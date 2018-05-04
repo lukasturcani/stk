@@ -232,8 +232,8 @@
 
 <span class="sd">Which functional groups are recognized by ``stk``?</span>
 
-<span class="sd">The module :mod:`.fg_info` defines the class :class:`.FGInfo` and a</span>
-<span class="sd">:class:`list` of instances of this class called</span>
+<span class="sd">The module :mod:`.functional_groups` defines the class :class:`.FGInfo`</span>
+<span class="sd">and a :class:`tuple` of instances of this class called</span>
 <span class="sd">:data:`functional_groups`. If you put an :class:`.FGInfo` instance into</span>
 <span class="sd">:data:`functional_groups`, the functional group will be recognized.</span>
 
@@ -243,7 +243,9 @@
 <span class="sd">    4. Using :class:`.FGInfo`, tag atoms in the building block as</span>
 <span class="sd">       either ``&#39;bonder&#39;`` or ``&#39;del&#39;``. ``&#39;bonder&#39;`` signifies that</span>
 <span class="sd">       the atoms form a bond during macromolecular assembly, while</span>
-<span class="sd">       ``&#39;del&#39;`` means they are deleted.</span>
+<span class="sd">       ``&#39;del&#39;`` means they are deleted. Also tag all atoms in the</span>
+<span class="sd">       functional group with the tag ``&#39;fg&#39;`` which holds the name</span>
+<span class="sd">       of the functional group.</span>
 
 <span class="sd">    5. Give the :class:`StructUnit` and :class:`.Topology` instances to</span>
 <span class="sd">       the macromolecule&#39;s initializer.</span>
@@ -267,18 +269,24 @@
 <span class="sd">       the :class:`.Topology` class used. However, the basic structure</span>
 <span class="sd">       is the same (steps 8 - 10).</span>
 
-<span class="sd">    8. Combine the ``rdkit`` molecules in :attr:`StructUnit.mol`</span>
-<span class="sd">       into a single ``rdkit`` molecule. Make sure that the building</span>
-<span class="sd">       blocks are arranged in the shape of the macromolecule. All the</span>
-<span class="sd">       manipulations available through :class:`StructUnit` are</span>
-<span class="sd">       useful here to make sure all building blocks are oriented</span>
-<span class="sd">       correctly when forming the macromolecule.</span>
+<span class="sd">    8. Use :meth:`.Topology.place_mols` to combine the ``rdkit``</span>
+<span class="sd">       molecules of all the building blocks into a single ``rdkit``</span>
+<span class="sd">       instance. The combined ``rdkit`` instance is placed into</span>
+<span class="sd">       ``macro_mol.mol``. :meth:`.Topology.place_mols` also gives</span>
+<span class="sd">       each functional group a unique id. Every atom in the</span>
+<span class="sd">       assembled molecule that belongs to a functional group is</span>
+<span class="sd">       given the tag ``&#39;fg_id&#39;``, whose value holds a unique id for</span>
+<span class="sd">       each functional group.</span>
 
-<span class="sd">    9. Create bonds between all the disjoined building block</span>
-<span class="sd">       molecules. This is where the tagging done by :class:`StructUnit`</span>
-<span class="sd">       is needed.</span>
+<span class="sd">    9. Use :meth:`.Topology.prepare` to run any additional operations</span>
+<span class="sd">       before joining up the building blocks and deleting extra</span>
+<span class="sd">       atoms, this method may do nothing.</span>
 
-<span class="sd">    10. Delete all atoms tagged for deletion.</span>
+<span class="sd">    10. Use :meth:`.Topology.bonded_fgs` to get the ids of functional</span>
+<span class="sd">        groups in the molecule to react using :func:`.react`.</span>
+
+<span class="sd">    11. Run :meth:`.Topology.cleanup` to perform any final operations</span>
+<span class="sd">        on the assembled molecule. Can be nothing.</span>
 
 <span class="sd">After all this you should have a ``rdkit`` instance of the</span>
 <span class="sd">macromolecule which should be placed into :attr:`MacroMolecule.mol`.</span>
@@ -318,11 +326,11 @@
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="k">import</span> <span class="n">euclidean_distances</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">ChainMap</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">signature</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">topologies</span>
-<span class="kn">from</span> <span class="nn">.fg_info</span> <span class="k">import</span> <span class="n">functional_groups</span>
+<span class="kn">from</span> <span class="nn">.functional_groups</span> <span class="k">import</span> <span class="n">functional_groups</span><span class="p">,</span> <span class="n">react</span>
 <span class="kn">from</span> <span class="nn">.energy</span> <span class="k">import</span> <span class="n">Energy</span>
 <span class="kn">import</span> <span class="nn">pywindow</span>
 <span class="kn">from</span> <span class="nn">..utilities</span> <span class="k">import</span> <span class="p">(</span><span class="n">flatten</span><span class="p">,</span>
@@ -434,6 +442,31 @@
 <span class="sd">    energy : :class:`.Energy`</span>
 <span class="sd">        Handles all things energy.</span>
 
+<span class="sd">    atom_props : :class:`dict`</span>
+<span class="sd">        Maps atom id to a :class:`dict` holding the ``rdkit`` atom</span>
+<span class="sd">        properties of the atom. For example</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            atom_props = {0: {&#39;bonder&#39;: 1,</span>
+<span class="sd">                              &#39;fg&#39;: &#39;amine&#39;,</span>
+<span class="sd">                              &#39;fg_id&#39;: 1},</span>
+<span class="sd">                          5: {&#39;fg&#39;: &#39;amine&#39;,</span>
+<span class="sd">                              &#39;fg_id&#39;: 2,</span>
+<span class="sd">                              &#39;del&#39;: 1}}</span>
+
+<span class="sd">    bonder_ids : :class:`list`</span>
+<span class="sd">        Holds the id of bonder atoms in a nested :class:`list`</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            bonder_ids = [[1, 3], [5, 6], [11, 14]]</span>
+
+<span class="sd">        This means atoms with ids ``1`` and ``3`` are bonder atoms with</span>
+<span class="sd">        ``fg_id`` of ``0``, atoms ``5`` and ``6`` are bonder atoms with</span>
+<span class="sd">        ``fg_id`` of ``1`` and ``11`` and ``14`` are bonder atoms with</span>
+<span class="sd">        ``fg_id`` of ``2``.</span>
+
 <span class="sd">    optimized : :class:`bool`</span>
 <span class="sd">        Indicates whether a :class:`Molecule` has been passed through</span>
 <span class="sd">        an optimization function or not.</span>
@@ -451,9 +484,10 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimized</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">Energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">note</span> <span class="o">=</span> <span class="n">note</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_atom_props</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Molecule.all_atom_coords"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.all_atom_coords">[docs]</a>    <span class="k">def</span> <span class="nf">all_atom_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -557,6 +591,52 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Molecule.bonder_centroids"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.bonder_centroids">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_centroids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the centriod of bonder atoms in each fg.</span>
+
+<span class="sd">        The centroids are yielded in order, with the centroid of</span>
+<span class="sd">        the functional group with ``fg_id`` of ``0`` first.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        :class:`numpy.array`</span>
+<span class="sd">            The bonder centroid of a functional group.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">)</span>
+                   <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Molecule.bonder_centroid"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.bonder_centroid">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the centroid of the bonder atoms.</span>
+
+<span class="sd">        The calculation has two stages. First, the centroids of</span>
+<span class="sd">        bonder atoms within the same functional groups are found.</span>
+<span class="sd">        Second, the centroid of the centroids found in stage 1 is</span>
+<span class="sd">        calculated and returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`numpy.array`</span>
+<span class="sd">            An array holding the midpoint of the bonder atoms.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroids</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Molecule._cavity_size"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule._cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">_cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -750,6 +830,68 @@
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Molecule.fg_centroid"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.fg_centroid">[docs]</a>    <span class="k">def</span> <span class="nf">fg_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fg_id</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The centroid of bonder atoms in a functional group.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fg_id : :class:`int`</span>
+<span class="sd">            The id of the functional group.</span>
+
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`numpy.array`</span>
+<span class="sd">            The coordinates of a bonder centroid.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        :class:`RuntimeError`</span>
+<span class="sd">            If `fg_id` is not found on any atoms.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">fg_id</span> <span class="ow">and</span>
+               <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">)):</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
+                <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;No fg_id of </span><span class="si">{fg_id}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">/</span> <span class="n">c</span></div>
+
+<div class="viewcode-block" id="Molecule.fg_distance"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.fg_distance">[docs]</a>    <span class="k">def</span> <span class="nf">fg_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The distance between the bonder centroids of two fgs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fg1 : :class:`int`</span>
+<span class="sd">            The ``fg_id`` of the first fg.</span>
+
+<span class="sd">        fg2 : :class:`int`</span>
+<span class="sd">            The ``fg_id`` of the second fg.</span>
+
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`float`</span>
+<span class="sd">            The distance between `fg1` and `fg2`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">c1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fg_centroid</span><span class="p">(</span><span class="n">fg1</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fg_centroid</span><span class="p">(</span><span class="n">fg2</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">euclidean</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Molecule.from_dict"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_dict</span><span class="p">,</span> <span class="n">optimized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -1053,9 +1195,9 @@
         <span class="c1"># Return the centroid of the molecule to the origin position.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">og_position</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Molecule.save_bonders"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.save_bonders">[docs]</a>    <span class="k">def</span> <span class="nf">save_bonders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.save_atom_props"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.save_atom_props">[docs]</a>    <span class="k">def</span> <span class="nf">save_atom_props</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds atoms tagged with &#39;bonder&#39; to `bonder_ids`.</span>
+<span class="sd">        Updates :attr:`atom_props` and :attr:`bonder_ids`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1063,11 +1205,23 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Clear the set in case the method is run twice.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_props</span> <span class="o">=</span> <span class="n">atom_props</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span></div>
+            <span class="n">atomid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetPropsAsDict</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">atom_props</span><span class="p">[</span><span class="n">atomid</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;bonder&#39;</span><span class="p">:</span>
+                    <span class="n">fg_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span>
+
+                    <span class="c1"># Make sure bonder_ids does not raise an index error.</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">fg_id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">diff</span> <span class="o">=</span> <span class="n">fg_id</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span>
+                        <span class="n">bonder_ids</span><span class="o">.</span><span class="n">extend</span><span class="p">([]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+
+                    <span class="n">bonder_ids</span><span class="p">[</span><span class="n">fg_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atomid</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Molecule.set_orientation"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.set_orientation">[docs]</a>    <span class="k">def</span> <span class="nf">set_orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1477,10 +1631,6 @@
 <span class="sd">        functional group which will react when the building block</span>
 <span class="sd">        assembles to form macromolecules.</span>
 
-<span class="sd">    bonder_ids : :class:`list` of :class:`int`</span>
-<span class="sd">        A :class:`list` holding the atom ids of the atoms which form</span>
-<span class="sd">        bonds during macromolecular assembly.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">init_funcs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;.mol&#39;</span><span class="p">:</span> <span class="n">partial</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromMolFile</span><span class="p">,</span>
@@ -1527,16 +1677,13 @@
         <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                   <span class="s1">&#39;Unable to initialize from &quot;</span><span class="si">{}</span><span class="s1">&quot; files.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ext</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to initialize from &quot;</span><span class="si">{ext}</span><span class="s1">&quot; files.&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">file</span><span class="p">)</span>
         <span class="c1"># Update the property cache of each atom. This updates things</span>
         <span class="c1"># like valence.</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">UpdatePropertyCache</span><span class="p">()</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="p">)</span>
 
         <span class="c1"># Define a generator which yields an ``FGInfo`` instance from</span>
         <span class="c1"># `functional_groups`. The yielded ``FGInfo``instance</span>
@@ -1567,6 +1714,8 @@
         <span class="c1"># which get removed.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_grp</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tag_atoms</span><span class="p">()</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="p">)</span>
 
 <div class="viewcode-block" id="StructUnit.init_random"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.init_random">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">init_random</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
@@ -1613,12 +1762,7 @@
 
 <div class="viewcode-block" id="StructUnit.all_bonder_distances"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.all_bonder_distances">[docs]</a>    <span class="k">def</span> <span class="nf">all_bonder_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Yield distances between all pairs of bonder atoms.</span>
-
-<span class="sd">        All distances are only yielded once. This means that if the</span>
-<span class="sd">        distance between atoms with ids ``1`` and ``2``is yielded as</span>
-<span class="sd">        ``(12.4, 1, 2)``, no tuple of the form ``(12.4, 2, 1)`` will be</span>
-<span class="sd">        yielded.</span>
+<span class="sd">        Yield distances between all pairs of bonder centroids.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1628,50 +1772,27 @@
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
 <span class="sd">        :class:`tuple`</span>
-<span class="sd">           A :class:`tuple` of the form</span>
-
-<span class="sd">           .. code-block:: python</span>
-
-<span class="sd">               (3, 54, 12.54)</span>
-
-<span class="sd">            The first two elements are the ids of the involved atoms</span>
-<span class="sd">            and the third element is the distance between them.</span>
+<span class="sd">            A :class:`tuple` of the form ``(3, 54, 12.54)``.</span>
+<span class="sd">            The first two elements are the ``fg_id`` of the involved</span>
+<span class="sd">            functional groups and the third element is the distance</span>
+<span class="sd">            between them.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Iterate through each pair of atoms - do not allow</span>
-        <span class="c1"># recombinations.</span>
-        <span class="k">for</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-                <span class="k">yield</span> <span class="p">(</span><span class="n">atom1</span><span class="p">,</span>
-                       <span class="n">atom2</span><span class="p">,</span>
-                       <span class="bp">self</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">conformer</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="StructUnit.bonder_centroid"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.bonder_centroid">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the centroid of the bonder atoms.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        conformer : :class:`int`, optional</span>
-<span class="sd">            The conformer to use.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        :class:`numpy.array`</span>
-<span class="sd">            An array holding the midpoint of the bonder atoms.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">centroid</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span> <span class="k">for</span>
-                       <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">centroid</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">))</span></div>
+        <span class="n">centroids</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroids</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">),</span> <span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">centroids</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">,</span> <span class="n">euclidean</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StructUnit.bonder_direction_vectors"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.bonder_direction_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_direction_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Yields the direction vectors between all pairs of bonder atoms.</span>
+<span class="sd">        Yields the direction vectors between bonder atoms.</span>
 
-<span class="sd">        The yielded vector is normalized. If the pair ``(1, 2)`` is</span>
-<span class="sd">        yielded, the pair ``(2, 1)`` will not be.</span>
+<span class="sd">        First the centroids of bonder atoms within the same functional</span>
+<span class="sd">        group are found. Then direction vectors between all pairs of</span>
+<span class="sd">        these centroids are yielded. Each pair is only yielded once.</span>
+
+<span class="sd">        The yielded vector is normalized.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1687,22 +1808,21 @@
 
 <span class="sd">                (3, 54, np.array([12.2, 43.3, 9.78]))</span>
 
-<span class="sd">            The first two elements of the tuple represent the ids of</span>
-<span class="sd">            the start and end atoms of the vector, respectively. The</span>
-<span class="sd">            array is the direction vector running between the atomic</span>
-<span class="sd">            positions.</span>
+<span class="sd">            The first two elements of the tuple represent the</span>
+<span class="sd">            ``fg_id`` of the start and end fgs of the vector,</span>
+<span class="sd">            respectively. The array is the direction vector running</span>
+<span class="sd">            between the functional group positions.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">for</span> <span class="n">atom1_id</span><span class="p">,</span> <span class="n">atom2_id</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
-            <span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
-
-            <span class="k">yield</span> <span class="n">atom2_id</span><span class="p">,</span> <span class="n">atom1_id</span><span class="p">,</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p2</span><span class="p">)</span></div>
+        <span class="n">centroids</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroids</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">),</span> <span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">centroids</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">id2</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">c1</span><span class="o">-</span><span class="n">c2</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StructUnit.bonder_position_matrix"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.bonder_position_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_position_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a matrix holding the positions of bonder atoms.</span>
+<span class="sd">        Returns a matrix holding the positions of bonder centroids.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1712,28 +1832,22 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`numpy.matrix`</span>
-<span class="sd">            The matrix has the shape ``[3, n``. Each column holds the</span>
-<span class="sd">            x, y and z coordinates of a bonder atom. The index of the</span>
-<span class="sd">            column corresponds to the index of the atom id in</span>
-<span class="sd">            :attr:`bonder_ids`.</span>
+<span class="sd">            The matrix has the shape ``[3, n]``. Each column holds the</span>
+<span class="sd">            x, y and z coordinates of a bonder centroid. The index of</span>
+<span class="sd">            the column corresponds to the ``fg_id`` of the bonder</span>
+<span class="sd">            centroid.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">pos_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
-
-        <span class="k">for</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">:</span>
-            <span class="n">pos_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)])</span>
-            <span class="n">pos_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos_array</span><span class="p">,</span> <span class="n">pos_vect</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">pos_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroids</span><span class="p">(</span><span class="n">conformer</span><span class="p">)))</span><span class="o">.</span><span class="n">T</span></div>
 
 <div class="viewcode-block" id="StructUnit.centroid_centroid_dir_vector"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.centroid_centroid_dir_vector">[docs]</a>    <span class="k">def</span> <span class="nf">centroid_centroid_dir_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the direction vector between the 2 molecular centroids.</span>
 
 <span class="sd">        The first molecular centroid is the centroid of the entire</span>
-<span class="sd">        molecule. The second molecular centroid is the centroid of the</span>
-<span class="sd">        bonder atoms.</span>
+<span class="sd">        molecule. The second molecular centroid is given by</span>
+<span class="sd">        :meth:`bonder_centroid`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
@@ -1783,7 +1897,6 @@
             <span class="n">atomid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_core_atom</span><span class="p">(</span><span class="n">atomid</span><span class="p">):</span>
                 <span class="n">emol</span><span class="o">.</span><span class="n">RemoveAtom</span><span class="p">(</span><span class="n">atomid</span><span class="p">)</span>
-                <span class="k">continue</span>
         <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="StructUnit.functional_group_atoms"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.functional_group_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">functional_group_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1817,7 +1930,7 @@
 
 <div class="viewcode-block" id="StructUnit.is_core_atom"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.is_core_atom">[docs]</a>    <span class="k">def</span> <span class="nf">is_core_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns ``True`` if atom is not H or part of the fg.</span>
+<span class="sd">        Returns ``True`` if atom is not H or part of a fg.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1832,13 +1945,13 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Tags are removed by multiprocessing - make sure to reapply</span>
-        <span class="c1"># them.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tag_atoms</span><span class="p">()</span>
         <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atomid</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+        <span class="k">if</span> <span class="n">atomid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_props</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="s1">&#39;fg&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_props</span><span class="p">[</span><span class="n">atomid</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="StructUnit.json"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.json">[docs]</a>    <span class="k">def</span> <span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2126,9 +2239,9 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The difference between this method and</span>
-<span class="sd">        :meth:`~Molecule.set_orientation` is about which point the rotation</span>
-<span class="sd">        occurs: centroid of bonder atoms versus centroid of entire</span>
-<span class="sd">        molecule, respectively.</span>
+<span class="sd">        :meth:`~Molecule.set_orientation` is about which point the</span>
+<span class="sd">        rotation occurs: centroid of bonder atoms versus centroid of</span>
+<span class="sd">        entire molecule, respectively.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2218,19 +2331,19 @@
 
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">similarities</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="StructUnit.smarts_init"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.smarts_init">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">smarts_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                    <span class="n">smarts</span><span class="p">,</span>
+<div class="viewcode-block" id="StructUnit.smiles_init"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.smiles_init">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">smiles_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                    <span class="n">smiles</span><span class="p">,</span>
                     <span class="n">functional_group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize from a SMARTS string.</span>
+<span class="sd">        Initialize from a SMILES string.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        smiles : :class:`str`</span>
-<span class="sd">            A SMARTS string of the molecule.</span>
+<span class="sd">            A SMILES string of the molecule.</span>
 
 <span class="sd">        functional_group : :class:`str`, optional</span>
 <span class="sd">            The name of the functional group which is to have atoms</span>
@@ -2251,17 +2364,16 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="n">smarts</span><span class="p">)</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
         <span class="n">rdkit</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
         <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
         <span class="n">key</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">gen_key</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">functional_group</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span> <span class="ow">and</span> <span class="n">CACHE_SETTINGS</span><span class="p">[</span><span class="s1">&#39;ON&#39;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-        <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-        <span class="n">Molecule</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">smarts</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">smiles</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">func_grp</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">functional_groups</span> <span class="k">if</span>
@@ -2269,21 +2381,25 @@
         <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">func_grp</span><span class="p">:</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">tag_atoms</span><span class="p">()</span>
 
+        <span class="n">Molecule</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
         <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="StructUnit.tag_atoms"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.tag_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">tag_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds bonding and deletion tags to atoms.</span>
+<span class="sd">        Adds atom properties to atoms.</span>
 
 <span class="sd">        All atoms which form the functional group of the molecule have</span>
 <span class="sd">        the property ``&#39;fg&#39;`` added. Its value is set to the name of</span>
-<span class="sd">        the functional group.</span>
+<span class="sd">        the functional group. In addition each such atom is given</span>
+<span class="sd">        the property ``&#39;fg_id&#39;`` which is unique to each functional</span>
+<span class="sd">        group.</span>
 
 <span class="sd">        The atoms which form bonds during assembly have the property</span>
-<span class="sd">        called ``&#39;bonder&#39;`` added and set to ``&#39;1&#39;``. Atoms which are</span>
+<span class="sd">        called ``&#39;bonder&#39;`` added and set to ``1``. Atoms which are</span>
 <span class="sd">        deleted during reactions have the property ``&#39;del&#39;`` set to</span>
-<span class="sd">        ``&#39;1&#39;``.</span>
+<span class="sd">        ``1``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2291,14 +2407,11 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Clear this list in case the method is being rerun.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="c1"># Give all atoms in functional groups the tag &#39;fg&#39; and set its</span>
-        <span class="c1"># value to the name of the functional group.</span>
-        <span class="k">for</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">()):</span>
-            <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
-            <span class="n">atom</span><span class="o">.</span><span class="n">SetProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_grp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">fg_id</span><span class="p">,</span> <span class="n">fg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="n">fg</span><span class="p">:</span>
+                <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">SetProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_grp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">SetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">,</span> <span class="n">fg_id</span><span class="p">)</span>
 
         <span class="c1"># Give all atoms which form bonds during reactions the tag</span>
         <span class="c1"># &#39;bonder&#39; and set its value to &#39;1&#39;. Add their ids to</span>
@@ -2307,8 +2420,7 @@
         <span class="n">bond_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">bond_mol</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">bond_atoms</span><span class="p">):</span>
             <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
-            <span class="n">atom</span><span class="o">.</span><span class="n">SetProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">SetIntProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># Give all atoms which form bonds during reactions the tag</span>
         <span class="c1"># &#39;del&#39; and set its value to &#39;1&#39;.</span>
@@ -2316,7 +2428,7 @@
         <span class="n">del_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">del_mol</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">del_atoms</span><span class="p">):</span>
             <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
-            <span class="n">atom</span><span class="o">.</span><span class="n">SetProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span></div>
+            <span class="n">atom</span><span class="o">.</span><span class="n">SetIntProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StructUnit.untag_atoms"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.untag_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">untag_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2328,12 +2440,11 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
-
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">ClearProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">)</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">ClearProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">)</span>
-            <span class="n">atom</span><span class="o">.</span><span class="n">ClearProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">)</span></div>
+            <span class="n">atom</span><span class="o">.</span><span class="n">ClearProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">)</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">ClearProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">))</span>
@@ -2354,7 +2465,7 @@
 
 <span class="sd">        The molecule is rotated about the centroid of the bonder atoms.</span>
 <span class="sd">        It is rotated so that the direction vector running between the</span>
-<span class="sd">        2 bonder atoms is aligned with the vector `end`.</span>
+<span class="sd">        2 bonder centroids is aligned with the vector `end`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2415,7 +2526,7 @@
 
 <div class="viewcode-block" id="StructUnit3.bonder_plane"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3.bonder_plane">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the coefficients of the plane formed by bonder atoms.</span>
+<span class="sd">        Returns coeffs of the plane formed by the bonder centroids.</span>
 
 <span class="sd">        A plane is defined by the scalar plane equation::</span>
 
@@ -2423,13 +2534,13 @@
 
 <span class="sd">        This method returns the ``a``, ``b``, ``c`` and ``d``</span>
 <span class="sd">        coefficients of this equation for the plane formed by the</span>
-<span class="sd">        bonder atoms. The coefficents ``a``, ``b`` and ``c`` decribe</span>
-<span class="sd">        the normal vector to the plane. The coefficent ``d`` is found</span>
-<span class="sd">        by substituting these coefficients along with the ``x``, ``y``</span>
-<span class="sd">        and ``z`` variables in the scalar equation and solving for</span>
-<span class="sd">        ``d``. The variables ``x``, ``y`` and ``z`` are substituted by</span>
-<span class="sd">        the coordinates of some point on the plane. For example, the</span>
-<span class="sd">        position of one of the bonder atoms.</span>
+<span class="sd">        bonder centroids. The coefficents ``a``, ``b`` and ``c``</span>
+<span class="sd">        describe the normal vector to the plane. The coefficent ``d``</span>
+<span class="sd">        is found by substituting these coefficients along with the</span>
+<span class="sd">        ``x``, ``y`` and ``z`` variables in the scalar equation and</span>
+<span class="sd">        solving for ``d``. The variables ``x``, ``y`` and ``z`` are</span>
+<span class="sd">        substituted by the coordinates of some point on the plane. For</span>
+<span class="sd">        example, the position of one of the bonder centroids.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2440,7 +2551,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            This array has the form ``[a, b, c, d]`` and represents the</span>
-<span class="sd">            scalar equation of the plane formed by the bonder atoms.</span>
+<span class="sd">            scalar equation of the plane formed by the bonder</span>
+<span class="sd">            centroids.</span>
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
@@ -2448,13 +2560,13 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">bonder_coord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">conformer</span><span class="p">)</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_plane_normal</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span> <span class="o">*</span> <span class="n">bonder_coord</span><span class="p">)</span>
+        <span class="n">centroid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroids</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_plane_normal</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span> <span class="o">*</span> <span class="n">centroid</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_plane_normal</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span> <span class="n">d</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StructUnit3.bonder_plane_normal"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3.bonder_plane_normal">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_plane_normal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the normal vector to the plane formed by bonder atoms.</span>
+<span class="sd">        Returns the normal to the plane formed by bonder centroids.</span>
 
 <span class="sd">        The normal of the plane is defined such that it goes in the</span>
 <span class="sd">        direction toward the centroid of the molecule.</span>
@@ -2468,7 +2580,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            A unit vector which describes the normal to the plane of</span>
-<span class="sd">            the bonder atoms.</span>
+<span class="sd">            the bonder centroids.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2489,17 +2601,19 @@
 
         <span class="k">return</span> <span class="n">normal_v</span></div>
 
-<div class="viewcode-block" id="StructUnit3.minimize_theta2"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3.minimize_theta2">[docs]</a>    <span class="k">def</span> <span class="nf">minimize_theta2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit3.minimize_theta2"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3.minimize_theta2">[docs]</a>    <span class="k">def</span> <span class="nf">minimize_theta2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fg_id</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Rotates molecule to minimize angle between `atom` and `vector`.</span>
+<span class="sd">        Rotate molecule to minimize angle between `fg_id` and `vector`.</span>
 
 <span class="sd">        The rotation is done about `axis` and is centered on the</span>
-<span class="sd">        bonder centroid.</span>
+<span class="sd">        bonder centroid, as given by</span>
+<span class="sd">        :meth:`~.StructUnit.bonder_centroid`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        atom : :class:`int`</span>
-<span class="sd">            The id of atom which is to have angle minimized.</span>
+<span class="sd">        fg_id : :class:`int`</span>
+<span class="sd">            The id of functional group which is to have angle</span>
+<span class="sd">            minimized.</span>
 
 <span class="sd">        vector : :class:`numpy.array`</span>
 <span class="sd">            A vector with which the angle is minimized.</span>
@@ -2516,28 +2630,28 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span> <span class="o">-</span>
-              <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span>
-                            <span class="n">vector</span><span class="p">,</span>
-                            <span class="n">axis</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span>
-                            <span class="n">conformer</span><span class="p">)</span></div>
+        <span class="n">centroid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+
+        <span class="n">fg_centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroids</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">fg_id</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">fg_centroid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fg_centroids</span><span class="p">)</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">fg_centroid</span> <span class="o">-</span> <span class="n">centroid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">centroid</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StructUnit3.set_orientation2"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3.set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates the molecule so the plane normal is aligned with `end`.</span>
 
 <span class="sd">        Here &quot;plane normal&quot; referes to the normal of the plane formed</span>
-<span class="sd">        by the bonder atoms. The molecule is rotated about the centroid</span>
-<span class="sd">        of the bonder atoms. The rotation results in the normal of</span>
-<span class="sd">        their plane being aligned with `end`.</span>
+<span class="sd">        by the bonder centroids. The molecule is rotated about</span>
+<span class="sd">        :meth:`~Molecule.bonder_centroid`. The rotation results in the</span>
+<span class="sd">        normal of the plane being aligned with `end`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        end : :class:`numpy.array`</span>
-<span class="sd">            The vector with which the normal of plane of bonder atoms</span>
-<span class="sd">            shoould be aligned.</span>
+<span class="sd">            The vector with which the normal of plane of bonder</span>
+<span class="sd">            centroids shoould be aligned.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The conformer to use.</span>
@@ -2619,38 +2733,8 @@
 <span class="sd">            unscaled_fitness = {&#39;fitness_func1&#39;: [8, 49]</span>
 <span class="sd">                                &#39;fitness_func2&#39;: [78, 4.2, 32.3]}</span>
 
-
 <span class="sd">    bonds_made : :class:`int`</span>
 <span class="sd">        The number of bonds made during assembly.</span>
-
-<span class="sd">    bonder_ids : :class:`list` of :class:`int`</span>
-<span class="sd">        The ids of atoms which have bonds added during assembly. Sorted</span>
-<span class="sd">        from lowest to highest id.</span>
-
-<span class="sd">    fg_ids : :class:`set` of :class:`int`</span>
-<span class="sd">        The ids of atoms which were part of the functional group of</span>
-<span class="sd">        the building blocks.</span>
-
-<span class="sd">    fragments : :class:`dict`</span>
-<span class="sd">        The :class:`dict` has the form</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">            fragments = {(0, 0): {1, 2, 3, 4},</span>
-<span class="sd">                         (0, 1): {5, 6, 7, 8},</span>
-<span class="sd">                         (1, 0): {9, 10, 11},</span>
-<span class="sd">                         (1, 1): {12, 13, 14},</span>
-<span class="sd">                         (1, 2): {15, 16, 17}}</span>
-
-<span class="sd">        The key in this dictionary is a tuple of form ``(5, 2)``. The</span>
-<span class="sd">        first element is the index of a building block within</span>
-<span class="sd">        :attr:`building_blocks`. The second element indentifies a</span>
-<span class="sd">        molecule of that building block. For example, ``(1, 3)``</span>
-<span class="sd">        identifies the 4th molecule of  ``building_blocks[1]`` to be</span>
-<span class="sd">        added to the macromolecule during assembly.</span>
-
-<span class="sd">        The value in the dictionary is a set of ints. These hold the</span>
-<span class="sd">        atom ids belonging to a particular molecule before assembly.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -2696,9 +2780,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">building_blocks</span> <span class="o">=</span> <span class="n">building_blocks</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bb_counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">topology</span> <span class="o">=</span> <span class="n">topology</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fg_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonds_made</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Ask the ``Topology`` instance to assemble/build the</span>
@@ -2728,7 +2809,6 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errormsg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_ids</span><span class="p">()</span>
 
 <div class="viewcode-block" id="MacroMolecule.add_conformer"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.add_conformer">[docs]</a>    <span class="k">def</span> <span class="nf">add_conformer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bb_conformers</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2808,13 +2888,15 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">for</span> <span class="p">(</span><span class="n">bb_index</span><span class="p">,</span> <span class="n">mol_index</span><span class="p">),</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">props</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># Ignore fragments which do not correspond to the molecule</span>
             <span class="c1"># `bb`.</span>
-            <span class="k">if</span> <span class="n">bb_index</span> <span class="o">!=</span> <span class="n">bb</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">props</span><span class="p">[</span><span class="s1">&#39;bb_index&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">bb</span> <span class="ow">or</span> <span class="n">props</span><span class="p">[</span><span class="s1">&#39;mol_index&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="c1"># For each fragment make a new core. To preserver bond</span>
+            <span class="n">done</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;mol_index&#39;</span><span class="p">])</span>
+            <span class="c1"># For each fragment make a new core. To preserve bond</span>
             <span class="c1"># information, start with the macromolecule.</span>
             <span class="n">coremol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
             <span class="c1"># Remove any atoms not part of the core - atoms not in the</span>
@@ -2822,9 +2904,13 @@
             <span class="c1"># group.</span>
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()):</span>
                 <span class="n">atomid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">atomid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">atoms</span> <span class="ow">or</span>
-                    <span class="n">atomid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fg_ids</span> <span class="ow">or</span>
-                   <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">bb_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_props</span><span class="p">[</span><span class="n">atomid</span><span class="p">][</span><span class="s1">&#39;bb_index&#39;</span><span class="p">]</span>
+                <span class="n">mol_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_props</span><span class="p">[</span><span class="n">atomid</span><span class="p">][</span><span class="s1">&#39;mol_index&#39;</span><span class="p">]</span>
+                <span class="n">fg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_props</span><span class="p">[</span><span class="n">atomid</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">bb_index</span> <span class="o">!=</span> <span class="n">props</span><span class="p">[</span><span class="s1">&#39;bb_index&#39;</span><span class="p">]</span> <span class="ow">or</span>
+                    <span class="n">mol_index</span> <span class="o">!=</span> <span class="n">props</span><span class="p">[</span><span class="s1">&#39;mol_index&#39;</span><span class="p">]</span> <span class="ow">or</span>
+                    <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span>
+                   <span class="n">fg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
                     <span class="n">coremol</span><span class="o">.</span><span class="n">RemoveAtom</span><span class="p">(</span><span class="n">atomid</span><span class="p">)</span>
             <span class="k">yield</span> <span class="n">coremol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
 
@@ -2859,8 +2945,6 @@
             <span class="s1">&#39;bb_counter&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="n">key</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span>
             <span class="s1">&#39;bonds_made&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds_made</span><span class="p">,</span>
-            <span class="s1">&#39;bonder_ids&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">,</span>
-            <span class="s1">&#39;fg_ids&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fg_ids</span><span class="p">),</span>
             <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
             <span class="s1">&#39;mol_block&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">(),</span>
             <span class="s1">&#39;building_blocks&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">json</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
@@ -2870,9 +2954,7 @@
             <span class="s1">&#39;progress_params&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_params</span><span class="p">,</span>
             <span class="s1">&#39;note&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">,</span>
             <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="s1">&#39;fragments&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span>
-                          <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-                          <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+            <span class="s1">&#39;atom_props&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_props</span>
 
         <span class="p">}</span></div>
 
@@ -2918,19 +3000,23 @@
                                   <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;bb_counter&#39;</span><span class="p">]})</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">bonds_made</span> <span class="o">=</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;bonds_made&#39;</span><span class="p">]</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">Energy</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;bonder_ids&#39;</span><span class="p">]</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">fg_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;fg_ids&#39;</span><span class="p">])</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">optimized</span> <span class="o">=</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;optimized&#39;</span><span class="p">]</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">note</span> <span class="o">=</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;note&#39;</span><span class="p">]</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;load_names&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">building_blocks</span> <span class="o">=</span> <span class="n">bbs</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">fragments</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">fragments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span>
-            <span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;()&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
-             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;fragments&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-            <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;fragments&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="p">))</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">atom_props</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span>
+                          <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;atom_props&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+        <span class="c1"># Remake bonder_ids</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">props</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">atom_props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s1">&#39;bonder&#39;</span> <span class="ow">in</span> <span class="n">props</span><span class="p">:</span>
+                <span class="n">fg_id</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="s1">&#39;fg_id&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">fg_id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">diff</span> <span class="o">=</span> <span class="n">fg_id</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span>
+                    <span class="n">bonder_ids</span><span class="o">.</span><span class="n">extend</span><span class="p">([]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+                <span class="n">bonder_ids</span><span class="p">[</span><span class="n">fg_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">CACHE_SETTINGS</span><span class="p">[</span><span class="s1">&#39;ON&#39;</span><span class="p">]:</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
@@ -3012,25 +3098,6 @@
                 <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">rmsd</span> <span class="o">/</span> <span class="n">n</span></div>
 
-<div class="viewcode-block" id="MacroMolecule.save_ids"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.save_ids">[docs]</a>    <span class="k">def</span> <span class="nf">save_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Updates `bonder_ids` and `fg_ids` attributes.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        None : :class:`NoneType`</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fg_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
-            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fg_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span></div>
-
 <div class="viewcode-block" id="MacroMolecule.update_cache"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.update_cache">[docs]</a>    <span class="k">def</span> <span class="nf">update_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update attributes of cached molecule.</span>
@@ -3050,30 +3117,6 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="MacroMolecule.update_fragments"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.update_fragments">[docs]</a>    <span class="k">def</span> <span class="nf">update_fragments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Saves ``rdkit`` atom properties in :attr:`fragments`.</span>
-
-<span class="sd">        The properties saved are ``&#39;bb_index&#39;`` and ``&#39;mol_index&#39;``.</span>
-<span class="sd">        These should be added to the atoms by</span>
-<span class="sd">        :meth:`.Topology.place_mols` when running</span>
-<span class="sd">        :meth:`.Topology.build`.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        None : :class:`NoneType`</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bb_index&#39;</span><span class="p">):</span>
-                <span class="k">continue</span>
-
-            <span class="n">molkey</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetProp</span><span class="p">(</span><span class="s1">&#39;bb_index&#39;</span><span class="p">)),</span>
-                      <span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetProp</span><span class="p">(</span><span class="s1">&#39;mol_index&#39;</span><span class="p">)))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="p">[</span><span class="n">molkey</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span></div>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">fitness</span>
@@ -3262,9 +3305,6 @@
 <span class="sd">    with additional methods and attributes relevant to periodic</span>
 <span class="sd">    materials being added.</span>
 
-<span class="sd">    The method :meth:`~.MacroMolecule.save_ids` is extended to take</span>
-<span class="sd">    into account ids of atoms in perdiodic bonds.</span>
-
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    deleters : :class:`dict`</span>
@@ -3301,67 +3341,12 @@
 <span class="sd">        ``a`` the second is ``b`` and the third is ``c``. This should</span>
 <span class="sd">        be added during the build process by the periodic topology.</span>
 
-<span class="sd">    _ids_updated : :class:`bool`</span>
-<span class="sd">        Indicates whether periodic bond ids have been updated already</span>
-<span class="sd">        by :meth:`save_ids`.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ids_updated</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Periodic._is_subterminal"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic._is_subterminal">[docs]</a>    <span class="k">def</span> <span class="nf">_is_subterminal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span> <span class="n">bonded</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        ``True`` if atom is bonded to a terminal one.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        For internal use by :meth:`island`.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        atom_id : :class:`int`</span>
-<span class="sd">            The id of the atom being checked.</span>
-
-<span class="sd">        bonder_map : :class:`dict`</span>
-<span class="sd">            A dictionary which maps the atom id in the island to the</span>
-<span class="sd">            equivalent bonder atom in the unit cell.</span>
-
-<span class="sd">        bonded : :class:`set`</span>
-<span class="sd">            A set of atom ids of all bonder atoms which have had a</span>
-<span class="sd">            bond added by :meth:`_join_island`.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        :class:`bool`</span>
-<span class="sd">            ``True`` if atom is bonded to a terminal atom, ``False``</span>
-<span class="sd">            otherwise.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># If `atom_id` is not in the `bonder_map` it means that the</span>
-        <span class="c1"># atom is not a bonder and therefore no terminal atoms need to</span>
-        <span class="c1"># be added to it.</span>
-        <span class="k">if</span> <span class="n">atom_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bonder_map</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="c1"># Get id of the equivalent bonder atom in the original unit</span>
-        <span class="c1"># cell.</span>
-        <span class="n">bid</span> <span class="o">=</span> <span class="n">bonder_map</span><span class="p">[</span><span class="n">atom_id</span><span class="p">]</span>
-        <span class="c1"># Make a set of all bonder atoms in the original unit cell</span>
-        <span class="c1"># which were registered as having bonds crossing periodic</span>
-        <span class="c1"># boundaries.</span>
-        <span class="n">periodic</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">atom1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="p">}</span>
-        <span class="n">periodic</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">atom2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="p">)</span>
-        <span class="c1"># If that atom does have a periodic bond and has not had a</span>
-        <span class="c1"># bond added while building the island - it is subterminal and</span>
-        <span class="c1"># needs to have a terminal atom attached.</span>
-        <span class="k">if</span> <span class="n">bid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">periodic</span> <span class="ow">or</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="n">bonded</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="Periodic.island"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic.island">[docs]</a>    <span class="k">def</span> <span class="nf">island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3376,14 +3361,6 @@
 <span class="sd">            A 3 member :class:`list`, holding the number of unit cells</span>
 <span class="sd">            in the x, y and z directions used to make the supercell.</span>
 
-<span class="sd">        terminator : :class:`int`, optional</span>
-<span class="sd">            The atomic number of the terminating atoms added to the</span>
-<span class="sd">            supercell.</span>
-
-<span class="sd">        bond_type : :class:`str`, optional</span>
-<span class="sd">            The bond type of bonds to terminating atoms. Valid options</span>
-<span class="sd">            include ``&#39;1&#39;``, ``&#39;2&#39;``, ``&#39;3&#39;`` and ``&#39;ar&#39;``.</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
@@ -3391,9 +3368,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place_island</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
-        <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_join_island</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminate_island</span><span class="p">(</span><span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">)</span></div>
+        <span class="n">cells</span><span class="p">,</span> <span class="n">island</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place_island</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_join_island</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Periodic._join_island"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic._join_island">[docs]</a>    <span class="k">def</span> <span class="nf">_join_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3414,34 +3390,28 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`tuple`</span>
-<span class="sd">            The first member of the tuple an ``rdkit`` molecule of the</span>
-<span class="sd">            island with all bonds between the unit cells added. The</span>
-<span class="sd">            second member of the tuple is a :class:`set` of</span>
-<span class="sd">            :class:`int`, where each :class:`int` is id of a bonder</span>
-<span class="sd">            atom which had a bond added by this function.</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The island with bonds added.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">island</span><span class="p">)</span>
-        <span class="n">bonded</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="c1"># `self.periodic_bonds` holds objects of the</span>
         <span class="c1"># ``PeriodicBond`` class. Each ``PeriodicBond`` object has the</span>
-        <span class="c1"># ids of two bonder atoms in the unit cell which are connected</span>
+        <span class="c1"># ids of two fgs in the unit cell which are connected</span>
         <span class="c1"># by a bond running across the periodic boundary. The</span>
         <span class="c1"># `direction` attribute descibes the axes along which the</span>
         <span class="c1"># bond is periodic. For example, if `direction1` is [1, 0, 0]</span>
-        <span class="c1"># it means that the bonder atom in `periodic_bond.atom1` has a</span>
-        <span class="c1"># perdiodic bond connecting it to `periodic_bond.atom2` going</span>
+        <span class="c1"># it means that the fg in `periodic_bond.fg1` has a</span>
+        <span class="c1"># perdiodic bond connecting it to `periodic_bond.fg2` going</span>
         <span class="c1"># in the positive direction along the x-axis.</span>
 
         <span class="c1"># When iterating through all the unit cells composing the</span>
         <span class="c1"># island, you can use the `direction` vector to get index of</span>
-        <span class="c1"># the unit cell which holds atoms connected the present cell.</span>
-        <span class="c1"># Then just form bonds between the correct atoms by mapping</span>
-        <span class="c1"># the atom ids in the unit cells to the ids of the equivalent</span>
-        <span class="c1"># atoms in the original unit cell  and checking the</span>
-        <span class="c1"># `periodic_bond` to see which atom ids are connected.</span>
+        <span class="c1"># the unit cell which holds fg connected the present cell.</span>
+        <span class="c1"># Then just form bonds between the correct fgs by mapping</span>
+        <span class="c1"># the fg ids in the unit cells to the ids of the equivalent</span>
+        <span class="c1"># fgs in the original unit cell  and checking the</span>
+        <span class="c1"># `periodic_bond` to see which fg ids are connected.</span>
         <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">cells</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">periodic_bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="p">:</span>
 
@@ -3454,92 +3424,22 @@
                     <span class="n">y</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span>
                    <span class="n">z</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])):</span>
                     <span class="k">continue</span>
+
                 <span class="c1"># ccel as in &quot;connected cell&quot;.</span>
                 <span class="n">ccell</span> <span class="o">=</span> <span class="n">cells</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">][</span><span class="n">z</span><span class="p">]</span>
 
-                <span class="c1"># `bonder1` is the id of a bonder atom, found in `cell`</span>
-                <span class="c1"># and equivalent to `periodic_bond.atom1`, having a</span>
+                <span class="c1"># `fg1` is the id of a fg, found in `cell`</span>
+                <span class="c1"># and equivalent to `periodic_bond.fg1`, having a</span>
                 <span class="c1"># bond added.</span>
-                <span class="n">bonder1</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="n">periodic_bond</span><span class="o">.</span><span class="n">atom1</span><span class="p">]</span>
-                <span class="c1"># `bonder2` is the id of a bonder atom, found in</span>
-                <span class="c1"># `ccell` and equivalent to `periodic_bond.atom2`,</span>
+                <span class="n">fg1</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">fgs</span><span class="p">[</span><span class="n">periodic_bond</span><span class="o">.</span><span class="n">fg1</span><span class="p">]</span>
+                <span class="c1"># `fg2` is the id of a fg, found in</span>
+                <span class="c1"># `ccell` and equivalent to `periodic_bond.fg2`,</span>
                 <span class="c1"># having a bond added.</span>
-                <span class="n">bonder2</span> <span class="o">=</span> <span class="n">ccell</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="n">periodic_bond</span><span class="o">.</span><span class="n">atom2</span><span class="p">]</span>
-                <span class="n">bond_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">determine_bond_type</span><span class="p">(</span>
-                              <span class="bp">self</span><span class="p">,</span>
-                              <span class="n">periodic_bond</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span>
-                              <span class="n">periodic_bond</span><span class="o">.</span><span class="n">atom2</span><span class="p">)</span>
-                <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">)</span>
-                <span class="n">bonded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder1</span><span class="p">)</span>
-                <span class="n">bonded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder2</span><span class="p">)</span>
+                <span class="n">fg2</span> <span class="o">=</span> <span class="n">ccell</span><span class="o">.</span><span class="n">fgs</span><span class="p">[</span><span class="n">periodic_bond</span><span class="o">.</span><span class="n">fg2</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">(),</span> <span class="n">bonded</span></div>
+                <span class="n">island</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">react</span><span class="p">(</span><span class="n">island</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Periodic._terminate_island"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic._terminate_island">[docs]</a>    <span class="k">def</span> <span class="nf">_terminate_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds atoms to all bonder atoms at the edges of `island`.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        For internal use by :meth:`island`.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        island : :class:`rdkit.Chem.rdchem.Mol`</span>
-<span class="sd">            The island molecule which needs to have terminating atoms</span>
-<span class="sd">            added.</span>
-
-<span class="sd">        bonded : :class:`set` of :class:`int`</span>
-<span class="sd">            Contains all the ids of all bonder atoms in `island` which</span>
-<span class="sd">            have already had a bonded added by :meth:`_join_island`.</span>
-
-<span class="sd">        bonder_map : :class:`dict`</span>
-<span class="sd">            This is a mapping of the ids of bonder atoms in the island</span>
-<span class="sd">            back to the id of the equivalent atom in the original unit</span>
-<span class="sd">            cell.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
-<span class="sd">            The ``rdkit`` molecule of the final, assembled island.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">iconf</span> <span class="o">=</span> <span class="n">island</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
-        <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">island</span><span class="p">)</span>
-        <span class="n">coords</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">island</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
-            <span class="n">atom_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
-            <span class="c1"># If the atom is not connected to a terminal atom, move on</span>
-            <span class="c1"># to the next one.</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_subterminal</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span> <span class="n">bonded</span><span class="p">):</span>
-                <span class="k">continue</span>
-
-            <span class="c1"># Get the id of bonder atom in the original unit cell</span>
-            <span class="c1"># which is equivalent to `atom`.</span>
-            <span class="n">bi</span> <span class="o">=</span> <span class="n">bonder_map</span><span class="p">[</span><span class="n">atom_id</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">rcoords</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">bond_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deleters</span><span class="p">[</span><span class="n">bi</span><span class="p">]:</span>
-                <span class="n">tid</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">element</span><span class="p">))</span>
-                <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">tid</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">)</span>
-
-                <span class="c1"># Using the equivalent bonder atom get the position</span>
-                <span class="c1"># of the terminating atom relative to the bonder atom. Add</span>
-                <span class="c1"># the relative position of the terminating atom and the</span>
-                <span class="c1"># position of `atom` to get the final position of the</span>
-                <span class="c1"># terminating atom.</span>
-                <span class="n">tcoords</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">iconf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">))</span> <span class="o">+</span>
-                           <span class="n">rcoords</span><span class="p">)</span>
-                <span class="n">rdkit_coords</span> <span class="o">=</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">tcoords</span><span class="p">)</span>
-                <span class="n">coords</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">=</span> <span class="n">rdkit_coords</span>
-
-        <span class="n">mol</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span>
-        <span class="n">conf</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
-        <span class="c1"># Update the positions of all the terminating atoms in the</span>
-        <span class="c1"># conformer.</span>
-        <span class="k">for</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">atom_coords</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">atom_coords</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">mol</span></div>
+        <span class="k">return</span> <span class="n">island</span></div>
 
 <div class="viewcode-block" id="Periodic._place_island"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic._place_island">[docs]</a>    <span class="k">def</span> <span class="nf">_place_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3575,58 +3475,37 @@
 
 <span class="sd">            The second member is an ``rdkit`` molecule of the island</span>
 <span class="sd">            being built. The third member is a :class:`dict` mapping</span>
-<span class="sd">            the ids of bonder atoms in the island back to the id of the</span>
-<span class="sd">            equivalent atom in the original unit cell.</span>
+<span class="sd">            the ids of fgs in the island back to the id of the</span>
+<span class="sd">            equivalent fg in the original unit cell.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_dimensions</span>
         <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="n">island</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
-        <span class="n">bonder_map</span> <span class="o">=</span> <span class="n">ChainMap</span><span class="p">()</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">xdim</span><span class="p">,</span> <span class="n">ydim</span><span class="p">,</span> <span class="n">zdim</span> <span class="o">=</span> <span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">)</span>
+        <span class="n">nfgs</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">))</span>
         <span class="c1"># For each dimension place a unit cell.</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
-                    <span class="n">island</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span>
-                                <span class="n">island</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">a</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">b</span> <span class="o">+</span> <span class="n">z</span><span class="o">*</span><span class="n">c</span><span class="p">))</span>
-                    <span class="c1"># `bonders` maps a bonder id in the original unit</span>
-                    <span class="c1"># cell to the one currently being added to the</span>
-                    <span class="c1"># island.</span>
-                    <span class="n">bonders</span> <span class="o">=</span> <span class="p">{</span><span class="n">bi</span><span class="p">:</span> <span class="n">i</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span> <span class="o">+</span> <span class="n">bi</span> <span class="k">for</span>
-                               <span class="n">bi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">}</span>
-                    <span class="n">cells</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">][</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">Cell</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">bonders</span><span class="p">)</span>
-                    <span class="c1"># &#39;bonder_map&#39; maps all bonder ids in the island</span>
-                    <span class="c1"># to the bonder ids in the original unit cell.</span>
-                    <span class="n">inverse_bonders</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bonders</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                                               <span class="n">bonders</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-                    <span class="n">bonder_map</span> <span class="o">=</span> <span class="n">bonder_map</span><span class="o">.</span><span class="n">new_child</span><span class="p">(</span><span class="n">inverse_bonders</span><span class="p">)</span>
-                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span></div>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xdim</span><span class="p">,</span> <span class="n">ydim</span><span class="p">,</span> <span class="n">zdim</span><span class="p">)):</span>
+            <span class="n">unit_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">a</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">b</span> <span class="o">+</span> <span class="n">z</span><span class="o">*</span><span class="n">c</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Periodic.save_ids"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic.save_ids">[docs]</a>    <span class="k">def</span> <span class="nf">save_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save_ids</span><span class="p">()</span>
+            <span class="c1"># Update fg_ids.</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">unit_cell</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">SetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="n">nfgs</span><span class="p">)</span>
 
-        <span class="c1"># If the ids of periodic bonds have already been updated, stop.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ids_updated</span><span class="p">:</span>
-            <span class="k">return</span>
+            <span class="n">island</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">island</span><span class="p">,</span> <span class="n">unit_cell</span><span class="p">)</span>
+            <span class="c1"># `bonders` maps a bonder id in the original unit</span>
+            <span class="c1"># cell to the one currently being added to the</span>
+            <span class="c1"># island.</span>
+            <span class="n">fgs</span> <span class="o">=</span> <span class="p">{</span><span class="n">fg</span><span class="p">:</span> <span class="n">i</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">+</span> <span class="n">fg</span> <span class="k">for</span>
+                   <span class="n">fg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">))}</span>
+            <span class="n">cells</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">][</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">Cell</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">fgs</span><span class="p">)</span>
 
-        <span class="c1"># Update periodic bonds to hold atom ids directly instead of</span>
-        <span class="c1"># indices of the atom ids within `bonder_ids`.</span>
-        <span class="k">for</span> <span class="n">pb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="p">:</span>
-            <span class="n">pb</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">pb</span><span class="o">.</span><span class="n">atom1</span><span class="p">]</span>
-            <span class="n">pb</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">pb</span><span class="o">.</span><span class="n">atom2</span><span class="p">]</span>
-
-        <span class="c1"># Update deleters to hold atom ids directly instead</span>
-        <span class="c1"># of indices of the atom ids within `bonder_ids`.</span>
-        <span class="n">deleters</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deleters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">bonder_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-            <span class="n">deleters</span><span class="p">[</span><span class="n">bonder_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">deleters</span> <span class="o">=</span> <span class="n">deleters</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ids_updated</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="k">return</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span></div>
 
 <div class="viewcode-block" id="Periodic.write_gulp_input"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic.write_gulp_input">[docs]</a>    <span class="k">def</span> <span class="nf">write_gulp_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">keywords</span><span class="p">,</span>
                          <span class="n">cell_fix</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">atom_fix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

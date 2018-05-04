@@ -118,7 +118,7 @@ and a :class:`tuple` of instances of this class called
        the :class:`.Topology` class used. However, the basic structure
        is the same (steps 8 - 10).
 
-    8. Use :meth:`.Topology.place_mols` to combine the ``rdkit`
+    8. Use :meth:`.Topology.place_mols` to combine the ``rdkit``
        molecules of all the building blocks into a single ``rdkit``
        instance. The combined ``rdkit`` instance is placed into
        ``macro_mol.mol``. :meth:`.Topology.place_mols` also gives
@@ -297,12 +297,12 @@ class Molecule:
 
         .. code-block:: python
 
-        atom_props = {0: {'bonder': 1,
-                          'fg': 'amine',
-                          'fg_id': 1},
-                      5: {'fg': 'amine',
-                          'fg_id': 2,
-                          'del': 1}}
+            atom_props = {0: {'bonder': 1,
+                              'fg': 'amine',
+                              'fg_id': 1},
+                          5: {'fg': 'amine',
+                              'fg_id': 2,
+                              'del': 1}}
 
     bonder_ids : :class:`list`
         Holds the id of bonder atoms in a nested :class:`list`
@@ -1621,13 +1621,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Yields
         ------
         :class:`tuple`
-           A :class:`tuple` of the form
-
-           .. code-block:: python
-
-               (3, 54, 12.54)
-
-            The first two elements are the ``fg_id` of the involved
+            A :class:`tuple` of the form ``(3, 54, 12.54)``.
+            The first two elements are the ``fg_id`` of the involved
             functional groups and the third element is the distance
             between them.
 
@@ -2498,8 +2493,8 @@ class StructUnit3(StructUnit):
 
         Here "plane normal" referes to the normal of the plane formed
         by the bonder centroids. The molecule is rotated about
-        :meth:`~.bonder_centroid`. The rotation results in the normal
-        of the plane being aligned with `end`.
+        :meth:`~Molecule.bonder_centroid`. The rotation results in the
+        normal of the plane being aligned with `end`.
 
         Parameters
         ----------
@@ -3159,9 +3154,6 @@ class Periodic(MacroMolecule):
     with additional methods and attributes relevant to periodic
     materials being added.
 
-    The method :meth:`~.MacroMolecule.save_ids` is extended to take
-    into account ids of atoms in perdiodic bonds.
-
     Attributes
     ----------
     deleters : :class:`dict`
@@ -3198,10 +3190,6 @@ class Periodic(MacroMolecule):
         ``a`` the second is ``b`` and the third is ``c``. This should
         be added during the build process by the periodic topology.
 
-    _ids_updated : :class:`bool`
-        Indicates whether periodic bond ids have been updated already
-        by :meth:`save_ids`.
-
     """
 
     def __init__(self, building_blocks, topology, name="", note=""):
@@ -3221,14 +3209,6 @@ class Periodic(MacroMolecule):
         dimensions : :class:`list` of :class:`int`
             A 3 member :class:`list`, holding the number of unit cells
             in the x, y and z directions used to make the supercell.
-
-        terminator : :class:`int`, optional
-            The atomic number of the terminating atoms added to the
-            supercell.
-
-        bond_type : :class:`str`, optional
-            The bond type of bonds to terminating atoms. Valid options
-            include ``'1'``, ``'2'``, ``'3'`` and ``'ar'``.
 
         Returns
         -------

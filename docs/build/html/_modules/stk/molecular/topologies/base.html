@@ -157,6 +157,23 @@
 <span class="sd">Extending stk: Adding new topologies.</span>
 <span class="sd">-------------------------------------</span>
 
+<span class="sd">General</span>
+<span class="sd">.......</span>
+
+<span class="sd">A new topology class must be defined. The class must inherit</span>
+<span class="sd">:class:`Topology`. The new topology class will have to define</span>
+<span class="sd">the methods :meth:`place_mols` and :meth:`bonded_fgs`. A description</span>
+<span class="sd">of what these methods should do is given by :meth:`Topology.place_mols`</span>
+<span class="sd">and :meth:`Topology.bonded_fgs`.</span>
+
+<span class="sd">The new class may optionally define the methods :meth:`prepare` and</span>
+<span class="sd">:meth:`cleanup`. The former perfroms operations on the molecule</span>
+<span class="sd">before it is joined up and has atoms deleted via :func:`.react`.</span>
+<span class="sd">The latter any final cleanup operations on the assembled molecule. For</span>
+<span class="sd">example, converting the end functional groups of a polymer into</span>
+<span class="sd">hydrogen atoms. See also :meth:`Topology.cleanup`.</span>
+
+
 <span class="sd">Cages</span>
 <span class="sd">.....</span>
 
@@ -199,13 +216,11 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="k">as</span> <span class="nn">rdkit</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">deque</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">signature</span>
 
-<span class="kn">from</span> <span class="nn">..fg_info</span> <span class="k">import</span> <span class="n">double_bond_combs</span>
-<span class="kn">from</span> <span class="nn">...utilities</span> <span class="k">import</span> <span class="n">dedupe</span><span class="p">,</span> <span class="n">flatten</span><span class="p">,</span> <span class="n">add_fragment_props</span>
+<span class="kn">from</span> <span class="nn">..functional_groups</span> <span class="k">import</span> <span class="n">react</span>
+<span class="kn">from</span> <span class="nn">...utilities</span> <span class="k">import</span> <span class="n">dedupe</span><span class="p">,</span> <span class="n">add_fragment_props</span>
 
 
 <div class="viewcode-block" id="remove_confs"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.remove_confs">[docs]</a><span class="k">def</span> <span class="nf">remove_confs</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">keep</span><span class="p">):</span>
@@ -301,7 +316,16 @@
 <span class="sd">    built. In addition, each child class must define methods which</span>
 <span class="sd">    place the building blocks in approriate positions.</span>
 
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    react_del : :class:`bool`</span>
+<span class="sd">        Toggles whether atoms with the ``&#39;del&#39;`` propety are deleted</span>
+<span class="sd">        by :func:`.react`.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">react_del</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">react_del</span> <span class="o">=</span> <span class="n">react_del</span>
 
 <div class="viewcode-block" id="Topology.build"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">bb_conformers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -347,18 +371,19 @@
         <span class="n">original_confs</span> <span class="o">=</span> <span class="n">remove_confs</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">,</span>
                                       <span class="n">bb_conformers</span><span class="p">)</span>
 
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonds_made</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">place_mols</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">join_mols</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">del_atoms</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">fgs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonded_fgs</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
+            <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">new_bonds</span> <span class="o">=</span> <span class="n">react</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">react_del</span><span class="p">,</span>
+                                             <span class="o">*</span><span class="n">fgs</span><span class="p">)</span>
+            <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonds_made</span> <span class="o">+=</span> <span class="n">new_bonds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
 
         <span class="c1"># Make sure that the property cache of each atom is up to date.</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">UpdatePropertyCache</span><span class="p">()</span>
-
-        <span class="c1"># Make sure that the tags showing which building block each</span>
-        <span class="c1"># atom belongs to are saved in `fragment_assignments` and not</span>
-        <span class="c1"># lost due to parallelism.</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">update_fragments</span><span class="p">()</span>
 
         <span class="c1"># Restore the original conformers.</span>
         <span class="k">for</span> <span class="n">bb</span><span class="p">,</span> <span class="n">confs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">original_confs</span><span class="p">):</span>
@@ -366,14 +391,83 @@
             <span class="k">for</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">confs</span><span class="p">:</span>
                 <span class="n">bb</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Topology.del_atoms"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.del_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">del_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="Topology.place_mols"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Deletes the atoms which are lost during assembly.</span>
+<span class="sd">        Places building blocks.</span>
+
+<span class="sd">        The ``rdkit`` molecules of the building blocks are</span>
+<span class="sd">        combined into a single ``rdkit`` molecule and placed into</span>
+<span class="sd">        `macro_mol.mol`. Beyond this, the function must give every</span>
+<span class="sd">        functional group in the macromolecule a unique id. This is</span>
+<span class="sd">        done by adding the property ``&#39;fg_id&#39;`` to every atom part</span>
+<span class="sd">        of a functional group in `macro_mol`. Atoms in the same</span>
+<span class="sd">        functional group will have the same value of ``&#39;fg_id&#39;`` while</span>
+<span class="sd">        atoms in different functional groups will have a different</span>
+<span class="sd">        ``&#39;fg_id&#39;``.</span>
+
+<span class="sd">        The function is also reponsible for updating</span>
+<span class="sd">        :attr:`~.MacroMolecule.bb_counter`.</span>
+
+<span class="sd">        Finally, this function must also add the tags ``&#39;bb_index&#39;``</span>
+<span class="sd">        and ``&#39;mol_index&#39;`` to every atom in the molecule. The</span>
+<span class="sd">        ``&#39;bb_index&#39;`` tag identifies which building block the atom</span>
+<span class="sd">        belongs to. The building block is identified by its index</span>
+<span class="sd">        within :attr:`MacroMolecule.building_blocks`.</span>
+<span class="sd">        The ``&#39;mol_index&#39;`` identifies which molecule of a specific</span>
+<span class="sd">        building the atom belongs to. For example, if</span>
+<span class="sd">        ``bb_index = 1`` and ``mol_index = 3`` the atom belongs to</span>
+<span class="sd">        the 4th molecule of ``macro_mol.building_blocks[1]`` to</span>
+<span class="sd">        be added to the macromolecule. The utility function</span>
+<span class="sd">        :func:`.add_fragment_props` is provided to help with this.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : :class:`MacroMolecule`</span>
+<span class="sd">            The molecule being assembled.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        :class:`NotImplementedError`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Topology.bonded_fgs"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.bonded_fgs">[docs]</a>    <span class="k">def</span> <span class="nf">bonded_fgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        An iterator which yields ids of functional groups to be bonded.</span>
+
+<span class="sd">        The ids of functional groups in `macro_mol` are assigned by</span>
+<span class="sd">        :meth:`place_mols`. The ids are stored as atom properties</span>
+<span class="sd">        under the name ``&#39;fg_id&#39;``, This method looks at the</span>
+<span class="sd">        macromolecule and determines which functional groups should be</span>
+<span class="sd">        bonded to create the final macromolecule. It then yields the</span>
+<span class="sd">        ids functional groups as a :class:`tuple`.</span>
+
+<span class="sd">        This :class:`tuple` gets passed to :func:`.react`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : :class:`MacroMolecule`</span>
+<span class="sd">            The molecule being assembled.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        :class:`NotImplementedError`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Topology.cleanup"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs final clean up actions on an assembled molecule.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
-<span class="sd">            The macromolecule being assembled.</span>
+<span class="sd">            The molecule being assembled.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -381,69 +475,38 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
-        <span class="c1"># Delete atoms with largest id last, so that when deleting</span>
-        <span class="c1"># later atoms their ids do not change.</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()):</span>
-            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">):</span>
-                <span class="n">mol</span><span class="o">.</span><span class="n">RemoveAtom</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
+        <span class="k">return</span></div>
 
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="Topology.determine_bond_type"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.determine_bond_type">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">determine_bond_type</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">atom1_id</span><span class="p">,</span> <span class="n">atom2_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Topology.prepare"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.prepare">[docs]</a>    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the bond order to be formed between the atoms.</span>
-
-<span class="sd">        Some atoms will need to have a double bond created between</span>
-<span class="sd">        them. This is defined in the :data:`fg_info.double_bond_combs`.</span>
-<span class="sd">        If the atom ids provided as parameters belong to functional</span>
-<span class="sd">        groups found in this list, the ``rdkit`` double bond type will</span>
-<span class="sd">        be returned. If not, the ``rdkit`` single bond type will be</span>
-<span class="sd">        returned. These types are needed when adding bonds to an</span>
-<span class="sd">        ``rdkit`` molecule.</span>
+<span class="sd">        Performs ops between placing and reacting building blocks.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
-<span class="sd">            The macromolecule being assembled.</span>
-
-<span class="sd">        atom1_id : :class:`int`</span>
-<span class="sd">            The id number of the first atom.</span>
-
-<span class="sd">        atom2_id : :class:`int`</span>
-<span class="sd">            The id number of the second atom.</span>
+<span class="sd">            The molecule being assembled.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`rdkit.Chem.rdchem.BondType.SINGLE`</span>
-<span class="sd">            If the atoms don&#39;t belong to functional groups which form</span>
-<span class="sd">            a double bond.</span>
-
-<span class="sd">        :class:`rdkit.Chem.rdchem.BondType.DOUBLE`</span>
-<span class="sd">            If the atoms belong to functional groups which form a</span>
-<span class="sd">            double bond.</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Get the functional groups of the of the atoms whose atom ids</span>
-        <span class="c1"># were supplied as arguments. If the groups form a tuple in</span>
-        <span class="c1"># `double_bond_combs` return a rdkit double bond type. If they</span>
-        <span class="c1"># do not, return a rdkit single bond type.</span>
+        <span class="k">return</span></div>
 
-        <span class="n">atom1</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">)</span>
-        <span class="n">atom1_grp</span> <span class="o">=</span> <span class="n">atom1</span><span class="o">.</span><span class="n">GetProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">)</span>
-        <span class="n">atom2</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">)</span>
-        <span class="n">atom2_grp</span> <span class="o">=</span> <span class="n">atom2</span><span class="o">.</span><span class="n">GetProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="Topology.update_fg_id"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.update_fg_id">[docs]</a>    <span class="k">def</span> <span class="nf">update_fg_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-        <span class="n">double_bond_present</span> <span class="o">=</span> <span class="p">((</span><span class="n">atom1_grp</span><span class="p">,</span> <span class="n">atom2_grp</span><span class="p">)</span> <span class="o">==</span> <span class="n">tup</span> <span class="ow">or</span>
-                               <span class="p">(</span><span class="n">atom2_grp</span><span class="p">,</span> <span class="n">atom1_grp</span><span class="p">)</span> <span class="o">==</span> <span class="n">tup</span> <span class="k">for</span>
-                               <span class="n">tup</span> <span class="ow">in</span> <span class="n">double_bond_combs</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">double_bond_present</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">DOUBLE</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span></div>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">max_id</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">a</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="k">for</span>
+                      <span class="n">a</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()</span> <span class="k">if</span>
+                      <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)),</span> <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">):</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">SetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span><span class="o">+</span><span class="n">max_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mol</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -531,8 +594,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">orientation</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ends</span> <span class="o">=</span> <span class="n">ends</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Linear.del_atoms"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear.del_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">del_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="Linear.cleanup"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes the atoms which are lost during assembly.</span>
 
@@ -548,51 +612,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ends</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hygrogen_ends</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ends</span> <span class="o">==</span> <span class="s1">&#39;fg&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fg_ends</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Linear.fg_ends"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear.fg_ends">[docs]</a>    <span class="k">def</span> <span class="nf">fg_ends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Removes almost all atoms tagged for deletion.</span>
-
-<span class="sd">        In polymers, you don&#39;t want to delete the atoms at the ends of</span>
-<span class="sd">        the chain.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        macro_mol : :class:`.Polymer`</span>
-<span class="sd">            The polymer being assembled.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        None : :class:`NoneType`</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">fgs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="c1"># Get all atoms tagged for deletion, held in tuples</span>
-        <span class="c1"># corresponding to individual functional groups.</span>
-        <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">:</span>
-            <span class="n">delmol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">func_grp</span><span class="o">.</span><span class="n">del_smarts</span><span class="p">)</span>
-            <span class="n">fgs</span> <span class="o">=</span> <span class="n">fgs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">delmol</span><span class="p">))</span>
-
-        <span class="c1"># Get the functional groups which hold the atoms with the</span>
-        <span class="c1"># smallest and largest values for the x coordinate need to have</span>
-        <span class="c1"># deletion tags removed.</span>
-        <span class="n">maxid</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">fgs</span><span class="p">),</span>
-                    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">maxfg</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fg</span> <span class="k">for</span> <span class="n">fg</span> <span class="ow">in</span> <span class="n">fgs</span> <span class="k">if</span> <span class="n">maxid</span> <span class="ow">in</span> <span class="n">fg</span><span class="p">)</span>
-
-        <span class="n">minid</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">fgs</span><span class="p">),</span>
-                    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">minfg</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fg</span> <span class="k">for</span> <span class="n">fg</span> <span class="ow">in</span> <span class="n">fgs</span> <span class="k">if</span> <span class="n">minid</span> <span class="ow">in</span> <span class="n">fg</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">minfg</span><span class="p">),</span> <span class="n">flatten</span><span class="p">(</span><span class="n">maxfg</span><span class="p">)):</span>
-            <span class="n">atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
-            <span class="n">atom</span><span class="o">.</span><span class="n">ClearProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">)</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">del_atoms</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hygrogen_ends</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Linear.hygrogen_ends"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear.hygrogen_ends">[docs]</a>    <span class="k">def</span> <span class="nf">hygrogen_ends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -612,8 +632,13 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
         <span class="c1"># Remove all extra atoms.</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">del_atoms</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">):</span>
+                <span class="n">emol</span><span class="o">.</span><span class="n">RemoveAtom</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
+
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span>
         <span class="c1"># Add hydrogens.</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">UpdatePropertyCache</span><span class="p">()</span>
@@ -621,10 +646,12 @@
 
 <div class="viewcode-block" id="Linear.place_mols"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Places monomers side by side and joins them.</span>
+<span class="sd">        Places monomers side by side.</span>
 
 <span class="sd">        The monomers are placed along the x-axis, so that the vector</span>
-<span class="sd">        running between the functional groups is placed on the axis.</span>
+<span class="sd">        running between the functional groups is placed along the axis.</span>
+<span class="sd">        Functional groups are tagged with ``&#39;fg_id&#39;`` such that</span>
+<span class="sd">        ``&#39;fg_id&#39;`` increases along the x-axis.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -644,8 +671,6 @@
                                   <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">):</span>
             <span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">monomer</span>
 
-        <span class="c1"># Make a que for holding bonder atom ids.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="c1"># Make string representing the entire polymer, not just the</span>
         <span class="c1"># repeating unit.</span>
         <span class="n">polymer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeating_unit</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span>
@@ -653,13 +678,9 @@
         <span class="c1"># not just the repeating unit.</span>
         <span class="n">dirs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span>
 
-        <span class="c1"># Go through the repeating unit. Place each monomer 50 A apart.</span>
-        <span class="c1"># Also create a bond.</span>
+        <span class="c1"># Go through the repeating unit and place each monomer.</span>
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">mdir</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">dirs</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
-                <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span> <span class="o">+</span> <span class="n">id_</span> <span class="k">for</span>
-                <span class="n">id_</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">])</span>
 
             <span class="c1"># Flip or not flip the monomer as given by the probability</span>
             <span class="c1"># in `mdir`.</span>
@@ -674,59 +695,35 @@
             <span class="n">bb_index</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
             <span class="n">add_fragment_props</span><span class="p">(</span><span class="n">monomer_mol</span><span class="p">,</span> <span class="n">bb_index</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
 
+            <span class="c1"># Add fg_id tags.</span>
+            <span class="n">monomer_conf</span> <span class="o">=</span> <span class="n">monomer_mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">monomer_mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">):</span>
+                    <span class="n">coord</span> <span class="o">=</span> <span class="n">monomer_conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
+                    <span class="n">fg_id</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span> <span class="k">if</span> <span class="n">coord</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">x_coord</span> <span class="k">else</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+                    <span class="n">atom</span><span class="o">.</span><span class="n">SetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">,</span> <span class="n">fg_id</span><span class="p">)</span>
+
             <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
-                                              <span class="n">monomer_mol</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
+                                              <span class="n">monomer_mol</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Linear.join"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="Linear.bonded_fgs"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear.bonded_fgs">[docs]</a>    <span class="k">def</span> <span class="nf">bonded_fgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Joins 2 monomers.</span>
+<span class="sd">        Yields functional groups to react.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        macro_mol : :class:`.Polymer`</span>
 <span class="sd">            The polymer being assembled.</span>
 
-<span class="sd">        Returns</span>
+<span class="sd">        Yields</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : :class:`NoneType`</span>
+<span class="sd">        :class:`tuple` of :class:`int`</span>
+<span class="sd">            Holds the ids of the functional groups set to react.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">distances</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">bonder1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">for</span> <span class="n">bonder2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">distances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span><span class="p">),</span>
-                         <span class="n">bonder1</span><span class="p">,</span>
-                         <span class="n">bonder2</span><span class="p">))</span>
-
-        <span class="n">_</span><span class="p">,</span> <span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
-        <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
-        <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">determine_bond_type</span><span class="p">(</span>
-                                                            <span class="n">macro_mol</span><span class="p">,</span>
-                                                            <span class="n">bonder1</span><span class="p">,</span>
-                                                            <span class="n">bonder2</span><span class="p">))</span>
-
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="Linear.join_mols"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear.join_mols">[docs]</a>    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Does nothing, :meth:`place_mols` joins up the molecules too.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        macro_mol : :class:`.Polymer`</span>
-<span class="sd">            The polymer being assembled.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        None : :class:`NoneType`</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">return</span></div>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repeating_unit</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span></div>
 
 <div class="viewcode-block" id="Linear._x_position"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear._x_position">[docs]</a>    <span class="k">def</span> <span class="nf">_x_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">bb</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

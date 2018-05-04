@@ -235,9 +235,9 @@
 <span class="sd">        A 3 member :class:`list` holding the x, y and z index</span>
 <span class="sd">        of the cell within the supercell.</span>
 
-<span class="sd">    bonders : :class:`dict`</span>
-<span class="sd">        Maps the bonder atoms in the original unit cell to the</span>
-<span class="sd">        equivalent bonder atoms in the cell.</span>
+<span class="sd">    fgs : :class:`dict`</span>
+<span class="sd">        Maps the fgs in the original unit cell to the</span>
+<span class="sd">        equivalent fgs in the cell.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -245,15 +245,15 @@
 <span class="sd">        A 3 member array holding the x, y and z index</span>
 <span class="sd">        of the cell within the supercell.</span>
 
-<span class="sd">    bonders : :class:`dict`</span>
-<span class="sd">        Maps the bonder atoms in the original unit cell to the</span>
-<span class="sd">        equivalent bonder atoms in the cell.</span>
+<span class="sd">    fgs : :class:`dict`</span>
+<span class="sd">        Maps the fgs in the original unit cell to the</span>
+<span class="sd">        equivalent fgs in the cell.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">,</span> <span class="n">bonders</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">,</span> <span class="n">fgs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span> <span class="o">=</span> <span class="n">bonders</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fgs</span> <span class="o">=</span> <span class="n">fgs</span></div>
 
 
 <div class="viewcode-block" id="ChargedMolError"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.ChargedMolError">[docs]</a><span class="k">class</span> <span class="nc">ChargedMolError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -506,43 +506,46 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    atom1 : :class:`int`</span>
-<span class="sd">        The id of first atom in the bond.</span>
+<span class="sd">    fg1 : :class:`int`</span>
+<span class="sd">        The value of the ``&#39;fg_id&#39;`` for atoms in the first functional</span>
+<span class="sd">        group.</span>
 
-<span class="sd">    atom2 : :class:`int`</span>
-<span class="sd">        The id of the second atom in the bond.</span>
+<span class="sd">    fg2 : :class:`int`</span>
+<span class="sd">        The value of the ``&#39;fg_id&#39;`` for atoms in the second</span>
+<span class="sd">        functional group.</span>
 
 <span class="sd">    direction : :class:`list` of :class:`int`</span>
 <span class="sd">        A 3 member list describing the axes along which the bond is</span>
-<span class="sd">        periodic, when going from `atom1` to `atom2`. For example,</span>
+<span class="sd">        periodic, when going from `fg1` to `fg2`. For example,</span>
 <span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
 <span class="sd">        in the positive direction.</span>
 
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    atom1 : :class:`int`</span>
-<span class="sd">        The id of first atom in the bond.</span>
+<span class="sd">    fg1 : :class:`int`</span>
+<span class="sd">        The value of the ``&#39;fg_id&#39;`` for atoms in the first functional</span>
+<span class="sd">        group.</span>
 
-<span class="sd">    atom2 : :class:`int`</span>
-<span class="sd">        The id of the second atom in the bond.</span>
+<span class="sd">    fg2 : :class:`int`</span>
+<span class="sd">        The value of the ``&#39;fg_id&#39;`` for atoms in the second</span>
+<span class="sd">        functional group.</span>
 
 <span class="sd">    direction : :class:`numpy.ndarray` of :class:`int`</span>
 <span class="sd">        A 3 member list describing the axes along which the bond is</span>
-<span class="sd">        periodic, when going from `atom1` to `atom2`. For example,</span>
+<span class="sd">        periodic, when going from `fg1` to `fg2`. For example,</span>
 <span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
 <span class="sd">        in the positive direction.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fg1</span> <span class="o">=</span> <span class="n">fg1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fg2</span> <span class="o">=</span> <span class="n">fg2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;PeriodicBond(</span><span class="si">{0.atom1}</span><span class="s2">, &quot;</span>
-                <span class="s2">&quot;</span><span class="si">{0.atom2}</span><span class="s2">, </span><span class="si">{0.direction}</span><span class="s2">)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;PeriodicBond(</span><span class="si">{self.fg1}</span><span class="s2">, </span><span class="si">{self.fg2}</span><span class="s2">, </span><span class="si">{self.direction}</span><span class="s2">)&quot;</span></div>
 
 
 <div class="viewcode-block" id="StopLogging"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.StopLogging">[docs]</a><span class="k">class</span> <span class="nc">StopLogging</span><span class="p">:</span>

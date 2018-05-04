@@ -162,21 +162,21 @@
 <code class="descname">A_alignments</code><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.A_alignments" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The length of this <code class="xref py py-class docutils literal"><span class="pre">list</span></code> must be equal to the number of
 building blocks in the cage. When cages are built one of the
-bonder atoms of each building block is aligned with an edge
-during placement. The <code class="xref py py-class docutils literal"><span class="pre">int</span></code> indicates which bonder atom
-is aligned. The <code class="xref py py-class docutils literal"><span class="pre">int</span></code> corresponds to an index in
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.bonder_ids" title="stk.molecular.molecules.StructUnit.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">StructUnit.bonder_ids</span></code></a>.</p>
-<p>If <code class="docutils literal"><span class="pre">None</span></code> the first atom in <cite>bonder_ids</cite> is always aligned.</p>
+fgs of each building block is aligned with an edge
+during placement. The <code class="xref py py-class docutils literal"><span class="pre">int</span></code> is the <code class="docutils literal"><span class="pre">fg_id</span></code> of the
+aligned functional group.</p>
+<p>If <code class="docutils literal"><span class="pre">None</span></code> then the functional group with <code class="docutils literal"><span class="pre">fg_id</span></code> of <code class="docutils literal"><span class="pre">0</span></code>
+is always aligned.</p>
 <p>For example,</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">A_alignments</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>In this case there must be 4 building blocks in the cage. The
-the first building block has its first (index <code class="docutils literal"><span class="pre">0</span></code>) bonder
-atom aligned. The 2nd building block has the 3rd (index <code class="docutils literal"><span class="pre">2</span></code>)
-atom aligned. The 3rd building block has the 2nd (index <code class="docutils literal"><span class="pre">1</span></code>)
-atom aligned. The 4th building block has the 3rd (index <code class="docutils literal"><span class="pre">2</span></code>)
-atom aligned.</p>
+the first building block has its first (<code class="docutils literal"><span class="pre">fg_id</span> <span class="pre">=</span> <span class="pre">0</span></code>) fg
+aligned. The 2nd building block has the 3rd fg (<code class="docutils literal"><span class="pre">fg_id</span> <span class="pre">=</span> <span class="pre">2</span></code>)
+aligned. The 3rd building block has the 2nd fg (<code class="docutils literal"><span class="pre">fg_id</span> <span class="pre">=</span> <span class="pre">1</span></code>)
+aligned. The 4th building block has the 3rd fg (<code class="docutils literal"><span class="pre">fg_id</span> <span class="pre">=</span> <span class="pre">2</span></code>)
+aligned.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -197,7 +197,7 @@ the second is aligned in parallel, and so on.</p>
 <p>If the linkers have 3 or more functional groups, the values
 in <a class="reference internal" href="#stk.molecular.topologies.cage.base.CageTopology.B_alignments" title="stk.molecular.topologies.cage.base.CageTopology.B_alignments"><code class="xref py py-attr docutils literal"><span class="pre">B_alignments</span></code></a> have the same role as
 <a class="reference internal" href="#stk.molecular.topologies.cage.base.CageTopology.A_alignments" title="stk.molecular.topologies.cage.base.CageTopology.A_alignments"><code class="xref py py-attr docutils literal"><span class="pre">A_alignments</span></code></a>. The only difference is that by default
-the second atom is aligned, rather than the first.</p>
+the second fg is aligned, rather than the first.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -250,8 +250,8 @@ functional groups.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="stk.molecular.topologies.cage.base.CageTopology.join_mols">
-<code class="descname">join_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#CageTopology.join_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.join_mols" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.molecular.topologies.cage.base.CageTopology.bonded_fgs">
+<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#CageTopology.bonded_fgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.bonded_fgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joins up the separate building blocks which form the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -259,24 +259,22 @@ functional groups.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The <code class="docutils literal"><span class="pre">fg_ids</span></code> of functional groups to be bonded.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.molecular.topologies.cage.base.CageTopology.pair_bonders_with_positions">
-<code class="descname">pair_bonders_with_positions</code><span class="sig-paren">(</span><em>scale</em>, <em>macro_mol</em>, <em>vertex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#CageTopology.pair_bonders_with_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.pair_bonders_with_positions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Matches atoms with the closest building block position.</p>
-<p>After a building block is placed on a position, each atom
+<dt id="stk.molecular.topologies.cage.base.CageTopology.pair_fgs_with_positions">
+<code class="descname">pair_fgs_with_positions</code><span class="sig-paren">(</span><em>scale</em>, <em>macro_mol</em>, <em>vertex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#CageTopology.pair_fgs_with_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.pair_fgs_with_positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matches fgs with the closest building block position.</p>
+<p>After a building block is placed on a position, each fg
 which forms a bond must be paired with the location of the
-building block to which it bonds. This function matches atoms
+building block to which it bonds. This function matches fgs
 and positions so that each is only present in one pairing and
 so that the total distance of the pairings is minimized.</p>
-<p>This updates of <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex.atom_position_pairs" title="stk.molecular.topologies.cage.base.Vertex.atom_position_pairs"><code class="xref py py-attr docutils literal"><span class="pre">Vertex.atom_position_pairs</span></code></a> attribute of
+<p>This updates of <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex.fg_position_pairs" title="stk.molecular.topologies.cage.base.Vertex.fg_position_pairs"><code class="xref py py-attr docutils literal"><span class="pre">Vertex.fg_position_pairs</span></code></a> attribute of
 <cite>vertex</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -347,7 +345,7 @@ provided in the initalizer.</p>
 <dt id="stk.molecular.topologies.cage.base.Edge.place_mol">
 <code class="descname">place_mol</code><span class="sig-paren">(</span><em>scale</em>, <em>linker</em>, <em>alignment</em>, <em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Edge.place_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Edge.place_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places a linker molecule on the coordinates of an edge.</p>
-<p>It also orientates the linker so that a the bonder atoms sit
+<p>It also orientates the linker so that a the fgs sit
 exactly on the edge and the bulk of the linker points away from
 the center of the cage.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -446,26 +444,26 @@ this one.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.molecular.topologies.cage.base.Vertex.bonder_ids">
-<code class="descname">bonder_ids</code><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.bonder_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – This <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holds the ids of atoms which belong to the
+<dt id="stk.molecular.topologies.cage.base.Vertex.fg_ids">
+<code class="descname">fg_ids</code><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.fg_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – This <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holds the ids of fgs which belong to the
 building block placed on the vertex and will form bonds. The
-ids reflect those in the macromolecule not in the building block
-itself.</p>
+ids reflect those in the macromolecule not in the building
+block itself.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.molecular.topologies.cage.base.Vertex.atom_position_pairs">
-<code class="descname">atom_position_pairs</code><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.atom_position_pairs" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.molecular.topologies.cage.base.Vertex.fg_position_pairs">
+<code class="descname">fg_position_pairs</code><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.fg_position_pairs" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> – A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of the form</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">atom_position_pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">4</span><span class="p">,</span> <span class="n">v1</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">v2</span><span class="p">)]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">fg_position_pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">4</span><span class="p">,</span> <span class="n">v1</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">v2</span><span class="p">)]</span>
 </pre></div>
 </div>
 <p>Where <code class="docutils literal"><span class="pre">v1</span></code> and <code class="docutils literal"><span class="pre">v2</span></code> are <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex" title="stk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a> instances.</p>
-<p>Each atom which  is paired to a neighboring vertex or
-edge first. Only after this is the atom-atom pairing
-performed. The atom-edge/vertex pairing is stored here. The
-int represents the id of the atom.</p>
+<p>Each fg which  is paired to a neighboring vertex or
+edge first. Only after this is the fg-fg pairing
+performed. The fg-edge/vertex pairing is stored here. The
+<code class="xref py py-class docutils literal"><span class="pre">int</span></code> represents the id of the fg.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -475,13 +473,13 @@ int represents the id of the atom.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">distances</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">15.2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mf">18.4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>After bonder atoms have been associated with vertices to which
-they join, the idividual atoms are paired up. To do this the
-distance between every bonder atom on the paired vertex and the
-bonder atom which is paired to the vertex is found. This
+<p>After fgs have been associated with vertices to which
+they join, the idividual fgs are paired up. To do this the
+distance between every fg on the paired vertex and the
+fg which is paired to the vertex is found. This
 information is stored here the first element of each
 <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> the distance, and the second and third elements
-represent the bonder atoms.</p>
+represent the fgs.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -504,7 +502,7 @@ conncected vertices.</p>
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.Vertex.bonder_centroid">
 <code class="descname">bonder_centroid</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.bonder_centroid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the centroid of the bonder atoms on the vertex.</p>
+<dd><p>Calculates the centroid of the fgs on the vertex.</p>
 <p>However if <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex.custom_position" title="stk.molecular.topologies.cage.base.Vertex.custom_position"><code class="xref py py-attr docutils literal"><span class="pre">custom_position</span></code></a> is <code class="docutils literal"><span class="pre">True</span></code> or
 <cite>macro_mol</cite> is <code class="docutils literal"><span class="pre">None</span></code>, then <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex.coord" title="stk.molecular.topologies.cage.base.Vertex.coord"><code class="xref py py-attr docutils literal"><span class="pre">coord</span></code></a> is returned.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -643,16 +641,16 @@ from the origin.</td>
 <code class="descname">place_mol</code><span class="sig-paren">(</span><em>scale</em>, <em>building_block</em>, <em>aligner=0</em>, <em>aligner_edge=0</em>, <em>macro_mol=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.place_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.place_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Place a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a> building block on the vertex.</p>
 <p>The orientation of the building block is aligned with 2
-parameters. Firstly, the normal of the plane of bonder atoms of
+parameters. Firstly, the normal of the plane of fgs of
 the building block is aligned with the normal of the plane
 formed by the edges connected to the vertex. Because the normal
-of the plane of bonder atoms always points in the direction of
+of the plane of fgs always points in the direction of
 the building block’s centroid, this alignment causes the bulk
 of the building block  molecule to point away from the center
 of the cage.</p>
-<p>Secondly, the building block is rotated so that a bonder atom
+<p>Secondly, the building block is rotated so that a fg
 is aligned perfectly with an edge. This reduces the rms
-distance between the edges and bonder atoms to some extent,
+distance between the edges and fgs to some extent,
 probably.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -661,15 +659,13 @@ probably.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>scale</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – The amount by which the size of the topology is scaled.</li>
 <li><strong>building_block</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a>) – The building block molecule to be placed on a vertex.</li>
-<li><strong>aligner</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The index of the atom within
-:attr`.StructUnit.bonder_ids` which is to be aligned
-with an edge.</li>
+<li><strong>aligner</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The <code class="docutils literal"><span class="pre">fg_id</span></code> of the aligned fg.</li>
 <li><strong>aligner_edge</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The index of an edge in <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex.connected" title="stk.molecular.topologies.cage.base.Vertex.connected"><code class="xref py py-attr docutils literal"><span class="pre">connected</span></code></a>. It is the edge
 with which <cite>aligner</cite> is aligned.</li>
 <li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>, optional) – The macromolecule being built. Used for vertex only cage
 topologies where the position of some of the vertices
-is derived from the positions of the bonder atoms of
-connceted vertices.</li>
+is derived from the positions of the fgs on
+connected vertices.</li>
 </ul>
 </td>
 </tr>
