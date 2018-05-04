@@ -223,11 +223,11 @@ class Topology(metaclass=TopologyMeta):
         macro_mol.bonds_made = 0
         self.place_mols(macro_mol)
         self.prepare(macro_mol)
-        for fgs in self.bonded_fgs(macro_mol):
-            macro_mol.mol, new_bonds = react(macro_mol.mol,
-                                             self.react_del,
-                                             *fgs)
-            macro_mol.bonds_made += new_bonds
+        # for fgs in self.bonded_fgs(macro_mol):
+        #     macro_mol.mol, new_bonds = react(macro_mol.mol,
+        #                                      self.react_del,
+        #                                      *fgs)
+        #     macro_mol.bonds_made += new_bonds
         self.cleanup(macro_mol)
 
         # Make sure that the property cache of each atom is up to date.
@@ -342,6 +342,18 @@ class Topology(metaclass=TopologyMeta):
         """
 
         return
+
+    def update_fg_id(self, macro_mol, mol):
+        """
+
+        """
+
+        max_id = max((a.GetIntProp('fg_id') for
+                      a in macro_mol.mol.GetAtoms() if
+                      a.HasProp('fg_id')), default=-1) + 1
+        for a in mol.GetAtoms():
+            if a.HasProp('fg_id'):
+                a.SetIntProp('fg_id', a.GetIntProp('fg_id')+max_id)
 
     def __str__(self):
         return repr(self)

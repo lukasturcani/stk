@@ -537,18 +537,6 @@ class COFLattice(Topology):
         self.scale_func = scale_func
         super().__init__()
 
-    def _update_fg_id(self, macro_mol, mol):
-        """
-
-        """
-
-        max_id = max((a.GetIntProp('fg_id') for
-                      a in macro_mol.mol.GetAtoms() if
-                      a.HasProp('fg_id')), default=-1) + 1
-        for a in mol.GetAtoms():
-            if a.HasProp('fg_id'):
-                a.SetIntProp('fg_id', a.GetIntProp('fg_id')+max_id)
-
 
 class LinkerCOFLattice(COFLattice):
     """
@@ -657,7 +645,7 @@ class LinkerCOFLattice(COFLattice):
                                macro_mol.building_blocks.index(multi),
                                i)
 
-            self._update_fg_id(macro_mol, mol)
+            self.update_fg_id(macro_mol, mol)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
             macro_mol.bb_counter.update([multi])
 
@@ -676,7 +664,7 @@ class LinkerCOFLattice(COFLattice):
             add_fragment_props(mol,
                                macro_mol.building_blocks.index(di),
                                i)
-            self._update_fg_id(macro_mol, mol)
+            self.update_fg_id(macro_mol, mol)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
             macro_mol.bb_counter.update([di])
 
@@ -806,7 +794,7 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
                            0)
 
         mol = rdkit.Mol(bb2.mol)
-        self._update_fg_id(macro_mol, mol)
+        self.update_fg_id(macro_mol, mol)
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
 
 

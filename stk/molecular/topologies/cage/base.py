@@ -532,12 +532,12 @@ class CageTopology(Topology):
     A_alignments : :class:`list` of :class:`int`
         The length of this :class:`list` must be equal to the number of
         building blocks in the cage. When cages are built one of the
-        bonder atoms of each building block is aligned with an edge
-        during placement. The :class:`int` indicates which bonder atom
-        is aligned. The :class:`int` corresponds to an index in
-        :attr:`.StructUnit.bonder_ids`.
+        fgs of each building block is aligned with an edge
+        during placement. The :class:`int` is the ``fg_id`` of the
+        aligned functional group.
 
-        If ``None`` the first atom in `bonder_ids` is always aligned.
+        If ``None`` then the functional group with ``fg_id`` of ``0``
+        is always aligned.
 
         For example,
 
@@ -546,11 +546,11 @@ class CageTopology(Topology):
             A_alignments = [0, 2, 1, 2]
 
         In this case there must be 4 building blocks in the cage. The
-        the first building block has its first (index ``0``) bonder
-        atom aligned. The 2nd building block has the 3rd (index ``2``)
-        atom aligned. The 3rd building block has the 2nd (index ``1``)
-        atom aligned. The 4th building block has the 3rd (index ``2``)
-        atom aligned.
+        the first building block has its first (``fg_id = 0``) fg
+        aligned. The 2nd building block has the 3rd fg (``fg_id = 2``)
+        aligned. The 3rd building block has the 2nd fg (``fg_id = 1``)
+        aligned. The 4th building block has the 3rd fg (``fg_id = 2``)
+        aligned.
 
     B_alignments : :class:`list` of :class:`int`
         The length of this :class:`list` should be euqal to the number
@@ -572,7 +572,7 @@ class CageTopology(Topology):
         If the linkers have 3 or more functional groups, the values
         in :attr:`B_alignments` have the same role as
         :attr:`A_alignments`. The only difference is that by default
-        the second atom is aligned, rather than the first.
+        the second fg is aligned, rather than the first.
 
     edge_alignments : :class:`list` of :class:`int`
         The length of the :class:`list` is equal to the number of
