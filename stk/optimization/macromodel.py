@@ -13,7 +13,7 @@ import re
 from uuid import uuid4
 import logging
 
-from ..utilities import MAEExtractor
+from ..utilities import MAEExtractor, flatten
 
 
 logger = logging.getLogger(__name__)
@@ -990,6 +990,8 @@ def _fix_distance_in_com_file(mol, fix_block):
 
     """
 
+    bonder_ids = set(flatten(mol.bonder_ids))
+
     # Go through all the bonds in the rdkit molecule. If the bond
     # is not between bonder atoms add a fix line to the ``fix_block``.
     # If the bond does invovle two bonder atoms go to the next bond.
@@ -999,8 +1001,8 @@ def _fix_distance_in_com_file(mol, fix_block):
         atom1 = bond.GetBeginAtom()
         atom2 = bond.GetEndAtom()
 
-        if (atom1.GetIdx() in mol.bonder_ids and
-           atom2.GetIdx() in mol.bonder_ids):
+        if (atom1.GetIdx() in bonder_ids and
+           atom2.GetIdx() in bonder_ids):
             continue
 
         # Make sure that the indices are increased by 1 in the .mae
