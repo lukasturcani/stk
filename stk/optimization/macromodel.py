@@ -808,6 +808,11 @@ def _structconvert(iname, oname, macromodel_path):
             raise _PathError(('Wrong Schrodinger path supplied to'
                               ' `structconvert` function.'))
 
+        if 'File does not exist' in convrt_return.stdout:
+            raise _ConversionError(
+                    (f'structconvert input file, {iname}, missing. '
+                     f'Console output was {convrt_return.stdout}'))
+
         # If no license if found, keep re-running the function until it
         # is.
         if _license_found(convrt_return.stdout):
@@ -816,11 +821,6 @@ def _structconvert(iname, oname, macromodel_path):
     # If force field failed, raise.
     if 'number 1' in convrt_return.stdout:
         raise _ForceFieldError(convrt_return.stdout)
-
-    if 'File does not exist' in convrt_return.stdout:
-        raise _ConversionError(
-                    (f'structconvert input file, {iname}, missing. '
-                     f'Console output was {convrt_return.stdout}'))
 
     _wait_for_file(oname)
     if not os.path.exists(oname):
