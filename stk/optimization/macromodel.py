@@ -819,7 +819,7 @@ def _structconvert(iname, oname, macromodel_path):
 
     if 'File does not exist' in convrt_return.stdout:
         raise _ConversionError(
-                    ('structconvert input file missing. '
+                    (f'structconvert input file, {iname}, missing. '
                      f'Console output was {convrt_return.stdout}'))
 
     _wait_for_file(oname)
