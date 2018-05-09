@@ -12,6 +12,7 @@ import psutil
 import re
 from uuid import uuid4
 import logging
+import gzip
 
 from ..utilities import MAEExtractor, flatten
 
@@ -77,9 +78,9 @@ def macromodel_opt(mol,
                 ``'both'`` then a restricted optimization is performed
                 first, followed by a regular optimization.
 
-            'timeout' : :class:`float` (default = ``0``)
+            'timeout' : :class:`float` (default = ``None``)
                 The amount in seconds the optimization is allowed to
-                run before being terminated. ``0`` means there is no
+                run before being terminated. ``None`` means there is no
                 timeout.
 
             'force_field' : :class:`int` (default = ``16``)
@@ -126,19 +127,13 @@ def macromodel_opt(mol,
 
     vals = {
              'restricted': True,
-             'timeout': 0,
+             'timeout': None,
              'force_field': 16,
              'max_iter': 2500,
              'gradient': 0.05,
              'md': False
             }
     vals.update(settings)
-
-    # Default initiailize some parameters. These are for the internal
-    # use of the function (to prevent infinite recursion) not for the
-    # user. Also see comments below.
-    if 'lewis_fixed' not in vals:
-        vals['lewis_fixed'] = False
 
     try:
         mol._file = '{}.mol'.format(uuid4().int)
@@ -153,7 +148,7 @@ def macromodel_opt(mol,
         _run_bmin(mol, macromodel_path, vals['timeout'])
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
-        _convert_maegz_to_mae(mol, macromodel_path)
+        _convert_maegz_to_mae(mol)
         mol.update_from_mae(mol._file.replace('.mol', '.mae'),
                             conformer)
 
@@ -187,25 +182,6 @@ def macromodel_opt(mol,
                               vals,
                               md,
                               conformer)
-
-    # The 'lewis_fixed' parameter should not be used by the user.
-    # Sometimes the Lewis structure of `macro_mol` is wrong. If this is
-    # the case the function tries to fix it and then runs itself again.
-    # The `lewis_fixed` parameter indicates if the fix has already been
-    # tried to prevent infinite recursion.
-    except _LewisStructureError as ex:
-        logger.warning(('Attempting to fix Lewis '
-                        'structure of "{}".'.format(mol.name)))
-        if not vals['lewis_fixed']:
-            _run_applyhtreat(mol, macromodel_path)
-            vals['lewis_fixed'] = True
-            return macromodel_opt(mol,
-                                  macromodel_path,
-                                  vals,
-                                  md,
-                                  conformer)
-        else:
-            raise ex
 
 
 def macromodel_cage_opt(mol,
@@ -246,9 +222,9 @@ def macromodel_cage_opt(mol,
                 ``'both'`` then a restricted optimization is performed
                 first, followed by a regular optimization.
 
-            'timeout' : :class:`float` (default = ``0``)
+            'timeout' : :class:`float` (default = ``None``)
                 The amount in seconds the optimization is allowed to
-                run before being terminated. ``0`` means there is no
+                run before being terminated. ``None`` means there is no
                 timeout.
 
             'force_field' : :class:`int` (default = ``16``)
@@ -295,19 +271,13 @@ def macromodel_cage_opt(mol,
 
     vals = {
              'restricted': True,
-             'timeout': 0,
+             'timeout': None,
              'force_field': 16,
              'max_iter': 2500,
              'gradient': 0.05,
              'md': False
             }
     vals.update(settings)
-
-    # Default initialize some parameters. These are for the internal
-    # use of the function (to prevent infinite recursion) not for the
-    # user. Also see comments below.
-    if 'lewis_fixed' not in vals:
-        vals['lewis_fixed'] = False
 
     try:
         mol._file = '{}.mol'.format(uuid4().int)
@@ -322,7 +292,7 @@ def macromodel_cage_opt(mol,
         _run_bmin(mol, macromodel_path, vals['timeout'])
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
-        _convert_maegz_to_mae(mol, macromodel_path)
+        _convert_maegz_to_mae(mol)
         mol.update_from_mae(mol._file.replace('.mol', '.mae'),
                             conformer)
 
@@ -364,25 +334,6 @@ def macromodel_cage_opt(mol,
                                    md,
                                    conformer)
 
-    # The 'lewis_fixed' parameter should not be used by the user.
-    # Sometimes the Lewis structure of `macro_mol` is wrong. If this is
-    # the case the function tries to fix it and then runs itself again.
-    # The `lewis_fixed` parameter indicates if the fix has already been
-    # tried to prevent infinite recursion.
-    except _LewisStructureError as ex:
-        logger.warning(('Attempting to fix Lewis '
-                        'structure of "{}".'.format(mol.name)))
-        if not vals['lewis_fixed']:
-            _run_applyhtreat(mol, macromodel_path)
-            vals['lewis_fixed'] = True
-            return macromodel_cage_opt(mol,
-                                       macromodel_path,
-                                       vals,
-                                       md,
-                                       conformer)
-        else:
-            raise ex
-
 
 def _macromodel_md_opt(mol,
                        macromodel_path,
@@ -407,9 +358,9 @@ def _macromodel_md_opt(mol,
         from the default need to be specified. The allowed parameters
         are:
 
-            'timeout' : :class:`float` (default = ``0``)
+            'timeout' : :class:`float` (default = ``None``)
                 The amount in seconds the MD is allowed to run before
-                being terminated. ``0`` means there is no timeout.
+                being terminated. ``None`` means there is no timeout.
 
             'force_field' : :class:`int` (default = ``16``)
                 The number of the force field to be used.
@@ -450,7 +401,7 @@ def _macromodel_md_opt(mol,
         settings = {}
 
     vals = {
-               'timeout': 0,
+               'timeout': None,
                'force_field': 16,
                'temp': 300,
                'confs': 50,
@@ -462,12 +413,6 @@ def _macromodel_md_opt(mol,
               }
 
     vals.update(settings)
-
-    # Default initiailize some parameters. These are for the internal
-    # use of the function (to prevent infinite recursion) not for the
-    # user. Also see comments below.
-    if 'lewis_fixed' not in vals:
-        vals['lewis_fixed'] = False
 
     logger.info('Running MD on "{}".'.format(mol.name))
     try:
@@ -499,26 +444,8 @@ def _macromodel_md_opt(mol,
                                   vals,
                                   conformer)
 
-    # The 'lewis_fixed' parameter should not be used by the user.
-    # Sometimes the Lewis structure of `macro_mol` is wrong. If this is
-    # the case the function tries to fix it and then runs itself again.
-    # The `lewis_fixed` parameter indicates if the fix has already been
-    # tried to prevent infinite recursion.
-    except _LewisStructureError as ex:
-        logger.warning(('Attempting to fix Lewis '
-                        'structure of "{}".'.format(mol.name)))
-        if not vals['lewis_fixed']:
-            vals['lewis_fixed'] = True
-            _run_applyhtreat(mol, macromodel_path)
-            return _macromodel_md_opt(mol,
-                                      macromodel_path,
-                                      vals,
-                                      conformer)
-        else:
-            raise ex
 
-
-def _run_bmin(macro_mol, macromodel_path, timeout=0):
+def _run_bmin(macro_mol, macromodel_path, timeout):
 
     logger.info('Running bmin on "{}".'.format(macro_mol.name))
 
@@ -533,56 +460,59 @@ def _run_bmin(macro_mol, macromodel_path, timeout=0):
     # are any additional arguments.
 
     opt_cmd = [opt_app, file_root, "-WAIT", "-LOCAL"]
-    opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE,
-                            stderr=sp.STDOUT,
-                            universal_newlines=True)
-    try:
-        if timeout:
+
+    incomplete = True
+    while incomplete:
+        opt_proc = psutil.Popen(opt_cmd,
+                                stdout=sp.PIPE,
+                                stderr=sp.STDOUT,
+                                universal_newlines=True)
+        try:
             proc_out, _ = opt_proc.communicate(timeout=timeout)
-        else:
-            proc_out, _ = opt_proc.communicate()
 
-    except sp.TimeoutExpired:
-        logger.warning(('Minimization took too long'
-                        ' and was terminated '
-                        'by force on "{}".').format(macro_mol.name))
-        _kill_bmin(macro_mol, macromodel_path)
-        proc_out = ""
+        except sp.TimeoutExpired:
+            logger.warning(('Minimization took too long'
+                            ' and was terminated '
+                            f'by force on "{macro_mol.name}".'))
+            _kill_bmin(macro_mol, macromodel_path)
+            proc_out = ""
 
-    logger.debug('Output of bmin on "{}" was: {}.'.format(
-                                             macro_mol.name, proc_out))
+        logger.debug(
+            f'Output of bmin on "{macro_mol.name}" was: {proc_out}.')
 
-    with open(log_file, 'r') as log:
-        log_content = log.read()
+        with open(log_file, 'r') as log:
+            log_content = log.read()
 
-    # Check the log for error reports.
-    if ("termination due to error condition           21-" in
-       log_content):
-        raise _OptimizationError(("`bmin` crashed due to"
-                                  " an error condition. "
-                                  "See .log file."))
+        # Check the log for error reports.
+        if ("termination due to error condition           21-" in
+           log_content):
+            raise _OptimizationError(("`bmin` crashed due to"
+                                      " an error condition. "
+                                      "See .log file."))
 
-    if ("FATAL do_nosort_typing: NO MATCH found for atom " in
-       log_content):
-        raise _ForceFieldError(
-                        'The log implies the force field failed.')
+        if ("FATAL do_nosort_typing: NO MATCH found for atom " in
+           log_content):
+            raise _ForceFieldError(
+                            'The log implies the force field failed.')
 
-    if (("FATAL gen_lewis_structure(): could not find best Lewis"
-         " structure") in log_content and ("skipping input structure  "
-       "due to forcefield interaction errors") in log_content):
-        raise _LewisStructureError(
-                '`bmin` failed due to poor Lewis structure.')
+        if (("FATAL gen_lewis_structure(): could not find best Lewis"
+             " structure") in log_content and
+            ("skipping input structure  due to "
+             "forcefield interaction errors") in log_content):
+            raise _LewisStructureError(
+                    '`bmin` failed due to poor Lewis structure.')
 
-    # If optimization fails because a wrong Schrodinger path was given,
-    # raise.
-    if 'The system cannot find the path specified' in proc_out:
-        raise _PathError(('Wrong Schrodinger path supplied to'
-                          ' `macromodel_opt` function.'))
+        # If optimization fails because a wrong Schrodinger path was
+        # given, raise.
+        if 'The system cannot find the path specified' in proc_out:
+            raise _PathError(('Wrong Schrodinger path supplied to'
+                              ' `macromodel_opt` function.'))
 
-    # If optimization fails because the license is not found, rerun the
-    # function.
-    if not _license_found(proc_out, macro_mol):
-        return _run_bmin(macro_mol, macromodel_path, timeout)
+        # If optimization fails because the license is not found, rerun
+        # the function.
+        if not _license_found(proc_out, macro_mol):
+            continue
+        incomplete = False
 
     # Make sure the .maegz file created by the optimization is present.
     maegz = file_root + '-out.maegz'
@@ -598,17 +528,23 @@ def _kill_bmin(macro_mol, macromodel_path):
     name = re.split(r'\\|/', name)[-1]
     app = os.path.join(macromodel_path, 'jobcontrol')
     cmd = [app, '-stop', name]
-    out = sp.run(cmd, stdout=sp.PIPE,
-                 stderr=sp.STDOUT, universal_newlines=True)
 
-    # If no license if found, keep re-running the function until it is.
-    if not _license_found(out.stdout):
-        return _kill_bmin(macro_mol, macromodel_path)
+    incomplete = True
+    while incomplete:
+        out = sp.run(cmd, stdout=sp.PIPE,
+                     stderr=sp.STDOUT, universal_newlines=True)
+
+        # If no license if found, keep re-running the function until it
+        # is.
+        if not _license_found(out.stdout):
+            continue
+        incomplete = False
 
     # This loop causes the function to wait until the job has been
-    # killed via job control. This means the output files will have been
-    # written by the time the function exits. Essentially the loop
-    # continues until the job is no longer found by "./jobcontrol -list"
+    # killed via job control. This means the output files will have
+    # been written by the time the function exits. Essentially the loop
+    # continues until the job is no longer found by
+    # "./jobcontrol -list"
     cmd = [app, '-list']
     output = name
     start = time.time()
@@ -617,24 +553,6 @@ def _kill_bmin(macro_mol, macromodel_path):
                         universal_newlines=True).stdout
         if time.time() - start > 600:
             break
-
-
-def _run_applyhtreat(macro_mol, macromodel_path):
-    name, ext = os.path.splitext(macro_mol._file)
-    mae = name + '.mae'
-    mae_out = name + '_htreated.mae'
-    _create_mae(macro_mol, macromodel_path)
-
-    app = os.path.join(macromodel_path, 'utilities', 'applyhtreat')
-    cmd = [app, mae, mae_out]
-    out = sp.run(cmd, stdout=sp.PIPE,
-                 stderr=sp.STDOUT, universal_newlines=True)
-
-    # If no license if found, keep re-running the function until it is.
-    if not _license_found(out.stdout):
-        return _run_applyhtreat(macro_mol, macromodel_path)
-
-    macro_mol.update_from_mae(mae_out)
 
 
 def _license_found(output, mol=None):
@@ -839,7 +757,7 @@ def _create_mae(mol, macromodel_path):
     return mae_file
 
 
-def _convert_maegz_to_mae(mol, macromodel_path):
+def _convert_maegz_to_mae(mol):
     """
     Converts a ``.maegz`` file to a ``.mae`` file.
 
@@ -850,22 +768,9 @@ def _convert_maegz_to_mae(mol, macromodel_path):
         its optimized structure is converted to a ``.mae`` file. Both
         versions are kept.
 
-    macromodel_path : :class:`str`
-        The full path of the Schrodinger suite within the user's
-        machine. For example, on a Linux machine this may be something
-        like ``'/opt/schrodinger2017-2'``.
-
     Returns
     -------
     None : :class:`NoneType`
-
-    Raises
-    ------
-    :class:`_ForceFieldError`
-        If the OPLS3 force field failed to optimize the molecule. If
-        this happens the conversion function is unable to convert the
-        output of the optimization function and as a result this error
-        is raised.
 
     """
 
@@ -875,31 +780,42 @@ def _convert_maegz_to_mae(mol, macromodel_path):
     maegz = name + '-out.maegz'
     # Replace extensions to get the names of the various files.
     mae = name + '.mae'
-    return _structconvert(maegz, mae, macromodel_path)
+
+    gz_file = gzip.open(maegz)
+    with open(mae, 'wb') as f:
+        f.write(gz_file.read())
+    gz_file.close()
 
 
 def _structconvert(iname, oname, macromodel_path):
 
-    convrt_app = os.path.join(macromodel_path, 'utilities',
+    convrt_app = os.path.join(macromodel_path,
+                              'utilities',
                               'structconvert')
     convrt_cmd = [convrt_app, iname, oname]
 
-    # Execute the file conversion.
-    try:
-        convrt_return = sp.run(convrt_cmd,
-                               stdout=sp.PIPE,
-                               stderr=sp.STDOUT,
-                               universal_newlines=True)
+    incomplete = True
+    while incomplete:
 
-    # If conversion fails because a wrong Schrodinger path was given,
-    # raise.
-    except FileNotFoundError:
-        raise _PathError(('Wrong Schrodinger path supplied to'
-                          ' `structconvert` function.'))
+        # Execute the file conversion.
+        try:
+            convrt_return = sp.run(convrt_cmd,
+                                   stdout=sp.PIPE,
+                                   stderr=sp.STDOUT,
+                                   universal_newlines=True)
 
-    # If no license if found, keep re-running the function until it is.
-    if not _license_found(convrt_return.stdout):
-        return _structconvert(iname, oname, macromodel_path)
+        # If conversion fails because a wrong Schrodinger path was
+        # given, raise.
+        except FileNotFoundError:
+            raise _PathError(('Wrong Schrodinger path supplied to'
+                              ' `structconvert` function.'))
+
+        # If no license if found, keep re-running the function until it
+        # is.
+        if not _license_found(convrt_return.stdout):
+            continue
+
+        incomplete = False
 
     # If force field failed, raise.
     if 'number 1' in convrt_return.stdout:
@@ -908,9 +824,8 @@ def _structconvert(iname, oname, macromodel_path):
     _wait_for_file(oname)
     if not os.path.exists(oname):
         raise _ConversionError(
-         ('Conversion output file {} was not found.'
-          ' Console output was {}.').format(oname,
-                                            convrt_return.stdout))
+         (f'Conversion output file {oname} was not found.'
+          f' Console output was {convrt_return.stdout}.'))
 
     return convrt_return
 
