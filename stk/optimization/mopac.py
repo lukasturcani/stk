@@ -79,7 +79,8 @@ def mopac_opt(mol, mopac_path, settings=None):
             'timeout' : :class:`float` (default = ``172800``)
                 The amount in seconds the optimization is allowed to
                 run before being terminated. The default value is ``2``
-                days or ``172,800`` seconds.
+                days or ``172,800`` seconds. ``None`` means there
+                is no timeout.
 
     Returns
     -------
@@ -137,10 +138,7 @@ def _run_mopac(mol, mopac_path, settings, timeout=7200):
                             universal_newlines=True)
 
     try:
-        if timeout:
-            proc_out, _ = opt_proc.communicate(timeout=timeout)
-        else:
-            proc_out, _ = opt_proc.communicate()
+        proc_out, _ = opt_proc.communicate(timeout=timeout)
     except sp.TimeoutExpired:
         logger.warning('\nMinimization took too long and was terminated '
                        'by force - {}\n'.format(mol.name))
