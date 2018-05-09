@@ -510,9 +510,8 @@ def _run_bmin(macro_mol, macromodel_path, timeout):
 
         # If optimization fails because the license is not found, rerun
         # the function.
-        if not _license_found(proc_out, macro_mol):
-            continue
-        incomplete = False
+        if _license_found(proc_out, macro_mol):
+            incomplete = False
 
     # Make sure the .maegz file created by the optimization is present.
     maegz = file_root + '-out.maegz'
@@ -536,9 +535,8 @@ def _kill_bmin(macro_mol, macromodel_path):
 
         # If no license if found, keep re-running the function until it
         # is.
-        if not _license_found(out.stdout):
-            continue
-        incomplete = False
+        if _license_found(out.stdout):
+            incomplete = False
 
     # This loop causes the function to wait until the job has been
     # killed via job control. This means the output files will have
@@ -812,10 +810,8 @@ def _structconvert(iname, oname, macromodel_path):
 
         # If no license if found, keep re-running the function until it
         # is.
-        if not _license_found(convrt_return.stdout):
-            continue
-
-        incomplete = False
+        if _license_found(convrt_return.stdout):
+            incomplete = False
 
     # If force field failed, raise.
     if 'number 1' in convrt_return.stdout:
