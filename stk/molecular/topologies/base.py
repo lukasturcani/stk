@@ -69,7 +69,7 @@ import numpy as np
 from inspect import signature
 
 from ..functional_groups import react
-from ...utilities import dedupe, add_fragment_props
+from ...utilities import dedupe, add_fragment_props, remake
 
 
 def remove_confs(building_blocks, keep):
@@ -486,10 +486,7 @@ class Linear(Topology):
             if atom.HasProp('del'):
                 emol.RemoveAtom(atom.GetIdx())
 
-        macro_mol.mol = emol.GetMol()
-        # Add hydrogens.
-        for atom in macro_mol.mol.GetAtoms():
-            atom.UpdatePropertyCache()
+        macro_mol.mol = remake(emol.GetMol())
         macro_mol.mol = rdkit.AddHs(macro_mol.mol, addCoords=True)
 
     def place_mols(self, macro_mol):
