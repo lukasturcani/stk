@@ -845,6 +845,50 @@ def normalize_vector(vector):
     return np.round(v, decimals=4)
 
 
+def remake(mol):
+    """
+    Remakes a molecule from scratch.
+
+    Parameters
+    ----------
+    mol : :class:`rdkit.Chem.rdchem.Mol`
+        The molecule to be remade.
+
+    Returns
+    -------
+    :class:`rdkit.Chem.rdchem.Mol`
+        The remade molecule.
+
+    """
+
+    emol = rdkit.EditableMol(rdkit.Mol())
+    for a in mol.GetAtoms():
+        new_atom = rdkit.Atom(a.GetAtomicNum())
+        # Set properties.
+        for pname, pval in a.GetPropsAsDict(False, False).items():
+            if isinstance(pval, int):
+                new_atom.SetIntProp(pname, pval)
+            elif isinstance(pval, bool):
+                new_atom.SetBoolProp(pname, pval)
+            else:
+                new_atom.SetProp(pname, pval)
+
+        emol.AddAtom(new_atom)
+
+    for bond in mol.GetBonds():
+        emol.AddBond(bond.GetBeginAtomIdx(),
+                     bond.GetEndAtomIdx(),
+                     bond.GetBondType())
+
+    m = emol.GetMol()
+    m.AddConformer(rdkit.Conformer(mol.GetConformer()))
+
+    for a in m.GetAtoms():
+        a.UpdatePropertyCache()
+
+    return m
+
+
 def rotation_matrix(vector1, vector2):
     """
     Returns a rotation matrix which transforms `vector1` to `vector2`.
