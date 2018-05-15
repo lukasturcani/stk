@@ -25,25 +25,17 @@
   
 
   
-  
     <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="stk  documentation" href="../../../index.html"/>
-        <link rel="up" title="Module code" href="../../index.html"/> 
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -96,7 +88,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">stk</a>
@@ -104,9 +96,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -136,8 +129,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-        
       </li>
     
   </ul>
@@ -163,8 +154,9 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">uuid4</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
 
-<span class="kn">from</span> <span class="nn">..utilities</span> <span class="k">import</span> <span class="n">MAEExtractor</span>
+<span class="kn">from</span> <span class="nn">..utilities</span> <span class="k">import</span> <span class="n">MAEExtractor</span><span class="p">,</span> <span class="n">flatten</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -228,9 +220,9 @@
 <span class="sd">                ``&#39;both&#39;`` then a restricted optimization is performed</span>
 <span class="sd">                first, followed by a regular optimization.</span>
 
-<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``0``)</span>
+<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``None``)</span>
 <span class="sd">                The amount in seconds the optimization is allowed to</span>
-<span class="sd">                run before being terminated. ``0`` means there is no</span>
+<span class="sd">                run before being terminated. ``None`` means there is no</span>
 <span class="sd">                timeout.</span>
 
 <span class="sd">            &#39;force_field&#39; : :class:`int` (default = ``16``)</span>
@@ -277,19 +269,13 @@
 
     <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
              <span class="s1">&#39;restricted&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-             <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+             <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
              <span class="s1">&#39;force_field&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
              <span class="s1">&#39;max_iter&#39;</span><span class="p">:</span> <span class="mi">2500</span><span class="p">,</span>
              <span class="s1">&#39;gradient&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
              <span class="s1">&#39;md&#39;</span><span class="p">:</span> <span class="kc">False</span>
             <span class="p">}</span>
     <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
-
-    <span class="c1"># Default initiailize some parameters. These are for the internal</span>
-    <span class="c1"># use of the function (to prevent infinite recursion) not for the</span>
-    <span class="c1"># user. Also see comments below.</span>
-    <span class="k">if</span> <span class="s1">&#39;lewis_fixed&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
-        <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
@@ -304,7 +290,7 @@
         <span class="n">_run_bmin</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
         <span class="c1"># Get the ``.maegz`` file output from the optimization and</span>
         <span class="c1"># convert it to a ``.mae`` file.</span>
-        <span class="n">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
+        <span class="n">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
         <span class="n">mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;.mae&#39;</span><span class="p">),</span>
                             <span class="n">conformer</span><span class="p">)</span>
 
@@ -337,26 +323,7 @@
                               <span class="n">macromodel_path</span><span class="p">,</span>
                               <span class="n">vals</span><span class="p">,</span>
                               <span class="n">md</span><span class="p">,</span>
-                              <span class="n">conformer</span><span class="p">)</span>
-
-    <span class="c1"># The &#39;lewis_fixed&#39; parameter should not be used by the user.</span>
-    <span class="c1"># Sometimes the Lewis structure of `macro_mol` is wrong. If this is</span>
-    <span class="c1"># the case the function tries to fix it and then runs itself again.</span>
-    <span class="c1"># The `lewis_fixed` parameter indicates if the fix has already been</span>
-    <span class="c1"># tried to prevent infinite recursion.</span>
-    <span class="k">except</span> <span class="n">_LewisStructureError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Attempting to fix Lewis &#39;</span>
-                        <span class="s1">&#39;structure of &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]:</span>
-            <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
-            <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">return</span> <span class="n">macromodel_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
-                                  <span class="n">macromodel_path</span><span class="p">,</span>
-                                  <span class="n">vals</span><span class="p">,</span>
-                                  <span class="n">md</span><span class="p">,</span>
-                                  <span class="n">conformer</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ex</span></div>
+                              <span class="n">conformer</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="macromodel_cage_opt"><a class="viewcode-back" href="../../../stk.optimization.macromodel.html#stk.optimization.macromodel.macromodel_cage_opt">[docs]</a><span class="k">def</span> <span class="nf">macromodel_cage_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
@@ -397,9 +364,9 @@
 <span class="sd">                ``&#39;both&#39;`` then a restricted optimization is performed</span>
 <span class="sd">                first, followed by a regular optimization.</span>
 
-<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``0``)</span>
+<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``None``)</span>
 <span class="sd">                The amount in seconds the optimization is allowed to</span>
-<span class="sd">                run before being terminated. ``0`` means there is no</span>
+<span class="sd">                run before being terminated. ``None`` means there is no</span>
 <span class="sd">                timeout.</span>
 
 <span class="sd">            &#39;force_field&#39; : :class:`int` (default = ``16``)</span>
@@ -446,19 +413,13 @@
 
     <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
              <span class="s1">&#39;restricted&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-             <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+             <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
              <span class="s1">&#39;force_field&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
              <span class="s1">&#39;max_iter&#39;</span><span class="p">:</span> <span class="mi">2500</span><span class="p">,</span>
              <span class="s1">&#39;gradient&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
              <span class="s1">&#39;md&#39;</span><span class="p">:</span> <span class="kc">False</span>
             <span class="p">}</span>
     <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
-
-    <span class="c1"># Default initialize some parameters. These are for the internal</span>
-    <span class="c1"># use of the function (to prevent infinite recursion) not for the</span>
-    <span class="c1"># user. Also see comments below.</span>
-    <span class="k">if</span> <span class="s1">&#39;lewis_fixed&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
-        <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
@@ -473,7 +434,7 @@
         <span class="n">_run_bmin</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
         <span class="c1"># Get the ``.maegz`` file output from the optimization and</span>
         <span class="c1"># convert it to a ``.mae`` file.</span>
-        <span class="n">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
+        <span class="n">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
         <span class="n">mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;.mae&#39;</span><span class="p">),</span>
                             <span class="n">conformer</span><span class="p">)</span>
 
@@ -513,26 +474,7 @@
                                    <span class="n">macromodel_path</span><span class="p">,</span>
                                    <span class="n">vals</span><span class="p">,</span>
                                    <span class="n">md</span><span class="p">,</span>
-                                   <span class="n">conformer</span><span class="p">)</span>
-
-    <span class="c1"># The &#39;lewis_fixed&#39; parameter should not be used by the user.</span>
-    <span class="c1"># Sometimes the Lewis structure of `macro_mol` is wrong. If this is</span>
-    <span class="c1"># the case the function tries to fix it and then runs itself again.</span>
-    <span class="c1"># The `lewis_fixed` parameter indicates if the fix has already been</span>
-    <span class="c1"># tried to prevent infinite recursion.</span>
-    <span class="k">except</span> <span class="n">_LewisStructureError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Attempting to fix Lewis &#39;</span>
-                        <span class="s1">&#39;structure of &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]:</span>
-            <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
-            <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">return</span> <span class="n">macromodel_cage_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
-                                       <span class="n">macromodel_path</span><span class="p">,</span>
-                                       <span class="n">vals</span><span class="p">,</span>
-                                       <span class="n">md</span><span class="p">,</span>
-                                       <span class="n">conformer</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ex</span></div>
+                                   <span class="n">conformer</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_macromodel_md_opt"><a class="viewcode-back" href="../../../stk.optimization.macromodel.html#stk.optimization.macromodel._macromodel_md_opt">[docs]</a><span class="k">def</span> <span class="nf">_macromodel_md_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
@@ -558,9 +500,9 @@
 <span class="sd">        from the default need to be specified. The allowed parameters</span>
 <span class="sd">        are:</span>
 
-<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``0``)</span>
+<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``None``)</span>
 <span class="sd">                The amount in seconds the MD is allowed to run before</span>
-<span class="sd">                being terminated. ``0`` means there is no timeout.</span>
+<span class="sd">                being terminated. ``None`` means there is no timeout.</span>
 
 <span class="sd">            &#39;force_field&#39; : :class:`int` (default = ``16``)</span>
 <span class="sd">                The number of the force field to be used.</span>
@@ -601,7 +543,7 @@
         <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
-               <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+               <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                <span class="s1">&#39;force_field&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
                <span class="s1">&#39;temp&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
                <span class="s1">&#39;confs&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
@@ -613,12 +555,6 @@
               <span class="p">}</span>
 
     <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
-
-    <span class="c1"># Default initiailize some parameters. These are for the internal</span>
-    <span class="c1"># use of the function (to prevent infinite recursion) not for the</span>
-    <span class="c1"># user. Also see comments below.</span>
-    <span class="k">if</span> <span class="s1">&#39;lewis_fixed&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
-        <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running MD on &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
@@ -648,28 +584,10 @@
         <span class="k">return</span> <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
                                   <span class="n">macromodel_path</span><span class="p">,</span>
                                   <span class="n">vals</span><span class="p">,</span>
-                                  <span class="n">conformer</span><span class="p">)</span>
-
-    <span class="c1"># The &#39;lewis_fixed&#39; parameter should not be used by the user.</span>
-    <span class="c1"># Sometimes the Lewis structure of `macro_mol` is wrong. If this is</span>
-    <span class="c1"># the case the function tries to fix it and then runs itself again.</span>
-    <span class="c1"># The `lewis_fixed` parameter indicates if the fix has already been</span>
-    <span class="c1"># tried to prevent infinite recursion.</span>
-    <span class="k">except</span> <span class="n">_LewisStructureError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Attempting to fix Lewis &#39;</span>
-                        <span class="s1">&#39;structure of &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]:</span>
-            <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
-                                      <span class="n">macromodel_path</span><span class="p">,</span>
-                                      <span class="n">vals</span><span class="p">,</span>
-                                      <span class="n">conformer</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ex</span></div>
+                                  <span class="n">conformer</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_run_bmin"><a class="viewcode-back" href="../../../stk.optimization.macromodel.html#stk.optimization.macromodel._run_bmin">[docs]</a><span class="k">def</span> <span class="nf">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="_run_bmin"><a class="viewcode-back" href="../../../stk.optimization.macromodel.html#stk.optimization.macromodel._run_bmin">[docs]</a><span class="k">def</span> <span class="nf">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running bmin on &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
@@ -684,56 +602,58 @@
     <span class="c1"># are any additional arguments.</span>
 
     <span class="n">opt_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">opt_app</span><span class="p">,</span> <span class="n">file_root</span><span class="p">,</span> <span class="s2">&quot;-WAIT&quot;</span><span class="p">,</span> <span class="s2">&quot;-LOCAL&quot;</span><span class="p">]</span>
-    <span class="n">opt_proc</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">opt_cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                            <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
-                            <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">timeout</span><span class="p">:</span>
+
+    <span class="n">incomplete</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="n">incomplete</span><span class="p">:</span>
+        <span class="n">opt_proc</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">opt_cmd</span><span class="p">,</span>
+                                <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                                <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
             <span class="n">proc_out</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">opt_proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">proc_out</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">opt_proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
 
-    <span class="k">except</span> <span class="n">sp</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Minimization took too long&#39;</span>
-                        <span class="s1">&#39; and was terminated &#39;</span>
-                        <span class="s1">&#39;by force on &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-        <span class="n">_kill_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
-        <span class="n">proc_out</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">except</span> <span class="n">sp</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Minimization took too long&#39;</span>
+                            <span class="s1">&#39; and was terminated &#39;</span>
+                            <span class="n">f</span><span class="s1">&#39;by force on &quot;</span><span class="si">{macro_mol.name}</span><span class="s1">&quot;.&#39;</span><span class="p">))</span>
+            <span class="n">_kill_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
+            <span class="n">proc_out</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Output of bmin on &quot;</span><span class="si">{}</span><span class="s1">&quot; was: </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                             <span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">proc_out</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;Output of bmin on &quot;</span><span class="si">{macro_mol.name}</span><span class="s1">&quot; was: </span><span class="si">{proc_out}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log</span><span class="p">:</span>
-        <span class="n">log_content</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log</span><span class="p">:</span>
+            <span class="n">log_content</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-    <span class="c1"># Check the log for error reports.</span>
-    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;termination due to error condition           21-&quot;</span> <span class="ow">in</span>
-       <span class="n">log_content</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">_OptimizationError</span><span class="p">((</span><span class="s2">&quot;`bmin` crashed due to&quot;</span>
-                                  <span class="s2">&quot; an error condition. &quot;</span>
-                                  <span class="s2">&quot;See .log file.&quot;</span><span class="p">))</span>
+        <span class="c1"># Check the log for error reports.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;termination due to error condition           21-&quot;</span> <span class="ow">in</span>
+           <span class="n">log_content</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">_OptimizationError</span><span class="p">((</span><span class="s2">&quot;`bmin` crashed due to&quot;</span>
+                                      <span class="s2">&quot; an error condition. &quot;</span>
+                                      <span class="s2">&quot;See .log file.&quot;</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;FATAL do_nosort_typing: NO MATCH found for atom &quot;</span> <span class="ow">in</span>
-       <span class="n">log_content</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">_ForceFieldError</span><span class="p">(</span>
-                        <span class="s1">&#39;The log implies the force field failed.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;FATAL do_nosort_typing: NO MATCH found for atom &quot;</span> <span class="ow">in</span>
+           <span class="n">log_content</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">_ForceFieldError</span><span class="p">(</span>
+                            <span class="s1">&#39;The log implies the force field failed.&#39;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="p">((</span><span class="s2">&quot;FATAL gen_lewis_structure(): could not find best Lewis&quot;</span>
-         <span class="s2">&quot; structure&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">log_content</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;skipping input structure  &quot;</span>
-       <span class="s2">&quot;due to forcefield interaction errors&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">log_content</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">_LewisStructureError</span><span class="p">(</span>
-                <span class="s1">&#39;`bmin` failed due to poor Lewis structure.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="s2">&quot;FATAL gen_lewis_structure(): could not find best Lewis&quot;</span>
+             <span class="s2">&quot; structure&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">log_content</span> <span class="ow">and</span>
+            <span class="p">(</span><span class="s2">&quot;skipping input structure  due to &quot;</span>
+             <span class="s2">&quot;forcefield interaction errors&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">log_content</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">_LewisStructureError</span><span class="p">(</span>
+                    <span class="s1">&#39;`bmin` failed due to poor Lewis structure.&#39;</span><span class="p">)</span>
 
-    <span class="c1"># If optimization fails because a wrong Schrodinger path was given,</span>
-    <span class="c1"># raise.</span>
-    <span class="k">if</span> <span class="s1">&#39;The system cannot find the path specified&#39;</span> <span class="ow">in</span> <span class="n">proc_out</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">_PathError</span><span class="p">((</span><span class="s1">&#39;Wrong Schrodinger path supplied to&#39;</span>
-                          <span class="s1">&#39; `macromodel_opt` function.&#39;</span><span class="p">))</span>
+        <span class="c1"># If optimization fails because a wrong Schrodinger path was</span>
+        <span class="c1"># given, raise.</span>
+        <span class="k">if</span> <span class="s1">&#39;The system cannot find the path specified&#39;</span> <span class="ow">in</span> <span class="n">proc_out</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_PathError</span><span class="p">((</span><span class="s1">&#39;Wrong Schrodinger path supplied to&#39;</span>
+                              <span class="s1">&#39; `macromodel_opt` function.&#39;</span><span class="p">))</span>
 
-    <span class="c1"># If optimization fails because the license is not found, rerun the</span>
-    <span class="c1"># function.</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">proc_out</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+        <span class="c1"># If optimization fails because the license is not found, rerun</span>
+        <span class="c1"># the function.</span>
+        <span class="k">if</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">proc_out</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+            <span class="n">incomplete</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># Make sure the .maegz file created by the optimization is present.</span>
     <span class="n">maegz</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;-out.maegz&#39;</span>
@@ -749,17 +669,22 @@
     <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">|/&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">app</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macromodel_path</span><span class="p">,</span> <span class="s1">&#39;jobcontrol&#39;</span><span class="p">)</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">app</span><span class="p">,</span> <span class="s1">&#39;-stop&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                 <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># If no license if found, keep re-running the function until it is.</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_kill_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
+    <span class="n">incomplete</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="n">incomplete</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                     <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># If no license if found, keep re-running the function until it</span>
+        <span class="c1"># is.</span>
+        <span class="k">if</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+            <span class="n">incomplete</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># This loop causes the function to wait until the job has been</span>
-    <span class="c1"># killed via job control. This means the output files will have been</span>
-    <span class="c1"># written by the time the function exits. Essentially the loop</span>
-    <span class="c1"># continues until the job is no longer found by &quot;./jobcontrol -list&quot;</span>
+    <span class="c1"># killed via job control. This means the output files will have</span>
+    <span class="c1"># been written by the time the function exits. Essentially the loop</span>
+    <span class="c1"># continues until the job is no longer found by</span>
+    <span class="c1"># &quot;./jobcontrol -list&quot;</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">app</span><span class="p">,</span> <span class="s1">&#39;-list&#39;</span><span class="p">]</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">name</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -768,24 +693,6 @@
                         <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">stdout</span>
         <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="mi">600</span><span class="p">:</span>
             <span class="k">break</span></div>
-
-
-<div class="viewcode-block" id="_run_applyhtreat"><a class="viewcode-back" href="../../../stk.optimization.macromodel.html#stk.optimization.macromodel._run_applyhtreat">[docs]</a><span class="k">def</span> <span class="nf">_run_applyhtreat</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">):</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
-    <span class="n">mae</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.mae&#39;</span>
-    <span class="n">mae_out</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_htreated.mae&#39;</span>
-    <span class="n">_create_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
-
-    <span class="n">app</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macromodel_path</span><span class="p">,</span> <span class="s1">&#39;utilities&#39;</span><span class="p">,</span> <span class="s1">&#39;applyhtreat&#39;</span><span class="p">)</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">app</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">mae_out</span><span class="p">]</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                 <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="c1"># If no license if found, keep re-running the function until it is.</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
-
-    <span class="n">macro_mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">mae_out</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_license_found"><a class="viewcode-back" href="../../../stk.optimization.macromodel.html#stk.optimization.macromodel._license_found">[docs]</a><span class="k">def</span> <span class="nf">_license_found</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -990,7 +897,7 @@
     <span class="k">return</span> <span class="n">mae_file</span></div>
 
 
-<div class="viewcode-block" id="_convert_maegz_to_mae"><a class="viewcode-back" href="../../../stk.optimization.macromodel.html#stk.optimization.macromodel._convert_maegz_to_mae">[docs]</a><span class="k">def</span> <span class="nf">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">):</span>
+<div class="viewcode-block" id="_convert_maegz_to_mae"><a class="viewcode-back" href="../../../stk.optimization.macromodel.html#stk.optimization.macromodel._convert_maegz_to_mae">[docs]</a><span class="k">def</span> <span class="nf">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a ``.maegz`` file to a ``.mae`` file.</span>
 
@@ -1001,22 +908,9 @@
 <span class="sd">        its optimized structure is converted to a ``.mae`` file. Both</span>
 <span class="sd">        versions are kept.</span>
 
-<span class="sd">    macromodel_path : :class:`str`</span>
-<span class="sd">        The full path of the Schrodinger suite within the user&#39;s</span>
-<span class="sd">        machine. For example, on a Linux machine this may be something</span>
-<span class="sd">        like ``&#39;/opt/schrodinger2017-2&#39;``.</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    None : :class:`NoneType`</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    :class:`_ForceFieldError`</span>
-<span class="sd">        If the OPLS3 force field failed to optimize the molecule. If</span>
-<span class="sd">        this happens the conversion function is unable to convert the</span>
-<span class="sd">        output of the optimization function and as a result this error</span>
-<span class="sd">        is raised.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1026,31 +920,45 @@
     <span class="n">maegz</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-out.maegz&#39;</span>
     <span class="c1"># Replace extensions to get the names of the various files.</span>
     <span class="n">mae</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.mae&#39;</span>
-    <span class="k">return</span> <span class="n">_structconvert</span><span class="p">(</span><span class="n">maegz</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span></div>
+
+    <span class="n">gz_file</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">maegz</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mae</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">gz_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="n">gz_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="_structconvert"><a class="viewcode-back" href="../../../stk.optimization.macromodel.html#stk.optimization.macromodel._structconvert">[docs]</a><span class="k">def</span> <span class="nf">_structconvert</span><span class="p">(</span><span class="n">iname</span><span class="p">,</span> <span class="n">oname</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">):</span>
 
-    <span class="n">convrt_app</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macromodel_path</span><span class="p">,</span> <span class="s1">&#39;utilities&#39;</span><span class="p">,</span>
+    <span class="n">convrt_app</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macromodel_path</span><span class="p">,</span>
+                              <span class="s1">&#39;utilities&#39;</span><span class="p">,</span>
                               <span class="s1">&#39;structconvert&#39;</span><span class="p">)</span>
     <span class="n">convrt_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">convrt_app</span><span class="p">,</span> <span class="n">iname</span><span class="p">,</span> <span class="n">oname</span><span class="p">]</span>
 
-    <span class="c1"># Execute the file conversion.</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">convrt_return</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">convrt_cmd</span><span class="p">,</span>
-                               <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                               <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
-                               <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">incomplete</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="n">incomplete</span><span class="p">:</span>
 
-    <span class="c1"># If conversion fails because a wrong Schrodinger path was given,</span>
-    <span class="c1"># raise.</span>
-    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">_PathError</span><span class="p">((</span><span class="s1">&#39;Wrong Schrodinger path supplied to&#39;</span>
-                          <span class="s1">&#39; `structconvert` function.&#39;</span><span class="p">))</span>
+        <span class="c1"># Execute the file conversion.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">convrt_return</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">convrt_cmd</span><span class="p">,</span>
+                                   <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                   <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                                   <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># If no license if found, keep re-running the function until it is.</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">convrt_return</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_structconvert</span><span class="p">(</span><span class="n">iname</span><span class="p">,</span> <span class="n">oname</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
+        <span class="c1"># If conversion fails because a wrong Schrodinger path was</span>
+        <span class="c1"># given, raise.</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_PathError</span><span class="p">((</span><span class="s1">&#39;Wrong Schrodinger path supplied to&#39;</span>
+                              <span class="s1">&#39; `structconvert` function.&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="s1">&#39;File does not exist&#39;</span> <span class="ow">in</span> <span class="n">convrt_return</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_ConversionError</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">f</span><span class="s1">&#39;structconvert input file, </span><span class="si">{iname}</span><span class="s1">, missing. &#39;</span>
+                     <span class="n">f</span><span class="s1">&#39;Console output was </span><span class="si">{convrt_return.stdout}</span><span class="s1">&#39;</span><span class="p">))</span>
+
+        <span class="c1"># If no license if found, keep re-running the function until it</span>
+        <span class="c1"># is.</span>
+        <span class="k">if</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">convrt_return</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+            <span class="n">incomplete</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># If force field failed, raise.</span>
     <span class="k">if</span> <span class="s1">&#39;number 1&#39;</span> <span class="ow">in</span> <span class="n">convrt_return</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
@@ -1059,9 +967,8 @@
     <span class="n">_wait_for_file</span><span class="p">(</span><span class="n">oname</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">oname</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">_ConversionError</span><span class="p">(</span>
-         <span class="p">(</span><span class="s1">&#39;Conversion output file </span><span class="si">{}</span><span class="s1"> was not found.&#39;</span>
-          <span class="s1">&#39; Console output was </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">oname</span><span class="p">,</span>
-                                            <span class="n">convrt_return</span><span class="o">.</span><span class="n">stdout</span><span class="p">))</span>
+         <span class="p">(</span><span class="n">f</span><span class="s1">&#39;Conversion output file </span><span class="si">{oname}</span><span class="s1"> was not found.&#39;</span>
+          <span class="n">f</span><span class="s1">&#39; Console output was </span><span class="si">{convrt_return.stdout}</span><span class="s1">.&#39;</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">convrt_return</span></div>
 
@@ -1141,6 +1048,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">))</span>
+
     <span class="c1"># Go through all the bonds in the rdkit molecule. If the bond</span>
     <span class="c1"># is not between bonder atoms add a fix line to the ``fix_block``.</span>
     <span class="c1"># If the bond does invovle two bonder atoms go to the next bond.</span>
@@ -1150,8 +1059,8 @@
         <span class="n">atom1</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetBeginAtom</span><span class="p">()</span>
         <span class="n">atom2</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetEndAtom</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">atom1</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="ow">and</span>
-           <span class="n">atom2</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">atom1</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="ow">in</span> <span class="n">bonder_ids</span> <span class="ow">and</span>
+           <span class="n">atom2</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="ow">in</span> <span class="n">bonder_ids</span><span class="p">):</span>
             <span class="k">continue</span>
 
         <span class="c1"># Make sure that the indices are increased by 1 in the .mae</span>
@@ -1285,9 +1194,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1300,7 +1207,7 @@
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1319,6 +1226,7 @@
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
             VERSION:'',
+            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -1336,14 +1244,11 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
   
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
