@@ -973,8 +973,7 @@ def _cage_target(func_name,
     cmplx_cage = Cage.__new__(Cage)
     cmplx_cage.building_blocks = list(macro_mol.building_blocks)
     cmplx_cage.bonder_ids = list(macro_mol.bonder_ids)
-    cmplx_cage.fragments = macro_mol.fragments
-    cmplx_cage.fg_ids = set(macro_mol.fg_ids)
+    cmplx_cage.atom_props = dict(macro_mol.atom_props)
     cmplx_cage.mol = cmplx_cage_mol
     cmplx_cage.topology = macro_mol.topology
     cmplx_cage.name = min_eng_cmplx.name + '_no_target'
