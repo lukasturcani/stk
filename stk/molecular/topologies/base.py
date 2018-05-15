@@ -385,11 +385,10 @@ class Linear(Topology):
         labelled as ``"A"`` while index ``1`` as ``"B"`` and so on.
 
     orientation : :class:`tuple` of :class:`int`
-        For each character in the repeating unit, a value of ``-1``,
-        ``0`` or ``1`` must be given in a :class:`list`. It indicates
-        the direction at which each monomer of the repeating unit is
-        placed along the chain. ``0`` means that the direction is
-        random.
+        For each character in the repeating unit, a value between ``0``
+        and ``1`` (both inclusive) must be given in a :class:`list`. It
+        indicates the probability that each monomer will have its
+        orientation along the chain flipped.
 
     n : :class:`int`
         The number of repeating units which are used to make the
