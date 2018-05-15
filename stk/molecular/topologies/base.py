@@ -76,12 +76,12 @@ def remove_confs(building_blocks, keep):
     """
     Removes all conformers from `building_blocks` except `keep`.
 
-    All kept conformers have their id set to 0.
+    All kept conformers have their id set to ``0``.
 
     Parameters
     ----------
-    building_blocks : iterable of ``StructUnit`` instances
-        A set of ``StructUnit`` instances which represent the
+    building_blocks : :class:`iterable` of :class:`.StructUnit`
+        A set of :class:`.StructUnit` instances which represent the
         building blocks forming a macromolecule.
 
     keep : :class:`list` of :class:`int`
@@ -96,9 +96,9 @@ def remove_confs(building_blocks, keep):
 
         .. code-block:: python
 
-        returned = [[conf1, conf2, conf3],
-                    [conf4, conf5],
-                    [conf6, conf7, conf8, conf9]]
+            returned = [[conf1, conf2, conf3],
+                        [conf4, conf5],
+                        [conf6, conf7, conf8, conf9]]
 
         where each sublist holds all the original conformers of a
         particular building block.
@@ -384,7 +384,7 @@ class Linear(Topology):
         index ``0`` in :attr:`.MacroMolecule.building_blocks` is
         labelled as ``"A"`` while index ``1`` as ``"B"`` and so on.
 
-    orientation : :class:`tuple` of :class:`int`
+    orientation : :class:`tuple` of :class:`float`
         For each character in the repeating unit, a value between ``0``
         and ``1`` (both inclusive) must be given in a :class:`list`. It
         indicates the probability that each monomer will have its
