@@ -218,12 +218,12 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Removes all conformers from `building_blocks` except `keep`.</span>
 
-<span class="sd">    All kept conformers have their id set to 0.</span>
+<span class="sd">    All kept conformers have their id set to ``0``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    building_blocks : iterable of ``StructUnit`` instances</span>
-<span class="sd">        A set of ``StructUnit`` instances which represent the</span>
+<span class="sd">    building_blocks : :class:`iterable` of :class:`.StructUnit`</span>
+<span class="sd">        A set of :class:`.StructUnit` instances which represent the</span>
 <span class="sd">        building blocks forming a macromolecule.</span>
 
 <span class="sd">    keep : :class:`list` of :class:`int`</span>
@@ -238,9 +238,9 @@
 
 <span class="sd">        .. code-block:: python</span>
 
-<span class="sd">        returned = [[conf1, conf2, conf3],</span>
-<span class="sd">                    [conf4, conf5],</span>
-<span class="sd">                    [conf6, conf7, conf8, conf9]]</span>
+<span class="sd">            returned = [[conf1, conf2, conf3],</span>
+<span class="sd">                        [conf4, conf5],</span>
+<span class="sd">                        [conf6, conf7, conf8, conf9]]</span>
 
 <span class="sd">        where each sublist holds all the original conformers of a</span>
 <span class="sd">        particular building block.</span>
@@ -526,7 +526,7 @@
 <span class="sd">        index ``0`` in :attr:`.MacroMolecule.building_blocks` is</span>
 <span class="sd">        labelled as ``&quot;A&quot;`` while index ``1`` as ``&quot;B&quot;`` and so on.</span>
 
-<span class="sd">    orientation : :class:`tuple` of :class:`int`</span>
+<span class="sd">    orientation : :class:`tuple` of :class:`float`</span>
 <span class="sd">        For each character in the repeating unit, a value between ``0``</span>
 <span class="sd">        and ``1`` (both inclusive) must be given in a :class:`list`. It</span>
 <span class="sd">        indicates the probability that each monomer will have its</span>
