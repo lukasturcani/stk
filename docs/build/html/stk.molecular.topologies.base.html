@@ -222,7 +222,7 @@ labelled as <code class="docutils literal"><span class="pre">&quot;A&quot;</span
 <dl class="attribute">
 <dt id="stk.molecular.topologies.base.Linear.orientation">
 <code class="descname">orientation</code><a class="headerlink" href="#stk.molecular.topologies.base.Linear.orientation" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – For each character in the repeating unit, a value between <code class="docutils literal"><span class="pre">0</span></code>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code> – For each character in the repeating unit, a value between <code class="docutils literal"><span class="pre">0</span></code>
 and <code class="docutils literal"><span class="pre">1</span></code> (both inclusive) must be given in a <code class="xref py py-class docutils literal"><span class="pre">list</span></code>. It
 indicates the probability that each monomer will have its
 orientation along the chain flipped.</p>
@@ -523,13 +523,13 @@ be added to the macromolecule. The utility function
 <dt id="stk.molecular.topologies.base.remove_confs">
 <code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">remove_confs</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>keep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#remove_confs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.remove_confs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes all conformers from <cite>building_blocks</cite> except <cite>keep</cite>.</p>
-<p>All kept conformers have their id set to 0.</p>
+<p>All kept conformers have their id set to <code class="docutils literal"><span class="pre">0</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>building_blocks</strong> (iterable of <code class="docutils literal"><span class="pre">StructUnit</span></code> instances) – A set of <code class="docutils literal"><span class="pre">StructUnit</span></code> instances which represent the
+<li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal"><span class="pre">iterable</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>) – A set of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> instances which represent the
 building blocks forming a macromolecule.</li>
 <li><strong>keep</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The ids of the building block conformers to be used for
 assembling the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>. Must be equal in length
@@ -538,15 +538,11 @@ to <cite>building_blocks</cite> and orders must correspond.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of the form,</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">returned</span> <span class="o">=</span> <span class="p">[[</span><span class="n">conf1</span><span class="p">,</span> <span class="n">conf2</span><span class="p">,</span> <span class="n">conf3</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">conf4</span><span class="p">,</span> <span class="n">conf5</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">conf6</span><span class="p">,</span> <span class="n">conf7</span><span class="p">,</span> <span class="n">conf8</span><span class="p">,</span> <span class="n">conf9</span><span class="p">]]</span>
 </pre></div>
 </div>
-<dl class="docutils">
-<dt>returned = [[conf1, conf2, conf3],</dt>
-<dd><p class="first last">[conf4, conf5],
-[conf6, conf7, conf8, conf9]]</p>
-</dd>
-</dl>
 <p>where each sublist holds all the original conformers of a
 particular building block.</p>
 </p>
