@@ -80,13 +80,33 @@ class FGInfo:
     fg_smarts : :class:`str`
         A SMARTS string which matches the functional group.
 
-    bonder_smarts : :class:`str`
-        A SMARTS string which matches the atom on the functional group
-        which forms bonds during reactions.
+    bonder_smarts : :class:`list`
+        A :class:`tuple` of the form
 
-    del_smarts : :class:`str`
-        A SMARTS string, which matches the atoms removed when the
-        functional group reacts.
+        .. code-block:: python
+
+            bonder_smarts = (('[$([N]([H])[H])]', 1),
+                             ('[$([H][N][H])], 1))
+
+        Each string is SMARTS string which matches an atom in the
+        functional group which is to be tagged as ``'bonder'``. The
+        number represents how many matched atoms should be tagged, per
+        functional group.
+
+        In the example, ``('[$([N]([H])[H])]', 1)`` matches the
+        nitrogen atom in the amine functional group. The ``1`` means
+        that 1 nitrogen atom per functional group will be tagged as
+        ``'bonder'``. The second :class:`tuple`,
+        ``('[$([H][N][H])], 1))``, matches the hydrogen atom in the
+        amine functional group. Because the number in the
+        :class:`tuple` is ``1``, only 1 of hydrogen atom per
+        amine functional group will be tagged ``'bonder'``. If instead
+        the tuple was ``('[$([H][N][H])], 2)``, then both of the
+        hydrogen atoms in the functional group would be tagged.
+
+    del_smarts : :class:`list`
+        Same as :attr:`bonder_smarts` but matched atoms are tagged
+        as ``'del'``.
 
     """
 
@@ -104,13 +124,11 @@ class FGInfo:
         fg_smarts : :class:`str`
             A SMARTS string which matches the functional group.
 
-        bonder_smarts : :class:`str`
-            A SMARTS string which matches the atom on the functional
-            group which forms bonds during reactions.
+        bonder_smarts : :class:`list`
+            See :attr:`bonder_smarts`.
 
-        del_smarts : :class:`str`
-            A SMARTS string, which matches the atoms removed when the
-            functional group reacts.
+        del_smarts : :class:`list`
+            See :attr:`del_smarts`.
 
         """
 
@@ -281,69 +299,90 @@ custom_reactions = {
     tuple(sorted((('boronic_acid', 1), ('diol', 1)))): boronic_acid_with_diol}
 
 
+_amine = FGInfo(name="amine",
+                fg_smarts="[N]([H])[H]",
+                bonder_smarts=[("[$([N]([H])[H])]", 1)],
+                del_smarts=[("[$([H][N][H])]", 1)])
+
+
+_aldehyde = FGInfo(name="aldehyde",
+                   fg_smarts="[C](=[O])[H]",
+                   bonder_smarts=[("[$([C](=[O])[H])]", 1)],
+                   del_smarts=[("[$([O]=[C][H])]", 1)])
+
+_carboxylic_acid = FGInfo(name="carboxylic_acid",
+                          fg_smarts="[C](=[O])[O][H]",
+                          bonder_smarts=[("[$([C](=[O])[O][H])]", 1)],
+                          del_smarts=[("[$([H][O][C](=[O]))]", 1),
+                                      ("[$([O]([H])[C](=[O]))]", 1)])
+
+_amide = FGInfo(name="amide",
+                fg_smarts="[C](=[O])[N]([H])[H]",
+                bonder_smarts=[("[$([C](=[O])[N]([H])[H])]", 1)],
+                del_smarts=[("[$([N]([H])([H])[C](=[O]))]", 1),
+                            ("[$([H][N]([H])[C](=[O]))]", 2)])
+
+_thioacid = FGInfo(name="thioacid",
+                   fg_smarts="[C](=[O])[S][H]",
+                   bonder_smarts=[("[$([C](=[O])[S][H])]", 1)],
+                   del_smarts=[("[$([H][S][C](=[O]))]", 1),
+                               ("[$([S]([H])[C](=[O]))]", 1)])
+
+_alcohol = FGInfo(name="alcohol",
+                  fg_smarts="[O][H]",
+                  bonder_smarts=[("[$([O][H])]", 1)],
+                  del_smarts=[("[$([H][O])]", 1)])
+
+_thiol = FGInfo(name="thiol",
+                fg_smarts="[S][H]",
+                bonder_smarts=[("[$([S][H])]", 1)],
+                del_smarts=[("[$([H][S])]", 1)])
+
+_bromine = FGInfo(name="bromine",
+                  fg_smarts="*[Br]",
+                  bonder_smarts=[("[$(*[Br])]", 1)],
+                  del_smarts=[("[$([Br]*)]", 1)])
+
+_iodine = FGInfo(name="iodine",
+                 fg_smarts="*[I]",
+                 bonder_smarts=[("[$(*[I])]", 1)],
+                 del_smarts=[("[$([I]*)]", 1)])
+
+_alkyne = FGInfo(name='alkyne',
+                 fg_smarts='[C]#[C][H]',
+                 bonder_smarts=[('[$([C]([H])#[C])]', 1)],
+                 del_smarts=[('[$([H][C]#[C])]', 1)])
+
+_terminal_alkene = FGInfo(name='terminal_alkene',
+                          fg_smarts='[C]=[C]([H])[H]',
+                          bonder_smarts=[('[$([C]=[C]([H])[H])]', 1)],
+                          del_smarts=[('[$([H][C]([H])=[C])]', 2),
+                                      ('[$([C](=[C])([H])[H])]', 1)])
+
 functional_groups = (
 
-                FGInfo("amine",
-                       "[N]([H])[H]",
-                       "[$([N]([H])[H])]",
-                       "[$([H][N][H])].[$([H][N][H])]"),
+                ,
 
-                FGInfo("aldehyde",
-                       "[C](=[O])[H]",
-                       "[$([C](=[O])[H])]",
-                       "[$([O]=[C][H])]"),
+,
 
-                FGInfo("carboxylic_acid",
-                       "[C](=[O])[O][H]",
-                       "[$([C](=[O])[O][H])]",
-                       "[$([H][O][C](=[O]))][O]"),
+,
 
-                FGInfo("amide",
-                       "[C](=[O])[N]([H])[H]",
-                       "[$([C](=[O])[N]([H])[H])]",
-                       "[$([N]([H])([H])[C](=[O]))]([H])[H]"),
+,
 
-                FGInfo("thioacid",
-                       "[C](=[O])[S][H]",
-                       "[$([C](=[O])[O][H])]",
-                       "[$([H][O][C](=[O]))][S]"),
+,
 
-                FGInfo("alcohol",
-                       "[O][H]",
-                       "[$([O][H])]",
-                       "[$([H][O])]"),
+,
 
-                FGInfo("thiol",
-                       "[S][H]",
-                       "[$([S][H])]",
-                       "[$([H][S])]"),
+,
 
-                FGInfo("bromine",
-                       "*[Br]",
-                       "[$(*[Br])]",
-                       "[$([Br]*)]"),
+,
 
-                FGInfo("iodine",
-                       "*[I]",
-                       "[$(*[I])]",
-                       "[$([I]*)]"),
+,
 
-                FGInfo("nitrile",
-                       "[C][C]#[N]",
-                       "[$([C]([H])([H])[C]#[N])]",
-                       "[$([H][C][H])].[$([H][C][H])]"),
 
-                FGInfo('alkyne',
-                       '[C]#[C][H]',
-                       '[$([C]([H])#[C])]',
-                       '[$([H][C]#[C])]'),
+,
 
-                FGInfo('terminal_alkene',
-                       '[C]=[C]([H])[H]',
-                       '[$([C]=[C]([H])[H])]',
-                       ('[$([H][C]([H])=[C])].'
-                        '[$([H][C]([H])=[C])].'
-                        '[$([C](=[C])([H])[H])]')),
+,
 
                 FGInfo('boronic_acid',
                        '[B]([O][H])[O][H]',
