@@ -3413,6 +3413,10 @@ periodic._place_island([4, 4, 4])
             f.write('cart\n')
             for (id_, coords), fix in zip(self.all_atom_coords(),
                                           atom_fix):
+                # Don't write deleter atoms.
+                if self.atom_props.get(id_, {}).get('del', False):
+                    continue
+
                 x, y, z = [round(x, 4) for x in coords]
                 fx, fy, fz = [int(x) for x in fix]
                 f.write('{} core {} {} {} {} {} {}\n'.format(
@@ -3426,9 +3430,11 @@ periodic._place_island([4, 4, 4])
 
             # Add periodic bonds.
             for bond in self.periodic_bonds:
-                a1 = bond.atom1 + 1
-                a2 = bond.atom2 + 1
+                a1 = next(a for a, props in self.atom_props.items() if
+                          props.get('fg_id', None) == bond.fg1 and
+                          props.get('bonder', False)) + 1
+                a2 = next(a for a, props in self.atom_props.items() if
+                          props.get('fg_id', None) == bond.fg2 and
+                          props.get('bonder', False)) + 1
                 dx, dy, dz = bond.direction
-                f.write('connect {} {} {:+} {:+} {:+}\n'.format(a1, a2,
-                                                                dx, dy,
-                                                                dz))
+                f.write(f'connect {a1} {a2} {dx:+} {dy:+} {dz:+}\n')
