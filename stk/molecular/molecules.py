@@ -2235,6 +2235,39 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         cls.cache[key] = obj
         return obj
 
+    def _valid_tags(self, match_atoms, fgs, n):
+        """
+
+        """
+
+        match_atoms = set(match_atoms)
+        # Keep only match atoms:
+        fgs = [[aid for aid in fg if aid in match_atoms] for fg in fgs]
+
+        # Make sure only `n` atoms per fg are returned.
+        result = []
+        for fg in fgs:
+            for i, atom_id in enumerate(fg):
+                if i >= n:
+                    break
+                result.append(atom_id)
+        return result
+
+    def _tag(self, mol, smarts, tag):
+        """
+
+        """
+
+        fgs = self.functional_group_atoms()
+
+        for match in smarts:
+            match_mol = rdkit.MolFromSmarts(match.smarts)
+            match_atoms = mol.GetSubstructMatches(match_mol)
+            match_atoms = self._valid_tags(match_atoms, fgs, match.n)
+            for atom_id in match_atoms:
+                atom = mol.GetAtomWithIdx(atom_id)
+                atom.SetIntProp(tag, 1)
+
     def tag_atoms(self):
         """
         Adds atom properties to atoms.
@@ -2262,22 +2295,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                 atom.SetProp('fg', self.func_grp.name)
                 atom.SetIntProp('fg_id', fg_id)
 
-        # Give all atoms which form bonds during reactions the tag
-        # 'bonder' and set its value to '1'. Add their ids to
-        # `bonder_ids`.
-        bond_mol = rdkit.MolFromSmarts(self.func_grp.bonder_smarts)
-        bond_atoms = self.mol.GetSubstructMatches(bond_mol)
-        for atom_id in flatten(bond_atoms):
-            atom = self.mol.GetAtomWithIdx(atom_id)
-            atom.SetIntProp('bonder', 1)
-
-        # Give all atoms which form bonds during reactions the tag
-        # 'del' and set its value to '1'.
-        del_mol = rdkit.MolFromSmarts(self.func_grp.del_smarts)
-        del_atoms = self.mol.GetSubstructMatches(del_mol)
-        for atom_id in flatten(del_atoms):
-            atom = self.mol.GetAtomWithIdx(atom_id)
-            atom.SetIntProp('del', 1)
+        self._tag(self.mol, self.func_grp.bonder_smarts, 'bonder')
+        self._tag(self.mol, self.func_grp.del_smarts, 'del')
 
     def untag_atoms(self):
         """
