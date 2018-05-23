@@ -297,12 +297,12 @@ class Molecule:
 
         .. code-block:: python
 
-            atom_props = {0: {'bonder': 1,
+            atom_props = {0: {'bonder': 0,
                               'fg': 'amine',
                               'fg_id': 1},
                           5: {'fg': 'amine',
                               'fg_id': 2,
-                              'del': 1}}
+                              'del': 0}}
 
     bonder_ids : :class:`list`
         Holds the id of bonder atoms in a nested :class:`list`
@@ -2296,6 +2296,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         fgs = self.functional_group_atoms()
 
+        tag_id = 0
         for match in smarts:
             match_mol = rdkit.MolFromSmarts(match.smarts)
             match_atoms = mol.GetSubstructMatches(match_mol)
@@ -2303,7 +2304,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
             for atom_id in match_atoms:
                 atom = mol.GetAtomWithIdx(atom_id)
-                atom.SetIntProp(tag, 1)
+                atom.SetIntProp(tag, tag_id)
+                tag_id += 1
 
     def tag_atoms(self):
         """
@@ -2316,9 +2318,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         group.
 
         The atoms which form bonds during assembly have the property
-        called ``'bonder'`` added and set to ``1``. Atoms which are
-        deleted during reactions have the property ``'del'`` set to
-        ``1``.
+        called ``'bonder'`` added and set to a unique id number. Atoms
+        which are deleted during reactions have the property ``'del'``
+        set to a unique id number.
 
         Returns
         -------

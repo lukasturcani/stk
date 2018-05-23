@@ -219,7 +219,7 @@ def react(mol, del_atoms, *fgs):
         The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
         the molecule with bonds added between the functional groups.
 
-        The seoncd element is a :class:`int`. It is the number
+        The second element is a :class:`int`. It is the number
         of bonds added.
 
     """
@@ -250,6 +250,41 @@ def react(mol, del_atoms, *fgs):
             emol.RemoveAtom(atom.GetIdx())
 
     return emol.GetMol(), 1
+
+
+def periodic_react(mol, del_atoms, *fgs):
+    """
+    Like :func:`react` but returns periodic bonds.
+
+    As periodic bonds are returned, no bonds are added to `mol`.
+
+    Parameters
+    ----------
+    mol : :class:`rdkit.Chem.rdchem.Mol`
+        A molecule being assembled.
+
+    del : :class:`bool`
+        Toggles if atoms with the ``'del'`` property are deleted.
+
+    *fgs : :class:`int`
+        The ids of the functional groups to react. The ids are held
+        by atom of `mol` in the ``'fg_id'`` property.
+
+    Returns
+    -------
+    :class:`tuple`
+        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
+        the molecule after the reaction.
+
+        The second element is a :class:`int`. It is the number
+        of bonds added.
+
+        The third element is a :class:`list` holding
+        :class:`.AtomicPeriodicBond`.
+
+    """
+
+    ...
 
 
 def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
