@@ -394,12 +394,20 @@ class AtomicPeriodicBond:
         :class:`int`
             The atom id of :attr:`bonder1` in `mol`.
 
+        Raises
+        ------
+        :class:`RuntimeError`
+            If `mol` does not have an atom with ``'bonder'`` tag
+            equal to :attr:`bonder1`.
+
         """
 
         for atom in mol.GetAtoms():
             if (atom.HasProp('bonder') and
                atom.GetIntProp('bonder') == self.bonder1):
                 return atom.GetIdx()
+        raise RuntimeError(
+                        f'No atom with bonder tag of {self.bonder1}.')
 
     def atom2(self, mol):
         """
@@ -415,12 +423,21 @@ class AtomicPeriodicBond:
         :class:`int`
             The atom id of :attr:`bonder2` in `mol`.
 
+        Raises
+        ------
+        :class:`RuntimeError`
+            If `mol` does not have an atom with ``'bonder'`` tag
+            equal to :attr:`bonder2`.
+
+
         """
 
         for atom in mol.GetAtoms():
             if (atom.HasProp('bonder') and
                atom.GetIntProp('bonder') == self.bonder2):
                 return atom.GetIdx()
+        raise RuntimeError(
+                        f'No atom with bonder tag of {self.bonder2}.')
 
 
 class PeriodicBond:

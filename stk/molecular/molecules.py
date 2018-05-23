@@ -3453,6 +3453,14 @@ periodic._place_island([4, 4, 4])
         """
 
         self.retag_atoms()
+
+        # Ensure each bonder id is unique
+        i = 0
+        for atom in self.mol.GetAtoms():
+            if atom.HasProp('bonder'):
+                atom.SetIntProp('bonder', i)
+                i += 1
+
         mol = rdkit.Mol(self.mol)
         periodic_bonds = []
         for pb in self.periodic_bonds:
@@ -3495,8 +3503,9 @@ periodic._place_island([4, 4, 4])
 
         """
 
-        mol, pbs = self.periodic_mol()
-        mol = StructUnit.rdkit_init(mol)
+        pmol, pbs = self.periodic_mol()
+        mol = StructUnit.__new__(StructUnit)
+        mol.mol = pmol
 
         if atom_fix is None:
             atom_fix = np.ones([mol.mol.GetNumAtoms(), 3])
