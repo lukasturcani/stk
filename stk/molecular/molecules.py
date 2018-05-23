@@ -3436,6 +3436,19 @@ periodic._place_island([4, 4, 4])
 
     def periodic_mol(self):
         """
+        Creates a molecule by reacting periodic functional groups.
+
+        Returns
+        -------
+        :class:`tuple`
+            The first member is a :class:`rdkit.Chem.rdchem.Mol`
+            where the functional groups involved in a periodic bond
+            have been reacted. This means the deleter atoms have been
+            removed.
+
+            The second member is :class:`list` of
+            :class:`.AtomicPeriodicBond` holding the periodic bonds
+            created as a result of the reactions.
 
         """
 
