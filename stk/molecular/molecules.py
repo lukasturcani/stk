@@ -179,7 +179,7 @@ from collections import Counter, defaultdict
 from inspect import signature
 
 from . import topologies
-from .functional_groups import functional_groups, react
+from .functional_groups import functional_groups, react, periodic_react
 from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
@@ -1005,6 +1005,26 @@ class Molecule:
         """
 
         return self.inchi == other.inchi
+
+    def retag_atoms(self):
+        """
+        Adds atom properties to atoms, using :attr:`atom_props`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        for atom_id, props in self.atom_props.items():
+            atom = self.mol.GetAtomWithIdx(atom_id)
+            for pname, pval in props.items():
+                if isinstance(pval, int):
+                    atom.SetIntProp(pname, pval)
+                elif isinstance(pval, bool):
+                    atom.SetBoolProp(pname, pval)
+                else:
+                    atom.SetProp(pname, pval)
 
     def rotate(self, theta, axis, conformer=-1):
         """
@@ -3414,6 +3434,24 @@ periodic._place_island([4, 4, 4])
 
         return cells, island
 
+    def periodic_mol(self):
+        """
+
+        """
+
+        self.retag_atoms()
+        mol = rdkit.Mol(self.mol)
+        periodic_bonds = []
+        for pb in self.periodic_bonds:
+            mol, _, new_bonds = periodic_react(mol,
+                                               True,
+                                               pb.direction,
+                                               pb.fg1,
+                                               pb.fg2)
+            periodic_bonds.extend(new_bonds)
+
+        return mol, periodic_bonds
+
     def write_gulp_input(self, path, keywords,
                          cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None):
         """
@@ -3444,8 +3482,11 @@ periodic._place_island([4, 4, 4])
 
         """
 
+        mol, pbs = self.periodic_mol()
+        mol = StructUnit.rdkit_init(mol)
+
         if atom_fix is None:
-            atom_fix = np.ones([self.mol.GetNumAtoms(), 3])
+            atom_fix = np.ones([mol.mol.GetNumAtoms(), 3])
 
         with open(path, 'w') as f:
             f.write(' '.join(keywords) + '\n\n')
@@ -3469,30 +3510,23 @@ periodic._place_island([4, 4, 4])
             f.write('\n')
             # Add atom coordinates.
             f.write('cart\n')
-            for (id_, coords), fix in zip(self.all_atom_coords(),
+            for (id_, coords), fix in zip(mol.all_atom_coords(),
                                           atom_fix):
-                # Don't write deleter atoms.
-                if self.atom_props.get(id_, {}).get('del', False):
-                    continue
 
                 x, y, z = [round(x, 4) for x in coords]
                 fx, fy, fz = [int(x) for x in fix]
                 f.write('{} core {} {} {} {} {} {}\n'.format(
-                         self.atom_symbol(id_), x, y, z, fx, fy, fz))
+                         mol.atom_symbol(id_), x, y, z, fx, fy, fz))
             f.write('\n')
             # Add bonds.
-            for bond in self.mol.GetBonds():
+            for bond in mol.mol.GetBonds():
                 a1 = bond.GetBeginAtomIdx() + 1
                 a2 = bond.GetEndAtomIdx() + 1
                 f.write('connect {} {} 0 0 0\n'.format(a1, a2))
 
             # Add periodic bonds.
-            for bond in self.periodic_bonds:
-                a1 = next(a for a, props in self.atom_props.items() if
-                          props.get('fg_id', None) == bond.fg1 and
-                          props.get('bonder', False)) + 1
-                a2 = next(a for a, props in self.atom_props.items() if
-                          props.get('fg_id', None) == bond.fg2 and
-                          props.get('bonder', False)) + 1
+            for bond in pbs:
+                a1 = bond.atom1(mol.mol) + 1
+                a2 = bond.atom2(mol.mol) + 1
                 dx, dy, dz = bond.direction
                 f.write(f'connect {a1} {a2} {dx:+} {dy:+} {dz:+}\n')

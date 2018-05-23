@@ -349,6 +349,80 @@ class MAEExtractor:
                 mae_file.write(maegz_file.read())
 
 
+class AtomicPeriodicBond:
+    """
+    Represents a periodic bond between two atoms.
+
+    Attributes
+    ----------
+    bonder1 : :class:`int`
+        The value of the ``'bonder'`` atom property of the first bonded
+        atom.
+
+    bonder2 : :class:`int`
+        The value of the ``'bonder'`` atom property of the second
+        bonded atom.
+
+    bond_type : :class:`rdkit.Chem.rdchem.BondType`
+        The bond type.
+
+    direction : :class:`list` of :class:`int`
+        A 3 member list describing the axes along which the bond is
+        periodic, when going from :attr:`bonder1` to :attr:`bonder2`.
+        For example, ``[1, 0, 0]`` means that the bond is periodic
+        along the x axis in the positive direction.
+
+    """
+
+    def __init__(self, bonder1, bonder2, bond_type, direction):
+        self.bonder1 = bonder1
+        self.bonder2 = bonder2
+        self.bond_type = bond_type
+        self.direction = direction
+
+    def atom1(self, mol):
+        """
+        Returns the atom id of :attr:`bonder1` in `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Chem.rdchem.Mol`
+            A molecule with a periodic bond.
+
+        Returns
+        -------
+        :class:`int`
+            The atom id of :attr:`bonder1` in `mol`.
+
+        """
+
+        for atom in mol.GetAtoms():
+            if (atom.HasProp('bonder') and
+               atom.GetIntProp('bonder') == self.bonder1):
+                return atom.GetIdx()
+
+    def atom2(self, mol):
+        """
+        Returns the atom id of :attr:`bonder2` in `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Chem.rdchem.Mol`
+            A molecule with a periodic bond.
+
+        Returns
+        -------
+        :class:`int`
+            The atom id of :attr:`bonder2` in `mol`.
+
+        """
+
+        for atom in mol.GetAtoms():
+            if (atom.HasProp('bonder') and
+               atom.GetIntProp('bonder') == self.bonder2):
+                return atom.GetIdx()
+
+
 class PeriodicBond:
     """
     Represents a periodic bond.
@@ -365,9 +439,9 @@ class PeriodicBond:
 
     direction : :class:`list` of :class:`int`
         A 3 member list describing the axes along which the bond is
-        periodic, when going from `fg1` to `fg2`. For example,
-        ``[1, 0, 0]`` means that the bond is periodic along the x axis
-        in the positive direction.
+        periodic, when going from :attr:`fg1` to :attr:`fg2`. For
+        example, ``[1, 0, 0]`` means that the bond is periodic along
+        the x axis in the positive direction.
 
 
     Attributes

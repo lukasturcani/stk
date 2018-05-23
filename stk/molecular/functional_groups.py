@@ -62,6 +62,7 @@ as an example.
 
 import rdkit.Chem.AllChem as rdkit
 from collections import Counter
+from ..utilities import AtomicPeriodicBond
 
 
 class Match:
@@ -252,7 +253,7 @@ def react(mol, del_atoms, *fgs):
     return emol.GetMol(), 1
 
 
-def periodic_react(mol, del_atoms, *fgs):
+def periodic_react(mol, del_atoms, direction, *fgs):
     """
     Like :func:`react` but returns periodic bonds.
 
@@ -265,6 +266,11 @@ def periodic_react(mol, del_atoms, *fgs):
 
     del : :class:`bool`
         Toggles if atoms with the ``'del'`` property are deleted.
+
+    direction : :class:`list` of :class:`int`
+        A 3 member list describing the axes along which the created
+        bonds are periodic. For example, ``[1, 0, 0]`` means that the
+        bonds are periodic along the x axis in the positive direction.
 
     *fgs : :class:`int`
         The ids of the functional groups to react. The ids are held
@@ -284,7 +290,38 @@ def periodic_react(mol, del_atoms, *fgs):
 
     """
 
-    ...
+    names = [fg_name(mol, fg) for fg in fgs]
+    reaction_key = tuple(sorted(Counter(names).items()))
+    if reaction_key in periodic_custom_reactions:
+        return periodic_custom_reactions[reaction_key](mol,
+                                                       del_atoms,
+                                                       direction,
+                                                       *fgs)
+
+    emol = rdkit.EditableMol(mol)
+
+    bonders = []
+    for atom in mol.GetAtoms():
+        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
+            continue
+        if atom.HasProp('bonder'):
+            bonders.append(atom.GetIntProp('bonder'))
+
+    bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
+    bonder1, bonder2 = bonders
+    periodic_bonds = [AtomicPeriodicBond(bonder1,
+                                         bonder2,
+                                         bond,
+                                         direction)]
+
+    for atom in reversed(mol.GetAtoms()):
+        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
+            continue
+
+        if atom.HasProp('del') and del_atoms:
+            emol.RemoveAtom(atom.GetIdx())
+
+    return emol.GetMol(), 1, periodic_bonds
 
 
 def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
@@ -354,6 +391,8 @@ def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
 # many such functional groups are invovled.
 custom_reactions = {
     tuple(sorted((('boronic_acid', 1), ('diol', 1)))): boronic_acid_with_diol}
+
+periodic_custom_reactions = {}
 
 
 functional_groups = (
