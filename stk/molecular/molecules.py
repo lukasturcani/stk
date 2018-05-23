@@ -179,7 +179,7 @@ from collections import Counter, defaultdict
 from inspect import signature
 
 from . import topologies
-from .functional_groups import functional_groups, react
+from .functional_groups import functional_groups, react, periodic_react
 from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
@@ -297,12 +297,12 @@ class Molecule:
 
         .. code-block:: python
 
-            atom_props = {0: {'bonder': 1,
+            atom_props = {0: {'bonder': 0,
                               'fg': 'amine',
                               'fg_id': 1},
                           5: {'fg': 'amine',
                               'fg_id': 2,
-                              'del': 1}}
+                              'del': 0}}
 
     bonder_ids : :class:`list`
         Holds the id of bonder atoms in a nested :class:`list`
@@ -1005,6 +1005,26 @@ class Molecule:
         """
 
         return self.inchi == other.inchi
+
+    def retag_atoms(self):
+        """
+        Adds atom properties to atoms, using :attr:`atom_props`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        for atom_id, props in self.atom_props.items():
+            atom = self.mol.GetAtomWithIdx(atom_id)
+            for pname, pval in props.items():
+                if isinstance(pval, int):
+                    atom.SetIntProp(pname, pval)
+                elif isinstance(pval, bool):
+                    atom.SetBoolProp(pname, pval)
+                else:
+                    atom.SetProp(pname, pval)
 
     def rotate(self, theta, axis, conformer=-1):
         """
@@ -2235,6 +2255,78 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         cls.cache[key] = obj
         return obj
 
+    def _valid_tags(self, match_atoms, fgs, n):
+        """
+        Ensures that only `n` atoms per functional group are tagged.
+
+        Parameters
+        ----------
+        match_atoms : :class:`tuple`
+            The atom ids of all matched atoms.
+
+        fgs : :class:`tuple`
+            The atom ids of all functional group atoms. Nested to
+            keep functional groups grouped.
+
+        n : :class:`int`
+            The maximum number of matched atoms per functional group
+            to be tagged.
+
+        Returns
+        -------
+        :class:`list` of :class:`int`
+            The ids of atoms to be tagged.
+
+        """
+
+        match_atoms = set(flatten(match_atoms))
+        # Keep only match atoms:
+        fgs = [[aid for aid in fg if aid in match_atoms] for fg in fgs]
+
+        # Make sure only `n` atoms per fg are returned.
+        result = []
+        for fg in fgs:
+            for i, atom_id in enumerate(fg):
+                if i >= n:
+                    break
+                result.append(atom_id)
+        return result
+
+    def _tag(self, mol, smarts, tag):
+        """
+        Adds an IntProp to atoms.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Chem.rdchem.Mol`
+            The molecule which is to have atoms tagged.
+
+        smarts : :class:`list`
+            Either :attr:`.FGInfo.bonder_smarts` or
+            :attr:`.FGInfo.del_smarts`.
+
+        tag : :class:`str`
+            The name of the atom tag.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        fgs = self.functional_group_atoms()
+
+        tag_id = 0
+        for match in smarts:
+            match_mol = rdkit.MolFromSmarts(match.smarts)
+            match_atoms = mol.GetSubstructMatches(match_mol)
+            match_atoms = self._valid_tags(match_atoms, fgs, match.n)
+
+            for atom_id in match_atoms:
+                atom = mol.GetAtomWithIdx(atom_id)
+                atom.SetIntProp(tag, tag_id)
+                tag_id += 1
+
     def tag_atoms(self):
         """
         Adds atom properties to atoms.
@@ -2246,9 +2338,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         group.
 
         The atoms which form bonds during assembly have the property
-        called ``'bonder'`` added and set to ``1``. Atoms which are
-        deleted during reactions have the property ``'del'`` set to
-        ``1``.
+        called ``'bonder'`` added and set to a unique id number. Atoms
+        which are deleted during reactions have the property ``'del'``
+        set to a unique id number.
 
         Returns
         -------
@@ -2262,22 +2354,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                 atom.SetProp('fg', self.func_grp.name)
                 atom.SetIntProp('fg_id', fg_id)
 
-        # Give all atoms which form bonds during reactions the tag
-        # 'bonder' and set its value to '1'. Add their ids to
-        # `bonder_ids`.
-        bond_mol = rdkit.MolFromSmarts(self.func_grp.bonder_smarts)
-        bond_atoms = self.mol.GetSubstructMatches(bond_mol)
-        for atom_id in flatten(bond_atoms):
-            atom = self.mol.GetAtomWithIdx(atom_id)
-            atom.SetIntProp('bonder', 1)
-
-        # Give all atoms which form bonds during reactions the tag
-        # 'del' and set its value to '1'.
-        del_mol = rdkit.MolFromSmarts(self.func_grp.del_smarts)
-        del_atoms = self.mol.GetSubstructMatches(del_mol)
-        for atom_id in flatten(del_atoms):
-            atom = self.mol.GetAtomWithIdx(atom_id)
-            atom.SetIntProp('del', 1)
+        self._tag(self.mol, self.func_grp.bonder_smarts, 'bonder')
+        self._tag(self.mol, self.func_grp.del_smarts, 'del')
 
     def untag_atoms(self):
         """
@@ -3356,6 +3434,45 @@ periodic._place_island([4, 4, 4])
 
         return cells, island
 
+    def periodic_mol(self):
+        """
+        Creates a molecule by reacting periodic functional groups.
+
+        Returns
+        -------
+        :class:`tuple`
+            The first member is a :class:`rdkit.Chem.rdchem.Mol`
+            where the functional groups involved in a periodic bond
+            have been reacted. This means the deleter atoms have been
+            removed.
+
+            The second member is :class:`list` of
+            :class:`.AtomicPeriodicBond` holding the periodic bonds
+            created as a result of the reactions.
+
+        """
+
+        self.retag_atoms()
+
+        # Ensure each bonder id is unique
+        i = 0
+        for atom in self.mol.GetAtoms():
+            if atom.HasProp('bonder'):
+                atom.SetIntProp('bonder', i)
+                i += 1
+
+        mol = rdkit.Mol(self.mol)
+        periodic_bonds = []
+        for pb in self.periodic_bonds:
+            mol, _, new_bonds = periodic_react(mol,
+                                               True,
+                                               pb.direction,
+                                               pb.fg1,
+                                               pb.fg2)
+            periodic_bonds.extend(new_bonds)
+
+        return mol, periodic_bonds
+
     def write_gulp_input(self, path, keywords,
                          cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None):
         """
@@ -3386,8 +3503,12 @@ periodic._place_island([4, 4, 4])
 
         """
 
+        pmol, pbs = self.periodic_mol()
+        mol = StructUnit.__new__(StructUnit)
+        mol.mol = pmol
+
         if atom_fix is None:
-            atom_fix = np.ones([self.mol.GetNumAtoms(), 3])
+            atom_fix = np.ones([mol.mol.GetNumAtoms(), 3])
 
         with open(path, 'w') as f:
             f.write(' '.join(keywords) + '\n\n')
@@ -3411,30 +3532,23 @@ periodic._place_island([4, 4, 4])
             f.write('\n')
             # Add atom coordinates.
             f.write('cart\n')
-            for (id_, coords), fix in zip(self.all_atom_coords(),
+            for (id_, coords), fix in zip(mol.all_atom_coords(),
                                           atom_fix):
-                # Don't write deleter atoms.
-                if self.atom_props.get(id_, {}).get('del', False):
-                    continue
 
                 x, y, z = [round(x, 4) for x in coords]
                 fx, fy, fz = [int(x) for x in fix]
                 f.write('{} core {} {} {} {} {} {}\n'.format(
-                         self.atom_symbol(id_), x, y, z, fx, fy, fz))
+                         mol.atom_symbol(id_), x, y, z, fx, fy, fz))
             f.write('\n')
             # Add bonds.
-            for bond in self.mol.GetBonds():
+            for bond in mol.mol.GetBonds():
                 a1 = bond.GetBeginAtomIdx() + 1
                 a2 = bond.GetEndAtomIdx() + 1
                 f.write('connect {} {} 0 0 0\n'.format(a1, a2))
 
             # Add periodic bonds.
-            for bond in self.periodic_bonds:
-                a1 = next(a for a, props in self.atom_props.items() if
-                          props.get('fg_id', None) == bond.fg1 and
-                          props.get('bonder', False)) + 1
-                a2 = next(a for a, props in self.atom_props.items() if
-                          props.get('fg_id', None) == bond.fg2 and
-                          props.get('bonder', False)) + 1
+            for bond in pbs:
+                a1 = bond.atom1(mol.mol) + 1
+                a2 = bond.atom2(mol.mol) + 1
                 dx, dy, dz = bond.direction
                 f.write(f'connect {a1} {a2} {dx:+} {dy:+} {dz:+}\n')

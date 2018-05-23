@@ -62,6 +62,29 @@ as an example.
 
 import rdkit.Chem.AllChem as rdkit
 from collections import Counter
+from ..utilities import AtomicPeriodicBond
+
+
+class Match:
+    """
+    A container for SMARTS queries.
+
+    Attributes
+    ----------
+    smarts : :class:`str`
+        A SMARTS string which matches some atoms.
+
+    n : :class:`int`
+        The maximum number of atoms to be matched by :attr:`smarts`,
+        per functional group.
+
+    """
+
+    __slots__ = ['smarts', 'n']
+
+    def __init__(self, smarts, n):
+        self.smarts = smarts
+        self.n = n
 
 
 class FGInfo:
@@ -80,13 +103,33 @@ class FGInfo:
     fg_smarts : :class:`str`
         A SMARTS string which matches the functional group.
 
-    bonder_smarts : :class:`str`
-        A SMARTS string which matches the atom on the functional group
-        which forms bonds during reactions.
+    bonder_smarts : :class:`list`
+        A :class:`list` of the form
 
-    del_smarts : :class:`str`
-        A SMARTS string, which matches the atoms removed when the
-        functional group reacts.
+        .. code-block:: python
+
+            bonder_smarts = [Match(smarts='[$([N]([H])[H])]', n=1),
+                             Match(smarts='[$([H][N][H])]', n=1)]
+
+        Each string is SMARTS string which matches an atom in the
+        functional group which is to be tagged as ``'bonder'``. The
+        number represents how many matched atoms should be tagged, per
+        functional group.
+
+        In the example, ``Match(smarts='[$([N]([H])[H])]', n=1)``
+        matches the nitrogen atom in the amine functional group. The
+        ``n=1`` means that 1 nitrogen atom per functional group will be
+        tagged as ``'bonder'``. The second
+        ``Match(smarts='[$([H][N][H])]', n=1)``, matches the hydrogen
+        atom in the amine functional group. Because ``n=1``, only 1 of
+        hydrogen atom per amine functional group will be tagged
+        ``'bonder'``. If instead
+        ``Match(smarts='[$([H][N][H])]', n=2)`` was used, then both of
+        the hydrogen atoms in the functional group would be tagged.
+
+    del_smarts : :class:`list`
+        Same as :attr:`bonder_smarts` but matched atoms are tagged
+        as ``'del'``.
 
     """
 
@@ -104,13 +147,11 @@ class FGInfo:
         fg_smarts : :class:`str`
             A SMARTS string which matches the functional group.
 
-        bonder_smarts : :class:`str`
-            A SMARTS string which matches the atom on the functional
-            group which forms bonds during reactions.
+        bonder_smarts : :class:`list`
+            See :attr:`bonder_smarts`.
 
-        del_smarts : :class:`str`
-            A SMARTS string, which matches the atoms removed when the
-            functional group reacts.
+        del_smarts : :class:`list`
+            See :attr:`del_smarts`.
 
         """
 
@@ -179,7 +220,7 @@ def react(mol, del_atoms, *fgs):
         The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
         the molecule with bonds added between the functional groups.
 
-        The seoncd element is a :class:`int`. It is the number
+        The second element is a :class:`int`. It is the number
         of bonds added.
 
     """
@@ -210,6 +251,77 @@ def react(mol, del_atoms, *fgs):
             emol.RemoveAtom(atom.GetIdx())
 
     return emol.GetMol(), 1
+
+
+def periodic_react(mol, del_atoms, direction, *fgs):
+    """
+    Like :func:`react` but returns periodic bonds.
+
+    As periodic bonds are returned, no bonds are added to `mol`.
+
+    Parameters
+    ----------
+    mol : :class:`rdkit.Chem.rdchem.Mol`
+        A molecule being assembled.
+
+    del : :class:`bool`
+        Toggles if atoms with the ``'del'`` property are deleted.
+
+    direction : :class:`list` of :class:`int`
+        A 3 member list describing the axes along which the created
+        bonds are periodic. For example, ``[1, 0, 0]`` means that the
+        bonds are periodic along the x axis in the positive direction.
+
+    *fgs : :class:`int`
+        The ids of the functional groups to react. The ids are held
+        by atom of `mol` in the ``'fg_id'`` property.
+
+    Returns
+    -------
+    :class:`tuple`
+        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
+        the molecule after the reaction.
+
+        The second element is a :class:`int`. It is the number
+        of bonds added.
+
+        The third element is a :class:`list` holding
+        :class:`.AtomicPeriodicBond`.
+
+    """
+
+    names = [fg_name(mol, fg) for fg in fgs]
+    reaction_key = tuple(sorted(Counter(names).items()))
+    if reaction_key in periodic_custom_reactions:
+        return periodic_custom_reactions[reaction_key](mol,
+                                                       del_atoms,
+                                                       direction,
+                                                       *fgs)
+
+    emol = rdkit.EditableMol(mol)
+
+    bonders = []
+    for atom in mol.GetAtoms():
+        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
+            continue
+        if atom.HasProp('bonder'):
+            bonders.append(atom.GetIntProp('bonder'))
+
+    bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
+    bonder1, bonder2 = bonders
+    periodic_bonds = [AtomicPeriodicBond(bonder1,
+                                         bonder2,
+                                         bond,
+                                         direction)]
+
+    for atom in reversed(mol.GetAtoms()):
+        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
+            continue
+
+        if atom.HasProp('del') and del_atoms:
+            emol.RemoveAtom(atom.GetIdx())
+
+    return emol.GetMol(), 1, periodic_bonds
 
 
 def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
@@ -280,98 +392,103 @@ def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
 custom_reactions = {
     tuple(sorted((('boronic_acid', 1), ('diol', 1)))): boronic_acid_with_diol}
 
+periodic_custom_reactions = {}
+
 
 functional_groups = (
 
-                FGInfo("amine",
-                       "[N]([H])[H]",
-                       "[$([N]([H])[H])]",
-                       "[$([H][N][H])].[$([H][N][H])]"),
+    FGInfo(name="amine",
+           fg_smarts="[N]([H])[H]",
+           bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
+           del_smarts=[Match(smarts="[$([H][N][H])]", n=2)]),
 
-                FGInfo("aldehyde",
-                       "[C](=[O])[H]",
-                       "[$([C](=[O])[H])]",
-                       "[$([O]=[C][H])]"),
+    FGInfo(name="aldehyde",
+           fg_smarts="[C](=[O])[H]",
+           bonder_smarts=[Match(smarts="[$([C](=[O])[H])]", n=1)],
+           del_smarts=[Match(smarts="[$([O]=[C][H])]", n=1)]),
 
-                FGInfo("carboxylic_acid",
-                       "[C](=[O])[O][H]",
-                       "[$([C](=[O])[O][H])]",
-                       "[$([H][O][C](=[O]))][O]"),
-
-                FGInfo("amide",
-                       "[C](=[O])[N]([H])[H]",
-                       "[$([C](=[O])[N]([H])[H])]",
-                       "[$([N]([H])([H])[C](=[O]))]([H])[H]"),
-
-                FGInfo("thioacid",
-                       "[C](=[O])[S][H]",
-                       "[$([C](=[O])[O][H])]",
-                       "[$([H][O][C](=[O]))][S]"),
-
-                FGInfo("alcohol",
-                       "[O][H]",
-                       "[$([O][H])]",
-                       "[$([H][O])]"),
-
-                FGInfo("thiol",
-                       "[S][H]",
-                       "[$([S][H])]",
-                       "[$([H][S])]"),
-
-                FGInfo("bromine",
-                       "*[Br]",
-                       "[$(*[Br])]",
-                       "[$([Br]*)]"),
-
-                FGInfo("iodine",
-                       "*[I]",
-                       "[$(*[I])]",
-                       "[$([I]*)]"),
-
-                FGInfo("nitrile",
-                       "[C][C]#[N]",
-                       "[$([C]([H])([H])[C]#[N])]",
-                       "[$([H][C][H])].[$([H][C][H])]"),
-
-                FGInfo('alkyne',
-                       '[C]#[C][H]',
-                       '[$([C]([H])#[C])]',
-                       '[$([H][C]#[C])]'),
-
-                FGInfo('terminal_alkene',
-                       '[C]=[C]([H])[H]',
-                       '[$([C]=[C]([H])[H])]',
-                       ('[$([H][C]([H])=[C])].'
-                        '[$([H][C]([H])=[C])].'
-                        '[$([C](=[C])([H])[H])]')),
-
-                FGInfo('boronic_acid',
-                       '[B]([O][H])[O][H]',
-                       '[$([B]([O][H])[O][H])]',
-                       ('[$([O]([H])[B][O][H])].'
-                        '[$([H][O][B][O][H])]')),
-
-                # This amine functional group only deletes one of the
-                # hydrogen atoms when a bond is formed.
-                FGInfo("amine2",
-                       "[N]([H])[H]",
-                       "[$([N]([H])[H])]",
-                       "[$([H][N][H])]"),
-
-                FGInfo("secondary_amine",
-                       "[H][N]([#6])[#6]",
-                       "[$([N]([H])([#6])[#6])]",
-                       "[$([H][N]([#6])[#6])]"),
-
-                FGInfo('diol',
-                       '[H][O][#6][#6][O][H]',
-                       ('[$([O]([H])[#6][#6][O][H])].'
-                        '[$([O]([H])[#6][#6][O][H])]'),
-                       ('[$([H][O][#6][#6][O][H])].'
-                        '[$([H][O][#6][#6][O][H])]'))
+    FGInfo(name="carboxylic_acid",
+           fg_smarts="[C](=[O])[O][H]",
+           bonder_smarts=[Match(smarts="[$([C](=[O])[O][H])]", n=1)],
+           del_smarts=[Match(smarts="[$([H][O][C](=[O]))]", n=1),
+                       Match(smarts="[$([O]([H])[C](=[O]))]", n=1)]),
 
 
-                    )
+    FGInfo(name="amide",
+           fg_smarts="[C](=[O])[N]([H])[H]",
+           bonder_smarts=[
+                Match(smarts="[$([C](=[O])[N]([H])[H])]", n=1)
+           ],
+           del_smarts=[
+                Match(smarts="[$([N]([H])([H])[C](=[O]))]", n=1),
+                Match(smarts="[$([H][N]([H])[C](=[O]))]", n=2)
+           ]),
+
+    FGInfo(name="thioacid",
+           fg_smarts="[C](=[O])[S][H]",
+           bonder_smarts=[Match(smarts="[$([C](=[O])[S][H])]", n=1)],
+           del_smarts=[Match(smarts="[$([H][S][C](=[O]))]", n=1),
+                       Match(smarts="[$([S]([H])[C](=[O]))]", n=1)]),
+
+    FGInfo(name="alcohol",
+           fg_smarts="[O][H]",
+           bonder_smarts=[Match(smarts="[$([O][H])]", n=1)],
+           del_smarts=[Match(smarts="[$([H][O])]", n=1)]),
+
+    FGInfo(name="thiol",
+           fg_smarts="[S][H]",
+           bonder_smarts=[Match(smarts="[$([S][H])]", n=1)],
+           del_smarts=[Match(smarts="[$([H][S])]", n=1)]),
+
+    FGInfo(name="bromine",
+           fg_smarts="*[Br]",
+           bonder_smarts=[Match(smarts="[$(*[Br])]", n=1)],
+           del_smarts=[Match(smarts="[$([Br]*)]", n=1)]),
+
+    FGInfo(name="iodine",
+           fg_smarts="*[I]",
+           bonder_smarts=[Match(smarts="[$(*[I])]", n=1)],
+           del_smarts=[Match(smarts="[$([I]*)]", n=1)]),
+
+    FGInfo(name='alkyne',
+           fg_smarts='[C]#[C][H]',
+           bonder_smarts=[Match(smarts='[$([C]([H])#[C])]', n=1)],
+           del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1)]),
+
+    FGInfo(name='terminal_alkene',
+           fg_smarts='[C]=[C]([H])[H]',
+           bonder_smarts=[Match(smarts='[$([C]=[C]([H])[H])]', n=1)],
+           del_smarts=[Match(smarts='[$([H][C]([H])=[C])]', n=2),
+                       Match(smarts='[$([C](=[C])([H])[H])]', n=1)]),
+
+    FGInfo(name='boronic_acid',
+           fg_smarts='[B]([O][H])[O][H]',
+           bonder_smarts=[Match(smarts='[$([B]([O][H])[O][H])]', n=1)],
+           del_smarts=[Match(smarts='[$([O]([H])[B][O][H])]', n=2),
+                       Match(smarts='[$([H][O][B][O][H])]', n=2)]),
+
+    # This amine functional group only deletes one of the
+    # hydrogen atoms when a bond is formed.
+    FGInfo(name="amine2",
+           fg_smarts="[N]([H])[H]",
+           bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
+           del_smarts=[Match(smarts="[$([H][N][H])]", n=1)]),
+
+    FGInfo(name="secondary_amine",
+           fg_smarts="[H][N]([#6])[#6]",
+           bonder_smarts=[
+                Match(smarts="[$([N]([H])([#6])[#6])]", n=1)
+           ],
+           del_smarts=[Match(smarts="[$([H][N]([#6])[#6])]", n=1)]),
+
+    FGInfo(name='diol',
+           fg_smarts='[H][O][#6][#6][O][H]',
+           bonder_smarts=[
+                Match(smarts='[$([O]([H])[#6][#6][O][H])]', n=2)
+           ],
+           del_smarts=[Match(smarts='[$([H][O][#6][#6][O][H])]', n=2)])
+
+    )
 
 double = rdkit.rdchem.BondType.DOUBLE
 bond_orders = {
