@@ -2237,6 +2237,25 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def _valid_tags(self, match_atoms, fgs, n):
         """
+        Ensures that only `n` atoms per functional group are tagged.
+
+        Parameters
+        ----------
+        match_atoms : :class:`tuple`
+            The atom ids of all matched atoms.
+
+        fgs : :class:`tuple`
+            The atom ids of all functional group atoms. Nested to
+            keep functional groups grouped.
+
+        n : :class:`int`
+            The maximum number of matched atoms per functional group
+            to be tagged.
+
+        Returns
+        -------
+        :class:`list` of :class:`int`
+            The ids of atoms to be tagged.
 
         """
 
@@ -2255,6 +2274,23 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def _tag(self, mol, smarts, tag):
         """
+        Adds an IntProp to atoms.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Chem.rdchem.Mol`
+            The molecule which is to have atoms tagged.
+
+        smarts : :class:`list`
+            Either :attr:`.FGInfo.bonder_smarts` or
+            :attr:`.FGInfo.del_smarts`.
+
+        tag : :class:`str`
+            The name of the atom tag.
+
+        Returns
+        -------
+        None : :class:`NoneType`
 
         """
 
