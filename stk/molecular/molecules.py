@@ -2240,7 +2240,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        match_atoms = set(match_atoms)
+        match_atoms = set(flatten(match_atoms))
         # Keep only match atoms:
         fgs = [[aid for aid in fg if aid in match_atoms] for fg in fgs]
 
@@ -2264,6 +2264,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             match_mol = rdkit.MolFromSmarts(match.smarts)
             match_atoms = mol.GetSubstructMatches(match_mol)
             match_atoms = self._valid_tags(match_atoms, fgs, match.n)
+
             for atom_id in match_atoms:
                 atom = mol.GetAtomWithIdx(atom_id)
                 atom.SetIntProp(tag, 1)
