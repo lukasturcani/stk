@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -95,7 +102,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -103,10 +110,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -667,12 +673,12 @@ should not be used directly.</p>
 <code class="descname">atom_props</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.atom_props" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps atom id to a <code class="xref py py-class docutils literal"><span class="pre">dict</span></code> holding the <code class="docutils literal"><span class="pre">rdkit</span></code> atom
 properties of the atom. For example</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">atom_props</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bonder&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">atom_props</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bonder&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
                   <span class="s1">&#39;fg&#39;</span><span class="p">:</span> <span class="s1">&#39;amine&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;fg_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
               <span class="mi">5</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;fg&#39;</span><span class="p">:</span> <span class="s1">&#39;amine&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;fg_id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-                  <span class="s1">&#39;del&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
+                  <span class="s1">&#39;del&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1231,6 +1237,22 @@ corresponds to the id of the atom in the molecule.</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="stk.molecular.molecules.Molecule.retag_atoms">
+<code class="descname">retag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.retag_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.retag_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds atom properties to atoms, using <a class="reference internal" href="#stk.molecular.molecules.Molecule.atom_props" title="stk.molecular.molecules.Molecule.atom_props"><code class="xref py py-attr docutils literal"><span class="pre">atom_props</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.molecular.molecules.Molecule.rotate">
 <code class="descname">rotate</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.rotate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule by <cite>theta</cite> about <cite>axis</cite>.</p>
@@ -1659,6 +1681,28 @@ in the x, y and z directions used to make the supercell.</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="stk.molecular.molecules.Periodic.periodic_mol">
+<code class="descname">periodic_mol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic.periodic_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic.periodic_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a molecule by reacting periodic functional groups.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The first member is a <code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>
+where the functional groups involved in a periodic bond
+have been reacted. This means the deleter atoms have been
+removed.<p>The second member is <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of
+<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.AtomicPeriodicBond" title="stk.utilities.utilities.AtomicPeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">AtomicPeriodicBond</span></code></a> holding the periodic bonds
+created as a result of the reactions.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.molecular.molecules.Periodic.write_gulp_input">
 <code class="descname">write_gulp_input</code><span class="sig-paren">(</span><em>path, keywords, cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic.write_gulp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic.write_gulp_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a GULP input file of the unit cell.</p>
@@ -1797,6 +1841,59 @@ the <cite>end</cite> vector.</li>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.StructUnit._tag">
+<code class="descname">_tag</code><span class="sig-paren">(</span><em>mol</em>, <em>smarts</em>, <em>tag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit._tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit._tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an IntProp to atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – The molecule which is to have atoms tagged.</li>
+<li><strong>smarts</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code>) – Either <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FGInfo.bonder_smarts" title="stk.molecular.functional_groups.FGInfo.bonder_smarts"><code class="xref py py-attr docutils literal"><span class="pre">FGInfo.bonder_smarts</span></code></a> or
+<a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FGInfo.del_smarts" title="stk.molecular.functional_groups.FGInfo.del_smarts"><code class="xref py py-attr docutils literal"><span class="pre">FGInfo.del_smarts</span></code></a>.</li>
+<li><strong>tag</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The name of the atom tag.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.StructUnit._valid_tags">
+<code class="descname">_valid_tags</code><span class="sig-paren">(</span><em>match_atoms</em>, <em>fgs</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit._valid_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit._valid_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensures that only <cite>n</cite> atoms per functional group are tagged.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>match_atoms</strong> (<code class="xref py py-class docutils literal"><span class="pre">tuple</span></code>) – The atom ids of all matched atoms.</li>
+<li><strong>fgs</strong> (<code class="xref py py-class docutils literal"><span class="pre">tuple</span></code>) – The atom ids of all functional group atoms. Nested to
+keep functional groups grouped.</li>
+<li><strong>n</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The maximum number of matched atoms per functional group
+to be tagged.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The ids of atoms to be tagged.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -1969,7 +2066,7 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt>
-<code class="descname">init_funcs</code><em class="property"> = {'.mae': &lt;function mol_from_mae_file at 0x7fd3a7d138c8&gt;, '.mol': functools.partial(&lt;Boost.Python.function object at 0x55e70a12e990&gt;, sanitize=False, removeHs=False), '.mol2': functools.partial(&lt;Boost.Python.function object at 0x55e70a963830&gt;, sanitize=False, removeHs=False), '.pdb': functools.partial(&lt;Boost.Python.function object at 0x55e70a30ef30&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object at 0x55e70a12e990&gt;, sanitize=False, removeHs=False)}</em></dt>
+<code class="descname">init_funcs</code><em class="property"> = {'.mol': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.mol2': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.mae': &lt;function mol_from_mae_file&gt;, '.pdb': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False)}</em></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -2210,9 +2307,9 @@ the functional group. In addition each such atom is given
 the property <code class="docutils literal"><span class="pre">'fg_id'</span></code> which is unique to each functional
 group.</p>
 <p>The atoms which form bonds during assembly have the property
-called <code class="docutils literal"><span class="pre">'bonder'</span></code> added and set to <code class="docutils literal"><span class="pre">1</span></code>. Atoms which are
-deleted during reactions have the property <code class="docutils literal"><span class="pre">'del'</span></code> set to
-<code class="docutils literal"><span class="pre">1</span></code>.</p>
+called <code class="docutils literal"><span class="pre">'bonder'</span></code> added and set to a unique id number. Atoms
+which are deleted during reactions have the property <code class="docutils literal"><span class="pre">'del'</span></code>
+set to a unique id number.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2443,7 +2540,9 @@ centroids shoould be aligned.</li>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -2456,7 +2555,7 @@ centroids shoould be aligned.</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -2475,7 +2574,6 @@ centroids shoould be aligned.</li>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -2493,11 +2591,14 @@ centroids shoould be aligned.</li>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>
