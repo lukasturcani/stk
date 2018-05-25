@@ -300,15 +300,18 @@ def periodic_react(mol, del_atoms, direction, *fgs):
 
     emol = rdkit.EditableMol(mol)
 
-    bonders = []
+    bonders = {}
     for atom in mol.GetAtoms():
         if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
             continue
         if atom.HasProp('bonder'):
-            bonders.append(atom.GetIntProp('bonder'))
+            bonders[atom.GetIntProp('fg_id')] = atom.GetIntProp('bonder')
 
     bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
-    bonder1, bonder2 = bonders
+
+    # Make sure the direction of the periodic bond is maintained.
+    fg1, fg2 = fgs
+    bonder1, bonder2 = bonders[fg1], bonders[fg2]
     periodic_bonds = [AtomicPeriodicBond(bonder1,
                                          bonder2,
                                          bond,
