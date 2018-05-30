@@ -67,7 +67,10 @@ from ..utilities import AtomicPeriodicBond
 
 class FGKey:
     """
-    Used to create a key in :data:`bond_orders`.
+    Used to create a key from a :class:`list` of fg names.
+
+    Used by :data:`bond_orders`, :data:`custom_reactions` and
+    :data:`periodic_custom_reactions`.
 
     Attributes
     ----------
@@ -258,7 +261,7 @@ def react(mol, del_atoms, *fgs):
     """
 
     names = [fg_name(mol, fg) for fg in fgs]
-    reaction_key = tuple(sorted(Counter(names).items()))
+    reaction_key = FGKey(names)
     if reaction_key in custom_reactions:
         return custom_reactions[reaction_key](mol, del_atoms, *fgs)
 
@@ -323,7 +326,7 @@ def periodic_react(mol, del_atoms, direction, *fgs):
     """
 
     names = [fg_name(mol, fg) for fg in fgs]
-    reaction_key = tuple(sorted(Counter(names).items()))
+    reaction_key = FGKey(names)
     if reaction_key in periodic_custom_reactions:
         return periodic_custom_reactions[reaction_key](mol,
                                                        del_atoms,
@@ -425,7 +428,7 @@ def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
 # of every functional group involved in the reaction along with how
 # many such functional groups are invovled.
 custom_reactions = {
-    tuple(sorted((('boronic_acid', 1), ('diol', 1)))): boronic_acid_with_diol}
+    FGKey(['boronic_acid', 'diol']): boronic_acid_with_diol}
 
 periodic_custom_reactions = {}
 
