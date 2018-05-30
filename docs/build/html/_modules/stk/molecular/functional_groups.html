@@ -158,10 +158,10 @@
 <span class="sd">----------------------------------------------</span>
 
 <span class="sd">If ``stk`` is to incorporate a new functional group, a new</span>
-<span class="sd">:class:``FGInfo`` instance should be added to</span>
+<span class="sd">:class:`FGInfo` instance should be added to</span>
 <span class="sd">:data:`functional_groups`.</span>
 
-<span class="sd">Adding a new ``FGInfo`` instance to :data:`functional_groups` will</span>
+<span class="sd">Adding a new :class:`FGInfo` instance to :data:`functional_groups` will</span>
 <span class="sd">allow :meth:`.Topology.build` to connect the functional group to</span>
 <span class="sd">all others during assembly. In most cases, nothing except adding this</span>
 <span class="sd">instance should be necessary in order to incorporate new functional</span>
@@ -214,6 +214,49 @@
 <span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="k">as</span> <span class="nn">rdkit</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">..utilities</span> <span class="k">import</span> <span class="n">AtomicPeriodicBond</span>
+
+
+<div class="viewcode-block" id="FGKey"><a class="viewcode-back" href="../../../stk.molecular.functional_groups.html#stk.molecular.functional_groups.FGKey">[docs]</a><span class="k">class</span> <span class="nc">FGKey</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Used to create a key from a :class:`list` of fg names.</span>
+
+<span class="sd">    Used by :data:`bond_orders`, :data:`custom_reactions` and</span>
+<span class="sd">    :data:`periodic_custom_reactions`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    key : :class:`tuple`</span>
+<span class="sd">        A unique key based on the functional groups provided to the</span>
+<span class="sd">        intializer.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fgs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Intializer.</span>
+
+<span class="sd">        Paramters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        fgs : :class:`list` of :class:`str`</span>
+<span class="sd">            A :class:`list` holding the names of functional groups.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">fgs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">key</span>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fg_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;FGInfo(</span><span class="si">{fg_names}</span><span class="s1">)&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Match"><a class="viewcode-back" href="../../../stk.molecular.functional_groups.html#stk.molecular.functional_groups.Match">[docs]</a><span class="k">class</span> <span class="nc">Match</span><span class="p">:</span>
@@ -377,7 +420,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">fg_name</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span> <span class="k">for</span> <span class="n">fg</span> <span class="ow">in</span> <span class="n">fgs</span><span class="p">]</span>
-    <span class="n">reaction_key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+    <span class="n">reaction_key</span> <span class="o">=</span> <span class="n">FGKey</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">reaction_key</span> <span class="ow">in</span> <span class="n">custom_reactions</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">custom_reactions</span><span class="p">[</span><span class="n">reaction_key</span><span class="p">](</span><span class="n">mol</span><span class="p">,</span> <span class="n">del_atoms</span><span class="p">,</span> <span class="o">*</span><span class="n">fgs</span><span class="p">)</span>
 
@@ -390,7 +433,7 @@
         <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">):</span>
             <span class="n">bonders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
 
-    <span class="n">bond</span> <span class="o">=</span> <span class="n">bond_orders</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">)</span>
+    <span class="n">bond</span> <span class="o">=</span> <span class="n">bond_orders</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reaction_key</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">)</span>
     <span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span> <span class="o">=</span> <span class="n">bonders</span>
     <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span><span class="p">,</span> <span class="n">bond</span><span class="p">)</span>
 
@@ -442,7 +485,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">fg_name</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span> <span class="k">for</span> <span class="n">fg</span> <span class="ow">in</span> <span class="n">fgs</span><span class="p">]</span>
-    <span class="n">reaction_key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+    <span class="n">reaction_key</span> <span class="o">=</span> <span class="n">FGKey</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">reaction_key</span> <span class="ow">in</span> <span class="n">periodic_custom_reactions</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">periodic_custom_reactions</span><span class="p">[</span><span class="n">reaction_key</span><span class="p">](</span><span class="n">mol</span><span class="p">,</span>
                                                        <span class="n">del_atoms</span><span class="p">,</span>
@@ -451,15 +494,18 @@
 
     <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
 
-    <span class="n">bonders</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bonders</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">fgs</span><span class="p">):</span>
             <span class="k">continue</span>
         <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">):</span>
-            <span class="n">bonders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">))</span>
+            <span class="n">bonders</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">)</span>
 
-    <span class="n">bond</span> <span class="o">=</span> <span class="n">bond_orders</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">)</span>
-    <span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span> <span class="o">=</span> <span class="n">bonders</span>
+    <span class="n">bond</span> <span class="o">=</span> <span class="n">bond_orders</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">FGKey</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">)</span>
+
+    <span class="c1"># Make sure the direction of the periodic bond is maintained.</span>
+    <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span> <span class="o">=</span> <span class="n">fgs</span>
+    <span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span> <span class="o">=</span> <span class="n">bonders</span><span class="p">[</span><span class="n">fg1</span><span class="p">],</span> <span class="n">bonders</span><span class="p">[</span><span class="n">fg2</span><span class="p">]</span>
     <span class="n">periodic_bonds</span> <span class="o">=</span> <span class="p">[</span><span class="n">AtomicPeriodicBond</span><span class="p">(</span><span class="n">bonder1</span><span class="p">,</span>
                                          <span class="n">bonder2</span><span class="p">,</span>
                                          <span class="n">bond</span><span class="p">,</span>
@@ -541,7 +587,7 @@
 <span class="c1"># of every functional group involved in the reaction along with how</span>
 <span class="c1"># many such functional groups are invovled.</span>
 <span class="n">custom_reactions</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(((</span><span class="s1">&#39;boronic_acid&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;diol&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))):</span> <span class="n">boronic_acid_with_diol</span><span class="p">}</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;boronic_acid&#39;</span><span class="p">,</span> <span class="s1">&#39;diol&#39;</span><span class="p">]):</span> <span class="n">boronic_acid_with_diol</span><span class="p">}</span>
 
 <span class="n">periodic_custom_reactions</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -637,17 +683,25 @@
            <span class="n">bonder_smarts</span><span class="o">=</span><span class="p">[</span>
                 <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([O]([H])[#6][#6][O][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
            <span class="p">],</span>
-           <span class="n">del_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][O][#6][#6][O][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)])</span>
+           <span class="n">del_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][O][#6][#6][O][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)]),</span>
+
+    <span class="n">FGInfo</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;alkyne2&#39;</span><span class="p">,</span>
+           <span class="n">fg_smarts</span><span class="o">=</span><span class="s1">&#39;[C]#[C][H]&#39;</span><span class="p">,</span>
+           <span class="n">bonder_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([C]#[C][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)],</span>
+           <span class="n">del_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][C]#[C])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                       <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([C](#[C])[H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span>
 
     <span class="p">)</span>
 
 <span class="n">double</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">DOUBLE</span>
+<span class="n">triple</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">TRIPLE</span>
 <span class="n">bond_orders</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nb">frozenset</span><span class="p">((</span><span class="s1">&#39;amine&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)):</span> <span class="n">double</span><span class="p">,</span>
-    <span class="nb">frozenset</span><span class="p">((</span><span class="s1">&#39;amide&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)):</span> <span class="n">double</span><span class="p">,</span>
-    <span class="nb">frozenset</span><span class="p">((</span><span class="s1">&#39;nitrile&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)):</span> <span class="n">double</span><span class="p">,</span>
-    <span class="nb">frozenset</span><span class="p">((</span><span class="s1">&#39;amide&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)):</span> <span class="n">double</span><span class="p">,</span>
-    <span class="nb">frozenset</span><span class="p">((</span><span class="s1">&#39;terminal_alkene&#39;</span><span class="p">,</span> <span class="p">)):</span> <span class="n">double</span><span class="p">}</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;amine&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">]):</span> <span class="n">double</span><span class="p">,</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;amide&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">]):</span> <span class="n">double</span><span class="p">,</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;nitrile&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">]):</span> <span class="n">double</span><span class="p">,</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;amide&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">]):</span> <span class="n">double</span><span class="p">,</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;terminal_alkene&#39;</span><span class="p">,</span> <span class="s1">&#39;terminal_alkene&#39;</span><span class="p">]):</span> <span class="n">double</span><span class="p">,</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;alkyne2&#39;</span><span class="p">,</span> <span class="s1">&#39;alkyne2&#39;</span><span class="p">]):</span> <span class="n">triple</span><span class="p">}</span>
 </pre></div>
 
            </div>
