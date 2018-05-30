@@ -2819,7 +2819,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         for atom_id, props in self.atom_props.items():
             # Ignore fragments which do not correspond to the molecule
             # `bb`.
-            if props['bb_index'] != bb or props['mol_index'] in done:
+            if (props.get('bb_index', None) != bb or
+               props.get('mol_index', None) in done):
                 continue
 
             done.add(props['mol_index'])
@@ -2831,8 +2832,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
             # group.
             for atom in reversed(self.mol.GetAtoms()):
                 atomid = atom.GetIdx()
-                bb_index = self.atom_props[atomid]['bb_index']
-                mol_index = self.atom_props[atomid]['mol_index']
+                bb_index = self.atom_props[atomid].get('bb_index', None)
+                mol_index = self.atom_props[atomid].get('mol_index', None)
                 fg = self.atom_props[atomid].get('fg', None)
                 if (bb_index != props['bb_index'] or
                     mol_index != props['mol_index'] or
