@@ -489,7 +489,13 @@ functional_groups = (
            bonder_smarts=[
                 Match(smarts='[$([O]([H])[#6][#6][O][H])]', n=2)
            ],
-           del_smarts=[Match(smarts='[$([H][O][#6][#6][O][H])]', n=2)])
+           del_smarts=[Match(smarts='[$([H][O][#6][#6][O][H])]', n=2)]),
+
+    FGInfo(name='alkyne2',
+           fg_smarts='[C]#[C][H]',
+           bonder_smarts=[Match(smarts='[$([C]#[C][H])]', n=1)],
+           del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1),
+                       Match(smarts='[$([C](#[C])[H])]', n=1)])
 
     )
 
