@@ -91,13 +91,21 @@ class FGKey:
 
         """
         c = Counter(fgs)
-        self.key = tuple(sorted((key, value) for key, value in c))
+        self.key = tuple(sorted((key, value) for key, value in c.items()))
 
     def __eq__(self, other):
-        self.key == other.key
+        return self.key == other.key
 
     def __hash__(self):
         return hash(self.key)
+
+    def __repr__(self):
+        fg_names = [name for name, count in self.key
+                    for i in range(count)]
+        return f'FGInfo({fg_names})'
+
+    def __str__(self):
+        return repr(self)
 
 
 class Match:
@@ -274,7 +282,7 @@ def react(mol, del_atoms, *fgs):
         if atom.HasProp('bonder'):
             bonders.append(atom.GetIdx())
 
-    bond = bond_orders.get(FGKey(names), rdkit.rdchem.BondType.SINGLE)
+    bond = bond_orders.get(reaction_key, rdkit.rdchem.BondType.SINGLE)
     bonder1, bonder2 = bonders
     emol.AddBond(bonder1, bonder2, bond)
 
