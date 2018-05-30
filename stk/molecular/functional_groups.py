@@ -7,10 +7,10 @@ Extending stk: Adding  more functional groups.
 ----------------------------------------------
 
 If ``stk`` is to incorporate a new functional group, a new
-:class:``FGInfo`` instance should be added to
+:class:`FGInfo` instance should be added to
 :data:`functional_groups`.
 
-Adding a new ``FGInfo`` instance to :data:`functional_groups` will
+Adding a new :class:`FGInfo` instance to :data:`functional_groups` will
 allow :meth:`.Topology.build` to connect the functional group to
 all others during assembly. In most cases, nothing except adding this
 instance should be necessary in order to incorporate new functional
@@ -63,6 +63,38 @@ as an example.
 import rdkit.Chem.AllChem as rdkit
 from collections import Counter
 from ..utilities import AtomicPeriodicBond
+
+
+class FGKey:
+    """
+    Used to create a key in :data:`bond_orders`.
+
+    Attributes
+    ----------
+    key : :class:`tuple`
+        A unique key based on the functional groups provided to the
+        intializer.
+
+    """
+
+    def __init__(self, fgs):
+        """
+        Intializer.
+
+        Paramters
+        ---------
+        fgs : :class:`list` of :class:`str`
+            A :class:`list` holding the names of functional groups.
+
+        """
+        c = Counter(fgs)
+        self.key = tuple(sorted((key, value) for key, value in c))
+
+    def __eq__(self, other):
+        self.key == other.key
+
+    def __hash__(self):
+        return hash(self.key)
 
 
 class Match:
@@ -239,7 +271,7 @@ def react(mol, del_atoms, *fgs):
         if atom.HasProp('bonder'):
             bonders.append(atom.GetIdx())
 
-    bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
+    bond = bond_orders.get(FGKey(names), rdkit.rdchem.BondType.SINGLE)
     bonder1, bonder2 = bonders
     emol.AddBond(bonder1, bonder2, bond)
 
@@ -307,7 +339,7 @@ def periodic_react(mol, del_atoms, direction, *fgs):
         if atom.HasProp('bonder'):
             bonders[atom.GetIntProp('fg_id')] = atom.GetIntProp('bonder')
 
-    bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
+    bond = bond_orders.get(FGKey(names), rdkit.rdchem.BondType.SINGLE)
 
     # Make sure the direction of the periodic bond is maintained.
     fg1, fg2 = fgs
@@ -500,9 +532,11 @@ functional_groups = (
     )
 
 double = rdkit.rdchem.BondType.DOUBLE
+triple = rdkit.rdchem.BondType.TRIPLE
 bond_orders = {
-    frozenset(('amine', 'aldehyde')): double,
-    frozenset(('amide', 'aldehyde')): double,
-    frozenset(('nitrile', 'aldehyde')): double,
-    frozenset(('amide', 'amine')): double,
-    frozenset(('terminal_alkene', )): double}
+    FGKey(['amine', 'aldehyde']): double,
+    FGKey(['amide', 'aldehyde']): double,
+    FGKey(['nitrile', 'aldehyde']): double,
+    FGKey(['amide', 'amine']): double,
+    FGKey(['terminal_alkene', 'terminal_alkene']): double,
+    FGKey(['alkyne2', 'alkyne2']): triple}
