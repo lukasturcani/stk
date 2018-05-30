@@ -162,9 +162,9 @@
 <div class="section" id="extending-stk-adding-more-functional-groups">
 <span id="adding-functional-groups"></span><h2>Extending stk: Adding  more functional groups.<a class="headerlink" href="#extending-stk-adding-more-functional-groups" title="Permalink to this headline">¶</a></h2>
 <p>If <code class="docutils literal"><span class="pre">stk</span></code> is to incorporate a new functional group, a new
-:class:<code class="docutils literal"><span class="pre">FGInfo</span></code> instance should be added to
+<a class="reference internal" href="#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal"><span class="pre">FGInfo</span></code></a> instance should be added to
 <code class="xref py py-data docutils literal"><span class="pre">functional_groups</span></code>.</p>
-<p>Adding a new <code class="docutils literal"><span class="pre">FGInfo</span></code> instance to <code class="xref py py-data docutils literal"><span class="pre">functional_groups</span></code> will
+<p>Adding a new <a class="reference internal" href="#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal"><span class="pre">FGInfo</span></code></a> instance to <code class="xref py py-data docutils literal"><span class="pre">functional_groups</span></code> will
 allow <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.build" title="stk.molecular.topologies.base.Topology.build"><code class="xref py py-meth docutils literal"><span class="pre">Topology.build()</span></code></a> to connect the functional group to
 all others during assembly. In most cases, nothing except adding this
 instance should be necessary in order to incorporate new functional
@@ -275,6 +275,22 @@ as <code class="docutils literal"><span class="pre">'del'</span></code>.</p>
 <dt>
 <code class="descname">name</code></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.molecular.functional_groups.FGKey">
+<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">FGKey</code><span class="sig-paren">(</span><em>fgs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#FGKey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.FGKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Used to create a key from a <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of fg names.</p>
+<p>Used by <code class="xref py py-data docutils literal"><span class="pre">bond_orders</span></code>, <code class="xref py py-data docutils literal"><span class="pre">custom_reactions</span></code> and
+<code class="xref py py-data docutils literal"><span class="pre">periodic_custom_reactions</span></code>.</p>
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.FGKey.key">
+<code class="descname">key</code><a class="headerlink" href="#stk.molecular.functional_groups.FGKey.key" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> – A unique key based on the functional groups provided to the
+intializer.</p>
+</dd></dl>
 
 </dd></dl>
 
