@@ -1877,7 +1877,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
+        with tempfile.NamedTemporaryFile('r+t',
+                                         suffix='.mol',
+                                         delete=False) as f:
             f.write(json_dict['mol_block'])
             f.seek(0)
             obj = cls(f.name, json_dict['func_grp'],
