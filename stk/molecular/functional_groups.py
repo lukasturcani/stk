@@ -60,6 +60,8 @@ as an example.
 
 """
 
+import numpy as np
+from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
 from collections import Counter
 from ..utilities import AtomicPeriodicBond
@@ -370,6 +372,87 @@ def periodic_react(mol, del_atoms, direction, *fgs):
     return emol.GetMol(), 1, periodic_bonds
 
 
+def diol_with_difluorne(mol, del_atoms, fg1, fg2):
+    """
+    Crates bonds between functional groups.
+
+    Parameters
+    ----------
+    mol : :class:`rdkit.Chem.rdchem.Mol`
+        A molecule being assembled.
+
+    del : :class:`bool`
+        Toggles if atoms with the ``'del'`` property are deleted.
+
+    fg1 : :class:`int`
+        The id of the first functional group which
+        is to be joined, as given by the 'fg_id' property.
+
+    fg2 : :class:`int`
+        The id of the second functional group which
+        is to be joined, as given by the 'fg_id' property.
+
+    Returns
+    -------
+    :class:`tuple`
+        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
+        the molecule with bonds added between the functional groups.
+
+        The second element is a :class:`int`. It is the number
+        of bonds added.
+
+    """
+
+    bond = rdkit.rdchem.BondType.SINGLE
+    fgs = {fg1, fg2}
+    oxygens = []
+    carbons = []
+    deleters = []
+
+    for a in reversed(mol.GetAtoms()):
+        if not a.HasProp('fg_id') or a.GetIntProp('fg_id') not in fgs:
+            continue
+
+        if a.HasProp('del'):
+            deleters.append(a)
+
+        if a.GetProp('fg') == 'difluorene' and a.HasProp('bonder'):
+            carbons.append(a)
+
+        if a.GetProp('fg') == 'diol' and a.HasProp('bonder'):
+            oxygens.append(a)
+
+    conf = mol.GetConformer()
+    distances = []
+    for c in carbons:
+        cpos = np.array([*conf.GetAtomPosition(c.GetIdx())])
+        for o in oxygens:
+            opos = np.array([*conf.GetAtomPosition(o.GetIdx())])
+            d = euclidean(cpos, opos)
+            distances.append((d, c.GetIdx(), o.GetIdx()))
+    distances.sort()
+
+    deduped_pairs = []
+    seen_o, seen_c = set(), set()
+    for d, c, o in distances:
+        if c not in seen_c and o not in seen_o:
+            deduped_pairs.append((c, o))
+            seen_c.add(c)
+            seen_o.add(o)
+
+    (c1, o1), (c2, o2), *_ = deduped_pairs
+    assert c1 != c2 and o1 != o2
+    emol = rdkit.EditableMol(mol)
+    emol.AddBond(c1, o1, bond)
+    emol.AddBond(c2, o2, bond)
+
+    if del_atoms:
+        for a in deleters:
+            emol.RemoveAtom(a.GetIdx())
+
+    return emol.GetMol(), 2
+
+
 def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
     """
     Crates bonds between functional groups.
@@ -436,7 +519,10 @@ def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
 # of every functional group involved in the reaction along with how
 # many such functional groups are invovled.
 custom_reactions = {
-    FGKey(['boronic_acid', 'diol']): boronic_acid_with_diol}
+    FGKey(['boronic_acid', 'diol']): boronic_acid_with_diol,
+    FGKey(['diol', 'difluorene']): diol_with_difluorne
+
+}
 
 periodic_custom_reactions = {}
 
@@ -533,6 +619,11 @@ functional_groups = (
                 Match(smarts='[$([O]([H])[#6][#6][O][H])]', n=2)
            ],
            del_smarts=[Match(smarts='[$([H][O][#6][#6][O][H])]', n=2)]),
+
+    FGInfo(name='difluorene',
+           fg_smarts='[F][#6]~[#6][F]',
+           bonder_smarts=[Match(smarts='[$([#6]([F])~[#6][F])]', n=2)],
+           del_smarts=[Match(smarts='[$([F][#6]~[#6][F])]', n=2)]),
 
     FGInfo(name='alkyne2',
            fg_smarts='[C]#[C][H]',
