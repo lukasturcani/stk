@@ -629,7 +629,17 @@ functional_groups = (
            fg_smarts='[C]#[C][H]',
            bonder_smarts=[Match(smarts='[$([C]#[C][H])]', n=1)],
            del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1),
-                       Match(smarts='[$([C](#[C])[H])]', n=1)])
+                       Match(smarts='[$([C](#[C])[H])]', n=1)]),
+
+    FGInfo(name='phenyl_amine',
+           fg_smarts='c1([H])cc(~[#6])c(~[#6])cc1[N]([H])[H]',
+           bonder_smarts=[
+            Match(smarts='[$([N]([H])([H])c1cc(~[#6])c(~[#6])cc1[H])]', n=1),
+            Match(smarts='[$(c1([H])c([N]([H])[H])cc(~[#6])c(~[#6])c1)]', n=1),
+            ],
+           del_smarts=[
+            Match(smarts='[$([H][N]([H])c1cc(~[#6])c(~[#6])ccc1)]', n=2),
+            Match(smarts='[$([H]c1c([N]([H])[H])cc(~[#6])c(~[#6])c1)]', n=1)])
 
     )
 
