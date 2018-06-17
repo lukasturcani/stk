@@ -573,26 +573,54 @@ def amine3_with_amine3(mol, del_atoms, fg1, fg2):
 
     n_joiner = emol.AddAtom(rdkit.Atom(6))
     n_joiner_pos = (n1_pos + n2_pos) / 2
+    nh1 = emol.AddAtom(rdkit.Atom(1))
+    nh1_pos = n_joiner_pos + np.array([0, 0, 1])
+    nh2 = emol.AddAtom(rdkit.Atom(1))
+    nh2_pos = n_joiner_pos + np.array([0, 0, -1])
+
     nc_joiner1 = emol.AddAtom(rdkit.Atom(6))
     nc_joiner1_pos = (c1_pos + n2_pos) / 2
+    nc1h1 = emol.AddAtom(rdkit.Atom(1))
+    nc1h1_pos = nc_joiner1_pos + np.array([0, 0, 1])
+    nc1h2 = emol.AddAtom(rdkit.Atom(1))
+    nc1h2_pos = nc_joiner1_pos + np.array([0, 0, -1])
+
     nc_joiner2 = emol.AddAtom(rdkit.Atom(6))
     nc_joiner2_pos = (c2_pos + n1_pos) / 2
+    nc2h1 = emol.AddAtom(rdkit.Atom(1))
+    nc2h1_pos = nc_joiner2_pos + np.array([0, 0, 1])
+    nc2h2 = emol.AddAtom(rdkit.Atom(1))
+    nc2h2_pos = nc_joiner2_pos + np.array([0, 0, -1])
 
     single = rdkit.rdchem.BondType.SINGLE
     emol.AddBond(atoms1['N'], n_joiner, single)
     emol.AddBond(atoms2['N'], n_joiner, single)
+    emol.AddBond(n_joiner, nh1, single)
+    emol.AddBond(n_joiner, nh2, single)
 
     emol.AddBond(atoms1['C'], nc_joiner1, single)
     emol.AddBond(atoms2['N'], nc_joiner1, single)
+    emol.AddBond(nc_joiner1, nc1h1, single)
+    emol.AddBond(nc_joiner1, nc1h2, single)
 
     emol.AddBond(atoms2['C'], nc_joiner2, single)
     emol.AddBond(atoms1['N'], nc_joiner2, single)
+    emol.AddBond(nc_joiner2, nc2h1, single)
+    emol.AddBond(nc_joiner2, nc2h2, single)
 
     mol = emol.GetMol()
     conf = mol.GetConformer()
     conf.SetAtomPosition(n_joiner, rdkit_geo.Point3D(*n_joiner_pos))
+    conf.SetAtomPosition(nh1, rdkit_geo.Point3D(*nh1_pos))
+    conf.SetAtomPosition(nh2, rdkit_geo.Point3D(*nh2_pos))
+
     conf.SetAtomPosition(nc_joiner1, rdkit_geo.Point3D(*nc_joiner1_pos))
+    conf.SetAtomPosition(nc1h1, rdkit_geo.Point3D(*nc1h1_pos))
+    conf.SetAtomPosition(nc1h2, rdkit_geo.Point3D(*nc1h2_pos))
+
     conf.SetAtomPosition(nc_joiner2, rdkit_geo.Point3D(*nc_joiner2_pos))
+    conf.SetAtomPosition(nc2h1, rdkit_geo.Point3D(*nc2h1_pos))
+    conf.SetAtomPosition(nc2h2, rdkit_geo.Point3D(*nc2h2_pos))
 
     if del_atoms:
         emol = rdkit.EditableMol(mol)
@@ -600,8 +628,7 @@ def amine3_with_amine3(mol, del_atoms, fg1, fg2):
             emol.RemoveAtom(a)
         mol = emol.GetMol()
 
-    rdkit.SanitizeMol(mol)
-    return rdkit.AddHs(mol, addCoords=True), 6
+    return mol, 6
 
 
 # If some functional groups react via a special mechanism not covered
