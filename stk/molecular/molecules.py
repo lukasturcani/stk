@@ -3215,7 +3215,10 @@ class Cage(MacroMolecule):
         if all_windows is None:
             return None
 
-        return sorted(all_windows[0], reverse=True)[:self.topology.n_windows]
+        # pyWindow sometimes detects super large windows by accident,
+        # filter them out first.
+        valid_windows = [w for w in all_windows[0] if w < 1e10]
+        return sorted(valid_windows, reverse=True)[:self.topology.n_windows]
 
 
 class Polymer(MacroMolecule):
