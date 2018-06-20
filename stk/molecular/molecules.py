@@ -3217,7 +3217,7 @@ class Cage(MacroMolecule):
 
         # pyWindow sometimes detects super large windows by accident,
         # filter them out first.
-        valid_windows = [w for w in all_windows[0] if w < 1e10]
+        valid_windows = [w for w in all_windows[0] if w < 1e6]
         return sorted(valid_windows, reverse=True)[:self.topology.n_windows]
 
 
