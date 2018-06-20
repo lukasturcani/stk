@@ -1082,6 +1082,64 @@ def rotation_matrix_arbitrary_axis(angle, axis):
                      [e31, e32, e33]])
 
 
+def quaternion(u):
+    """
+    Returns a translation + rotation quaternion.
+
+    Parameters
+    ----------
+    u : :class:`list` of :class:`float`
+        A :class:`list` of length 3 holding the paramter for the
+        quarternion.
+
+    References
+    ----------
+    K. Shoemake, Uniform random rotations, Graphics Gems III,
+    pages 124-132. Academic, New York, 1992.
+
+    """
+
+    a, b, c = u
+    q = np.zeros(4, np.float64)
+    q[0] = np.sqrt(1. - a) * np.sin(2. * np.pi * b)
+    q[1] = np.sqrt(1. - a) * np.cos(2. * np.pi * b)
+    q[2] = np.sqrt(a) * np.sin(2. * np.pi * c)
+    q[3] = np.sqrt(a) * np.cos(2. * np.pi * c)
+    return q
+
+
+def translation_component(q):
+    """
+    Extracts translation vector from quaternion.
+
+    Parameters
+    ----------
+    q : :class:`numpy.array`
+        A length 4 quaternion.
+
+    Returns
+    -------
+    :class:`numpy.array`
+        The translation vector encoded within `q`.
+
+    """
+
+    rot_epsilon = 1e-6
+    q = np.copy(q)
+    if q[0] < 0.:
+        q = -q
+    if q[0] > 1.0:
+        q /= np.sqrt(np.dot(q, q))
+
+    theta = 2. * np.arccos(q[0])
+    s = np.sqrt(1. - q[0] * q[0])
+    if s < rot_epsilon:
+        p = 2. * q[1:4]
+    else:
+        p = q[1:4] / s * theta
+    return p
+
+
 def tar_output():
     """
     Places all the content in the `output` folder into a .tgz file.
