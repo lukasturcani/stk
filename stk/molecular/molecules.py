@@ -3096,12 +3096,11 @@ class Cage(MacroMolecule):
 
     def window_difference(self, conformer=-1):
         """
-        The total difference in all window sizes.
+        The average difference across window sizes.
 
-        Every combination of windows is considered and all the
-        size differences are summed and returned. Only
-        differences between windows of the same type are
-        considered.
+        First take the average window difference between all windows
+        of the same type. Then take the average of window differences
+        across window types.
 
         Consider a triangular-based prism cage topology. Such a
         cage will have triangular windows and square windows. You
@@ -3170,7 +3169,7 @@ class Cage(MacroMolecule):
 
             diff_sums.append(diff_sum / diff_num)
 
-        return sum(diff_sums)
+        return np.mean(diff_sums)
 
     def windows(self, conformer=-1):
         """
