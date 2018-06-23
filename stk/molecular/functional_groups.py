@@ -63,6 +63,7 @@ as an example.
 import numpy as np
 from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
+import rdkit.Geometry.rdGeometry as rdkit_geo
 from collections import Counter
 from ..utilities import AtomicPeriodicBond
 
@@ -513,6 +514,123 @@ def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
     return emol.GetMol(), 2
 
 
+def amine3_with_amine3(mol, del_atoms, fg1, fg2):
+    """
+    Crates bonds between functional groups.
+
+    Parameters
+    ----------
+    mol : :class:`rdkit.Chem.rdchem.Mol`
+        A molecule being assembled.
+
+    del : :class:`bool`
+        Toggles if atoms with the ``'del'`` property are deleted.
+
+    fg1 : :class:`int`
+        The id of the first functional group which
+        is to be joined, as given by the 'fg_id' property.
+
+    fg2 : :class:`int`
+        The id of the second functional group which
+        is to be joined, as given by the 'fg_id' property.
+
+    Returns
+    -------
+    :class:`tuple`
+        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
+        the molecule with bonds added between the functional groups.
+
+        The second element is a :class:`int`. It is the number
+        of bonds added.
+
+    """
+
+    fgs = {fg1, fg2}
+    atoms1, atoms2 = {}, {}
+    deleters = []
+
+    for a in mol.GetAtoms():
+        if not a.HasProp('fg_id') or a.GetIntProp('fg_id') not in fgs:
+            continue
+
+        if a.HasProp('bonder') and a.GetIntProp('fg_id') == fg1:
+            atoms1[a.GetSymbol()] = a.GetIdx()
+
+        if a.HasProp('bonder') and a.GetIntProp('fg_id') == fg2:
+            atoms2[a.GetSymbol()] = a.GetIdx()
+
+        if a.HasProp('del'):
+            deleters.append(a.GetIdx())
+
+    conf = mol.GetConformer()
+    n1_pos = np.array([*conf.GetAtomPosition(atoms1['N'])])
+    n2_pos = np.array([*conf.GetAtomPosition(atoms2['N'])])
+
+    c1_pos = np.array([*conf.GetAtomPosition(atoms1['C'])])
+    c2_pos = np.array([*conf.GetAtomPosition(atoms2['C'])])
+
+    emol = rdkit.EditableMol(mol)
+
+    n_joiner = emol.AddAtom(rdkit.Atom(6))
+    n_joiner_pos = (n1_pos + n2_pos) / 2
+    nh1 = emol.AddAtom(rdkit.Atom(1))
+    nh1_pos = n_joiner_pos + np.array([0, 0, 1])
+    nh2 = emol.AddAtom(rdkit.Atom(1))
+    nh2_pos = n_joiner_pos + np.array([0, 0, -1])
+
+    nc_joiner1 = emol.AddAtom(rdkit.Atom(6))
+    nc_joiner1_pos = (c1_pos + n2_pos) / 2
+    nc1h1 = emol.AddAtom(rdkit.Atom(1))
+    nc1h1_pos = nc_joiner1_pos + np.array([0, 0, 1])
+    nc1h2 = emol.AddAtom(rdkit.Atom(1))
+    nc1h2_pos = nc_joiner1_pos + np.array([0, 0, -1])
+
+    nc_joiner2 = emol.AddAtom(rdkit.Atom(6))
+    nc_joiner2_pos = (c2_pos + n1_pos) / 2
+    nc2h1 = emol.AddAtom(rdkit.Atom(1))
+    nc2h1_pos = nc_joiner2_pos + np.array([0, 0, 1])
+    nc2h2 = emol.AddAtom(rdkit.Atom(1))
+    nc2h2_pos = nc_joiner2_pos + np.array([0, 0, -1])
+
+    single = rdkit.rdchem.BondType.SINGLE
+    emol.AddBond(atoms1['N'], n_joiner, single)
+    emol.AddBond(atoms2['N'], n_joiner, single)
+    emol.AddBond(n_joiner, nh1, single)
+    emol.AddBond(n_joiner, nh2, single)
+
+    emol.AddBond(atoms1['C'], nc_joiner1, single)
+    emol.AddBond(atoms2['N'], nc_joiner1, single)
+    emol.AddBond(nc_joiner1, nc1h1, single)
+    emol.AddBond(nc_joiner1, nc1h2, single)
+
+    emol.AddBond(atoms2['C'], nc_joiner2, single)
+    emol.AddBond(atoms1['N'], nc_joiner2, single)
+    emol.AddBond(nc_joiner2, nc2h1, single)
+    emol.AddBond(nc_joiner2, nc2h2, single)
+
+    mol = emol.GetMol()
+    conf = mol.GetConformer()
+    conf.SetAtomPosition(n_joiner, rdkit_geo.Point3D(*n_joiner_pos))
+    conf.SetAtomPosition(nh1, rdkit_geo.Point3D(*nh1_pos))
+    conf.SetAtomPosition(nh2, rdkit_geo.Point3D(*nh2_pos))
+
+    conf.SetAtomPosition(nc_joiner1, rdkit_geo.Point3D(*nc_joiner1_pos))
+    conf.SetAtomPosition(nc1h1, rdkit_geo.Point3D(*nc1h1_pos))
+    conf.SetAtomPosition(nc1h2, rdkit_geo.Point3D(*nc1h2_pos))
+
+    conf.SetAtomPosition(nc_joiner2, rdkit_geo.Point3D(*nc_joiner2_pos))
+    conf.SetAtomPosition(nc2h1, rdkit_geo.Point3D(*nc2h1_pos))
+    conf.SetAtomPosition(nc2h2, rdkit_geo.Point3D(*nc2h2_pos))
+
+    if del_atoms:
+        emol = rdkit.EditableMol(mol)
+        for a in reversed(deleters):
+            emol.RemoveAtom(a)
+        mol = emol.GetMol()
+
+    return mol, 6
+
+
 # If some functional groups react via a special mechanism not covered
 # in by the base "react()" function the function should be placed
 # in this dict. The key should be a sorted tuple which holds the name
@@ -520,7 +638,8 @@ def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
 # many such functional groups are invovled.
 custom_reactions = {
     FGKey(['boronic_acid', 'diol']): boronic_acid_with_diol,
-    FGKey(['diol', 'difluorene']): diol_with_difluorne
+    FGKey(['diol', 'difluorene']): diol_with_difluorne,
+    FGKey(['amine3', 'amine3']): amine3_with_amine3
 
 }
 
@@ -629,7 +748,17 @@ functional_groups = (
            fg_smarts='[C]#[C][H]',
            bonder_smarts=[Match(smarts='[$([C]#[C][H])]', n=1)],
            del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1),
-                       Match(smarts='[$([C](#[C])[H])]', n=1)])
+                       Match(smarts='[$([C](#[C])[H])]', n=1)]),
+
+    FGInfo(name='amine3',
+           fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6]([H])',
+           bonder_smarts=[
+            Match(smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6]([H]))]', n=1),
+            Match(smarts='[$([#6]([H])(~[#6]([H]))~[#6][N]([H])[H])]', n=1),
+            ],
+           del_smarts=[
+            Match(smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6]([H]))]', n=2),
+            Match(smarts='[$([H][#6](~[#6]([H]))~[#6][N]([H])[H])]', n=1)])
 
     )
 
