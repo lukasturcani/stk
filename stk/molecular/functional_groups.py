@@ -733,11 +733,11 @@ functional_groups = (
            del_smarts=[Match(smarts="[$([H][N]([#6])[#6])]", n=1)]),
 
     FGInfo(name='diol',
-           fg_smarts='[H][O][#6][#6][O][H]',
+           fg_smarts='[H][O][#6]~[#6][O][H]',
            bonder_smarts=[
-                Match(smarts='[$([O]([H])[#6][#6][O][H])]', n=2)
+                Match(smarts='[$([O]([H])[#6]~[#6][O][H])]', n=2)
            ],
-           del_smarts=[Match(smarts='[$([H][O][#6][#6][O][H])]', n=2)]),
+           del_smarts=[Match(smarts='[$([H][O][#6]~[#6][O][H])]', n=2)]),
 
     FGInfo(name='difluorene',
            fg_smarts='[F][#6]~[#6][F]',
