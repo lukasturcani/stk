@@ -3171,6 +3171,64 @@ class Cage(MacroMolecule):
 
         return np.mean(diff_sums)
 
+    def window_variance(self, conformer=-1):
+        """
+        The variance in window sizes.
+
+        For cages where multiple window types are present, the
+        window variance within each window type is calculated first and
+        the returned value is the mean of these variances.
+
+        Parameters
+        ---------
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
+        Returns
+        -------
+        :class:`float`
+            The variance in window sizes.
+
+        """
+
+        windows = self.windows(conformer)
+
+        if windows is None or len(windows) < self.topology.n_windows:
+            return None
+
+        windows = np.array(windows)
+
+        # Cluster the windows into groups so that only size
+        # differences between windows of the same type are taken
+        # into account. To do this, first sort the windows by
+        # size. If two windows types are present split the
+        # windows at the two groups at the point where the window
+        # sizes have the biggest difference. If there are three
+        # types split it at the two biggest differences and so
+        # on.
+
+        diffs = list(abs(np.ediff1d(windows)))
+        sorted_diffs = sorted(diffs, reverse=True)
+
+        # Get indices of where the list should be split.
+        split = []
+        for x in range(self.topology.n_window_types-1):
+            i = diffs.index(sorted_diffs[x]) + 1
+            split.append(i)
+
+        # Get the sub-lists.
+        og = list(windows)
+        clusters = []
+        for i in sorted(split, reverse=True):
+            clusters.append(og[i:])
+            og = og[:i]
+
+        if self.topology.n_window_types == 1:
+            clusters.append(og)
+
+        variances = [np.var(c) for c in clusters]
+        return np.mean(variances)
+
     def windows(self, conformer=-1):
         """
         Returns window sizes found by ``pyWindow``.
