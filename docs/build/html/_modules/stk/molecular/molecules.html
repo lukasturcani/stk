@@ -25,25 +25,17 @@
   
 
   
-  
     <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="stk  documentation" href="../../../index.html"/>
-        <link rel="up" title="Module code" href="../../index.html"/> 
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -96,7 +88,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">stk</a>
@@ -104,9 +96,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -135,8 +128,6 @@
     
     
       <li class="wy-breadcrumbs-aside">
-        
-            
         
       </li>
     
@@ -2028,7 +2019,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="s1">&#39;r+t&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.mol&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="s1">&#39;r+t&#39;</span><span class="p">,</span>
+                                         <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span>
+                                         <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;mol_block&#39;</span><span class="p">])</span>
             <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;func_grp&#39;</span><span class="p">],</span>
@@ -3245,12 +3238,11 @@
 
 <div class="viewcode-block" id="Cage.window_difference"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Cage.window_difference">[docs]</a>    <span class="k">def</span> <span class="nf">window_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The total difference in all window sizes.</span>
+<span class="sd">        The average difference across window sizes.</span>
 
-<span class="sd">        Every combination of windows is considered and all the</span>
-<span class="sd">        size differences are summed and returned. Only</span>
-<span class="sd">        differences between windows of the same type are</span>
-<span class="sd">        considered.</span>
+<span class="sd">        First take the average window difference between all windows</span>
+<span class="sd">        of the same type. Then take the average of window differences</span>
+<span class="sd">        across window types.</span>
 
 <span class="sd">        Consider a triangular-based prism cage topology. Such a</span>
 <span class="sd">        cage will have triangular windows and square windows. You</span>
@@ -3319,7 +3311,65 @@
 
             <span class="n">diff_sums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diff_sum</span> <span class="o">/</span> <span class="n">diff_num</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">diff_sums</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">diff_sums</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Cage.window_variance"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Cage.window_variance">[docs]</a>    <span class="k">def</span> <span class="nf">window_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The variance in window sizes.</span>
+
+<span class="sd">        For cages where multiple window types are present, the</span>
+<span class="sd">        window variance within each window type is calculated first and</span>
+<span class="sd">        the returned value is the mean of these variances.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`float`</span>
+<span class="sd">            The variance in window sizes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">windows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">windows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">windows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span>
+
+        <span class="c1"># Cluster the windows into groups so that only size</span>
+        <span class="c1"># differences between windows of the same type are taken</span>
+        <span class="c1"># into account. To do this, first sort the windows by</span>
+        <span class="c1"># size. If two windows types are present split the</span>
+        <span class="c1"># windows at the two groups at the point where the window</span>
+        <span class="c1"># sizes have the biggest difference. If there are three</span>
+        <span class="c1"># types split it at the two biggest differences and so</span>
+        <span class="c1"># on.</span>
+
+        <span class="n">diffs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ediff1d</span><span class="p">(</span><span class="n">windows</span><span class="p">)))</span>
+        <span class="n">sorted_diffs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">diffs</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Get indices of where the list should be split.</span>
+        <span class="n">split</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_window_types</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">diffs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sorted_diffs</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">split</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="c1"># Get the sub-lists.</span>
+        <span class="n">og</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">clusters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">og</span><span class="p">[</span><span class="n">i</span><span class="p">:])</span>
+            <span class="n">og</span> <span class="o">=</span> <span class="n">og</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_window_types</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">clusters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">og</span><span class="p">)</span>
+
+        <span class="n">variances</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">variances</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Cage.windows"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Cage.windows">[docs]</a>    <span class="k">def</span> <span class="nf">windows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3364,7 +3414,10 @@
         <span class="k">if</span> <span class="n">all_windows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_windows</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">]</span></div></div>
+        <span class="c1"># pyWindow sometimes detects super large windows by accident,</span>
+        <span class="c1"># filter them out first.</span>
+        <span class="n">valid_windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">all_windows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="mf">1e6</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">valid_windows</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">]</span></div></div>
 
 
 <div class="viewcode-block" id="Polymer"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Polymer">[docs]</a><span class="k">class</span> <span class="nc">Polymer</span><span class="p">(</span><span class="n">MacroMolecule</span><span class="p">):</span>
@@ -3707,9 +3760,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -3722,7 +3773,7 @@
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -3741,6 +3792,7 @@
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
             VERSION:'',
+            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -3758,14 +3810,11 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
   
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

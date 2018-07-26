@@ -25,25 +25,17 @@
   
 
   
-  
     <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="stk  documentation" href="../../../index.html"/>
-        <link rel="up" title="Module code" href="../../index.html"/> 
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -96,7 +88,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">stk</a>
@@ -104,9 +96,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -135,8 +128,6 @@
     
     
       <li class="wy-breadcrumbs-aside">
-        
-            
         
       </li>
     
@@ -211,7 +202,10 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="k">import</span> <span class="n">euclidean</span>
 <span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="k">as</span> <span class="nn">rdkit</span>
+<span class="kn">import</span> <span class="nn">rdkit.Geometry.rdGeometry</span> <span class="k">as</span> <span class="nn">rdkit_geo</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">..utilities</span> <span class="k">import</span> <span class="n">AtomicPeriodicBond</span>
 
@@ -521,6 +515,87 @@
     <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">periodic_bonds</span></div>
 
 
+<div class="viewcode-block" id="diol_with_difluorne"><a class="viewcode-back" href="../../../stk.molecular.functional_groups.html#stk.molecular.functional_groups.diol_with_difluorne">[docs]</a><span class="k">def</span> <span class="nf">diol_with_difluorne</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">del_atoms</span><span class="p">,</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Crates bonds between functional groups.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">        A molecule being assembled.</span>
+
+<span class="sd">    del : :class:`bool`</span>
+<span class="sd">        Toggles if atoms with the ``&#39;del&#39;`` property are deleted.</span>
+
+<span class="sd">    fg1 : :class:`int`</span>
+<span class="sd">        The id of the first functional group which</span>
+<span class="sd">        is to be joined, as given by the &#39;fg_id&#39; property.</span>
+
+<span class="sd">    fg2 : :class:`int`</span>
+<span class="sd">        The id of the second functional group which</span>
+<span class="sd">        is to be joined, as given by the &#39;fg_id&#39; property.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`tuple`</span>
+<span class="sd">        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is</span>
+<span class="sd">        the molecule with bonds added between the functional groups.</span>
+
+<span class="sd">        The second element is a :class:`int`. It is the number</span>
+<span class="sd">        of bonds added.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">bond</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span>
+    <span class="n">fgs</span> <span class="o">=</span> <span class="p">{</span><span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">}</span>
+    <span class="n">oxygens</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">carbons</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">deleters</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fgs</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">):</span>
+            <span class="n">deleters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">GetProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;difluorene&#39;</span> <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">):</span>
+            <span class="n">carbons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">GetProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;diol&#39;</span> <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">):</span>
+            <span class="n">oxygens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+    <span class="n">conf</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">carbons</span><span class="p">:</span>
+        <span class="n">cpos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())])</span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">oxygens</span><span class="p">:</span>
+            <span class="n">opos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())])</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">euclidean</span><span class="p">(</span><span class="n">cpos</span><span class="p">,</span> <span class="n">opos</span><span class="p">)</span>
+            <span class="n">distances</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">d</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">(),</span> <span class="n">o</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()))</span>
+    <span class="n">distances</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="n">deduped_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">seen_o</span><span class="p">,</span> <span class="n">seen_c</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(),</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">distances</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_c</span> <span class="ow">and</span> <span class="n">o</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_o</span><span class="p">:</span>
+            <span class="n">deduped_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">c</span><span class="p">,</span> <span class="n">o</span><span class="p">))</span>
+            <span class="n">seen_c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">seen_o</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">o1</span><span class="p">),</span> <span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">o2</span><span class="p">),</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">deduped_pairs</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="o">!=</span> <span class="n">c2</span> <span class="ow">and</span> <span class="n">o1</span> <span class="o">!=</span> <span class="n">o2</span>
+    <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">o1</span><span class="p">,</span> <span class="n">bond</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">o2</span><span class="p">,</span> <span class="n">bond</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">del_atoms</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">deleters</span><span class="p">:</span>
+            <span class="n">emol</span><span class="o">.</span><span class="n">RemoveAtom</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">(),</span> <span class="mi">2</span></div>
+
+
 <div class="viewcode-block" id="boronic_acid_with_diol"><a class="viewcode-back" href="../../../stk.molecular.functional_groups.html#stk.molecular.functional_groups.boronic_acid_with_diol">[docs]</a><span class="k">def</span> <span class="nf">boronic_acid_with_diol</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">del_atoms</span><span class="p">,</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Crates bonds between functional groups.</span>
@@ -581,13 +656,134 @@
     <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">(),</span> <span class="mi">2</span></div>
 
 
+<div class="viewcode-block" id="amine3_with_amine3"><a class="viewcode-back" href="../../../stk.molecular.functional_groups.html#stk.molecular.functional_groups.amine3_with_amine3">[docs]</a><span class="k">def</span> <span class="nf">amine3_with_amine3</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">del_atoms</span><span class="p">,</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Crates bonds between functional groups.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">        A molecule being assembled.</span>
+
+<span class="sd">    del : :class:`bool`</span>
+<span class="sd">        Toggles if atoms with the ``&#39;del&#39;`` property are deleted.</span>
+
+<span class="sd">    fg1 : :class:`int`</span>
+<span class="sd">        The id of the first functional group which</span>
+<span class="sd">        is to be joined, as given by the &#39;fg_id&#39; property.</span>
+
+<span class="sd">    fg2 : :class:`int`</span>
+<span class="sd">        The id of the second functional group which</span>
+<span class="sd">        is to be joined, as given by the &#39;fg_id&#39; property.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`tuple`</span>
+<span class="sd">        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is</span>
+<span class="sd">        the molecule with bonds added between the functional groups.</span>
+
+<span class="sd">        The second element is a :class:`int`. It is the number</span>
+<span class="sd">        of bonds added.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">fgs</span> <span class="o">=</span> <span class="p">{</span><span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">}</span>
+    <span class="n">atoms1</span><span class="p">,</span> <span class="n">atoms2</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+    <span class="n">deleters</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fgs</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">fg1</span><span class="p">:</span>
+            <span class="n">atoms1</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()]</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">GetIntProp</span><span class="p">(</span><span class="s1">&#39;fg_id&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">fg2</span><span class="p">:</span>
+            <span class="n">atoms2</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()]</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">):</span>
+            <span class="n">deleters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
+
+    <span class="n">conf</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+    <span class="n">n1_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atoms1</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">])])</span>
+    <span class="n">n2_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atoms2</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">])])</span>
+
+    <span class="n">c1_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atoms1</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])])</span>
+    <span class="n">c2_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atoms2</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])])</span>
+
+    <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+    <span class="n">n_joiner</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+    <span class="n">n_joiner_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">n1_pos</span> <span class="o">+</span> <span class="n">n2_pos</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">nh1</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">nh1_pos</span> <span class="o">=</span> <span class="n">n_joiner_pos</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">nh2</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">nh2_pos</span> <span class="o">=</span> <span class="n">n_joiner_pos</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">nc_joiner1</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+    <span class="n">nc_joiner1_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">c1_pos</span> <span class="o">+</span> <span class="n">n2_pos</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">nc1h1</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">nc1h1_pos</span> <span class="o">=</span> <span class="n">nc_joiner1_pos</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">nc1h2</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">nc1h2_pos</span> <span class="o">=</span> <span class="n">nc_joiner1_pos</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">nc_joiner2</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+    <span class="n">nc_joiner2_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">c2_pos</span> <span class="o">+</span> <span class="n">n1_pos</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">nc2h1</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">nc2h1_pos</span> <span class="o">=</span> <span class="n">nc_joiner2_pos</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">nc2h2</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">nc2h2_pos</span> <span class="o">=</span> <span class="n">nc_joiner2_pos</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">single</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">atoms1</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">],</span> <span class="n">n_joiner</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">atoms2</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">],</span> <span class="n">n_joiner</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">n_joiner</span><span class="p">,</span> <span class="n">nh1</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">n_joiner</span><span class="p">,</span> <span class="n">nh2</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">atoms1</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="n">nc_joiner1</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">atoms2</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">],</span> <span class="n">nc_joiner1</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">nc_joiner1</span><span class="p">,</span> <span class="n">nc1h1</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">nc_joiner1</span><span class="p">,</span> <span class="n">nc1h2</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">atoms2</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="n">nc_joiner2</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">atoms1</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">],</span> <span class="n">nc_joiner2</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">nc_joiner2</span><span class="p">,</span> <span class="n">nc2h1</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+    <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">nc_joiner2</span><span class="p">,</span> <span class="n">nc2h2</span><span class="p">,</span> <span class="n">single</span><span class="p">)</span>
+
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">n_joiner</span><span class="p">,</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">n_joiner_pos</span><span class="p">))</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">nh1</span><span class="p">,</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">nh1_pos</span><span class="p">))</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">nh2</span><span class="p">,</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">nh2_pos</span><span class="p">))</span>
+
+    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">nc_joiner1</span><span class="p">,</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">nc_joiner1_pos</span><span class="p">))</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">nc1h1</span><span class="p">,</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">nc1h1_pos</span><span class="p">))</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">nc1h2</span><span class="p">,</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">nc1h2_pos</span><span class="p">))</span>
+
+    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">nc_joiner2</span><span class="p">,</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">nc_joiner2_pos</span><span class="p">))</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">nc2h1</span><span class="p">,</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">nc2h1_pos</span><span class="p">))</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">nc2h2</span><span class="p">,</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">nc2h2_pos</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">del_atoms</span><span class="p">:</span>
+        <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">deleters</span><span class="p">):</span>
+            <span class="n">emol</span><span class="o">.</span><span class="n">RemoveAtom</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">mol</span><span class="p">,</span> <span class="mi">6</span></div>
+
+
 <span class="c1"># If some functional groups react via a special mechanism not covered</span>
 <span class="c1"># in by the base &quot;react()&quot; function the function should be placed</span>
 <span class="c1"># in this dict. The key should be a sorted tuple which holds the name</span>
 <span class="c1"># of every functional group involved in the reaction along with how</span>
 <span class="c1"># many such functional groups are invovled.</span>
 <span class="n">custom_reactions</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;boronic_acid&#39;</span><span class="p">,</span> <span class="s1">&#39;diol&#39;</span><span class="p">]):</span> <span class="n">boronic_acid_with_diol</span><span class="p">}</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;boronic_acid&#39;</span><span class="p">,</span> <span class="s1">&#39;diol&#39;</span><span class="p">]):</span> <span class="n">boronic_acid_with_diol</span><span class="p">,</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;diol&#39;</span><span class="p">,</span> <span class="s1">&#39;difluorene&#39;</span><span class="p">]):</span> <span class="n">diol_with_difluorne</span><span class="p">,</span>
+    <span class="n">FGKey</span><span class="p">([</span><span class="s1">&#39;amine3&#39;</span><span class="p">,</span> <span class="s1">&#39;amine3&#39;</span><span class="p">]):</span> <span class="n">amine3_with_amine3</span>
+
+<span class="p">}</span>
 
 <span class="n">periodic_custom_reactions</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -679,17 +875,32 @@
            <span class="n">del_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s2">&quot;[$([H][N]([#6])[#6])]&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)]),</span>
 
     <span class="n">FGInfo</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;diol&#39;</span><span class="p">,</span>
-           <span class="n">fg_smarts</span><span class="o">=</span><span class="s1">&#39;[H][O][#6][#6][O][H]&#39;</span><span class="p">,</span>
+           <span class="n">fg_smarts</span><span class="o">=</span><span class="s1">&#39;[H][O][#6]~[#6][O][H]&#39;</span><span class="p">,</span>
            <span class="n">bonder_smarts</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([O]([H])[#6][#6][O][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([O]([H])[#6]~[#6][O][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
            <span class="p">],</span>
-           <span class="n">del_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][O][#6][#6][O][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)]),</span>
+           <span class="n">del_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][O][#6]~[#6][O][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)]),</span>
+
+    <span class="n">FGInfo</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;difluorene&#39;</span><span class="p">,</span>
+           <span class="n">fg_smarts</span><span class="o">=</span><span class="s1">&#39;[F][#6]~[#6][F]&#39;</span><span class="p">,</span>
+           <span class="n">bonder_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([#6]([F])~[#6][F])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)],</span>
+           <span class="n">del_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([F][#6]~[#6][F])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)]),</span>
 
     <span class="n">FGInfo</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;alkyne2&#39;</span><span class="p">,</span>
            <span class="n">fg_smarts</span><span class="o">=</span><span class="s1">&#39;[C]#[C][H]&#39;</span><span class="p">,</span>
            <span class="n">bonder_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([C]#[C][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)],</span>
            <span class="n">del_smarts</span><span class="o">=</span><span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][C]#[C])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-                       <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([C](#[C])[H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span>
+                       <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([C](#[C])[H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)]),</span>
+
+    <span class="n">FGInfo</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;amine3&#39;</span><span class="p">,</span>
+           <span class="n">fg_smarts</span><span class="o">=</span><span class="s1">&#39;[N]([H])([H])[#6]~[#6]([H])~[#6]([H])&#39;</span><span class="p">,</span>
+           <span class="n">bonder_smarts</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([N]([H])([H])[#6]~[#6]([H])~[#6]([H]))]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([#6]([H])(~[#6]([H]))~[#6][N]([H])[H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">],</span>
+           <span class="n">del_smarts</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][N]([H])[#6]~[#6]([H])~[#6]([H]))]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][#6](~[#6]([H]))~[#6][N]([H])[H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span>
 
     <span class="p">)</span>
 
@@ -705,9 +916,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -720,7 +929,7 @@
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -739,6 +948,7 @@
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
             VERSION:'',
+            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -756,14 +966,11 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
   
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

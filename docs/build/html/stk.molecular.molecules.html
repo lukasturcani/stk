@@ -25,24 +25,17 @@
   
 
   
-  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="stk  documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -102,7 +95,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -110,9 +103,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -320,11 +314,10 @@ class does the assembly of the macromolecule from the building blocks.</p>
 <dl class="method">
 <dt id="stk.molecular.molecules.Cage.window_difference">
 <code class="descname">window_difference</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Cage.window_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Cage.window_difference" title="Permalink to this definition">¶</a></dt>
-<dd><p>The total difference in all window sizes.</p>
-<p>Every combination of windows is considered and all the
-size differences are summed and returned. Only
-differences between windows of the same type are
-considered.</p>
+<dd><p>The average difference across window sizes.</p>
+<p>First take the average window difference between all windows
+of the same type. Then take the average of window differences
+across window types.</p>
 <p>Consider a triangular-based prism cage topology. Such a
 cage will have triangular windows and square windows. You
 only want to compare the triangulars with other
@@ -341,6 +334,27 @@ every combination of windows of the same type.</li>
 <li><strong>None</strong> (<code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code>) – If not all windows were found.</li>
 </ul>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.Cage.window_variance">
+<code class="descname">window_variance</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Cage.window_variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Cage.window_variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The variance in window sizes.</p>
+<p>For cages where multiple window types are present, the
+window variance within each window type is calculated first and
+the returned value is the mean of these variances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The variance in window sizes.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -2066,7 +2080,7 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt>
-<code class="descname">init_funcs</code><em class="property"> = {'.mol': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.mol2': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.mae': &lt;function mol_from_mae_file&gt;, '.pdb': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False)}</em></dt>
+<code class="descname">init_funcs</code><em class="property"> = {'.mae': &lt;function mol_from_mae_file at 0x7f3b3f2f6840&gt;, '.mol': functools.partial(&lt;Boost.Python.function object at 0x5594cb299ff0&gt;, sanitize=False, removeHs=False), '.mol2': functools.partial(&lt;Boost.Python.function object at 0x5594cb2e12e0&gt;, sanitize=False, removeHs=False), '.pdb': functools.partial(&lt;Boost.Python.function object at 0x5594cb576120&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object at 0x5594cb299ff0&gt;, sanitize=False, removeHs=False)}</em></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -2540,9 +2554,7 @@ centroids shoould be aligned.</li>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -2555,7 +2567,7 @@ centroids shoould be aligned.</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -2574,6 +2586,7 @@ centroids shoould be aligned.</li>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
+            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -2591,14 +2604,11 @@ centroids shoould be aligned.</li>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
