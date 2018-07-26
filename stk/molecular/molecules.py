@@ -251,7 +251,7 @@ class CachedStructUnit(type):
             raise TypeError(('Unable to initialize'
                              ' from "{}" files.').format(ext))
 
-        mol = self.init_funcs[ext](sig['file'])
+        mol = remake(self.init_funcs[ext](sig['file']))
 
         # Get the name of the functional group provided to the
         # initializer or get it from the path.
@@ -1353,7 +1353,9 @@ class Molecule:
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
 
-        mol = rdkit.MolFromMolFile(path, sanitize=False, removeHs=False)
+        mol = remake(rdkit.MolFromMolFile(path,
+                                          sanitize=False,
+                                          removeHs=False))
         conf = rdkit.Conformer(mol.GetConformer())
         conf.SetId(conformer)
         self.mol.RemoveConformer(conformer)
