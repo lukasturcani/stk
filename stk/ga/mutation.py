@@ -286,7 +286,13 @@ class Mutation:
             self._similar_bb[macro_mol][chosen_bb] = iter(
                       chosen_bb.similar_molecules(m.mol for m in mols))
 
-        sim_mol = next(self._similar_bb[macro_mol][chosen_bb])[-1]
+        try:
+            sim_mol = next(self._similar_bb[macro_mol][chosen_bb])[-1]
+        except StopIteration:
+            self._similar_bb[macro_mol][chosen_bb] = iter(
+                      chosen_bb.similar_molecules(m.mol for m in mols))
+            sim_mol = next(self._similar_bb[macro_mol][chosen_bb])[-1]
+
         sim_mol_inchi = rdkit.MolToInchi(sim_mol)
         sim_struct_unit = mol_map[sim_mol_inchi]
 
