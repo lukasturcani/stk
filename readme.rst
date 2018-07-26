@@ -104,3 +104,4 @@ using stk
 
 * https://pubs.acs.org/doi/abs/10.1021/acs.jcim.8b00256
 * https://chemrxiv.org/articles/Computationally-Inspired_Discovery_of_an_Unsymmetrical_Porous_Organic_Cage/6863684
+* https://pubs.rsc.org/en/Content/ArticleLanding/TA/2018/C8TA04186E#!divAbstract
