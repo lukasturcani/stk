@@ -102,4 +102,5 @@ about stk
 using stk
 ---------
 
-* https://chemrxiv.org/articles/A_High-Throughput_Screening_Approach_for_the_Optoelectronic_Properties_of_Conjugated_Polymers/6181841
+* https://pubs.acs.org/doi/abs/10.1021/acs.jcim.8b00256
+* https://chemrxiv.org/articles/Computationally-Inspired_Discovery_of_an_Unsymmetrical_Porous_Organic_Cage/6863684
