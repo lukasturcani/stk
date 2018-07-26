@@ -27,6 +27,7 @@ import logging
 import numpy as np
 from collections import Counter
 from itertools import islice
+import rdkit.Chem.AllChem as rdkit
 
 from .ga_population import GAPopulation
 from .plotting import plot_counter
@@ -150,6 +151,7 @@ class Mutation:
             counter.update([parent])
             func_data = np.random.choice(self.funcs, p=self.weights)
             func = getattr(self, func_data.name)
+            logger.info(f'Using {func.__name__}.')
 
             try:
                 mutant = func(parent, **func_data.params)
@@ -265,9 +267,10 @@ class Mutation:
             # each previously chosen building block.
             self._similar_bb = {}
         if macro_mol not in self._similar_bb:
-            # Maps the building blocks to iterators which yield the
-            # next most similar molecule in `mols` to the building
-            # block.
+            # Maps the macro_mol to a dict. The dict maps each
+            # building block of the macro mol to an iterator.
+            # The iterators yield the next most similar molecules in
+            # `mols` to the building block.
             self._similar_bb[macro_mol] = {}
 
         # Choose the building block which undergoes mutation.
@@ -275,22 +278,24 @@ class Mutation:
         chosen_bb = np.random.choice(valid_bbs)
 
         # Create a mapping from rdkit molecules to the StructUnits.
-        mol_map = {struct_unit.mol: struct_unit for struct_unit in mols}
+        mol_map = {struct_unit.inchi: struct_unit for struct_unit in mols}
 
         # If the building block has not been chosen before, create an
         # iterator yielding similar molecules from `mols` for it.
         if chosen_bb not in self._similar_bb[macro_mol]:
             self._similar_bb[macro_mol][chosen_bb] = iter(
-                           chosen_bb.similar_molecules(mol_map.keys()))
+                      chosen_bb.similar_molecules(m.mol for m in mols))
 
         sim_mol = next(self._similar_bb[macro_mol][chosen_bb])[-1]
-        sim_struct_unit = mol_map[sim_mol]
+        sim_mol_inchi = rdkit.MolToInchi(sim_mol)
+        sim_struct_unit = mol_map[sim_mol_inchi]
 
         # If the most similar molecule in `mols` is itself, then take
         # the next most similar one.
         if sim_struct_unit is chosen_bb:
             sim_mol = next(self._similar_bb[macro_mol][chosen_bb])[-1]
-            sim_struct_unit = mol_map[sim_mol]
+            sim_mol_inchi = rdkit.MolToInchi(sim_mol)
+            sim_struct_unit = mol_map[sim_mol_inchi]
 
         # Build the new MacroMolecule.
         new_bbs = [bb for bb in macro_mol.building_blocks if

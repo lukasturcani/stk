@@ -161,6 +161,7 @@ class Crossover:
             # Get the crossover function.
             func_data = np.random.choice(self.funcs, p=self.weights)
             func = getattr(self, func_data.name)
+            logger.info(f'Using {func.__name__}.')
 
             try:
                 # Apply the crossover function and supply any
