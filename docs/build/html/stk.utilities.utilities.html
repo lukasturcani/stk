@@ -25,24 +25,17 @@
   
 
   
-  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="stk  documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -98,7 +91,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -106,9 +99,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -750,6 +744,24 @@ are not currently supported, so an error is raised.</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="stk.utilities.utilities.quaternion">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">quaternion</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#quaternion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.quaternion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a translation + rotation quaternion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>u</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of length 3 holding the paramter for the
+quarternion.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>K. Shoemake, Uniform random rotations, Graphics Gems III,
+pages 124-132. Academic, New York, 1992.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="stk.utilities.utilities.remake">
 <code class="descclassname">stk.utilities.utilities.</code><code class="descname">remake</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#remake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.remake" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remakes a molecule from scratch.</p>
@@ -855,6 +867,24 @@ the time taken to process the entire block is printed.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="stk.utilities.utilities.translation_component">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">translation_component</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#translation_component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.translation_component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts translation vector from quaternion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – A length 4 quaternion.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The translation vector encoded within <cite>q</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="stk.utilities.utilities.vector_theta">
 <code class="descclassname">stk.utilities.utilities.</code><code class="descname">vector_theta</code><span class="sig-paren">(</span><em>vector1</em>, <em>vector2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#vector_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.vector_theta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the angle between two vectors in radians.</p>
@@ -882,9 +912,7 @@ the time taken to process the entire block is printed.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -897,7 +925,7 @@ the time taken to process the entire block is printed.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -916,6 +944,7 @@ the time taken to process the entire block is printed.</p>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
+            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -933,14 +962,11 @@ the time taken to process the entire block is printed.</p>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
