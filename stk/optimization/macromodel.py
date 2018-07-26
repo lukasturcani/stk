@@ -59,7 +59,7 @@ def macromodel_opt(mol,
 
     Parameters
     ----------
-    mol : `.Molecule`
+    mol : :class:`.Molecule`
         The molecule who's structure must be optimized.
 
     macromodel_path : :class:`str`
@@ -74,7 +74,8 @@ def macromodel_opt(mol,
             'restricted' : :class:`bool` (default = ``True``)
                 If ``False`` then all bonds are optimized, not just the
                 ones created during macromolecular assembly. If
-                ``True`` then a regular optimization is performed. If
+                ``True`` then an optimization is performed only on the
+                bonds added during molecular assembly. If
                 ``'both'`` then a restricted optimization is performed
                 first, followed by a regular optimization.
 
@@ -203,7 +204,7 @@ def macromodel_cage_opt(mol,
 
     Parameters
     ----------
-    mol : `.Molecule`
+    mol : :class:`.Molecule`
         The molecule who's structure must be optimized.
 
     macromodel_path : :class:`str`
@@ -218,7 +219,8 @@ def macromodel_cage_opt(mol,
             'restricted' : :class:`bool` (default = ``True``)
                 If ``False`` then all bonds are optimized, not just the
                 ones created during macromolecular assembly. If
-                ``True`` then a regular optimization is performed. If
+                ``True`` then an optimization is performed only on the
+                bonds added during molecular assembly. If
                 ``'both'`` then a restricted optimization is performed
                 first, followed by a regular optimization.
 
@@ -344,7 +346,7 @@ def _macromodel_md_opt(mol,
 
     Parameters
     ----------
-    mol : `.Molecule`
+    mol : :class:`.Molecule`
         The molecule who's structure must be optimized.
 
     macromodel_path : :class:`str`
