@@ -190,7 +190,8 @@ from ..utilities import (flatten,
                          mol_from_mae_file,
                          rotation_matrix_arbitrary_axis,
                          atom_vdw_radii,
-                         Cell)
+                         Cell,
+                         remake)
 
 
 logger = logging.getLogger(__name__)
@@ -1548,7 +1549,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         if ext not in self.init_funcs:
             raise TypeError(f'Unable to initialize from "{ext}" files.')
 
-        self.mol = self.init_funcs[ext](file)
+        self.mol = remake(self.init_funcs[ext](file))
         # Update the property cache of each atom. This updates things
         # like valence.
         for atom in self.mol.GetAtoms():
