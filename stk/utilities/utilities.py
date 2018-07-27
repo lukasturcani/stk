@@ -964,6 +964,7 @@ def remake(mol):
             else:
                 new_atom.SetProp(pname, pval)
 
+        new_atom.SetFormalCharge(a.GetFormalCharge())
         emol.AddAtom(new_atom)
 
     for bond in mol.GetBonds():
