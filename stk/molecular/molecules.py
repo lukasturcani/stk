@@ -3234,7 +3234,7 @@ class Cage(MacroMolecule):
 
     def windows(self, conformer=-1):
         """
-        Returns window sizes found by ``pyWindow``.
+        Returns window sizes found by ``pywindow``.
 
         Parameters
         ----------
@@ -3259,9 +3259,9 @@ class Cage(MacroMolecule):
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            # Load an RDKit molecule object to pyWINDOW.
+            # Load an RDKit molecule object to pywindow.
 
-            # As pyWindow doesnt support multiple conformers, first
+            # As pywindow doesnt support multiple conformers, first
             # make an rdkit molecule holding only the desired conformer.
             new_mol = rdkit.Mol(self.mol)
             new_mol.RemoveAllConformers()
@@ -3269,7 +3269,7 @@ class Cage(MacroMolecule):
 
             pw_molecule = pywindow.molecular.Molecule.load_rdkit_mol(new_mol)
             # Find windows and get a single array with windows' sizes.
-            all_windows = pw_molecule.calculate_windows(output='windows')
+            all_windows = pw_molecule.calculate_windows()
 
         # If pyWindow failed, return ``None``.
         if all_windows is None:
@@ -3277,7 +3277,7 @@ class Cage(MacroMolecule):
 
         # pyWindow sometimes detects super large windows by accident,
         # filter them out first.
-        valid_windows = [w for w in all_windows[0] if w < 1e6]
+        valid_windows = [w for w in all_windows if w < 1e6]
         return sorted(valid_windows, reverse=True)[:self.topology.n_windows]
 
 
