@@ -3,4 +3,4 @@ scipy
 matplotlib
 scikit-learn
 psutil
-pywindowx==0.0.1
+pywindowx==0.0.2
