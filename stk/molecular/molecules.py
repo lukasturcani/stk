@@ -3271,11 +3271,11 @@ class Cage(MacroMolecule):
             # Find windows and get a single array with windows' sizes.
             all_windows = pw_molecule.calculate_windows()
 
-        # If pyWindow failed, return ``None``.
+        # If pywindow failed, return ``None``.
         if all_windows is None:
             return None
 
-        # pyWindow sometimes detects super large windows by accident,
+        # pywindow sometimes detects super large windows by accident,
         # filter them out first.
         valid_windows = [w for w in all_windows if w < 1e6]
         return sorted(valid_windows, reverse=True)[:self.topology.n_windows]
