@@ -155,7 +155,7 @@
 <p>Defines <a class="reference internal" href="#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>.</p>
 <dl class="class">
 <dt id="stk.population.Population">
-<em class="property">class </em><code class="descclassname">stk.population.</code><code class="descname">Population</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.population.</code><code class="descname">Population</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A container for  <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> objects.</p>
 <p><a class="reference internal" href="#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instances can be nested.</p>
@@ -194,7 +194,7 @@ used.</p>
 
 <dl class="method">
 <dt id="stk.population.Population.add_members">
-<code class="descname">add_members</code><span class="sig-paren">(</span><em>population</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.add_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.add_members" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_members</code><span class="sig-paren">(</span><em>population</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.add_members" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instances into <a class="reference internal" href="#stk.population.Population.members" title="stk.population.Population.members"><code class="xref py py-attr docutils literal"><span class="pre">members</span></code></a>.</p>
 <p>The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>  instances held within <cite>population</cite>, are
 added into <a class="reference internal" href="#stk.population.Population.members" title="stk.population.Population.members"><code class="xref py py-attr docutils literal"><span class="pre">members</span></code></a>. Any nesting is removed. This is
@@ -230,7 +230,7 @@ than one instance of the same molecule to be added.</p>
 
 <dl class="method">
 <dt id="stk.population.Population.add_subpopulation">
-<code class="descname">add_subpopulation</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.add_subpopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.add_subpopulation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_subpopulation</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.add_subpopulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Appends a copy of <cite>population</cite> to <a class="reference internal" href="#stk.population.Population.populations" title="stk.population.Population.populations"><code class="xref py py-attr docutils literal"><span class="pre">populations</span></code></a>.</p>
 <p>Only a copy of the <cite>population</cite> container is made. The
 molecules it holds are not copies.</p>
@@ -250,7 +250,7 @@ molecules it holds are not copies.</p>
 
 <dl class="method">
 <dt id="stk.population.Population.all_members">
-<code class="descname">all_members</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.all_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.all_members" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_members</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.all_members" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields all molecules in the population and its subpopulations.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -265,7 +265,7 @@ population or its subpopulations.</td>
 
 <dl class="method">
 <dt id="stk.population.Population.assign_names_from">
-<code class="descname">assign_names_from</code><span class="sig-paren">(</span><em>n</em>, <em>overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.assign_names_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.assign_names_from" title="Permalink to this definition">¶</a></dt>
+<code class="descname">assign_names_from</code><span class="sig-paren">(</span><em>n</em>, <em>overwrite=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.assign_names_from" title="Permalink to this definition">¶</a></dt>
 <dd><p>Give each member of the population a name starting from <cite>n</cite>.</p>
 <p class="rubric">Notes</p>
 <p>This method modifies the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.name" title="stk.molecular.molecules.Molecule.name"><code class="xref py py-attr docutils literal"><span class="pre">Molecule.name</span></code></a> attribute of
@@ -294,7 +294,7 @@ by one between members.</li>
 
 <dl class="method">
 <dt id="stk.population.Population.dump">
-<code class="descname">dump</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.dump" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dump</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dumps the population to a file.</p>
 <p>The population is dumped in the JSON format in the following
 way. The population is represented as a list,</p>
@@ -321,7 +321,7 @@ be dumped.</td>
 
 <dl class="classmethod">
 <dt id="stk.population.Population.from_list">
-<em class="property">classmethod </em><code class="descname">from_list</code><span class="sig-paren">(</span><em>pop_list</em>, <em>member_init</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.from_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.from_list" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">from_list</code><span class="sig-paren">(</span><em>pop_list</em>, <em>member_init</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.from_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a population from a <code class="xref py py-class docutils literal"><span class="pre">list</span></code> representation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -355,7 +355,7 @@ desired objects.</li>
 
 <dl class="method">
 <dt id="stk.population.Population.has_structure">
-<code class="descname">has_structure</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.has_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.has_structure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">has_structure</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.has_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns <code class="docutils literal"><span class="pre">True</span></code> if molecule with <cite>mol</cite> structure is held.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -375,7 +375,7 @@ is held by the population.</td>
 
 <dl class="classmethod">
 <dt id="stk.population.Population.init_all">
-<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>processes=None</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.init_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.init_all" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>processes=None</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.init_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates all possible molecules from provided building blocks.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -422,7 +422,7 @@ assembled from <cite>databases</cite>.</p>
 
 <dl class="classmethod">
 <dt id="stk.population.Population.init_diverse">
-<em class="property">classmethod </em><code class="descname">init_diverse</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.init_diverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.init_diverse" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_diverse</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.init_diverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>.</p>
 <p>All molecules are held in the <a class="reference internal" href="#stk.population.Population.members" title="stk.population.Population.members"><code class="xref py py-attr docutils literal"><span class="pre">members</span></code></a>.</p>
 <p>From the supplied sublists of building blocks, a random
@@ -473,7 +473,7 @@ selected during initialization of <a class="reference internal" href="stk.molecu
 
 <dl class="classmethod">
 <dt id="stk.population.Population.init_from_files">
-<em class="property">classmethod </em><code class="descname">init_from_files</code><span class="sig-paren">(</span><em>folder</em>, <em>moltype</em>, <em>glob_pattern='*'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.init_from_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.init_from_files" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_from_files</code><span class="sig-paren">(</span><em>folder</em>, <em>moltype</em>, <em>glob_pattern='*'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.init_from_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a population from files in <cite>folder</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -504,7 +504,7 @@ also be used.</li>
 
 <dl class="classmethod">
 <dt id="stk.population.Population.init_random">
-<em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.init_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.init_random" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.init_random" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>.</p>
 <p>All molecules are held in <a class="reference internal" href="#stk.population.Population.members" title="stk.population.Population.members"><code class="xref py py-attr docutils literal"><span class="pre">members</span></code></a>.</p>
 <p>From the supplied building blocks a random molecule is selected
@@ -551,7 +551,7 @@ selected during initialization of <a class="reference internal" href="stk.molecu
 
 <dl class="classmethod">
 <dt id="stk.population.Population.load">
-<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>path</em>, <em>member_init</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.load" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>path</em>, <em>member_init</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a <a class="reference internal" href="#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> from one dumped to a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -579,7 +579,7 @@ generated by <a class="reference internal" href="#stk.population.Population.dump
 
 <dl class="method">
 <dt id="stk.population.Population.max">
-<code class="descname">max</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.max" title="Permalink to this definition">¶</a></dt>
+<code class="descname">max</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the maximum in the population given a key.</p>
 <p>This method applies <code class="docutils literal"><span class="pre">key(member)</span></code> on every member of the
 population and returns the maximum of returned values.</p>
@@ -606,7 +606,7 @@ when it is applied to all members of the population.</td>
 
 <dl class="method">
 <dt id="stk.population.Population.mean">
-<code class="descname">mean</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.mean" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mean</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the mean in the population given a key.</p>
 <p>This method applies <code class="docutils literal"><span class="pre">key(member)</span></code> on every member of the
 population and returns the mean of returned values.</p>
@@ -633,7 +633,7 @@ it is applied to all members of the population.</td>
 
 <dl class="method">
 <dt id="stk.population.Population.min">
-<code class="descname">min</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.min" title="Permalink to this definition">¶</a></dt>
+<code class="descname">min</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.min" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the minimum in the population given a key.</p>
 <p>This method applies <code class="docutils literal"><span class="pre">key(member)</span></code> on every member of the
 population and returns the minimum of returned values.</p>
@@ -660,7 +660,7 @@ when it is applied to all members of the population.</td>
 
 <dl class="method">
 <dt id="stk.population.Population.optimize">
-<code class="descname">optimize</code><span class="sig-paren">(</span><em>func_data</em>, <em>processes=12</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.optimize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>func_data</em>, <em>processes=12</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structures of molecules in the population.</p>
 <p>The molecules are optimized serially or in parallel depending
 if <cite>processes</cite> is <code class="docutils literal"><span class="pre">1</span></code> or more. The serial version may be
@@ -697,7 +697,7 @@ will run serially if <code class="docutils literal"><span class="pre">1</span></
 
 <dl class="method">
 <dt id="stk.population.Population.remove_duplicates">
-<code class="descname">remove_duplicates</code><span class="sig-paren">(</span><em>between_subpops=True</em>, <em>key=&lt;built-in function id&gt;</em>, <em>top_seen=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.remove_duplicates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.remove_duplicates" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_duplicates</code><span class="sig-paren">(</span><em>between_subpops=True</em>, <em>key=&lt;built-in function id&gt;</em>, <em>top_seen=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.remove_duplicates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes duplicates from the population and preserves structure.</p>
 <p>The question of which molcule is preserved when duplicates are
 removed is difficult to answer. The iteration through a
@@ -736,7 +736,7 @@ returned by <code class="docutils literal"><span class="pre">key(molecule)</span
 
 <dl class="method">
 <dt id="stk.population.Population.remove_members">
-<code class="descname">remove_members</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.remove_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.remove_members" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_members</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.remove_members" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes all members where <code class="docutils literal"><span class="pre">key(member)</span></code> is <code class="docutils literal"><span class="pre">True</span></code>.</p>
 <p>The structure of the population is preserved.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -758,7 +758,7 @@ population.</td>
 
 <dl class="method">
 <dt id="stk.population.Population.to_list">
-<code class="descname">to_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.to_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.to_list" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.to_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the population to a list representation.</p>
 <p>The population and any subpopulations are represented as lists
 (and sublists), while members are represented by their JSON
@@ -777,7 +777,7 @@ dictionaries (as strings).</p>
 
 <dl class="method">
 <dt id="stk.population.Population.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>dir_path</em>, <em>use_name=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write</code><span class="sig-paren">(</span><em>dir_path</em>, <em>use_name=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.population.Population.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the <code class="docutils literal"><span class="pre">.mol</span></code> files of members to a directory.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

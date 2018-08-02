@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -91,7 +98,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -99,10 +106,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -149,7 +155,7 @@
 <p>A module for defining plotting functions.</p>
 <dl class="function">
 <dt id="stk.ga.plotting.fitness_epp">
-<code class="descclassname">stk.ga.plotting.</code><code class="descname">fitness_epp</code><span class="sig-paren">(</span><em>pop</em>, <em>plot_name=False</em>, <em>dump_name=None</em>, <em>xlabel='Generation'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/plotting.html#fitness_epp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.plotting.fitness_epp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.ga.plotting.</code><code class="descname">fitness_epp</code><span class="sig-paren">(</span><em>pop</em>, <em>plot_name=False</em>, <em>dump_name=None</em>, <em>xlabel='Generation'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.plotting.fitness_epp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the min, max and avg fitness values of each subpopulation.</p>
 <p>Also saves the plot data. The min, mean and max values for each
 subpopulation of <cite>pop</cite> are placed in an array:</p>
@@ -189,7 +195,7 @@ dumped. If <code class="docutils literal"><span class="pre">None</span></code> t
 
 <dl class="function">
 <dt id="stk.ga.plotting.parameter_epp">
-<code class="descclassname">stk.ga.plotting.</code><code class="descname">parameter_epp</code><span class="sig-paren">(</span><em>pop</em>, <em>plot_name=False</em>, <em>dump_name=None</em>, <em>xlabel='Generation'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/plotting.html#parameter_epp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.plotting.parameter_epp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.ga.plotting.</code><code class="descname">parameter_epp</code><span class="sig-paren">(</span><em>pop</em>, <em>plot_name=False</em>, <em>dump_name=None</em>, <em>xlabel='Generation'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.plotting.parameter_epp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.progress_params</span></code></a> values.</p>
 <p>For each element in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a> a
 separate graph will be produced. Each will show subpopulations on
@@ -231,7 +237,7 @@ dumped. If <code class="docutils literal"><span class="pre">None</span></code> t
 
 <dl class="function">
 <dt id="stk.ga.plotting.plot_counter">
-<code class="descclassname">stk.ga.plotting.</code><code class="descname">plot_counter</code><span class="sig-paren">(</span><em>counter</em>, <em>plot_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/plotting.html#plot_counter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.plotting.plot_counter" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.ga.plotting.</code><code class="descname">plot_counter</code><span class="sig-paren">(</span><em>counter</em>, <em>plot_name</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.plotting.plot_counter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves a <code class="docutils literal"><span class="pre">.png</span></code> file holding a plot of <cite>counter</cite>.</p>
 <p>The counter should hold the number of times a certain population
 member was selected.</p>
@@ -259,7 +265,9 @@ member was selected.</p>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -272,7 +280,7 @@ member was selected.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -291,7 +299,6 @@ member was selected.</p>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -309,11 +316,14 @@ member was selected.</p>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -91,7 +98,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -99,10 +106,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -151,7 +157,7 @@
 carrying out GA operations.</p>
 <dl class="class">
 <dt id="stk.ga.ga_population.GAPopulation">
-<em class="property">class </em><code class="descclassname">stk.ga.ga_population.</code><code class="descname">GAPopulation</code><span class="sig-paren">(</span><em>*args</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.ga.ga_population.</code><code class="descname">GAPopulation</code><span class="sig-paren">(</span><em>*args</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="stk.population.html#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">stk.population.Population</span></code></a></p>
 <p>Used for applying GA operations to molecules.</p>
 <p>The GA is invoked by calling a number of methods of this class,
@@ -181,7 +187,7 @@ operations on the population.</p>
 
 <dl class="method">
 <dt id="stk.ga.ga_population.GAPopulation.calculate_member_fitness">
-<code class="descname">calculate_member_fitness</code><span class="sig-paren">(</span><em>processes=12</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.calculate_member_fitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.calculate_member_fitness" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate_member_fitness</code><span class="sig-paren">(</span><em>processes=12</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.calculate_member_fitness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the fitness function to all members.</p>
 <p>The fitness function is defined in the attribute
 <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools.fitness" title="stk.ga.ga_tools.GATools.fitness"><code class="xref py py-attr docutils literal"><span class="pre">GATools.fitness</span></code></a> of the <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a> instance
@@ -212,7 +218,7 @@ held by the population.</p>
 
 <dl class="method">
 <dt id="stk.ga.ga_population.GAPopulation.exit">
-<code class="descname">exit</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.exit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">exit</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.exit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks the if the EA exit criterion has been satisfied.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -231,7 +237,7 @@ held by the population.</p>
 
 <dl class="method">
 <dt id="stk.ga.ga_population.GAPopulation.gen_mutants">
-<code class="descname">gen_mutants</code><span class="sig-paren">(</span><em>counter_name='mutation_counter.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.gen_mutants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.gen_mutants" title="Permalink to this definition">¶</a></dt>
+<code class="descname">gen_mutants</code><span class="sig-paren">(</span><em>counter_name='mutation_counter.png'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.gen_mutants" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a> of mutants.</p>
 <p>The selection function which decides which molecules are
 selected for mutation is defined in the
@@ -259,7 +265,7 @@ which members were selected for mutation.</td>
 
 <dl class="method">
 <dt id="stk.ga.ga_population.GAPopulation.gen_next_gen">
-<code class="descname">gen_next_gen</code><span class="sig-paren">(</span><em>pop_size</em>, <em>counter_path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.gen_next_gen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.gen_next_gen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">gen_next_gen</code><span class="sig-paren">(</span><em>pop_size</em>, <em>counter_path=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.gen_next_gen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a population holding the next generation of structures.</p>
 <p>The selection function to be used for selecting the next
 generation of molecules is defined in the <a class="reference internal" href="stk.ga.selection.html#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a>
@@ -289,7 +295,7 @@ then no file is made.</li>
 
 <dl class="method">
 <dt id="stk.ga.ga_population.GAPopulation.gen_offspring">
-<code class="descname">gen_offspring</code><span class="sig-paren">(</span><em>counter_name='crossover_counter.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.gen_offspring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.gen_offspring" title="Permalink to this definition">¶</a></dt>
+<code class="descname">gen_offspring</code><span class="sig-paren">(</span><em>counter_name='crossover_counter.png'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.gen_offspring" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a> of offspring molecules.</p>
 <p>The selection function which decides which molecules are
 selected for crossover is defined in the
@@ -318,7 +324,7 @@ population.</td>
 
 <dl class="classmethod">
 <dt id="stk.ga.ga_population.GAPopulation.init_all">
-<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>processes=None</em>, <em>duplicates=False</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.init_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_all" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>processes=None</em>, <em>duplicates=False</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <a class="reference internal" href="stk.population.html#stk.population.Population.init_all" title="stk.population.Population.init_all"><code class="xref py py-meth docutils literal"><span class="pre">Population.init_all()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -332,7 +338,7 @@ population.</td>
 
 <dl class="classmethod">
 <dt id="stk.ga.ga_population.GAPopulation.init_diverse">
-<em class="property">classmethod </em><code class="descname">init_diverse</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.init_diverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_diverse" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_diverse</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_diverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <a class="reference internal" href="stk.population.html#stk.population.Population.init_diverse" title="stk.population.Population.init_diverse"><code class="xref py py-meth docutils literal"><span class="pre">Population.init_diverse()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -346,7 +352,7 @@ population.</td>
 
 <dl class="classmethod">
 <dt id="stk.ga.ga_population.GAPopulation.init_from_files">
-<em class="property">classmethod </em><code class="descname">init_from_files</code><span class="sig-paren">(</span><em>folder</em>, <em>moltype</em>, <em>glob_pattern='*'</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.init_from_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_from_files" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_from_files</code><span class="sig-paren">(</span><em>folder</em>, <em>moltype</em>, <em>glob_pattern='*'</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_from_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <a class="reference internal" href="stk.population.html#stk.population.Population.init_from_files" title="stk.population.Population.init_from_files"><code class="xref py py-meth docutils literal"><span class="pre">Population.init_from_files()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -360,7 +366,7 @@ population.</td>
 
 <dl class="classmethod">
 <dt id="stk.ga.ga_population.GAPopulation.init_random">
-<em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em>, <em>ga_tools</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.init_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_random" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em>, <em>ga_tools</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_random" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <a class="reference internal" href="stk.population.html#stk.population.Population.init_random" title="stk.population.Population.init_random"><code class="xref py py-meth docutils literal"><span class="pre">Population.init_random()</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -374,7 +380,7 @@ population.</td>
 
 <dl class="method">
 <dt id="stk.ga.ga_population.GAPopulation.normalize_fitness_values">
-<code class="descname">normalize_fitness_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.normalize_fitness_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.normalize_fitness_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">normalize_fitness_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.normalize_fitness_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the normalization functions on the population.</p>
 <p>Normalization functions scale or modify the fitness values of
 molecules in the population.</p>
@@ -399,7 +405,7 @@ attribute of molecules held by the population.</p>
 
 <dl class="method">
 <dt id="stk.ga.ga_population.GAPopulation.select">
-<code class="descname">select</code><span class="sig-paren">(</span><em>type='generational'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/ga_population.html#GAPopulation.select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.select" title="Permalink to this definition">¶</a></dt>
+<code class="descname">select</code><span class="sig-paren">(</span><em>type='generational'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.select" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a generator for yielding members of the population.</p>
 <p>Members are yielded based on the selection function defined in
 the <a class="reference internal" href="stk.ga.selection.html#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance held by the population via the
@@ -436,7 +442,9 @@ Valid values will correspond to names of attributes of the
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -449,7 +457,7 @@ Valid values will correspond to names of attributes of the
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -468,7 +476,6 @@ Valid values will correspond to names of attributes of the
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -486,11 +493,14 @@ Valid values will correspond to names of attributes of the
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -94,7 +101,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -102,10 +109,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -170,7 +176,7 @@ make sure that any helper functions are private, i.e. that their names
 start with a leading underscore.</p>
 <dl class="class">
 <dt id="stk.ga.selection.Selection">
-<em class="property">class </em><code class="descclassname">stk.ga.selection.</code><code class="descname">Selection</code><span class="sig-paren">(</span><em>generational</em>, <em>crossover</em>, <em>mutation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.ga.selection.</code><code class="descname">Selection</code><span class="sig-paren">(</span><em>generational</em>, <em>crossover</em>, <em>mutation</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A class for handling all types of selection in the GA.</p>
 <p>Whenever a population needs to have some of its members selected
@@ -266,7 +272,7 @@ selection function used for selecting molecules to mutate.</p>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection._stochastic_sampling_guaranteed">
-<code class="descname">_stochastic_sampling_guaranteed</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection._stochastic_sampling_guaranteed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection._stochastic_sampling_guaranteed" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_stochastic_sampling_guaranteed</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection._stochastic_sampling_guaranteed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yielded the members guaranteed by stochastic sampling.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -289,7 +295,7 @@ is greater than 0.</p>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection._stochastic_sampling_roulette">
-<code class="descname">_stochastic_sampling_roulette</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection._stochastic_sampling_roulette"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection._stochastic_sampling_roulette" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_stochastic_sampling_roulette</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection._stochastic_sampling_roulette" title="Permalink to this definition">¶</a></dt>
 <dd><p>Does the roulette component of stochastic sampling.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -311,7 +317,7 @@ is greater than 0.</p>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection.all_combinations">
-<code class="descname">all_combinations</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection.all_combinations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection.all_combinations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_combinations</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.all_combinations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields every possible pairing of individuals from a population.</p>
 <p>This yields members regardless of which subpopulation they are
 in. Each pair is only returned once. This means if <code class="docutils literal"><span class="pre">(1,2)</span></code> is
@@ -331,7 +337,7 @@ crossed.</td>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection.all_combinations_n_fittest">
-<code class="descname">all_combinations_n_fittest</code><span class="sig-paren">(</span><em>population</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection.all_combinations_n_fittest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection.all_combinations_n_fittest" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_combinations_n_fittest</code><span class="sig-paren">(</span><em>population</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.all_combinations_n_fittest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields all pairings of the <cite>n</cite> fittest individuals.</p>
 <p>The pairings are yielded with in order of fitness, with most
 fit pair yielded first.</p>
@@ -355,7 +361,7 @@ crossed.</p>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection.crossover_deterministic_sampling">
-<code class="descname">crossover_deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection.crossover_deterministic_sampling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection.crossover_deterministic_sampling" title="Permalink to this definition">¶</a></dt>
+<code class="descname">crossover_deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.crossover_deterministic_sampling" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields parents according to determnistic sampling.</p>
 <p>In determnistic sampling the mean fitness value of the
 population is calculated, <code class="docutils literal"><span class="pre">&lt;f&gt;</span></code>. For each individual a
@@ -392,7 +398,7 @@ yielded.</li>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection.crossover_roulette">
-<code class="descname">crossover_roulette</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection.crossover_roulette"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection.crossover_roulette" title="Permalink to this definition">¶</a></dt>
+<code class="descname">crossover_roulette</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.crossover_roulette" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields parents using roulette selection.</p>
 <p>In roulette selection the probability an individual is selected
 is given by its fitness. If the total fitness is the sum of all
@@ -429,7 +435,7 @@ yielded.</li>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection.deterministic_sampling">
-<code class="descname">deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection.deterministic_sampling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection.deterministic_sampling" title="Permalink to this definition">¶</a></dt>
+<code class="descname">deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.deterministic_sampling" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields individuals using deterministic sampling.</p>
 <p>This algorithm can only be used for selection of mutants. It
 will return duplicates. The results of <a class="reference internal" href="#stk.ga.selection.Selection.fittest" title="stk.ga.selection.Selection.fittest"><code class="xref py py-meth docutils literal"><span class="pre">fittest()</span></code></a> are
@@ -465,7 +471,7 @@ yielded.</li>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection.fittest">
-<code class="descname">fittest</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection.fittest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection.fittest" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fittest</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.fittest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields members of the population, fittest first.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -482,7 +488,7 @@ yielded.</li>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection.roulette">
-<code class="descname">roulette</code><span class="sig-paren">(</span><em>population</em>, <em>elites=0</em>, <em>truncation=None</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection.roulette"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection.roulette" title="Permalink to this definition">¶</a></dt>
+<code class="descname">roulette</code><span class="sig-paren">(</span><em>population</em>, <em>elites=0</em>, <em>truncation=None</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.roulette" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields individuals using roulette selection.</p>
 <p>In roulette selection the probability an individual is selected
 is given by its fitness. If the total fitness is the sum of all
@@ -523,7 +529,7 @@ once.</li>
 
 <dl class="method">
 <dt id="stk.ga.selection.Selection.stochastic_sampling">
-<code class="descname">stochastic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>elites=0</em>, <em>truncation=None</em>, <em>duplicates=False</em>, <em>use_rank=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection.stochastic_sampling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection.stochastic_sampling" title="Permalink to this definition">¶</a></dt>
+<code class="descname">stochastic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>elites=0</em>, <em>truncation=None</em>, <em>duplicates=False</em>, <em>use_rank=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.stochastic_sampling" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields individuals via stochastic sampling.</p>
 <p>Each fitness value is used to calculate the normalized fitness
 of an individual:</p>
@@ -571,7 +577,9 @@ calculated as, <code class="docutils literal"><span class="pre">f</span> <span c
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -584,7 +592,7 @@ calculated as, <code class="docutils literal"><span class="pre">f</span> <span c
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -603,7 +611,6 @@ calculated as, <code class="docutils literal"><span class="pre">f</span> <span c
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -621,11 +628,14 @@ calculated as, <code class="docutils literal"><span class="pre">f</span> <span c
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

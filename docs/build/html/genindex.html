@@ -26,17 +26,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="#"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -89,7 +96,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -97,10 +104,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -716,6 +722,8 @@
 </li>
       <li><a href="stk.ga.input.html#stk.ga.input.GAInput.crossover_select_func">crossover_select_func (stk.ga.input.GAInput attribute)</a>
 </li>
+      <li><a href="stk.ga.input.html#stk.ga.input.GAInput.crossover_weights">crossover_weights (stk.ga.input.GAInput attribute)</a>
+</li>
       <li><a href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.Vertex.custom_position">custom_position (stk.molecular.topologies.cage.base.Vertex attribute)</a>
 </li>
   </ul></td>
@@ -886,10 +894,10 @@
       </ul></li>
       <li><a href="stk.molecular.topologies.cage.two_plus_four.html#stk.molecular.topologies.cage.two_plus_four.FourPlusEight.e7">e7 (stk.molecular.topologies.cage.two_plus_four.FourPlusEight attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="stk.molecular.topologies.cage.two_plus_four.html#stk.molecular.topologies.cage.two_plus_four.FourPlusEight.e8">e8 (stk.molecular.topologies.cage.two_plus_four.FourPlusEight attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="stk.molecular.energy.html#stk.molecular.energy.e_logger">e_logger() (in module stk.molecular.energy)</a>
 </li>
       <li><a href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.Edge">Edge (class in stk.molecular.topologies.cage.base)</a>
@@ -947,6 +955,8 @@
       <li><a href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools.exit">exit (stk.ga.ga_tools.GATools attribute)</a>, <a href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools.exit">[1]</a>
 </li>
       <li><a href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation.exit">exit() (stk.ga.ga_population.GAPopulation method)</a>
+</li>
+      <li><a href="stk.ga.input.html#stk.ga.input.GAInput.exit_func">exit_func (stk.ga.input.GAInput attribute)</a>
 </li>
       <li><a href="stk.ga.input.html#stk.ga.input.GAInput.exiter">exiter() (stk.ga.input.GAInput method)</a>
 </li>
@@ -2106,7 +2116,9 @@
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -2119,7 +2131,7 @@
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -2138,7 +2150,6 @@
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -2156,11 +2167,14 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

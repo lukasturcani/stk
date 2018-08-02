@@ -154,7 +154,7 @@
 <span id="stk-molecular-topologies-cage-base-module"></span><h1>stk.molecular.topologies.cage.base module<a class="headerlink" href="#module-stk.molecular.topologies.cage.base" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="stk.molecular.topologies.cage.base.CageTopology">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">CageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#CageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">CageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.base.Topology</span></code></a></p>
 <p>An abstract base class for cage topologies.</p>
 <dl class="attribute">
@@ -246,12 +246,12 @@ functional groups.</p>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.CageTopology._bb_maps">
-<code class="descname">_bb_maps</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#CageTopology._bb_maps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology._bb_maps" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_bb_maps</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology._bb_maps" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.CageTopology.bonded_fgs">
-<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#CageTopology.bonded_fgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.bonded_fgs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.bonded_fgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joins up the separate building blocks which form the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -267,7 +267,7 @@ functional groups.</p>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.CageTopology.pair_fgs_with_positions">
-<code class="descname">pair_fgs_with_positions</code><span class="sig-paren">(</span><em>scale</em>, <em>macro_mol</em>, <em>vertex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#CageTopology.pair_fgs_with_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.pair_fgs_with_positions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pair_fgs_with_positions</code><span class="sig-paren">(</span><em>scale</em>, <em>macro_mol</em>, <em>vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.pair_fgs_with_positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Matches fgs with the closest building block position.</p>
 <p>After a building block is placed on a position, each fg
 which forms a bond must be paired with the location of the
@@ -300,7 +300,7 @@ located.</li>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.CageTopology.place_mols">
-<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#CageTopology.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.place_mols" title="Permalink to this definition">¶</a></dt>
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.CageTopology.place_mols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places all building block molecules on correct coordinates.</p>
 <p>The building block molecules are placed in their appropriate
 positions based on the topology. It does not join them.</p>
@@ -323,14 +323,14 @@ positions based on the topology. It does not join them.</p>
 
 <dl class="class">
 <dt id="stk.molecular.topologies.cage.base.Edge">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">Edge</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>id_=None</em>, <em>custom_position=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Edge" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">Edge</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>id_=None</em>, <em>custom_position=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex" title="stk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cage.base.Vertex</span></code></a></p>
 <p>Used to represent the edges of Cage polyhedra.</p>
 <p>This class stores information about the edges which make up a
 cage’s structure.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cage.base.Edge.direction">
-<code class="descname">direction</code><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Edge.direction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Edge.direction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">direction</code><a class="headerlink" href="#stk.molecular.topologies.cage.base.Edge.direction" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code> – This vector represents the orientation of the edge. It is a
 normalized direction vector which runs from <cite>v2</cite> to <cite>v1</cite>,
 provided in the initalizer.</p>
@@ -338,12 +338,12 @@ provided in the initalizer.</p>
 
 <dl class="method">
 <dt>
-<code class="descname">direction</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Edge.direction"><span class="viewcode-link">[source]</span></a></dt>
+<code class="descname">direction</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>scale</em><span class="sig-paren">)</span></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.Edge.place_mol">
-<code class="descname">place_mol</code><span class="sig-paren">(</span><em>scale</em>, <em>linker</em>, <em>alignment</em>, <em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Edge.place_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Edge.place_mol" title="Permalink to this definition">¶</a></dt>
+<code class="descname">place_mol</code><span class="sig-paren">(</span><em>scale</em>, <em>linker</em>, <em>alignment</em>, <em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Edge.place_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places a linker molecule on the coordinates of an edge.</p>
 <p>It also orientates the linker so that a the fgs sit
 exactly on the edge and the bulk of the linker points away from
@@ -378,7 +378,7 @@ described in the docstring.</p>
 
 <dl class="class">
 <dt id="stk.molecular.topologies.cage.base.NoLinkerCageTopology">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">NoLinkerCageTopology</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#NoLinkerCageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.NoLinkerCageTopology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">NoLinkerCageTopology</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.NoLinkerCageTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cage.base.CageTopology" title="stk.molecular.topologies.cage.base.CageTopology"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cage.base.CageTopology</span></code></a></p>
 <p>Abstract base class for cage topologies without linkers.</p>
 <p>This means that all building blocks have the same number of
@@ -400,7 +400,7 @@ It is the building block to be placed on that vertex. Can be
 
 <dl class="classmethod">
 <dt id="stk.molecular.topologies.cage.base.NoLinkerCageTopology.connect">
-<em class="property">classmethod </em><code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#NoLinkerCageTopology.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.NoLinkerCageTopology.connect" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.NoLinkerCageTopology.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates each <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex.connected" title="stk.molecular.topologies.cage.base.Vertex.connected"><code class="xref py py-attr docutils literal"><span class="pre">Vertex.connected</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -416,14 +416,14 @@ It is the building block to be placed on that vertex. Can be
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.NoLinkerCageTopology.place_mols">
-<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#NoLinkerCageTopology.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.NoLinkerCageTopology.place_mols" title="Permalink to this definition">¶</a></dt>
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.NoLinkerCageTopology.place_mols" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.molecular.topologies.cage.base.Vertex">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">Vertex</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>id_=None</em>, <em>custom_position=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">Vertex</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>id_=None</em>, <em>custom_position=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Used to represent the vertices of cage polyhedra.</p>
 <p>This class stores information about the vertices which make up a
@@ -501,7 +501,7 @@ conncected vertices.</p>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.Vertex.bonder_centroid">
-<code class="descname">bonder_centroid</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.bonder_centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_centroid</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.bonder_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the centroid of the fgs on the vertex.</p>
 <p>However if <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex.custom_position" title="stk.molecular.topologies.cage.base.Vertex.custom_position"><code class="xref py py-attr docutils literal"><span class="pre">custom_position</span></code></a> is <code class="docutils literal"><span class="pre">True</span></code> or
 <cite>macro_mol</cite> is <code class="docutils literal"><span class="pre">None</span></code>, then <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex.coord" title="stk.molecular.topologies.cage.base.Vertex.coord"><code class="xref py py-attr docutils literal"><span class="pre">coord</span></code></a> is returned.</p>
@@ -527,7 +527,7 @@ conncected vertices.</p>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.Vertex.edge_centroid">
-<code class="descname">edge_centroid</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.edge_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descname">edge_centroid</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the centroid of the edges connected to the vertex.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -546,7 +546,7 @@ centroid of the edges connected to the vertex.</td>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.Vertex.edge_coord_matrix">
-<code class="descname">edge_coord_matrix</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.edge_coord_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_coord_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">edge_coord_matrix</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_coord_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return matrix holding coords of edges joined to the vertex.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -566,7 +566,7 @@ and z coordinates, respectively.</td>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.Vertex.edge_direction_vectors">
-<code class="descname">edge_direction_vectors</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.edge_direction_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_direction_vectors" title="Permalink to this definition">¶</a></dt>
+<code class="descname">edge_direction_vectors</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_direction_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields direction vectors between edges connected to the vertex.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -583,7 +583,7 @@ connected to the vertex to another.</td>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.Vertex.edge_plane">
-<code class="descname">edge_plane</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.edge_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_plane" title="Permalink to this definition">¶</a></dt>
+<code class="descname">edge_plane</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_plane" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return coefficients of plane of edges connected to the vertex.</p>
 <p>A plane is defined by the scalar plane equation:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">+</span> <span class="n">by</span> <span class="o">+</span> <span class="n">cz</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span>
@@ -617,7 +617,7 @@ scalar equation of the plane formed by the connected edges.</td>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.Vertex.edge_plane_normal">
-<code class="descname">edge_plane_normal</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.edge_plane_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_plane_normal" title="Permalink to this definition">¶</a></dt>
+<code class="descname">edge_plane_normal</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.edge_plane_normal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the normal of the plane formed by the connected edges.</p>
 <p>The normal is set such that it always points away from the
 origin.</p>
@@ -638,7 +638,7 @@ from the origin.</td>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.base.Vertex.place_mol">
-<code class="descname">place_mol</code><span class="sig-paren">(</span><em>scale</em>, <em>building_block</em>, <em>aligner=0</em>, <em>aligner_edge=0</em>, <em>macro_mol=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.place_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.place_mol" title="Permalink to this definition">¶</a></dt>
+<code class="descname">place_mol</code><span class="sig-paren">(</span><em>scale</em>, <em>building_block</em>, <em>aligner=0</em>, <em>aligner_edge=0</em>, <em>macro_mol=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.place_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Place a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a> building block on the vertex.</p>
 <p>The orientation of the building block is aligned with 2
 parameters. Firstly, the normal of the plane of fgs of
@@ -683,7 +683,7 @@ set as described in the docstring.</p>
 
 <dl class="classmethod">
 <dt id="stk.molecular.topologies.cage.base.Vertex.vertex_init">
-<em class="property">classmethod </em><code class="descname">vertex_init</code><span class="sig-paren">(</span><em>*vertices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#Vertex.vertex_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.vertex_init" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">vertex_init</code><span class="sig-paren">(</span><em>*vertices</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.Vertex.vertex_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Intializes the <a class="reference internal" href="#stk.molecular.topologies.cage.base.Vertex" title="stk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a> from other vertices.</p>
 <p>This initalizer automatically calculates the position of the
 vertex from the positions of the vertices provided to the
@@ -709,7 +709,7 @@ are also updated.</p>
 
 <dl class="class">
 <dt id="stk.molecular.topologies.cage.base.VertexOnlyCageTopology">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">VertexOnlyCageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/cage/base.html#VertexOnlyCageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.cage.base.VertexOnlyCageTopology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.base.</code><code class="descname">VertexOnlyCageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.base.VertexOnlyCageTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cage.base.CageTopology" title="stk.molecular.topologies.cage.base.CageTopology"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cage.base.CageTopology</span></code></a></p>
 <p>Abstract base class for cage topologies using ditopics.</p>
 </dd></dl>

@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -98,7 +105,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -106,10 +113,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -207,7 +213,7 @@ positions from the vertices supplied during initialization.</p>
 topology is at the origin.</p>
 <dl class="class">
 <dt id="stk.molecular.topologies.base.Linear">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Linear</code><span class="sig-paren">(</span><em>repeating_unit</em>, <em>orientation</em>, <em>n</em>, <em>ends='h'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Linear</code><span class="sig-paren">(</span><em>repeating_unit</em>, <em>orientation</em>, <em>n</em>, <em>ends='h'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.base.Topology</span></code></a></p>
 <p>A class represting linear polymers.</p>
 <dl class="attribute">
@@ -246,7 +252,7 @@ kept as the original functional group.</p>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Linear._x_position">
-<code class="descname">_x_position</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear._x_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear._x_position" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_x_position</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Linear._x_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the x coordinate on which to place <cite>bb</cite>.</p>
 <p>Does this by checking the most how for down the x axis
 <cite>macro_mol</cite> stretches and checking the distance between
@@ -274,7 +280,7 @@ It then tries to place <cite>bb</cite> about 3 A away from <cite>macro_mol</cite
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Linear.bonded_fgs">
-<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.bonded_fgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.bonded_fgs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Linear.bonded_fgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields functional groups to react.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -290,7 +296,7 @@ It then tries to place <cite>bb</cite> about 3 A away from <cite>macro_mol</cite
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Linear.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.cleanup" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Linear.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes the atoms which are lost during assembly.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -308,7 +314,7 @@ It then tries to place <cite>bb</cite> about 3 A away from <cite>macro_mol</cite
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Linear.hygrogen_ends">
-<code class="descname">hygrogen_ends</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.hygrogen_ends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.hygrogen_ends" title="Permalink to this definition">¶</a></dt>
+<code class="descname">hygrogen_ends</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Linear.hygrogen_ends" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes all atoms tagged for deletion and adds hydrogens.</p>
 <p>In polymers, you want to replace the functional groups at the
 ends with hydrogen atoms.</p>
@@ -328,7 +334,7 @@ ends with hydrogen atoms.</p>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Linear.place_mols">
-<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.place_mols" title="Permalink to this definition">¶</a></dt>
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Linear.place_mols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places monomers side by side.</p>
 <p>The monomers are placed along the x-axis, so that the vector
 running between the functional groups is placed along the axis.
@@ -352,7 +358,7 @@ Functional groups are tagged with <code class="docutils literal"><span class="pr
 
 <dl class="class">
 <dt id="stk.molecular.topologies.base.Topology">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>react_del=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>react_del=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Builds macromolecules.</p>
 <p>More accurately, child classes of <a class="reference internal" href="#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a> take care of
@@ -377,7 +383,7 @@ by <a class="reference internal" href="stk.molecular.functional_groups.html#stk.
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Topology.bonded_fgs">
-<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.bonded_fgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.bonded_fgs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology.bonded_fgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>An iterator which yields ids of functional groups to be bonded.</p>
 <p>The ids of functional groups in <cite>macro_mol</cite> are assigned by
 <a class="reference internal" href="#stk.molecular.topologies.base.Topology.place_mols" title="stk.molecular.topologies.base.Topology.place_mols"><code class="xref py py-meth docutils literal"><span class="pre">place_mols()</span></code></a>. The ids are stored as atom properties
@@ -400,7 +406,7 @@ ids functional groups as a <code class="xref py py-class docutils literal"><span
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Topology.build">
-<code class="descname">build</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.build" title="Permalink to this definition">¶</a></dt>
+<code class="descname">build</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology.build" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assembles <code class="docutils literal"><span class="pre">rdkit</span></code> instances of macromolecules.</p>
 <p>This method places an <code class="docutils literal"><span class="pre">rdkit</span></code> molecule of the assembled
 macromolecule into the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.mol" title="stk.molecular.molecules.Molecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute of
@@ -433,7 +439,7 @@ building blocks.</li>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Topology.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.cleanup" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs final clean up actions on an assembled molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -451,7 +457,7 @@ building blocks.</li>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Topology.place_mols">
-<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.place_mols" title="Permalink to this definition">¶</a></dt>
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology.place_mols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places building blocks.</p>
 <p>The <code class="docutils literal"><span class="pre">rdkit</span></code> molecules of the building blocks are
 combined into a single <code class="docutils literal"><span class="pre">rdkit</span></code> molecule and placed into
@@ -489,7 +495,7 @@ be added to the macromolecule. The utility function
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Topology.prepare">
-<code class="descname">prepare</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.prepare" title="Permalink to this definition">¶</a></dt>
+<code class="descname">prepare</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology.prepare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs ops between placing and reacting building blocks.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -507,21 +513,21 @@ be added to the macromolecule. The utility function
 
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Topology.update_fg_id">
-<code class="descname">update_fg_id</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.update_fg_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.update_fg_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_fg_id</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology.update_fg_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.molecular.topologies.base.TopologyMeta">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">TopologyMeta</code><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#TopologyMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.TopologyMeta" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">TopologyMeta</code><a class="headerlink" href="#stk.molecular.topologies.base.TopologyMeta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
 <p>Makes a repr of an instance, based initialization arguments used.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="stk.molecular.topologies.base.remove_confs">
-<code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">remove_confs</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>keep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#remove_confs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.remove_confs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">remove_confs</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>keep</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.remove_confs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes all conformers from <cite>building_blocks</cite> except <cite>keep</cite>.</p>
 <p>All kept conformers have their id set to <code class="docutils literal"><span class="pre">0</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -561,7 +567,9 @@ particular building block.</p>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -574,7 +582,7 @@ particular building block.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -593,7 +601,6 @@ particular building block.</p>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -611,11 +618,14 @@ particular building block.</p>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

@@ -25,17 +25,25 @@
   
 
   
+  
     <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="stk  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -88,7 +96,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">stk</a>
@@ -96,10 +104,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -128,6 +135,8 @@
     
     
       <li class="wy-breadcrumbs-aside">
+        
+            
         
       </li>
     
@@ -332,7 +341,8 @@
                          <span class="n">mol_from_mae_file</span><span class="p">,</span>
                          <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">,</span>
                          <span class="n">atom_vdw_radii</span><span class="p">,</span>
-                         <span class="n">Cell</span><span class="p">)</span>
+                         <span class="n">Cell</span><span class="p">,</span>
+                         <span class="n">remake</span><span class="p">)</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -392,7 +402,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span><span class="s1">&#39;Unable to initialize&#39;</span>
                              <span class="s1">&#39; from &quot;</span><span class="si">{}</span><span class="s1">&quot; files.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ext</span><span class="p">))</span>
 
-        <span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">sig</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">])</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">remake</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">sig</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]))</span>
 
         <span class="c1"># Get the name of the functional group provided to the</span>
         <span class="c1"># initializer or get it from the path.</span>
@@ -1494,7 +1504,9 @@
         <span class="k">if</span> <span class="n">conformer</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="n">conformer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
 
-        <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromMolFile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sanitize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">removeHs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">remake</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromMolFile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span>
+                                          <span class="n">sanitize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                          <span class="n">removeHs</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
         <span class="n">conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">())</span>
         <span class="n">conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
@@ -1690,7 +1702,7 @@
         <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to initialize from &quot;</span><span class="si">{ext}</span><span class="s1">&quot; files.&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">remake</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">file</span><span class="p">))</span>
         <span class="c1"># Update the property cache of each atom. This updates things</span>
         <span class="c1"># like valence.</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
@@ -3373,7 +3385,7 @@
 
 <div class="viewcode-block" id="Cage.windows"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Cage.windows">[docs]</a>    <span class="k">def</span> <span class="nf">windows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns window sizes found by ``pyWindow``.</span>
+<span class="sd">        Returns window sizes found by ``pywindow``.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3398,9 +3410,9 @@
 
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-            <span class="c1"># Load an RDKit molecule object to pyWINDOW.</span>
+            <span class="c1"># Load an RDKit molecule object to pywindow.</span>
 
-            <span class="c1"># As pyWindow doesnt support multiple conformers, first</span>
+            <span class="c1"># As pywindow doesnt support multiple conformers, first</span>
             <span class="c1"># make an rdkit molecule holding only the desired conformer.</span>
             <span class="n">new_mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
             <span class="n">new_mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
@@ -3408,15 +3420,15 @@
 
             <span class="n">pw_molecule</span> <span class="o">=</span> <span class="n">pywindow</span><span class="o">.</span><span class="n">molecular</span><span class="o">.</span><span class="n">Molecule</span><span class="o">.</span><span class="n">load_rdkit_mol</span><span class="p">(</span><span class="n">new_mol</span><span class="p">)</span>
             <span class="c1"># Find windows and get a single array with windows&#39; sizes.</span>
-            <span class="n">all_windows</span> <span class="o">=</span> <span class="n">pw_molecule</span><span class="o">.</span><span class="n">calculate_windows</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s1">&#39;windows&#39;</span><span class="p">)</span>
+            <span class="n">all_windows</span> <span class="o">=</span> <span class="n">pw_molecule</span><span class="o">.</span><span class="n">calculate_windows</span><span class="p">()</span>
 
-        <span class="c1"># If pyWindow failed, return ``None``.</span>
+        <span class="c1"># If pywindow failed, return ``None``.</span>
         <span class="k">if</span> <span class="n">all_windows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="c1"># pyWindow sometimes detects super large windows by accident,</span>
+        <span class="c1"># pywindow sometimes detects super large windows by accident,</span>
         <span class="c1"># filter them out first.</span>
-        <span class="n">valid_windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">all_windows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="mf">1e6</span><span class="p">]</span>
+        <span class="n">valid_windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">all_windows</span> <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="mf">1e6</span><span class="p">]</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">valid_windows</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">]</span></div></div>
 
 
@@ -3760,7 +3772,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -3773,7 +3787,7 @@
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -3792,7 +3806,6 @@
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -3810,11 +3823,14 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

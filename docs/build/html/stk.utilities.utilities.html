@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -91,7 +98,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -99,10 +106,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -151,7 +157,7 @@
 part of <code class="docutils literal"><span class="pre">stk</span></code>. They must be completely self-sufficient.</p>
 <dl class="class">
 <dt id="stk.utilities.utilities.AtomicPeriodicBond">
-<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">AtomicPeriodicBond</code><span class="sig-paren">(</span><em>bonder1</em>, <em>bonder2</em>, <em>bond_type</em>, <em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#AtomicPeriodicBond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">AtomicPeriodicBond</code><span class="sig-paren">(</span><em>bonder1</em>, <em>bonder2</em>, <em>bond_type</em>, <em>direction</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Represents a periodic bond between two atoms.</p>
 <dl class="attribute">
@@ -185,7 +191,7 @@ along the x axis in the positive direction.</p>
 
 <dl class="method">
 <dt id="stk.utilities.utilities.AtomicPeriodicBond.atom1">
-<code class="descname">atom1</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#AtomicPeriodicBond.atom1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.atom1" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atom1</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.atom1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the atom id of <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder1" title="stk.utilities.utilities.AtomicPeriodicBond.bonder1"><code class="xref py py-attr docutils literal"><span class="pre">bonder1</span></code></a> in <cite>mol</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -206,7 +212,7 @@ equal to <a class="reference internal" href="#stk.utilities.utilities.AtomicPeri
 
 <dl class="method">
 <dt id="stk.utilities.utilities.AtomicPeriodicBond.atom2">
-<code class="descname">atom2</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#AtomicPeriodicBond.atom2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.atom2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atom2</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.atom2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the atom id of <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder2" title="stk.utilities.utilities.AtomicPeriodicBond.bonder2"><code class="xref py py-attr docutils literal"><span class="pre">bonder2</span></code></a> in <cite>mol</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -229,7 +235,7 @@ equal to <a class="reference internal" href="#stk.utilities.utilities.AtomicPeri
 
 <dl class="class">
 <dt id="stk.utilities.utilities.Cell">
-<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">Cell</code><span class="sig-paren">(</span><em>id_</em>, <em>fgs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#Cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.Cell" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">Cell</code><span class="sig-paren">(</span><em>id_</em>, <em>fgs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.Cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Represents an individual cell in a supercell.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -264,13 +270,13 @@ equivalent fgs in the cell.</p>
 
 <dl class="exception">
 <dt id="stk.utilities.utilities.ChargedMolError">
-<em class="property">exception </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">ChargedMolError</code><span class="sig-paren">(</span><em>mol_file</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#ChargedMolError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.ChargedMolError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">ChargedMolError</code><span class="sig-paren">(</span><em>mol_file</em>, <em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.ChargedMolError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.utilities.utilities.FunctionData">
-<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">FunctionData</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#FunctionData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.FunctionData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">FunctionData</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.FunctionData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Stores information about functions and their parameters.</p>
 <dl class="attribute">
@@ -300,14 +306,14 @@ equivalent fgs in the cell.</p>
 
 <dl class="class">
 <dt id="stk.utilities.utilities.LazyAttr">
-<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">LazyAttr</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#LazyAttr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.LazyAttr" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">LazyAttr</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.LazyAttr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A descriptor for creating lazy attributes.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.utilities.utilities.MAEExtractor">
-<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">MAEExtractor</code><span class="sig-paren">(</span><em>file</em>, <em>n=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">MAEExtractor</code><span class="sig-paren">(</span><em>file</em>, <em>n=1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Extracts the lowest energy conformer from a .maegz file.</p>
 <p>Macromodel conformer searches produce -out.maegz files containing
@@ -365,19 +371,19 @@ energy conformer.</p>
 
 <dl class="method">
 <dt id="stk.utilities.utilities.MAEExtractor.extract_conformers">
-<code class="descname">extract_conformers</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor.extract_conformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.extract_conformers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extract_conformers</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.extract_conformers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a series of <code class="docutils literal"><span class="pre">.mae</span></code> files holding the lowest energy conformers.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="stk.utilities.utilities.MAEExtractor.extract_energy">
-<code class="descname">extract_energy</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor.extract_energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.extract_energy" title="Permalink to this definition">¶</a></dt>
+<code class="descname">extract_energy</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.extract_energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the energy value from a .mae energy data block.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="stk.utilities.utilities.MAEExtractor.lowest_energy_conformers">
-<code class="descname">lowest_energy_conformers</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor.lowest_energy_conformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.lowest_energy_conformers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lowest_energy_conformers</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.lowest_energy_conformers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the id and energy of the lowest energy conformers.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -400,7 +406,7 @@ lowest energy conformers, respectively</p>
 
 <dl class="method">
 <dt id="stk.utilities.utilities.MAEExtractor.maegz_to_mae">
-<code class="descname">maegz_to_mae</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor.maegz_to_mae"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.maegz_to_mae" title="Permalink to this definition">¶</a></dt>
+<code class="descname">maegz_to_mae</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.maegz_to_mae" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the .maegz file to a .mae file.</p>
 </dd></dl>
 
@@ -408,13 +414,13 @@ lowest energy conformers, respectively</p>
 
 <dl class="exception">
 <dt id="stk.utilities.utilities.MolFileError">
-<em class="property">exception </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">MolFileError</code><span class="sig-paren">(</span><em>mol_file</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MolFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MolFileError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">MolFileError</code><span class="sig-paren">(</span><em>mol_file</em>, <em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.MolFileError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.utilities.utilities.PeriodicBond">
-<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">PeriodicBond</code><span class="sig-paren">(</span><em>fg1</em>, <em>fg2</em>, <em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#PeriodicBond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">PeriodicBond</code><span class="sig-paren">(</span><em>fg1</em>, <em>fg2</em>, <em>direction</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Represents a periodic bond.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -462,19 +468,19 @@ in the positive direction.</p>
 
 <dl class="exception">
 <dt id="stk.utilities.utilities.PopulationSizeError">
-<em class="property">exception </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">PopulationSizeError</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#PopulationSizeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.PopulationSizeError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">PopulationSizeError</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.PopulationSizeError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.utilities.utilities.StopLogging">
-<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">StopLogging</code><a class="reference internal" href="_modules/stk/utilities/utilities.html#StopLogging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.StopLogging" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">StopLogging</code><a class="headerlink" href="#stk.utilities.utilities.StopLogging" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.add_fragment_props">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">add_fragment_props</code><span class="sig-paren">(</span><em>mol</em>, <em>bb_index</em>, <em>mol_index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#add_fragment_props"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.add_fragment_props" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">add_fragment_props</code><span class="sig-paren">(</span><em>mol</em>, <em>bb_index</em>, <em>mol_index</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.add_fragment_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds properties to <cite>mol</cite> of <cite>bb_index</cite> and <cite>mol_index</cite>.</p>
 <p>Properties called ‘bb_index’ and ‘mol_index’ are added to every
 atom in <cite>mol</cite>.</p>
@@ -503,7 +509,7 @@ to be added to a macromolecule, <cite>mol_index</cite> is 4.</li>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.archive_output">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">archive_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#archive_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.archive_output" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">archive_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.archive_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places the <code class="docutils literal"><span class="pre">output</span></code> folder into <code class="docutils literal"><span class="pre">old_output</span></code>.</p>
 <p>This function assumes that the <code class="docutils literal"><span class="pre">output</span></code> folder is in the current
 working directory.</p>
@@ -521,7 +527,7 @@ working directory.</p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.centroid">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">centroid</code><span class="sig-paren">(</span><em>*coords</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">centroid</code><span class="sig-paren">(</span><em>*coords</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the centroid of a group of coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -539,7 +545,7 @@ working directory.</p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.dedupe">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">dedupe</code><span class="sig-paren">(</span><em>iterable</em>, <em>seen=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#dedupe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.dedupe" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">dedupe</code><span class="sig-paren">(</span><em>iterable</em>, <em>seen=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.dedupe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields items from <cite>iterable</cite> barring duplicates.</p>
 <p>If <cite>seen</cite> is provided it contains elements which are not to be
 yielded at all.</p>
@@ -566,7 +572,7 @@ yielded before.</p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.flatten">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">flatten</code><span class="sig-paren">(</span><em>iterable</em>, <em>excluded_types={&lt;class 'str'&gt;}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">flatten</code><span class="sig-paren">(</span><em>iterable</em>, <em>excluded_types={&lt;class 'str'&gt;}</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transforms an nested iterable into a flat one.</p>
 <p>For example</p>
 <blockquote>
@@ -600,7 +606,7 @@ For example if <cite>str</cite> is in <cite>excluded_types</cite></p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.kabsch">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">kabsch</code><span class="sig-paren">(</span><em>coords1</em>, <em>coords2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#kabsch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.kabsch" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">kabsch</code><span class="sig-paren">(</span><em>coords1</em>, <em>coords2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.kabsch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a rotation matrix to minimize dstance between 2 coord sets.</p>
 <p>This is essentially an implementation of the Kabsch algorithm.
 Given two sets of coordinates, <cite>coords1</cite> and <cite>coords2</cite>, this
@@ -639,7 +645,7 @@ of one point, respectively. Here <code class="docutils literal"><span class="pre
 
 <dl class="function">
 <dt id="stk.utilities.utilities.kill_macromodel">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">kill_macromodel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#kill_macromodel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.kill_macromodel" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">kill_macromodel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.kill_macromodel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kills any applications left open as a result running MacroModel.</p>
 <p>Applications that are typically left open are
 <code class="docutils literal"><span class="pre">jserver-watcher.exe</span></code> and <code class="docutils literal"><span class="pre">jservergo.exe</span></code>.</p>
@@ -657,7 +663,7 @@ of one point, respectively. Here <code class="docutils literal"><span class="pre
 
 <dl class="function">
 <dt id="stk.utilities.utilities.matrix_centroid">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">matrix_centroid</code><span class="sig-paren">(</span><em>matrix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#matrix_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.matrix_centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">matrix_centroid</code><span class="sig-paren">(</span><em>matrix</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.matrix_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the centroid of the coordinates held in <cite>matrix</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -677,7 +683,7 @@ centroid of the coordinates in <cite>matrix</cite>.</td>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.mol_from_mae_file">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">mol_from_mae_file</code><span class="sig-paren">(</span><em>mae_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#mol_from_mae_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.mol_from_mae_file" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">mol_from_mae_file</code><span class="sig-paren">(</span><em>mae_path</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.mol_from_mae_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a rdkit molecule from a <code class="docutils literal"><span class="pre">.mae</span></code> file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -696,7 +702,7 @@ should be instantiated.</td>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.mol_from_mol_file">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">mol_from_mol_file</code><span class="sig-paren">(</span><em>mol_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#mol_from_mol_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.mol_from_mol_file" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">mol_from_mol_file</code><span class="sig-paren">(</span><em>mol_file</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.mol_from_mol_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a rdkit molecule from a <code class="docutils literal"><span class="pre">.mol</span></code> (V3000) file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -726,7 +732,7 @@ are not currently supported, so an error is raised.</li>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.normalize_vector">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">normalize_vector</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#normalize_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.normalize_vector" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">normalize_vector</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.normalize_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the given vector.</p>
 <p>A new vector is returned, the original vector is not modified.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -745,7 +751,7 @@ are not currently supported, so an error is raised.</li>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.quaternion">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">quaternion</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#quaternion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.quaternion" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">quaternion</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.quaternion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a translation + rotation quaternion.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -763,7 +769,7 @@ pages 124-132. Academic, New York, 1992.</p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.remake">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">remake</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#remake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.remake" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">remake</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.remake" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remakes a molecule from scratch.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -781,7 +787,7 @@ pages 124-132. Academic, New York, 1992.</p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.rotation_matrix">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">rotation_matrix</code><span class="sig-paren">(</span><em>vector1</em>, <em>vector2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#rotation_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.rotation_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">rotation_matrix</code><span class="sig-paren">(</span><em>vector1</em>, <em>vector2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.rotation_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a rotation matrix which transforms <cite>vector1</cite> to <cite>vector2</cite>.</p>
 <p>Multiplying <cite>vector1</cite> by the rotation matrix returned by this
 function yields <cite>vector2</cite>.</p>
@@ -810,7 +816,7 @@ function yields <cite>vector2</cite>.</p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.rotation_matrix_arbitrary_axis">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">rotation_matrix_arbitrary_axis</code><span class="sig-paren">(</span><em>angle</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#rotation_matrix_arbitrary_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.rotation_matrix_arbitrary_axis" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">rotation_matrix_arbitrary_axis</code><span class="sig-paren">(</span><em>angle</em>, <em>axis</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.rotation_matrix_arbitrary_axis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a rotation matrix of <cite>angle</cite> radians about <cite>axis</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -835,7 +841,7 @@ axis about which the rotation is carried out.</li>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.tar_output">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">tar_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#tar_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.tar_output" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">tar_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.tar_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places all the content in the <cite>output</cite> folder into a .tgz file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -851,7 +857,7 @@ axis about which the rotation is carried out.</li>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.time_it">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">time_it</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#time_it"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.time_it" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">time_it</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.time_it" title="Permalink to this definition">¶</a></dt>
 <dd><p>Times the code executed within the indent.</p>
 <p>This is a context manager so it should be used as:</p>
 <blockquote>
@@ -868,7 +874,7 @@ the time taken to process the entire block is printed.</p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.translation_component">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">translation_component</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#translation_component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.translation_component" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">translation_component</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.translation_component" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts translation vector from quaternion.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -886,7 +892,7 @@ the time taken to process the entire block is printed.</p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.vector_theta">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">vector_theta</code><span class="sig-paren">(</span><em>vector1</em>, <em>vector2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#vector_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.vector_theta" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">vector_theta</code><span class="sig-paren">(</span><em>vector1</em>, <em>vector2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.vector_theta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the angle between two vectors in radians.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -912,7 +918,9 @@ the time taken to process the entire block is printed.</p>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -925,7 +933,7 @@ the time taken to process the entire block is printed.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -944,7 +952,6 @@ the time taken to process the entire block is printed.</p>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -962,11 +969,14 @@ the time taken to process the entire block is printed.</p>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

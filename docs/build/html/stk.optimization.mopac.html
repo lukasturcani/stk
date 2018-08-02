@@ -155,7 +155,7 @@
 <p>Defines optimization functions which use MOPAC.</p>
 <dl class="function">
 <dt id="stk.optimization.mopac._convert_mopout_to_mol">
-<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_convert_mopout_to_mol</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/mopac.html#_convert_mopout_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.mopac._convert_mopout_to_mol" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_convert_mopout_to_mol</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.mopac._convert_mopout_to_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the molecular structure if the optimization is successful.</p>
 <p>Takes the <code class="docutils literal"><span class="pre">.pdb</span></code> file of the neutral file generated from the
 MOPAC run and initializes a new <code class="docutils literal"><span class="pre">rdkit</span></code> molecule with those
@@ -177,7 +177,7 @@ its optimized structure is converted to a rdkit molecule.</td>
 
 <dl class="function">
 <dt id="stk.optimization.mopac._create_mop">
-<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_create_mop</code><span class="sig-paren">(</span><em>mol</em>, <em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/mopac.html#_create_mop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.mopac._create_mop" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_create_mop</code><span class="sig-paren">(</span><em>mol</em>, <em>settings</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.mopac._create_mop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the <code class="docutils literal"><span class="pre">.mop</span></code> file holding the molecule to be optimized.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -204,7 +204,7 @@ details are defined.</li>
 
 <dl class="function">
 <dt id="stk.optimization.mopac._kill_mopac">
-<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/mopac.html#_kill_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.mopac._kill_mopac" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.mopac._kill_mopac" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kills an in-progress MOPAC run.</p>
 <p>To kill a MOPAC run, a file with the molecule’s name and a <code class="docutils literal"><span class="pre">.end</span></code>
 extension is written.</p>
@@ -224,7 +224,7 @@ extension is written.</p>
 
 <dl class="function">
 <dt id="stk.optimization.mopac._mop_line">
-<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_mop_line</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/mopac.html#_mop_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.mopac._mop_line" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_mop_line</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.mopac._mop_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Formats <cite>settings</cite> into a MOPAC input string.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -244,12 +244,12 @@ for the input file.</td>
 
 <dl class="function">
 <dt id="stk.optimization.mopac._run_mopac">
-<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_run_mopac</code><span class="sig-paren">(</span><em>mol</em>, <em>mopac_path</em>, <em>settings</em>, <em>timeout=7200</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/mopac.html#_run_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.mopac._run_mopac" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.mopac.</code><code class="descname">_run_mopac</code><span class="sig-paren">(</span><em>mol</em>, <em>mopac_path</em>, <em>settings</em>, <em>timeout=7200</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.mopac._run_mopac" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="stk.optimization.mopac.mopac_opt">
-<code class="descclassname">stk.optimization.mopac.</code><code class="descname">mopac_opt</code><span class="sig-paren">(</span><em>mol</em>, <em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/mopac.html#mopac_opt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.mopac.mopac_opt" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.mopac.</code><code class="descname">mopac_opt</code><span class="sig-paren">(</span><em>mol</em>, <em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.mopac.mopac_opt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the molecule using MOPAC.</p>
 <p>This function runs an optimization. It is possible to provide
 different options, which correspond to the input keywords from

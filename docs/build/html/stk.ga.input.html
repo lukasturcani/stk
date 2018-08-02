@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -91,7 +98,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -99,10 +106,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -149,7 +155,7 @@
 <p>Defines classes which deal with input.</p>
 <dl class="class">
 <dt id="stk.ga.input.GAInput">
-<em class="property">class </em><code class="descclassname">stk.ga.input.</code><code class="descname">GAInput</code><span class="sig-paren">(</span><em>input_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.ga.input.</code><code class="descname">GAInput</code><span class="sig-paren">(</span><em>input_file</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A class for reading a GA’s input file.</p>
 <p>An <code class="docutils literal"><span class="pre">stk</span></code> input file is a Python script. The script must define a
@@ -288,12 +294,30 @@ calculate the fitness of the molecules.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="stk.ga.input.GAInput.exit_func">
+<code class="descname">exit_func</code><a class="headerlink" href="#stk.ga.input.GAInput.exit_func" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – This must define the parameters of a method of <a class="reference internal" href="stk.ga.ga_exit.html#stk.ga.ga_exit.Exit" title="stk.ga.ga_exit.Exit"><code class="xref py py-class docutils literal"><span class="pre">Exit</span></code></a>.
+This will be the function which checks if an
+early exit criterion has been satisfied. If missing, the
+default is <a class="reference internal" href="stk.ga.ga_exit.html#stk.ga.ga_exit.Exit.no_exit" title="stk.ga.ga_exit.Exit.no_exit"><code class="xref py py-meth docutils literal"><span class="pre">Exit.no_exit()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="stk.ga.input.GAInput.mutation_weights">
 <code class="descname">mutation_weights</code><a class="headerlink" href="#stk.ga.input.GAInput.mutation_weights" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The probability that each function in <a class="reference internal" href="#stk.ga.input.GAInput.mutation_funcs" title="stk.ga.input.GAInput.mutation_funcs"><code class="xref py py-attr docutils literal"><span class="pre">mutation_funcs</span></code></a>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code> – The probability that each function in <a class="reference internal" href="#stk.ga.input.GAInput.mutation_funcs" title="stk.ga.input.GAInput.mutation_funcs"><code class="xref py py-attr docutils literal"><span class="pre">mutation_funcs</span></code></a>
 will be selected each time a mutation operation is carried out.
 The order of the probabilities corresponds to the order of the
 mutation functions in <a class="reference internal" href="#stk.ga.input.GAInput.mutation_funcs" title="stk.ga.input.GAInput.mutation_funcs"><code class="xref py py-attr docutils literal"><span class="pre">mutation_funcs</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.ga.input.GAInput.crossover_weights">
+<code class="descname">crossover_weights</code><a class="headerlink" href="#stk.ga.input.GAInput.crossover_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code> – The probability that each function in <a class="reference internal" href="#stk.ga.input.GAInput.crossover_funcs" title="stk.ga.input.GAInput.crossover_funcs"><code class="xref py py-attr docutils literal"><span class="pre">crossover_funcs</span></code></a>
+will be selected each time a crossover operation is carried
+out. The order of the probabilities corresponds to the order of
+the crossover functions in <a class="reference internal" href="#stk.ga.input.GAInput.crossover_funcs" title="stk.ga.input.GAInput.crossover_funcs"><code class="xref py py-attr docutils literal"><span class="pre">crossover_funcs</span></code></a>.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -393,7 +417,7 @@ new GA run is assumed.</p>
 
 <dl class="method">
 <dt id="stk.ga.input.GAInput.crosser">
-<code class="descname">crosser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput.crosser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput.crosser" title="Permalink to this definition">¶</a></dt>
+<code class="descname">crosser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput.crosser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use input file data to build <a class="reference internal" href="stk.ga.crossover.html#stk.ga.crossover.Crossover" title="stk.ga.crossover.Crossover"><code class="xref py py-class docutils literal"><span class="pre">Crossover</span></code></a> instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -411,7 +435,7 @@ instance.</td>
 
 <dl class="method">
 <dt id="stk.ga.input.GAInput.exiter">
-<code class="descname">exiter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput.exiter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput.exiter" title="Permalink to this definition">¶</a></dt>
+<code class="descname">exiter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput.exiter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use input file data to build <a class="reference internal" href="stk.ga.ga_exit.html#stk.ga.ga_exit.Exit" title="stk.ga.ga_exit.Exit"><code class="xref py py-class docutils literal"><span class="pre">Exit</span></code></a> instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -428,7 +452,7 @@ defined in the input file.</td>
 
 <dl class="method">
 <dt id="stk.ga.input.GAInput.fitnessor">
-<code class="descname">fitnessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput.fitnessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput.fitnessor" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fitnessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput.fitnessor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use input file data to  extract fitness function information.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -445,7 +469,7 @@ fitness function.</td>
 
 <dl class="method">
 <dt id="stk.ga.input.GAInput.ga_tools">
-<code class="descname">ga_tools</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput.ga_tools"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput.ga_tools" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ga_tools</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput.ga_tools" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use input file data to build a <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a> instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -462,7 +486,7 @@ defined in the input file.</td>
 
 <dl class="method">
 <dt id="stk.ga.input.GAInput.initer">
-<code class="descname">initer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput.initer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput.initer" title="Permalink to this definition">¶</a></dt>
+<code class="descname">initer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput.initer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use input file to  extract initialization function information.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -479,7 +503,7 @@ initialization function.</td>
 
 <dl class="method">
 <dt id="stk.ga.input.GAInput.mutator">
-<code class="descname">mutator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput.mutator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput.mutator" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mutator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput.mutator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use input file data to build <a class="reference internal" href="stk.ga.mutation.html#stk.ga.mutation.Mutation" title="stk.ga.mutation.Mutation"><code class="xref py py-class docutils literal"><span class="pre">Mutation</span></code></a> instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -496,7 +520,7 @@ mutation related data held in the input file.</td>
 
 <dl class="method">
 <dt id="stk.ga.input.GAInput.normalizer">
-<code class="descname">normalizer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput.normalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput.normalizer" title="Permalink to this definition">¶</a></dt>
+<code class="descname">normalizer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput.normalizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use input file data to build <a class="reference internal" href="stk.ga.normalization.html#stk.ga.normalization.Normalization" title="stk.ga.normalization.Normalization"><code class="xref py py-class docutils literal"><span class="pre">Normalization</span></code></a> instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -513,7 +537,7 @@ normalization related data held in the input file.</td>
 
 <dl class="method">
 <dt id="stk.ga.input.GAInput.opter">
-<code class="descname">opter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput.opter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput.opter" title="Permalink to this definition">¶</a></dt>
+<code class="descname">opter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput.opter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use the input file to extract optimization function data.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -530,7 +554,7 @@ optimization function defined in the input file.</td>
 
 <dl class="method">
 <dt id="stk.ga.input.GAInput.selector">
-<code class="descname">selector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/input.html#GAInput.selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.input.GAInput.selector" title="Permalink to this definition">¶</a></dt>
+<code class="descname">selector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.input.GAInput.selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use input file data to build <a class="reference internal" href="stk.ga.selection.html#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -551,7 +575,9 @@ selection related data held in the input file.</td>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -564,7 +590,7 @@ selection related data held in the input file.</td>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -583,7 +609,6 @@ selection related data held in the input file.</td>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -601,11 +626,14 @@ selection related data held in the input file.</td>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

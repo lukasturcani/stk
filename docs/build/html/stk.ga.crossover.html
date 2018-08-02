@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -94,7 +101,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -102,10 +109,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -167,7 +173,7 @@ make sure that any helper functions are private, i.e. that their names
 start with a leading underscore.</p>
 <dl class="class">
 <dt id="stk.ga.crossover.Crossover">
-<em class="property">class </em><code class="descclassname">stk.ga.crossover.</code><code class="descname">Crossover</code><span class="sig-paren">(</span><em>funcs</em>, <em>num_crossovers</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/crossover.html#Crossover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.crossover.Crossover" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.ga.crossover.</code><code class="descname">Crossover</code><span class="sig-paren">(</span><em>funcs</em>, <em>num_crossovers</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.crossover.Crossover" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Carries out crossover operations on the population.</p>
 <p>Instances of <a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a> delegate crossover operations
@@ -219,7 +225,7 @@ probability of selection.</p>
 
 <dl class="method">
 <dt id="stk.ga.crossover.Crossover.bb_lk_exchange">
-<code class="descname">bb_lk_exchange</code><span class="sig-paren">(</span><em>macro_mol1</em>, <em>macro_mol2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/crossover.html#Crossover.bb_lk_exchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.crossover.Crossover.bb_lk_exchange" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bb_lk_exchange</code><span class="sig-paren">(</span><em>macro_mol1</em>, <em>macro_mol2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.crossover.Crossover.bb_lk_exchange" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exchanges the building blocks and linkers of cages.</p>
 <p>This operation is basically:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">bb1</span><span class="o">-</span><span class="n">lk1</span> <span class="o">+</span> <span class="n">bb2</span><span class="o">-</span><span class="n">lk2</span> <span class="o">--&gt;</span> <span class="n">bb1</span><span class="o">-</span><span class="n">lk2</span> <span class="o">+</span> <span class="n">bb2</span><span class="o">-</span><span class="n">lk1</span><span class="p">,</span>
@@ -260,7 +266,9 @@ combined with those of <cite>cage1</cite> to form new cages.</li>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -273,7 +281,7 @@ combined with those of <cite>cage1</cite> to form new cages.</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -292,7 +300,6 @@ combined with those of <cite>cage1</cite> to form new cages.</li>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -310,11 +317,14 @@ combined with those of <cite>cage1</cite> to form new cages.</li>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>
