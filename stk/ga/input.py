@@ -70,7 +70,7 @@ class GAInput:
         The number of parallel processes to create when running
         parallel operations. This does not have to be specified in the
         input file. If not specified, the number will default to the
-        value returned by :func:`psutil.cpu_count`
+        value returned by :func:`psutil.cpu_count`.
 
     pop_size : :class:`int`
         The size of the population.
