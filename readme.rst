@@ -11,7 +11,7 @@ Overview
 ========
 
 ``stk`` is a Python library for building, manipulating, optimizing and
-designing molecules. This includes a genetic algorithm for the
+designing molecules, including a genetic algorithm for the
 automated design of molecules. For more information, the documentation can be found at
 https://lukasturcani.github.io/stk/docs/build/html.
 
