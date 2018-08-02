@@ -123,11 +123,23 @@ class GAInput:
         :mod:`.fitness`. This will be the function used to
         calculate the fitness of the molecules.
 
-    mutation_weights : :class:`list` of :class:`int`
+    exit_func : :class:`dict`
+        This must define the parameters of a method of :class:`.Exit`.
+        This will be the function which checks if an
+        early exit criterion has been satisfied. If missing, the
+        default is :meth:`.Exit.no_exit`.
+
+    mutation_weights : :class:`list` of :class:`float`
         The probability that each function in :attr:`mutation_funcs`
         will be selected each time a mutation operation is carried out.
         The order of the probabilities corresponds to the order of the
         mutation functions in :attr:`mutation_funcs`.
+
+    crossover_weights : :class:`list` of :class:`float`
+        The probability that each function in :attr:`crossover_funcs`
+        will be selected each time a crossover operation is carried
+        out. The order of the probabilities corresponds to the order of
+        the crossover functions in :attr:`crossover_funcs`.
 
     normalization_funcs : :class:`list` of :class:`dict`
         This :class:`list` holds a :class:`dict` for each normalization
