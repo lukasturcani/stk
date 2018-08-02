@@ -1,0 +1,642 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to stk’s documentation! &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="#"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Welcome to <code class="docutils literal"><span class="pre">stk</span></code>’s documentation!</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#basic-examples">Basic Examples</a><ul>
+<li><a class="reference internal" href="#linear-polymer">Linear Polymer</a></li>
+<li><a class="reference internal" href="#molecular-cages">Molecular Cages</a></li>
+<li><a class="reference internal" href="#covalent-organic-frameworks">Covalent Organic Frameworks</a></li>
+<li><a class="reference internal" href="#other-materials">Other Materials</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-features">Other Features</a><ul>
+<li><a class="reference internal" href="#calculating-molecular-properties">Calculating Molecular Properties</a></li>
+<li><a class="reference internal" href="#geometric-manipulations">Geometric Manipulations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dealing-with-multiple-conformers">Dealing with Multiple Conformers</a><ul>
+<li><a class="reference internal" href="#dealing-with-multiple-molecules">Dealing with Multiple Molecules</a></li>
+<li><a class="reference internal" href="#automated-molecular-design-with-genetic-algorithms">Automated Molecular Design with Genetic Algorithms</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#extending-stk">Extending <code class="docutils literal"><span class="pre">stk</span></code></a></li>
+<li><a class="reference internal" href="#further-reading">Further Reading</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">stk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Welcome to <code class="docutils literal"><span class="pre">stk</span></code>’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-stk-s-documentation">
+<h1>Welcome to <code class="docutils literal"><span class="pre">stk</span></code>’s documentation!<a class="headerlink" href="#welcome-to-stk-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>GitHub: <a class="reference external" href="https://www.github.com/supramolecular-toolkit/stk">https://www.github.com/supramolecular-toolkit/stk</a></p>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">stk</span></code> is a Python 3 library for building, manipulating, optimizing
+and designing molecules.</p>
+<p>For quick navigation through the modules use <a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a>.</p>
+</div>
+<div class="section" id="basic-examples">
+<h2>Basic Examples<a class="headerlink" href="#basic-examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="linear-polymer">
+<h3>Linear Polymer<a class="headerlink" href="#linear-polymer" title="Permalink to this headline">¶</a></h3>
+<p>The core function of <code class="docutils literal"><span class="pre">stk</span></code> is to assemble molecules. Here is an example
+of how a simple, linear polymer can be built. Starting with three monomers,
+such as</p>
+<img alt="_images/monomers.png" src="_images/monomers.png" />
+<p>each can be loaded into a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit2" title="stk.molecular.molecules.StructUnit2"><code class="xref py py-class docutils literal"><span class="pre">StructUnit2</span></code></a> object from a molecular
+structure file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">monomer1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;monomer1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">)</span>
+<span class="n">monomer2</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;monomer2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">)</span>
+<span class="n">monomer3</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;monomer3.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first argument is the path to the structure file and the second
+argument specifies the functional group of the monomer.</p>
+<p>To assemble a polymer only a single line of code is required:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">polymer</span> <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">monomer1</span><span class="p">,</span> <span class="n">monomer2</span><span class="p">,</span> <span class="n">monomer3</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;ABC&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Simply create a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Polymer" title="stk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a> object by giving it a list of
+monomers and a topology object, in this
+case <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear" title="stk.molecular.topologies.base.Linear"><code class="xref py py-class docutils literal"><span class="pre">Linear</span></code></a>. The topology object defines the the structure of
+the polymer being assembled. The repeating unit is <code class="docutils literal"><span class="pre">'ABC'</span></code>, the orientation
+of the each monomer along the chain is parallel, anti-parallel and random, respectively, and
+the number of repeating units is <code class="docutils literal"><span class="pre">3</span></code>.</p>
+<p>The assembled polymer can be written to a file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">polymer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;polymer.mol&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and will look like this.</p>
+<img alt="_images/polymer.png" src="_images/polymer.png" />
+<p>Notice that the functional group has disappeared and been replaced by
+new bonds between the monomers. The new bonds seem a little stretched,
+so we can optimize the structure using an optimization function defined in
+<a class="reference internal" href="stk.optimization.optimization.html#module-stk.optimization.optimization" title="stk.optimization.optimization"><code class="xref py py-mod docutils literal"><span class="pre">optimization</span></code></a>, in this case <a class="reference internal" href="stk.optimization.optimization.html#stk.optimization.optimization.rdkit_ETKDG" title="stk.optimization.optimization.rdkit_ETKDG"><code class="xref py py-func docutils literal"><span class="pre">rdkit_ETKDG()</span></code></a></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">rdkit_ETKDG</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Again, the polymer can be written to a file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">polymer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;polymer_opt.mol&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and viewed</p>
+<img alt="_images/polymer_opt.png" src="_images/polymer_opt.png" />
+<p><code class="docutils literal"><span class="pre">stk</span></code> also allows you to save the Python objects themselves in the JSON
+format.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">polymer</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;polymer.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This allows you to restore a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> object from a previous session.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">polymer</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;polymer.json&#39;</span><span class="p">)</span>
+<span class="n">polymer</span> <span class="c1"># &lt; Polymer NOT Molecule object &gt;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.load" title="stk.molecular.molecules.Molecule.load"><code class="xref py py-meth docutils literal"><span class="pre">Molecule.load()</span></code></a> allows you to load any dumped <code class="docutils literal"><span class="pre">stk</span></code> JSON object
+regardless of its class and it will returned an object of the correct
+class to you.</p>
+</div>
+<div class="section" id="molecular-cages">
+<h3>Molecular Cages<a class="headerlink" href="#molecular-cages" title="Permalink to this headline">¶</a></h3>
+<p>Molecular cages are relatively
+exotic molecules that look like, yes, cages. Here is an example:</p>
+<img alt="_images/molecular_cage.png" src="_images/molecular_cage.png" />
+<p>Despite their apparent complexity, assembling a molecular cage is
+extremely straightforward. In fact, it is done in exactly the same way
+as a polymer.</p>
+<p>First we define the building blocks of the cage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;bb1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;bb2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is what they look like:</p>
+<img alt="_images/cage_building_blocks.png" src="_images/cage_building_blocks.png" />
+<p>Notice a slight difference, while the first building building block still
+uses the class <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit2" title="stk.molecular.molecules.StructUnit2"><code class="xref py py-class docutils literal"><span class="pre">StructUnit2</span></code></a>, the second uses the class
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a>. The reason is that the first building block has
+2 functional groups while the second has 3 functional groups. Each class
+defines a slightly different set of operations for manipulating the
+positions of the building blocks when assembling the cage. This is
+important so that the building blocks are placed exactly how we want them
+when constructing a molecule. However, all of this happens behind the scenes
+and a cage can be constructed through a simple one-liner:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Notice that this is exactly the same as the polymer example. To generate
+a cage, we simply create a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a> object. We initialize it with
+a list of building blocks and provide a topology instance, in this case
+<a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.FourPlusSix" title="stk.molecular.topologies.cage.two_plus_three.FourPlusSix"><code class="xref py py-class docutils literal"><span class="pre">FourPlusSix</span></code></a>. Unlike the <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear" title="stk.molecular.topologies.base.Linear"><code class="xref py py-class docutils literal"><span class="pre">Linear</span></code></a> class, the <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.FourPlusSix" title="stk.molecular.topologies.cage.two_plus_three.FourPlusSix"><code class="xref py py-class docutils literal"><span class="pre">FourPlusSix</span></code></a>
+does not require any additional arguments. Our assembled cage looks like
+this</p>
+<img alt="_images/cage.png" src="_images/cage.png" />
+<p>If we want to create a cage with a different topology but using the same
+building blocks, we provide a different topology instance:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cage2</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">EightPlusTwelve</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>The assembled cage looks like a cube:</p>
+<img alt="_images/cage2.png" src="_images/cage2.png" />
+<p>Notice that the building blocks are the same, only the shape has changed.
+This is because a different topology instance was provided during initialization.</p>
+<p>Here is a third example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cage3</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Dodecahedron</span><span class="p">())</span>
+</pre></div>
+</div>
+<img alt="_images/cage3.png" src="_images/cage3.png" />
+<p>While we assembled some cages, the constructed structures are not
+particularly realistic. We can optimize the geometry using an optimization
+function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+<span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage2</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+<span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage3</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/cages_opt.png" src="_images/cages_opt.png" />
+<p>In this case the function <a class="reference internal" href="stk.optimization.macromodel.html#stk.optimization.macromodel.macromodel_opt" title="stk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal"><span class="pre">macromodel_opt()</span></code></a> was used. We could have
+used <a class="reference internal" href="stk.optimization.optimization.html#stk.optimization.optimization.rdkit_ETKDG" title="stk.optimization.optimization.rdkit_ETKDG"><code class="xref py py-func docutils literal"><span class="pre">rdkit_ETKDG()</span></code></a> again but chances are the structures would
+have been optimized quite poorly. The <a class="reference internal" href="stk.optimization.macromodel.html#stk.optimization.macromodel.macromodel_opt" title="stk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal"><span class="pre">macromodel_opt()</span></code></a> function
+requires a valid <code class="docutils literal"><span class="pre">MacroModel</span></code> installation with a working license.
+The argument <code class="docutils literal"><span class="pre">'/opt/schrodinger2017-4'</span></code> is the path to the installation.</p>
+<p>Note that there are many more cage topologies available (14+), which
+can be found by looking in <a class="reference internal" href="stk.molecular.topologies.cage.html#module-stk.molecular.topologies.cage" title="stk.molecular.topologies.cage"><code class="xref py py-mod docutils literal"><span class="pre">stk.molecular.topologies.cage</span></code></a>.</p>
+<img alt="_images/cages_two_plus_three.png" src="_images/cages_two_plus_three.png" />
+<img alt="_images/cages_two_plus_four.png" src="_images/cages_two_plus_four.png" />
+<img alt="_images/cages_three_plus_four.png" src="_images/cages_three_plus_four.png" />
+<img alt="_images/cages_three_plus_three.png" src="_images/cages_three_plus_three.png" />
+<p>The topologies are organized into submodules based on the building blocks
+required to build them. For example, all topologies in the
+<a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#module-stk.molecular.topologies.cage.two_plus_three" title="stk.molecular.topologies.cage.two_plus_three"><code class="xref py py-mod docutils literal"><span class="pre">stk.molecular.topologies.cage.two_plus_three</span></code></a> submodule are composed of two and three functionalized building
+blocks, all cages in the <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_four.html#module-stk.molecular.topologies.cage.two_plus_four" title="stk.molecular.topologies.cage.two_plus_four"><code class="xref py py-mod docutils literal"><span class="pre">stk.molecular.topologies.cage.two_plus_four</span></code></a> submodule are composed of two and
+four functionalized building blocks, cages in <a class="reference internal" href="stk.molecular.topologies.cage.three_plus_three.html#module-stk.molecular.topologies.cage.three_plus_three" title="stk.molecular.topologies.cage.three_plus_three"><code class="xref py py-mod docutils literal"><span class="pre">stk.molecular.topologies.cage.three_plus_three</span></code></a> are composed
+of three functionalized building blocks and so on.</p>
+<p>All cage topologies also support being built from more than two building
+blocks, to produce mixed or multi-component cages.</p>
+<img alt="_images/multi_cage.png" src="_images/multi_cage.png" />
+<p>In addition, cage topologies support a number of optional arguments which allow the many
+possible structural isomers to be easily assembled. These topics are
+discussed in <a class="reference internal" href="advanced_cage_building.html"><span class="doc">Advanced Cage Building</span></a>.</p>
+</div>
+<div class="section" id="covalent-organic-frameworks">
+<h3>Covalent Organic Frameworks<a class="headerlink" href="#covalent-organic-frameworks" title="Permalink to this headline">¶</a></h3>
+<p>Just like the other molecules, covalent organic frameworks (COFs) are easy to
+construct:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;cof_bb1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;cof_bb2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">))</span>
+<span class="n">cof</span> <span class="o">=</span> <span class="n">Periodic</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Honeycomb</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Where the buliding blocks are:</p>
+<img alt="_images/cof_bbs.png" src="_images/cof_bbs.png" />
+<p>The same pattern is used. First building blocks objects are created using
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a> instances. Then a molecule is assembled by creating
+an instance of its class, in this case <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Periodic" title="stk.molecular.molecules.Periodic"><code class="xref py py-class docutils literal"><span class="pre">Periodic</span></code></a>. The molecule
+being assembled is provided with the building blocks and the topology,
+in this case <a class="reference internal" href="stk.molecular.topologies.cof.html#stk.molecular.topologies.cof.Honeycomb" title="stk.molecular.topologies.cof.Honeycomb"><code class="xref py py-class docutils literal"><span class="pre">Honeycomb</span></code></a>.</p>
+<p>Because COFs are periodic structures, if we want to make a finite size
+molecule we have to create an “island”:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cof</span><span class="o">.</span><span class="n">island</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Here we created create a 5 by 5 by 1 grid of the periodic unit cell.
+This is a cut-out of our structure:</p>
+<img alt="_images/honey.png" src="_images/honey.png" />
+<p>Other COF topologies are available in <a class="reference internal" href="stk.molecular.topologies.cof.html#module-stk.molecular.topologies.cof" title="stk.molecular.topologies.cof"><code class="xref py py-mod docutils literal"><span class="pre">topologies.cof</span></code></a>. For example:</p>
+<p><a class="reference internal" href="stk.molecular.topologies.cof.html#stk.molecular.topologies.cof.Hexagonal" title="stk.molecular.topologies.cof.Hexagonal"><code class="xref py py-class docutils literal"><span class="pre">Hexagonal</span></code></a></p>
+<img alt="_images/hex.png" src="_images/hex.png" />
+<p><a class="reference internal" href="stk.molecular.topologies.cof.html#stk.molecular.topologies.cof.Square" title="stk.molecular.topologies.cof.Square"><code class="xref py py-class docutils literal"><span class="pre">Square</span></code></a></p>
+<img alt="_images/square.png" src="_images/square.png" />
+<p><a class="reference internal" href="stk.molecular.topologies.cof.html#stk.molecular.topologies.cof.Kagome" title="stk.molecular.topologies.cof.Kagome"><code class="xref py py-class docutils literal"><span class="pre">Kagome</span></code></a></p>
+<img alt="_images/kagome.png" src="_images/kagome.png" />
+<p><code class="docutils literal"><span class="pre">stk</span></code> also gives tools to build a large number of structural isomers
+of each COF. This is done analogously to the organic cage case so reading
+<a class="reference internal" href="advanced_cage_building.html"><span class="doc">Advanced Cage Building</span></a> is recommended.</p>
+</div>
+<div class="section" id="other-materials">
+<h3>Other Materials<a class="headerlink" href="#other-materials" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">stk</span></code> is a work in progress and currently supports only the above classes
+of materials out of the box. However, <code class="docutils literal"><span class="pre">stk</span></code> was designed to be easy
+extend to other classes of molecules.
+For a guide on how this can be done
+see, <a class="reference internal" href="#extending-stk"><span class="std std-ref">Extending stk</span></a>.</p>
+</div>
+</div>
+<div class="section" id="other-features">
+<h2>Other Features<a class="headerlink" href="#other-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="calculating-molecular-properties">
+<h3>Calculating Molecular Properties<a class="headerlink" href="#calculating-molecular-properties" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">stk</span></code> provides a variety of methods to calculate molecular properties.
+What methods can be used depends on what kind of molecule object is created.
+All molecules can use methods defined in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>. All
+building blocks can use methods in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> in addition to this.
+Assembled molecules can use additional methods provided by <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>.</p>
+<p>Here are some examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Calculate the energy of a molecule using rdkit and the UFF force field.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span>
+<span class="c1"># Calculate the energy of a molecule using MacroModel. Using force field</span>
+<span class="c1"># number 16 (OPLS3).</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">marcomodel</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+<span class="c1"># Calculate the maximum diameter of of a molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">max_diameter</span><span class="p">()</span>
+<span class="c1"># Calculate the cavity size of a cage molecule.</span>
+<span class="n">cage</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">()</span>
+<span class="c1"># Calculate the mean RMSD between the building blocks original</span>
+<span class="c1"># structure and their structure inside an assembled macromolecule.</span>
+<span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
+<span class="c1"># Get the center of mass of a molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">center_of_mass</span><span class="p">()</span>
+<span class="c1"># Get the atomic symbol of atom with id of 13.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">atom_symbol</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Something to note about energy calculations, is that each time you run
+the method, the result gets saved. For example,</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span> <span class="c1"># {}</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span> <span class="c1"># Returns 16.05</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span> <span class="c1"># {FunctionData(&#39;rdkit&#39;, forcefield=&#39;uff&#39;): 16.501}</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">macromodel</span><span class="p">(</span><span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                      <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;path/to/macromodel/dir&#39;</span><span class="p">)</span> <span class="c1"># Returns 200</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span> <span class="c1"># {FunctionData(&#39;rdkit&#39;, forcefield=&#39;uff&#39;): 16.501,</span>
+                  <span class="c1">#  FunctionData(&#39;macromodel&#39;, forcefield=16): 200}</span>
+</pre></div>
+</div>
+<p>This can come in handy if you do not want to repeat expensive calculations.</p>
+</div>
+<div class="section" id="geometric-manipulations">
+<h3>Geometric Manipulations<a class="headerlink" href="#geometric-manipulations" title="Permalink to this headline">¶</a></h3>
+<p>In addition to molecular property calculation, <code class="docutils literal"><span class="pre">stk</span></code> provides tools to
+rotate and translate molecules. These tools are particularly useful when
+defining the assembly process of a new class of molecules.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Change the position of a molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="c1"># Get a matrix holding the position of every atom in the molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">()</span>
+<span class="c1"># Use a matrix to set the position of every atom in the molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">some_matrix</span><span class="p">)</span>
+<span class="c1"># Rotate the molecule along by pi radians about the vector (1, 1, 3)</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="dealing-with-multiple-conformers">
+<h2>Dealing with Multiple Conformers<a class="headerlink" href="#dealing-with-multiple-conformers" title="Permalink to this headline">¶</a></h2>
+<p>Every <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>, be it a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> or a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>
+supports multiple conformers. These are stored in the underlying
+<code class="xref py py-mod docutils literal"><span class="pre">rdkit</span></code> object held in <code class="xref py py-class docutils literal"><span class="pre">Molecule.mol</span></code>.</p>
+<p>Adding a new conformer to a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> is simple</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;bb1_conf1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span> <span class="c1"># Loads molecule into conformer 0.</span>
+<span class="n">bb1</span><span class="o">.</span><span class="n">update_from_mol</span><span class="p">(</span><span class="s1">&#39;bb1_conf2.mol&#39;</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Load into conformer 1.</span>
+</pre></div>
+</div>
+<p>Lets take a look</p>
+<blockquote>
+<div><img alt="_images/bb1_confs.png" src="_images/bb1_confs.png" />
+</div></blockquote>
+<p>Well, one is clearly better than the other. At least they are easy to
+recognize.</p>
+<p>Lets try this with a another building block as well</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;bb2_conf1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">bb2</span><span class="o">.</span><span class="n">update_from_mol</span><span class="p">(</span><span class="s1">&#39;bb2_conf2.mol&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/bb2_confs.png" src="_images/bb2_confs.png" />
+<p>Also pretty distinguishable. This is good, it makes it easy to show
+that you can pick which conformers to use for assembly with <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">(),</span> <span class="n">bb_conformers</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">cage</span><span class="o">.</span><span class="n">add_conformer</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">cage</span><span class="o">.</span><span class="n">add_conformer</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">cage</span><span class="o">.</span><span class="n">add_conformer</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>These are the conformers we produced!</p>
+<img alt="_images/1.png" src="_images/1.png" />
+<img alt="_images/2.png" src="_images/2.png" />
+<img alt="_images/3.png" src="_images/3.png" />
+<img alt="_images/4.png" src="_images/4.png" />
+<p><code class="docutils literal"><span class="pre">stk</span></code> will use whichever <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> conformers you want, when
+constructing conformers of the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> itself.</p>
+<p>Most methods and functions in <code class="docutils literal"><span class="pre">stk</span></code> also support conformers.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mol</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">(</span><span class="n">conformer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># And so on ...</span>
+</pre></div>
+</div>
+<div class="section" id="dealing-with-multiple-molecules">
+<h3>Dealing with Multiple Molecules<a class="headerlink" href="#dealing-with-multiple-molecules" title="Permalink to this headline">¶</a></h3>
+<p>When batches of molecules are created, it is often desirable to optimize
+them all at once. By placing the molecules in a <a class="reference internal" href="stk.population.html#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>
+instance, all molecules can be optimized in parallel.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">cage</span><span class="p">,</span> <span class="n">cage2</span><span class="p">,</span> <span class="n">cage3</span><span class="p">)</span>
+<span class="n">pop</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;macromodel_opt&#39;</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In addition to this, the <a class="reference internal" href="stk.population.html#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> class provides some handy
+tools to assemble large amounts of molecules at a time. For example if
+we want to create every possible cage from a set of building blocks and
+topologies:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bbs1</span> <span class="o">=</span> <span class="p">[</span><span class="n">StructUnit2</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;3.mol&#39;</span><span class="p">)]</span>
+<span class="n">bbs2</span> <span class="o">=</span> <span class="p">[</span><span class="n">StructUnit3</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;4.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;5.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;6.mol&#39;</span><span class="p">)]</span>
+<span class="c1"># Create 18 Cage molecules.</span>
+<span class="n">pop2</span> <span class="o">=</span> <span class="n">Population</span><span class="o">.</span><span class="n">init_all</span><span class="p">(</span><span class="n">Cage</span><span class="p">,</span> <span class="p">[</span><span class="n">bbs1</span><span class="p">,</span> <span class="n">bbs2</span><span class="p">],</span> <span class="p">[</span><span class="n">FourPlusSix</span><span class="p">(),</span> <span class="n">EightPlusTwelve</span><span class="p">()])</span>
+</pre></div>
+</div>
+<p>Or if we want to select building blocks at random and create 5 cages:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop3</span> <span class="o">=</span> <span class="n">Population</span><span class="o">.</span><span class="n">init_random</span><span class="p">(</span><span class="n">Cage</span><span class="p">,</span> <span class="p">[</span><span class="n">bbs1</span><span class="p">,</span> <span class="n">bbs2</span><span class="p">],</span> <span class="p">[</span><span class="n">FourPlusSix</span><span class="p">(),</span> <span class="n">EightPlusTwelve</span><span class="p">()],</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The population can also be used to calculate statistics across all
+molecules. For example, if you want to know the average cavity size of
+your cages:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Finally, we can use the population to write structure files of
+all the molecules to a folder</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;dirname&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or we can dump the population to a JSON file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;pop.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and recover the <code class="docutils literal"><span class="pre">stk</span></code> objects later</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;pop.json&#39;</span><span class="p">,</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_dict</span><span class="p">)</span>
+<span class="n">pop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># &lt;StructUnit2 at 0x01283&gt;</span>
+<span class="n">pop</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># &lt;Periodic at 0x12498&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="automated-molecular-design-with-genetic-algorithms">
+<h3>Automated Molecular Design with Genetic Algorithms<a class="headerlink" href="#automated-molecular-design-with-genetic-algorithms" title="Permalink to this headline">¶</a></h3>
+<p>Via the <a class="reference internal" href="stk.ga.html#module-stk.ga" title="stk.ga"><code class="xref py py-mod docutils literal"><span class="pre">ga</span></code></a> module, <code class="docutils literal"><span class="pre">stk</span></code> includes a genetic algorithm which
+can be used to evolve molecules that fulfil user defined design criteria.
+The genetic algorithm can be run from the command line using:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python -m stk input_file.py
+</pre></div>
+</div>
+<p>The input file is a simple python script which defines the mutation,
+crossover, selection and other functions the genetic algorithm
+should use. For details on how to build and input file see <a class="reference internal" href="stk.ga.input.html#stk.ga.input.GAInput" title="stk.ga.input.GAInput"><code class="xref py py-class docutils literal"><span class="pre">GAInput</span></code></a>.</p>
+<p>The genetic algorithm automatically works with any molecules that <code class="docutils literal"><span class="pre">stk</span></code>
+can construct, just make sure you define an appropriate fitness function.</p>
+</div>
+</div>
+<div class="section" id="extending-stk">
+<span id="id1"></span><h2>Extending <code class="docutils literal"><span class="pre">stk</span></code><a class="headerlink" href="#extending-stk" title="Permalink to this headline">¶</a></h2>
+<p>Each module of <code class="docutils literal"><span class="pre">stk</span></code> has its own guidelines for adding new functionality.
+However, in almost all cases adding new features to <code class="docutils literal"><span class="pre">stk</span></code> only involves
+defining a simple function in the appropriate module or a method in the
+appropriate class.</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="stk.molecular.molecules.html#adding-macromolecules"><span class="std std-ref">Extending stk: Adding new macromolecules.</span></a></li>
+<li><a class="reference internal" href="stk.molecular.topologies.base.html#adding-topologies"><span class="std std-ref">Extending stk: Adding new topologies.</span></a></li>
+<li><a class="reference internal" href="stk.molecular.functional_groups.html#adding-functional-groups"><span class="std std-ref">Extending stk: Adding  more functional groups.</span></a></li>
+<li><a class="reference internal" href="stk.optimization.optimization.html#adding-optimization-functions"><span class="std std-ref">Extending stk: Adding optimization functions.</span></a></li>
+<li><a class="reference internal" href="stk.molecular.energy.html#adding-energy-functions"><span class="std std-ref">Extending stk: Adding more energy functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.mutation.html#adding-mutation-functions"><span class="std std-ref">Extending stk: Adding mutation functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.crossover.html#adding-crossover-functions"><span class="std std-ref">Extending stk: Adding crossover functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.fitness.html#adding-fitness-functions"><span class="std std-ref">Extending stk: Adding fitness functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.normalization.html#adding-normalization-functions"><span class="std std-ref">Extending stk: Adding normalization functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.selection.html#adding-selection-functions"><span class="std std-ref">Extending stk: Adding selection functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.ga_exit.html#adding-exit-functions"><span class="std std-ref">Extending stk: Adding exit functions.</span></a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="stk.molecular.molecules.html#macromolecular-assembly"><span class="std std-ref">A more detailed description of macromolecular assembly.</span></a></li>
+<li><a class="reference internal" href="stk.molecular.topologies.cof.html#cof-assembly"><span class="std std-ref">How the assembly process works for 2D COF topologies.</span></a></li>
+<li><a class="reference internal" href="advanced_cage_building.html"><span class="doc">Advanced Cage Building</span></a></li>
+<li><a class="reference internal" href="caching.html"><span class="doc">Caching</span></a></li>
+<li><a class="reference external" href="https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826">https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826</a></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
