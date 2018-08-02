@@ -6,7 +6,7 @@
 Welcome to ``stk``'s documentation!
 ===================================
 
-GitHub: https://github.com/supramolecular-toolkit/stk
+GitHub: https://www.github.com/supramolecular-toolkit/stk
 
 .. toctree::
    :maxdepth: 2
@@ -472,6 +472,22 @@ and recover the ``stk`` objects later
     pop[0] # <StructUnit2 at 0x01283>
     pop[1] # <Periodic at 0x12498>
 
+Automated Molecular Design with Genetic Algorithms
+..................................................
+
+Via the :mod:`.ga` module, ``stk`` includes a genetic algorithm which
+can be used to evolve molecules that fulfil user defined design criteria.
+The genetic algorithm can be run from the command line using::
+
+    $ python -m stk input_file.py
+
+The input file is a simple python script which defines the mutation,
+crossover, selection and other functions the genetic algorithm
+should use. For details on how to build and input file see :class:`.GAInput`.
+
+The genetic algorithm automatically works with any molecules that ``stk``
+can construct, just make sure you define an appropriate fitness function.
+
 .. _`extending stk`:
 
 Extending ``stk``
@@ -487,6 +503,12 @@ appropriate class.
     * :ref:`adding functional groups`
     * :ref:`adding optimization functions`
     * :ref:`adding energy functions`
+    * :ref:`adding mutation functions`
+    * :ref:`adding crossover functions`
+    * :ref:`adding fitness functions`
+    * :ref:`adding normalization functions`
+    * :ref:`adding selection functions`
+    * :ref:`adding exit functions`
 
 
 Further Reading

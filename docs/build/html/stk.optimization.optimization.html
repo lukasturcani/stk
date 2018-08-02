@@ -176,7 +176,7 @@ sure that only the optimization functions are imported back into this
 file, not any of the helper functions or classes.</p>
 <dl class="class">
 <dt id="stk.optimization.optimization._OptimizationFunc">
-<em class="property">class </em><code class="descclassname">stk.optimization.optimization.</code><code class="descname">_OptimizationFunc</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/optimization.html#_OptimizationFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.optimization._OptimizationFunc" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.optimization.optimization.</code><code class="descname">_OptimizationFunc</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.optimization._OptimizationFunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A decorator for optimziation functions.</p>
 <p>This decorator is applied to all optimization functions
@@ -189,7 +189,7 @@ being run twice on the same molecule.</p>
 
 <dl class="function">
 <dt id="stk.optimization.optimization._optimize_all">
-<code class="descclassname">stk.optimization.optimization.</code><code class="descname">_optimize_all</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em>, <em>processes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/optimization.html#_optimize_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.optimization._optimize_all" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.optimization.</code><code class="descname">_optimize_all</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em>, <em>processes</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.optimization._optimize_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run opt function on all population members in parallel.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -216,7 +216,7 @@ optimized.</li>
 
 <dl class="function">
 <dt id="stk.optimization.optimization._optimize_all_serial">
-<code class="descclassname">stk.optimization.optimization.</code><code class="descname">_optimize_all_serial</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/optimization.html#_optimize_all_serial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.optimization._optimize_all_serial" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.optimization.</code><code class="descname">_optimize_all_serial</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.optimization._optimize_all_serial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run opt function on all population members sequentially.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -242,7 +242,7 @@ optimized.</li>
 
 <dl class="function">
 <dt id="stk.optimization.optimization.do_not_optimize">
-<code class="descclassname">stk.optimization.optimization.</code><code class="descname">do_not_optimize</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/optimization.html#do_not_optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.optimization.do_not_optimize" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.optimization.</code><code class="descname">do_not_optimize</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.optimization.do_not_optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Skips the optimization step.</p>
 <p>This is very useful when debugging so you do not waste your time
 waiting for molecules to get optimized. Use this in the input file
@@ -263,7 +263,7 @@ in place of an optimization function when necessary.</p>
 
 <dl class="function">
 <dt id="stk.optimization.optimization.partial_raiser">
-<code class="descclassname">stk.optimization.optimization.</code><code class="descname">partial_raiser</code><span class="sig-paren">(</span><em>mol</em>, <em>ofunc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/optimization.html#partial_raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.optimization.partial_raiser" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.optimization.</code><code class="descname">partial_raiser</code><span class="sig-paren">(</span><em>mol</em>, <em>ofunc</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.optimization.partial_raiser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises and optimizes at random.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -288,7 +288,7 @@ function to be used.</li>
 
 <dl class="function">
 <dt id="stk.optimization.optimization.raiser">
-<code class="descclassname">stk.optimization.optimization.</code><code class="descname">raiser</code><span class="sig-paren">(</span><em>mol</em>, <em>param1</em>, <em>param2=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/optimization.html#raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.optimization.raiser" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.optimization.</code><code class="descname">raiser</code><span class="sig-paren">(</span><em>mol</em>, <em>param1</em>, <em>param2=2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.optimization.raiser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Doens’t optimize, raises an error instead.</p>
 <p>This function is used to test that when optimization functions
 raise errors during multiprocessing, they are handled correctly.</p>
@@ -317,7 +317,7 @@ raise errors during multiprocessing, they are handled correctly.</p>
 
 <dl class="function">
 <dt id="stk.optimization.optimization.rdkit_ETKDG">
-<code class="descclassname">stk.optimization.optimization.</code><code class="descname">rdkit_ETKDG</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/optimization.html#rdkit_ETKDG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.optimization.rdkit_ETKDG" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.optimization.</code><code class="descname">rdkit_ETKDG</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.optimization.rdkit_ETKDG" title="Permalink to this definition">¶</a></dt>
 <dd><p>Does a conformer search with <code class="xref py py-func docutils literal"><span class="pre">rdkit.ETKDG()</span></code> <a class="footnote-reference" href="#id2" id="id1">[1]</a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -348,7 +348,7 @@ raise errors during multiprocessing, they are handled correctly.</p>
 
 <dl class="function">
 <dt id="stk.optimization.optimization.rdkit_optimization">
-<code class="descclassname">stk.optimization.optimization.</code><code class="descname">rdkit_optimization</code><span class="sig-paren">(</span><em>mol</em>, <em>embed=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/optimization/optimization.html#rdkit_optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.optimization.optimization.rdkit_optimization" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.optimization.optimization.</code><code class="descname">rdkit_optimization</code><span class="sig-paren">(</span><em>mol</em>, <em>embed=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.optimization.rdkit_optimization" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structure of the molecule using <code class="docutils literal"><span class="pre">rdkit</span></code>.</p>
 <p>Uses the <code class="docutils literal"><span class="pre">MMFF</span></code> forcefield.</p>
 <table class="docutils field-list" frame="void" rules="none">

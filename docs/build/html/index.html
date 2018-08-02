@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="#"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -95,6 +102,7 @@
 </li>
 <li><a class="reference internal" href="#dealing-with-multiple-conformers">Dealing with Multiple Conformers</a><ul>
 <li><a class="reference internal" href="#dealing-with-multiple-molecules">Dealing with Multiple Molecules</a></li>
+<li><a class="reference internal" href="#automated-molecular-design-with-genetic-algorithms">Automated Molecular Design with Genetic Algorithms</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#extending-stk">Extending <code class="docutils literal"><span class="pre">stk</span></code></a></li>
@@ -113,7 +121,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="#">stk</a>
@@ -121,10 +129,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -168,7 +175,7 @@
             
   <div class="section" id="welcome-to-stk-s-documentation">
 <h1>Welcome to <code class="docutils literal"><span class="pre">stk</span></code>’s documentation!<a class="headerlink" href="#welcome-to-stk-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>GitHub: <a class="reference external" href="https://github.com/supramolecular-toolkit/stk">https://github.com/supramolecular-toolkit/stk</a></p>
+<p>GitHub: <a class="reference external" href="https://www.github.com/supramolecular-toolkit/stk">https://www.github.com/supramolecular-toolkit/stk</a></p>
 <div class="toctree-wrapper compound">
 </div>
 <div class="section" id="overview">
@@ -510,6 +517,20 @@ all the molecules to a folder</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="automated-molecular-design-with-genetic-algorithms">
+<h3>Automated Molecular Design with Genetic Algorithms<a class="headerlink" href="#automated-molecular-design-with-genetic-algorithms" title="Permalink to this headline">¶</a></h3>
+<p>Via the <a class="reference internal" href="stk.ga.html#module-stk.ga" title="stk.ga"><code class="xref py py-mod docutils literal"><span class="pre">ga</span></code></a> module, <code class="docutils literal"><span class="pre">stk</span></code> includes a genetic algorithm which
+can be used to evolve molecules that fulfil user defined design criteria.
+The genetic algorithm can be run from the command line using:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python -m stk input_file.py
+</pre></div>
+</div>
+<p>The input file is a simple python script which defines the mutation,
+crossover, selection and other functions the genetic algorithm
+should use. For details on how to build and input file see <a class="reference internal" href="stk.ga.input.html#stk.ga.input.GAInput" title="stk.ga.input.GAInput"><code class="xref py py-class docutils literal"><span class="pre">GAInput</span></code></a>.</p>
+<p>The genetic algorithm automatically works with any molecules that <code class="docutils literal"><span class="pre">stk</span></code>
+can construct, just make sure you define an appropriate fitness function.</p>
+</div>
 </div>
 <div class="section" id="extending-stk">
 <span id="id1"></span><h2>Extending <code class="docutils literal"><span class="pre">stk</span></code><a class="headerlink" href="#extending-stk" title="Permalink to this headline">¶</a></h2>
@@ -524,6 +545,12 @@ appropriate class.</p>
 <li><a class="reference internal" href="stk.molecular.functional_groups.html#adding-functional-groups"><span class="std std-ref">Extending stk: Adding  more functional groups.</span></a></li>
 <li><a class="reference internal" href="stk.optimization.optimization.html#adding-optimization-functions"><span class="std std-ref">Extending stk: Adding optimization functions.</span></a></li>
 <li><a class="reference internal" href="stk.molecular.energy.html#adding-energy-functions"><span class="std std-ref">Extending stk: Adding more energy functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.mutation.html#adding-mutation-functions"><span class="std std-ref">Extending stk: Adding mutation functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.crossover.html#adding-crossover-functions"><span class="std std-ref">Extending stk: Adding crossover functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.fitness.html#adding-fitness-functions"><span class="std std-ref">Extending stk: Adding fitness functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.normalization.html#adding-normalization-functions"><span class="std std-ref">Extending stk: Adding normalization functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.selection.html#adding-selection-functions"><span class="std std-ref">Extending stk: Adding selection functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.ga_exit.html#adding-exit-functions"><span class="std std-ref">Extending stk: Adding exit functions.</span></a></li>
 </ul>
 </div></blockquote>
 </div>
@@ -551,7 +578,9 @@ appropriate class.</p>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -564,7 +593,7 @@ appropriate class.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -583,7 +612,6 @@ appropriate class.</p>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -601,11 +629,14 @@ appropriate class.</p>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

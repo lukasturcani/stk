@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -97,7 +104,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -105,10 +112,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -201,7 +207,7 @@ to be added to <code class="xref py py-data docutils literal"><span class="pre">
 as an example.</p>
 <dl class="class">
 <dt id="stk.molecular.functional_groups.FGInfo">
-<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">FGInfo</code><span class="sig-paren">(</span><em>name</em>, <em>fg_smarts</em>, <em>bonder_smarts</em>, <em>del_smarts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#FGInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.FGInfo" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">FGInfo</code><span class="sig-paren">(</span><em>name</em>, <em>fg_smarts</em>, <em>bonder_smarts</em>, <em>del_smarts</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.FGInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Contains key information about functional groups.</p>
 <p>The point of this class is to register which atoms of a functional
@@ -274,7 +280,7 @@ as <code class="docutils literal"><span class="pre">'del'</span></code>.</p>
 
 <dl class="class">
 <dt id="stk.molecular.functional_groups.FGKey">
-<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">FGKey</code><span class="sig-paren">(</span><em>fgs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#FGKey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.FGKey" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">FGKey</code><span class="sig-paren">(</span><em>fgs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.FGKey" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Used to create a key from a <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of fg names.</p>
 <p>Used by <code class="xref py py-data docutils literal"><span class="pre">bond_orders</span></code>, <code class="xref py py-data docutils literal"><span class="pre">custom_reactions</span></code> and
@@ -290,7 +296,7 @@ intializer.</p>
 
 <dl class="class">
 <dt id="stk.molecular.functional_groups.Match">
-<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">Match</code><span class="sig-paren">(</span><em>smarts</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#Match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.Match" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">Match</code><span class="sig-paren">(</span><em>smarts</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.Match" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A container for SMARTS queries.</p>
 <dl class="attribute">
@@ -320,7 +326,7 @@ per functional group.</p>
 
 <dl class="function">
 <dt id="stk.molecular.functional_groups.amine3_with_amine3">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">amine3_with_amine3</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#amine3_with_amine3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.amine3_with_amine3" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">amine3_with_amine3</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.amine3_with_amine3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Crates bonds between functional groups.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -352,7 +358,7 @@ of bonds added.</p>
 
 <dl class="function">
 <dt id="stk.molecular.functional_groups.boronic_acid_with_diol">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">boronic_acid_with_diol</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#boronic_acid_with_diol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.boronic_acid_with_diol" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">boronic_acid_with_diol</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.boronic_acid_with_diol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Crates bonds between functional groups.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -384,7 +390,7 @@ of bonds added.</p>
 
 <dl class="function">
 <dt id="stk.molecular.functional_groups.diol_with_difluorne">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">diol_with_difluorne</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#diol_with_difluorne"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.diol_with_difluorne" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">diol_with_difluorne</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.diol_with_difluorne" title="Permalink to this definition">¶</a></dt>
 <dd><p>Crates bonds between functional groups.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -416,7 +422,7 @@ of bonds added.</p>
 
 <dl class="function">
 <dt id="stk.molecular.functional_groups.fg_name">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">fg_name</code><span class="sig-paren">(</span><em>mol</em>, <em>fg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#fg_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.fg_name" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">fg_name</code><span class="sig-paren">(</span><em>mol</em>, <em>fg</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.fg_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retruns the name of the functional group with id <cite>fg</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -440,7 +446,7 @@ of bonds added.</p>
 
 <dl class="function">
 <dt id="stk.molecular.functional_groups.periodic_react">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">periodic_react</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>direction</em>, <em>*fgs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#periodic_react"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.periodic_react" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">periodic_react</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>direction</em>, <em>*fgs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.periodic_react" title="Permalink to this definition">¶</a></dt>
 <dd><p>Like <a class="reference internal" href="#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal"><span class="pre">react()</span></code></a> but returns periodic bonds.</p>
 <p>As periodic bonds are returned, no bonds are added to <cite>mol</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -476,7 +482,7 @@ of bonds added.</p>
 
 <dl class="function">
 <dt id="stk.molecular.functional_groups.react">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">react</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>*fgs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/functional_groups.html#react"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.functional_groups.react" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">react</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>*fgs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.react" title="Permalink to this definition">¶</a></dt>
 <dd><p>Crates bonds between functional groups.</p>
 <p>This function first looks at the functional group ids provided via
 the <cite>*fgs</cite> argument and checks which functional groups are
@@ -520,7 +526,9 @@ of bonds added.</p>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -533,7 +541,7 @@ of bonds added.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -552,7 +560,6 @@ of bonds added.</p>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -570,11 +577,14 @@ of bonds added.</p>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

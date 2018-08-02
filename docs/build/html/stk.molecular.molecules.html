@@ -25,17 +25,24 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -95,7 +102,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -103,10 +110,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -289,21 +295,21 @@ want to add a new <a class="reference internal" href="stk.molecular.topologies.b
 class does the assembly of the macromolecule from the building blocks.</p>
 <dl class="class">
 <dt id="stk.molecular.molecules.Cached">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Cached</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Cached"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Cached" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Cached</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Cached" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
 <p>A metaclass for creating classes which create cached instances.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.molecular.molecules.CachedStructUnit">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">CachedStructUnit</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#CachedStructUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.CachedStructUnit" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">CachedStructUnit</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.CachedStructUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
 <p>A metaclass for making <a class="reference internal" href="#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> create cached instances.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.molecular.molecules.Cage">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Cage</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Cage" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Cage</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Cage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.molecules.MacroMolecule</span></code></a></p>
 <p>Used to represent molecular cages.</p>
 <dl class="attribute">
@@ -313,7 +319,7 @@ class does the assembly of the macromolecule from the building blocks.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Cage.window_difference">
-<code class="descname">window_difference</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Cage.window_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Cage.window_difference" title="Permalink to this definition">¶</a></dt>
+<code class="descname">window_difference</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Cage.window_difference" title="Permalink to this definition">¶</a></dt>
 <dd><p>The average difference across window sizes.</p>
 <p>First take the average window difference between all windows
 of the same type. Then take the average of window differences
@@ -341,7 +347,7 @@ every combination of windows of the same type.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Cage.window_variance">
-<code class="descname">window_variance</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Cage.window_variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Cage.window_variance" title="Permalink to this definition">¶</a></dt>
+<code class="descname">window_variance</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Cage.window_variance" title="Permalink to this definition">¶</a></dt>
 <dd><p>The variance in window sizes.</p>
 <p>For cages where multiple window types are present, the
 window variance within each window type is calculated first and
@@ -362,8 +368,8 @@ the returned value is the mean of these variances.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Cage.windows">
-<code class="descname">windows</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Cage.windows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Cage.windows" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns window sizes found by <code class="docutils literal"><span class="pre">pyWindow</span></code>.</p>
+<code class="descname">windows</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Cage.windows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns window sizes found by <code class="docutils literal"><span class="pre">pywindow</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -390,7 +396,7 @@ number of expected windows for that cage topology.</li>
 
 <dl class="class">
 <dt id="stk.molecular.molecules.MacroMolecule">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">MacroMolecule</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">MacroMolecule</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.molecules.Molecule</span></code></a></p>
 <p>A representing assembled macromolecules.</p>
 <p>Because of the computational cost associated with macromolecule
@@ -472,7 +478,7 @@ the form</p>
 
 <dl class="classmethod">
 <dt id="stk.molecular.molecules.MacroMolecule._json_init">
-<em class="property">classmethod </em><code class="descname">_json_init</code><span class="sig-paren">(</span><em>json_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule._json_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule._json_init" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">_json_init</code><span class="sig-paren">(</span><em>json_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule._json_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Completes a JSON initialization.</p>
 <p>This function is not to be used. Use <a class="reference internal" href="#stk.molecular.molecules.Molecule.load" title="stk.molecular.molecules.Molecule.load"><code class="xref py py-meth docutils literal"><span class="pre">Molecule.load()</span></code></a>
 for loading instances from a JSON string. That function will
@@ -493,7 +499,7 @@ automatically call this one.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.MacroMolecule.add_conformer">
-<code class="descname">add_conformer</code><span class="sig-paren">(</span><em>bb_conformers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule.add_conformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.add_conformer" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_conformer</code><span class="sig-paren">(</span><em>bb_conformers</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.add_conformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assembles a new conformer.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -514,7 +520,7 @@ building blocks.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.MacroMolecule.bb_distortion">
-<code class="descname">bb_distortion</code><span class="sig-paren">(</span><em>bb_conformers=None</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule.bb_distortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.bb_distortion" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bb_distortion</code><span class="sig-paren">(</span><em>bb_conformers=None</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.bb_distortion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rmsd difference of building blocks before and after assembly.</p>
 <p>The function looks at each building block in the macromolecule
 and calculates the rmsd between the “free” verson and the one
@@ -548,7 +554,7 @@ default to <code class="docutils literal"><span class="pre">-1</span></code>.</l
 
 <dl class="method">
 <dt id="stk.molecular.molecules.MacroMolecule.building_block_cores">
-<code class="descname">building_block_cores</code><span class="sig-paren">(</span><em>bb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule.building_block_cores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.building_block_cores" title="Permalink to this definition">¶</a></dt>
+<code class="descname">building_block_cores</code><span class="sig-paren">(</span><em>bb</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.building_block_cores" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields the “cores” of the building block molecules.</p>
 <p>The structure of the yielded cores has the geometry found in
 the macromolecule.</p>
@@ -574,7 +580,7 @@ macromolecule.</td>
 
 <dl class="staticmethod">
 <dt id="stk.molecular.molecules.MacroMolecule.gen_key">
-<em class="property">static </em><code class="descname">gen_key</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule.gen_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.gen_key" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">gen_key</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.gen_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates the key used for caching the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -598,7 +604,7 @@ macromolecule.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.MacroMolecule.json">
-<code class="descname">json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule.json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.json" title="Permalink to this definition">¶</a></dt>
+<code class="descname">json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a JSON representation of the molecule.</p>
 <p>The representation has the form</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -628,12 +634,12 @@ macromolecule.</td>
 
 <dl class="classmethod">
 <dt id="stk.molecular.molecules.MacroMolecule.testing_init">
-<em class="property">classmethod </em><code class="descname">testing_init</code><span class="sig-paren">(</span><em>bb1</em>, <em>bb2</em>, <em>topology</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule.testing_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.testing_init" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">testing_init</code><span class="sig-paren">(</span><em>bb1</em>, <em>bb2</em>, <em>topology</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.testing_init" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.MacroMolecule.update_cache">
-<code class="descname">update_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule.update_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.update_cache" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.update_cache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update attributes of cached molecule.</p>
 <p>When an instance of <a class="reference internal" href="#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> is first created it
 is cached. Using <code class="docutils literal"><span class="pre">multiprocessing</span></code> to perform optimizations
@@ -657,7 +663,7 @@ method must be run on the copies.</p>
 
 <dl class="class">
 <dt id="stk.molecular.molecules.Molecule">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>The most basic class representing molecules.</p>
 <p>This class defines the operations which any class
@@ -733,7 +739,7 @@ be useful for labelling and debugging.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule._cavity_size">
-<code class="descname">_cavity_size</code><span class="sig-paren">(</span><em>origin</em>, <em>conformer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule._cavity_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule._cavity_size" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_cavity_size</code><span class="sig-paren">(</span><em>origin</em>, <em>conformer</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule._cavity_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates diameter of the molecule from <cite>origin</cite>.</p>
 <p>The cavity is measured by finding the atom nearest to
 <cite>origin</cite>, correcting for van der Waals diameter and multiplying
@@ -764,7 +770,7 @@ the cavity is measured.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule._write_mdl_mol_file">
-<code class="descname">_write_mdl_mol_file</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule._write_mdl_mol_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule._write_mdl_mol_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_write_mdl_mol_file</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule._write_mdl_mol_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a V3000 <code class="docutils literal"><span class="pre">.mol</span></code> file of the molecule</p>
 <p>This function should not be used directly, only via
 <a class="reference internal" href="#stk.molecular.molecules.Molecule.write" title="stk.molecular.molecules.Molecule.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a>.</p>
@@ -790,7 +796,7 @@ the cavity is measured.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule._write_pdb_file">
-<code class="descname">_write_pdb_file</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule._write_pdb_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule._write_pdb_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_write_pdb_file</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule._write_pdb_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a <code class="docutils literal"><span class="pre">.pdb</span></code> file of the molecule</p>
 <p>This function should not be used directly, only via
 <a class="reference internal" href="#stk.molecular.molecules.Molecule.write" title="stk.molecular.molecules.Molecule.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a>.</p>
@@ -816,7 +822,7 @@ the cavity is measured.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.all_atom_coords">
-<code class="descname">all_atom_coords</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.all_atom_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.all_atom_coords" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_atom_coords</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.all_atom_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields the coordinates of atoms in <a class="reference internal" href="#stk.molecular.molecules.Molecule.mol" title="stk.molecular.molecules.Molecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -839,7 +845,7 @@ element is an array holding the coordinates of the atom.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.atom_coords">
-<code class="descname">atom_coords</code><span class="sig-paren">(</span><em>atom_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.atom_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.atom_coords" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atom_coords</code><span class="sig-paren">(</span><em>atom_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.atom_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return coordinates of an atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -863,7 +869,7 @@ element is an array holding the coordinates of the atom.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.atom_distance">
-<code class="descname">atom_distance</code><span class="sig-paren">(</span><em>atom1_id</em>, <em>atom2_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.atom_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.atom_distance" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atom_distance</code><span class="sig-paren">(</span><em>atom1_id</em>, <em>atom2_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.atom_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distance between 2 atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -888,7 +894,7 @@ element is an array holding the coordinates of the atom.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.atom_symbol">
-<code class="descname">atom_symbol</code><span class="sig-paren">(</span><em>atom_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.atom_symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.atom_symbol" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atom_symbol</code><span class="sig-paren">(</span><em>atom_id</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.atom_symbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the symbol of the atom with id <cite>atom_id</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -906,7 +912,7 @@ element is an array holding the coordinates of the atom.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.bonder_centroid">
-<code class="descname">bonder_centroid</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.bonder_centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_centroid</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.bonder_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the centroid of the bonder atoms.</p>
 <p>The calculation has two stages. First, the centroids of
 bonder atoms within the same functional groups are found.
@@ -928,7 +934,7 @@ calculated and returned.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.bonder_centroids">
-<code class="descname">bonder_centroids</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.bonder_centroids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.bonder_centroids" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_centroids</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.bonder_centroids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the centriod of bonder atoms in each fg.</p>
 <p>The centroids are yielded in order, with the centroid of
 the functional group with <code class="docutils literal"><span class="pre">fg_id</span></code> of <code class="docutils literal"><span class="pre">0</span></code> first.</p>
@@ -946,7 +952,7 @@ the functional group with <code class="docutils literal"><span class="pre">fg_id
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.cavity_size">
-<code class="descname">cavity_size</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.cavity_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.cavity_size" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cavity_size</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.cavity_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the diameter of the molecule’s cavity.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -964,7 +970,7 @@ the functional group with <code class="docutils literal"><span class="pre">fg_id
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.center_of_mass">
-<code class="descname">center_of_mass</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.center_of_mass" title="Permalink to this definition">¶</a></dt>
+<code class="descname">center_of_mass</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.center_of_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the centre of mass of the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -984,7 +990,7 @@ the functional group with <code class="docutils literal"><span class="pre">fg_id
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.centroid">
-<code class="descname">centroid</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descname">centroid</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the centroid of the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1002,7 +1008,7 @@ the functional group with <code class="docutils literal"><span class="pre">fg_id
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.dihedral_strain">
-<code class="descname">dihedral_strain</code><span class="sig-paren">(</span><em>dihedral_SMARTS=''</em>, <em>target=180</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.dihedral_strain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.dihedral_strain" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dihedral_strain</code><span class="sig-paren">(</span><em>dihedral_SMARTS=''</em>, <em>target=180</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.dihedral_strain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the difference between the average dihedral and target.</p>
 <p>The differences is a returned as a percent.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1029,7 +1035,7 @@ molecule and the target value.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.dump">
-<code class="descname">dump</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.dump" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dump</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a JSON <code class="xref py py-class docutils literal"><span class="pre">dict</span></code> of the molecule to a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1048,7 +1054,7 @@ written.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.fg_centroid">
-<code class="descname">fg_centroid</code><span class="sig-paren">(</span><em>fg_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.fg_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.fg_centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fg_centroid</code><span class="sig-paren">(</span><em>fg_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.fg_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>The centroid of bonder atoms in a functional group.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1075,7 +1081,7 @@ written.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.fg_distance">
-<code class="descname">fg_distance</code><span class="sig-paren">(</span><em>fg1</em>, <em>fg2</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.fg_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.fg_distance" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fg_distance</code><span class="sig-paren">(</span><em>fg1</em>, <em>fg2</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.fg_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>The distance between the bonder centroids of two fgs.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1100,7 +1106,7 @@ written.</td>
 
 <dl class="classmethod">
 <dt id="stk.molecular.molecules.Molecule.from_dict">
-<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>json_dict</em>, <em>optimized=True</em>, <em>load_names=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.from_dict" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>json_dict</em>, <em>optimized=True</em>, <em>load_names=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.from_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> from a JSON <code class="xref py py-class docutils literal"><span class="pre">dict</span></code>.</p>
 <p>The <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> returned has the class specified in
 <cite>json_dict</cite>, not <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>.</p>
@@ -1129,7 +1135,7 @@ is loaded.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.graph">
-<code class="descname">graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.graph" title="Permalink to this definition">¶</a></dt>
+<code class="descname">graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.graph" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a mathematical graph representing the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1162,7 +1168,7 @@ edges are the bonds.</td>
 
 <dl class="classmethod">
 <dt id="stk.molecular.molecules.Molecule.load">
-<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>path</em>, <em>optimized=True</em>, <em>load_names=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.load" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>path</em>, <em>optimized=True</em>, <em>load_names=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> from a JSON file.</p>
 <p>The returned <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> has the class specified in the
 JSON file, not <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>.</p>
@@ -1190,7 +1196,7 @@ is loaded.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.max_diameter">
-<code class="descname">max_diameter</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.max_diameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.max_diameter" title="Permalink to this definition">¶</a></dt>
+<code class="descname">max_diameter</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.max_diameter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the largest distance between 2 atoms in the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1214,7 +1220,7 @@ of the involved atoms.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.mdl_mol_block">
-<code class="descname">mdl_mol_block</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.mdl_mol_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.mdl_mol_block" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mdl_mol_block</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.mdl_mol_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a V3000 mol block of the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1232,7 +1238,7 @@ of the involved atoms.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.position_matrix">
-<code class="descname">position_matrix</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.position_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.position_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">position_matrix</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.position_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the position of all atoms as a matrix.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1252,7 +1258,7 @@ corresponds to the id of the atom in the molecule.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.retag_atoms">
-<code class="descname">retag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.retag_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.retag_atoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">retag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.retag_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds atom properties to atoms, using <a class="reference internal" href="#stk.molecular.molecules.Molecule.atom_props" title="stk.molecular.molecules.Molecule.atom_props"><code class="xref py py-attr docutils literal"><span class="pre">atom_props</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1268,7 +1274,7 @@ corresponds to the id of the atom in the molecule.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.rotate">
-<code class="descname">rotate</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.rotate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rotate</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.rotate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule by <cite>theta</cite> about <cite>axis</cite>.</p>
 <p>The rotation occurs about the molecular centroid.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1294,7 +1300,7 @@ corresponds to the id of the atom in the molecule.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.same">
-<code class="descname">same</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.same"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.same" title="Permalink to this definition">¶</a></dt>
+<code class="descname">same</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.same" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if <cite>other</cite> has the same molecular structure.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1313,7 +1319,7 @@ the same structure.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.save_atom_props">
-<code class="descname">save_atom_props</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.save_atom_props"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.save_atom_props" title="Permalink to this definition">¶</a></dt>
+<code class="descname">save_atom_props</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.save_atom_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates <a class="reference internal" href="#stk.molecular.molecules.Molecule.atom_props" title="stk.molecular.molecules.Molecule.atom_props"><code class="xref py py-attr docutils literal"><span class="pre">atom_props</span></code></a> and <a class="reference internal" href="#stk.molecular.molecules.Molecule.bonder_ids" title="stk.molecular.molecules.Molecule.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1329,7 +1335,7 @@ the same structure.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.set_orientation">
-<code class="descname">set_orientation</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.set_orientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.set_orientation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_orientation</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.set_orientation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule by a rotation from <cite>start</cite> to <cite>end</cite>.</p>
 <p>Given two direction vectors, <cite>start</cite> and <cite>end</cite>, this method
 applies the rotation required transform <cite>start</cite> to <cite>end</cite> on
@@ -1374,7 +1380,7 @@ the <cite>end</cite> vector.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.set_position">
-<code class="descname">set_position</code><span class="sig-paren">(</span><em>position</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.set_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.set_position" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_position</code><span class="sig-paren">(</span><em>position</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.set_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the centroid of the molecule to <cite>position</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1401,7 +1407,7 @@ molecule should be placed.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.set_position_from_matrix">
-<code class="descname">set_position_from_matrix</code><span class="sig-paren">(</span><em>pos_mat</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.set_position_from_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.set_position_from_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_position_from_matrix</code><span class="sig-paren">(</span><em>pos_mat</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.set_position_from_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set atomic positions of the molecule to those in <cite>pos_mat</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1432,7 +1438,7 @@ and so on.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.shift">
-<code class="descname">shift</code><span class="sig-paren">(</span><em>shift</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.shift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.shift" title="Permalink to this definition">¶</a></dt>
+<code class="descname">shift</code><span class="sig-paren">(</span><em>shift</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.shift" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shifts the coordinates of all atoms.</p>
 <p>This does not modify the molecule. A modified copy is returned.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1459,7 +1465,7 @@ shifted by <cite>shift</cite>.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.update_from_mae">
-<code class="descname">update_from_mae</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.update_from_mae"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.update_from_mae" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_from_mae</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.update_from_mae" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates molecular structure to match an <code class="docutils literal"><span class="pre">.mae</span></code> file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1484,7 +1490,7 @@ should be updated.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.update_from_mol">
-<code class="descname">update_from_mol</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.update_from_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.update_from_mol" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_from_mol</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.update_from_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates molecular structure to match an <code class="docutils literal"><span class="pre">.mol</span></code> file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1509,7 +1515,7 @@ should be updated.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.update_stereochemistry">
-<code class="descname">update_stereochemistry</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.update_stereochemistry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.update_stereochemistry" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_stereochemistry</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.update_stereochemistry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates stereochemistry tags in <a class="reference internal" href="#stk.molecular.molecules.Molecule.mol" title="stk.molecular.molecules.Molecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">Molecule.mol</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1527,7 +1533,7 @@ should be updated.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Molecule.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule.write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a molecular structure file of the molecule.</p>
 <p>This bypasses the need to the writining functions in <code class="docutils literal"><span class="pre">rdkit</span></code>.
 These have issues with macromolecules due to poor ring finding
@@ -1556,7 +1562,7 @@ and sanitization issues.</p>
 
 <dl class="class">
 <dt id="stk.molecular.molecules.Periodic">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Periodic</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Periodic</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Periodic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.molecules.MacroMolecule</span></code></a></p>
 <p>Used to represent periodic structures.</p>
 <p>This class is essentially the same as <a class="reference internal" href="#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>,
@@ -1605,7 +1611,7 @@ be added during the build process by the periodic topology.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Periodic._join_island">
-<code class="descname">_join_island</code><span class="sig-paren">(</span><em>cells</em>, <em>island</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic._join_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic._join_island" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_join_island</code><span class="sig-paren">(</span><em>cells</em>, <em>island</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Periodic._join_island" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds bonds between unit cells of <cite>island</cite>.</p>
 <p class="rubric">Notes</p>
 <p>For internal use by <a class="reference internal" href="#stk.molecular.molecules.Periodic.island" title="stk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
@@ -1633,7 +1639,7 @@ them.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Periodic._place_island">
-<code class="descname">_place_island</code><span class="sig-paren">(</span><em>dimensions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic._place_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic._place_island" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_place_island</code><span class="sig-paren">(</span><em>dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Periodic._place_island" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places unit cells side by side to form an island.</p>
 <p class="rubric">Notes</p>
 <p>For internal use by <a class="reference internal" href="#stk.molecular.molecules.Periodic.island" title="stk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
@@ -1675,7 +1681,7 @@ equivalent fg in the original unit cell.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Periodic.island">
-<code class="descname">island</code><span class="sig-paren">(</span><em>dimensions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic.island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic.island" title="Permalink to this definition">¶</a></dt>
+<code class="descname">island</code><span class="sig-paren">(</span><em>dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Periodic.island" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build a terminated supercell.</p>
 <p>Terminated means that the periodic bonds are replaced with
 bonds to terminating atoms.</p>
@@ -1696,7 +1702,7 @@ in the x, y and z directions used to make the supercell.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Periodic.periodic_mol">
-<code class="descname">periodic_mol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic.periodic_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic.periodic_mol" title="Permalink to this definition">¶</a></dt>
+<code class="descname">periodic_mol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Periodic.periodic_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a molecule by reacting periodic functional groups.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1718,7 +1724,7 @@ created as a result of the reactions.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.Periodic.write_gulp_input">
-<code class="descname">write_gulp_input</code><span class="sig-paren">(</span><em>path, keywords, cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic.write_gulp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic.write_gulp_input" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_gulp_input</code><span class="sig-paren">(</span><em>path, keywords, cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Periodic.write_gulp_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a GULP input file of the unit cell.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1751,7 +1757,7 @@ atom.</li>
 
 <dl class="class">
 <dt id="stk.molecular.molecules.Polymer">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Polymer</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Polymer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Polymer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">Polymer</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Polymer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.molecules.MacroMolecule</span></code></a></p>
 <p>Used to represent polymers.</p>
 <dl class="attribute">
@@ -1763,7 +1769,7 @@ atom.</li>
 
 <dl class="class">
 <dt id="stk.molecular.molecules.StructUnit">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">StructUnit</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">StructUnit</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.molecules.Molecule</span></code></a></p>
 <p>Represents the building blocks of macromolecules.</p>
 <p>The goal of this class is to conveniently store information about,
@@ -1797,7 +1803,7 @@ assembles to form macromolecules.</p>
 
 <dl class="classmethod">
 <dt id="stk.molecular.molecules.StructUnit._json_init">
-<em class="property">classmethod </em><code class="descname">_json_init</code><span class="sig-paren">(</span><em>json_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit._json_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit._json_init" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">_json_init</code><span class="sig-paren">(</span><em>json_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit._json_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Completes a JSON initialization.</p>
 <p>This function is not to be used. Use <a class="reference internal" href="#stk.molecular.molecules.Molecule.load" title="stk.molecular.molecules.Molecule.load"><code class="xref py py-meth docutils literal"><span class="pre">Molecule.load()</span></code></a>
 for loading instances from a JSON string. That function will
@@ -1818,7 +1824,7 @@ automatically call this one.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit._set_orientation2">
-<code class="descname">_set_orientation2</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>conformer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit._set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit._set_orientation2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_set_orientation2</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>conformer</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit._set_orientation2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule by a rotation from <cite>start</cite> to <cite>end</cite>.</p>
 <p>Given two direction vectors, <cite>start</cite> and <cite>end</cite>, this method
 applies the rotation required transform <cite>start</cite> to <cite>end</cite> on
@@ -1863,7 +1869,7 @@ the <cite>end</cite> vector.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit._tag">
-<code class="descname">_tag</code><span class="sig-paren">(</span><em>mol</em>, <em>smarts</em>, <em>tag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit._tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit._tag" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_tag</code><span class="sig-paren">(</span><em>mol</em>, <em>smarts</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit._tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds an IntProp to atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1889,7 +1895,7 @@ the <cite>end</cite> vector.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit._valid_tags">
-<code class="descname">_valid_tags</code><span class="sig-paren">(</span><em>match_atoms</em>, <em>fgs</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit._valid_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit._valid_tags" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_valid_tags</code><span class="sig-paren">(</span><em>match_atoms</em>, <em>fgs</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit._valid_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensures that only <cite>n</cite> atoms per functional group are tagged.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1916,7 +1922,7 @@ to be tagged.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.all_bonder_distances">
-<code class="descname">all_bonder_distances</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.all_bonder_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.all_bonder_distances" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_bonder_distances</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.all_bonder_distances" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield distances between all pairs of bonder centroids.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1935,7 +1941,7 @@ between them.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.bonder_direction_vectors">
-<code class="descname">bonder_direction_vectors</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.bonder_direction_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.bonder_direction_vectors" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_direction_vectors</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.bonder_direction_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields the direction vectors between bonder atoms.</p>
 <p>First the centroids of bonder atoms within the same functional
 group are found. Then direction vectors between all pairs of
@@ -1964,7 +1970,7 @@ between the functional group positions.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.bonder_position_matrix">
-<code class="descname">bonder_position_matrix</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.bonder_position_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.bonder_position_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_position_matrix</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.bonder_position_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a matrix holding the positions of bonder centroids.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1990,7 +1996,7 @@ centroid.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.centroid_centroid_dir_vector">
-<code class="descname">centroid_centroid_dir_vector</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.centroid_centroid_dir_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.centroid_centroid_dir_vector" title="Permalink to this definition">¶</a></dt>
+<code class="descname">centroid_centroid_dir_vector</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.centroid_centroid_dir_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the direction vector between the 2 molecular centroids.</p>
 <p>The first molecular centroid is the centroid of the entire
 molecule. The second molecular centroid is given by
@@ -2012,7 +2018,7 @@ of the bonder atoms to the molecular centroid.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.core">
-<code class="descname">core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.core" title="Permalink to this definition">¶</a></dt>
+<code class="descname">core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.core" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the molecule with no H or functional group atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2028,7 +2034,7 @@ of the bonder atoms to the molecular centroid.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.functional_group_atoms">
-<code class="descname">functional_group_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.functional_group_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.functional_group_atoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">functional_group_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.functional_group_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a container of atom ids of atoms in functional groups.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2051,7 +2057,7 @@ and <code class="docutils literal"><span class="pre">6</span></code> and so on.<
 
 <dl class="staticmethod">
 <dt id="stk.molecular.molecules.StructUnit.gen_key">
-<em class="property">static </em><code class="descname">gen_key</code><span class="sig-paren">(</span><em>rdkit_mol</em>, <em>functional_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.gen_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.gen_key" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">gen_key</code><span class="sig-paren">(</span><em>rdkit_mol</em>, <em>functional_group</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.gen_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates the key used when caching the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2080,12 +2086,12 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt>
-<code class="descname">init_funcs</code><em class="property"> = {'.mae': &lt;function mol_from_mae_file at 0x7f3b3f2f6840&gt;, '.mol': functools.partial(&lt;Boost.Python.function object at 0x5594cb299ff0&gt;, sanitize=False, removeHs=False), '.mol2': functools.partial(&lt;Boost.Python.function object at 0x5594cb2e12e0&gt;, sanitize=False, removeHs=False), '.pdb': functools.partial(&lt;Boost.Python.function object at 0x5594cb576120&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object at 0x5594cb299ff0&gt;, sanitize=False, removeHs=False)}</em></dt>
+<code class="descname">init_funcs</code><em class="property"> = {'.mol': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.mol2': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.mae': &lt;function mol_from_mae_file&gt;, '.pdb': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False)}</em></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="stk.molecular.molecules.StructUnit.init_random">
-<em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>db</em>, <em>fg=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.init_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.init_random" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>db</em>, <em>fg=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.init_random" title="Permalink to this definition">¶</a></dt>
 <dd><p>Picks a random file from <cite>db</cite> to initialize from.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2114,7 +2120,7 @@ path of the files.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.is_core_atom">
-<code class="descname">is_core_atom</code><span class="sig-paren">(</span><em>atomid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.is_core_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.is_core_atom" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_core_atom</code><span class="sig-paren">(</span><em>atomid</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.is_core_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns <code class="docutils literal"><span class="pre">True</span></code> if atom is not H or part of a fg.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2133,7 +2139,7 @@ core.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.json">
-<code class="descname">json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.json" title="Permalink to this definition">¶</a></dt>
+<code class="descname">json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a JSON representation of the molecule.</p>
 <p>The representation has the following form:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -2159,7 +2165,7 @@ core.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.minimize_theta">
-<code class="descname">minimize_theta</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>axis</em>, <em>centroid</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.minimize_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.minimize_theta" title="Permalink to this definition">¶</a></dt>
+<code class="descname">minimize_theta</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>axis</em>, <em>centroid</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.minimize_theta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule to minimize angle between <cite>v1</cite> and <cite>v2</cite>.</p>
 <p>The rotation is done about the vector <cite>axis</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2187,7 +2193,7 @@ core.</td>
 
 <dl class="classmethod">
 <dt id="stk.molecular.molecules.StructUnit.rdkit_init">
-<em class="property">classmethod </em><code class="descname">rdkit_init</code><span class="sig-paren">(</span><em>mol</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.rdkit_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.rdkit_init" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">rdkit_init</code><span class="sig-paren">(</span><em>mol</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.rdkit_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses an <code class="docutils literal"><span class="pre">rdkit</span></code> molecule for initialization.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2205,7 +2211,7 @@ core.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.rotate2">
-<code class="descname">rotate2</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.rotate2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.rotate2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rotate2</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.rotate2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule by <cite>theta</cite> about <cite>axis</cite>.</p>
 <p>The rotation occurs about the centroid of the bonder atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2231,7 +2237,7 @@ core.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.set_bonder_centroid">
-<code class="descname">set_bonder_centroid</code><span class="sig-paren">(</span><em>position</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.set_bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.set_bonder_centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_bonder_centroid</code><span class="sig-paren">(</span><em>position</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.set_bonder_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move the molecule so that the bonder centroid is on <cite>position</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2257,7 +2263,7 @@ instance as in <a class="reference internal" href="#stk.molecular.molecules.Mole
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.similar_molecules">
-<code class="descname">similar_molecules</code><span class="sig-paren">(</span><em>mols</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.similar_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.similar_molecules" title="Permalink to this definition">¶</a></dt>
+<code class="descname">similar_molecules</code><span class="sig-paren">(</span><em>mols</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.similar_molecules" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns molecules from <cite>mols</cite> ordered by similarity.</p>
 <p>The most similar molecule is at index 0.</p>
 <p>This method uses the Morgan fingerprints of radius 4 to
@@ -2284,7 +2290,7 @@ molecule in <cite>mols</cite> while the <code class="docutils literal"><span cla
 
 <dl class="classmethod">
 <dt id="stk.molecular.molecules.StructUnit.smiles_init">
-<em class="property">classmethod </em><code class="descname">smiles_init</code><span class="sig-paren">(</span><em>smiles</em>, <em>functional_group=None</em>, <em>note=''</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.smiles_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.smiles_init" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">smiles_init</code><span class="sig-paren">(</span><em>smiles</em>, <em>functional_group=None</em>, <em>note=''</em>, <em>name=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.smiles_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize from a SMILES string.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2313,7 +2319,7 @@ easy identification.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.tag_atoms">
-<code class="descname">tag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.tag_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.tag_atoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">tag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.tag_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds atom properties to atoms.</p>
 <p>All atoms which form the functional group of the molecule have
 the property <code class="docutils literal"><span class="pre">'fg'</span></code> added. Its value is set to the name of
@@ -2338,7 +2344,7 @@ set to a unique id number.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit.untag_atoms">
-<code class="descname">untag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit.untag_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit.untag_atoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">untag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit.untag_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes the tags added by <a class="reference internal" href="#stk.molecular.molecules.StructUnit.tag_atoms" title="stk.molecular.molecules.StructUnit.tag_atoms"><code class="xref py py-meth docutils literal"><span class="pre">tag_atoms()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2356,7 +2362,7 @@ set to a unique id number.</p>
 
 <dl class="class">
 <dt id="stk.molecular.molecules.StructUnit2">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">StructUnit2</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit2" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">StructUnit2</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.molecules.StructUnit</span></code></a></p>
 <p>Represents building blocks with 2 functional groups.</p>
 <dl class="attribute">
@@ -2366,7 +2372,7 @@ set to a unique id number.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit2.minimize_theta2">
-<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>vector</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit2.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit2.minimize_theta2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>vector</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit2.minimize_theta2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates molecule about <cite>axis</cite> to minimze theta with <cite>vector</cite>.</p>
 <p>The molecule is rotated about <cite>axis</cite> passing through the bonder
 centroid. It is rotated so that the vector between the bonder
@@ -2394,7 +2400,7 @@ and molecular centroids lies on the same plane as <cite>vector</cite>.</p>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit2.set_orientation2">
-<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit2.set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit2.set_orientation2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit2.set_orientation2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotate the molecule so that bonder atoms lie on <cite>end</cite>.</p>
 <p>The molecule is rotated about the centroid of the bonder atoms.
 It is rotated so that the direction vector running between the
@@ -2424,12 +2430,12 @@ aligned.</li>
 
 <dl class="class">
 <dt id="stk.molecular.molecules.StructUnit3">
-<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">StructUnit3</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit3" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.</code><code class="descname">StructUnit3</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.molecules.StructUnit</span></code></a></p>
 <p>Represents building blocks with 3 functional groups.</p>
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit3.bonder_plane">
-<code class="descname">bonder_plane</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit3.bonder_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit3.bonder_plane" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_plane</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit3.bonder_plane" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns coeffs of the plane formed by the bonder centroids.</p>
 <p>A plane is defined by the scalar plane equation:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">+</span> <span class="n">by</span> <span class="o">+</span> <span class="n">cz</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span>
@@ -2464,7 +2470,7 @@ centroids.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit3.bonder_plane_normal">
-<code class="descname">bonder_plane_normal</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit3.bonder_plane_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit3.bonder_plane_normal" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_plane_normal</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit3.bonder_plane_normal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the normal to the plane formed by bonder centroids.</p>
 <p>The normal of the plane is defined such that it goes in the
 direction toward the centroid of the molecule.</p>
@@ -2490,7 +2496,7 @@ the bonder centroids.</td>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit3.minimize_theta2">
-<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>fg_id</em>, <em>vector</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit3.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit3.minimize_theta2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>fg_id</em>, <em>vector</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit3.minimize_theta2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotate molecule to minimize angle between <cite>fg_id</cite> and <cite>vector</cite>.</p>
 <p>The rotation is done about <cite>axis</cite> and is centered on the
 bonder centroid, as given by
@@ -2520,7 +2526,7 @@ minimized.</li>
 
 <dl class="method">
 <dt id="stk.molecular.molecules.StructUnit3.set_orientation2">
-<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit3.set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit3.set_orientation2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.StructUnit3.set_orientation2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule so the plane normal is aligned with <cite>end</cite>.</p>
 <p>Here “plane normal” referes to the normal of the plane formed
 by the bonder centroids. The molecule is rotated about
@@ -2554,7 +2560,9 @@ centroids shoould be aligned.</li>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -2567,7 +2575,7 @@ centroids shoould be aligned.</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -2586,7 +2594,6 @@ centroids shoould be aligned.</li>
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
             VERSION:'',
-            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -2604,11 +2611,14 @@ centroids shoould be aligned.</li>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

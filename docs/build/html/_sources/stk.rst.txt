@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+    stk.ga
     stk.molecular
     stk.optimization
     stk.utilities

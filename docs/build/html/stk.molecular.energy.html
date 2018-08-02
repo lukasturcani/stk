@@ -312,7 +312,7 @@ but information about how they work is provided in the docstring of
 </ol>
 <dl class="class">
 <dt id="stk.molecular.energy.EMeta">
-<em class="property">class </em><code class="descclassname">stk.molecular.energy.</code><code class="descname">EMeta</code><a class="reference internal" href="_modules/stk/molecular/energy.html#EMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.EMeta" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.energy.</code><code class="descname">EMeta</code><a class="headerlink" href="#stk.molecular.energy.EMeta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
 <p>A metaclass for <a class="reference internal" href="#stk.molecular.energy.Energy" title="stk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>.</p>
 <p>In conjuction with the <a class="reference internal" href="#stk.molecular.energy.EMethod" title="stk.molecular.energy.EMethod"><code class="xref py py-class docutils literal"><span class="pre">EMethod</span></code></a> descriptor and the
@@ -329,7 +329,7 @@ update <a class="reference internal" href="#stk.molecular.energy.Energy.values" 
 
 <dl class="class">
 <dt id="stk.molecular.energy.EMethod">
-<em class="property">class </em><code class="descclassname">stk.molecular.energy.</code><code class="descname">EMethod</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#EMethod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.EMethod" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.energy.</code><code class="descname">EMethod</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.EMethod" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A descriptor for methods of <a class="reference internal" href="#stk.molecular.energy.Energy" title="stk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>.</p>
 <dl class="attribute">
@@ -342,7 +342,7 @@ update <a class="reference internal" href="#stk.molecular.energy.Energy.values" 
 
 <dl class="class">
 <dt id="stk.molecular.energy.Energy">
-<em class="property">class </em><code class="descclassname">stk.molecular.energy.</code><code class="descname">Energy</code><span class="sig-paren">(</span><em>molecule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#Energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.Energy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.energy.</code><code class="descname">Energy</code><span class="sig-paren">(</span><em>molecule</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.Energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Handles all things related to a molecule’s energy.</p>
 <p>An instance of this class will be placed in
@@ -367,7 +367,7 @@ were used, while the key holds the result of the calculation.</p>
 
 <dl class="method">
 <dt id="stk.molecular.energy.Energy.formation">
-<code class="descname">formation</code><span class="sig-paren">(</span><em>func</em>, <em>products</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#Energy.formation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.Energy.formation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">formation</code><span class="sig-paren">(</span><em>func</em>, <em>products</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.Energy.formation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the formation energy.</p>
 <p>The formation energy is calculated under the assumption that
 the molecule in <a class="reference internal" href="#stk.molecular.energy.Energy.molecule" title="stk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a> is composed of the molecules
@@ -427,7 +427,7 @@ value has not already been found.</li>
 
 <dl class="method">
 <dt id="stk.molecular.energy.Energy.macromodel">
-<code class="descname">macromodel</code><span class="sig-paren">(</span><em>forcefield</em>, <em>macromodel_path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#Energy.macromodel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.Energy.macromodel" title="Permalink to this definition">¶</a></dt>
+<code class="descname">macromodel</code><span class="sig-paren">(</span><em>forcefield</em>, <em>macromodel_path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.Energy.macromodel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the energy using macromodel.</p>
 <p>Note that this requires macromodel to be installed and have a
 valid license.</p>
@@ -462,7 +462,7 @@ forcefield error.</p>
 
 <dl class="method">
 <dt id="stk.molecular.energy.Energy.mopac">
-<code class="descname">mopac</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#Energy.mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.Energy.mopac" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mopac</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.Energy.mopac" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the energy using MOPAC.</p>
 <p>Note that this requires MOPAC to be installed and have a
 valid license.</p>
@@ -525,7 +525,7 @@ run before being terminated. The default value is
 
 <dl class="method">
 <dt id="stk.molecular.energy.Energy.mopac_dipole">
-<code class="descname">mopac_dipole</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#Energy.mopac_dipole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.Energy.mopac_dipole" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mopac_dipole</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.Energy.mopac_dipole" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the dipole moment using MOPAC.</p>
 <p>Note that this requires MOPAC to be installed and have a
 valid license.</p>
@@ -588,7 +588,7 @@ run before being terminated. The default value is
 
 <dl class="method">
 <dt id="stk.molecular.energy.Energy.mopac_ea">
-<code class="descname">mopac_ea</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#Energy.mopac_ea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.Energy.mopac_ea" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mopac_ea</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.Energy.mopac_ea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the electron affinity using MOPAC.</p>
 <p>Note that this requires MOPAC to be installed and have a
 valid license.</p>
@@ -651,7 +651,7 @@ run before being terminated. The default value is
 
 <dl class="method">
 <dt id="stk.molecular.energy.Energy.mopac_ip">
-<code class="descname">mopac_ip</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#Energy.mopac_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.Energy.mopac_ip" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mopac_ip</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.Energy.mopac_ip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the ionization potential using MOPAC.</p>
 <p>Note that this requires MOPAC to be installed and have a
 valid license.</p>
@@ -714,7 +714,7 @@ run before being terminated. The default value is
 
 <dl class="method">
 <dt id="stk.molecular.energy.Energy.pseudoformation">
-<code class="descname">pseudoformation</code><span class="sig-paren">(</span><em>func</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#Energy.pseudoformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.Energy.pseudoformation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pseudoformation</code><span class="sig-paren">(</span><em>func</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.Energy.pseudoformation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the formation energy, sans other products.</p>
 <p>This is the formation energy if the energy of the other
 products of the reaction is not taken into account.</p>
@@ -763,7 +763,7 @@ value has not already been found.</li>
 
 <dl class="method">
 <dt id="stk.molecular.energy.Energy.rdkit">
-<code class="descname">rdkit</code><span class="sig-paren">(</span><em>forcefield</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#Energy.rdkit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.Energy.rdkit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rdkit</code><span class="sig-paren">(</span><em>forcefield</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.Energy.rdkit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses <code class="docutils literal"><span class="pre">rdkit</span></code> to calculate the energy.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -789,14 +789,14 @@ value has not already been found.</li>
 
 <dl class="exception">
 <dt id="stk.molecular.energy.EnergyError">
-<em class="property">exception </em><code class="descclassname">stk.molecular.energy.</code><code class="descname">EnergyError</code><a class="reference internal" href="_modules/stk/molecular/energy.html#EnergyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.EnergyError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">stk.molecular.energy.</code><code class="descname">EnergyError</code><a class="headerlink" href="#stk.molecular.energy.EnergyError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 <p>A class for errors in <a class="reference internal" href="#stk.molecular.energy.Energy" title="stk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> methods.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="stk.molecular.energy._create_mop">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">_create_mop</code><span class="sig-paren">(</span><em>file_root</em>, <em>molecule</em>, <em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#_create_mop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy._create_mop" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">_create_mop</code><span class="sig-paren">(</span><em>file_root</em>, <em>molecule</em>, <em>settings</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy._create_mop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the <code class="docutils literal"><span class="pre">.mop</span></code> file holding the molecule to be optimized.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -823,17 +823,17 @@ details are defined.</li>
 
 <dl class="function">
 <dt id="stk.molecular.energy._extract_MOPAC_dipole">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">_extract_MOPAC_dipole</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#_extract_MOPAC_dipole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy._extract_MOPAC_dipole" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">_extract_MOPAC_dipole</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy._extract_MOPAC_dipole" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="stk.molecular.energy._extract_MOPAC_en">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">_extract_MOPAC_en</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#_extract_MOPAC_en"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy._extract_MOPAC_en" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">_extract_MOPAC_en</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy._extract_MOPAC_en" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="stk.molecular.energy._kill_mopac">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#_kill_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy._kill_mopac" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy._kill_mopac" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stops an in-progress MOPAC run.</p>
 <p>To kill a MOPAC run, a file with the molecule’s name and a <code class="docutils literal"><span class="pre">.end</span></code>
 extension is written.</p>
@@ -853,7 +853,7 @@ extension is written.</p>
 
 <dl class="function">
 <dt id="stk.molecular.energy._mop_line">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">_mop_line</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#_mop_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy._mop_line" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">_mop_line</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy._mop_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Formats <cite>settings</cite> into a MOPAC input string.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -873,12 +873,12 @@ for the input file.</td>
 
 <dl class="function">
 <dt id="stk.molecular.energy._run_mopac">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">_run_mopac</code><span class="sig-paren">(</span><em>file_root</em>, <em>mopac_path</em>, <em>timeout=3600</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#_run_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy._run_mopac" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">_run_mopac</code><span class="sig-paren">(</span><em>file_root</em>, <em>mopac_path</em>, <em>timeout=3600</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy._run_mopac" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="stk.molecular.energy.e_logger">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">e_logger</code><span class="sig-paren">(</span><em>func</em>, <em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#e_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.e_logger" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">e_logger</code><span class="sig-paren">(</span><em>func</em>, <em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.e_logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Turns <cite>func</cite> into a version which updates :attr`Energy.values`.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -904,7 +904,7 @@ called the results update <a class="reference internal" href="#stk.molecular.ene
 
 <dl class="function">
 <dt id="stk.molecular.energy.exclude">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">exclude</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.exclude" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">exclude</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.exclude" title="Permalink to this definition">¶</a></dt>
 <dd><p>A decorator to add the :attr`exclude` attribute to methods.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -925,7 +925,7 @@ are not part of the key.</td>
 
 <dl class="function">
 <dt id="stk.molecular.energy.formation_key">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">formation_key</code><span class="sig-paren">(</span><em>fargs</em>, <em>fkwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#formation_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.formation_key" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">formation_key</code><span class="sig-paren">(</span><em>fargs</em>, <em>fkwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.formation_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates the key of <a class="reference internal" href="#stk.molecular.energy.Energy.formation" title="stk.molecular.energy.Energy.formation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.formation()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -952,7 +952,7 @@ called.</li>
 
 <dl class="function">
 <dt id="stk.molecular.energy.func_key">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">func_key</code><span class="sig-paren">(</span><em>func</em>, <em>fargs=None</em>, <em>fkwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#func_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.func_key" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">func_key</code><span class="sig-paren">(</span><em>func</em>, <em>fargs=None</em>, <em>fkwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.func_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the key used in <a class="reference internal" href="#stk.molecular.energy.Energy.values" title="stk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">Energy.values</span></code></a> for <cite>func</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -980,7 +980,7 @@ arguments <cite>fkwargs</cite>.</p>
 
 <dl class="function">
 <dt id="stk.molecular.energy.pseudoformation_key">
-<code class="descclassname">stk.molecular.energy.</code><code class="descname">pseudoformation_key</code><span class="sig-paren">(</span><em>fargs</em>, <em>fkwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/energy.html#pseudoformation_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.energy.pseudoformation_key" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.molecular.energy.</code><code class="descname">pseudoformation_key</code><span class="sig-paren">(</span><em>fargs</em>, <em>fkwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.energy.pseudoformation_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates key of the <a class="reference internal" href="#stk.molecular.energy.Energy.pseudoformation" title="stk.molecular.energy.Energy.pseudoformation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.pseudoformation()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

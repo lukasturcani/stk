@@ -32,7 +32,6 @@ sys.path.insert(0, os.path.abspath('../..'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.imgmath',
-    'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon']
 
@@ -172,6 +171,3 @@ texinfo_documents = [
      author, 'stk', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-

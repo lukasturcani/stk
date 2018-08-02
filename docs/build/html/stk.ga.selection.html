@@ -1,0 +1,641 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.ga.selection module &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">stk.ga.selection module</a><ul>
+<li><a class="reference internal" href="#extending-stk-adding-selection-functions">Extending stk: Adding selection functions.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">stk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>stk.ga.selection module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stk.ga.selection.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-stk.ga.selection">
+<span id="stk-ga-selection-module"></span><h1>stk.ga.selection module<a class="headerlink" href="#module-stk.ga.selection" title="Permalink to this headline">¶</a></h1>
+<p>Defines selection functions via <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a>.</p>
+<div class="section" id="extending-stk-adding-selection-functions">
+<span id="adding-selection-functions"></span><h2>Extending stk: Adding selection functions.<a class="headerlink" href="#extending-stk-adding-selection-functions" title="Permalink to this headline">¶</a></h2>
+<p>If a new selection operation is to be added to <code class="docutils literal"><span class="pre">stk</span></code> it should be
+added as a method in <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a>. The only requirements are
+that the first argument is <cite>population</cite> (excluding any <cite>self</cite> or <cite>cls</cite>
+arguments).</p>
+<p>The naming requirement exists to help users identify which arguments
+are handled automatically by the GA and which they need to define in
+the input file. The convention is that if the selection function takes
+an argument called  <cite>population</cite> it does not have to be specified in
+the input file.</p>
+<p>All selection functions should be defined as generators, which yield a
+member of the population. In the case of crossover selection functions,
+they should yield a tuple of members. Generational selection functions
+should yield each molecule at most once.</p>
+<p>If the selection function does not fit neatly into a single function
+make sure that any helper functions are private, i.e. that their names
+start with a leading underscore.</p>
+<dl class="class">
+<dt id="stk.ga.selection.Selection">
+<em class="property">class </em><code class="descclassname">stk.ga.selection.</code><code class="descname">Selection</code><span class="sig-paren">(</span><em>generational</em>, <em>crossover</em>, <em>mutation</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class for handling all types of selection in the GA.</p>
+<p>Whenever a population needs to have some of its members selected
+for GA operations such as mutation, selection or generational
+selection, it delegates this task to an instance of this class. The
+population holds the instance in <a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation.ga_tools" title="stk.ga.ga_population.GAPopulation.ga_tools"><code class="xref py py-attr docutils literal"><span class="pre">GAPopulation.ga_tools</span></code></a>.</p>
+<p>To illustrate how a <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance works it is best
+to use an example.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># 1. Create FunctionData objects which describe the selection</span>
+<span class="c1">#    functions to be used. These will correspond to methods</span>
+<span class="c1">#    in the Selection class.</span>
+
+<span class="c1"># For selecting members of the next generation.</span>
+<span class="n">gen_select_fn</span> <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;fittest&#39;</span><span class="p">)</span>
+
+<span class="c1"># For selecting molecules for crossover.</span>
+<span class="n">crossover_select_fn</span> <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;crossover_roulette&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># For selecting molecules to mutate.</span>
+<span class="n">mutation_select_fn</span> <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;stochastic_sampling&#39;</span><span class="p">,</span>
+                                  <span class="n">elites</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+
+
+<span class="c1"># 2. Create a Selection instance using the chosen functions.</span>
+
+<span class="n">sel</span> <span class="o">=</span> <span class="n">Selection</span><span class="p">(</span><span class="n">gen_select_fn</span><span class="p">,</span>
+                <span class="n">crossover_select_fn</span><span class="p">,</span>
+                <span class="n">mutation_select_fn</span><span class="p">)</span>
+
+<span class="c1"># 3. Create a population from which &quot;sel&quot; will select members.</span>
+<span class="n">pop</span> <span class="o">=</span> <span class="n">GAPopulation</span><span class="p">(</span><span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span><span class="p">,</span> <span class="n">mol3</span><span class="p">,</span> <span class="n">mol4</span><span class="p">)</span>
+
+<span class="c1"># 4. Now the selection instance can be used to select members</span>
+<span class="c1">#    of &quot;pop&quot;.</span>
+
+<span class="c1"># To select members of the next generation, call the selection</span>
+<span class="c1"># instance with the population as an argument, and a string</span>
+<span class="c1"># to indicate generational selection is desired.</span>
+<span class="n">next_gen</span> <span class="o">=</span> <span class="n">sel</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="s1">&#39;generational&#39;</span><span class="p">)</span>
+
+<span class="c1"># Note that next_gen is a generator, which yields the</span>
+<span class="c1"># selected molecules.</span>
+<span class="n">next_gen</span>  <span class="c1"># &lt;generator object ... &gt;</span>
+
+<span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">next_gen</span><span class="p">:</span>
+    <span class="n">mol</span>  <span class="c1"># A molecule in &quot;pop&quot;.</span>
+
+<span class="c1"># To select members for crossover, the same idea as for</span>
+<span class="c1"># generational selection applies.</span>
+<span class="n">crossover_mols</span> <span class="o">=</span> <span class="n">sel</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="s1">&#39;crossover&#39;</span><span class="p">)</span>
+
+<span class="c1"># Again, &quot;crossover_mols&quot; is a generator. This time it yields</span>
+<span class="c1"># tuples of molecules however. This is because 2 or more</span>
+<span class="c1"># molecules are required per crossover operation.</span>
+
+
+<span class="c1"># Finally, to select molecules for mutation.</span>
+<span class="n">mols_to_mutate</span> <span class="o">=</span> <span class="n">sel</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="s1">&#39;mutation&#39;</span><span class="p">)</span>
+
+<span class="c1"># Again, &quot;mols_to_mutate&quot; is a generator yielding single</span>
+<span class="c1"># molecules.</span>
+</pre></div>
+</div>
+<p>By providing the strings <code class="docutils literal"><span class="pre">'generational'</span></code>, <code class="docutils literal"><span class="pre">'crossover'</span></code> and
+<code class="docutils literal"><span class="pre">'mutation'</span></code>, the <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance knows to pick the
+correct function from the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> instances provided
+during initialization.</p>
+<p>Note that duplicates are not considered during selection. If a
+molecule is present in the population twice, its chance of
+selection does not double.</p>
+<dl class="attribute">
+<dt id="stk.ga.selection.Selection.generational">
+<code class="descname">generational</code><a class="headerlink" href="#stk.ga.selection.Selection.generational" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – This holds the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+selection function used for selecting the next generation of
+molecules.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.ga.selection.Selection.crossover">
+<code class="descname">crossover</code><a class="headerlink" href="#stk.ga.selection.Selection.crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+selection function used for selecting molecules for crossover.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.ga.selection.Selection.mutation">
+<code class="descname">mutation</code><a class="headerlink" href="#stk.ga.selection.Selection.mutation" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+selection function used for selecting molecules to mutate.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection._stochastic_sampling_guaranteed">
+<code class="descname">_stochastic_sampling_guaranteed</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection._stochastic_sampling_guaranteed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yielded the members guaranteed by stochastic sampling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The molecules which are being selected.</li>
+<li><strong>yielded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – Holds all previously yielded molecules.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>) – Indicates whether a member can be yielded more than once.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next member whose normalized fitness integer component
+is greater than 0.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection._stochastic_sampling_roulette">
+<code class="descname">_stochastic_sampling_roulette</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection._stochastic_sampling_roulette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the roulette component of stochastic sampling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The molecules which are being selected.</li>
+<li><strong>yielded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – Holds all previously yielded molecules.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>) – Indicates whether a member can be yielded more than once.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The seleceted population member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection.all_combinations">
+<code class="descname">all_combinations</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.all_combinations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields every possible pairing of individuals from a population.</p>
+<p>This yields members regardless of which subpopulation they are
+in. Each pair is only returned once. This means if <code class="docutils literal"><span class="pre">(1,2)</span></code> is
+yielded <code class="docutils literal"><span class="pre">(2,1)</span></code> will not be.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents should be selected.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instances which are to be
+crossed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection.all_combinations_n_fittest">
+<code class="descname">all_combinations_n_fittest</code><span class="sig-paren">(</span><em>population</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.all_combinations_n_fittest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields all pairings of the <cite>n</cite> fittest individuals.</p>
+<p>The pairings are yielded with in order of fitness, with most
+fit pair yielded first.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents should be selected.</li>
+<li><strong>n</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of individuals used for making offspring.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instances which are to be
+crossed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection.crossover_deterministic_sampling">
+<code class="descname">crossover_deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.crossover_deterministic_sampling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields parents according to determnistic sampling.</p>
+<p>In determnistic sampling the mean fitness value of the
+population is calculated, <code class="docutils literal"><span class="pre">&lt;f&gt;</span></code>. For each individual a
+normalized fitness value is then calculated via:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">fn</span></code> is the normalized fitness value and <code class="docutils literal"><span class="pre">f</span></code> is the
+original fitness value.</p>
+<p>Deterministic sampling then creates a temporary, parent
+population of the same size as the original population. An
+individual is guaranteed to be placed into the parent
+population <code class="docutils literal"><span class="pre">n</span></code> times, where <code class="docutils literal"><span class="pre">n</span></code> is the integer part of
+<code class="docutils literal"><span class="pre">fn</span></code>. Any remaining slots are given to individuals with the
+largest decimal values.</p>
+<p>Parents are then randomly selected from the parent population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents are selected.</li>
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+yielded.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The selected parent pair.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection.crossover_roulette">
+<code class="descname">crossover_roulette</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.crossover_roulette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields parents using roulette selection.</p>
+<p>In roulette selection the probability an individual is selected
+is given by its fitness. If the total fitness is the sum of all
+fitness values, the chance an individuals is selected is given
+by:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">individual</span> <span class="n">fitness</span> <span class="o">/</span> <span class="n">total</span> <span class="n">fitness</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">p</span></code> is the probability of selection <a class="footnote-reference" href="#id2" id="id1">[1]</a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents are selected.</li>
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+yielded.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The selected parent pair.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="http://tinyurl.com/csc3djm">http://tinyurl.com/csc3djm</a></td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection.deterministic_sampling">
+<code class="descname">deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.deterministic_sampling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields individuals using deterministic sampling.</p>
+<p>This algorithm can only be used for selection of mutants. It
+will return duplicates. The results of <a class="reference internal" href="#stk.ga.selection.Selection.fittest" title="stk.ga.selection.Selection.fittest"><code class="xref py py-meth docutils literal"><span class="pre">fittest()</span></code></a> are
+equivalent to algorithm without duplicates.</p>
+<p>In determnistic sampling the mean fitness value of the
+population is calculated, <code class="docutils literal"><span class="pre">&lt;f&gt;</span></code>. For each individual a
+normalized fitness value is then calculated via:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">fn</span></code> is the normalized fitness value and <code class="docutils literal"><span class="pre">f</span></code> is the
+original fitness value. An individual will be selected <code class="docutils literal"><span class="pre">n</span></code>
+times, where <code class="docutils literal"><span class="pre">n</span></code> is the integer value of <code class="docutils literal"><span class="pre">fn</span></code>. After all
+individuals where <code class="docutils literal"><span class="pre">n</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> are yielded, all inidividuals are
+yielded again, largest decimal part of <code class="docutils literal"><span class="pre">fn</span></code> first.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+yielded.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next selected population member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection.fittest">
+<code class="descname">fittest</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.fittest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields members of the population, fittest first.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population who’s members need to be selected.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next fittest <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instance held by
+<cite>population</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection.roulette">
+<code class="descname">roulette</code><span class="sig-paren">(</span><em>population</em>, <em>elites=0</em>, <em>truncation=None</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.roulette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields individuals using roulette selection.</p>
+<p>In roulette selection the probability an individual is selected
+is given by its fitness. If the total fitness is the sum of all
+fitness values, the chance an individuals is selected is given
+by:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">individual</span> <span class="n">fitness</span> <span class="o">/</span> <span class="n">total</span> <span class="n">fitness</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">p</span></code> is the probability of selection <a class="footnote-reference" href="#id4" id="id3">[2]</a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
+<li><strong>elites</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of the fittest members which are guaranteed to
+be yielded first.</li>
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+yielded.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">True</span></code> the same member can be yielded more than
+once.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next selected population member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td><a class="reference external" href="http://tinyurl.com/csc3djm">http://tinyurl.com/csc3djm</a></td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection.stochastic_sampling">
+<code class="descname">stochastic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>elites=0</em>, <em>truncation=None</em>, <em>duplicates=False</em>, <em>use_rank=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.stochastic_sampling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields individuals via stochastic sampling.</p>
+<p>Each fitness value is used to calculate the normalized fitness
+of an individual:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">fn</span></code> is the normalized fitness value, <code class="docutils literal"><span class="pre">f</span></code> is the
+original fitness value and <code class="docutils literal"><span class="pre">&lt;f&gt;</span></code> is the mean fitness of the
+population. If <code class="docutils literal"><span class="pre">fn</span></code> is greater than <code class="docutils literal"><span class="pre">1</span></code> then the individual
+is guaranteed to be selected. If duplicates are allowed,
+individuals are guaranteed to be selected <code class="docutils literal"><span class="pre">n</span></code> times, where
+<code class="docutils literal"><span class="pre">n</span></code> is the integer part of <code class="docutils literal"><span class="pre">fn</span></code>.</p>
+<p>Once all the guarnteed individuals have been yielded, the
+remaining individuals are yielded via the roulette method. The
+weights in the roulette method are based on the decimal part of
+<code class="docutils literal"><span class="pre">fn</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
+<li><strong>elites</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of the fittest members which are guaranteed to
+be yielded first.</li>
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+yielded.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">True</span></code> the same member can be yielded more than
+once.</li>
+<li><strong>use_rank</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal"><span class="pre">True</span></code> the fitness value of an individual is
+calculated as, <code class="docutils literal"><span class="pre">f</span> <span class="pre">=</span> <span class="pre">1/rank</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next selected population member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
