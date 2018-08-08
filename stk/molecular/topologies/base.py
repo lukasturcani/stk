@@ -525,6 +525,7 @@ class Linear(Topology):
 
         # Go through the repeating unit and place each monomer.
         macro_mol.mol = rdkit.Mol()
+
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
 
             # Flip or not flip the monomer as given by the probability
@@ -541,11 +542,17 @@ class Linear(Topology):
             add_fragment_props(monomer_mol, bb_index, i)
 
             # Add fg_id tags.
-            monomer_conf = monomer_mol.GetConformer()
+
+            # Check which funcitonal group is at the back and which
+            # one at the front.
+            centroids = list(mapping[label].bonder_centroids())
+            front = 1 if centroids[0][0] < centroids[1][0] else 0
+            back = 1 if front != 1 else 0
+
             for atom in monomer_mol.GetAtoms():
                 if atom.HasProp('fg'):
-                    coord = monomer_conf.GetAtomPosition(atom.GetIdx())
-                    fg_id = 2*i if coord.x < x_coord else 2*i+1
+                    fg_id = atom.GetIntProp('fg_id')
+                    fg_id = 2*i if fg_id == back else 2*i+1
                     atom.SetIntProp('fg_id', fg_id)
 
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
