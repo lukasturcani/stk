@@ -527,6 +527,7 @@ class Linear(Topology):
         macro_mol.mol = rdkit.Mol()
 
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
+            bb = mapping[label]
 
             # Flip or not flip the monomer as given by the probability
             # in `mdir`.
@@ -535,17 +536,18 @@ class Linear(Topology):
 
             # The first building block should be placed at 0, the others
             # have positions calculated based on bb size.
-            x_coord = self._x_position(macro_mol, mapping[label]) if i else 0
-            monomer_mol = mapping[label].set_position([x_coord, 0, 0])
+            x_coord = self._x_position(macro_mol, bb) if i else 0
+            monomer_mol = bb.set_bonder_centroid([x_coord, 0, 0])
+            monomer_mol = rdkit.Mol(monomer_mol)
 
-            bb_index = macro_mol.building_blocks.index(mapping[label])
+            bb_index = macro_mol.building_blocks.index(bb)
             add_fragment_props(monomer_mol, bb_index, i)
 
             # Add fg_id tags.
 
             # Check which funcitonal group is at the back and which
             # one at the front.
-            centroids = list(mapping[label].bonder_centroids())
+            centroids = list(bb.bonder_centroids())
             front = 1 if centroids[0][0] < centroids[1][0] else 0
             back = 1 if front != 1 else 0
 
