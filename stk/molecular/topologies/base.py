@@ -528,11 +528,12 @@ class Linear(Topology):
 
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             bb = mapping[label]
+            original_position = bb.position_matrix()
 
             # Flip or not flip the monomer as given by the probability
             # in `mdir`.
             mdir = np.random.choice([1, -1], p=[mdir, 1-mdir])
-            mapping[label].set_orientation2([mdir, 0, 0])
+            bb.set_orientation2([mdir, 0, 0])
 
             # The first building block should be placed at 0, the others
             # have positions calculated based on bb size.
@@ -547,8 +548,11 @@ class Linear(Topology):
 
             # Check which funcitonal group is at the back and which
             # one at the front.
-            centroids = list(bb.bonder_centroids())
-            front = 1 if centroids[0][0] < centroids[1][0] else 0
+            if len(bb.bonder_ids) == 1:
+                c1, c2 = bb.bonder_centroid(), bb.centroid()
+            else:
+                c1, c2 = list(bb.bonder_centroids())
+            front = 1 if c1[0] < c2[0] else 0
             back = 1 if front != 1 else 0
 
             for atom in monomer_mol.GetAtoms():
@@ -559,6 +563,8 @@ class Linear(Topology):
 
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
                                               monomer_mol)
+
+            bb.set_position_from_matrix(original_position)
 
     def bonded_fgs(self, macro_mol):
         """

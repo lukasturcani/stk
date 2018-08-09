@@ -2089,6 +2089,33 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return self.mol
 
+    def set_orientation2(self, end, conformer=-1):
+        """
+        Rotate the molecule so that bonder atoms lie on `end`.
+
+        The molecule is rotated about the centroid of the bonder atoms.
+        It is rotated so that the direction vector running between the
+        2 bonder centroids is aligned with the vector `end`.
+
+        Parameters
+        ----------
+        end : :class:`numpy.array`
+            The vector with which the molecule's bonder atoms should be
+            aligned.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
+
+        """
+
+        start = self.centroid() - self.bonder_centroid()
+        return self._set_orientation2(start, end, conformer)
+
     def _set_orientation2(self, start, end, conformer):
         """
         Rotates the molecule by a rotation from `start` to `end`.
