@@ -98,33 +98,35 @@ Publications
 about stk
 ---------
 
-* `stk: A Python Toolkit for Supramolecular Assembly`_ | `chemrxiv`_
+* `stk: A Python Toolkit for Supramolecular Assembly`_ | chemrxiv__
+
+__ https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826
 
 .. _`stk: A Python Toolkit for Supramolecular Assembly`: https://onlinelibrary.wiley.com/doi/abs/10.1002/jcc.25377
-.. _`chemrxiv`: https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826
 
 using stk
 ---------
 
-* `An Evolutionary Algorithm for the Discovery of Porous Organic Cages`_ | `chemrxiv`_
+* `An Evolutionary Algorithm for the Discovery of Porous Organic Cages`_ | chemrxiv__
 
+__ https://chemrxiv.org/articles/An_Evolutionary_Algorithm_for_the_Discovery_of_Porous_Organic_Cages/6954557
 .. _`An Evolutionary Algorithm for the Discovery of Porous Organic Cages`: https://pubs.rsc.org/en/content/articlelanding/2018/sc/c8sc03560a#!divAbstract
-.. _`chemrxiv`: https://chemrxiv.org/articles/An_Evolutionary_Algorithm_for_the_Discovery_of_Porous_Organic_Cages/6954557
 
-* `Machine Learning for Organic Cage Property Prediction`_ | `chemrxiv`_
+* `Machine Learning for Organic Cage Property Prediction`_ | chemrxiv__
 
-.. _`Machine Learning for Organic Cage Property Prediction`:
-.. _`chemrxiv`: https://chemrxiv.org/articles/Machine_Learning_for_Organic_Cage_Property_Prediction/6995018
+__ https://chemrxiv.org/articles/Machine_Learning_for_Organic_Cage_Property_Prediction/6995018
+.. _`Machine Learning for Organic Cage Property Prediction`: https://something.com
 
-* `A High-Throughput Screening Approach for the Optoelectronic Properties of Conjugated Polymers`_ | `chemrxiv`_
 
+* `A High-Throughput Screening Approach for the Optoelectronic Properties of Conjugated Polymers`_ | chemrxiv__
+
+__ https://chemrxiv.org/articles/A_High-Throughput_Screening_Approach_for_the_Optoelectronic_Properties_of_Conjugated_Polymers/6181841
 .. _`A High-Throughput Screening Approach for the Optoelectronic Properties of Conjugated Polymers`: https://pubs.acs.org/doi/abs/10.1021/acs.jcim.8b00256
-.. _`chemrxvi`: https://chemrxiv.org/articles/A_High-Throughput_Screening_Approach_for_the_Optoelectronic_Properties_of_Conjugated_Polymers/6181841
 
-* `Computationally-Inspired Discovery of an Unsymmetrical Porous Organic Cage`_ | `chemrxiv`_
+* `Computationally-Inspired Discovery of an Unsymmetrical Porous Organic Cage`_ | chemrxiv__
 
-.. _`Computationally-Inspired Discovery of an Unsymmetrical Porous Organic Cage`:
-.. _`chemrxiv`: https://chemrxiv.org/articles/Computationally-Inspired_Discovery_of_an_Unsymmetrical_Porous_Organic_Cage/6863684
+__ https://chemrxiv.org/articles/Computationally-Inspired_Discovery_of_an_Unsymmetrical_Porous_Organic_Cage/6863684
+.. _`Computationally-Inspired Discovery of an Unsymmetrical Porous Organic Cage`: https:://something.com
 
 * `Maximising the Hydrogen Evolution Activity in Organic Photocatalysts by co-Polymerisation`_
 
