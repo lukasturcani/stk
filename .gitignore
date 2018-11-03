@@ -7,10 +7,10 @@
 **/*tests_output
 
 # This folder gets created by running tests for fitness functions.
-stk/tests/cage_target
+tests/cage_target
 
 # These folders get created when running tests for topologies.
-stk/tests/linear_topology_tests
-stk/tests/cage_topology_tests
-stk/tests/cof_topology_tests
-stk/tests/failures.txt
+tests/linear_topology_tests
+tests/cage_topology_tests
+tests/cof_topology_tests
+tests/failures.txt
