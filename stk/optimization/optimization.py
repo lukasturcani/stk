@@ -126,7 +126,7 @@ def _optimize_all_serial(func_data, population):
 
 class _OptimizationFunc:
     """
-    A decorator for optimziation functions.
+    A decorator for optimization functions.
 
     This decorator is applied to all optimization functions
     automatically in :func:`_optimize_all`. It should not be applied
