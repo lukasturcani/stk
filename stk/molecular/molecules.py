@@ -1615,7 +1615,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         :class:`StructUnit`
             A random molecule from `db`.
 
-        None : :class:`NoneType`
+        Raises
+        ------
+        :class:`RuntimeError`
             If no files in `db` could be initialized from.
 
         """
@@ -1628,9 +1630,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                 return cls(molfile, fg, name, note)
 
             except Exception:
-                logger.error(
+                logger.warning(
                     'Could not initialize {} from {}.'.format(
                                                 cls.__name__, molfile))
+        raise RuntimeError(
+                f'No files in "{db}" could be initialized from.')
 
     def all_bonder_distances(self, conformer=-1):
         """
@@ -2626,6 +2630,10 @@ class StructUnit3(StructUnit):
         return self._set_orientation2(start, end, conformer)
 
 
+class MacroMoleculeBuildError(Exception):
+    ...
+
+
 @total_ordering
 class MacroMolecule(Molecule, metaclass=Cached):
     """
@@ -2746,7 +2754,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
             topology.build(self, bb_conformers)
 
         except Exception as ex:
-            self.mol = rdkit.Mol()
             errormsg = ('Build failure.\n'
                         '\n'
                         'topology\n'
@@ -2759,13 +2766,14 @@ class MacroMolecule(Molecule, metaclass=Cached):
             bb_blocks = []
             for i, bb in enumerate(building_blocks):
                 bb_conf = bb_conformers[i]
-                bb_blocks.append(
-                    ('{0.__class__.__name__} {0.func_grp.name}\n'
-                     '{1}').format(bb, bb.mdl_mol_block(bb_conf)))
+                bb_blocks.append('{} {}\n{}'.format(
+                    bb.__class__.__name__,
+                    None if bb.func_grp is None else bb.func_grp.name,
+                    bb.mdl_mol_block(bb_conf)))
 
             errormsg += '\n'.join(bb_blocks)
 
-            logger.error(errormsg, exc_info=True)
+            raise MacroMoleculeBuildError(errormsg) from ex
 
         super().__init__(name, note)
 
@@ -2810,13 +2818,14 @@ class MacroMolecule(Molecule, metaclass=Cached):
             bb_blocks = []
             for i, bb in enumerate(self.building_blocks):
                 bb_conf = bb_conformers[i]
-                bb_blocks.append(
-                    ('{0.__class__.__name__} {0.func_grp.name}\n'
-                     '{1}').format(bb, bb.mdl_mol_block(bb_conf)))
+                bb_blocks.append('{} {}\n{}'.format(
+                    bb.__class__.__name__,
+                    None if bb.func_grp is None else bb.func_grp.name,
+                    bb.mdl_mol_block(bb_conf)))
 
             errormsg += '\n'.join(bb_blocks)
 
-            logger.error(errormsg, exc_info=True)
+            raise MacroMoleculeBuildError(errormsg) from ex
 
         # Get the new conformer.
         new_conf = rdkit.Conformer(self.mol.GetConformer())
