@@ -5,15 +5,7 @@ import logging
 import argparse
 from rdkit import RDLogger
 from os.path import join, basename, abspath
-
-from .molecular import Molecule, CACHE_SETTINGS
-from .ga import GAPopulation, GAInput
-from .utilities import (tar_output,
-                        errorhandler,
-                        streamhandler,
-                        archive_output,
-                        kill_macromodel)
-from .ga import plotting as plot
+import stk
 
 warnings.filterwarnings("ignore")
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
@@ -21,8 +13,8 @@ RDLogger.logger().setLevel(RDLogger.CRITICAL)
 
 # Get the loggers.
 rootlogger = logging.getLogger()
-rootlogger.addHandler(errorhandler)
-rootlogger.addHandler(streamhandler)
+rootlogger.addHandler(stk.errorhandler)
+rootlogger.addHandler(stk.streamhandler)
 
 logger = logging.getLogger(__name__)
 
@@ -62,16 +54,18 @@ class GAProgress:
             # from the previous GA run may have. As a result, first
             # turn the cache of to load the GA produced version and
             # then update the cache.
-            CACHE_SETTINGS['ON'] = False
-            for m in GAPopulation.load(ga_tools.input.progress_load,
-                                       Molecule.from_dict):
+            stk.CACHE_SETTINGS['ON'] = False
+            for m in stk.GAPopulation.load(
+                                       ga_tools.input.progress_load,
+                                       stk.Molecule.from_dict):
                 m.update_cache()
-            CACHE_SETTINGS['ON'] = True
-            self.progress = GAPopulation.load(ga_tools.input.progress_load,
-                                              Molecule.from_dict)
+            stk.CACHE_SETTINGS['ON'] = True
+            self.progress = stk.GAPopulation.load(
+                                    ga_tools.input.progress_load,
+                                    stk.Molecule.from_dict)
             self.progress.ga_tools = ga_tools
         else:
-            self.progress = GAPopulation(ga_tools=ga_tools)
+            self.progress = stk.GAPopulation(ga_tools=ga_tools)
 
         # The +1 is added so that the first mol's name is 1 more than
         # the max in the previous GA.
@@ -83,7 +77,7 @@ class GAProgress:
         self.start_gen = (1 if len(self.progress.populations) == 0
                           else len(self.progress.populations))
 
-        self.db_pop = GAPopulation(ga_tools=ga_tools)
+        self.db_pop = stk.GAPopulation(ga_tools=ga_tools)
 
     def db(self, mols):
         """
@@ -218,9 +212,9 @@ def ga_run(ga_input):
     # Running MacroModel optimizations sometimes leaves applications
     # open.This closes them. If this is not done, directories may not
     # be possible to move.
-    kill_macromodel()
+    stk.kill_macromodel()
     # Move any ``output`` dir in the cwd into ``old_output``.
-    archive_output()
+    stk.archive_output()
     os.mkdir('output')
     os.chdir('output')
     root_dir = os.getcwd()
@@ -249,7 +243,7 @@ def ga_run(ga_input):
     progress = GAProgress(ga_input.ga_tools())
 
     logger.info('Generating initial population.')
-    init_func = getattr(GAPopulation, ga_input.initer().name)
+    init_func = getattr(stk.GAPopulation, ga_input.initer().name)
     if init_func.__name__ != 'load':
         pop = init_func(**ga_input.initer().params,
                         size=ga_input.pop_size,
@@ -260,10 +254,10 @@ def ga_run(ga_input):
         # the previous GA run may have. As a result, first turn the
         # cache off to load the GA produced version and then update the
         # cache.
-        CACHE_SETTINGS['ON'] = False
+        stk.CACHE_SETTINGS['ON'] = False
         for m in init_func(**ga_input.initer().params):
             m.update_cache()
-        CACHE_SETTINGS['ON'] = True
+        stk.CACHE_SETTINGS['ON'] = True
         pop = init_func(**ga_input.initer().params)
         pop.ga_tools = ga_input.ga_tools()
 
@@ -340,25 +334,25 @@ def ga_run(ga_input):
         if pop.exit(progress.progress):
             break
 
-    kill_macromodel()
+    stk.kill_macromodel()
     os.chdir(root_dir)
     os.rename('scratch/errors.log', 'errors.log')
     progress.progress.normalize_fitness_values()
     progress.dump()
     logger.info('Plotting EPP.')
-    plot.fitness_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
+    stk.fitness_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
     progress.progress.remove_members(
                     lambda x:
                     pop.ga_tools.fitness.name not in x.progress_params)
-    plot.parameter_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
+    stk.parameter_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
 
     shutil.rmtree('scratch')
     pop.write('final_pop', True)
     os.chdir(launch_dir)
     if ga_input.tar_output:
         logger.info('Compressing output.')
-        tar_output()
-    archive_output()
+        stk.tar_output()
+    stk.archive_output()
 
 
 if __name__ == '__main__':
@@ -371,12 +365,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ifile = abspath(args.input_file)
-    ga_input = GAInput(ifile)
+    ga_input = stk.GAInput(ifile)
     rootlogger.setLevel(ga_input.logging_level)
     logger.info('Loading molecules from any provided databases.')
     dbs = []
     for db in ga_input.databases:
-        dbs.append(GAPopulation.load(db, Molecule.from_dict))
+        dbs.append(stk.GAPopulation.load(db, stk.Molecule.from_dict))
 
     for x in range(args.loops):
         ga_run(ga_input)
