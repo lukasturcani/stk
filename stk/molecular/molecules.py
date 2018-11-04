@@ -272,6 +272,10 @@ class CachedStructUnit(type):
             return obj
 
 
+class MoleculeSubclassError(Exception):
+    ...
+
+
 class Molecule:
     """
     The most basic class representing molecules.
@@ -331,13 +335,21 @@ class Molecule:
 
     """
 
+    subclasses = {}
+
     def __init__(self, name="", note=""):
         self.optimized = False
         self.energy = Energy(self)
         self.name = name
         self.note = note
-
         self.save_atom_props()
+
+    def __init_subclass__(cls, **kwargs):
+        if cls.__name__ in cls.subclasses:
+            msg = 'Subclass with this name already exists.'
+            raise MoleculeSubclassError(msg)
+        cls.subclasses[cls.__name__] = cls
+        super().__init_subclass__(**kwargs)
 
     def all_atom_coords(self, conformer=-1):
         """
@@ -770,8 +782,9 @@ class Molecule:
             The molecule represented by `json_dict`.
 
         """
+
         # Get the class of the object.
-        c = globals()[json_dict['class']]
+        c = self.subclasses[json_dict['class']]
         json_dict['optimized'] = optimized
         json_dict['load_names'] = load_names
         return c._json_init(json_dict)
@@ -1080,13 +1093,15 @@ class Molecule:
 
         for atom in self.mol.GetAtoms():
             atomid = atom.GetIdx()
-            for name, value in atom.GetPropsAsDict(False, False).items():
+            prop_dict = atom.GetPropsAsDict(False, False)
+            for name, value in prop_dict.items():
                 atom_props[atomid][name] = value
 
                 if name == 'bonder':
                     fg_id = atom.GetIntProp('fg_id')
 
-                    # Make sure bonder_ids does not raise an index error.
+                    # Make sure bonder_ids
+                    # does not raise an index error.
                     if len(bonder_ids) < fg_id + 1:
                         diff = fg_id + 1 - len(bonder_ids)
                         bonder_ids.extend([] for i in range(diff))
@@ -3104,27 +3119,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     def __hash__(self):
         return id(self)
-
-    """
-    The following methods are inteded for convenience while
-    debugging or testing and should not be used during typical
-    execution of the program.
-
-    """
-
-    @classmethod
-    def testing_init(cls, bb1, bb2, topology):
-
-        key = frozenset({bb1, bb2}), repr(topology)
-
-        if key in MacroMolecule.cache.keys():
-            return MacroMolecule.cache[key]
-        else:
-            macro_mol = cls.__new__(cls)
-            macro_mol.building_blocks = [bb1, bb2]
-            macro_mol.topology = topology
-            MacroMolecule.cache[key] = macro_mol
-            return macro_mol
 
 
 class Cage(MacroMolecule):

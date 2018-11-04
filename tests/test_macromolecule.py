@@ -4,27 +4,22 @@ import stk
 if not os.path.exists('macromolecule_tests_output'):
     os.mkdir('macromolecule_tests_output')
 
-bb1 = stk.StructUnit2.smiles_init('Nc1ccc(N)cc1', 'amine')
-bb2 = stk.StructUnit2.smiles_init('O=Cc1cc2ccc3cc(C=O)cc4ccc(c1)c2c34',
-                                  'aldehyde')
-mol = stk.Polymer([bb1, bb2], stk.Linear('AB', [0.5, 0.5], 3))
 
-
-def test_building_block_cores():
+def test_building_block_cores(polymer):
     # Check that the yielded rdkit molecules match the cores of the
     # building block molecules.
-    for i in range(len(mol.building_blocks)):
-        for frag in mol.building_block_cores(i):
+    for i in range(len(polymer.building_blocks)):
+        for frag in polymer.building_block_cores(i):
             bb1match = len(frag.GetSubstructMatch(
-                           mol.building_blocks[0].core()))
+                           polymer.building_blocks[0].core()))
             bb2match = len(frag.GetSubstructMatch(
-                           mol.building_blocks[1].core()))
+                           polymer.building_blocks[1].core()))
             nfrag_atoms = frag.GetNumAtoms()
             assert bb1match == nfrag_atoms or bb2match == nfrag_atoms
 
 
-def test_bb_distortion():
-    assert isinstance(mol.bb_distortion(), float)
+def test_bb_distortion(polymer):
+    assert isinstance(polymer.bb_distortion(), float)
 
 
 def test_comparison():
@@ -50,34 +45,39 @@ def test_comparison():
     assert c >= a
 
 
-def test_caching():
-    mol2 = stk.Polymer([bb2, bb1], stk.Linear('AB', [0.5, 0.5], 3))
-    assert mol is mol2
-
-    mol3 = stk.Polymer([bb1, bb2], stk.Linear('AB', [1, 0.5], 3))
-    assert mol is not mol3
-
-
-def test_json_init():
+def test_caching(polymer, mol1, mol2):
+    # Other tests assume that the cache is turned off. Make sure
+    # that this test restores cache to off after it finishes.
     try:
-        path = os.path.join('macromolecule_tests_output', 'mol.json')
-        mol.dump(path)
-        stk.CACHE_SETTINGS['ON'] = False
-        mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
         stk.CACHE_SETTINGS['ON'] = True
+        polymer2 = stk.Polymer([mol1, mol2],
+                               stk.Linear('AB', [0.5, 0.5], 3))
+        assert polymer is polymer2
 
-        assert mol is not mol2
-        assert mol.bonder_ids == mol2.bonder_ids
-        assert mol.atom_props == mol2.atom_props
-        assert mol.bb_counter == mol2.bb_counter
-        assert mol.topology == mol2.topology
-        assert mol.bonds_made == mol2.bonds_made
-        assert mol.unscaled_fitness == mol2.unscaled_fitness
-        assert mol.progress_params == mol2.progress_params
-        assert all(bb1.same(bb2) and bb1.func_grp.name == bb2.func_grp.name
-                   for bb1, bb2 in
-                   zip(mol.building_blocks, mol2.building_blocks))
+        stk.CACHE_SETTINGS['ON'] = False
+        polymer3 = stk.Polymer([mol1, mol2],
+                               stk.Linear('AB', [1, 0.5], 3))
+        assert polymer is not polymer3
     except Exception:
         raise
     finally:
-        stk.CACHE_SETTINGS['ON'] = True
+        stk.CACHE_SETTINGS['ON'] = False
+
+
+def test_json_init(polymer):
+        path = os.path.join('macromolecule_tests_output', 'mol.json')
+        polymer.dump(path)
+        mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
+
+        assert polymer is not mol2
+        assert polymer.bonder_ids == mol2.bonder_ids
+        assert polymer.atom_props == mol2.atom_props
+        assert polymer.bb_counter == mol2.bb_counter
+        assert polymer.topology == mol2.topology
+        assert polymer.bonds_made == mol2.bonds_made
+        assert polymer.unscaled_fitness == mol2.unscaled_fitness
+        assert polymer.progress_params == mol2.progress_params
+        assert all(bb1.same(bb2) and
+                   bb1.func_grp.name == bb2.func_grp.name
+                   for bb1, bb2 in
+                   zip(polymer.building_blocks, mol2.building_blocks))

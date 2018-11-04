@@ -70,6 +70,12 @@ class Population:
             placed into the :attr:`members` or :attr:`populations`
             attributes, respectively.
 
+        Raises
+        ------
+        :class:`TypeError`
+            If :class:`.Molecule` or :class:`.Population` objects are
+            not provided to the initializer.
+
         """
 
         self.populations = []

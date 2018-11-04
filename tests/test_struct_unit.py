@@ -12,25 +12,32 @@ def test_init(mol2):
     assert mol2.func_grp.name == 'amine'
 
 
-def test_all_bonder_distances(mol2):
-    for i, (id1, id2, d) in enumerate(mol2.all_bonder_distances()):
-        assert type(id1) == int
-        assert type(id2) == int
-        assert type(d) == float
+def test_all_bonder_distances(tmp_mol):
+    shape = (3, tmp_mol.mol.GetNumAtoms())
+    tmp_mol.set_position_from_matrix(np.zeros(shape))
+    for i, (id1, id2, d) in enumerate(tmp_mol.all_bonder_distances()):
+        assert type(id1) == float
+        assert type(id2) == float
+        assert abs(d) > 1e-5
     assert i == 2
 
 
-def test_bonder_centroids(mol2):
-    for i, centroid in enumerate(mol2.bonder_centroids()):
+def test_bonder_centroids(tmp_mol):
+    shape = (3, tmp_mol.mol.GetNumAtoms())
+    tmp_mol.set_position_from_matrix(np.zeros(shape))
+
+    for i, centroid in enumerate(tmp_mol.bonder_centroids()):
         assert len(centroid) == 3
-        assert type(centroid) == np.ndarray
+        assert sum(centroid) < 1e-5
     assert i == 2
 
 
-def test_bonder_centroid(mol2):
-    centroid = mol2.bonder_centroid()
+def test_bonder_centroid(tmp_mol):
+    shape = (3, tmp_mol.mol.GetNumAtoms())
+    tmp_mol.set_position_from_matrix(np.zeros(shape))
+    centroid = tmp_mol.bonder_centroid()
     assert len(centroid) == 3
-    assert type(centroid) == np.ndarray
+    assert sum(centroid) < 1e-5
 
 
 def test_bonder_direction_vectors(mol2):

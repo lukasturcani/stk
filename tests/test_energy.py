@@ -1,35 +1,43 @@
-from os.path import join
 import stk
-import numpy as np
 
 
-pop = stk.Population.load(
-                      join('data', 'macromolecule', 'mm.json'),
-                      stk.Molecule.from_dict)
-mol, mol2 = pop[:2]
+def test_rdkit(mol):
+    e1 = mol.energy.rdkit('uff')
+    assert abs(e1 - 59.003470735439585) < 1e-4
+    e2 = mol.energy.rdkit('mmff')
+    assert abs(e2 - 65.17285719079524) < 1e-4
 
 
-def test_rdkit():
-    assert np.isclose(mol.energy.rdkit('uff'), -0.84, atol=0.01)
-    assert np.isclose(mol.energy.rdkit('mmff'), 3476.86, atol=0.02)
+def test_formation(polymer, mol):
+    reactant_energy = sum(mol.energy.rdkit('uff') for
+                          mol in polymer.building_blocks)
+    product_energy = (polymer.energy.rdkit('uff') +
+                      mol.energy.rdkit('uff'))
+    form_energy = reactant_energy - product_energy
+
+    func = stk.FunctionData(name='rdkit',
+                            forcefield='uff')
+    calc_form_energy = polymer.energy.formation(
+                           func=func,
+                           products=[(1, mol)])
+
+    assert abs(form_energy - calc_form_energy) < 1e-4
 
 
-def test_formation():
-    assert np.isclose(
-            mol.energy.formation(
-                        stk.FunctionData('rdkit', forcefield='uff'),
-                        [(2, mol2)]),
-            0,
-            atol=18.318412936376188)
+def test_pseudoformation(polymer):
+    reactant_energy = sum(mol.energy.rdkit('uff') for
+                          mol in polymer.building_blocks)
+    product_energy = polymer.energy.rdkit('uff')
+    pseudoform_energy = reactant_energy - product_energy
+
+    calc_pseudoform_energy = polymer.energy.pseudoformation(
+                                stk.FunctionData(name='rdkit',
+                                                 forcefield='uff'))
+
+    assert abs(pseudoform_energy - calc_pseudoform_energy) < 1e-4
 
 
-def test_pseudoformation():
-    assert np.isclose(
-            mol.energy.pseudoformation(
-                    stk.FunctionData('rdkit', forcefield='uff')),
-            0,
-            atol=17.75271336716965)
-
-
-def test_logging():
-    assert len(mol.energy.values) != 0
+def test_logging(mol):
+    mol.energy.rdkit('uff')
+    fd = stk.FunctionData(name='rdkit', forcefield='uff', conformer=-1)
+    assert fd in mol.energy.values

@@ -1,9 +1,4 @@
 import stk
-from os.path import join
-
-pop = stk.Population.load(
-                      join('data', 'crossover', 'molecules.json'),
-                      stk.Molecule.from_dict)
 
 
 def test_bb_lk_exchange(pop):
