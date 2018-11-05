@@ -4,7 +4,6 @@ Tests for normalization functions.
 """
 
 import stk
-from test_population import generate_population
 
 population = generate_population()
 
