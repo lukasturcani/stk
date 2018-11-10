@@ -195,8 +195,12 @@ from ..utilities import (flatten,
 
 
 logger = logging.getLogger(__name__)
-# Toggles caching when making molecules.
-CACHE_SETTINGS = {'ON': True}
+
+OPTIONS = {
+    # Toggle caching of molecules.
+    'cache': True
+
+}
 
 
 class Cached(type):
@@ -216,12 +220,12 @@ class Cached(type):
         sig = sig.arguments
         key = self.gen_key(sig['building_blocks'], sig['topology'])
 
-        if key in self.cache and CACHE_SETTINGS['ON']:
+        if key in self.cache and OPTIONS['cache']:
             return self.cache[key]
         else:
             obj = super().__call__(*args, **kwargs)
             obj.key = key
-            if CACHE_SETTINGS['ON']:
+            if OPTIONS['cache']:
                 self.cache[key] = obj
             return obj
 
@@ -262,12 +266,12 @@ class CachedStructUnit(type):
                        x.name in sig['file']), None)
 
         key = self.gen_key(mol, fg)
-        if key in self.cache and CACHE_SETTINGS['ON']:
+        if key in self.cache and OPTIONS['cache']:
             return self.cache[key]
         else:
             obj = super().__call__(*args, **kwargs)
             obj.key = key
-            if CACHE_SETTINGS['ON']:
+            if OPTIONS['cache']:
                 self.cache[key] = obj
             return obj
 
@@ -2296,7 +2300,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         rdkit.SanitizeMol(mol)
         mol = rdkit.AddHs(mol)
         key = cls.gen_key(mol, functional_group)
-        if key in cls.cache and CACHE_SETTINGS['ON']:
+        if key in cls.cache and OPTIONS['cache']:
             return cls.cache[key]
 
         params = rdkit.ETKDG()
@@ -2991,7 +2995,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         topology = eval(json_dict['topology'],  topologies.__dict__)
 
         key = cls.gen_key(bbs, topology)
-        if key in cls.cache and CACHE_SETTINGS['ON']:
+        if key in cls.cache and OPTIONS['cache']:
             return cls.cache[key]
 
         obj = cls.__new__(cls)
@@ -3024,7 +3028,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                     bonder_ids.extend([] for i in range(diff))
                 bonder_ids[fg_id].append(atom_id)
 
-        if CACHE_SETTINGS['ON']:
+        if OPTIONS['cache']:
             cls.cache[key] = obj
 
         return obj

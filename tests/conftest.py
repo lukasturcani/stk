@@ -4,7 +4,7 @@ from os.path import join
 from collections import Counter
 import rdkit.Chem.AllChem as rdkit
 
-stk.CACHE_SETTINGS['ON'] = False
+stk.OPTIONS['cache'] = False
 
 
 class TestMol(stk.MacroMolecule):
@@ -101,7 +101,7 @@ def generate_population():
 
         """
 
-        stk.CACHE_SETTINGS['ON'] = cache
+        stk.OPTIONS['cache'] = cache
 
         bbs = [stk.StructUnit.smiles_init('C'*i)
                for i in range(1, 12)]
@@ -129,7 +129,7 @@ def generate_population():
         # Initialize final population of subpopulations and cages.
         p = stk.Population(sub1, sub2, *mols[8:])
 
-        stk.CACHE_SETTINGS['ON'] = False
+        stk.OPTIONS['cache'] = False
 
         return p
 

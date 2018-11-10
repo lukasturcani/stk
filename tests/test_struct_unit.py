@@ -96,11 +96,11 @@ def test_json_init(mol):
 
 def test_caching():
     # This test is in a try block because pytest runs with
-    # CACHE_SETTINGS turned off. If this test fails, the finally
+    # molecule cache turned off. If this test fails, the finally
     # clause ensures that the cache remains off so other tests are
     # not affected by unexpected cache problems.
     try:
-        stk.CACHE_SETTINGS['ON'] = True
+        stk.OPTIONS['cache'] = True
         mol = stk.StructUnit.smiles_init('NC1CC(N)CC(N)C1', 'amine')
         mol2 = stk.StructUnit.smiles_init('NC1CC(N)CC(N)C1', 'amine')
         assert mol is mol2
@@ -108,9 +108,9 @@ def test_caching():
         mol3 = stk.StructUnit.smiles_init('NC1CC(N)CC(N)C1', 'aldehyde')
         assert mol3 is not mol
 
-        stk.CACHE_SETTINGS['ON'] = False
+        stk.OPTIONS['cache'] = False
         mol4 = stk.StructUnit.smiles_init('NC1CC(N)CC(N)C1', 'amine')
-        stk.CACHE_SETTINGS['ON'] = True
+        stk.OPTIONS['cache'] = True
 
         assert mol is not mol4
 
@@ -118,7 +118,7 @@ def test_caching():
         raise
 
     finally:
-        stk.CACHE_SETTINGS['ON'] = False
+        stk.OPTIONS['cache'] = False
 
 
 def test_set_bonder_centroid(tmp_mol):

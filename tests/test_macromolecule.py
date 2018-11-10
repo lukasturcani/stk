@@ -49,21 +49,21 @@ def test_caching(mol3, mol6):
     # Other tests assume that the cache is turned off. Make sure
     # that this test restores cache to off after it finishes.
     try:
-        stk.CACHE_SETTINGS['ON'] = True
+        stk.OPTIONS['cache'] = True
         polymer = stk.Polymer([mol3, mol6],
                               stk.Linear('AB', [0, 0], 3))
         polymer2 = stk.Polymer([mol3, mol6],
                                stk.Linear('AB', [0, 0], 3))
         assert polymer is polymer2
 
-        stk.CACHE_SETTINGS['ON'] = False
+        stk.OPTIONS['cache'] = False
         polymer3 = stk.Polymer([mol3, mol6],
                                stk.Linear('AB', [1, 0.5], 3))
         assert polymer is not polymer3
     except Exception:
         raise
     finally:
-        stk.CACHE_SETTINGS['ON'] = False
+        stk.OPTIONS['cache'] = False
 
 
 def test_json_init(polymer):
