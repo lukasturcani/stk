@@ -7,7 +7,7 @@ import rdkit.Chem.AllChem as rdkit
 stk.CACHE_SETTINGS['ON'] = False
 
 
-class FakeMol(stk.MacroMolecule):
+class TestMol(stk.MacroMolecule):
     def __init__(self,
                  building_blocks,
                  topology,
@@ -32,17 +32,17 @@ class FakeMol(stk.MacroMolecule):
 
 @pytest.fixture(scope='session')
 def mol():
-    return stk.StructUnit.smiles_init('NC1CC(Br)C(Br)CC1N')
+    return stk.StructUnit.smiles_init('NC1CC(Br)C(Br)CC1N', 'bromine')
 
 
 @pytest.fixture
 def tmp_mol():
-    return stk.StructUnit.smiles_init('NC1CC(Br)C(Br)CC1N')
+    return stk.StructUnit.smiles_init('NC1CC(Br)C(Br)CC1N', 'bromine')
 
 
 @pytest.fixture(scope='session')
 def mol2():
-    stk.StructUnit.smiles_init('NC1CC(N)CC(N)C1', 'amine')
+    return stk.StructUnit.smiles_init('NC1CC(N)CC(N)C1', 'amine')
 
 
 @pytest.fixture(scope='session')
@@ -78,8 +78,8 @@ def mol8():
 
 
 @pytest.fixture(scope='session')
-def polymer(mol1, mol2):
-    return stk.Polymer([mol1, mol2], stk.Linear('AB', [0, 0], 1))
+def polymer(mol3, mol6):
+    return stk.Polymer([mol3, mol6], stk.Linear('AB', [0, 0], 1))
 
 
 @pytest.fixture(scope='session')
@@ -89,7 +89,7 @@ def cof_bb1():
 
 @pytest.fixture(scope='session')
 def cc3():
-    return stk.Molecule.load(join('data', 'molecule', 'cc3.json'))
+    return stk.Molecule.load(join('data', 'cage', 'cc3.json'))
 
 
 @pytest.fixture(scope='session')
@@ -108,11 +108,11 @@ def generate_population():
 
         # Generate a bunch of cages.
         if offset:
-            mols = [FakeMol([bbs[i], bbs[i+1]], stk.FourPlusSix())
+            mols = [TestMol([bbs[i], bbs[i+1]], stk.FourPlusSix())
                     for i in range(0, 10)]
 
         if not offset:
-            mols = [FakeMol([bbs[x], bbs[x]], stk.FourPlusSix())
+            mols = [TestMol([bbs[x], bbs[x]], stk.FourPlusSix())
                     for x in range(0, 10)]
 
         # Generate a couple of

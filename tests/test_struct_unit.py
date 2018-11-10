@@ -16,10 +16,10 @@ def test_all_bonder_distances(tmp_mol):
     shape = (3, tmp_mol.mol.GetNumAtoms())
     tmp_mol.set_position_from_matrix(np.zeros(shape))
     for i, (id1, id2, d) in enumerate(tmp_mol.all_bonder_distances()):
-        assert type(id1) == float
-        assert type(id2) == float
-        assert abs(d) > 1e-5
-    assert i == 2
+        assert type(id1) == int
+        assert type(id2) == int
+        assert abs(d) < 1e-5
+    assert i == 0
 
 
 def test_bonder_centroids(tmp_mol):
@@ -29,7 +29,7 @@ def test_bonder_centroids(tmp_mol):
     for i, centroid in enumerate(tmp_mol.bonder_centroids()):
         assert len(centroid) == 3
         assert sum(centroid) < 1e-5
-    assert i == 2
+    assert i == 1
 
 
 def test_bonder_centroid(tmp_mol):
@@ -89,7 +89,7 @@ def test_json_init(mol):
     assert mol2.optimized
     assert mol2.bonder_ids == mol.bonder_ids
     assert mol2.energy.__class__.__name__ == 'Energy'
-    assert mol2.func_grp.name == 'amine'
+    assert mol2.func_grp.name == mol.func_grp.name
     assert mol is not mol2
     assert mol.atom_props == mol.atom_props
 

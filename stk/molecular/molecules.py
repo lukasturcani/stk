@@ -562,9 +562,10 @@ class Molecule:
         ref = self.center_of_mass(conformer)
         icavity = 0.5*self._cavity_size(ref, conformer)
         bounds = [(coord+icavity, coord-icavity) for coord in ref]
-        cavity_origin = minimize(lambda x: self._cavity_size(x, conformer),
-                                 x0=ref,
-                                 bounds=bounds).x
+        cavity_origin = minimize(
+                            lambda x: self._cavity_size(x, conformer),
+                            x0=ref,
+                            bounds=bounds).x
         cavity = -self._cavity_size(cavity_origin, conformer)
         return 0 if cavity < 0 else cavity
 
@@ -2255,10 +2256,14 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     def smiles_init(cls,
                     smiles,
                     functional_group=None,
+                    random_seed=4,
                     note="",
                     name=""):
         """
         Initialize from a SMILES string.
+
+        The structure of the molecule is embedded using
+        :func:`rdkit.ETKDG()`.
 
         Parameters
         ----------
@@ -2269,6 +2274,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             The name of the functional group which is to have atoms
             tagged. If no functional group is provided to this
             parameter, no tagging is done.
+
+        random_seed : :class:`int`, optional
+            Random seed passed to :func:`rdkit.ETKDG`
 
         note : :class:`str`, optional
             A note or comment about the molecule.
@@ -2291,7 +2299,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         if key in cls.cache and CACHE_SETTINGS['ON']:
             return cls.cache[key]
 
-        rdkit.EmbedMolecule(mol, rdkit.ETKDG())
+        params = rdkit.ETKDG()
+        params.randomSeed = random_seed
+        rdkit.EmbedMolecule(mol, params)
         obj = cls.__new__(cls)
         obj.file = smiles
         obj.key = key

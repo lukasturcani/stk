@@ -525,9 +525,10 @@ class Linear(Topology):
 
         # Go through the repeating unit and place each monomer.
         macro_mol.mol = rdkit.Mol()
-
+        bb_counter = macro_mol.bb_counter = {}
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             bb = mapping[label]
+            bb_counter[bb] = bb_counter.get(bb, 0) + 1
             original_position = bb.position_matrix()
 
             # Flip or not flip the monomer as given by the probability
@@ -535,8 +536,8 @@ class Linear(Topology):
             mdir = np.random.choice([1, -1], p=[mdir, 1-mdir])
             bb.set_orientation2([mdir, 0, 0])
 
-            # The first building block should be placed at 0, the others
-            # have positions calculated based on bb size.
+            # The first building block should be placed at 0, the
+            # others have positions calculated based on bb size.
             x_coord = self._x_position(macro_mol, bb) if i else 0
             monomer_mol = bb.set_bonder_centroid([x_coord, 0, 0])
             monomer_mol = rdkit.Mol(monomer_mol)

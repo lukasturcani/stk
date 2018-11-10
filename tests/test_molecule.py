@@ -160,6 +160,8 @@ def test_same(mol, tmp_mol, mol2):
     """
 
     assert mol is not tmp_mol
+    print(mol.inchi)
+    print(tmp_mol.inchi)
     assert mol.same(tmp_mol)
 
     assert mol is not mol2

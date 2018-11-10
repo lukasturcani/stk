@@ -3,20 +3,20 @@ import stk
 
 def test_rdkit(mol):
     e1 = mol.energy.rdkit('uff')
-    assert abs(e1 - 59.003470735439585) < 1e-4
+    assert abs(e1 - 63.08022818007178) < 1e-4
     e2 = mol.energy.rdkit('mmff')
-    assert abs(e2 - 65.17285719079524) < 1e-4
+    assert abs(e2 - 64.47479589587392) < 1e-4
 
 
 def test_formation(polymer, mol):
-    reactant_energy = sum(mol.energy.rdkit('uff') for
+    reactant_energy = sum(mol.energy.rdkit('mmff') for
                           mol in polymer.building_blocks)
-    product_energy = (polymer.energy.rdkit('uff') +
-                      mol.energy.rdkit('uff'))
+    product_energy = (polymer.energy.rdkit('mmff') +
+                      mol.energy.rdkit('mmff'))
     form_energy = reactant_energy - product_energy
 
     func = stk.FunctionData(name='rdkit',
-                            forcefield='uff')
+                            forcefield='mmff')
     calc_form_energy = polymer.energy.formation(
                            func=func,
                            products=[(1, mol)])
@@ -25,14 +25,16 @@ def test_formation(polymer, mol):
 
 
 def test_pseudoformation(polymer):
-    reactant_energy = sum(mol.energy.rdkit('uff') for
+    reactant_energy = sum(mol.energy.rdkit('mmff') for
                           mol in polymer.building_blocks)
-    product_energy = polymer.energy.rdkit('uff')
+    product_energy = polymer.energy.rdkit('mmff')
+    print(polymer.bb_counter)
+    print(2, reactant_energy, product_energy)
     pseudoform_energy = reactant_energy - product_energy
 
     calc_pseudoform_energy = polymer.energy.pseudoformation(
                                 stk.FunctionData(name='rdkit',
-                                                 forcefield='uff'))
+                                                 forcefield='mmff'))
 
     assert abs(pseudoform_energy - calc_pseudoform_energy) < 1e-4
 
