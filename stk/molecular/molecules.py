@@ -2440,6 +2440,19 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     def __repr__(self):
         return str(self)
 
+    def __eq__(self, other):
+        if self.inchi != other.inchi:
+            return False
+
+        if self.func_grp is None or other.func_grp is None:
+            return self.func_grp is None and other.func_grp is None
+
+        return self.func_grp.name == other.func_grp.name
+
+    def __hash__(self):
+        fg = None if self.func_grp is None else self.func_grp.name
+        return hash((self.inchi, fg))
+
 
 class StructUnit2(StructUnit):
     """
@@ -2972,9 +2985,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        bbs = [Molecule.from_dict(x) for x in
-               json_dict['building_blocks']]
-
+        bb_counter = Counter({Molecule.from_dict(key): val for
+                              key, val in json_dict['bb_counter']})
+        bbs = list(bb_counter)
         topology = eval(json_dict['topology'],  topologies.__dict__)
 
         key = cls.gen_key(bbs, topology)
@@ -2990,8 +3003,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                                     np.__dict__)
         obj.fitness = None
         obj.progress_params = json_dict['progress_params']
-        obj.bb_counter = Counter({Molecule.from_dict(key): val for
-                                  key, val in json_dict['bb_counter']})
+        obj.bb_counter = bb_counter
         obj.bonds_made = json_dict['bonds_made']
         obj.energy = Energy(obj)
         obj.optimized = json_dict['optimized']
