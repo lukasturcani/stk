@@ -197,7 +197,7 @@ def test_TenPlusTwenty(aldehyde2, amine4):
 
 # 3 + 3 cage topologies.
 def test_OnePlusOne(amine3, aldehyde3):
-    top = stk.OnePlusOne(bb_assignments={
+    top = stk.OnePlusOne(bb_positions={
                             0: [0],
                             1: [1]
     })
@@ -223,7 +223,7 @@ def test_OnePlusOne(amine3, aldehyde3):
 
 
 def test_TwoPlusTwo(amine3, aldehyde3):
-    top = stk.TwoPlusTwo(bb_assignments={
+    top = stk.TwoPlusTwo(bb_positions={
                             0: [0, 1],
                             1: [2, 3]
     })
@@ -249,7 +249,7 @@ def test_TwoPlusTwo(amine3, aldehyde3):
 
 
 def test_FourPlusFour(amine3, aldehyde3):
-    top = stk.FourPlusFour(bb_assignments={
+    top = stk.FourPlusFour(bb_positions={
                                 0: [4, 1, 6, 3],
                                 1: [0, 5, 2, 7]
     })
@@ -324,7 +324,7 @@ def test_FourPlusSix(amine2, aldehyde3):
 def test_multiFourPlusSix(amine2, amine2_alt1, amine2_alt2,
                           aldehyde3, aldehyde3_alt1, aldehyde3_alt2):
     top = stk.FourPlusSix(
-                      bb_assignments={
+                      bb_positions={
                           0: [0, 1],
                           1: [2, 3, 4],
                           2: [5],
