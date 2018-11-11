@@ -7,7 +7,15 @@ import rdkit.Chem.AllChem as rdkit
 stk.OPTIONS['cache'] = False
 
 
-class TestMol(stk.MacroMolecule):
+class TestEnergy(stk.Energy):
+    def pseudoformation(self, *_, **__):
+        return 12
+
+    def rdkit(self, *_, **__):
+        return 12
+
+
+class TestMol(stk.Cage):
     def __init__(self,
                  building_blocks,
                  topology,
@@ -28,6 +36,19 @@ class TestMol(stk.MacroMolecule):
             self.mol = rdkit.CombineMols(self.mol, bb.mol)
         self.topology = topology
         stk.Molecule.__init__(self, name, note)
+        self.energy = TestEnergy(self)
+
+    def windows(self, *_, **__):
+        return [4, 3, 2, 1]
+
+    def cavity_size(self, *_, **__):
+        return 3.48
+
+    def bb_distortion(self, *_, **__):
+        return 5
+
+    def dihedral_strain(self, *_, **__):
+        return 4
 
 
 @pytest.fixture(scope='session')
@@ -125,7 +146,35 @@ def cc3():
 
 
 @pytest.fixture(scope='session')
-def generate_population():
+def c60():
+    return stk.StructUnit(join('data', 'fitness', 'target.pdb'))
+
+
+@pytest.fixture(scope='session')
+def test_mol1():
+    bb1 = stk.StructUnit2.smiles_init('N')
+    bb2 = stk.StructUnit3.smiles_init('NN')
+    # Make sure calling build does nothing.
+    top = stk.FourPlusSix()
+    top.build = lambda x: ...
+    test_mol = TestMol([bb1, bb2], top)
+    test_mol.mol = rdkit.Mol(bb1.mol)
+    test_mol.bonds_made = 2
+    return test_mol
+
+
+@pytest.fixture(scope='session')
+def struct_units2():
+    return [stk.StructUnit2.smiles_init('C'*i) for i in range(1, 12)]
+
+
+@pytest.fixture(scope='session')
+def struct_units3():
+    return [stk.StructUnit3.smiles_init('C'*i) for i in range(1, 12)]
+
+
+@pytest.fixture(scope='session')
+def generate_population(struct_units2, struct_units3):
 
     def inner(cache=False, offset=False):
         """
@@ -135,17 +184,14 @@ def generate_population():
 
         stk.OPTIONS['cache'] = cache
 
-        bbs = [stk.StructUnit.smiles_init('C'*i)
-               for i in range(1, 12)]
-
         # Generate a bunch of cages.
         if offset:
-            mols = [TestMol([bbs[i], bbs[i+1]], stk.FourPlusSix())
-                    for i in range(0, 10)]
+            mols = [TestMol([struct_units2[i], struct_units3[i+1]],
+                            stk.FourPlusSix()) for i in range(10)]
 
-        if not offset:
-            mols = [TestMol([bbs[x], bbs[x]], stk.FourPlusSix())
-                    for x in range(0, 10)]
+        else:
+            mols = [TestMol([struct_units2[i], struct_units3[i]],
+                            stk.FourPlusSix()) for i in range(10)]
 
         # Generate a couple of
         # populations to be used as subpopulations.
@@ -169,18 +215,8 @@ def generate_population():
 
 
 @pytest.fixture(scope='session')
-def pop(pop_generator):
+def pop(generate_population):
     return generate_population()
-
-
-@pytest.fixture(scope='session')
-def cage():
-    return stk.Molecule.load(join('data', 'fitness', 'cage.json'))
-
-
-@pytest.fixture(scope='session')
-def target():
-    return join('data', 'fitness', 'target.pdb')
 
 
 @pytest.fixture(scope='session')
