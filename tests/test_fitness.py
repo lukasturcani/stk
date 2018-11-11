@@ -1,30 +1,53 @@
 import stk
 import numpy as np
-import pytest
 
 
-def test_cage(cage):
-    assert isinstance(stk.fitness.cage(cage), np.ndarray)
+def test_cage(test_mol1):
+    assert np.allclose(stk.fitness.cage(test_mol1),
+                       [test_mol1.cavity_size(),
+                        max(test_mol1.windows()),
+                        test_mol1.window_difference(),
+                        test_mol1.energy.rdkit()/test_mol1.bonds_made,
+                        test_mol1.bb_distortion(),
+                        test_mol1.dihedral_strain()],
+                       atol=1e-6)
 
 
-def test_cage_target(cage, target):
-    # Because no optimization function is used this function will fail.
-    with pytest.raises(ValueError) as ex:
-        isinstance(stk.cage_target(cage, target,
-                   stk.FunctionData('rdkit', forcefield='mmff'),
-                   stk.FunctionData('do_not_optimize')), np.ndarray)
-        # The 3rd fitness parameter should be the only one that failed.
-        ex.args[1].pop(2)
-        assert all(x is not None for x in ex.args[1])
+def test_cage_target(test_mol1, amine2):
+    fitness = stk.cage_target(
+                  test_mol1,
+                  amine2,
+                  stk.FunctionData('rdkit', forcefield='mmff'),
+                  stk.FunctionData('do_not_optimize'))
+
+    expected_fitness = [-4.02119416,
+                        test_mol1.cavity_size(),
+                        test_mol1.window_difference(),
+                        test_mol1.bb_distortion(),
+                        test_mol1.cavity_size(),
+                        test_mol1.window_difference(),
+                        test_mol1.bb_distortion(),
+                        test_mol1.dihedral_strain()]
+    assert np.allclose(fitness, expected_fitness, atol=1e-6)
 
 
-def test_cage_c60(cage, target):
-    # Because no optimization function is used this function will fail.
-    with pytest.raises(ValueError) as ex:
-        isinstance(stk.cage_c60(cage, target,
-                   stk.FunctionData('rdkit', forcefield='mmff'),
-                   stk.FunctionData('do_not_optimize'), 1, 1),
-                   np.ndarray)
-        # The 3rd fitness parameter should be the only one that failed.
-        ex.args[1].pop(2)
-        assert all(x is not None for x in ex.args[1])
+def test_cage_c60(test_mol1, c60):
+    fitness = stk.cage_c60(
+                  test_mol1,
+                  c60,
+                  stk.FunctionData('rdkit', forcefield='mmff'),
+                  stk.FunctionData('do_not_optimize'),
+                  n5fold=1,
+                  n2fold=1)
+
+    expected_fitness = [
+                   -704.24608581,
+                   test_mol1.cavity_size(),
+                   test_mol1.window_difference(),
+                   test_mol1.bb_distortion(),
+                   test_mol1.cavity_size(),
+                   test_mol1.window_difference(),
+                   test_mol1.bb_distortion(),
+                   test_mol1.dihedral_strain()]
+
+    assert np.allclose(fitness, expected_fitness, atol=1e-6)
