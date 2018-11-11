@@ -127,6 +127,7 @@ class GAInput:
         the input file, for example:
 
         .. code-block:: python
+
             # some_input_file.py
 
             def custom_fitness_fn(macro_mol):
@@ -142,6 +143,7 @@ class GAInput:
         DO NOT DO THIS:
 
         .. code-block:: python
+
             # some_input_file.py
 
             def fitness_func(macro_mol):
