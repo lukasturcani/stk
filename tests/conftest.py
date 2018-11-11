@@ -115,7 +115,7 @@ def aldehyde3_alt2():
 
 @pytest.fixture(scope='session')
 def boronic_acid4():
-    return stk.StructUnit3(join('data', 'cof', 'boronic_acid.sdf'))
+    return stk.StructUnit3(join('data', 'boronic_acid.sdf'))
 
 
 @pytest.fixture(scope='session')
@@ -142,12 +142,12 @@ def polymer(amine2, aldehyde2):
 
 @pytest.fixture(scope='session')
 def cc3():
-    return stk.Molecule.load(join('data', 'cage', 'cc3.json'))
+    return stk.Molecule.load(join('data', 'cc3.json'))
 
 
 @pytest.fixture(scope='session')
 def c60():
-    return stk.StructUnit(join('data', 'fitness', 'target.pdb'))
+    return stk.StructUnit(join('data', 'c60.pdb'))
 
 
 @pytest.fixture(scope='session')
@@ -221,4 +221,4 @@ def pop(generate_population):
 
 @pytest.fixture(scope='session')
 def ga_input():
-    return stk.GAInput(join('data', 'gainput', 'test.py'))
+    return stk.GAInput(join('data', 'inputfile.py'))
