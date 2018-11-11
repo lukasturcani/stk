@@ -16,9 +16,11 @@ Overview
 --------
 
 ``stk`` is a Python library for building, manipulating, analyzing and
-automatic design of molecules, including a genetic algorithm. 
+automatic design of molecules, including a genetic algorithm.
 
 For quick navigation through the modules use :ref:`modindex`.
+For a closer look at the genetic algorithm, start with
+`Automated Molecular Design with Genetic Algorithms`_.
 
 Basic Examples
 --------------
@@ -479,14 +481,266 @@ Via the :mod:`.ga` module, ``stk`` includes a genetic algorithm which
 can be used to evolve molecules that fulfil user defined design criteria.
 The genetic algorithm can be run from the command line using::
 
-    $ python -m stk input_file.py
+    $ python -m stk.ga input_file.py
 
 The input file is a simple python script which defines the mutation,
 crossover, selection and other functions the genetic algorithm
-should use. For details on how to build and input file see :class:`.GAInput`.
+should use. For details on how to build an input file see :class:`.GAInput`
+and :doc:`ga_input_file_examples`.
 
 The genetic algorithm automatically works with any molecules that ``stk``
 can construct, just make sure you define an appropriate fitness function.
+
+Take for example, the following input file which runs the GA on polymers
+and selects building blocks which have the most atoms.
+
+.. code-block:: python
+
+    # big_monomers.py
+
+
+
+Running the genetic algorithm with this input file::
+
+    $ python -m stk.ga big_monomers.py
+
+will produce the following directory structure::
+
+    |-- old_output
+    |   |-- 0
+    |   |   |-- counters
+    |   |   |   |-- gen_1_crossover_counter.png
+    |   |   |   |-- gen_1_mutation_counter.png
+    |   |   |   |-- gen_1_selection_counter.png
+    |   |   |   |-- ...
+    |   |   |
+    |   |   |-- final_pop
+    |   |   |   |-- 150.mol
+    |   |   |   |-- 2160.mol
+    |   |   |   |-- 9471.mol
+    |   |   |   |-- ...
+    |   |   |
+    |   |   |-- pop_dumps
+    |   |   |   |-- gen_1_selected.json
+    |   |   |   |-- gen_1_unselected.json
+    |   |   |   |-- ...
+    |   |   |
+    |   |   |-- big_monomers.py
+    |   |   |-- database.json
+    |   |   |-- progress.json
+    |   |   |-- errors.log
+    |   |   |-- progress.log
+    |   |   |-- epp.png
+    |   |   |-- epp.dmp
+    |   |   |-- output.tgz
+
+A glance at the evolutionary progress plot in ``epp.png`` will show us
+how well our GA did.
+
+.. image:: figures/epp.png
+
+
+Running the genetic algorithm again::
+
+    $ python -m stk.ga big_monomers.py
+
+will add a second subfolder with the same structure::
+
+    |-- old_output
+    |   |-- 0
+    |   |   |-- counters
+    |   |   |   |-- gen_1_crossover_counter.png
+    |   |   |   |-- gen_1_mutation_counter.png
+    |   |   |   |-- gen_1_selection_counter.png
+    |   |   |   |-- ...
+    |   |   |
+    |   |   |-- final_pop
+    |   |   |   |-- 150.mol
+    |   |   |   |-- 2160.mol
+    |   |   |   |-- 9471.mol
+    |   |   |   |-- ...
+    |   |   |
+    |   |   |-- pop_dumps
+    |   |   |   |-- gen_1_selected.json
+    |   |   |   |-- gen_1_unselected.json
+    |   |   |   |-- ...
+    |   |   |
+    |   |   |-- big_monomers.py
+    |   |   |-- database.json
+    |   |   |-- progress.json
+    |   |   |-- errors.log
+    |   |   |-- progress.log
+    |   |   |-- epp.png
+    |   |   |-- epp.dmp
+    |   |   |-- output.tgz
+    |
+    |   |-- 1
+    |   |   |-- counters
+    |   |   |   |-- gen_1_crossover_counter.png
+    |   |   |   |-- gen_1_mutation_counter.png
+    |   |   |   |-- gen_1_selection_counter.png
+    |   |   |   |-- ...
+    |   |   |
+    |   |   |-- final_pop
+    |   |   |   |-- 41.mol
+    |   |   |   |-- 221.mol
+    |   |   |   |-- 1391.mol
+    |   |   |   |-- ...
+    |   |   |
+    |   |   |-- pop_dumps
+    |   |   |   |-- gen_1_selected.json
+    |   |   |   |-- gen_1_unselected.json
+    |   |   |   |-- ...
+    |   |   |
+    |   |   |-- big_monomers.py
+    |   |   |-- database.json
+    |   |   |-- progress.json
+    |   |   |-- errors.log
+    |   |   |-- progress.log
+    |   |   |-- epp.png
+    |   |   |-- epp.dmp
+    |   |   |-- output.tgz
+
+The genetic algorithm can also be run multiple times in a row::
+
+    $ python -m stk.ga -l 5 big_monomers.py
+
+which will run the GA 5 separate times adding 5 more subfolders to the
+directory structure::
+
+    |-- old_output
+    |   |-- 0
+    |   |   |-- ...
+    |   |
+    |   |-- 1
+    |   |   |-- ...
+    |   |
+    |   |-- 2
+    |   |   |-- ...
+    |   |
+    |   |-- 3
+    |   |   |-- ...
+    |   |
+    |   |-- 4
+    |   |   |-- ...
+    |   |
+    |   |-- 5
+    |   |   |-- ...
+    |   |
+    |   |-- 6
+            |-- ...
+
+The benefit of using the ``-l`` option is that the molecular cache is
+not reset between each run. This means that a molecule which was constructed,
+optimized and had its fitness value calculated in the first run will
+not need to be re-constructed, re-optimized or have fitness value
+re-calculated in any of the subsequent runs. The cached version
+of the molecule will be used.
+
+However, the molecular cache be pre-loaded even when the ``-l`` option is
+not used. The input file allows the definition of a variable
+:attr:`~.GAInput.databases`, for example
+
+.. code-block:: python
+
+    # some_inputfile.py
+
+    databases = ['path/to/some/population1.json',
+                 'path/to/some/other/population2.json']
+
+If this variable is defined in the input file, any molecules present
+in the population dump files will be loaded into the cache before the
+GA starts. This means that any molecules found in these populations
+will not be re-optimized, or have their fitness value re-calculated
+if discovered by the GA.
+
+The output of a single GA consists of a number of files and
+directories. The ``counter`` directory holds ``.png`` files showing
+how frequently a member of the population was selected for mutation,
+crossover and generational selection. For example
+
+.. image:: figures/counter_example.png
+
+shows that
+
+If you do want want the GA to produce these files, simply tell the
+GA in the input file::
+
+.. code-block:: python
+
+    # some_input_file.py
+
+    counters = False
+
+The ``final_pop`` directory holds the ``.mol`` files holding the
+structures of the last generation of molecules. We can see that
+in our case the GA produced 5 polymers all formed from large monomers.
+
+.. image:: figures/ga_last_pop.png
+
+The ``pop_dumps`` directory holds the population dump files at each
+generation. Files of the form ``gen_X_selected.json`` hold the molecules
+of the generation after the generational selection is performed while
+files of the form ``gen_X_unselected.json`` hold the generation before
+generational selection is performed. This folder can also be removed
+through the input file
+
+.. code-block:: python
+
+    # some_input_file.py
+
+    pop_dumps = False
+
+Disabling this folder will likely increase the speed of the GA
+significantly, but will make debugging harder if something goes wrong,
+as you can lose all your progress if an unhandled exception occurs.
+
+The output folder has a copy of the input file used to produce the
+output, ``big_monomers.py`` in our example. The ``database.json``
+file is a population dump file which holds every molecule produced by
+the GA during the run. This can be turned off with
+
+.. code-block:: python
+
+    # some_input_file.py
+
+    database_dump = False
+
+``progress.json`` is also a population dump file. This population hold
+every generation of the GA as a subpopulation. This is quite useful
+if you want to analyse the output of the GA generation-wise. It
+can be turned off with
+
+.. code-block:: python
+
+    # some_input_file.py
+
+    progress_dump = False
+
+``errors.log`` is a file which contains every exception and its
+traceback encountered by the GA during its run.
+
+``progress.log`` is a file which lists which molecules make up each
+generation, and their respective fitness values.
+
+``epp.png`` is a picture of the evolutionary progress plot. It
+shows how the fitness values change with the generations, for example
+
+.. image:: figures/epp.png
+
+``epp.dmp`` is a :mod:`numpy` array dump holding all the data used to
+make ``epp.png``.
+
+``output.tgz`` is a tarred and compressed copy of the output folder for
+the run.
+This means if you want to share you entire run output you can just
+share this file. It can be turned off with
+
+.. code-block:: python
+
+    # some_input_file.png
+
+    tar_output = False
 
 .. _`extending stk`:
 

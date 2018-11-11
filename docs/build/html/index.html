@@ -175,7 +175,9 @@
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">stk</span></code> is a Python library for building, manipulating, analyzing and
 automatic design of molecules, including a genetic algorithm.</p>
-<p>For quick navigation through the modules use <a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a>.</p>
+<p>For quick navigation through the modules use <a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a>.
+For a closer look at the genetic algorithm, start with
+<a class="reference internal" href="#automated-molecular-design-with-genetic-algorithms">Automated Molecular Design with Genetic Algorithms</a>.</p>
 </div>
 <div class="section" id="basic-examples">
 <h2>Basic Examples<a class="headerlink" href="#basic-examples" title="Permalink to this headline">¶</a></h2>
@@ -515,14 +517,236 @@ all the molecules to a folder</p>
 <p>Via the <a class="reference internal" href="stk.ga.html#module-stk.ga" title="stk.ga"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ga</span></code></a> module, <code class="docutils literal notranslate"><span class="pre">stk</span></code> includes a genetic algorithm which
 can be used to evolve molecules that fulfil user defined design criteria.
 The genetic algorithm can be run from the command line using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m stk input_file.py
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m stk.ga input_file.py
 </pre></div>
 </div>
 <p>The input file is a simple python script which defines the mutation,
 crossover, selection and other functions the genetic algorithm
-should use. For details on how to build and input file see <a class="reference internal" href="stk.ga.input.html#stk.ga.input.GAInput" title="stk.ga.input.GAInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAInput</span></code></a>.</p>
+should use. For details on how to build an input file see <a class="reference internal" href="stk.ga.input.html#stk.ga.input.GAInput" title="stk.ga.input.GAInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAInput</span></code></a>
+and <span class="xref std std-doc">ga_input_file_examples</span>.</p>
 <p>The genetic algorithm automatically works with any molecules that <code class="docutils literal notranslate"><span class="pre">stk</span></code>
 can construct, just make sure you define an appropriate fitness function.</p>
+<p>Take for example, the following input file which runs the GA on polymers
+and selects building blocks which have the most atoms.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># big_monomers.py</span>
+</pre></div>
+</div>
+<p>Running the genetic algorithm with this input file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m stk.ga big_monomers.py
+</pre></div>
+</div>
+<p>will produce the following directory structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">old_output</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">0</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">counters</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_crossover_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_mutation_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selection_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">final_pop</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">150.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">2160.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">9471.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">pop_dumps</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selected</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_unselected</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">big_monomers</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">database</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">errors</span><span class="o">.</span><span class="n">log</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">dmp</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">output</span><span class="o">.</span><span class="n">tgz</span>
+</pre></div>
+</div>
+<p>A glance at the evolutionary progress plot in <code class="docutils literal notranslate"><span class="pre">epp.png</span></code> will show us
+how well our GA did.</p>
+<img alt="figures/epp.png" src="figures/epp.png" />
+<p>Running the genetic algorithm again:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m stk.ga big_monomers.py
+</pre></div>
+</div>
+<p>will add a second subfolder with the same structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">old_output</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">0</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">counters</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_crossover_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_mutation_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selection_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">final_pop</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">150.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">2160.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">9471.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">pop_dumps</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selected</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_unselected</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">big_monomers</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">database</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">errors</span><span class="o">.</span><span class="n">log</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">dmp</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">output</span><span class="o">.</span><span class="n">tgz</span>
+<span class="o">|</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">1</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">counters</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_crossover_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_mutation_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selection_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">final_pop</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">41.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">221.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">1391.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">pop_dumps</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selected</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_unselected</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">big_monomers</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">database</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">json</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">errors</span><span class="o">.</span><span class="n">log</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">dmp</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">output</span><span class="o">.</span><span class="n">tgz</span>
+</pre></div>
+</div>
+<p>The genetic algorithm can also be run multiple times in a row:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m stk.ga -l 5 big_monomers.py
+</pre></div>
+</div>
+<p>which will run the GA 5 separate times adding 5 more subfolders to the
+directory structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">old_output</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">0</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">1</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">2</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">3</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">4</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">5</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
+<span class="o">|</span>   <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="mi">6</span>
+        <span class="o">|--</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>The benefit of using the <code class="docutils literal notranslate"><span class="pre">-l</span></code> option is that the molecular cache is
+not reset between each run. This means that a molecule which was constructed,
+optimized and had its fitness value calculated in the first run will
+not need to be re-constructed, re-optimized or have fitness value
+re-calculated in any of the subsequent runs. The cached version
+of the molecule will be used.</p>
+<p>However, the molecular cache be pre-loaded even when the <code class="docutils literal notranslate"><span class="pre">-l</span></code> option is
+not used. The input file allows the definition of a variable
+<a class="reference internal" href="stk.ga.input.html#stk.ga.input.GAInput.databases" title="stk.ga.input.GAInput.databases"><code class="xref py py-attr docutils literal notranslate"><span class="pre">databases</span></code></a>, for example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_inputfile.py</span>
+
+<span class="n">databases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;path/to/some/population1.json&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;path/to/some/other/population2.json&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If this variable is defined in the input file, any molecules present
+in the population dump files will be loaded into the cache before the
+GA starts. This means that any molecules found in these populations
+will not be re-optimized, or have their fitness value re-calculated
+if discovered by the GA.</p>
+<p>The output of a single GA consists of a number of files and
+directories. The <code class="docutils literal notranslate"><span class="pre">counter</span></code> directory holds <code class="docutils literal notranslate"><span class="pre">.png</span></code> files showing
+how frequently a member of the population was selected for mutation,
+crossover and generational selection. For example</p>
+<img alt="figures/counter_example.png" src="figures/counter_example.png" />
+<p>shows that</p>
+<p>If you do want want the GA to produce these files, simply tell the
+GA in the input file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">code</span><span class="o">-</span><span class="n">block</span><span class="p">::</span> <span class="n">python</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p># some_input_file.py</p>
+<p>counters = False</p>
+</div></blockquote>
+<p>The <code class="docutils literal notranslate"><span class="pre">final_pop</span></code> directory holds the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> files holding the
+structures of the last generation of molecules. We can see that
+in our case the GA produced 5 polymers all formed from large monomers.</p>
+<img alt="figures/ga_last_pop.png" src="figures/ga_last_pop.png" />
+<p>The <code class="docutils literal notranslate"><span class="pre">pop_dumps</span></code> directory holds the population dump files at each
+generation. Files of the form <code class="docutils literal notranslate"><span class="pre">gen_X_selected.json</span></code> hold the molecules
+of the generation after the generational selection is performed while
+files of the form <code class="docutils literal notranslate"><span class="pre">gen_X_unselected.json</span></code> hold the generation before
+generational selection is performed. This folder can also be removed
+through the input file</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.py</span>
+
+<span class="n">pop_dumps</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
+<p>Disabling this folder will likely increase the speed of the GA
+significantly, but will make debugging harder if something goes wrong,
+as you can lose all your progress if an unhandled exception occurs.</p>
+<p>The output folder has a copy of the input file used to produce the
+output, <code class="docutils literal notranslate"><span class="pre">big_monomers.py</span></code> in our example. The <code class="docutils literal notranslate"><span class="pre">database.json</span></code>
+file is a population dump file which holds every molecule produced by
+the GA during the run. This can be turned off with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.py</span>
+
+<span class="n">database_dump</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">progress.json</span></code> is also a population dump file. This population hold
+every generation of the GA as a subpopulation. This is quite useful
+if you want to analyse the output of the GA generation-wise. It
+can be turned off with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.py</span>
+
+<span class="n">progress_dump</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">errors.log</span></code> is a file which contains every exception and its
+traceback encountered by the GA during its run.</p>
+<p><code class="docutils literal notranslate"><span class="pre">progress.log</span></code> is a file which lists which molecules make up each
+generation, and their respective fitness values.</p>
+<p><code class="docutils literal notranslate"><span class="pre">epp.png</span></code> is a picture of the evolutionary progress plot. It
+shows how the fitness values change with the generations, for example</p>
+<img alt="figures/epp.png" src="figures/epp.png" />
+<p><code class="docutils literal notranslate"><span class="pre">epp.dmp</span></code> is a <code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code> array dump holding all the data used to
+make <code class="docutils literal notranslate"><span class="pre">epp.png</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">output.tgz</span></code> is a tarred and compressed copy of the output folder for
+the run.
+This means if you want to share you entire run output you can just
+share this file. It can be turned off with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.png</span>
+
+<span class="n">tar_output</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="extending-stk">
