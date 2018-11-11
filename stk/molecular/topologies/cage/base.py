@@ -593,34 +593,62 @@ class CageTopology(Topology):
         For this to work, the edges must have their :attr:`Vertex.id_`
         attributes defined.
 
-    bb_assignments : :class:`dict`
+    bb_positions : :class:`dict`
         A :class:`dict` of the form
 
         .. code-block:: python
 
-            bb_assignments = {
+            bb_positions = {
+                bb1: [0, 1, 3],
+                bb2: [2]
+                bb3: [0, 4, 5],
+                bb4: [1, 2, 3]
+            }
+
+        where ``bb1`` and ``bb2`` are the :class:`.StructUnit3`
+        objects used to initialize the cage and ``bb3``, ``bb4`` are
+        the :class:`.StructUnit3` objects used to initialize a cage:
+
+        .. code-block:: python
+
+            cage = Cage([bb1, bb2, bb3, bb4],
+                        stk.FourPlusSix(bb_positions=bb_positions))
+
+        This means ``bb1`` sits on the vertices ``0``, ``1``,
+        and ``3``, ``bb2`` sits on vertex ``2`` of the cage, while
+        ``bb3`` sits on the edges ``0``, ``4`` and ``5`` and
+        ``bb4`` sits on the edges ``1``, ``2`` and ``3``. The
+        vertices and edges can be found in class attributes
+        :attr:`~.CageTopology.positions_A` and
+        :attr:`~.CageTopology.positions_B` of each cage topology.
+        Vertex ``0`` therefore refers to the vertex with index ``0``
+        in :attr:`~.CageTopology.positions_A` and so on.
+
+        If ``bb_positions=None`` then building blocks are placed on
+        edges and vertices at random.
+
+        It is also possible to specify the building blocks via their
+        index, for example:
+
+        .. code-block:: python
+
+            bb_positions = {
                 0: [0, 1, 3],
                 1: [2]
                 2: [0, 4, 5],
                 3: [1, 2, 3]
             }
 
-        This means the building block at index ``0`` of
-        :attr:`.MacroMolecule.building_blocks` sits on the vertices
-        of indices ``0``, ``1``, and ``3``. The building block at
-        index ``1`` of :attr:`.MacroMolecule.building_blocks` sits on
-        verticex of index ``2``.
+        Here ``bb1`` was replaced by ``0`` because it has an index
+        of ``0`` during cage construction, recall:
 
-        The building block at index ``2`` in
-        :attr:`.MacroMolecule.building_blocks` also sits on the vertex
-        of index ``0``. However each cage is composed of two sets of
-        building blocks, called building blocks and linkers. This means
-        that the building block at index ``0`` is builing block while
-        the one at index ``2`` is a linker, or vice versa. Which one
-        is which is automatically deduced by looking at the number of
-        functional groups.
+        .. code-block:: python
 
-        If ``None`` then building blocks are assigned at random.
+            cage = Cage([bb1, bb2, bb3, bb4],
+                        stk.FourPlusSix(bb_positions=bb_positions))
+
+        equally ``bb2`` is replaced by ``1`` in ``bb_positions``
+        because it has an index of ``1`` and so on.
 
     """
 
@@ -628,7 +656,7 @@ class CageTopology(Topology):
                  A_alignments=None,
                  B_alignments=None,
                  edge_alignments=None,
-                 bb_assignments=None):
+                 bb_positions=None):
 
         if A_alignments is None:
             A_alignments = np.zeros(len(self.positions_A))
@@ -642,7 +670,7 @@ class CageTopology(Topology):
         self.A_alignments = A_alignments
         self.B_alignments = B_alignments
         self.edge_alignments = edge_alignments
-        self.bb_assignments = bb_assignments
+        self.bb_positions = bb_positions
 
     def _bb_maps(self, macro_mol):
         """
@@ -653,7 +681,7 @@ class CageTopology(Topology):
                      bb in macro_mol.building_blocks)
         bb_map, lk_map = {}, {}
 
-        if self.bb_assignments is None:
+        if self.bb_positions is None:
             bbs = [bb for bb in macro_mol.building_blocks if
                    len(bb.functional_group_atoms()) == bb_fgs]
             lks = [bb for bb in macro_mol.building_blocks if
@@ -666,8 +694,12 @@ class CageTopology(Topology):
 
         else:
 
-            for bb_index, positions in self.bb_assignments.items():
-                bb = macro_mol.building_blocks[bb_index]
+            for bb, positions in self.bb_positions.items():
+                # bb_positions can hold the StructUnits directly or
+                # refer to them by index.
+                if isinstance(bb, int):
+                    bb = macro_mol.building_blocks[bb]
+
                 n_fgs = len(bb.functional_group_atoms())
                 map_ = bb_map if n_fgs == bb_fgs else lk_map
                 for position in positions:
@@ -888,7 +920,7 @@ class NoLinkerCageTopology(CageTopology):
     alignments : :class:`list` of :class:`int`
         See :attr:`CageTopology.A_alignments`
 
-    bb_assignments : :class:`list` of :class:`int`
+    bb_positions : :class:`list` of :class:`int`
         For each vertex, the :class:`int` is the index of a
         building block in :attr:`.MacroMolecule.building_blocks`.
         It is the building block to be placed on that vertex. Can be
@@ -896,12 +928,12 @@ class NoLinkerCageTopology(CageTopology):
 
     """
 
-    def __init__(self, alignments=None, bb_assignments=None):
+    def __init__(self, alignments=None, bb_positions=None):
         if alignments is None:
             alignments = np.zeros(len(self.positions_A))
 
         self.alignments = alignments
-        self.bb_assignments = bb_assignments
+        self.bb_positions = bb_positions
         self.connect()
         self.react_del = True
 
@@ -910,11 +942,11 @@ class NoLinkerCageTopology(CageTopology):
         scale = max(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
 
         bb_map = {}
-        if self.bb_assignments is None:
+        if self.bb_positions is None:
             for i in range(len(self.positions_A)):
                 bb_map[i] = np.random.choice(macro_mol.building_blocks)
         else:
-            for bb_index, positions in self.bb_assignments.items():
+            for bb_index, positions in self.bb_positions.items():
                 bb = macro_mol.building_blocks[bb_index]
                 for position in positions:
                     bb_map[position] = bb
