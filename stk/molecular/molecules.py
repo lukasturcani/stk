@@ -195,8 +195,12 @@ from ..utilities import (flatten,
 
 
 logger = logging.getLogger(__name__)
-# Toggles caching when making molecules.
-CACHE_SETTINGS = {'ON': True}
+
+OPTIONS = {
+    # Toggle caching of molecules.
+    'cache': True
+
+}
 
 
 class Cached(type):
@@ -216,12 +220,12 @@ class Cached(type):
         sig = sig.arguments
         key = self.gen_key(sig['building_blocks'], sig['topology'])
 
-        if key in self.cache and CACHE_SETTINGS['ON']:
+        if key in self.cache and OPTIONS['cache']:
             return self.cache[key]
         else:
             obj = super().__call__(*args, **kwargs)
             obj.key = key
-            if CACHE_SETTINGS['ON']:
+            if OPTIONS['cache']:
                 self.cache[key] = obj
             return obj
 
@@ -262,12 +266,12 @@ class CachedStructUnit(type):
                        x.name in sig['file']), None)
 
         key = self.gen_key(mol, fg)
-        if key in self.cache and CACHE_SETTINGS['ON']:
+        if key in self.cache and OPTIONS['cache']:
             return self.cache[key]
         else:
             obj = super().__call__(*args, **kwargs)
             obj.key = key
-            if CACHE_SETTINGS['ON']:
+            if OPTIONS['cache']:
                 self.cache[key] = obj
             return obj
 
@@ -562,9 +566,10 @@ class Molecule:
         ref = self.center_of_mass(conformer)
         icavity = 0.5*self._cavity_size(ref, conformer)
         bounds = [(coord+icavity, coord-icavity) for coord in ref]
-        cavity_origin = minimize(lambda x: self._cavity_size(x, conformer),
-                                 x0=ref,
-                                 bounds=bounds).x
+        cavity_origin = minimize(
+                            lambda x: self._cavity_size(x, conformer),
+                            x0=ref,
+                            bounds=bounds).x
         cavity = -self._cavity_size(cavity_origin, conformer)
         return 0 if cavity < 0 else cavity
 
@@ -2255,10 +2260,14 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     def smiles_init(cls,
                     smiles,
                     functional_group=None,
+                    random_seed=4,
                     note="",
                     name=""):
         """
         Initialize from a SMILES string.
+
+        The structure of the molecule is embedded using
+        :func:`rdkit.ETKDG()`.
 
         Parameters
         ----------
@@ -2269,6 +2278,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             The name of the functional group which is to have atoms
             tagged. If no functional group is provided to this
             parameter, no tagging is done.
+
+        random_seed : :class:`int`, optional
+            Random seed passed to :func:`rdkit.ETKDG`
 
         note : :class:`str`, optional
             A note or comment about the molecule.
@@ -2288,10 +2300,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         rdkit.SanitizeMol(mol)
         mol = rdkit.AddHs(mol)
         key = cls.gen_key(mol, functional_group)
-        if key in cls.cache and CACHE_SETTINGS['ON']:
+        if key in cls.cache and OPTIONS['cache']:
             return cls.cache[key]
 
-        rdkit.EmbedMolecule(mol, rdkit.ETKDG())
+        params = rdkit.ETKDG()
+        params.randomSeed = random_seed
+        rdkit.EmbedMolecule(mol, params)
         obj = cls.__new__(cls)
         obj.file = smiles
         obj.key = key
@@ -2429,6 +2443,19 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def __repr__(self):
         return str(self)
+
+    def __eq__(self, other):
+        if self.inchi != other.inchi:
+            return False
+
+        if self.func_grp is None or other.func_grp is None:
+            return self.func_grp is None and other.func_grp is None
+
+        return self.func_grp.name == other.func_grp.name
+
+    def __hash__(self):
+        fg = None if self.func_grp is None else self.func_grp.name
+        return hash((self.inchi, fg))
 
 
 class StructUnit2(StructUnit):
@@ -2684,7 +2711,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     bb_counter : :class:`collections.Counter`
         A counter keeping track of how much of each building block is
-        used to form the macromolecule.
+        used to form the macromolecule. Added by
+        :func:`.Topology.build`.
 
     topology : :class:`.Topology`
         Defines the shape of macromolecule and assembles it.
@@ -2716,7 +2744,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
                                 'fitness_func2': [78, 4.2, 32.3]}
 
     bonds_made : :class:`int`
-        The number of bonds made during assembly.
+        The number of bonds made during assembly. Added by
+        :func:`.Topology.build`.
 
     """
 
@@ -2760,7 +2789,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         self.unscaled_fitness = {}
         self.progress_params = {}
         self.building_blocks = building_blocks
-        self.bb_counter = Counter()
         self.topology = topology
 
         try:
@@ -2962,13 +2990,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        bbs = [Molecule.from_dict(x) for x in
-               json_dict['building_blocks']]
-
+        bb_counter = Counter({Molecule.from_dict(key): val for
+                              key, val in json_dict['bb_counter']})
+        bbs = list(bb_counter)
         topology = eval(json_dict['topology'],  topologies.__dict__)
 
         key = cls.gen_key(bbs, topology)
-        if key in cls.cache and CACHE_SETTINGS['ON']:
+        if key in cls.cache and OPTIONS['cache']:
             return cls.cache[key]
 
         obj = cls.__new__(cls)
@@ -2980,8 +3008,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                                     np.__dict__)
         obj.fitness = None
         obj.progress_params = json_dict['progress_params']
-        obj.bb_counter = Counter({Molecule.from_dict(key): val for
-                                  key, val in json_dict['bb_counter']})
+        obj.bb_counter = bb_counter
         obj.bonds_made = json_dict['bonds_made']
         obj.energy = Energy(obj)
         obj.optimized = json_dict['optimized']
@@ -3002,7 +3029,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                     bonder_ids.extend([] for i in range(diff))
                 bonder_ids[fg_id].append(atom_id)
 
-        if CACHE_SETTINGS['ON']:
+        if OPTIONS['cache']:
             cls.cache[key] = obj
 
         return obj

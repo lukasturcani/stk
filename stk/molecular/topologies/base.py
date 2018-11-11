@@ -67,6 +67,7 @@ topology is at the origin.
 import rdkit.Chem.AllChem as rdkit
 import numpy as np
 from inspect import signature
+from collections import Counter
 
 from ..functional_groups import react
 from ...utilities import dedupe, add_fragment_props, remake
@@ -182,7 +183,7 @@ class Topology(metaclass=TopologyMeta):
 
         This method places an ``rdkit`` molecule of the assembled
         macromolecule into the :attr:`~.Molecule.mol` attribute of
-        :class:`.MacroMolecule`. It also updates the
+        :class:`.MacroMolecule`. It also creates the
         :attr:`.MacroMolecule.bb_counter` and
         :attr:`.MacroMolecule.bonds_made` attributes.
 
@@ -221,6 +222,9 @@ class Topology(metaclass=TopologyMeta):
                                       bb_conformers)
 
         macro_mol.bonds_made = 0
+        macro_mol.mol = rdkit.Mol()
+        macro_mol.bb_counter = Counter()
+
         self.place_mols(macro_mol)
         self.prepare(macro_mol)
         for fgs in self.bonded_fgs(macro_mol):
@@ -524,10 +528,10 @@ class Linear(Topology):
         dirs = self.orientation*self.n
 
         # Go through the repeating unit and place each monomer.
-        macro_mol.mol = rdkit.Mol()
-
+        bb_counter = macro_mol.bb_counter = {}
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             bb = mapping[label]
+            bb_counter[bb] = bb_counter.get(bb, 0) + 1
             original_position = bb.position_matrix()
 
             # Flip or not flip the monomer as given by the probability
@@ -535,8 +539,8 @@ class Linear(Topology):
             mdir = np.random.choice([1, -1], p=[mdir, 1-mdir])
             bb.set_orientation2([mdir, 0, 0])
 
-            # The first building block should be placed at 0, the others
-            # have positions calculated based on bb size.
+            # The first building block should be placed at 0, the
+            # others have positions calculated based on bb size.
             x_coord = self._x_position(macro_mol, bb) if i else 0
             monomer_mol = bb.set_bonder_centroid([x_coord, 0, 0])
             monomer_mol = rdkit.Mol(monomer_mol)

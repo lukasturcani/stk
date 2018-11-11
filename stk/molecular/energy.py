@@ -670,6 +670,8 @@ class Energy(metaclass=EMeta):
                       else getattr(self, func.name)(**func.params))
 
         eng = e_reactants - e_products
+        print(self.molecule.bb_counter)
+        print(1, e_reactants, e_products)
         return eng
 
     def rdkit(self, forcefield, conformer=-1):

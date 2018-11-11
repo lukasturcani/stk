@@ -1,7 +1,6 @@
 import pytest
 from collections import Counter
 import numpy as np
-from types import SimpleNamespace
 import os
 from os.path import join
 import stk
@@ -147,16 +146,16 @@ def test_load(generate_population):
         pname = join(odir, 'pop.json')
         pop.dump(pname)
 
-        stk.CACHE_SETTINGS['ON'] = True
+        stk.OPTIONS['cache'] = True
         p0 = stk.Population.load(pname, stk.Molecule.from_dict)
 
-        stk.CACHE_SETTINGS['ON'] = False
+        stk.OPTIONS['cache'] = False
         p1 = stk.Population.load(pname, stk.Molecule.from_dict)
 
         for m in p1:
             assert m not in p0
 
-        stk.CACHE_SETTINGS['ON'] = True
+        stk.OPTIONS['cache'] = True
         p2 = stk.Population.load(pname, stk.Molecule.from_dict)
 
         for m in p2:
@@ -166,10 +165,10 @@ def test_load(generate_population):
         raise
 
     finally:
-        stk.CACHE_SETTINGS['ON'] = False
+        stk.OPTIONS['cache'] = False
 
 
-def test_all_members(generate_population, mol):
+def test_all_members(generate_population):
     """
     Check that all members, direct and in subpopulations, are returned.
 

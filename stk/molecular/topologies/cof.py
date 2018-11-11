@@ -767,8 +767,6 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
 
         """
 
-        # Make the rdkit molecule.
-        macro_mol.mol = rdkit.Mol()
         # Get the building blocks.
         bb1, bb2 = macro_mol.building_blocks
         cell_size = self.scale_func(macro_mol)
@@ -796,6 +794,7 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         mol = rdkit.Mol(bb2.mol)
         mol = self.update_fg_id(macro_mol, mol)
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
+        macro_mol.bb_counter.update([bb1, bb2])
 
 
 class Honeycomb(LinkerCOFLattice):
