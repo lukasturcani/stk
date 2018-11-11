@@ -10,9 +10,9 @@ http://www.jelfs-group.org/.
 Overview
 ========
 
-``stk`` is a Python library for building, manipulating, optimizing and
-designing molecules, including a genetic algorithm for the
-automated design of molecules. For more information, the documentation can be found at
+``stk`` is a Python library for building, manipulating, analyzing and
+automatic design of molecules, including a genetic algorithm. For more
+information, the documentation can be found at
 https://lukasturcani.github.io/stk/docs/build/html.
 
 Installation
