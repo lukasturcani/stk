@@ -1,0 +1,80 @@
+{ 
+ s_m_m2io_version
+ :::
+ 2.0.0 
+} 
+
+f_m_ct { 
+ s_m_title
+ s_m_entry_id
+ s_m_entry_name
+ s_m_Source_Path
+ s_m_Source_File
+ i_m_Source_File_Index
+ i_m_ct_format
+ :::
+ ***** 
+  1 
+  eg.1 
+  /home/lukas 
+  eg.mol2 
+  1
+  2
+ m_atom[15] { 
+  # First column is atom index #
+  i_m_mmod_type
+  r_m_x_coord
+  r_m_y_coord
+  r_m_z_coord
+  i_m_residue_number
+  i_m_color
+  r_m_charge1
+  s_m_pdb_residue_name
+  s_m_pdb_atom_name
+  i_m_atomic_number
+  s_m_color_rgb
+  s_m_atom_name
+  i_m_sculpting_atom_index
+  i_m_sculpting_constraint
+  :::
+  1 26 -3.729156 -1.541142 -0.409569 1 43 -0.32990 "LIG " " N  " 7 5757FF  N  1 1
+  2 3 -1.281004 0.550426 0.169799 1 2 -0.00580 "LIG " " C  " 6 A0A0A0  C  2 2
+  3 3 0.193556 0.188805 0.410478 1 2 -0.02830 "LIG " " C  " 6 A0A0A0  C  3 2
+  4 3 0.952155 -0.143282 -0.883023 1 2 -0.00580 "LIG " " C  " 6 A0A0A0  C  4 2
+  5 26 5.172793 0.560396 -0.376877 1 43 -0.32990 "LIG " " N  " 7 5757FF  N  5 2
+  6 43 -1.956820 -1.351414 0.447149 1 21 0.11820 "LIG " " H  " 1 FFFFFF  H  6 2
+  7 43 -3.021066 -0.397262 -0.317325 1 21 0.11820 "LIG " " H  " 1 FFFFFF  H  7 2
+  8 41 -1.366484 1.334355 -0.584429 1 21 0.04220 "LIG " " H  " 1 FFFFFF  H  8 2
+  9 41 -1.716407 0.943158 1.090097 1 21 0.04220 "LIG " " H  " 1 FFFFFF  H  9 2
+  10 41 0.675704 1.038042 0.896902 1 21 0.02900 "LIG " " H  " 1 FFFFFF  H  10 2
+  11 41 0.268801 -0.641823 1.114170 1 21 0.02900 "LIG " " H  " 1 FFFFFF  H  11 2
+  12 41 0.513653 -1.023801 -1.356223 1 21 0.04220 "LIG " " H  " 1 FFFFFF  H  12 2
+  13 41 0.869687 0.678420 -1.596301 1 21 0.04220 "LIG " " H  " 1 FFFFFF  H  13 2
+  14 43 2.841304 -0.649288 -1.435962 1 21 0.11820 "LIG " " H  " 1 FFFFFF  H  14 2
+  15 43 2.796211 0.439557 -0.238956 1 21 0.11820 "LIG " " H  " 1 FFFFFF  H  15 2
+  :::
+ } 
+ m_bond[14] { 
+  # First column is bond index #
+  i_m_from
+  i_m_to
+  i_m_order
+  :::
+  1 1 2 1
+  2 1 6 1
+  3 1 7 1
+  4 2 3 1
+  5 2 8 1
+  6 2 9 1
+  7 3 4 1
+  8 3 10 1
+  9 3 11 1
+  10 4 5 1
+  11 4 12 1
+  12 4 13 1
+  13 5 14 1
+  14 5 15 1
+  :::
+ } 
+} 
+

@@ -189,7 +189,7 @@ def test_shift(amine2):
 
 
 def test_update_from_mae(tmp_amine2):
-    filename = join('data', 'molecule', 'molecule.mae')
+    filename = join('data', 'molecule.mae')
     tmp_amine2.update_from_mae(filename, 1)
     assert abs(tmp_amine2.max_diameter(0)[0] -
                tmp_amine2.max_diameter(1)[0]) > 1
