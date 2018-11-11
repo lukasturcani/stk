@@ -118,10 +118,47 @@ class GAInput:
         :mod:`~stk.optimization`. This will be the function used to
         optimize the structures of the molecules.
 
-    fitness_func : :class:`dict`
+    fitness_func : :class:`dict`, :class:`function`
         This must define the parameters of a function defined in
         :mod:`.fitness`. This will be the function used to
         calculate the fitness of the molecules.
+
+        Alternatively a fitness function can be defined directly in
+        the input file, for example:
+
+        .. code-block:: python
+            # some_input_file.py
+
+            def custom_fitness_fn(macro_mol):
+                energy = macro_mol.energy.rdkit('mmff')
+                diameter = macro_mol.max_diameter()[0]
+                return energy + diameter
+
+            fitness_func = custom_fitness_fn
+
+        The function must conform to all the guidelines specified in
+        :mod:`.fitness`. It is important that the fitness function
+        is defined with its own name, such as ``custom_fitness_fn``.
+        DO NOT DO THIS:
+
+        .. code-block:: python
+            # some_input_file.py
+
+            def fitness_func(macro_mol):
+                energy = macro_mol.energy.rdkit('mmff')
+                diameter = macro_mol.max_diameter()[0]
+                return energy + diameter
+
+        If you have two different input files, and each defines the
+        input function as ``fitness_func``, then even if they do
+        completely different things, ``stk`` will think they are the
+        same function. Therefore, if you load a molecule produced by
+        the GA using the first input file, into
+        a GA run using the second input file, the molecule's fitness
+        value will not be recalculated in the second run - even if you
+        changed the internals of the fitness function. The only way
+        to ensure that the fitness value is recalculated is if
+        different fitness functions have different names.
 
     exit_func : :class:`dict`
         This must define the parameters of a method of :class:`.Exit`.
@@ -148,6 +185,9 @@ class GAInput:
         each generation. The functions are defined as methods in
         :class:`.Normalization`. This can be ommited from the input
         file which means that no normalization functions will be used.
+
+        Normalization functions can also be defined directly in the
+        input file.
 
     databases : :class:`list` of :class:`str`
         A :class:`list` which holds the paths to any number ``JSON``
@@ -328,6 +368,10 @@ class GAInput:
 
         """
 
+        # Check if a function was defined in the input file.
+        if hasattr(self.fitness_func, '__call__'):
+            return self.fitness_func
+
         return FunctionData(self.fitness_func['NAME'],
                             **{key: val for key, val in
                                self.fitness_func.items() if
@@ -402,9 +446,15 @@ class GAInput:
 
         """
 
-        funcs = [FunctionData(x['NAME'],
-                 **{k: v for k, v in x.items() if k != 'NAME'})
-                 for x in self.normalization_funcs]
+        funcs = []
+        for fn in self.normalization_funcs:
+            if hasattr(fn, '__call__'):
+                funcs.append(fn)
+            else:
+                # Copy to prevent fn.pop() from modifying the original.
+                fn = dict(fn)
+                funcs.append(FunctionData(fn.pop('NAME'), **fn))
+
         return Normalization(funcs)
 
     def opter(self):

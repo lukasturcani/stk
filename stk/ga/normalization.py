@@ -52,8 +52,10 @@ start with a leading underscore.
 import numpy as np
 import copy
 import logging
+from functools import partial
 
 from .ga_population import GAPopulation
+from ..utilities import FunctionData
 
 
 logger = logging.getLogger(__name__)
@@ -77,9 +79,16 @@ class Normalization:
 
         Parameters
         ----------
-        funcs : :class:`list` of :class:`.FunctionData`
+        funcs : :class:`list` of :class:`.FunctionData` and :class:`function`
             Holds all the normalization functions to be applied each
             generation, in the order in which they are to be applied.
+
+            Can be either :class:`.FunctionData` instances which must
+            refer to methods defined in :class:`Normalization` or
+            can be normalization functions directly. If normalization
+            functions are provided directly they must take a single
+            argument, which is the population getting normalized and
+            follow all requirements described in :mod:`normalization`.
 
         """
 
@@ -101,7 +110,11 @@ class Normalization:
 
         """
 
-        fitness_func = population.ga_tools.fitness.name
+        if isinstance(population.ga_tools.fitness, FunctionData):
+            fitness_func = population.ga_tools.fitness.name
+        else:
+            fitness_func = population.ga_tools.fitness.__name__
+
         # First make sure that all the fitness values are reset and
         # hold the value of the approraite fitness function.
         for macro_mol in population:
@@ -133,9 +146,16 @@ class Normalization:
             return
 
         for func_data in self.funcs:
-            logger.debug('Applying "{}()".'.format(func_data.name))
-            getattr(self, func_data.name)(valid_pop,
-                                          **func_data.params)
+            if isinstance(func_data, FunctionData):
+                fn = getattr(self, func_data.name)
+                fn = partial(fn, **func_data.params)
+                name = func_data.name
+            else:
+                fn = func_data
+                name = fn.__name__
+
+            logger.debug('Applying "{}()".'.format(name))
+            fn(valid_pop)
 
     def cage(self, population, cavity, window):
         """

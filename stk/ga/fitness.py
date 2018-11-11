@@ -244,9 +244,12 @@ def _calc_fitness(func_data, population, processes):
 
     Parameters
     ----------
-    func_data : :class:`.FunctionData`
+    func_data : :class:`.FunctionData`, :class:`function`
         A :class:`.FunctionData` instance representing the chosen
         fitness function and any additional parameters it may require.
+
+        Alternatively, it can be a function which takes 1
+        argument: the molecule whose fitness is to be calculated.
 
     population : :class:`.GAPopulation`
         The population whose members must have their fitness
@@ -267,9 +270,15 @@ def _calc_fitness(func_data, population, processes):
     log_thread.start()
 
     # Get the fitness function object.
-    func = globals()[func_data.name]
-    # Make sure it won't raise errors while using multiprocessing.
-    p_func = _FitnessFunc(partial(func, **func_data.params))
+    if isinstance(func_data, FunctionData):
+        func = globals()[func_data.name]
+        # Make sure it won't raise errors while using multiprocessing.
+        p_func = _FitnessFunc(partial(func, **func_data.params))
+
+    # If the func_data is not a FunctionData object it must be a
+    # function which can be directly called on a molecule.
+    else:
+        p_func = _FitnessFunc(func_data)
 
     # Apply the function to every member of the population, in
     # parallel.
@@ -292,9 +301,12 @@ def _calc_fitness_serial(func_data, population):
 
     Parameters
     ----------
-    func_data : :class:`.FunctionData`
+    func_data : :class:`.FunctionData`, :class:`function`
         A :class:`.FunctionData` instance representing the chosen
         fitness function and any additional parameters it may require.
+
+        Alternatively, it can be a function which takes 1
+        argument: the molecule whose fitness is to be calculated.
 
     population : :class:`.GAPopulation`
         The population whose members must have their fitness
@@ -307,8 +319,16 @@ def _calc_fitness_serial(func_data, population):
     """
 
     # Get the fitness function object.
-    func = globals()[func_data.name]
-    p_func = _FitnessFunc(partial(func, **func_data.params))
+    if isinstance(func_data, FunctionData):
+        func = globals()[func_data.name]
+        # Make sure it won't raise errors while using multiprocessing.
+        p_func = _FitnessFunc(partial(func, **func_data.params))
+
+    # If the func_data is not a FunctionData object it must be a
+    # function which can be directly called on a molecule.
+    else:
+        p_func = _FitnessFunc(func_data)
+
     # Apply the function to every member of the population.
     for member in population:
         p_func(member)

@@ -26,10 +26,13 @@ class GATools:
         A :class:`.Normalization` instance which rescales or normalizes
         the fitness values in the population.
 
-    fitness : :class:`.FunctionData`
+    fitness : :class:`.FunctionData`, :class:`function`
         Holds the name and arguments of the function in :mod:`.fitness`
         to be used for calculating the fitness of
         :class:`.MacroMolecule` instances in the population.
+
+        Alternatively, it can be a function which takes 1
+        argument: the molecule whose fitness is to be calculated.
 
     exit : :class:`.Exit`
         An :class:`.Exit` object which checks if the population
@@ -85,7 +88,6 @@ class GATools:
         input : :class:`.GAInput`
             The :class:`.GAInput` object holding data gathered from the
             input file.
-
 
         """
 
