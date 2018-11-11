@@ -1,7 +1,6 @@
 import pytest
 from collections import Counter
 import numpy as np
-from types import SimpleNamespace
 import os
 from os.path import join
 import stk
@@ -169,7 +168,7 @@ def test_load(generate_population):
         stk.OPTIONS['cache'] = False
 
 
-def test_all_members(generate_population, mol):
+def test_all_members(generate_population):
     """
     Check that all members, direct and in subpopulations, are returned.
 

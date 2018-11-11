@@ -45,19 +45,19 @@ def test_comparison():
     assert c >= a
 
 
-def test_caching(mol3, mol6):
+def test_caching(amine2, aldehyde2):
     # Other tests assume that the cache is turned off. Make sure
     # that this test restores cache to off after it finishes.
     try:
         stk.OPTIONS['cache'] = True
-        polymer = stk.Polymer([mol3, mol6],
+        polymer = stk.Polymer([amine2, aldehyde2],
                               stk.Linear('AB', [0, 0], 3))
-        polymer2 = stk.Polymer([mol3, mol6],
+        polymer2 = stk.Polymer([amine2, aldehyde2],
                                stk.Linear('AB', [0, 0], 3))
         assert polymer is polymer2
 
         stk.OPTIONS['cache'] = False
-        polymer3 = stk.Polymer([mol3, mol6],
+        polymer3 = stk.Polymer([amine2, aldehyde2],
                                stk.Linear('AB', [1, 0.5], 3))
         assert polymer is not polymer3
     except Exception:

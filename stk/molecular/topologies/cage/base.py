@@ -796,7 +796,6 @@ class CageTopology(Topology):
 
         """
 
-        macro_mol.mol = rdkit.Mol()
         bb_map, lk_map = self._bb_maps(macro_mol)
         scale = max(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
 
@@ -900,8 +899,6 @@ class NoLinkerCageTopology(CageTopology):
     def __init__(self, alignments=None, bb_assignments=None):
         if alignments is None:
             alignments = np.zeros(len(self.positions_A))
-        if bb_assignments is None:
-            bb_assignments = [None for i in range(len(self.positions_A))]
 
         self.alignments = alignments
         self.bb_assignments = bb_assignments
@@ -910,16 +907,21 @@ class NoLinkerCageTopology(CageTopology):
 
     def place_mols(self, macro_mol):
 
-        macro_mol.mol = rdkit.Mol()
         scale = max(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
 
-        for position, orientation, bb_index in zip(self.positions_A,
-                                                   self.alignments,
-                                                   self.bb_assignments):
-            if bb_index is None:
-                bb = np.random.choice(macro_mol.building_blocks)
-            else:
+        bb_map = {}
+        if self.bb_assignments is None:
+            for i in range(len(self.positions_A)):
+                bb_map[i] = np.random.choice(macro_mol.building_blocks)
+        else:
+            for bb_index, positions in self.bb_assignments.items():
                 bb = macro_mol.building_blocks[bb_index]
+                for position in positions:
+                    bb_map[position] = bb
+
+        bb_params = enumerate(zip(self.positions_A, self.alignments))
+        for bb_index, (position, orientation) in bb_params:
+            bb = bb_map[bb_index]
             ipos = bb.position_matrix()
             n_bb = len(bb.functional_group_atoms())
 

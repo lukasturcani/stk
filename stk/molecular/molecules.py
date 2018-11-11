@@ -2711,7 +2711,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     bb_counter : :class:`collections.Counter`
         A counter keeping track of how much of each building block is
-        used to form the macromolecule.
+        used to form the macromolecule. Added by
+        :func:`.Topology.build`.
 
     topology : :class:`.Topology`
         Defines the shape of macromolecule and assembles it.
@@ -2743,7 +2744,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
                                 'fitness_func2': [78, 4.2, 32.3]}
 
     bonds_made : :class:`int`
-        The number of bonds made during assembly.
+        The number of bonds made during assembly. Added by
+        :func:`.Topology.build`.
 
     """
 
@@ -2787,7 +2789,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         self.unscaled_fitness = {}
         self.progress_params = {}
         self.building_blocks = building_blocks
-        self.bb_counter = Counter()
         self.topology = topology
 
         try:

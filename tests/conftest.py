@@ -31,60 +31,92 @@ class TestMol(stk.MacroMolecule):
 
 
 @pytest.fixture(scope='session')
-def mol():
-    return stk.StructUnit.smiles_init('NC1CC(Br)C(Br)CC1N', 'bromine')
+def amine2():
+    return stk.StructUnit2.smiles_init('NCCCN', 'amine')
 
 
 @pytest.fixture
-def tmp_mol():
-    return stk.StructUnit.smiles_init('NC1CC(Br)C(Br)CC1N', 'bromine')
-
-
-@pytest.fixture(scope='session')
-def mol2():
-    return stk.StructUnit.smiles_init('NC1CC(N)CC(N)C1', 'amine')
-
-
-@pytest.fixture(scope='session')
-def mol3():
+def tmp_amine2():
     return stk.StructUnit2.smiles_init('NCCCN', 'amine')
 
 
 @pytest.fixture(scope='session')
-def mol4():
-    return stk.StructUnit3.smiles_init('NCC(N)CN', 'amine')
+def amine2_alt1():
+    return stk.StructUnit2.smiles_init('NCNCN', 'amine')
 
 
 @pytest.fixture(scope='session')
-def mol5():
-    return stk.StructUnit2.smiles_init('Nc1ccc(N)nc1', 'amine')
+def amine2_alt2():
+    return stk.StructUnit2.smiles_init('NC[Si]CN', 'amine')
 
 
 @pytest.fixture(scope='session')
-def mol6():
-    return stk.StructUnit2.smiles_init('O=CC1=CN=C(C=O)C1', 'aldehyde')
+def aldehyde2():
+    return stk.StructUnit2.smiles_init('O=CCC=O', 'aldehyde')
 
 
 @pytest.fixture(scope='session')
-def mol7():
+def boronic_acid2():
     return stk.StructUnit2.smiles_init('OB(O)c1ccc(B(O)O)nc1',
                                        'boronic_acid')
 
 
 @pytest.fixture(scope='session')
-def mol8():
+def diol2():
     return stk.StructUnit2.smiles_init('Oc1cc2cc(O)c(O)nc2cc1O',
                                        'diol')
 
 
 @pytest.fixture(scope='session')
-def polymer(mol3, mol6):
-    return stk.Polymer([mol3, mol6], stk.Linear('AB', [0, 0], 1))
+def amine3():
+    return stk.StructUnit3.smiles_init('NCC(CN)CN', 'amine')
 
 
 @pytest.fixture(scope='session')
-def cof_bb1():
-    return stk.StructUnit2.smiles_init('Nc1ccc(N)cc1', 'amine')
+def aldehyde3():
+    return stk.StructUnit3.smiles_init('O=CC(C=O)C=O', 'aldehyde')
+
+
+@pytest.fixture
+def tmp_aldehyde3():
+    return stk.StructUnit3.smiles_init('O=CC(C=O)C=O', 'aldehyde')
+
+
+@pytest.fixture(scope='session')
+def aldehyde3_alt1():
+    return stk.StructUnit3.smiles_init('O=CN(C=O)C=O', 'aldehyde')
+
+
+@pytest.fixture(scope='session')
+def aldehyde3_alt2():
+    return stk.StructUnit3.smiles_init('O=C[Si](C=O)C=O', 'aldehyde')
+
+
+@pytest.fixture(scope='session')
+def boronic_acid4():
+    return stk.StructUnit3(join('data', 'cof', 'boronic_acid.sdf'))
+
+
+@pytest.fixture(scope='session')
+def amine4():
+    return stk.StructUnit3.smiles_init('NCC(CN)(CN)CN', 'amine')
+
+
+@pytest.fixture(scope='session')
+def aldehyde4():
+    return stk.StructUnit3.smiles_init('O=CC(C=O)(C=O)C=O', 'aldehyde')
+
+
+@pytest.fixture(scope='session')
+def aldehyde6():
+    return stk.StructUnit3.smiles_init('O=CC(C=O)(C=O)C(C=O)(C=O)C=O',
+                                       'aldehyde')
+
+
+@pytest.fixture(scope='session')
+def polymer(amine2, aldehyde2):
+    return stk.Polymer([amine2, aldehyde2],
+                       stk.Linear('AB', [0, 0], 1))
 
 
 @pytest.fixture(scope='session')
@@ -139,16 +171,6 @@ def generate_population():
 @pytest.fixture(scope='session')
 def pop(pop_generator):
     return generate_population()
-
-
-@pytest.fixture(scope='session')
-def struct_unit2_mols():
-    ...
-
-
-@pytest.fixture(scope='session')
-def struct_unit3_mols():
-    ...
 
 
 @pytest.fixture(scope='session')
