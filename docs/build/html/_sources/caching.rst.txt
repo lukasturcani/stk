@@ -60,15 +60,15 @@ and with :class:`.MacroMolecule`
 
 
 The user has the option to turn the cache off and on through the
-``CACHE_SETTINGS`` variable.
+``OPTIONS`` variable.
 
 .. code-block:: python
 
-    CACHE_SETTINGS['ON'] = False # Cache is off.
+    OPTIONS['cache'] = False # Cache is off.
     bb10 = StructUnit('molecele1.mol')
     bb10 is bb1 # False
 
-    CACHE_SETTINGS['ON'] = True # Cache is back on.
+    OPTIONS['cache'] = True # Cache is back on.
     bb11 = StructUnit('molecule1.mol')
     bb11 is bb1 # True
     bb11 is bb10 # False
