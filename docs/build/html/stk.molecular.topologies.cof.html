@@ -24,25 +24,17 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="stk  documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -104,7 +96,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -112,9 +104,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -166,7 +159,7 @@
 <p>Linker topologies are those which use a building block with two
 functional groups and a building block with three or more functional
 groups. These are implemented as subclasses to
-<a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal"><span class="pre">LinkerCOFLattice</span></code></a>.</p>
+<a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkerCOFLattice</span></code></a>.</p>
 <p>As for any assembly process, there are 2 main stages: placement of
 building blocks and yielding of functional groups which react.</p>
 <p>A 2D COF topology can be defined through vertices and the edges which
@@ -174,9 +167,9 @@ connect them. The building block with 3 or more functional groups
 sits on the vertices while the building block with 2 functional groups
 sits on the edges. To assemble a COF topology, first the vertices
 and edges are defined. They are represented by the classes
-<a class="reference internal" href="#stk.molecular.topologies.cof.Vertex" title="stk.molecular.topologies.cof.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a> and <a class="reference internal" href="#stk.molecular.topologies.cof.Edge" title="stk.molecular.topologies.cof.Edge"><code class="xref py py-class docutils literal"><span class="pre">Edge</span></code></a>. Each of these objects defines their
+<a class="reference internal" href="#stk.molecular.topologies.cof.Vertex" title="stk.molecular.topologies.cof.Vertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></a> and <a class="reference internal" href="#stk.molecular.topologies.cof.Edge" title="stk.molecular.topologies.cof.Edge"><code class="xref py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a>. Each of these objects defines their
 positions in terms of the fractional coordinates along the
-<code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of a unit cell. In addtion, each
+<code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of a unit cell. In addtion, each
 of these objects defines a set of “fg positiions”.</p>
 <p>For edges, there are two fg positions, 0 and 1. 0 is the position
 of the fg which gets connected to an fg on the first vertex
@@ -190,7 +183,7 @@ position 1.</p>
 <p>For vertices there are multiple fg positions. The number of
 fg positions on a vertex is equal to the number of functional
 groups the building block placed on the vertex has. The fg
-positions are labelled from <code class="docutils literal"><span class="pre">0</span></code> to <code class="docutils literal"><span class="pre">n</span></code> where <code class="docutils literal"><span class="pre">n</span></code> is one less than
+positions are labelled from <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">n</span></code> where <code class="docutils literal notranslate"><span class="pre">n</span></code> is one less than
 the number of functional groups in the building block. Going clockwise
 around the vertex, starting at the 12 o clock position, the positions
 are labelled starting at 0. After placing and aligning a building block
@@ -205,30 +198,30 @@ in clockwise order.</p>
 edge holds the vertices it is connected to and the positions on those
 vertices it connects. Each edge and vertex defines
 a dictionary which maps the position to the fg which sits on
-it. For each edge take the fg at position <code class="docutils literal"><span class="pre">0</span></code> and the fg
+it. For each edge take the fg at position <code class="docutils literal notranslate"><span class="pre">0</span></code> and the fg
 position on the vertex which is connceted to it. Use the fg
 position on the connected vertex to get the id of the fg which
 is to be connected. The same can be done for the fg at position
-<code class="docutils literal"><span class="pre">1</span></code> on the edge.</p>
+<code class="docutils literal notranslate"><span class="pre">1</span></code> on the edge.</p>
 <p>Periodic bonds are not added to the rdkit molecule, instead they
-are registered in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Periodic.periodic_bonds" title="stk.molecular.molecules.Periodic.periodic_bonds"><code class="xref py py-attr docutils literal"><span class="pre">Periodic.periodic_bonds</span></code></a>.</p>
+are registered in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Periodic.periodic_bonds" title="stk.molecular.molecules.Periodic.periodic_bonds"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Periodic.periodic_bonds</span></code></a>.</p>
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.COFLattice">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">COFLattice</code><span class="sig-paren">(</span><em>scale_func=&lt;function bb_size&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.COFLattice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.base.Topology</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.base.Topology</span></code></a></p>
 <p>A base class for periodic topologies.</p>
 <p>This class behaves almost exactly like
-<a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a> with only minor additions to suit the
-representation of COF periodic lattices. The <code class="xref py py-meth docutils literal"><span class="pre">del_atoms()</span></code>
+<a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a> with only minor additions to suit the
+representation of COF periodic lattices. The <code class="xref py py-meth docutils literal notranslate"><span class="pre">del_atoms()</span></code>
 method is extended to collect the coordinates of any deleted atoms.
 This is necessary for positioning terminating atoms on islands
-generated from the periodic structure by <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Periodic.island" title="stk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">Periodic.island()</span></code></a>.</p>
+generated from the periodic structure by <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Periodic.island" title="stk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Periodic.island()</span></code></a>.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.COFLattice.scale_func">
 <code class="descname">scale_func</code><a class="headerlink" href="#stk.molecular.topologies.cof.COFLattice.scale_func" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">function</span></code> – A function which takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> as its only
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code> – A function which takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> as its only
 argument returns a number. The number is used
-to scale the size of the unit cell. See <a class="reference internal" href="#stk.molecular.topologies.cof.bb_size" title="stk.molecular.topologies.cof.bb_size"><code class="xref py py-func docutils literal"><span class="pre">bb_size()</span></code></a>
+to scale the size of the unit cell. See <a class="reference internal" href="#stk.molecular.topologies.cof.bb_size" title="stk.molecular.topologies.cof.bb_size"><code class="xref py py-func docutils literal notranslate"><span class="pre">bb_size()</span></code></a>
 for an example.</p>
 </dd></dl>
 
@@ -237,14 +230,14 @@ for an example.</p>
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.Edge">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">Edge</code><span class="sig-paren">(</span><em>v1, v2, joint_positions, bond=[0, 0, 0]</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.Edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represents a bond in a COF unit cell.</p>
 <p>This class is used for positioning and aligning ditopic building
 blocks in 2D COF topologies.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Edge.v1">
 <code class="descname">v1</code><a class="headerlink" href="#stk.molecular.topologies.cof.Edge.v1" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#stk.molecular.topologies.cof.Vertex" title="stk.molecular.topologies.cof.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a> – The first vertex connected by the edge.</p>
+<dd><p><a class="reference internal" href="#stk.molecular.topologies.cof.Vertex" title="stk.molecular.topologies.cof.Vertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></a> – The first vertex connected by the edge.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -256,38 +249,38 @@ blocks in 2D COF topologies.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Edge.joint_positions">
 <code class="descname">joint_positions</code><a class="headerlink" href="#stk.molecular.topologies.cof.Edge.joint_positions" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – Holds 2 numbers. The first is the id of the position on
-<a class="reference internal" href="#stk.molecular.topologies.cof.Edge.v1" title="stk.molecular.topologies.cof.Edge.v1"><code class="xref py py-attr docutils literal"><span class="pre">v1</span></code></a> which gets connected by the edge. The second is the
-id of the position on <a class="reference internal" href="#stk.molecular.topologies.cof.Edge.v2" title="stk.molecular.topologies.cof.Edge.v2"><code class="xref py py-attr docutils literal"><span class="pre">v2</span></code></a> which gets connected by the
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – Holds 2 numbers. The first is the id of the position on
+<a class="reference internal" href="#stk.molecular.topologies.cof.Edge.v1" title="stk.molecular.topologies.cof.Edge.v1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">v1</span></code></a> which gets connected by the edge. The second is the
+id of the position on <a class="reference internal" href="#stk.molecular.topologies.cof.Edge.v2" title="stk.molecular.topologies.cof.Edge.v2"><code class="xref py py-attr docutils literal notranslate"><span class="pre">v2</span></code></a> which gets connected by the
 edge.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Edge.bond">
 <code class="descname">bond</code><a class="headerlink" href="#stk.molecular.topologies.cof.Edge.bond" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>: – Indicates if the bond is periodic.</p>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>: – Indicates if the bond is periodic.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Edge.connected">
 <code class="descname">connected</code><a class="headerlink" href="#stk.molecular.topologies.cof.Edge.connected" title="Permalink to this definition">¶</a></dt>
-<dd><p>class:<cite>list</cite> of <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex" title="stk.molecular.topologies.cof.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a> – The vertices conncetd by the edge.</p>
+<dd><p>class:<cite>list</cite> of <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex" title="stk.molecular.topologies.cof.Vertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></a> – The vertices conncetd by the edge.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Edge.frac_coord">
 <code class="descname">frac_coord</code><a class="headerlink" href="#stk.molecular.topologies.cof.Edge.frac_coord" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of :class`float` – The position of the edge in terms of the fractional positions
-along the <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of a unit cell.</p>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of :class`float` – The position of the edge in terms of the fractional positions
+along the <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of a unit cell.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Edge.fg_map">
 <code class="descname">fg_map</code><a class="headerlink" href="#stk.molecular.topologies.cof.Edge.fg_map" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps the id of a position to the <code class="docutils literal"><span class="pre">fg_id</span></code> of the fg which
-sits on it. The positions are <code class="docutils literal"><span class="pre">0</span></code> and <code class="docutils literal"><span class="pre">1</span></code> where <code class="docutils literal"><span class="pre">0</span></code> is
-the  position which is closer to <a class="reference internal" href="#stk.molecular.topologies.cof.Edge.v1" title="stk.molecular.topologies.cof.Edge.v1"><code class="xref py py-attr docutils literal"><span class="pre">v1</span></code></a> while <code class="docutils literal"><span class="pre">1</span></code>
-is the position closer to <a class="reference internal" href="#stk.molecular.topologies.cof.Edge.v2" title="stk.molecular.topologies.cof.Edge.v2"><code class="xref py py-attr docutils literal"><span class="pre">v2</span></code></a>.</p>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> – Maps the id of a position to the <code class="docutils literal notranslate"><span class="pre">fg_id</span></code> of the fg which
+sits on it. The positions are <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> where <code class="docutils literal notranslate"><span class="pre">0</span></code> is
+the  position which is closer to <a class="reference internal" href="#stk.molecular.topologies.cof.Edge.v1" title="stk.molecular.topologies.cof.Edge.v1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">v1</span></code></a> while <code class="docutils literal notranslate"><span class="pre">1</span></code>
+is the position closer to <a class="reference internal" href="#stk.molecular.topologies.cof.Edge.v2" title="stk.molecular.topologies.cof.Edge.v2"><code class="xref py py-attr docutils literal notranslate"><span class="pre">v2</span></code></a>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -298,11 +291,11 @@ is the position closer to <a class="reference internal" href="#stk.molecular.top
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cell_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of the unit cell.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The position.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -311,21 +304,21 @@ is the position closer to <a class="reference internal" href="#stk.molecular.top
 <dl class="method">
 <dt id="stk.molecular.topologies.cof.Edge.create_fg_map">
 <code class="descname">create_fg_map</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>cell_params</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.Edge.create_fg_map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates the attribute <a class="reference internal" href="#stk.molecular.topologies.cof.Edge.fg_map" title="stk.molecular.topologies.cof.Edge.fg_map"><code class="xref py py-attr docutils literal"><span class="pre">fg_map</span></code></a>.</p>
+<dd><p>Creates the attribute <a class="reference internal" href="#stk.molecular.topologies.cof.Edge.fg_map" title="stk.molecular.topologies.cof.Edge.fg_map"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fg_map</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being built.</li>
-<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</li>
+<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being built.</li>
+<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of the unit cell.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -340,11 +333,11 @@ is the position closer to <a class="reference internal" href="#stk.molecular.top
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cell_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of the unit cell.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The direction vector.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -360,15 +353,15 @@ is the position closer to <a class="reference internal" href="#stk.molecular.top
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</li>
-<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</li>
+<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</li>
+<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of the unit cell.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The centroid of the fgs connected to those on the edge.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -384,15 +377,15 @@ is the position closer to <a class="reference internal" href="#stk.molecular.top
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</li>
-<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</li>
+<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</li>
+<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of the unit cell.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The direction vector.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -408,10 +401,10 @@ is the position closer to <a class="reference internal" href="#stk.molecular.top
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being built.</li>
-<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</li>
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a>) – The building block to be placed.</li>
-<li><strong>alignment</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – Can be <code class="docutils literal"><span class="pre">1</span></code> or <code class="docutils literal"><span class="pre">-1</span></code> to align <cite>mol</cite> either parallel or
+<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being built.</li>
+<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of the unit cell.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit3</span></code></a>) – The building block to be placed.</li>
+<li><strong>alignment</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Can be <code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code> to align <cite>mol</cite> either parallel or
 anti-parallel with the edge.</li>
 </ul>
 </td>
@@ -419,7 +412,7 @@ anti-parallel with the edge.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rdkit instance of the placed <cite>mol</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -431,7 +424,7 @@ anti-parallel with the edge.</li>
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.Hexagonal">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">Hexagonal</code><span class="sig-paren">(</span><em>ditopic_directions=None</em>, <em>multitopic_aligners=None</em>, <em>scale_func=&lt;function linker_cof_scale_func&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.Hexagonal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cof.LinkerCOFLattice</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cof.LinkerCOFLattice</span></code></a></p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Hexagonal.a">
 <code class="descname">a</code><em class="property"> = array([1, 0, 0])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Hexagonal.a" title="Permalink to this definition">¶</a></dt>
@@ -439,17 +432,17 @@ anti-parallel with the edge.</li>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Hexagonal.b">
-<code class="descname">b</code><em class="property"> = array([ 0.5  ,  0.866,  0.   ])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Hexagonal.b" title="Permalink to this definition">¶</a></dt>
+<code class="descname">b</code><em class="property"> = array([0.5  , 0.866, 0.   ])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Hexagonal.b" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Hexagonal.c">
-<code class="descname">c</code><em class="property"> = array([ 0.        ,  0.        ,  2.88666936])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Hexagonal.c" title="Permalink to this definition">¶</a></dt>
+<code class="descname">c</code><em class="property"> = array([0.        , 0.        , 2.88666936])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Hexagonal.c" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Hexagonal.cell_dimensions">
-<code class="descname">cell_dimensions</code><em class="property"> = [array([1, 0, 0]), array([ 0.5  ,  0.866,  0.   ]), array([ 0.        ,  0.        ,  2.88666936])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.Hexagonal.cell_dimensions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cell_dimensions</code><em class="property"> = [array([1, 0, 0]), array([0.5  , 0.866, 0.   ]), array([0.        , 0.        , 2.88666936])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.Hexagonal.cell_dimensions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -487,7 +480,7 @@ anti-parallel with the edge.</li>
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.Honeycomb">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">Honeycomb</code><span class="sig-paren">(</span><em>ditopic_directions=None</em>, <em>multitopic_aligners=None</em>, <em>scale_func=&lt;function linker_cof_scale_func&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.Honeycomb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cof.LinkerCOFLattice</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cof.LinkerCOFLattice</span></code></a></p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Honeycomb.a">
 <code class="descname">a</code><em class="property"> = array([1, 0, 0])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Honeycomb.a" title="Permalink to this definition">¶</a></dt>
@@ -495,17 +488,17 @@ anti-parallel with the edge.</li>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Honeycomb.b">
-<code class="descname">b</code><em class="property"> = array([ 0.5  ,  0.866,  0.   ])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Honeycomb.b" title="Permalink to this definition">¶</a></dt>
+<code class="descname">b</code><em class="property"> = array([0.5  , 0.866, 0.   ])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Honeycomb.b" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Honeycomb.c">
-<code class="descname">c</code><em class="property"> = array([ 0.        ,  0.        ,  2.88666936])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Honeycomb.c" title="Permalink to this definition">¶</a></dt>
+<code class="descname">c</code><em class="property"> = array([0.        , 0.        , 2.88666936])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Honeycomb.c" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Honeycomb.cell_dimensions">
-<code class="descname">cell_dimensions</code><em class="property"> = [array([1, 0, 0]), array([ 0.5  ,  0.866,  0.   ]), array([ 0.        ,  0.        ,  2.88666936])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.Honeycomb.cell_dimensions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cell_dimensions</code><em class="property"> = [array([1, 0, 0]), array([0.5  , 0.866, 0.   ]), array([0.        , 0.        , 2.88666936])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.Honeycomb.cell_dimensions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -533,7 +526,7 @@ anti-parallel with the edge.</li>
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.Kagome">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">Kagome</code><span class="sig-paren">(</span><em>ditopic_directions=None</em>, <em>multitopic_aligners=None</em>, <em>scale_func=&lt;function linker_cof_scale_func&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.Kagome" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cof.LinkerCOFLattice</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cof.LinkerCOFLattice</span></code></a></p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Kagome.a">
 <code class="descname">a</code><em class="property"> = array([1, 0, 0])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Kagome.a" title="Permalink to this definition">¶</a></dt>
@@ -541,17 +534,17 @@ anti-parallel with the edge.</li>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Kagome.b">
-<code class="descname">b</code><em class="property"> = array([ 0.5  ,  0.866,  0.   ])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Kagome.b" title="Permalink to this definition">¶</a></dt>
+<code class="descname">b</code><em class="property"> = array([0.5  , 0.866, 0.   ])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Kagome.b" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Kagome.c">
-<code class="descname">c</code><em class="property"> = array([ 0.        ,  0.        ,  2.88666936])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Kagome.c" title="Permalink to this definition">¶</a></dt>
+<code class="descname">c</code><em class="property"> = array([0.        , 0.        , 2.88666936])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Kagome.c" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Kagome.cell_dimensions">
-<code class="descname">cell_dimensions</code><em class="property"> = [array([1, 0, 0]), array([ 0.5  ,  0.866,  0.   ]), array([ 0.        ,  0.        ,  2.88666936])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.Kagome.cell_dimensions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cell_dimensions</code><em class="property"> = [array([1, 0, 0]), array([0.5  , 0.866, 0.   ]), array([0.        , 0.        , 2.88666936])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.Kagome.cell_dimensions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -584,7 +577,7 @@ anti-parallel with the edge.</li>
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.LinkerCOFLattice">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">LinkerCOFLattice</code><span class="sig-paren">(</span><em>ditopic_directions=None</em>, <em>multitopic_aligners=None</em>, <em>scale_func=&lt;function linker_cof_scale_func&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.COFLattice" title="stk.molecular.topologies.cof.COFLattice"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cof.COFLattice</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.COFLattice" title="stk.molecular.topologies.cof.COFLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cof.COFLattice</span></code></a></p>
 <p>For 2D COF topologies which use a linker.</p>
 <p>These are topologies which consist of 2 building blocks. One
 which has two functional groups and one which has 3 or more
@@ -594,21 +587,21 @@ the vertices and edges which a particular topology consists of.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.LinkerCOFLattice.vertices">
 <code class="descname">vertices</code><a class="headerlink" href="#stk.molecular.topologies.cof.LinkerCOFLattice.vertices" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex" title="stk.molecular.topologies.cof.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a> – Class attribute added when defining a subclass. Holds the
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex" title="stk.molecular.topologies.cof.Vertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></a> – Class attribute added when defining a subclass. Holds the
 vertices which make up the topology.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.LinkerCOFLattice.edges">
 <code class="descname">edges</code><a class="headerlink" href="#stk.molecular.topologies.cof.LinkerCOFLattice.edges" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.molecular.topologies.cof.Edge" title="stk.molecular.topologies.cof.Edge"><code class="xref py py-class docutils literal"><span class="pre">Edge</span></code></a> – Class attribute added when defining a subclass. Holds the
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.molecular.topologies.cof.Edge" title="stk.molecular.topologies.cof.Edge"><code class="xref py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a> – Class attribute added when defining a subclass. Holds the
 edges which make up the topology.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.LinkerCOFLattice.ditopic_directions">
 <code class="descname">ditopic_directions</code><a class="headerlink" href="#stk.molecular.topologies.cof.LinkerCOFLattice.ditopic_directions" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – For each edge in the topology, holds <code class="docutils literal"><span class="pre">1</span></code> or <code class="docutils literal"><span class="pre">-1</span></code> to
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – For each edge in the topology, holds <code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code> to
 indicate if the building block is placed parallel or
 anti-parallel to the edge.</p>
 </dd></dl>
@@ -616,8 +609,8 @@ anti-parallel to the edge.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.LinkerCOFLattice.multitopic_aligners">
 <code class="descname">multitopic_aligners</code><a class="headerlink" href="#stk.molecular.topologies.cof.LinkerCOFLattice.multitopic_aligners" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – For each vertex in the topology, holds the value of a
-<code class="docutils literal"><span class="pre">fg_id</span></code> of the multitopic bulding block. This is the
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – For each vertex in the topology, holds the value of a
+<code class="docutils literal notranslate"><span class="pre">fg_id</span></code> of the multitopic bulding block. This is the
 functional group which gets aligned at a given edge.</p>
 </dd></dl>
 
@@ -634,11 +627,11 @@ functional group which gets aligned at a given edge.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -649,13 +642,13 @@ functional group which gets aligned at a given edge.</p>
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.NoLinkerCOFLattice">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">NoLinkerCOFLattice</code><span class="sig-paren">(</span><em>scale_func=&lt;function bb_size&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerCOFLattice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.COFLattice" title="stk.molecular.topologies.cof.COFLattice"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cof.COFLattice</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.COFLattice" title="stk.molecular.topologies.cof.COFLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cof.COFLattice</span></code></a></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.NoLinkerHoneycomb">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">NoLinkerHoneycomb</code><span class="sig-paren">(</span><em>scale_func=&lt;function bb_size&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.NoLinkerCOFLattice" title="stk.molecular.topologies.cof.NoLinkerCOFLattice"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cof.NoLinkerCOFLattice</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.NoLinkerCOFLattice" title="stk.molecular.topologies.cof.NoLinkerCOFLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cof.NoLinkerCOFLattice</span></code></a></p>
 <p>Represents a hexagonal lattice with 2 tritopic building blocks.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.NoLinkerHoneycomb.a">
@@ -664,7 +657,7 @@ functional group which gets aligned at a given edge.</p>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.NoLinkerHoneycomb.b">
-<code class="descname">b</code><em class="property"> = array([ 0.5  ,  0.866,  0.   ])</em><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.b" title="Permalink to this definition">¶</a></dt>
+<code class="descname">b</code><em class="property"> = array([0.5  , 0.866, 0.   ])</em><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.b" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -672,15 +665,15 @@ functional group which gets aligned at a given edge.</p>
 <code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.bonded_fgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields functional groups to be bonded.</p>
 <p class="rubric">Notes</p>
-<p>The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Periodic.periodic_bonds" title="stk.molecular.molecules.Periodic.periodic_bonds"><code class="xref py py-attr docutils literal"><span class="pre">periodic_bonds</span></code></a> attribute is filled
-with <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.PeriodicBond" title="stk.utilities.utilities.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> instances.</p>
+<p>The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Periodic.periodic_bonds" title="stk.molecular.molecules.Periodic.periodic_bonds"><code class="xref py py-attr docutils literal notranslate"><span class="pre">periodic_bonds</span></code></a> attribute is filled
+with <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.PeriodicBond" title="stk.utilities.utilities.PeriodicBond"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodicBond</span></code></a> instances.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The unit cell being constructed.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The unit cell being constructed.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The ids of the functional groups to be bonded.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The ids of the functional groups to be bonded.</td>
 </tr>
 </tbody>
 </table>
@@ -688,12 +681,12 @@ with <a class="reference internal" href="stk.utilities.utilities.html#stk.utilit
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.NoLinkerHoneycomb.c">
-<code class="descname">c</code><em class="property"> = array([ 0.        ,  0.        ,  2.88666936])</em><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.c" title="Permalink to this definition">¶</a></dt>
+<code class="descname">c</code><em class="property"> = array([0.        , 0.        , 2.88666936])</em><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.c" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.NoLinkerHoneycomb.cell_dimensions">
-<code class="descname">cell_dimensions</code><em class="property"> = [array([1, 0, 0]), array([ 0.5  ,  0.866,  0.   ]), array([ 0.        ,  0.        ,  2.88666936])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.cell_dimensions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cell_dimensions</code><em class="property"> = [array([1, 0, 0]), array([0.5  , 0.866, 0.   ]), array([0.        , 0.        , 2.88666936])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.cell_dimensions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -701,18 +694,18 @@ with <a class="reference internal" href="stk.utilities.utilities.html#stk.utilit
 <code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.place_mols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places and aligns building blocks in the unit cell.</p>
 <p class="rubric">Notes</p>
-<p>This method modifies <cite>macro_mol</cite>. An <code class="docutils literal"><span class="pre">rdkit</span></code> molecule of the
+<p>This method modifies <cite>macro_mol</cite>. An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule of the
 unit cell with the building blocks not joined up is placed in
-the <code class="xref py py-attr docutils literal"><span class="pre">mol</span></code> attribute.</p>
+the <code class="xref py py-attr docutils literal notranslate"><span class="pre">mol</span></code> attribute.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The unit cell being constructed.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The unit cell being constructed.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -720,7 +713,7 @@ the <code class="xref py py-attr docutils literal"><span class="pre">mol</span><
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.NoLinkerHoneycomb.vertices">
-<code class="descname">vertices</code><em class="property"> = [array([ 0.5       ,  0.28866667,  1.44333468]), array([ 1.        ,  0.57733333,  1.44333468])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.vertices" title="Permalink to this definition">¶</a></dt>
+<code class="descname">vertices</code><em class="property"> = [array([0.5       , 0.28866667, 1.44333468]), array([1.        , 0.57733333, 1.44333468])]</em><a class="headerlink" href="#stk.molecular.topologies.cof.NoLinkerHoneycomb.vertices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -728,7 +721,7 @@ the <code class="xref py py-attr docutils literal"><span class="pre">mol</span><
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.Square">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">Square</code><span class="sig-paren">(</span><em>ditopic_directions=None</em>, <em>multitopic_aligners=None</em>, <em>scale_func=&lt;function linker_cof_scale_func&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.Square" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cof.LinkerCOFLattice</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cof.LinkerCOFLattice</span></code></a></p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Square.a">
 <code class="descname">a</code><em class="property"> = array([1, 0, 0])</em><a class="headerlink" href="#stk.molecular.topologies.cof.Square.a" title="Permalink to this definition">¶</a></dt>
@@ -769,41 +762,41 @@ the <code class="xref py py-attr docutils literal"><span class="pre">mol</span><
 <dl class="class">
 <dt id="stk.molecular.topologies.cof.Vertex">
 <em class="property">class </em><code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">Vertex</code><span class="sig-paren">(</span><em>frac_coord</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.Vertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represents a vertex of a 2D COF topology.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Vertex.frac_coord">
 <code class="descname">frac_coord</code><a class="headerlink" href="#stk.molecular.topologies.cof.Vertex.frac_coord" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code> – The fractional positions along the <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> – The fractional positions along the <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code>
 vectors of the vector.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Vertex.connected">
 <code class="descname">connected</code><a class="headerlink" href="#stk.molecular.topologies.cof.Vertex.connected" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.molecular.topologies.cof.Edge" title="stk.molecular.topologies.cof.Edge"><code class="xref py py-class docutils literal"><span class="pre">Edge</span></code></a> – The edges connected to this vertex.</p>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.molecular.topologies.cof.Edge" title="stk.molecular.topologies.cof.Edge"><code class="xref py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a> – The edges connected to this vertex.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cof.Vertex.fg_map">
 <code class="descname">fg_map</code><a class="headerlink" href="#stk.molecular.topologies.cof.Vertex.fg_map" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps the id of a fg position on the vertex to the <code class="docutils literal"><span class="pre">fg_id</span></code>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> – Maps the id of a fg position on the vertex to the <code class="docutils literal notranslate"><span class="pre">fg_id</span></code>
 of the functional group sitting on it.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="stk.molecular.topologies.cof.Vertex.aligned_position">
 <code class="descname">aligned_position</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.Vertex.aligned_position" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the position of the fg aligned by <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex.place_mol" title="stk.molecular.topologies.cof.Vertex.place_mol"><code class="xref py py-meth docutils literal"><span class="pre">place_mol()</span></code></a>.</p>
+<dd><p>Returns the position of the fg aligned by <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex.place_mol" title="stk.molecular.topologies.cof.Vertex.place_mol"><code class="xref py py-meth docutils literal notranslate"><span class="pre">place_mol()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The id of a position of on the vertex. The fg
-which gets aligned during <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex.place_mol" title="stk.molecular.topologies.cof.Vertex.place_mol"><code class="xref py py-meth docutils literal"><span class="pre">place_mol()</span></code></a> sits on this
+which gets aligned during <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex.place_mol" title="stk.molecular.topologies.cof.Vertex.place_mol"><code class="xref py py-meth docutils literal notranslate"><span class="pre">place_mol()</span></code></a> sits on this
 position.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -818,8 +811,8 @@ position.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</li>
-<li><strong>cell_position</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – Indicates if the vertex is in a periodic cell or not.
+<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of the unit cell.</li>
+<li><strong>cell_position</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Indicates if the vertex is in a periodic cell or not.
 Analogous to the defintion of a periodic bond.</li>
 </ul>
 </td>
@@ -827,7 +820,7 @@ Analogous to the defintion of a periodic bond.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The position.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -837,18 +830,18 @@ Analogous to the defintion of a periodic bond.</li>
 <dl class="method">
 <dt id="stk.molecular.topologies.cof.Vertex.create_fg_map">
 <code class="descname">create_fg_map</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>cell_params</em>, <em>nfgs</em>, <em>aligned_fg</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.Vertex.create_fg_map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates the attribute <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex.fg_map" title="stk.molecular.topologies.cof.Vertex.fg_map"><code class="xref py py-attr docutils literal"><span class="pre">fg_map</span></code></a>.</p>
+<dd><p>Creates the attribute <a class="reference internal" href="#stk.molecular.topologies.cof.Vertex.fg_map" title="stk.molecular.topologies.cof.Vertex.fg_map"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fg_map</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being built.</li>
-<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</li>
-<li><strong>nfgs</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of functional groups the building block placed
+<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being built.</li>
+<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of the unit cell.</li>
+<li><strong>nfgs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of functional groups the building block placed
 on the vertex has.</li>
-<li><strong>aligned_fg</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The <code class="docutils literal"><span class="pre">fg_id</span></code> of a functional group. This is the
-fg which gets aligned with an edge. The <code class="docutils literal"><span class="pre">fg_id</span></code>
+<li><strong>aligned_fg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The <code class="docutils literal notranslate"><span class="pre">fg_id</span></code> of a functional group. This is the
+fg which gets aligned with an edge. The <code class="docutils literal notranslate"><span class="pre">fg_id</span></code>
 corresponods to the value in the building block.</li>
 </ul>
 </td>
@@ -856,7 +849,7 @@ corresponods to the value in the building block.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -872,9 +865,9 @@ corresponods to the value in the building block.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</li>
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a>) – The building block to be placed.</li>
-<li><strong>aligner</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The <code class="docutils literal"><span class="pre">fg_id</span></code> of a functional group. This is the
+<li><strong>cell_params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> vectors of the unit cell.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit3</span></code></a>) – The building block to be placed.</li>
+<li><strong>aligner</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The <code class="docutils literal notranslate"><span class="pre">fg_id</span></code> of a functional group. This is the
 fg which gets aligned with an edge.</li>
 </ul>
 </td>
@@ -882,7 +875,7 @@ fg which gets aligned with an edge.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rdkit instance of the placed <cite>mol</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -899,12 +892,12 @@ fg which gets aligned with an edge.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The sum of the diameters of the building blocks. Used to
 scale the size of unit cells.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -913,17 +906,17 @@ scale the size of unit cells.</td>
 <dl class="function">
 <dt id="stk.molecular.topologies.cof.linker_cof_scale_func">
 <code class="descclassname">stk.molecular.topologies.cof.</code><code class="descname">linker_cof_scale_func</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cof.linker_cof_scale_func" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the scale factor for <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal"><span class="pre">LinkerCOFLattice</span></code></a>.</p>
+<dd><p>Calculates the scale factor for <a class="reference internal" href="#stk.molecular.topologies.cof.LinkerCOFLattice" title="stk.molecular.topologies.cof.LinkerCOFLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkerCOFLattice</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A product of the sum of the diameters of the building blocks
 and the number of vertices in the unit cell.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -935,9 +928,7 @@ and the number of vertices in the unit cell.</td>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -946,11 +937,11 @@ and the number of vertices in the unit cell.</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Lukas Turcani.
+        &copy; Copyright 2018, Lukas Turcani
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -965,35 +956,33 @@ and the number of vertices in the unit cell.</td>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

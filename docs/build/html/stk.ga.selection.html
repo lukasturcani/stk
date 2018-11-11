@@ -24,25 +24,17 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="stk  documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -101,7 +93,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -109,9 +101,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -155,11 +148,11 @@
             
   <div class="section" id="module-stk.ga.selection">
 <span id="stk-ga-selection-module"></span><h1>stk.ga.selection module<a class="headerlink" href="#module-stk.ga.selection" title="Permalink to this headline">¶</a></h1>
-<p>Defines selection functions via <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a>.</p>
+<p>Defines selection functions via <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selection</span></code></a>.</p>
 <div class="section" id="extending-stk-adding-selection-functions">
 <span id="adding-selection-functions"></span><h2>Extending stk: Adding selection functions.<a class="headerlink" href="#extending-stk-adding-selection-functions" title="Permalink to this headline">¶</a></h2>
-<p>If a new selection operation is to be added to <code class="docutils literal"><span class="pre">stk</span></code> it should be
-added as a method in <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a>. The only requirements are
+<p>If a new selection operation is to be added to <code class="docutils literal notranslate"><span class="pre">stk</span></code> it should be
+added as a method in <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selection</span></code></a>. The only requirements are
 that the first argument is <cite>population</cite> (excluding any <cite>self</cite> or <cite>cls</cite>
 arguments).</p>
 <p>The naming requirement exists to help users identify which arguments
@@ -177,15 +170,15 @@ start with a leading underscore.</p>
 <dl class="class">
 <dt id="stk.ga.selection.Selection">
 <em class="property">class </em><code class="descclassname">stk.ga.selection.</code><code class="descname">Selection</code><span class="sig-paren">(</span><em>generational</em>, <em>crossover</em>, <em>mutation</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class for handling all types of selection in the GA.</p>
 <p>Whenever a population needs to have some of its members selected
 for GA operations such as mutation, selection or generational
 selection, it delegates this task to an instance of this class. The
-population holds the instance in <a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation.ga_tools" title="stk.ga.ga_population.GAPopulation.ga_tools"><code class="xref py py-attr docutils literal"><span class="pre">GAPopulation.ga_tools</span></code></a>.</p>
-<p>To illustrate how a <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance works it is best
+population holds the instance in <a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation.ga_tools" title="stk.ga.ga_population.GAPopulation.ga_tools"><code class="xref py py-attr docutils literal notranslate"><span class="pre">GAPopulation.ga_tools</span></code></a>.</p>
+<p>To illustrate how a <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selection</span></code></a> instance works it is best
 to use an example.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># 1. Create FunctionData objects which describe the selection</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Create FunctionData objects which describe the selection</span>
 <span class="c1">#    functions to be used. These will correspond to methods</span>
 <span class="c1">#    in the Selection class.</span>
 
@@ -241,9 +234,9 @@ to use an example.</p>
 <span class="c1"># molecules.</span>
 </pre></div>
 </div>
-<p>By providing the strings <code class="docutils literal"><span class="pre">'generational'</span></code>, <code class="docutils literal"><span class="pre">'crossover'</span></code> and
-<code class="docutils literal"><span class="pre">'mutation'</span></code>, the <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance knows to pick the
-correct function from the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> instances provided
+<p>By providing the strings <code class="docutils literal notranslate"><span class="pre">'generational'</span></code>, <code class="docutils literal notranslate"><span class="pre">'crossover'</span></code> and
+<code class="docutils literal notranslate"><span class="pre">'mutation'</span></code>, the <a class="reference internal" href="#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selection</span></code></a> instance knows to pick the
+correct function from the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> instances provided
 during initialization.</p>
 <p>Note that duplicates are not considered during selection. If a
 molecule is present in the population twice, its chance of
@@ -251,7 +244,7 @@ selection does not double.</p>
 <dl class="attribute">
 <dt id="stk.ga.selection.Selection.generational">
 <code class="descname">generational</code><a class="headerlink" href="#stk.ga.selection.Selection.generational" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – This holds the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+<dd><p><a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> – This holds the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the
 selection function used for selecting the next generation of
 molecules.</p>
 </dd></dl>
@@ -259,14 +252,14 @@ molecules.</p>
 <dl class="attribute">
 <dt id="stk.ga.selection.Selection.crossover">
 <code class="descname">crossover</code><a class="headerlink" href="#stk.ga.selection.Selection.crossover" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+<dd><p><a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the
 selection function used for selecting molecules for crossover.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.ga.selection.Selection.mutation">
 <code class="descname">mutation</code><a class="headerlink" href="#stk.ga.selection.Selection.mutation" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+<dd><p><a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the
 selection function used for selecting molecules to mutate.</p>
 </dd></dl>
 
@@ -279,13 +272,13 @@ selection function used for selecting molecules to mutate.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The molecules which are being selected.</li>
-<li><strong>yielded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – Holds all previously yielded molecules.</li>
-<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>) – Indicates whether a member can be yielded more than once.</li>
+<li><strong>pop</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecules which are being selected.</li>
+<li><strong>yielded</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – Holds all previously yielded molecules.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Indicates whether a member can be yielded more than once.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next member whose normalized fitness integer component
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The next member whose normalized fitness integer component
 is greater than 0.</p>
 </td>
 </tr>
@@ -302,13 +295,13 @@ is greater than 0.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The molecules which are being selected.</li>
-<li><strong>yielded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – Holds all previously yielded molecules.</li>
-<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>) – Indicates whether a member can be yielded more than once.</li>
+<li><strong>pop</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecules which are being selected.</li>
+<li><strong>yielded</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – Holds all previously yielded molecules.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Indicates whether a member can be yielded more than once.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The seleceted population member.</p>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The seleceted population member.</p>
 </td>
 </tr>
 </tbody>
@@ -320,15 +313,15 @@ is greater than 0.</p>
 <code class="descname">all_combinations</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.all_combinations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields every possible pairing of individuals from a population.</p>
 <p>This yields members regardless of which subpopulation they are
-in. Each pair is only returned once. This means if <code class="docutils literal"><span class="pre">(1,2)</span></code> is
-yielded <code class="docutils literal"><span class="pre">(2,1)</span></code> will not be.</p>
+in. Each pair is only returned once. This means if <code class="docutils literal notranslate"><span class="pre">(1,2)</span></code> is
+yielded <code class="docutils literal notranslate"><span class="pre">(2,1)</span></code> will not be.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents should be selected.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population from which parents should be selected.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instances which are to be
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instances which are to be
 crossed.</td>
 </tr>
 </tbody>
@@ -346,12 +339,12 @@ fit pair yielded first.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents should be selected.</li>
-<li><strong>n</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of individuals used for making offspring.</li>
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population from which parents should be selected.</li>
+<li><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of individuals used for making offspring.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instances which are to be
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instances which are to be
 crossed.</p>
 </td>
 </tr>
@@ -364,18 +357,18 @@ crossed.</p>
 <code class="descname">crossover_deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.crossover_deterministic_sampling" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields parents according to determnistic sampling.</p>
 <p>In determnistic sampling the mean fitness value of the
-population is calculated, <code class="docutils literal"><span class="pre">&lt;f&gt;</span></code>. For each individual a
+population is calculated, <code class="docutils literal notranslate"><span class="pre">&lt;f&gt;</span></code>. For each individual a
 normalized fitness value is then calculated via:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal"><span class="pre">fn</span></code> is the normalized fitness value and <code class="docutils literal"><span class="pre">f</span></code> is the
+<p>where <code class="docutils literal notranslate"><span class="pre">fn</span></code> is the normalized fitness value and <code class="docutils literal notranslate"><span class="pre">f</span></code> is the
 original fitness value.</p>
 <p>Deterministic sampling then creates a temporary, parent
 population of the same size as the original population. An
 individual is guaranteed to be placed into the parent
-population <code class="docutils literal"><span class="pre">n</span></code> times, where <code class="docutils literal"><span class="pre">n</span></code> is the integer part of
-<code class="docutils literal"><span class="pre">fn</span></code>. Any remaining slots are given to individuals with the
+population <code class="docutils literal notranslate"><span class="pre">n</span></code> times, where <code class="docutils literal notranslate"><span class="pre">n</span></code> is the integer part of
+<code class="docutils literal notranslate"><span class="pre">fn</span></code>. Any remaining slots are given to individuals with the
 largest decimal values.</p>
 <p>Parents are then randomly selected from the parent population.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -383,13 +376,13 @@ largest decimal values.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents are selected.</li>
-<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population from which parents are selected.</li>
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
 yielded.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The selected parent pair.</p>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The selected parent pair.</p>
 </td>
 </tr>
 </tbody>
@@ -404,22 +397,22 @@ yielded.</li>
 is given by its fitness. If the total fitness is the sum of all
 fitness values, the chance an individuals is selected is given
 by:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">individual</span> <span class="n">fitness</span> <span class="o">/</span> <span class="n">total</span> <span class="n">fitness</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">individual</span> <span class="n">fitness</span> <span class="o">/</span> <span class="n">total</span> <span class="n">fitness</span><span class="p">,</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal"><span class="pre">p</span></code> is the probability of selection <a class="footnote-reference" href="#id2" id="id1">[1]</a>.</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">p</span></code> is the probability of selection <a class="footnote-reference" href="#id2" id="id1">[1]</a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents are selected.</li>
-<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population from which parents are selected.</li>
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
 yielded.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The selected parent pair.</p>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The selected parent pair.</p>
 </td>
 </tr>
 </tbody>
@@ -438,31 +431,31 @@ yielded.</li>
 <code class="descname">deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.selection.Selection.deterministic_sampling" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields individuals using deterministic sampling.</p>
 <p>This algorithm can only be used for selection of mutants. It
-will return duplicates. The results of <a class="reference internal" href="#stk.ga.selection.Selection.fittest" title="stk.ga.selection.Selection.fittest"><code class="xref py py-meth docutils literal"><span class="pre">fittest()</span></code></a> are
+will return duplicates. The results of <a class="reference internal" href="#stk.ga.selection.Selection.fittest" title="stk.ga.selection.Selection.fittest"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fittest()</span></code></a> are
 equivalent to algorithm without duplicates.</p>
 <p>In determnistic sampling the mean fitness value of the
-population is calculated, <code class="docutils literal"><span class="pre">&lt;f&gt;</span></code>. For each individual a
+population is calculated, <code class="docutils literal notranslate"><span class="pre">&lt;f&gt;</span></code>. For each individual a
 normalized fitness value is then calculated via:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal"><span class="pre">fn</span></code> is the normalized fitness value and <code class="docutils literal"><span class="pre">f</span></code> is the
-original fitness value. An individual will be selected <code class="docutils literal"><span class="pre">n</span></code>
-times, where <code class="docutils literal"><span class="pre">n</span></code> is the integer value of <code class="docutils literal"><span class="pre">fn</span></code>. After all
-individuals where <code class="docutils literal"><span class="pre">n</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> are yielded, all inidividuals are
-yielded again, largest decimal part of <code class="docutils literal"><span class="pre">fn</span></code> first.</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">fn</span></code> is the normalized fitness value and <code class="docutils literal notranslate"><span class="pre">f</span></code> is the
+original fitness value. An individual will be selected <code class="docutils literal notranslate"><span class="pre">n</span></code>
+times, where <code class="docutils literal notranslate"><span class="pre">n</span></code> is the integer value of <code class="docutils literal notranslate"><span class="pre">fn</span></code>. After all
+individuals where <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> are yielded, all inidividuals are
+yielded again, largest decimal part of <code class="docutils literal notranslate"><span class="pre">fn</span></code> first.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
-<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
 yielded.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next selected population member.</p>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The next selected population member.</p>
 </td>
 </tr>
 </tbody>
@@ -477,9 +470,9 @@ yielded.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population who’s members need to be selected.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population who’s members need to be selected.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next fittest <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instance held by
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The next fittest <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instance held by
 <cite>population</cite>.</td>
 </tr>
 </tbody>
@@ -494,26 +487,26 @@ yielded.</li>
 is given by its fitness. If the total fitness is the sum of all
 fitness values, the chance an individuals is selected is given
 by:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">individual</span> <span class="n">fitness</span> <span class="o">/</span> <span class="n">total</span> <span class="n">fitness</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">individual</span> <span class="n">fitness</span> <span class="o">/</span> <span class="n">total</span> <span class="n">fitness</span><span class="p">,</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal"><span class="pre">p</span></code> is the probability of selection <a class="footnote-reference" href="#id4" id="id3">[2]</a>.</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">p</span></code> is the probability of selection <a class="footnote-reference" href="#id4" id="id3">[2]</a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
-<li><strong>elites</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of the fittest members which are guaranteed to
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
+<li><strong>elites</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of the fittest members which are guaranteed to
 be yielded first.</li>
-<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
 yielded.</li>
-<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">True</span></code> the same member can be yielded more than
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> the same member can be yielded more than
 once.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next selected population member.</p>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The next selected population member.</p>
 </td>
 </tr>
 </tbody>
@@ -533,37 +526,37 @@ once.</li>
 <dd><p>Yields individuals via stochastic sampling.</p>
 <p>Each fitness value is used to calculate the normalized fitness
 of an individual:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal"><span class="pre">fn</span></code> is the normalized fitness value, <code class="docutils literal"><span class="pre">f</span></code> is the
-original fitness value and <code class="docutils literal"><span class="pre">&lt;f&gt;</span></code> is the mean fitness of the
-population. If <code class="docutils literal"><span class="pre">fn</span></code> is greater than <code class="docutils literal"><span class="pre">1</span></code> then the individual
+<p>where <code class="docutils literal notranslate"><span class="pre">fn</span></code> is the normalized fitness value, <code class="docutils literal notranslate"><span class="pre">f</span></code> is the
+original fitness value and <code class="docutils literal notranslate"><span class="pre">&lt;f&gt;</span></code> is the mean fitness of the
+population. If <code class="docutils literal notranslate"><span class="pre">fn</span></code> is greater than <code class="docutils literal notranslate"><span class="pre">1</span></code> then the individual
 is guaranteed to be selected. If duplicates are allowed,
-individuals are guaranteed to be selected <code class="docutils literal"><span class="pre">n</span></code> times, where
-<code class="docutils literal"><span class="pre">n</span></code> is the integer part of <code class="docutils literal"><span class="pre">fn</span></code>.</p>
+individuals are guaranteed to be selected <code class="docutils literal notranslate"><span class="pre">n</span></code> times, where
+<code class="docutils literal notranslate"><span class="pre">n</span></code> is the integer part of <code class="docutils literal notranslate"><span class="pre">fn</span></code>.</p>
 <p>Once all the guarnteed individuals have been yielded, the
 remaining individuals are yielded via the roulette method. The
 weights in the roulette method are based on the decimal part of
-<code class="docutils literal"><span class="pre">fn</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">fn</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
-<li><strong>elites</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of the fittest members which are guaranteed to
+<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
+<li><strong>elites</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of the fittest members which are guaranteed to
 be yielded first.</li>
-<li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
+<li><strong>truncation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
 yielded.</li>
-<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">True</span></code> the same member can be yielded more than
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> the same member can be yielded more than
 once.</li>
-<li><strong>use_rank</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal"><span class="pre">True</span></code> the fitness value of an individual is
-calculated as, <code class="docutils literal"><span class="pre">f</span> <span class="pre">=</span> <span class="pre">1/rank</span></code>.</li>
+<li><strong>use_rank</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> the fitness value of an individual is
+calculated as, <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">=</span> <span class="pre">1/rank</span></code>.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next selected population member.</p>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The next selected population member.</p>
 </td>
 </tr>
 </tbody>
@@ -577,9 +570,7 @@ calculated as, <code class="docutils literal"><span class="pre">f</span> <span c
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -588,11 +579,11 @@ calculated as, <code class="docutils literal"><span class="pre">f</span> <span c
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Lukas Turcani.
+        &copy; Copyright 2018, Lukas Turcani
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -607,35 +598,33 @@ calculated as, <code class="docutils literal"><span class="pre">f</span> <span c
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

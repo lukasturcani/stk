@@ -24,25 +24,17 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="stk  documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -98,7 +90,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -106,9 +98,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -155,8 +148,8 @@
 <p>Defines cage topologies of building blocks with 3 functional groups.</p>
 <dl class="class">
 <dt id="stk.molecular.topologies.cage.three_plus_three.FourPlusFour">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.three_plus_three.</code><code class="descname">FourPlusFour</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.FourPlusFour" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.NoLinkerCageTopology" title="stk.molecular.topologies.cage.base.NoLinkerCageTopology"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cage.base.NoLinkerCageTopology</span></code></a></p>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.three_plus_three.</code><code class="descname">FourPlusFour</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>bb_positions=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.FourPlusFour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.NoLinkerCageTopology" title="stk.molecular.topologies.cage.base.NoLinkerCageTopology"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cage.base.NoLinkerCageTopology</span></code></a></p>
 <p>A square cage topology from tri-functionalised building blocks.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cage.three_plus_three.FourPlusFour.a">
@@ -227,8 +220,8 @@
 
 <dl class="class">
 <dt id="stk.molecular.topologies.cage.three_plus_three.OnePlusOne">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.three_plus_three.</code><code class="descname">OnePlusOne</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.OnePlusOne" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.NoLinkerCageTopology" title="stk.molecular.topologies.cage.base.NoLinkerCageTopology"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cage.base.NoLinkerCageTopology</span></code></a></p>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.three_plus_three.</code><code class="descname">OnePlusOne</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>bb_positions=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.OnePlusOne" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.NoLinkerCageTopology" title="stk.molecular.topologies.cage.base.NoLinkerCageTopology"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cage.base.NoLinkerCageTopology</span></code></a></p>
 <p>A sandwich cage topology from tri-functionalised building blocks.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cage.three_plus_three.OnePlusOne.a">
@@ -243,7 +236,18 @@
 <dl class="method">
 <dt id="stk.molecular.topologies.cage.three_plus_three.OnePlusOne.bonded_fgs">
 <code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.OnePlusOne.bonded_fgs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Joins up the separate building blocks which form the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The <code class="docutils literal notranslate"><span class="pre">fg_ids</span></code> of functional groups to be bonded.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cage.three_plus_three.OnePlusOne.connections">
@@ -274,8 +278,8 @@
 
 <dl class="class">
 <dt id="stk.molecular.topologies.cage.three_plus_three.TwoPlusTwo">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.three_plus_three.</code><code class="descname">TwoPlusTwo</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.TwoPlusTwo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.NoLinkerCageTopology" title="stk.molecular.topologies.cage.base.NoLinkerCageTopology"><code class="xref py py-class docutils literal"><span class="pre">stk.molecular.topologies.cage.base.NoLinkerCageTopology</span></code></a></p>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.cage.three_plus_three.</code><code class="descname">TwoPlusTwo</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>bb_positions=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.TwoPlusTwo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.NoLinkerCageTopology" title="stk.molecular.topologies.cage.base.NoLinkerCageTopology"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.cage.base.NoLinkerCageTopology</span></code></a></p>
 <p>Tetrahedral cage topology from tri-functionalised building blocks.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.cage.three_plus_three.TwoPlusTwo.a">
@@ -312,9 +316,9 @@
 <code class="descname">n_windows</code><em class="property"> = 4</em><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.TwoPlusTwo.n_windows" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="classmethod">
 <dt id="stk.molecular.topologies.cage.three_plus_three.TwoPlusTwo.old_normal">
-<code class="descname">old_normal</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.TwoPlusTwo.old_normal" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">old_normal</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.cage.three_plus_three.TwoPlusTwo.old_normal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the normal of the plane formed by the connected edges.</p>
 <p>The normal is set such that it always points away from the
 origin.</p>
@@ -322,12 +326,12 @@ origin.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scale</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – The amount by which the size of the topology is scaled.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scale</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The amount by which the size of the topology is scaled.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A normalized vector which defines the normal pointed away
 from the origin.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -349,9 +353,7 @@ from the origin.</td>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -360,11 +362,11 @@ from the origin.</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Lukas Turcani.
+        &copy; Copyright 2018, Lukas Turcani
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -379,35 +381,33 @@ from the origin.</td>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

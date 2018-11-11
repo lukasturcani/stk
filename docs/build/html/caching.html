@@ -24,25 +24,17 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="stk  documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -98,7 +90,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">stk</a>
@@ -106,9 +98,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -152,11 +145,11 @@
             
   <div class="section" id="caching">
 <h1>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h1>
-<p>One important feature of <code class="docutils literal"><span class="pre">stk</span></code>, which is often the source of unexpected
+<p>One important feature of <code class="docutils literal notranslate"><span class="pre">stk</span></code>, which is often the source of unexpected
 behaviour, is that it caches every molecule it creates. In addition,
 every time the the user attempts to build or load the same molecule, the
 cached copy is returned from memory. Here are some examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Example 1</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example 1</span>
 <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">)</span>
 <span class="n">bb1</span> <span class="c1"># &lt;StructUnit at 0x0012931&gt;</span>
 <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">)</span>
@@ -191,8 +184,8 @@ cached copy is returned from memory. Here are some examples</p>
 <span class="n">bb8</span> <span class="ow">is</span> <span class="n">bb9</span> <span class="c1"># False</span>
 </pre></div>
 </div>
-<p>and with <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Example 5 - using the same objects for initialization results</span>
+<p>and with <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example 5 - using the same objects for initialization results</span>
 <span class="c1"># in the same object being returned from the cache. Assembly step is</span>
 <span class="c1"># skipped!</span>
 <span class="n">mmol1</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">())</span> <span class="c1"># Slow, have to build.</span>
@@ -206,12 +199,12 @@ cached copy is returned from memory. Here are some examples</p>
 </pre></div>
 </div>
 <p>The user has the option to turn the cache off and on through the
-<code class="docutils literal"><span class="pre">CACHE_SETTINGS</span></code> variable.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">CACHE_SETTINGS</span><span class="p">[</span><span class="s1">&#39;ON&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span> <span class="c1"># Cache is off.</span>
+<code class="docutils literal notranslate"><span class="pre">OPTIONS</span></code> variable.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">OPTIONS</span><span class="p">[</span><span class="s1">&#39;cache&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span> <span class="c1"># Cache is off.</span>
 <span class="n">bb10</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecele1.mol&#39;</span><span class="p">)</span>
 <span class="n">bb10</span> <span class="ow">is</span> <span class="n">bb1</span> <span class="c1"># False</span>
 
-<span class="n">CACHE_SETTINGS</span><span class="p">[</span><span class="s1">&#39;ON&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span> <span class="c1"># Cache is back on.</span>
+<span class="n">OPTIONS</span><span class="p">[</span><span class="s1">&#39;cache&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span> <span class="c1"># Cache is back on.</span>
 <span class="n">bb11</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">)</span>
 <span class="n">bb11</span> <span class="ow">is</span> <span class="n">bb1</span> <span class="c1"># True</span>
 <span class="n">bb11</span> <span class="ow">is</span> <span class="n">bb10</span> <span class="c1"># False</span>
@@ -221,9 +214,7 @@ cached copy is returned from memory. Here are some examples</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -232,11 +223,11 @@ cached copy is returned from memory. Here are some examples</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Lukas Turcani.
+        &copy; Copyright 2018, Lukas Turcani
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -251,35 +242,33 @@ cached copy is returned from memory. Here are some examples</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
