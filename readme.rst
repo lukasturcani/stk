@@ -15,6 +15,8 @@ automatic design of molecules, including a genetic algorithm. For more
 information, the documentation can be found at
 https://lukasturcani.github.io/stk/docs/build/html.
 
+Slack user group: https://t.co/LCPzWhvsVO
+
 Installation
 ============
 
