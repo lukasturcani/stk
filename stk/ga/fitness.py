@@ -495,6 +495,25 @@ def random_fitness_vector(macro_mol):
     return f
 
 
+def building_block_atoms(macro_mol):
+    """
+    Returns the number of atoms in the molecule.
+
+    Parameters
+    ----------
+    macro_mol : :class:`.MacroMolecule`
+        The molecule having its fitness calculated.
+
+    Returns
+    -------
+    :class:`int`
+        The number of atoms in `macro_mol`.
+
+    """
+
+    return macro_mol.mol.GetNumAtoms()
+
+
 def raiser(macro_mol, param1, param2=2):
     """
     Doens't calculate a fitness value, raises an error instead.
@@ -504,6 +523,9 @@ def raiser(macro_mol, param1, param2=2):
 
     Parameters
     ---------
+    macro_mol : :class:`.MacroMolecule`
+        The molecule having its fitness calculated.
+
     param1 : :class:`object`
         Dummy parameter, does nothing.
 

@@ -506,6 +506,12 @@ and selects building blocks which have the most atoms.
     import stk
 
     # ################################################################
+    # Number of CPU cores to use.
+    # ################################################################
+
+    processes = 1
+
+    # ################################################################
     # Population size.
     # ################################################################
 
@@ -599,7 +605,9 @@ and selects building blocks which have the most atoms.
     # The "macro_mol" parameters are not specified and any default
     # parameters can be specified optionally. All other parameters
     # must be specified as key-value pairs.
-    crossover_funcs = [{'NAME': 'jumble'}]
+    crossover_funcs = [{'NAME': 'jumble',
+                        'n_offspring_building_blocks': 2,
+                        'n_offspring': 2}]
 
     # ################################################################
     # Mutation functions.
