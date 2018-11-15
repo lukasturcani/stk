@@ -491,6 +491,9 @@ and :doc:`ga_input_file_examples`.
 
 The genetic algorithm automatically works with any molecules that ``stk``
 can construct, just make sure you define an appropriate fitness function.
+It will also work with :class:`StructUnit` if you do not wish to use
+``stk``'s construction capabilities.
+
 
 Take for example, the following input file which runs the GA on polymers
 and selects building blocks which have the most atoms.
@@ -499,6 +502,163 @@ and selects building blocks which have the most atoms.
 
     # big_monomers.py
 
+    # Import stuff.
+    import stk
+
+    # ################################################################
+    # Population size.
+    # ################################################################
+
+    pop_size = 10
+
+    # ################################################################
+    # Number of generations to create.
+    # ################################################################
+
+    num_generations = 30
+
+    # ################################################################
+    # Number of mutation operations to perform each generation.
+    # ################################################################
+
+    num_mutations = 5
+
+    # ################################################################
+    # Number of crossover operations to perform each generation.
+    # ################################################################
+
+    num_crossovers = 3
+
+    # ################################################################
+    # Population initialization function.
+    # ################################################################
+
+    # First create the StructUnit objects of the monomers. In
+    # this simple example, they are simple hydro-carbon chains of
+    # varying length with a Br atom at each end of the chain.
+    monomers = [stk.StructUnit2.smiles_init('[Br]'+'C'*i+'[Br]')
+                for i in range(1000)]
+    # List of the possible topologies the polymers can have. In this
+    # simple example a single topology will suffice.
+    polymer_topologies = [stk.Linear(repeating_unit='AB',
+                                     orientation=[0, 0],
+                                     n=1)]
+
+    # Finally, define the function which is called to create the
+    # initial GA population. The "NAME" key holds the name of an
+    # initialization function of the GAPopulation class. The remaining
+    # key-value pairs are additional parameters for that function.
+    # Default parameters can be specified if desired.
+    init_func = {'NAME': 'init_random',
+                 'macromol_class': stk.Polymer,
+                 'building_blocks': [monomers, monomers],
+                 'topologies': polymer_topologies}
+
+    # ################################################################
+    # Selection function for selecting the next generation.
+    # ################################################################
+
+    # The "NAME" key holds the name of a method in the Selection class.
+    # The remaining key-value pairs are additional parameters for that
+    # method. The "population" parameter is not specified and any
+    # default parameters can be specified if desired.
+    generational_select_func = {'NAME': 'stochastic_sampling',
+                                'use_rank': True}
+
+    # ################################################################
+    # Selection function for selecting parents.
+    # ################################################################
+
+    # The "NAME" key holds the name of a method in the Selection class.
+    # The remaining key-value pairs are additional parameters for that
+    # method. The "population" parameter is not specified and any
+    # default parameters can be specified if desired.
+    crossover_select_func = {'NAME': 'crossover_roulette',
+                             'truncation': 5}
+
+    # ################################################################
+    # Selection function for selecting molecules for mutation.
+    # ################################################################
+
+    # The "NAME" key holds the name of a method in the Selection class.
+    # The remaining key-value pairs are additional parameters for that
+    # method. The "population" parameter is not specified and any
+    # default parameters can be specified if desired.
+    mutation_select_func = {'NAME': 'stochastic_sampling',
+                            'truncation': 3,
+                            'duplicates': True}
+
+    # ################################################################
+    # Crossover functions.
+    # ################################################################
+
+    # In this example there only one crossover function will be used,
+    # but can use multiple if we add them into the list.
+
+    # The "NAME" key holds the name of a method in the Crossover class.
+    # The "macro_mol" parameters are not specified and any default
+    # parameters can be specified optionally. All other parameters
+    # must be specified as key-value pairs.
+    crossover_funcs = [{'NAME': 'jumble'}]
+
+    # ################################################################
+    # Mutation functions.
+    # ################################################################
+
+    # The "NAME" key holds the name of a method in the Mutation class.
+    # The "macro_mol" parameter is not specified and any default
+    # parameters can be specified optionally. All other parameters
+    # must be specified as key-value pairs.
+
+    # mutation_func1 substitutes a building block in the
+    # molecule with one in the list "monomers".
+    mutation_func1 = {'NAME': 'random_bb',
+                      'mols': monomers,
+                      'key': lambda x: isinstance(x, stk.StructUnit2)}
+
+    # mutation_func2 substitutes the topology of a polymer with a
+    # topology1, topology2 or topology3.
+    topology1 = stk.Linear(repeating_unit='AB',
+                           orientation=[0, 0],
+                           n=1)
+    topology2 = stk.Linear(repeating_unit='ABBA',
+                          orientation=[0, 0],
+                          n=1)
+   topology3 = stk.Linear(repeating_unit='AAB',
+                          orientation=[0, 0],
+                          n=1)
+    mutation_func2 = {'NAME': 'random_topology',
+                      'topologies': [topology1, topology2, topology3]}
+
+    # Here we tell the GA which mutation functions we want to use.
+    mutation_funcs = [mutation_func1, mutation_func2]
+
+    # ################################################################
+    # Optimization function.
+    # ################################################################
+
+    # In this example, for the sake of speed, we will not optimize
+    # constructed polymers.
+
+    # The "NAME" key holds the name of a function
+    # defined in the optimization.py module. The "mol" parameter is
+    # not specified and any default parameters can be specified
+    # optionally. All other parameters must be specified as key-value
+    # pairs.
+
+    # Note that "do_not_optimize" is the name of a function
+    # in this module. The does no work however and returns immediately.
+    opt_func = {'NAME': 'do_not_optimize'}
+
+    # ################################################################
+    # Fitness function.
+    # ################################################################
+
+    # The "NAME" key holds the name of a function defined in the
+    # "fitness.py" module. The "macro_mol" parameter is not
+    # specified and any default parameters can be specified if desired.
+    # The remaining parameters must be specified as key-value pairs.
+    fitness_func = {'NAME': 'building_block_atoms'}
 
 
 Running the genetic algorithm with this input file::
