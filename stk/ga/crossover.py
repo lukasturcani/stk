@@ -270,7 +270,8 @@ class Crossover:
 
         return offspring_pop
 
-    def jumble(macro_mol1,
+    def jumble(self,
+               macro_mol1,
                macro_mol2,
                n_offspring_building_blocks,
                n_offspring):
@@ -308,8 +309,8 @@ class Crossover:
 
         """
 
-        building_blocks = (macro_mol1.buliding_blocks +
-                           macro_mol2.buliding_blocks)
+        building_blocks = (macro_mol1.building_blocks +
+                           macro_mol2.building_blocks)
         parent_topologies = [macro_mol1.topology, macro_mol2.topology]
 
         pop = GAPopulation()
@@ -317,6 +318,7 @@ class Crossover:
             offspring_topology = np.random.choice(parent_topologies)
             bbs = np.random.choice(building_blocks,
                                    size=n_offspring_building_blocks)
-            offspring = macro_mol1.__class__(bbs, offspring_topology)
+            offspring = macro_mol1.__class__(bbs.tolist(),
+                                             offspring_topology)
             pop.members.append(offspring)
         return pop
