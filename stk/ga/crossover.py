@@ -31,6 +31,7 @@ from itertools import islice
 
 from .ga_population import GAPopulation
 from .plotting import plot_counter
+from ..utilities import dedupe
 
 
 logger = logging.getLogger(__name__)
@@ -274,7 +275,8 @@ class Crossover:
                macro_mol1,
                macro_mol2,
                n_offspring_building_blocks,
-               n_offspring):
+               n_offspring,
+               allow_duplicate_building_blocks=False):
         """
         Randomly distributes all building blocks among offspring.
 
@@ -301,6 +303,10 @@ class Crossover:
         n_offspring : :class:`int`
             The number of offspring to produce.
 
+        allow_duplicate_building_blocks : :class:`bool`, optional
+            Indicates whether the building blocks used to construct the
+            offspring must all be unique.
+
         Returns
         -------
         :class:`.GAPopulation`
@@ -309,15 +315,17 @@ class Crossover:
 
         """
 
-        building_blocks = (macro_mol1.building_blocks +
-                           macro_mol2.building_blocks)
+        building_blocks = list(dedupe(macro_mol1.building_blocks +
+                                      macro_mol2.building_blocks))
         parent_topologies = [macro_mol1.topology, macro_mol2.topology]
 
         pop = GAPopulation()
         for i in range(n_offspring):
             offspring_topology = np.random.choice(parent_topologies)
-            bbs = np.random.choice(building_blocks,
-                                   size=n_offspring_building_blocks)
+            bbs = np.random.choice(
+                        building_blocks,
+                        size=n_offspring_building_blocks,
+                        replace=allow_duplicate_building_blocks)
             offspring = macro_mol1.__class__(bbs.tolist(),
                                              offspring_topology)
             pop.members.append(offspring)

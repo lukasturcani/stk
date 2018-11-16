@@ -181,7 +181,11 @@ class Mutation:
 
         return mutant_pop
 
-    def random_bb(self, macro_mol, mols, key):
+    def random_bb(self,
+                  macro_mol,
+                  mols,
+                  key,
+                  allow_duplicate_building_blocks=False):
         """
         Substitute a building block at random.
 
@@ -200,6 +204,10 @@ class Mutation:
             which return ``True``, one is chosen at random to undergo
             mutation.
 
+        allow_duplicate_building_blocks : :class:`bool`, optional
+            Indicates whether the building blocks used to construct the
+            mutant must all be unique.
+
         Returns
         -------
         :class:`.MacroMolecule`
@@ -211,8 +219,18 @@ class Mutation:
         valid_bbs = [bb for bb in macro_mol.building_blocks if key(bb)]
         chosen_bb = np.random.choice(valid_bbs)
 
+        # If the mutant can have more than one of the same building
+        # block, prevent only the building block getting replaced
+        # from being used as a replacement.
+        if allow_duplicate_building_blocks:
+            excluded_bbs = {chosen_bb}
+        # If the mutant is to be composed of unique building blocks
+        # only, prevent any building block already present in the
+        # macro_mol from being used as a replacement.
+        else:
+            excluded_bbs = set(macro_mol.building_blocks)
         # Make sure that the building block itself will not be picked.
-        mols = [mol for mol in mols if mol is not chosen_bb]
+        mols = [mol for mol in mols if mol not in excluded_bbs]
 
         # Choose a replacement building block.
         replacement = np.random.choice(mols)
