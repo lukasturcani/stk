@@ -411,37 +411,69 @@ use <a class="reference internal" href="#stk.molecular.molecules.Molecule.same" 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.MacroMolecule.building_blocks">
 <code class="descname">building_blocks</code><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.building_blocks" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> – This attribute holds <a class="reference internal" href="#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances which
+<dd><p>This attribute holds <a class="reference internal" href="#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances which
 represent the monomers forming the macromolecule. Only one
 <a class="reference internal" href="#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instance is needed per building block, even
 if multiples of that molecule join up to form the
 macromolecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.MacroMolecule.bb_counter">
 <code class="descname">bb_counter</code><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.bb_counter" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.Counter</span></code> – A counter keeping track of how much of each building block is
+<dd><p>A counter keeping track of how much of each building block is
 used to form the macromolecule. Added by
 <code class="xref py py-func docutils literal notranslate"><span class="pre">Topology.build()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.Counter</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.MacroMolecule.topology">
 <code class="descname">topology</code><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.topology" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a> – Defines the shape of macromolecule and assembles it.</p>
+<dd><p>Defines the shape of macromolecule and assembles it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.MacroMolecule.fitness">
 <code class="descname">fitness</code><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.fitness" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> – The fitness value of the macromolecule, used by the GA.</p>
+<dd><p>The fitness value of the macromolecule, used by the GA.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.MacroMolecule.unscaled_fitness">
 <code class="descname">unscaled_fitness</code><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.unscaled_fitness" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> – The dictionary holds the name of a fitness function as the
+<dd><p>The dictionary holds the name of a fitness function as the
 key and the value it calculated for unscaled_fitness as the
 value. For example,</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">unscaled_fitness</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fitness_func1&#39;</span><span class="p">:</span> <span class="mf">12.3</span><span class="p">,</span>
@@ -450,25 +482,49 @@ value. For example,</p>
 </div>
 <p>where <code class="docutils literal notranslate"><span class="pre">'fitness_func1'</span></code> and <code class="docutils literal notranslate"><span class="pre">'fitness_func2'</span></code> are the
 names of the fintess functions applied on the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.MacroMolecule.progress_params">
 <code class="descname">progress_params</code><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.progress_params" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> – Holds the fitness parameters which the GA should track to make
+<dd><p>Holds the fitness parameters which the GA should track to make
 progress plots. The key is the name of a fitness function. Has
 the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">unscaled_fitness</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fitness_func1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">49</span><span class="p">]</span>
                     <span class="s1">&#39;fitness_func2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">78</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">32.3</span><span class="p">]}</span>
 </pre></div>
 </div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.MacroMolecule.bonds_made">
 <code class="descname">bonds_made</code><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.bonds_made" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The number of bonds made during assembly. Added by
+<dd><p>The number of bonds made during assembly. Added by
 <code class="xref py py-func docutils literal notranslate"><span class="pre">Topology.build()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="classmethod">
@@ -669,25 +725,49 @@ should not be used directly.</p>
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Molecule.mol">
 <code class="descname">mol</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.mol" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code> – An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule instance representing the molecule.</p>
+<dd><p>An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule instance representing the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Molecule.inchi">
 <code class="descname">inchi</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.inchi" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – The InChI of the molecule.</p>
+<dd><p>The InChI of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Molecule.energy">
 <code class="descname">energy</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.energy" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="stk.molecular.energy.html#stk.molecular.energy.Energy" title="stk.molecular.energy.Energy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Energy</span></code></a> – Handles all things energy.</p>
+<dd><p>Handles all things energy.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.energy.html#stk.molecular.energy.Energy" title="stk.molecular.energy.Energy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Energy</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Molecule.atom_props">
 <code class="descname">atom_props</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.atom_props" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> – Maps atom id to a <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> holding the <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> atom
+<dd><p>Maps atom id to a <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> holding the <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> atom
 properties of the atom. For example</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">atom_props</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bonder&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
                   <span class="s1">&#39;fg&#39;</span><span class="p">:</span> <span class="s1">&#39;amine&#39;</span><span class="p">,</span>
@@ -697,12 +777,20 @@ properties of the atom. For example</p>
                   <span class="s1">&#39;del&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}}</span>
 </pre></div>
 </div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Molecule.bonder_ids">
 <code class="descname">bonder_ids</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.bonder_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> – Holds the id of bonder atoms in a nested <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+<dd><p>Holds the id of bonder atoms in a nested <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">14</span><span class="p">]]</span>
 </pre></div>
 </div>
@@ -710,27 +798,59 @@ properties of the atom. For example</p>
 <code class="docutils literal notranslate"><span class="pre">fg_id</span></code> of <code class="docutils literal notranslate"><span class="pre">0</span></code>, atoms <code class="docutils literal notranslate"><span class="pre">5</span></code> and <code class="docutils literal notranslate"><span class="pre">6</span></code> are bonder atoms with
 <code class="docutils literal notranslate"><span class="pre">fg_id</span></code> of <code class="docutils literal notranslate"><span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">11</span></code> and <code class="docutils literal notranslate"><span class="pre">14</span></code> are bonder atoms with
 <code class="docutils literal notranslate"><span class="pre">fg_id</span></code> of <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Molecule.optimized">
 <code class="descname">optimized</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.optimized" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> – Indicates whether a <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> has been passed through
+<dd><p>Indicates whether a <a class="reference internal" href="#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> has been passed through
 an optimization function or not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Molecule.name">
 <code class="descname">name</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – A name which can be optionally given to the molecule for easy
+<dd><p>A name which can be optionally given to the molecule for easy
 identification.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Molecule.note">
 <code class="descname">note</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.note" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – A note or comment about the molecule. Purely optional but can
+<dd><p>A note or comment about the molecule. Purely optional but can
 be useful for labelling and debugging.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1578,7 +1698,7 @@ materials being added.</p>
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Periodic.deleters">
 <code class="descname">deleters</code><a class="headerlink" href="#stk.molecular.molecules.Periodic.deleters" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of the form</p>
+<dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="mi">12</span><span class="p">:</span> <span class="p">[[</span><span class="n">coord</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">],</span>
          <span class="p">[</span><span class="n">coord</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">],</span>
@@ -1595,25 +1715,49 @@ The value holds the position, element and bond type of
 every deleter atom removed from that bonder. The position is a
 <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>, the element is an <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> and the
 bond type is an <code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.BondType</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Periodic.periodic_bonds">
 <code class="descname">periodic_bonds</code><a class="headerlink" href="#stk.molecular.molecules.Periodic.periodic_bonds" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.PeriodicBond" title="stk.utilities.utilities.PeriodicBond"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodicBond</span></code></a> – When periodic topologies are assembled, periodic bonds
+<dd><p>When periodic topologies are assembled, periodic bonds
 do not get added to the <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule in the
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">mol</span></code> attribute. Instead,
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">join_mols()</span></code> adds
 <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.PeriodicBond" title="stk.utilities.utilities.PeriodicBond"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodicBond</span></code></a> instances representing the bonds into
 this list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.PeriodicBond" title="stk.utilities.utilities.PeriodicBond"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodicBond</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Periodic.cell_dimensions">
 <code class="descname">cell_dimensions</code><a class="headerlink" href="#stk.molecular.molecules.Periodic.cell_dimensions" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code> – The dimensions of the unit cell. The first array is the vector
+<dd><p>The dimensions of the unit cell. The first array is the vector
 <code class="docutils literal notranslate"><span class="pre">a</span></code> the second is <code class="docutils literal notranslate"><span class="pre">b</span></code> and the third is <code class="docutils literal notranslate"><span class="pre">c</span></code>. This should
 be added during the build process by the periodic topology.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1785,27 +1929,51 @@ building blocks.</p>
 <dl class="attribute">
 <dt id="stk.molecular.molecules.StructUnit.init_funcs">
 <code class="descname">init_funcs</code><a class="headerlink" href="#stk.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> – This dictionary holds the various functions which can be used
+<dd><p>This dictionary holds the various functions which can be used
 to initialize <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecules and pairs them with the
 appropriate file extension.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.StructUnit.file">
 <code class="descname">file</code><a class="headerlink" href="#stk.molecular.molecules.StructUnit.file" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – The full path to the molecular structure file holding the
+<dd><p>The full path to the molecular structure file holding the
 molecule. The supported file formats are the keys in
 <a class="reference internal" href="#stk.molecular.molecules.StructUnit.init_funcs" title="stk.molecular.molecules.StructUnit.init_funcs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">init_funcs</span></code></a>. As long as a file with one of these
 extensions is provided, the correct initialization function
 will be used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.molecules.StructUnit.func_grp">
 <code class="descname">func_grp</code><a class="headerlink" href="#stk.molecular.molecules.StructUnit.func_grp" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGInfo</span></code></a> – The <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGInfo</span></code></a> instance holding information about the
+<dd><p>The <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGInfo</span></code></a> instance holding information about the
 functional group which will react when the building block
 assembles to form macromolecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGInfo</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="classmethod">
@@ -2093,7 +2261,7 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt>
-<code class="descname">init_funcs</code><em class="property"> = {'.mae': &lt;function mol_from_mae_file at 0x7f89779312f0&gt;, '.mol': functools.partial(&lt;Boost.Python.function object at 0x55f01f916e70&gt;, sanitize=False, removeHs=False), '.mol2': functools.partial(&lt;Boost.Python.function object at 0x55f01f86c750&gt;, sanitize=False, removeHs=False), '.pdb': functools.partial(&lt;Boost.Python.function object at 0x55f01ff2cd40&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object at 0x55f01f916e70&gt;, sanitize=False, removeHs=False)}</em></dt>
+<code class="descname">init_funcs</code><em class="property"> = {'.mae': &lt;function mol_from_mae_file&gt;, '.mol': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.mol2': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.pdb': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False)}</em></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -2630,17 +2798,7 @@ centroids shoould be aligned.</li>
 
     
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>

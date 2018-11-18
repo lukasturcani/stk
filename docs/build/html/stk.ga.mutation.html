@@ -180,32 +180,56 @@ to select molecules for mutation.</p>
 <dl class="attribute">
 <dt id="stk.ga.mutation.Mutation.funcs">
 <code class="descname">funcs</code><a class="headerlink" href="#stk.ga.mutation.Mutation.funcs" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> – This lists holds all the mutation functions which are to be
+<dd><p>This lists holds all the mutation functions which are to be
 used by the GA. One will be chosen at random when a mutation
 is desired. The likelihood that each is selected is given by
 <cite>weights</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.ga.mutation.Mutation.num_mutations">
 <code class="descname">num_mutations</code><a class="headerlink" href="#stk.ga.mutation.Mutation.num_mutations" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The number of mutations that needs to be performed each
+<dd><p>The number of mutations that needs to be performed each
 generation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.ga.mutation.Mutation.weights">
 <code class="descname">weights</code><a class="headerlink" href="#stk.ga.mutation.Mutation.weights" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> – If <a class="reference internal" href="#stk.ga.mutation.Mutation.weights" title="stk.ga.mutation.Mutation.weights"><code class="xref py py-attr docutils literal notranslate"><span class="pre">weights</span></code></a> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, each <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>
+<dd><p>If <a class="reference internal" href="#stk.ga.mutation.Mutation.weights" title="stk.ga.mutation.Mutation.weights"><code class="xref py py-attr docutils literal notranslate"><span class="pre">weights</span></code></a> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, each <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>
 corresponds to the probability of selecting the mutation
 function at the corresponding index. If <a class="reference internal" href="#stk.ga.mutation.Mutation.weights" title="stk.ga.mutation.Mutation.weights"><code class="xref py py-attr docutils literal notranslate"><span class="pre">weights</span></code></a> is
 <code class="docutils literal notranslate"><span class="pre">None</span></code>, each mutation function has equal likelihood of
 being picked.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="stk.ga.mutation.Mutation.random_bb">
-<code class="descname">random_bb</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mols</em>, <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.mutation.Mutation.random_bb" title="Permalink to this definition">¶</a></dt>
+<code class="descname">random_bb</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mols</em>, <em>key</em>, <em>allow_duplicate_building_blocks=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.mutation.Mutation.random_bb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Substitute a building block at random.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -219,6 +243,8 @@ substitution.</li>
 returns <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>. For all building blocks
 which return <code class="docutils literal notranslate"><span class="pre">True</span></code>, one is chosen at random to undergo
 mutation.</li>
+<li><strong>allow_duplicate_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Indicates whether the building blocks used to construct the
+mutant must all be unique.</li>
 </ul>
 </td>
 </tr>
@@ -345,17 +371,7 @@ mutation.</li>
 
     
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>

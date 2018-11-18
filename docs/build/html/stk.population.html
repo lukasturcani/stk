@@ -168,21 +168,37 @@ methods.</p>
 <dl class="attribute">
 <dt id="stk.population.Population.populations">
 <code class="descname">populations</code><a class="headerlink" href="#stk.population.Population.populations" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> instances – A list of other instances of the <a class="reference internal" href="#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> class.
+<dd><p>A list of other instances of the <a class="reference internal" href="#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> class.
 This allows the implementation of subpopulations or
 evolutionary islands. This attribute is also used for grouping
 molecules within a given population for organizational
 purposes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> instances</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.population.Population.members">
 <code class="descname">members</code><a class="headerlink" href="#stk.population.Population.members" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances – Held here are the members of the population which are not held
+<dd><p>Held here are the members of the population which are not held
 within any subpopulations. This means that not all members of a
 population are stored in this attribute. To access all members
 of a population the generator <a class="reference internal" href="#stk.population.Population.all_members" title="stk.population.Population.all_members"><code class="xref py py-meth docutils literal notranslate"><span class="pre">all_members()</span></code></a> should be
 used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -832,17 +848,7 @@ index in the population.</li>
 
     
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>

@@ -150,14 +150,7 @@
 <dt id="stk.ga.plotting.fitness_epp">
 <code class="descclassname">stk.ga.plotting.</code><code class="descname">fitness_epp</code><span class="sig-paren">(</span><em>pop</em>, <em>plot_name=False</em>, <em>dump_name=None</em>, <em>xlabel='Generation'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.plotting.fitness_epp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the min, max and avg fitness values of each subpopulation.</p>
-<p>Also saves the plot data. The min, mean and max values for each
-subpopulation of <cite>pop</cite> are placed in an array:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dmp_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span>
-</pre></div>
-</div>
-<p>which is then dumped to the file <cite>dump_name</cite>.</p>
-<p>The members with a fitness of <code class="docutils literal notranslate"><span class="pre">0.0001</span></code> (indicating a failed
-fitness calculation) are excluded from this analysis.</p>
+<p>Also saves the plot data in a csv file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -171,7 +164,7 @@ then no plot is made. Useful if you only want the dump file and
 not graph.</li>
 <li><strong>dump_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The path to the file where the data to make the graph is
 dumped. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then <cite>plot_name</cite> is used but with a
-<code class="docutils literal notranslate"><span class="pre">.dmp</span></code> extension.</li>
+<code class="docutils literal notranslate"><span class="pre">.csv</span></code> extension.</li>
 <li><strong>xlabel</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The label on the x-axis.</li>
 </ul>
 </td>
@@ -194,12 +187,7 @@ dumped. If <code class="docutils literal notranslate"><span class="pre">None</sp
 separate graph will be produced. Each will show subpopulations on
 the x-axis and the min, max and avg values of that
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">progress_params</span></code></a> element on the y-axis.</p>
-<p>Also saves the plot data. The min, mean and max values for each
-subpopulation are placed in an array:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dmp_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span>
-</pre></div>
-</div>
-<p>which is then dumped to the file <cite>dump_name</cite>.</p>
+<p>Also saves the plot data in a csv file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -213,7 +201,7 @@ then no plot is made. Useful if you only want the dump file and
 not graph.</li>
 <li><strong>dump_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The path to the file where the data to make the graph is
 dumped. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then <cite>plot_name</cite> is used but with a
-<code class="docutils literal notranslate"><span class="pre">.dmp</span></code> extension.</li>
+<code class="docutils literal notranslate"><span class="pre">.csv</span></code> extension.</li>
 <li><strong>xlabel</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The label on the x-axis.</li>
 </ul>
 </td>
@@ -288,17 +276,7 @@ member was selected.</p>
 
     
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>

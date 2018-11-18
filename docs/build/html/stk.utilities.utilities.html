@@ -156,30 +156,62 @@ part of <code class="docutils literal notranslate"><span class="pre">stk</span><
 <dl class="attribute">
 <dt id="stk.utilities.utilities.AtomicPeriodicBond.bonder1">
 <code class="descname">bonder1</code><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder1" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The value of the <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> atom property of the first bonded
+<dd><p>The value of the <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> atom property of the first bonded
 atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.AtomicPeriodicBond.bonder2">
 <code class="descname">bonder2</code><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder2" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The value of the <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> atom property of the second
+<dd><p>The value of the <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> atom property of the second
 bonded atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.AtomicPeriodicBond.bond_type">
 <code class="descname">bond_type</code><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.bond_type" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.BondType</span></code> – The bond type.</p>
+<dd><p>The bond type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.BondType</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.AtomicPeriodicBond.direction">
 <code class="descname">direction</code><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.direction" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – A 3 member list describing the axes along which the bond is
+<dd><p>A 3 member list describing the axes along which the bond is
 periodic, when going from <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder1" title="stk.utilities.utilities.AtomicPeriodicBond.bonder1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder1</span></code></a> to <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder2" title="stk.utilities.utilities.AtomicPeriodicBond.bonder2"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder2</span></code></a>.
 For example, <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is periodic
 along the x axis in the positive direction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -248,15 +280,31 @@ equivalent fgs in the cell.</li>
 <dl class="attribute">
 <dt id="stk.utilities.utilities.Cell.id">
 <code class="descname">id</code><a class="headerlink" href="#stk.utilities.utilities.Cell.id" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – A 3 member array holding the x, y and z index
+<dd><p>A 3 member array holding the x, y and z index
 of the cell within the supercell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.Cell.fgs">
 <code class="descname">fgs</code><a class="headerlink" href="#stk.utilities.utilities.Cell.fgs" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> – Maps the fgs in the original unit cell to the
+<dd><p>Maps the fgs in the original unit cell to the
 equivalent fgs in the cell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -275,14 +323,30 @@ equivalent fgs in the cell.</p>
 <dl class="attribute">
 <dt id="stk.utilities.utilities.FunctionData.name">
 <code class="descname">name</code><a class="headerlink" href="#stk.utilities.utilities.FunctionData.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – The name of a function or method.</p>
+<dd><p>The name of a function or method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.FunctionData.params">
 <code class="descname">params</code><a class="headerlink" href="#stk.utilities.utilities.FunctionData.params" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – The parameters of the function or method who’s name is held by
+<dd><p>The parameters of the function or method who’s name is held by
 <cite>name</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -319,47 +383,95 @@ energy conformer found.</p>
 <dl class="attribute">
 <dt id="stk.utilities.utilities.MAEExtractor.maegz_path">
 <code class="descname">maegz_path</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.maegz_path" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – The path to the <code class="docutils literal notranslate"><span class="pre">-out.maegz</span></code> file generated by the macromodel
+<dd><p>The path to the <code class="docutils literal notranslate"><span class="pre">-out.maegz</span></code> file generated by the macromodel
 conformer search.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.MAEExtractor.mae_path">
 <code class="descname">mae_path</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.mae_path" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – The path to the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file holding the conformers generated by
+<dd><p>The path to the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file holding the conformers generated by
 the macromodel conformer search.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.MAEExtractor.content">
 <code class="descname">content</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.content" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – The content of the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file hodling all the conformers from
+<dd><p>The content of the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file hodling all the conformers from
 the macromodel conformer search. This holds other data such as
 their energies too.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.MAEExtractor.energies">
 <code class="descname">energies</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.energies" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> – The <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> has the form</p>
+<dd><p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> has the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">energies</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">231.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">144.4</span><span class="p">),</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Each <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> holds the id and energy of every conformer in the
 <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file, respectively.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.MAEExtractor.min_energy">
 <code class="descname">min_energy</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.min_energy" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> – The minimum energy found in the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
+<dd><p>The minimum energy found in the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.MAEExtractor.path">
 <code class="descname">path</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.path" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – The full path of the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file holding the extracted lowest
+<dd><p>The full path of the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file holding the extracted lowest
 energy conformer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -437,24 +549,48 @@ the x axis in the positive direction.</li>
 <dl class="attribute">
 <dt id="stk.utilities.utilities.PeriodicBond.fg1">
 <code class="descname">fg1</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.fg1" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The value of the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> for atoms in the first functional
+<dd><p>The value of the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> for atoms in the first functional
 group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.PeriodicBond.fg2">
 <code class="descname">fg2</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.fg2" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The value of the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> for atoms in the second
+<dd><p>The value of the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> for atoms in the second
 functional group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.PeriodicBond.direction">
 <code class="descname">direction</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.direction" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – A 3 member list describing the axes along which the bond is
+<dd><p>A 3 member list describing the axes along which the bond is
 periodic, when going from <cite>fg1</cite> to <cite>fg2</cite>. For example,
 <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is periodic along the x axis
 in the positive direction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -503,7 +639,7 @@ to be added to a macromolecule, <cite>mol_index</cite> is 4.</li>
 <dl class="function">
 <dt id="stk.utilities.utilities.archive_output">
 <code class="descclassname">stk.utilities.utilities.</code><code class="descname">archive_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.archive_output" title="Permalink to this definition">¶</a></dt>
-<dd><p>Places the <code class="docutils literal notranslate"><span class="pre">output</span></code> folder into <code class="docutils literal notranslate"><span class="pre">old_output</span></code>.</p>
+<dd><p>Places the <code class="docutils literal notranslate"><span class="pre">output</span></code> folder into <code class="docutils literal notranslate"><span class="pre">stk_ga_runs</span></code>.</p>
 <p>This function assumes that the <code class="docutils literal notranslate"><span class="pre">output</span></code> folder is in the current
 working directory.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -941,17 +1077,7 @@ the time taken to process the entire block is printed.</p>
 
     
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>

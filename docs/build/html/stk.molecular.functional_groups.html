@@ -209,19 +209,35 @@ macromolecules.</p>
 <dl class="attribute">
 <dt id="stk.molecular.functional_groups.FGInfo.name">
 <code class="descname">name</code><a class="headerlink" href="#stk.molecular.functional_groups.FGInfo.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – The name of the functional group.</p>
+<dd><p>The name of the functional group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.functional_groups.FGInfo.fg_smarts">
 <code class="descname">fg_smarts</code><a class="headerlink" href="#stk.molecular.functional_groups.FGInfo.fg_smarts" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – A SMARTS string which matches the functional group.</p>
+<dd><p>A SMARTS string which matches the functional group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.functional_groups.FGInfo.bonder_smarts">
 <code class="descname">bonder_smarts</code><a class="headerlink" href="#stk.molecular.functional_groups.FGInfo.bonder_smarts" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of the form</p>
+<dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bonder_smarts</span> <span class="o">=</span> <span class="p">[</span><span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([N]([H])[H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
                  <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][N][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
 </pre></div>
@@ -240,13 +256,29 @@ hydrogen atom per amine functional group will be tagged
 <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code>. If instead
 <code class="docutils literal notranslate"><span class="pre">Match(smarts='[$([H][N][H])]',</span> <span class="pre">n=2)</span></code> was used, then both of
 the hydrogen atoms in the functional group would be tagged.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.functional_groups.FGInfo.del_smarts">
 <code class="descname">del_smarts</code><a class="headerlink" href="#stk.molecular.functional_groups.FGInfo.del_smarts" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> – Same as <a class="reference internal" href="#stk.molecular.functional_groups.FGInfo.bonder_smarts" title="stk.molecular.functional_groups.FGInfo.bonder_smarts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder_smarts</span></code></a> but matched atoms are tagged
+<dd><p>Same as <a class="reference internal" href="#stk.molecular.functional_groups.FGInfo.bonder_smarts" title="stk.molecular.functional_groups.FGInfo.bonder_smarts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder_smarts</span></code></a> but matched atoms are tagged
 as <code class="docutils literal notranslate"><span class="pre">'del'</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -281,8 +313,16 @@ as <code class="docutils literal notranslate"><span class="pre">'del'</span></co
 <dl class="attribute">
 <dt id="stk.molecular.functional_groups.FGKey.key">
 <code class="descname">key</code><a class="headerlink" href="#stk.molecular.functional_groups.FGKey.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A unique key based on the functional groups provided to the
+<dd><p>A unique key based on the functional groups provided to the
 intializer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -295,14 +335,30 @@ intializer.</p>
 <dl class="attribute">
 <dt id="stk.molecular.functional_groups.Match.smarts">
 <code class="descname">smarts</code><a class="headerlink" href="#stk.molecular.functional_groups.Match.smarts" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – A SMARTS string which matches some atoms.</p>
+<dd><p>A SMARTS string which matches some atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.functional_groups.Match.n">
 <code class="descname">n</code><a class="headerlink" href="#stk.molecular.functional_groups.Match.n" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The maximum number of atoms to be matched by <a class="reference internal" href="#stk.molecular.functional_groups.Match.smarts" title="stk.molecular.functional_groups.Match.smarts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">smarts</span></code></a>,
+<dd><p>The maximum number of atoms to be matched by <a class="reference internal" href="#stk.molecular.functional_groups.Match.smarts" title="stk.molecular.functional_groups.Match.smarts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">smarts</span></code></a>,
 per functional group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -549,17 +605,7 @@ of bonds added.</p>
 
     
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>

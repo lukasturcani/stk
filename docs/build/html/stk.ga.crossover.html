@@ -153,14 +153,23 @@
 <span id="adding-crossover-functions"></span><h2>Extending stk: Adding crossover functions.<a class="headerlink" href="#extending-stk-adding-crossover-functions" title="Permalink to this headline">¶</a></h2>
 <p>If a new crossover operation is to be added to <code class="docutils literal notranslate"><span class="pre">stk</span></code> it should be
 added as a method in the <a class="reference internal" href="#stk.ga.crossover.Crossover" title="stk.ga.crossover.Crossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crossover</span></code></a> class defined in this
-module. The only requirements are that the first two arguments are
-<cite>macro_mol1</cite> and <cite>macro_mol2</cite> (excluding <cite>self</cite> or <cite>cls</cite>) and that any
-offspring are returned in a <a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a> instance.</p>
-<p>The naming requirement of <cite>macro_mol1</cite> and <cite>macro_mol2</cite> exists to
-help users identify which arguments are handled automatically by
-<code class="docutils literal notranslate"><span class="pre">stk</span></code> and which they need to define in the input file. The convention
-is that if the crossover function takes arguments called  <cite>macro_mol1</cite>
-and <cite>macro_mol2</cite> they do not have to be specified in the input file.</p>
+module. The only requirement is that the function returns the offpsring
+in a <a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a> instance. The function will be called with
+each parent selected by the crossover selection function in a
+separate argument. For example if you wish to define a function
+which carries out crossover across two parents</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">crossover_fn_example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol1</span><span class="p">,</span> <span class="n">macro_mol2</span><span class="p">,</span> <span class="n">param1</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>or with a variable number of parents</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">crossover_fn_example2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">param2</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>and of course any where in between is valid too. Just make sure that
+the crossover selection function selects the number of parents that the
+crossover function expects to receive when running the GA.</p>
 <p>If the crossover function does not fit neatly into a single function
 make sure that any helper functions are private, i.e. that their names
 start with a leading underscore.</p>
@@ -181,23 +190,39 @@ of <code class="docutils literal notranslate"><span class="pre">pop</span></code
 <dl class="attribute">
 <dt id="stk.ga.crossover.Crossover.funcs">
 <code class="descname">funcs</code><a class="headerlink" href="#stk.ga.crossover.Crossover.funcs" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> – This lists holds all the crossover functions which are to be
+<dd><p>This lists holds all the crossover functions which are to be
 used. One will be chosen at random when a crossover operation
 is to be performed. The likelihood that each is selected is
 given by <a class="reference internal" href="#stk.ga.crossover.Crossover.weights" title="stk.ga.crossover.Crossover.weights"><code class="xref py py-attr docutils literal notranslate"><span class="pre">weights</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.ga.crossover.Crossover.num_crossovers">
 <code class="descname">num_crossovers</code><a class="headerlink" href="#stk.ga.crossover.Crossover.num_crossovers" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The number of crossover operations performed each time
+<dd><p>The number of crossover operations performed each time
 <a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation.gen_offspring" title="stk.ga.ga_population.GAPopulation.gen_offspring"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GAPopulation.gen_offspring()</span></code></a> is called.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.ga.crossover.Crossover.weights">
 <code class="descname">weights</code><a class="headerlink" href="#stk.ga.crossover.Crossover.weights" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> – Each float corresponds to the probability of selecting the
+<dd><p>Each float corresponds to the probability of selecting the
 crossover function in <a class="reference internal" href="#stk.ga.crossover.Crossover.funcs" title="stk.ga.crossover.Crossover.funcs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">funcs</span></code></a> at the corresponding index.
 For example,</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">selection</span> <span class="o">=</span> <span class="n">Selection</span><span class="p">(</span><span class="n">funcs</span><span class="o">=</span><span class="p">[</span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;one&#39;</span><span class="p">),</span>
@@ -214,6 +239,14 @@ used.</p>
 entries must be the same as in <a class="reference internal" href="#stk.ga.crossover.Crossover.funcs" title="stk.ga.crossover.Crossover.funcs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">funcs</span></code></a>. Defaults to
 <code class="docutils literal notranslate"><span class="pre">None</span></code>, which means all crossover functions have an equal
 probability of selection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -234,10 +267,127 @@ there may be up to <code class="docutils literal notranslate"><span class="pre">
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol1</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The first parent cage. Its building-block* and linker are
+<li><strong>macro_mol1</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The first parent cage. Its building-block* and linker are
 combined with those of <cite>cage2</cite> to form new cages.</li>
-<li><strong>macro_mol2</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The second parent cage. Its building-block* and linker are
+<li><strong>macro_mol2</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The second parent cage. Its building-block* and linker are
 combined with those of <cite>cage1</cite> to form new cages.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A population of all the offspring generated by crossover of
+<cite>macro_mol1</cite> with <cite>macro_mol2</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.crossover.Crossover.genetic_recombination">
+<code class="descname">genetic_recombination</code><span class="sig-paren">(</span><em>*macro_mols</em>, <em>key</em>, <em>n_offspring=1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.crossover.Crossover.genetic_recombination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recombine building blocks using biological systems as a model.</p>
+<p>Overall, this function mimics how animals and plants inherit
+DNA from their parents, except generalized to work with any
+number of parents. First it is worth discussing some
+terminology. A gene is a the smallest packet of genetic
+information. In animals, each gene can have multiple alleles.
+For example, there is a gene for hair color, and individual
+alleles for black, red, brown, etc. hair. This means that every
+person has a gene for hair color, but a person with black hair
+will have the black hair allele and a person with red hair will
+have the red hair allele. When two parents produce an
+offspring, the offspring will have a hair color gene and will
+inherit th allele of one of the parents at random. Therefore,
+if you have two parents, one with black hair and one with red
+hair, the offspring will either have black or red hair,
+depending on which allele they inherit.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">stk</span></code> molecules, each building block represents an allele.
+The question is, which gene is each building block an allele
+of? To answer that, let’s first construct a couple of
+building block molecules</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;filename1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;filename2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)</span>
+<span class="n">bb3</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;filename3.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)</span>
+<span class="n">bb4</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;filename4.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can define a function which analyzes a building block
+molecule and returns the gene it belongs to, for example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">determine_gene</span><span class="p">(</span><span class="n">building_block</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">building_block</span><span class="o">.</span><span class="n">func_grp</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+<p>Here, we can see that the gene to which each building block
+molecule belongs is given by the functional group name.
+Therefore there is an <code class="docutils literal notranslate"><span class="pre">'amine'</span></code> gene which has two alleles
+<code class="docutils literal notranslate"><span class="pre">bb1</span></code> and <code class="docutils literal notranslate"><span class="pre">bb4</span></code> and there is an <code class="docutils literal notranslate"><span class="pre">'aldehyde'</span></code> gene which
+has two alleles <code class="docutils literal notranslate"><span class="pre">bb2</span></code> and <code class="docutils literal notranslate"><span class="pre">bb3</span></code>.</p>
+<p>Alternatively, we could have defined a function such as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">determine_gene</span><span class="p">(</span><span class="n">building_block</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">building_block</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+</pre></div>
+</div>
+<p>Now we can see that we end up with the gene called
+<code class="docutils literal notranslate"><span class="pre">'StructUnit2'</span></code> which has two alleles <code class="docutils literal notranslate"><span class="pre">bb1</span></code> and <code class="docutils literal notranslate"><span class="pre">bb3</span></code>
+and a second gene called <code class="docutils literal notranslate"><span class="pre">'StructUnit3'</span></code> which has the
+alleles <code class="docutils literal notranslate"><span class="pre">bb2</span></code> and <code class="docutils literal notranslate"><span class="pre">bb4</span></code>.</p>
+<p>To produce offspring molecules, this function categorizes
+each building block of the parent molecules into genes using
+the <cite>key</cite> parameter. Then, to generate a single offspring, it
+picks a random building block for every gene. The picked
+building blocks are used to construct the offspring. The
+topoogy of the offspring one of the parent’s topologies, also
+selected at random. For obvious reasons, this approach works
+with any number of parents.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mols</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The parent molecules.</li>
+<li><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function, which takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> object
+and returns its gene or category. To produce an offspring,
+one of the building blocks from each category is picked
+at random.</li>
+<li><strong>n_offspring</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The maximum number of offspring to create.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A population holding all the generated offspring.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.crossover.Crossover.jumble">
+<code class="descname">jumble</code><span class="sig-paren">(</span><em>macro_mol1</em>, <em>macro_mol2</em>, <em>n_offspring_building_blocks</em>, <em>n_offspring</em>, <em>allow_duplicate_building_blocks=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.crossover.Crossover.jumble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly distributes all building blocks among offspring.</p>
+<p>Puts all the building blocks from each parent into one big pot
+and samples <code class="docutils literal notranslate"><span class="pre">N</span></code> building block sets, where each set has a
+size of <code class="docutils literal notranslate"><span class="pre">M</span></code>. Each sampled set is used to create one new
+offspring. <code class="docutils literal notranslate"><span class="pre">N</span></code> is given by <cite>n_offspring</cite> and <code class="docutils literal notranslate"><span class="pre">M</span></code> is given
+by <cite>n_offspring_building_blocks</cite>.</p>
+<p>The offspring inherit the topology of one of the parents,
+chosen at random.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol1</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The first parent.</li>
+<li><strong>macro_mol2</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The second parent.</li>
+<li><strong>n_offspring_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of building blocks each offspring is made from.</li>
+<li><strong>n_offspring</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of offspring to produce.</li>
+<li><strong>allow_duplicate_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Indicates whether the building blocks used to construct the
+offspring must all be unique.</li>
 </ul>
 </td>
 </tr>
@@ -289,17 +439,7 @@ combined with those of <cite>cage1</cite> to form new cages.</li>
 
     
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
