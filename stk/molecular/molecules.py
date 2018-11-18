@@ -2298,14 +2298,28 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         mol = rdkit.MolFromSmiles(smiles)
         rdkit.SanitizeMol(mol)
-        mol = rdkit.AddHs(mol)
-        key = cls.gen_key(mol, functional_group)
+        H_mol = rdkit.AddHs(mol)
+        key = cls.gen_key(H_mol, functional_group)
         if key in cls.cache and OPTIONS['cache']:
             return cls.cache[key]
 
-        params = rdkit.ETKDG()
+        params = rdkit.ETKDGv2()
         params.randomSeed = random_seed
-        rdkit.EmbedMolecule(mol, params)
+        for i in range(100):
+            failed = rdkit.EmbedMolecule(mol, params) == -1
+            if failed:
+                params.randomSeed += 1
+            else:
+                break
+
+        if params.randomSeed != random_seed:
+            msg = ('Embedding with seed value of '
+                   f'"{random_seed}" failed. Using alternative value'
+                   f' of "{params.randomSeed}" was successful.')
+            logger.warning(msg)
+
+        mol = rdkit.AddHs(mol, addCoords=True)
+        mol.GetConformer()
         obj = cls.__new__(cls)
         obj.file = smiles
         obj.key = key
