@@ -168,7 +168,8 @@
             
   <div class="section" id="welcome-to-stk-s-documentation">
 <h1>Welcome to <code class="docutils literal notranslate"><span class="pre">stk</span></code>’s documentation!<a class="headerlink" href="#welcome-to-stk-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>GitHub: <a class="reference external" href="https://www.github.com/lukasturcani/stk">https://www.github.com/lukasturcani/stk</a></p>
+<p>GitHub: <a class="reference external" href="https://www.github.com/lukasturcani/stk">https://www.github.com/lukasturcani/stk</a>
+Slack: <a class="reference external" href="https://t.co/LCPzWhvsVO">https://t.co/LCPzWhvsVO</a></p>
 <div class="toctree-wrapper compound">
 </div>
 <div class="section" id="overview">
@@ -523,12 +524,198 @@ The genetic algorithm can be run from the command line using:</p>
 <p>The input file is a simple python script which defines the mutation,
 crossover, selection and other functions the genetic algorithm
 should use. For details on how to build an input file see <a class="reference internal" href="stk.ga.input.html#stk.ga.input.GAInput" title="stk.ga.input.GAInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAInput</span></code></a>
-and <span class="xref std std-doc">ga_input_file_examples</span>.</p>
+and <a class="reference internal" href="ga_input_file_examples.html"><span class="doc">&lt;no title&gt;</span></a>.</p>
 <p>The genetic algorithm automatically works with any molecules that <code class="docutils literal notranslate"><span class="pre">stk</span></code>
-can construct, just make sure you define an appropriate fitness function.</p>
-<p>Take for example, the following input file which runs the GA on polymers
+can construct, just make sure you define an appropriate fitness function.
+It will also work with <code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code> if you do not wish to use
+<code class="docutils literal notranslate"><span class="pre">stk</span></code>’s construction capabilities.</p>
+<p>Take for example the following input file which runs the GA on polymers
 and selects building blocks which have the most atoms.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># big_monomers.py</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Import stuff.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="kn">import</span> <span class="nn">stk</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Number of CPU cores to use.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="n">processes</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Disable debug population dumps.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="n">pop_dumps</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Population size.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="n">pop_size</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Number of generations to create.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="n">num_generations</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Number of mutation operations to perform each generation.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="n">num_mutations</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Number of crossover operations to perform each generation.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="n">num_crossovers</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Population initialization function.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="c1"># First create the StructUnit objects of the monomers. In</span>
+<span class="c1"># this simple example, they are simple hydro-carbon chains terminated</span>
+<span class="c1"># with either two amine or two aldehyde functional groups.</span>
+<span class="n">amines</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">aldehydes</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">):</span>
+    <span class="c1"># There are 2 different backbones, alkane, alkene.</span>
+    <span class="n">backbones</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="o">*</span><span class="n">i</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">backbone</span> <span class="ow">in</span> <span class="n">backbones</span><span class="p">:</span>
+        <span class="n">amine_smiles</span> <span class="o">=</span> <span class="s1">&#39;N&#39;</span> <span class="o">+</span> <span class="n">backbone</span> <span class="o">+</span> <span class="s1">&#39;N&#39;</span>
+        <span class="n">amine_monomer</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span>
+                                         <span class="n">smiles</span><span class="o">=</span><span class="n">amine_smiles</span><span class="p">,</span>
+                                         <span class="n">functional_group</span><span class="o">=</span><span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+        <span class="n">amines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amine_monomer</span><span class="p">)</span>
+
+        <span class="n">aldehyde_smiles</span> <span class="o">=</span> <span class="s1">&#39;O=C&#39;</span> <span class="o">+</span> <span class="n">backbone</span> <span class="o">+</span> <span class="s1">&#39;C=O&#39;</span>
+        <span class="n">aldehyde_monomer</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span>
+                                        <span class="n">smiles</span><span class="o">=</span><span class="n">aldehyde_smiles</span><span class="p">,</span>
+                                        <span class="n">functional_group</span><span class="o">=</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">)</span>
+        <span class="n">aldehydes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aldehyde_monomer</span><span class="p">)</span>
+
+<span class="c1"># List of the possible topologies the polymers can have. In this</span>
+<span class="c1"># simple example a single topology will suffice.</span>
+<span class="n">polymer_topologies</span> <span class="o">=</span> <span class="p">[</span><span class="n">stk</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">repeating_unit</span><span class="o">=</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span>
+                                 <span class="n">orientation</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                 <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+
+<span class="c1"># Finally, define the function which is called to create the</span>
+<span class="c1"># initial GA population. The &quot;NAME&quot; key holds the name of an</span>
+<span class="c1"># initialization function of the GAPopulation class. The remaining</span>
+<span class="c1"># key-value pairs are additional parameters for that function.</span>
+<span class="c1"># Default parameters can be specified if desired.</span>
+<span class="n">init_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;init_random&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;macromol_class&#39;</span><span class="p">:</span> <span class="n">stk</span><span class="o">.</span><span class="n">Polymer</span><span class="p">,</span>
+             <span class="s1">&#39;building_blocks&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">amines</span><span class="p">,</span> <span class="n">aldehydes</span><span class="p">],</span>
+             <span class="s1">&#39;topologies&#39;</span><span class="p">:</span> <span class="n">polymer_topologies</span><span class="p">}</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Selection function for selecting the next generation.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Selection class.</span>
+<span class="c1"># The remaining key-value pairs are additional parameters for that</span>
+<span class="c1"># method. The &quot;population&quot; parameter is not specified and any</span>
+<span class="c1"># default parameters can be specified if desired.</span>
+<span class="n">generational_select_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;stochastic_sampling&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;use_rank&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Selection function for selecting parents.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Selection class.</span>
+<span class="c1"># The remaining key-value pairs are additional parameters for that</span>
+<span class="c1"># method. The &quot;population&quot; parameter is not specified and any</span>
+<span class="c1"># default parameters can be specified if desired.</span>
+<span class="n">crossover_select_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;crossover_roulette&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;truncation&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Selection function for selecting molecules for mutation.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Selection class.</span>
+<span class="c1"># The remaining key-value pairs are additional parameters for that</span>
+<span class="c1"># method. The &quot;population&quot; parameter is not specified and any</span>
+<span class="c1"># default parameters can be specified if desired.</span>
+<span class="n">mutation_select_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;stochastic_sampling&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;truncation&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                        <span class="s1">&#39;duplicates&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Crossover functions.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="c1"># In this example there only one crossover function will be used,</span>
+<span class="c1"># but can use multiple if we add them into the list.</span>
+
+<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Crossover class.</span>
+<span class="c1"># The &quot;macro_mol&quot; parameters are not specified and any default</span>
+<span class="c1"># parameters can be specified optionally. All other parameters</span>
+<span class="c1"># must be specified as key-value pairs.</span>
+<span class="n">crossover_funcs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;genetic_recombination&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">func_grp</span><span class="o">.</span><span class="n">name</span><span class="p">}]</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Mutation functions.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Mutation class.</span>
+<span class="c1"># The &quot;macro_mol&quot; parameter is not specified and any default</span>
+<span class="c1"># parameters can be specified optionally. All other parameters</span>
+<span class="c1"># must be specified as key-value pairs.</span>
+
+<span class="c1"># mutation_func1 substitutes the amine building block in the</span>
+<span class="c1"># molecule with one from the list &quot;amines&quot;, defined earlier.</span>
+<span class="n">mutation_func1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;random_bb&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;mols&#39;</span><span class="p">:</span> <span class="n">amines</span><span class="p">,</span>
+                  <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">func_grp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;amine&#39;</span><span class="p">}</span>
+
+<span class="c1"># mutation_func2 substitutes the aldehyde building block in the</span>
+<span class="c1"># molecule with one from the list &quot;aldehydes&quot;, defined earlier.</span>
+<span class="n">mutation_func2</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;random_bb&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;mols&#39;</span><span class="p">:</span> <span class="n">aldehydes</span><span class="p">,</span>
+                  <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">func_grp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">}</span>
+
+<span class="c1"># Here we tell the GA which mutation functions we want to use.</span>
+<span class="n">mutation_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">mutation_func1</span><span class="p">,</span> <span class="n">mutation_func2</span><span class="p">]</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Optimization function.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="c1"># In this example, for the sake of speed, we will not optimize</span>
+<span class="c1"># constructed polymers.</span>
+
+<span class="c1"># The &quot;NAME&quot; key holds the name of a function</span>
+<span class="c1"># defined in the optimization.py module. The &quot;mol&quot; parameter is</span>
+<span class="c1"># not specified and any default parameters can be specified</span>
+<span class="c1"># optionally. All other parameters must be specified as key-value</span>
+<span class="c1"># pairs.</span>
+
+<span class="c1"># Note that &quot;do_not_optimize&quot; is the name of a function</span>
+<span class="c1"># in this module. It simply returns immediately and as a result does</span>
+<span class="c1"># no work.</span>
+<span class="n">opt_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;do_not_optimize&#39;</span><span class="p">}</span>
+
+<span class="c1"># ################################################################</span>
+<span class="c1"># Fitness function.</span>
+<span class="c1"># ################################################################</span>
+
+<span class="c1"># The &quot;NAME&quot; key holds the name of a function defined in the</span>
+<span class="c1"># &quot;fitness.py&quot; module. The &quot;macro_mol&quot; parameter is not</span>
+<span class="c1"># specified and any default parameters can be specified if desired.</span>
+<span class="c1"># The remaining parameters must be specified as key-value pairs.</span>
+<span class="n">fitness_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;building_block_atoms&#39;</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>Running the genetic algorithm with this input file:</p>
@@ -536,7 +723,7 @@ and selects building blocks which have the most atoms.</p>
 </pre></div>
 </div>
 <p>will produce the following directory structure:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">old_output</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">stk_ga_runs</span>
 <span class="o">|</span>   <span class="o">|--</span> <span class="mi">0</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">counters</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_crossover_counter</span><span class="o">.</span><span class="n">png</span>
@@ -548,11 +735,6 @@ and selects building blocks which have the most atoms.</p>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">150.</span><span class="n">mol</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">2160.</span><span class="n">mol</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">9471.</span><span class="n">mol</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">pop_dumps</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selected</span><span class="o">.</span><span class="n">json</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_unselected</span><span class="o">.</span><span class="n">json</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">big_monomers</span><span class="o">.</span><span class="n">py</span>
@@ -567,13 +749,13 @@ and selects building blocks which have the most atoms.</p>
 </div>
 <p>A glance at the evolutionary progress plot in <code class="docutils literal notranslate"><span class="pre">epp.png</span></code> will show us
 how well our GA did.</p>
-<img alt="figures/epp.png" src="figures/epp.png" />
+<img alt="_images/epp.png" src="_images/epp.png" />
 <p>Running the genetic algorithm again:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m stk.ga big_monomers.py
 </pre></div>
 </div>
 <p>will add a second subfolder with the same structure:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">old_output</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">stk_ga_runs</span>
 <span class="o">|</span>   <span class="o">|--</span> <span class="mi">0</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">counters</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_crossover_counter</span><span class="o">.</span><span class="n">png</span>
@@ -585,11 +767,6 @@ how well our GA did.</p>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">150.</span><span class="n">mol</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">2160.</span><span class="n">mol</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">9471.</span><span class="n">mol</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">pop_dumps</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selected</span><span class="o">.</span><span class="n">json</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_unselected</span><span class="o">.</span><span class="n">json</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">big_monomers</span><span class="o">.</span><span class="n">py</span>
@@ -614,11 +791,6 @@ how well our GA did.</p>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">1391.</span><span class="n">mol</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">pop_dumps</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selected</span><span class="o">.</span><span class="n">json</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_unselected</span><span class="o">.</span><span class="n">json</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">big_monomers</span><span class="o">.</span><span class="n">py</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">database</span><span class="o">.</span><span class="n">json</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">json</span>
@@ -635,7 +807,7 @@ how well our GA did.</p>
 </div>
 <p>which will run the GA 5 separate times adding 5 more subfolders to the
 directory structure:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">old_output</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">stk_ga_runs</span>
 <span class="o">|</span>   <span class="o">|--</span> <span class="mi">0</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
 <span class="o">|</span>   <span class="o">|</span>
@@ -682,7 +854,7 @@ if discovered by the GA.</p>
 directories. The <code class="docutils literal notranslate"><span class="pre">counter</span></code> directory holds <code class="docutils literal notranslate"><span class="pre">.png</span></code> files showing
 how frequently a member of the population was selected for mutation,
 crossover and generational selection. For example</p>
-<img alt="figures/counter_example.png" src="figures/counter_example.png" />
+<img alt="_images/counter_example.png" src="_images/counter_example.png" />
 <p>shows that</p>
 <p>If you do want want the GA to produce these files, simply tell the
 GA in the input file:</p>
@@ -694,25 +866,8 @@ GA in the input file:</p>
 <p>counters = False</p>
 </div></blockquote>
 <p>The <code class="docutils literal notranslate"><span class="pre">final_pop</span></code> directory holds the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> files holding the
-structures of the last generation of molecules. We can see that
-in our case the GA produced 5 polymers all formed from large monomers.</p>
-<img alt="figures/ga_last_pop.png" src="figures/ga_last_pop.png" />
-<p>The <code class="docutils literal notranslate"><span class="pre">pop_dumps</span></code> directory holds the population dump files at each
-generation. Files of the form <code class="docutils literal notranslate"><span class="pre">gen_X_selected.json</span></code> hold the molecules
-of the generation after the generational selection is performed while
-files of the form <code class="docutils literal notranslate"><span class="pre">gen_X_unselected.json</span></code> hold the generation before
-generational selection is performed. This folder can also be removed
-through the input file</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.py</span>
-
-<span class="n">pop_dumps</span> <span class="o">=</span> <span class="bp">False</span>
-</pre></div>
-</div>
-<p>Disabling this folder will likely increase the speed of the GA
-significantly, but will make debugging harder if something goes wrong,
-as you can lose all your progress if an unhandled exception occurs.</p>
-<p>The output folder has a copy of the input file used to produce the
-output, <code class="docutils literal notranslate"><span class="pre">big_monomers.py</span></code> in our example. The <code class="docutils literal notranslate"><span class="pre">database.json</span></code>
+structures of the last generation of molecules.
+The file <code class="docutils literal notranslate"><span class="pre">big_monomers.py</span></code> is a copy of the input file. The <code class="docutils literal notranslate"><span class="pre">database.json</span></code>
 file is a population dump file which holds every molecule produced by
 the GA during the run. This can be turned off with</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.py</span>
@@ -720,7 +875,7 @@ the GA during the run. This can be turned off with</p>
 <span class="n">database_dump</span> <span class="o">=</span> <span class="bp">False</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">progress.json</span></code> is also a population dump file. This population hold
+<p><code class="docutils literal notranslate"><span class="pre">progress.json</span></code> is also a population dump file. This population holds
 every generation of the GA as a subpopulation. This is quite useful
 if you want to analyse the output of the GA generation-wise. It
 can be turned off with</p>
@@ -735,7 +890,7 @@ traceback encountered by the GA during its run.</p>
 generation, and their respective fitness values.</p>
 <p><code class="docutils literal notranslate"><span class="pre">epp.png</span></code> is a picture of the evolutionary progress plot. It
 shows how the fitness values change with the generations, for example</p>
-<img alt="figures/epp.png" src="figures/epp.png" />
+<img alt="_images/epp.png" src="_images/epp.png" />
 <p><code class="docutils literal notranslate"><span class="pre">epp.dmp</span></code> is a <code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code> array dump holding all the data used to
 make <code class="docutils literal notranslate"><span class="pre">epp.png</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">output.tgz</span></code> is a tarred and compressed copy of the output folder for
@@ -747,6 +902,22 @@ share this file. It can be turned off with</p>
 <span class="n">tar_output</span> <span class="o">=</span> <span class="bp">False</span>
 </pre></div>
 </div>
+<p>Finally, when running the GA the progress will be printed into
+stderr. The message should be relatively straightforward. One thing
+to note though is that during optimizations and fitness function
+calculation, any molecule that has already been optimized and had its
+fitness value calculated will be skipped, so that duplicate work is
+avoided. Briefly an example message</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">======================================================================</span>
+
+<span class="mi">17</span><span class="p">:</span><span class="mi">42</span><span class="p">:</span><span class="mi">20</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">stk</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">mutation</span> <span class="o">-</span> <span class="n">Using</span> <span class="n">random_bb</span><span class="o">.</span>
+
+<span class="o">======================================================================</span>
+</pre></div>
+</div>
+<p>show the time, the level of the message which can be, in order of
+priority DEBUG, INFO, WARNING, ERROR or CRITICAL, the module where
+the message originated and finally the message itself.</p>
 </div>
 </div>
 <div class="section" id="extending-stk">
@@ -825,17 +996,7 @@ appropriate class.</p>
 
     
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>

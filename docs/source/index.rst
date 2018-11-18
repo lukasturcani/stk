@@ -494,15 +494,17 @@ can construct, just make sure you define an appropriate fitness function.
 It will also work with :class:`StructUnit` if you do not wish to use
 ``stk``'s construction capabilities.
 
-
-Take for example, the following input file which runs the GA on polymers
+Take for example the following input file which runs the GA on polymers
 and selects building blocks which have the most atoms.
 
 .. code-block:: python
 
     # big_monomers.py
 
+    # ################################################################
     # Import stuff.
+    # ################################################################
+
     import stk
 
     # ################################################################
@@ -512,16 +514,22 @@ and selects building blocks which have the most atoms.
     processes = 1
 
     # ################################################################
+    # Disable debug population dumps.
+    # ################################################################
+
+    pop_dumps = False
+
+    # ################################################################
     # Population size.
     # ################################################################
 
-    pop_size = 10
+    pop_size = 20
 
     # ################################################################
     # Number of generations to create.
     # ################################################################
 
-    num_generations = 30
+    num_generations = 50
 
     # ################################################################
     # Number of mutation operations to perform each generation.
@@ -540,10 +548,27 @@ and selects building blocks which have the most atoms.
     # ################################################################
 
     # First create the StructUnit objects of the monomers. In
-    # this simple example, they are simple hydro-carbon chains of
-    # varying length with a Br atom at each end of the chain.
-    monomers = [stk.StructUnit2.smiles_init('[Br]'+'C'*i+'[Br]')
-                for i in range(1000)]
+    # this simple example, they are simple hydro-carbon chains terminated
+    # with either two amine or two aldehyde functional groups.
+    amines = []
+    aldehydes = []
+    for i in range(1, 50):
+        # There are 2 different backbones, alkane, alkene.
+        backbones = ['C'*i, '='.join('C'*i)]
+
+        for backbone in backbones:
+            amine_smiles = 'N' + backbone + 'N'
+            amine_monomer = stk.StructUnit2.smiles_init(
+                                             smiles=amine_smiles,
+                                             functional_group='amine')
+            amines.append(amine_monomer)
+
+            aldehyde_smiles = 'O=C' + backbone + 'C=O'
+            aldehyde_monomer = stk.StructUnit2.smiles_init(
+                                            smiles=aldehyde_smiles,
+                                            functional_group='aldehyde')
+            aldehydes.append(aldehyde_monomer)
+
     # List of the possible topologies the polymers can have. In this
     # simple example a single topology will suffice.
     polymer_topologies = [stk.Linear(repeating_unit='AB',
@@ -557,7 +582,7 @@ and selects building blocks which have the most atoms.
     # Default parameters can be specified if desired.
     init_func = {'NAME': 'init_random',
                  'macromol_class': stk.Polymer,
-                 'building_blocks': [monomers, monomers],
+                 'building_blocks': [amines, aldehydes],
                  'topologies': polymer_topologies}
 
     # ################################################################
@@ -605,9 +630,8 @@ and selects building blocks which have the most atoms.
     # The "macro_mol" parameters are not specified and any default
     # parameters can be specified optionally. All other parameters
     # must be specified as key-value pairs.
-    crossover_funcs = [{'NAME': 'jumble',
-                        'n_offspring_building_blocks': 2,
-                        'n_offspring': 2}]
+    crossover_funcs = [{'NAME': 'genetic_recombination',
+                        'key': lambda x: x.func_grp.name}]
 
     # ################################################################
     # Mutation functions.
@@ -618,25 +642,17 @@ and selects building blocks which have the most atoms.
     # parameters can be specified optionally. All other parameters
     # must be specified as key-value pairs.
 
-    # mutation_func1 substitutes a building block in the
-    # molecule with one in the list "monomers".
+    # mutation_func1 substitutes the amine building block in the
+    # molecule with one from the list "amines", defined earlier.
     mutation_func1 = {'NAME': 'random_bb',
-                      'mols': monomers,
-                      'key': lambda x: isinstance(x, stk.StructUnit2)}
+                      'mols': amines,
+                      'key': lambda x: x.func_grp.name == 'amine'}
 
-    # mutation_func2 substitutes the topology of a polymer with a
-    # topology1, topology2 or topology3.
-    topology1 = stk.Linear(repeating_unit='AB',
-                           orientation=[0, 0],
-                           n=1)
-    topology2 = stk.Linear(repeating_unit='ABBA',
-                          orientation=[0, 0],
-                          n=1)
-   topology3 = stk.Linear(repeating_unit='AAB',
-                          orientation=[0, 0],
-                          n=1)
-    mutation_func2 = {'NAME': 'random_topology',
-                      'topologies': [topology1, topology2, topology3]}
+    # mutation_func2 substitutes the aldehyde building block in the
+    # molecule with one from the list "aldehydes", defined earlier.
+    mutation_func2 = {'NAME': 'random_bb',
+                      'mols': aldehydes,
+                      'key': lambda x: x.func_grp.name == 'aldehyde'}
 
     # Here we tell the GA which mutation functions we want to use.
     mutation_funcs = [mutation_func1, mutation_func2]
@@ -655,7 +671,8 @@ and selects building blocks which have the most atoms.
     # pairs.
 
     # Note that "do_not_optimize" is the name of a function
-    # in this module. The does no work however and returns immediately.
+    # in this module. It simply returns immediately and as a result does
+    # no work.
     opt_func = {'NAME': 'do_not_optimize'}
 
     # ################################################################
@@ -675,7 +692,7 @@ Running the genetic algorithm with this input file::
 
 will produce the following directory structure::
 
-    |-- old_output
+    |-- stk_ga_runs
     |   |-- 0
     |   |   |-- counters
     |   |   |   |-- gen_1_crossover_counter.png
@@ -687,11 +704,6 @@ will produce the following directory structure::
     |   |   |   |-- 150.mol
     |   |   |   |-- 2160.mol
     |   |   |   |-- 9471.mol
-    |   |   |   |-- ...
-    |   |   |
-    |   |   |-- pop_dumps
-    |   |   |   |-- gen_1_selected.json
-    |   |   |   |-- gen_1_unselected.json
     |   |   |   |-- ...
     |   |   |
     |   |   |-- big_monomers.py
@@ -715,7 +727,7 @@ Running the genetic algorithm again::
 
 will add a second subfolder with the same structure::
 
-    |-- old_output
+    |-- stk_ga_runs
     |   |-- 0
     |   |   |-- counters
     |   |   |   |-- gen_1_crossover_counter.png
@@ -727,11 +739,6 @@ will add a second subfolder with the same structure::
     |   |   |   |-- 150.mol
     |   |   |   |-- 2160.mol
     |   |   |   |-- 9471.mol
-    |   |   |   |-- ...
-    |   |   |
-    |   |   |-- pop_dumps
-    |   |   |   |-- gen_1_selected.json
-    |   |   |   |-- gen_1_unselected.json
     |   |   |   |-- ...
     |   |   |
     |   |   |-- big_monomers.py
@@ -756,11 +763,6 @@ will add a second subfolder with the same structure::
     |   |   |   |-- 1391.mol
     |   |   |   |-- ...
     |   |   |
-    |   |   |-- pop_dumps
-    |   |   |   |-- gen_1_selected.json
-    |   |   |   |-- gen_1_unselected.json
-    |   |   |   |-- ...
-    |   |   |
     |   |   |-- big_monomers.py
     |   |   |-- database.json
     |   |   |-- progress.json
@@ -777,7 +779,7 @@ The genetic algorithm can also be run multiple times in a row::
 which will run the GA 5 separate times adding 5 more subfolders to the
 directory structure::
 
-    |-- old_output
+    |-- stk_ga_runs
     |   |-- 0
     |   |   |-- ...
     |   |
@@ -842,30 +844,8 @@ GA in the input file::
     counters = False
 
 The ``final_pop`` directory holds the ``.mol`` files holding the
-structures of the last generation of molecules. We can see that
-in our case the GA produced 5 polymers all formed from large monomers.
-
-.. image:: figures/ga_last_pop.png
-
-The ``pop_dumps`` directory holds the population dump files at each
-generation. Files of the form ``gen_X_selected.json`` hold the molecules
-of the generation after the generational selection is performed while
-files of the form ``gen_X_unselected.json`` hold the generation before
-generational selection is performed. This folder can also be removed
-through the input file
-
-.. code-block:: python
-
-    # some_input_file.py
-
-    pop_dumps = False
-
-Disabling this folder will likely increase the speed of the GA
-significantly, but will make debugging harder if something goes wrong,
-as you can lose all your progress if an unhandled exception occurs.
-
-The output folder has a copy of the input file used to produce the
-output, ``big_monomers.py`` in our example. The ``database.json``
+structures of the last generation of molecules.
+The file ``big_monomers.py`` is a copy of the input file. The ``database.json``
 file is a population dump file which holds every molecule produced by
 the GA during the run. This can be turned off with
 
@@ -875,7 +855,7 @@ the GA during the run. This can be turned off with
 
     database_dump = False
 
-``progress.json`` is also a population dump file. This population hold
+``progress.json`` is also a population dump file. This population holds
 every generation of the GA as a subpopulation. This is quite useful
 if you want to analyse the output of the GA generation-wise. It
 can be turned off with
@@ -910,6 +890,25 @@ share this file. It can be turned off with
     # some_input_file.png
 
     tar_output = False
+
+Finally, when running the GA the progress will be printed into
+stderr. The message should be relatively straightforward. One thing
+to note though is that during optimizations and fitness function
+calculation, any molecule that has already been optimized and had its
+fitness value calculated will be skipped, so that duplicate work is
+avoided. Briefly an example message
+
+::
+
+    ======================================================================
+
+    17:42:20 - INFO - stk.ga.mutation - Using random_bb.
+
+    ======================================================================
+
+show the time, the level of the message which can be, in order of
+priority DEBUG, INFO, WARNING, ERROR or CRITICAL, the module where
+the message originated and finally the message itself.
 
 .. _`extending stk`:
 

@@ -212,35 +212,67 @@ topology is at the origin.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.base.Linear.repeating_unit">
 <code class="descname">repeating_unit</code><a class="headerlink" href="#stk.molecular.topologies.base.Linear.repeating_unit" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – A string showing the repeating unit of the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Polymer" title="stk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polymer</span></code></a>.
+<dd><p>A string showing the repeating unit of the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Polymer" title="stk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polymer</span></code></a>.
 For example, <code class="docutils literal notranslate"><span class="pre">&quot;AB&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ABB&quot;</span></code>. The building block with
 index <code class="docutils literal notranslate"><span class="pre">0</span></code> in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.building_blocks" title="stk.molecular.molecules.MacroMolecule.building_blocks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.building_blocks</span></code></a> is
 labelled as <code class="docutils literal notranslate"><span class="pre">&quot;A&quot;</span></code> while index <code class="docutils literal notranslate"><span class="pre">1</span></code> as <code class="docutils literal notranslate"><span class="pre">&quot;B&quot;</span></code> and so on.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.base.Linear.orientation">
 <code class="descname">orientation</code><a class="headerlink" href="#stk.molecular.topologies.base.Linear.orientation" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> – For each character in the repeating unit, a value between <code class="docutils literal notranslate"><span class="pre">0</span></code>
+<dd><p>For each character in the repeating unit, a value between <code class="docutils literal notranslate"><span class="pre">0</span></code>
 and <code class="docutils literal notranslate"><span class="pre">1</span></code> (both inclusive) must be given in a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>. It
 indicates the probability that each monomer will have its
 orientation along the chain flipped.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.base.Linear.n">
 <code class="descname">n</code><a class="headerlink" href="#stk.molecular.topologies.base.Linear.n" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – The number of repeating units which are used to make the
+<dd><p>The number of repeating units which are used to make the
 polymer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.molecular.topologies.base.Linear.ends">
 <code class="descname">ends</code><a class="headerlink" href="#stk.molecular.topologies.base.Linear.ends" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> – The string represents how the end groups of the polymer are
+<dd><p>The string represents how the end groups of the polymer are
 treated. If <code class="docutils literal notranslate"><span class="pre">'h'</span></code> the functional groups at the end of the
 polymer are converted into hydrogem atoms. If <code class="docutils literal notranslate"><span class="pre">'fg'</span></code> they are
 kept as the original functional group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -370,8 +402,16 @@ place the building blocks in approriate positions.</p>
 <dl class="attribute">
 <dt id="stk.molecular.topologies.base.Topology.react_del">
 <code class="descname">react_del</code><a class="headerlink" href="#stk.molecular.topologies.base.Topology.react_del" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> – Toggles whether atoms with the <code class="docutils literal notranslate"><span class="pre">'del'</span></code> propety are deleted
+<dd><p>Toggles whether atoms with the <code class="docutils literal notranslate"><span class="pre">'del'</span></code> propety are deleted
 by <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal notranslate"><span class="pre">react()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -590,17 +630,7 @@ particular building block.</p>
 
     
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>

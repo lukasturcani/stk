@@ -5,7 +5,9 @@ A module for defining plotting functions.
 
 import os
 import matplotlib.pyplot as plt
+import seaborn as sns
 import numpy as np
+import pandas as pd
 
 from . import fitness
 
@@ -19,15 +21,7 @@ def fitness_epp(pop,
     """
     Plots the min, max and avg fitness values of each subpopulation.
 
-    Also saves the plot data. The min, mean and max values for each
-    subpopulation of `pop` are placed in an array:
-
-        >>> dmp_array = np.array([mins, means, maxs])
-
-    which is then dumped to the file `dump_name`.
-
-    The members with a fitness of ``0.0001`` (indicating a failed
-    fitness calculation) are excluded from this analysis.
+    Also saves the plot data in a csv file.
 
     Parameters
     ----------
@@ -44,7 +38,7 @@ def fitness_epp(pop,
     dump_name : :class:`str`, optional
         The path to the file where the data to make the graph is
         dumped. If ``None`` then `plot_name` is used but with a
-        ``.dmp`` extension.
+        ``.csv`` extension.
 
     xlabel : :class:`str`, optional
         The label on the x-axis.
@@ -55,49 +49,47 @@ def fitness_epp(pop,
 
     """
 
-    xvals = []
-    maxs = []
-    means = []
-    mins = []
-
+    sns.set(style='darkgrid')
+    df = pd.DataFrame()
     for i, subpop in enumerate(pop.populations, 1):
-        xvals.append(i)
         # Ignore failed molecules from EPP.
         clean_pop = [x.fitness for x in subpop if x.fitness != 0.0001]
-        if clean_pop:
-            maxs.append(max(clean_pop))
-            means.append(np.mean(clean_pop))
-            mins.append(min(clean_pop))
-        else:
-            maxs.append(0.0001)
-            means.append(0.0001)
-            mins.append(0.0001)
+        data = [
+            {'Generation': i,
+             'Fitness': max(clean_pop) if clean_pop else 1e-4,
+             'Type': 'Max'},
+            {'Generation': i,
+             'Fitness': min(clean_pop) if clean_pop else 1e-4,
+             'Type': 'Min'},
+            {'Generation': i,
+             'Fitness': np.mean(clean_pop) if clean_pop else 1e-4,
+             'Type': 'Mean'}
+        ]
+
+        df = df.append(data, ignore_index=True)
 
     # Save the plot data.
     if plot_name and dump_name is None:
         basename, ext = os.path.splitext(plot_name)
-        dump_name = basename + '.dmp'
-
-    np.array([mins, means, maxs]).dump(dump_name)
+        dump_name = basename + '.csv'
+    df.to_csv(dump_name)
 
     if plot_name:
-        fig = plt.figure()
-        axes = plt.gca()
-        plt.xlabel(xlabel)
-        plt.ylabel('Fitness')
-        plt.scatter(xvals, maxs, color='red', marker='o', label='max',
-                    alpha=0.5)
-        plt.scatter(xvals, means, color='green', marker='o',
-                    label='mean', alpha=0.5)
-        plt.scatter(xvals, mins, color='blue', marker='o', label='min',
-                    alpha=0.5)
-        frame = (min(mins) + max(maxs))/50
-        axes.set_ylim([min(mins) - frame, max(maxs) + frame])
+        fig = plt.figure(figsize=[8, 4.5])
 
-        lgd = plt.legend(bbox_to_anchor=(1.05, 1),
-                         loc=2, borderaxespad=0.)
-        fig.savefig(plot_name, dpi=1000,
-                    bbox_extra_artists=(lgd,), bbox_inches='tight')
+        palette = sns.color_palette('deep')
+        sns.scatterplot(
+            x='Generation',
+            y='Fitness',
+            hue='Type',
+            palette={'Max': palette[3],
+                     'Min': palette[0],
+                     'Mean': palette[2]},
+            data=df)
+
+        plt.legend(bbox_to_anchor=(1.15, 1), prop={'size': 9})
+        plt.tight_layout()
+        fig.savefig(plot_name, dpi=500)
         plt.close('all')
 
 
@@ -113,12 +105,7 @@ def parameter_epp(pop,
     the x-axis and the min, max and avg values of that
     :attr:`~.MacroMolecule.progress_params` element on the y-axis.
 
-    Also saves the plot data. The min, mean and max values for each
-    subpopulation are placed in an array:
-
-        >>> dmp_array = np.array([mins, means, maxs])
-
-    which is then dumped to the file `dump_name`.
+    Also saves the plot data in a csv file.
 
     Parameters
     ----------
@@ -135,7 +122,7 @@ def parameter_epp(pop,
     dump_name : :class:`str`, optional
         The path to the file where the data to make the graph is
         dumped. If ``None`` then `plot_name` is used but with a
-        ``.dmp`` extension.
+        ``.csv`` extension.
 
     xlabel : :class:`str`, optional
         The label on the x-axis.
@@ -146,6 +133,7 @@ def parameter_epp(pop,
 
     """
 
+    sns.set(style='darkgrid')
     func_name = pop.ga_tools.fitness.name
     fitness_func = vars(fitness)[func_name]
 
@@ -153,80 +141,48 @@ def parameter_epp(pop,
     if not hasattr(fitness_func, 'param_labels'):
         return
 
-    min_params = []
-    max_params = []
-    mean_params = []
-    nparams = len(fitness_func.param_labels)
+    df = pd.DataFrame()
+    for gen, sp in enumerate(pop.populations):
+        for i, param_label in enumerate(fitness_func.param_labels):
+            param_vals = [m.progress_params[func_name][i] for m in sp]
 
-    for sp in pop.populations:
+            data = [
+                {'Generation': gen,
+                 param_label: max(param_vals) if sp else None,
+                 'Type': 'Max'},
+                {'Generation': gen,
+                 param_label: min(param_vals) if sp else None,
+                 'Type': 'Min'},
+                {'Generation': gen,
+                 param_label: np.mean(param_vals) if sp else None,
+                 'Type': 'Mean'}]
+            df = df.append(data, ignore_index=True)
 
-        if len(sp) == 0:
-            min_params.append([None for x in range(nparams)])
-            mean_params.append([None for x in range(nparams)])
-            max_params.append([None for x in range(nparams)])
-            continue
+    # Save the plot data.
+    if plot_name and dump_name is None:
+        basename, ext = os.path.splitext(plot_name)
+        dump_name = basename + '.csv'
+    df.to_csv(dump_name)
 
-        p_mat = [x.progress_params[func_name] for x in sp]
-        # Each element of this list holds an array of all the valid
-        # values of a particular progress_param.
-        p_arrays = [[pparams[x] for
-                     pparams in p_mat if pparams[x] is not None] for
-                    x in range(nparams)]
-
-        min_params.append([min(x) if len(x) > 0 else None
-                           for x in p_arrays])
-
-        mean_params.append([np.mean(x) if len(x) > 0 else None
-                            for x in p_arrays])
-
-        max_params.append([max(x) if len(x) > 0 else None
-                           for x in p_arrays])
-
-    for x in range(len(min_params[0])):
-
-        y_mean = [array[x] for array in mean_params]
-        y_max = [array[x] for array in max_params]
-        y_min = [array[x] for array in min_params]
-
-        # This loop checks if any y values are ``None`` in which case
-        # they are removed and the corresponding x value as well.
-        nones = set()
-        for i, yval in enumerate(y_min):
-            if yval is None:
-                nones.add(i)
-        xvals = list(range(1, len(pop.populations)+1))
-        xvals = [xv for i, xv in enumerate(xvals) if i not in nones]
-        y_mean = [yv for i, yv in enumerate(y_mean) if i not in nones]
-        y_max = [yv for i, yv in enumerate(y_max) if i not in nones]
-        y_min = [yv for i, yv in enumerate(y_min) if i not in nones]
-
-        # Save the plot data.
-        if plot_name and dump_name is None:
-            basename, ext = os.path.splitext(plot_name)
-            dump_name = basename+'.dmp'
-        dname = dump_name.replace('.dmp', '{}.dmp'.format(x))
-        np.array([y_min, y_mean, y_max]).dump(dname)
+    palette = sns.color_palette('deep')
+    for i, param_label in enumerate(fitness_func.param_labels):
 
         if plot_name:
-            fig = plt.figure()
-            axes = plt.gca()
-            plt.xlabel(xlabel)
-            plt.ylabel('Unscaled ' + fitness_func.param_labels[x])
-            plt.scatter(xvals, y_mean,
-                        color='green', marker='o', label='mean')
-            plt.scatter(xvals, y_min,
-                        color='blue', marker='o', label='min')
-            plt.scatter(xvals, y_max,
-                        color='red', marker='o', label='max')
-            frame = (min(y_min) + max(y_max))/50
-            axes.set_ylim([min(y_min) - frame, max(y_max) + frame])
-            lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2,
-                             borderaxespad=0.)
+            fig = plt.figure(figsize=[8, 4.5])
 
-            new_plot_name = str(x).join(os.path.splitext(plot_name))
+            sns.scatterplot(
+                x='Generation',
+                y=param_label,
+                hue='Type',
+                palette={'Max': palette[3],
+                         'Min': palette[0],
+                         'Mean': palette[2]},
+                data=df)
 
-            fig.savefig(new_plot_name, dpi=1000,
-                        bbox_extra_artists=(lgd,), bbox_inches='tight')
+            plt.legend(bbox_to_anchor=(1.15, 1), prop={'size': 9})
+            plt.tight_layout()
+            new_plot_name = str(i).join(os.path.splitext(plot_name))
+            fig.savefig(new_plot_name, dpi=500)
             plt.close('all')
 
 
@@ -251,19 +207,35 @@ def plot_counter(counter, plot_name):
 
     """
 
+    sns.set(style='darkgrid')
     fig = plt.figure()
-    x_vals = list(range(1, len(counter.items())+1))
-    y_vals = []
-    labels = []
 
-    for ind, value in sorted(counter.items(), reverse=True):
-        y_vals.append(value)
-        labels.append(ind.name + ' - ' + str(ind.fitness))
+    df = pd.DataFrame()
+    for ind, selection_count in counter.items():
+        label = f'{ind.name} - {ind.fitness}'
+        data = {
+            'Molecule: name - fitness value': label,
+            'Number of times selected': selection_count,
+            'Fitness': ind.fitness
+        }
+        df = df.append(data, ignore_index=True)
 
-    plt.bar(x_vals, y_vals, color='blue')
-    plt.xlabel('Individuals, denoted by fitness value')
-    plt.ylabel('Number of times selected')
-    plt.xticks([x for x in x_vals], labels, rotation='vertical')
+    df = df.sort_values(['Number of times selected', 'Fitness'],
+                        ascending=[False, False])
+    norm = plt.Normalize(df['Fitness'].min(), df['Fitness'].max())
+    sm = plt.cm.ScalarMappable(cmap='magma_r', norm=norm)
+    sm.set_array([])
+
+    ax = sns.barplot(
+                x='Molecule: name - fitness value',
+                y='Number of times selected',
+                hue='Fitness',
+                palette='magma_r',
+                dodge=False,
+                data=df)
+    ax.get_legend().remove()
+    ax.figure.colorbar(sm).set_label('Fitness')
+    plt.xticks(rotation=90)
     plt.tight_layout()
     fig.savefig(plot_name, dpi=fig.dpi)
     plt.close('all')

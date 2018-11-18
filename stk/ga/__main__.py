@@ -158,7 +158,7 @@ class GAProgress:
 
         try:
             u = '-'*os.get_terminal_size().columns
-        except OSError as ex:
+        except OSError:
             # When testing os.get_terminal_size() will fail because
             # stdout is not connceted to a terminal.
             u = '-'*100
@@ -213,7 +213,7 @@ def ga_run(ga_input):
     # open.This closes them. If this is not done, directories may not
     # be possible to move.
     stk.kill_macromodel()
-    # Move any ``output`` dir in the cwd into ``old_output``.
+    # Move any ``output`` dir in the cwd into ``stk_ga_runs``.
     stk.archive_output()
     os.mkdir('output')
     os.chdir('output')
@@ -340,11 +340,11 @@ def ga_run(ga_input):
     progress.progress.normalize_fitness_values()
     progress.dump()
     logger.info('Plotting EPP.')
-    stk.fitness_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
+    stk.fitness_epp(progress.progress, ga_input.plot_epp, 'epp.csv')
     progress.progress.remove_members(
                     lambda x:
                     pop.ga_tools.fitness.name not in x.progress_params)
-    stk.parameter_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
+    stk.parameter_epp(progress.progress, ga_input.plot_epp, 'epp.csv')
 
     shutil.rmtree('scratch')
     pop.write('final_pop', True)

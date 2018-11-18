@@ -8,15 +8,27 @@ Extending stk: Adding crossover functions.
 
 If a new crossover operation is to be added to ``stk`` it should be
 added as a method in the :class:`Crossover` class defined in this
-module. The only requirements are that the first two arguments are
-`macro_mol1` and `macro_mol2` (excluding `self` or `cls`) and that any
-offspring are returned in a :class:`.GAPopulation` instance.
+module. The only requirement is that the function returns the offpsring
+in a :class:`.GAPopulation` instance. The function will be called with
+each parent selected by the crossover selection function in a
+separate argument. For example if you wish to define a function
+which carries out crossover across two parents
 
-The naming requirement of `macro_mol1` and `macro_mol2` exists to
-help users identify which arguments are handled automatically by
-``stk`` and which they need to define in the input file. The convention
-is that if the crossover function takes arguments called  `macro_mol1`
-and `macro_mol2` they do not have to be specified in the input file.
+.. code-block:: python
+
+    def crossover_fn_example(self, macro_mol1, macro_mol2, param1):
+        ...
+
+or with a variable number of parents
+
+.. code-block:: python
+
+    def crossover_fn_example2(self, *macro_mol, param2):
+        ...
+
+and of course any where in between is valid too. Just make sure that
+the crossover selection function selects the number of parents that the
+crossover function expects to receive when running the GA.
 
 If the crossover function does not fit neatly into a single function
 make sure that any helper functions are private, i.e. that their names
@@ -25,9 +37,9 @@ start with a leading underscore.
 """
 
 import logging
-from collections import Counter
+from collections import Counter, defaultdict
 import numpy as np
-from itertools import islice
+from itertools import islice, product
 
 from .ga_population import GAPopulation
 from .plotting import plot_counter
@@ -179,7 +191,7 @@ class Crossover:
                 # Add the new offspring to the offspring population.
                 offspring_pop.add_members(offspring)
 
-            except Exception as ex:
+            except Exception:
                 errormsg = ('Crossover function "{}()" failed on '
                             'molecules PARENTS.').format(
                             func_data.name)
@@ -202,10 +214,115 @@ class Crossover:
 
         return offspring_pop
 
-    """
-    The following crossover operations apply to ``Cage`` instances
+    def genetic_recombination(self, *macro_mols, key, n_offspring=1):
+        """
+        Recombine building blocks using biological systems as a model.
 
-    """
+        Overall, this function mimics how animals and plants inherit
+        DNA from their parents, except generalized to work with any
+        number of parents. First it is worth discussing some
+        terminology. A gene is a the smallest packet of genetic
+        information. In animals, each gene can have multiple alleles.
+        For example, there is a gene for hair color, and individual
+        alleles for black, red, brown, etc. hair. This means that every
+        person has a gene for hair color, but a person with black hair
+        will have the black hair allele and a person with red hair will
+        have the red hair allele. When two parents produce an
+        offspring, the offspring will have a hair color gene and will
+        inherit th allele of one of the parents at random. Therefore,
+        if you have two parents, one with black hair and one with red
+        hair, the offspring will either have black or red hair,
+        depending on which allele they inherit.
+
+        In ``stk`` molecules, each building block represents an allele.
+        The question is, which gene is each building block an allele
+        of? To answer that, let's first construct a couple of
+        building block molecules
+
+        .. code-block:: python
+
+            bb1 = StructUnit2('filename1.mol', 'amine')
+            bb2 = StructUnit3('filename2.mol', 'aldehyde')
+            bb3 = StructUnit2('filename3.mol', 'aldehyde')
+            bb4 = StructUnit3('filename4.mol', 'amine')
+
+        We can define a function which analyzes a building block
+        molecule and returns the gene it belongs to, for example
+
+        .. code-block:: python
+
+            def determine_gene(building_block):
+                return building_block.func_grp.name
+
+        Here, we can see that the gene to which each building block
+        molecule belongs is given by the functional group name.
+        Therefore there is an ``'amine'`` gene which has two alleles
+        ``bb1`` and ``bb4`` and there is an ``'aldehyde'`` gene which
+        has two alleles ``bb2`` and ``bb3``.
+
+        Alternatively, we could have defined a function such as
+
+        .. code-block:: python
+
+            def determine_gene(building_block):
+                return building_block.__class__.__name__
+
+        Now we can see that we end up with the gene called
+        ``'StructUnit2'`` which has two alleles ``bb1`` and ``bb3``
+        and a second gene called ``'StructUnit3'`` which has the
+        alleles ``bb2`` and ``bb4``.
+
+        To produce offspring molecules, this function categorizes
+        each building block of the parent molecules into genes using
+        the `key` parameter. Then, to generate a single offspring, it
+        picks a random building block for every gene. The picked
+        building blocks are used to construct the offspring. The
+        topoogy of the offspring one of the parent's topologies, also
+        selected at random. For obvious reasons, this approach works
+        with any number of parents.
+
+        Parameters
+        ----------
+        macro_mols : :class:`.MacroMolecule`
+            The parent molecules.
+
+        key : :class:`function`
+            A function, which takes a :class:`.StructUnit` object
+            and returns its gene or category. To produce an offspring,
+            one of the building blocks from each category is picked
+            at random.
+
+        n_offspring : :class:`int`
+            The maximum number of offspring to create.
+
+        Returns
+        -------
+        :class:`.GAPopulation`
+            A population holding all the generated offspring.
+
+        """
+
+        cls = macro_mols[0].__class__
+        topologies = [macro_mol.topology for macro_mol in macro_mols]
+
+        genes = defaultdict(set)
+        for macro_mol in macro_mols:
+            for allele in macro_mol.building_blocks:
+                genes[key(allele)].add(allele)
+
+        genes = {gene: np.random.permutation(list(alleles))
+                 for gene, alleles in genes.items()}
+
+        offspring_pop = GAPopulation()
+        for i, building_blocks in enumerate(product(*genes.values())):
+            topology = np.random.choice(topologies)
+            offspring = cls(building_blocks, topology)
+            offspring_pop.members.append(offspring)
+
+            if i == n_offspring:
+                return offspring_pop
+
+        return offspring_pop
 
     def bb_lk_exchange(self, macro_mol1, macro_mol2):
         """
@@ -224,11 +341,11 @@ class Crossover:
 
         Parameters
         ----------
-        macro_mol1 : :class:`.Cage`
+        macro_mol1 : :class:`.MacroMolecule`
             The first parent cage. Its building-block* and linker are
             combined with those of `cage2` to form new cages.
 
-        macro_mol2 : :class:`.Cage`
+        macro_mol2 : :class:`.MacroMolecule`
             The second parent cage. Its building-block* and linker are
             combined with those of `cage1` to form new cages.
 
