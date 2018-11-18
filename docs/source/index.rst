@@ -712,7 +712,7 @@ will produce the following directory structure::
     |   |   |-- errors.log
     |   |   |-- progress.log
     |   |   |-- epp.png
-    |   |   |-- epp.dmp
+    |   |   |-- epp.csv
     |   |   |-- output.tgz
 
 A glance at the evolutionary progress plot in ``epp.png`` will show us
@@ -747,7 +747,7 @@ will add a second subfolder with the same structure::
     |   |   |-- errors.log
     |   |   |-- progress.log
     |   |   |-- epp.png
-    |   |   |-- epp.dmp
+    |   |   |-- epp.csv
     |   |   |-- output.tgz
     |
     |   |-- 1
@@ -769,7 +769,7 @@ will add a second subfolder with the same structure::
     |   |   |-- errors.log
     |   |   |-- progress.log
     |   |   |-- epp.png
-    |   |   |-- epp.dmp
+    |   |   |-- epp.csv
     |   |   |-- output.tgz
 
 The genetic algorithm can also be run multiple times in a row::
@@ -828,14 +828,18 @@ if discovered by the GA.
 The output of a single GA consists of a number of files and
 directories. The ``counter`` directory holds ``.png`` files showing
 how frequently a member of the population was selected for mutation,
-crossover and generational selection. For example
+crossover and generational selection. For example, this is a
+crossover counter
 
 .. image:: figures/counter_example.png
 
-shows that
+It shows that molecule ``168`` was selected twice for crossover, while molecules
+``60``, ``170``, ``167``, ``63`` and ``153`` were selected once. The
+remaining molecules did not participate in crossover operations
+in that generation.
 
 If you do want want the GA to produce these files, simply tell the
-GA in the input file::
+GA in the input file
 
 .. code-block:: python
 
@@ -872,12 +876,7 @@ traceback encountered by the GA during its run.
 ``progress.log`` is a file which lists which molecules make up each
 generation, and their respective fitness values.
 
-``epp.png`` is a picture of the evolutionary progress plot. It
-shows how the fitness values change with the generations, for example
-
-.. image:: figures/epp.png
-
-``epp.dmp`` is a :mod:`numpy` array dump holding all the data used to
+``epp.csv`` is a dumped :class:`pandas.DataFrame` which holds the data used
 make ``epp.png``.
 
 ``output.tgz`` is a tarred and compressed copy of the output folder for

@@ -743,7 +743,7 @@ and selects building blocks which have the most atoms.</p>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">errors</span><span class="o">.</span><span class="n">log</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">png</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">dmp</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">csv</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">output</span><span class="o">.</span><span class="n">tgz</span>
 </pre></div>
 </div>
@@ -775,7 +775,7 @@ how well our GA did.</p>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">errors</span><span class="o">.</span><span class="n">log</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">png</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">dmp</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">csv</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">output</span><span class="o">.</span><span class="n">tgz</span>
 <span class="o">|</span>
 <span class="o">|</span>   <span class="o">|--</span> <span class="mi">1</span>
@@ -797,7 +797,7 @@ how well our GA did.</p>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">errors</span><span class="o">.</span><span class="n">log</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">png</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">dmp</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">csv</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">output</span><span class="o">.</span><span class="n">tgz</span>
 </pre></div>
 </div>
@@ -838,7 +838,7 @@ re-calculated in any of the subsequent runs. The cached version
 of the molecule will be used.</p>
 <p>However, the molecular cache be pre-loaded even when the <code class="docutils literal notranslate"><span class="pre">-l</span></code> option is
 not used. The input file allows the definition of a variable
-<a class="reference internal" href="stk.ga.input.html#stk.ga.input.GAInput.databases" title="stk.ga.input.GAInput.databases"><code class="xref py py-attr docutils literal notranslate"><span class="pre">databases</span></code></a>, for example</p>
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">databases</span></code>, for example</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_inputfile.py</span>
 
 <span class="n">databases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;path/to/some/population1.json&#39;</span><span class="p">,</span>
@@ -853,18 +853,20 @@ if discovered by the GA.</p>
 <p>The output of a single GA consists of a number of files and
 directories. The <code class="docutils literal notranslate"><span class="pre">counter</span></code> directory holds <code class="docutils literal notranslate"><span class="pre">.png</span></code> files showing
 how frequently a member of the population was selected for mutation,
-crossover and generational selection. For example</p>
+crossover and generational selection. For example, this is a
+crossover counter</p>
 <img alt="_images/counter_example.png" src="_images/counter_example.png" />
-<p>shows that</p>
+<p>It shows that molecule <code class="docutils literal notranslate"><span class="pre">168</span></code> was selected twice for crossover, while molecules
+<code class="docutils literal notranslate"><span class="pre">60</span></code>, <code class="docutils literal notranslate"><span class="pre">170</span></code>, <code class="docutils literal notranslate"><span class="pre">167</span></code>, <code class="docutils literal notranslate"><span class="pre">63</span></code> and <code class="docutils literal notranslate"><span class="pre">153</span></code> were selected once. The
+remaining molecules did not participate in crossover operations
+in that generation.</p>
 <p>If you do want want the GA to produce these files, simply tell the
-GA in the input file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">code</span><span class="o">-</span><span class="n">block</span><span class="p">::</span> <span class="n">python</span>
+GA in the input file</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.py</span>
+
+<span class="n">counters</span> <span class="o">=</span> <span class="bp">False</span>
 </pre></div>
 </div>
-<blockquote>
-<div><p># some_input_file.py</p>
-<p>counters = False</p>
-</div></blockquote>
 <p>The <code class="docutils literal notranslate"><span class="pre">final_pop</span></code> directory holds the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> files holding the
 structures of the last generation of molecules.
 The file <code class="docutils literal notranslate"><span class="pre">big_monomers.py</span></code> is a copy of the input file. The <code class="docutils literal notranslate"><span class="pre">database.json</span></code>
@@ -888,10 +890,7 @@ can be turned off with</p>
 traceback encountered by the GA during its run.</p>
 <p><code class="docutils literal notranslate"><span class="pre">progress.log</span></code> is a file which lists which molecules make up each
 generation, and their respective fitness values.</p>
-<p><code class="docutils literal notranslate"><span class="pre">epp.png</span></code> is a picture of the evolutionary progress plot. It
-shows how the fitness values change with the generations, for example</p>
-<img alt="_images/epp.png" src="_images/epp.png" />
-<p><code class="docutils literal notranslate"><span class="pre">epp.dmp</span></code> is a <code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code> array dump holding all the data used to
+<p><code class="docutils literal notranslate"><span class="pre">epp.csv</span></code> is a dumped <code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> which holds the data used
 make <code class="docutils literal notranslate"><span class="pre">epp.png</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">output.tgz</span></code> is a tarred and compressed copy of the output folder for
 the run.

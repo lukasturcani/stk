@@ -72,51 +72,182 @@ class GAInput:
         input file. If not specified, the number will default to the
         value returned by :func:`psutil.cpu_count`.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Use 4 cores.
+            processes = 4
+
+
     pop_size : :class:`int`
         The size of the population.
+
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # GA will have a population size of 25.
+            pop_size = 25
 
     num_generations : :class:`int`
         The number of generations the GA runs for.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # GA run for 50 generations.
+            pop_size = 50
+
     num_mutations: :class:`int`
         The number of mutation operations carried out per generation.
+
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Carry out 5 mutation operations each generation.
+            num_mutations = 5
 
     num_crossovers: :class:`int`
         The number of crossover operations carried out per generation.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Carry out 3 crossover operations each generation.
+            num_crossovers = 3
+
     init_func : :class:`dict`
         This must define the parameters of a :class:`.GAPopulation`
         initializer.
+
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Use Population.init_random to initialize the GA pop.
+
+            # Load the StructUnits used to build the initial population
+            # from a folder.
+            amines2 = [stk.StructUnit2(filename, 'amine')
+                       for filename in iglob('path/amine2/*.mol')]
+            aldehydes3 = [stk.StructUnit3(filename, 'aldehyde')
+                          for filename
+                          in iglob('path/aldehyde3/*.mol')]
+            # Topologies used to construct the initial population.
+            topologies = [stk.FourPlusSix(), stk.EightPlusTwelve(),
+                          stk.Dodecahedron(), stk.TwoPlusThree()]
+
+            # Define the initialization function and its parameters.
+            init_func = {'NAME': 'init_random',
+                         'macromol_class': stk.Cage,
+                         'building_blocks': [amines, aldehydes],
+                         'topologies': topologies}
 
     generational_select_func : :class:`dict`
         This must define the parameters of a :class:`.Selection`
         method. This will be the function used to select members of the
         next generation.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            generational_select_func = {'NAME': 'stochastic_sampling',
+                                        'use_rank': True}
+
     crossover_select_func : :class:`dict`
         This must define the parameters of a :class:`.Selection`
         method. This will be the function used to select molecules for
         crossover.
+
+        .. code-block:: python
+
+            # some_input_file.py
+
+            crossover_select_func = {'NAME': 'crossover_roulette',
+                                     'truncation': 5}
 
     mutation_select_func : :class:`dict`
         This must define the parameters of a :class:`.Selection`
         method. This will be the function used to select molecules for
         mutation.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            mutation_select_func = {'NAME': 'stochastic_sampling',
+                                    'truncation': 3,
+                                    'duplicates': True}
+
     crossover_funcs : :class:`list` of :class:`dict`
         This :class:`list` holds a :class:`dict` for each crossover
         function which is to be used by the GA. The functions are
         defined as methods in :class:`.Crossover`
+
+        .. code-block:: python
+
+            # some_input_file.py
+
+            crossover_fn1 = {
+                'NAME': 'genetic_recombination',
+                'key': lambda x: x.func_grp.name
+            }
+
+            crossover_fn2 = {
+                'NAME': 'jumble',
+                'n_offspring_building_blocks': 2,
+                'n_offspring': 3
+            }
+
+            crossover_funcs = [crossover_fn1, crossover_fn2]
 
     mutation_funcs : :class:`list` of :class:`dict`
         This :class:`list` holds a :class:`dict` for each mutation
         function which is to be used by the GA. The functions are
         defined as methods in :class:`.Mutation`
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # mutation_func1 substitutes the amine building block in
+            # the molecule with one from the list "amines".
+
+            amines2 = [stk.StructUnit2(filename, 'amine')
+                       for filename in iglob('path/amine2/*.mol')]
+
+            mutation_fn1 = {
+                'NAME': 'random_bb',
+                'mols': amines,
+                'key': lambda x: x.func_grp.name == 'amine'}
+
+            # mutation_func2 substitutes the aldehyde building block in
+            # the molecule with one from the list "aldehydes".
+
+            aldehydes3 = [stk.StructUnit3(filename, 'aldehyde')
+                          for filename
+                          in iglob('path/aldehyde3/*.mol')]
+
+            mutation_fn2 = {
+                'NAME': 'random_bb',
+                'mols': aldehydes,
+                'key': lambda x: x.func_grp.name == 'aldehyde'}
+
+            mutation_funcs = [mutation_fn1, mutation_fn2]
+
     opt_func : :class:`dict`
         This must define the parameters of a function defined in
         :mod:`~stk.optimization`. This will be the function used to
         optimize the structures of the molecules.
+
+        .. code-block:: python
+
+            opt_func = {'NAME': 'rdkit_ETKDG'}
 
     fitness_func : :class:`dict`, :class:`function`
         This must define the parameters of a function defined in
@@ -168,17 +299,48 @@ class GAInput:
         early exit criterion has been satisfied. If missing, the
         default is :meth:`.Exit.no_exit`.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Stop the GA when the top 5 molecules are the same
+            # for 15 generations.
+            exit_func = {
+                'NAME': 'fitness_plateau',
+                'num_gens': 15,
+                'top_members': 5
+            }
+
     mutation_weights : :class:`list` of :class:`float`
         The probability that each function in :attr:`mutation_funcs`
         will be selected each time a mutation operation is carried out.
         The order of the probabilities corresponds to the order of the
         mutation functions in :attr:`mutation_funcs`.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            mutations_funcs = [fn1, fn2, fn3]
+            # Use fn1 for mutations 50 % of the time fn2 for mutations
+            # 20 % of the time and fn3 for 30 % of the time.
+            mutation_weights = [0.5, 0.2, 0.3]
+
     crossover_weights : :class:`list` of :class:`float`
         The probability that each function in :attr:`crossover_funcs`
         will be selected each time a crossover operation is carried
         out. The order of the probabilities corresponds to the order of
         the crossover functions in :attr:`crossover_funcs`.
+
+        .. code-block:: python
+
+            # some_input_fn.py
+
+            crossover_fn = [fn1, fn2, fn3, fn4]
+            # When doing crossover operations, use fn1 25 % of the
+            # time, fn2 10 % of the time, fn3 25 % of the time and
+            # fn4 40 % of the time.
+            crossover_weights = [0.25, 0.1, 0.25, 0.4]
 
     normalization_funcs : :class:`list` of :class:`dict`
         This :class:`list` holds a :class:`dict` for each normalization
@@ -188,8 +350,43 @@ class GAInput:
         :class:`.Normalization`. This can be ommited from the input
         file which means that no normalization functions will be used.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            norm_func0 = {'NAME': 'cage',
+                          'cavity': 50,
+                          'window': 50}
+
+            # First shift all energy
+            # values so that they are always positive.
+            norm_func1 = {'NAME': 'shift_elements',
+                                  'indices': [3]}
+
+            # Second, make sure that the magnitudes
+            # of all fitness parameters are comparable.
+            norm_func2 = {'NAME': 'magnitudes'}
+
+            # Third, combine the fitness
+            # parameter into a single fitness value.
+            norm_func3 = {'NAME': 'combine',
+                          'coefficients': [1, 0, 0.5, 0, 0, 0],
+                          'exponents': [1, 1, 1, 1, 1, 1]}
+
+            # Last, invert the fitness value because all
+            # fitness parameters are inversely proportional to fitness.
+            norm_func4 = {'NAME': 'invert'}
+
+            # Tell the GA which normalizaion function to use.
+            normalization_funcs = [norm_func0,
+                                   norm_func1,
+                                   norm_func2,
+                                   norm_func3,
+                                   norm_func4]
+
+
         Normalization functions can also be defined directly in the
-        input file.
+        input file, see :attr:`fitness_func`.
 
     databases : :class:`list` of :class:`str`
         A :class:`list` which holds the paths to any number ``JSON``
@@ -200,12 +397,27 @@ class GAInput:
         re-optimized or have fitness values recalculated when
         encountered by the GA.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            databases = ['path/to/some/population1.json',
+                         'path/to/some/other/population2.json']
+
     progress_dump : :class:`bool`
         If ``True`` a ``.json`` :class:`.Population` dump is made at
         the end of the GA run called ``progress.json``. The population
         holds each generation made by the GA as a subpopulation. This
         can be ommitted from the input file, in which case it
         defaults to ``True``.
+
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Do not make a population holding every generation
+            # of the GA.
+            progress_dump = False
 
     database_dump : :class:`bool`
         If ``True`` a ``.json`` :class:`.Population` dump is made at
@@ -214,21 +426,51 @@ class GAInput:
         be omitted from the input file, in which case it defaults to
         ``True``.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Do not save all the molecules made by the GA.
+            database_dump = False
+
     plot_epp : :class:`bool` or :class:`str`
         If a string is provided, it should hold the base name for the
         EPP plots made by the GA. If ``False`` then no EPP plots are
         made. This can be omitted from the input file, in which case
         it defaults to ``'epp.png'``.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Do not plot the EPP.
+            plot_epp = False
+
     logging_level : :class:`int`
         The logging level for logging messages to the screen. This can
         be omitted from the input file in which case it defulats to
         ``logging.DEBUG``.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Log only messages with level WARNING or higher.
+            import logging
+            logging_level = logging.WARNING
+
     counters : :class:`bool`
         If ``True`` plots of which molecules get chosen by selection
         functions are made. This can be omitted from the input file,
         in which case it defaults to ``True``.
+
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Do not plot the frequency at which molecules are
+            # selected for GA operations.
+            counters = False
 
     pop_dumps : :class:`bool`
         If ``True`` each generation makes a ``.json`` dump file. This
@@ -236,10 +478,24 @@ class GAInput:
         to ``True``. It means that a progress and database dump is made
         at each generation as well.
 
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Turn of debug population dumps.
+            progress_dump = False
+
     tar_output : :class:`bool`
         If ``True`` a copy of the output folder is compressed, tarred
         and placed in the output folder. This can be omitted from the
         input file, in which case it defaults to ``True``.
+
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Do not make a tar.gz file of the output folder.
+            tar_output = False
 
     progress_load : :class:`str`
         The path to a ``progress.json`` file generated by a previous
@@ -247,6 +503,13 @@ class GAInput:
         restart GA run can be performed. Can be omitted from the input
         file in which case it dafaults to ``''``. This means that a
         new GA run is assumed.
+
+        .. code-block:: python
+
+            # some_input_file.py
+
+            # Load the state of a previous GA run.
+            progress_load = 'path/to/some/progress.json'
 
     """
 
