@@ -409,8 +409,7 @@ class Molecule:
         """
 
         conf = self.mol.GetConformer(conformer)
-        atom_position = conf.GetAtomPosition(atom_id)
-        return np.array([*atom_position])
+        return np.array(conf.GetAtomPosition(atom_id))
 
     def atom_distance(self, atom1_id, atom2_id, conformer=-1):
         """
