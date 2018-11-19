@@ -122,7 +122,7 @@ def test_max_diameter(tmp_amine2):
                y in range(tmp_amine2.mol.GetNumAtoms())]
     pos_mat[1] = [0, -50, 0]
     pos_mat[3] = [0, 50, 0]
-    tmp_amine2.set_position_from_matrix(np.matrix(pos_mat).T)
+    tmp_amine2.set_position_from_matrix(np.array(pos_mat).T)
 
     d, id1, id2 = tmp_amine2.max_diameter()
     # Note that it is not exactly 100 because of the Van der Waals
@@ -130,26 +130,6 @@ def test_max_diameter(tmp_amine2):
     assert d > 100 and d < 105
     assert id1 == 1
     assert id2 == 3
-
-
-def test_position_matrix(amine2):
-    """
-    Test `postion_matrix`.
-
-    """
-
-    # Go through each atom id. For each atom id get the column in the
-    # position matrix with that id as its index. Make sure that the
-    # data is the same.
-    pos_mat1 = amine2.position_matrix()
-    conf = amine2.mol.GetConformer()
-
-    for atom in amine2.mol.GetAtoms():
-        atom_id = atom.GetIdx()
-        conf_coord = np.array(conf.GetAtomPosition(atom_id))
-        mat_coord = pos_mat1.T[atom_id]
-
-        assert np.allclose(conf_coord, mat_coord, atol=1e-8)
 
 
 def test_same(amine2,
@@ -169,7 +149,7 @@ def test_same(amine2,
 
 def test_set_position_from_matrix(tmp_amine2):
     # The new position matrix just sets all atomic positions to origin.
-    new_pos_mat = np.matrix([[0 for x in range(3)] for y in
+    new_pos_mat = np.array([[0 for x in range(3)] for y in
                             range(tmp_amine2.mol.GetNumAtoms())])
     tmp_amine2.set_position_from_matrix(new_pos_mat.T)
     for _, atom_coord in tmp_amine2.all_atom_coords():

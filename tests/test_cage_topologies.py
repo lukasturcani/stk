@@ -477,11 +477,11 @@ def test_multiconformer(tmp_amine2, tmp_aldehyde3):
 
     # Give conformers distinct geometries.
     tmp_amine2.set_position_from_matrix(
-                pos_mat=tmp_amine2.position_matrix()*4,
-                conformer=1)
+        pos_mat=tmp_amine2.mol.GetConformer().GetPositions().T*4,
+        conformer=1)
     tmp_aldehyde3.set_position_from_matrix(
-                pos_mat=tmp_aldehyde3.position_matrix()*4,
-                conformer=1)
+        pos_mat=tmp_aldehyde3.mol.GetConformer().GetPositions().T*4,
+        conformer=1)
 
     c = stk.Cage([tmp_amine2, tmp_aldehyde3],
                  stk.FourPlusSix(),

@@ -125,7 +125,7 @@ class Vertex:
         """
 
         coord = self.calc_coord(cell_params)
-        original_position = mol.position_matrix()
+        original_position = mol.mol.GetConformer().GetPositions().T
         mol.set_orientation2([0, 0, 1])
 
         mol.set_bonder_centroid(coord)
@@ -329,7 +329,7 @@ class Edge:
         """
 
         coord = self.fg_centroid(macro_mol, cell_params)
-        original_position = mol.position_matrix()
+        original_position = mol.mol.GetConformer().GetPositions().T
 
         mol.set_bonder_centroid(coord)
         d = self.fg_direction(macro_mol, cell_params)*alignment

@@ -534,9 +534,8 @@ class Molecule:
 
         atom_vdw = np.array([atom_vdw_radii[x.GetSymbol()] for x
                             in self.mol.GetAtoms()])
-
-        distances = euclidean_distances(self.position_matrix(conformer).T,
-                                        np.matrix(origin))
+        pos_mat = self.mol.GetConformer(conformer).GetPositions()
+        distances = euclidean_distances(pos_mat, np.array([origin]))
         distances = distances.flatten() - atom_vdw
         return -2*min(distances)
 
@@ -892,10 +891,10 @@ class Molecule:
 
         """
 
-        coords = self.position_matrix(conformer).T
+        coords = self.mol.GetConformer(conformer).GetPositions()
         dist = euclidean_distances(coords, coords)
-        vdw = np.matrix([atom_vdw_radii[self.atom_symbol(i)] for
-                         i in range(self.mol.GetNumAtoms())])
+        vdw = np.array([[atom_vdw_radii[self.atom_symbol(i)] for
+                        i in range(self.mol.GetNumAtoms())]])
         dist = dist + vdw + vdw.T
         maxid1, maxid2 = np.unravel_index(dist.argmax(), dist.shape)
         return dist[maxid1, maxid2], maxid1, maxid2
@@ -980,32 +979,6 @@ class Molecule:
         return main_string.replace(
                             "!!!BOND!!!BLOCK!!!HERE!!!\n", bond_block)
 
-    def position_matrix(self, conformer=-1):
-        """
-        Returns the position of all atoms as a matrix.
-
-        Parameters
-        ---------
-        conformer : :class:`int`, optional
-            The id of the conformer to use.
-
-        Returns
-        -------
-        :class:`numpy.matrix`
-            The matrix has a shape ``[3, n]``. Each column holds the x,
-            y and z coordinates of an atom. The index of the column
-            corresponds to the id of the atom in the molecule.
-
-        """
-
-        pos_array = np.array([])
-        for atom in self.mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            pos_vect = np.array([*self.atom_coords(atom_id, conformer)])
-            pos_array = np.append(pos_array, pos_vect)
-
-        return np.matrix(pos_array.reshape(-1, 3).T)
-
     def same(self, other):
         """
         Check if `other` has the same molecular structure.
@@ -1077,7 +1050,8 @@ class Molecule:
         rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
         # Apply the rotation matrix on the position matrix, to get the
         # new position matrix.
-        new_pos_mat = np.dot(rot_mat, self.position_matrix(conformer))
+        pos_mat = self.mol.GetConformer(conformer).GetPositions()
+        new_pos_mat = rot_mat @ pos_mat.T
         # Apply the rotation.
         self.set_position_from_matrix(new_pos_mat, conformer)
         # Return the centroid of the molecule to the origin position.
@@ -1175,7 +1149,8 @@ class Molecule:
 
         # Apply the rotation matrix to the atomic positions to yield
         # the new atomic positions.
-        new_pos_mat = np.dot(rot_mat, self.position_matrix(conformer))
+        pos_mat = self.mol.GetConformer(conformer).GetPositions().T
+        new_pos_mat = np.dot(rot_mat, pos_mat)
 
         # Set the positions of the molecule.
         self.set_position_from_matrix(new_pos_mat, conformer)
@@ -1727,15 +1702,15 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`numpy.matrix`
-            The matrix has the shape ``[3, n]``. Each column holds the
+        :class:`numpy.ndarray`
+            The array has the shape ``[3, n]``. Each column holds the
             x, y and z coordinates of a bonder centroid. The index of
             the column corresponds to the ``fg_id`` of the bonder
             centroid.
 
         """
 
-        return np.matrix(list(self.bonder_centroids(conformer))).T
+        return np.array(list(self.bonder_centroids(conformer))).T
 
     def centroid_centroid_dir_vector(self, conformer=-1):
         """
@@ -2014,9 +1989,10 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         if t2 < t1:
             angle *= -1
 
-        rotmat = rotation_matrix_arbitrary_axis(angle, axis)
-        posmat = np.dot(rotmat, self.position_matrix(conformer))
-        self.set_position_from_matrix(posmat, conformer)
+        rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
+        pos_mat = self.mol.GetConformer(conformer).GetPositions().T
+        new_pos_mat = np.dot(rot_mat, pos_mat)
+        self.set_position_from_matrix(new_pos_mat, conformer)
         self.set_position(iposition, conformer)
 
     @classmethod
@@ -2073,7 +2049,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
         # Apply the rotation on the original atomic coordinates to get
         # the new ones.
-        new_pos_mat = np.dot(rot_mat, self.position_matrix(conformer))
+        pos_mat = self.mol.GetConformer(conformer).GetPositions().T
+        new_pos_mat = np.dot(rot_mat, pos_mat)
         # Set the atomic positions to the new coordinates.
         self.set_position_from_matrix(new_pos_mat, conformer)
         # Return the centroid to its original position.
@@ -2202,7 +2179,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         # Apply the rotation matrix to the atomic positions to yield
         # the new atomic positions.
-        new_pos_mat = np.dot(rot_mat, self.position_matrix(conformer))
+        pos_mat = self.mol.GetConformer(conformer).GetPositions().T
+        new_pos_mat = np.dot(rot_mat, pos_mat)
 
         # Set the positions in the rdkit molecule.
         self.set_position_from_matrix(new_pos_mat, conformer)
