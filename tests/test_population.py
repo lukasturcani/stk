@@ -196,7 +196,7 @@ def test_max(generate_population):
 
     maxf = pop.max(lambda x: x.fitness)
     maxuf = pop.max(lambda x: x.unscaled_fitness)
-    m = np.matrix([x.unscaled_fitness for x in pop])
+    m = np.array([x.unscaled_fitness for x in pop])
 
     assert np.max([x.fitness for x in pop]) == maxf
     assert np.allclose(np.max(m, axis=0), maxuf, atol=1e-8)
@@ -211,7 +211,7 @@ def test_mean(generate_population):
 
     avgf = pop.mean(lambda x: x.fitness)
     avguf = pop.mean(lambda x: x.unscaled_fitness)
-    m = np.matrix([x.unscaled_fitness for x in pop])
+    m = np.array([x.unscaled_fitness for x in pop])
 
     assert np.mean([x.fitness for x in pop]) == avgf
     assert np.allclose(np.mean(m, axis=0), avguf, atol=1e-8)
@@ -226,7 +226,7 @@ def test_min(generate_population):
 
     minf = pop.min(lambda x: x.fitness)
     minuf = pop.min(lambda x: x.unscaled_fitness)
-    m = np.matrix([x.unscaled_fitness for x in pop])
+    m = np.array([x.unscaled_fitness for x in pop])
 
     assert np.min([x.fitness for x in pop]) == minf
     assert np.allclose(np.min(m, axis=0), minuf, atol=1e-8)

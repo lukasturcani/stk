@@ -3,9 +3,9 @@ import stk
 
 def test_rdkit(amine2):
     e1 = amine2.energy.rdkit('uff')
-    assert abs(e1 - 14.648348742970565) < 1e-4
+    assert abs(e1 - 37.910347343880076) < 1e-4
     e2 = amine2.energy.rdkit('mmff')
-    assert abs(e2 - 4.0211941578881512) < 1e-4
+    assert abs(e2 - 7.031976893872189) < 1e-4
 
 
 def test_formation(polymer, amine2):

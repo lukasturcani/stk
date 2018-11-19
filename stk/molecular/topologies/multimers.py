@@ -31,10 +31,10 @@ class Dimer(Topology):
         bb.rotate(np.random.random()*np.pi/2, axis)
         q = quaternion(self.u)
         v = translation_component(q)*self.distance
-        new_pos = bb.position_matrix() + np.matrix(v).T
+        new_pos = (bb.mol.GetConformer().GetPositions() +
+                   np.matrix(v)).T
         bb.set_position_from_matrix(new_pos)
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb.mol)
-
 
     def bonded_fgs(self, macro_mol):
         return []

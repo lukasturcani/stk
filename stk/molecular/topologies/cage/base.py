@@ -196,7 +196,7 @@ class Vertex:
 
         """
 
-        icoord = building_block.position_matrix()
+        icoord = building_block.mol.GetConformer().GetPositions().T
         # Flush the list of data from previous molecules.
         self.distances = []
 
@@ -504,7 +504,7 @@ class Edge(Vertex):
 
         """
 
-        icoord = linker.position_matrix()
+        icoord = linker.mol.GetConformer().GetPositions().T
 
         # Flush the lists from data of previous molecules.
         self.distances = []
@@ -954,7 +954,7 @@ class NoLinkerCageTopology(CageTopology):
         bb_params = enumerate(zip(self.positions_A, self.alignments))
         for bb_index, (position, orientation) in bb_params:
             bb = bb_map[bb_index]
-            ipos = bb.position_matrix()
+            ipos = bb.mol.GetConformer().GetPositions().T
             n_bb = len(bb.functional_group_atoms())
 
             mol = position.place_mol(scale, bb, int(orientation))
