@@ -183,7 +183,6 @@ from .functional_groups import functional_groups, react, periodic_react
 from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
-                         periodic_table,
                          normalize_vector,
                          rotation_matrix,
                          vector_theta,
@@ -914,33 +913,6 @@ class Molecule:
 
         """
 
-        main_string = ("\n"
-                       "     RDKit          3D\n"
-                       "\n"
-                       "  0  0  0  0  0  0  0  0  0  0999 V3000\n"
-                       "M  V30 BEGIN CTAB\n"
-                       "M  V30 COUNTS {0} {1} 0 0 0\n"
-                       "M  V30 BEGIN ATOM\n"
-                       "!!!ATOM!!!BLOCK!!!HERE!!!\n"
-                       "M  V30 END ATOM\n"
-                       "M  V30 BEGIN BOND\n"
-                       "!!!BOND!!!BLOCK!!!HERE!!!\n"
-                       "M  V30 END BOND\n"
-                       "M  V30 END CTAB\n"
-                       "M  END\n"
-                       "\n"
-                       "$$$$\n")
-
-        # id atomic_symbol x y z
-        atom_line = "M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n"
-        atom_block = ""
-
-        # id bond_order atom1 atom2
-        bond_line = "M  V30 {} {} {} {}\n"
-        bond_block = ""
-
-        main_string = main_string.format(self.mol.GetNumAtoms(),
-                                         self.mol.GetNumBonds())
         # Kekulize the mol, which means that each aromatic bond is
         # converted to a single or double. This is necessary because
         # .mol V3000 only supports integer bonds. However, this fails
@@ -950,33 +922,55 @@ class Molecule:
         except ValueError:
             pass
 
-        for atom in self.mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            atom_sym = periodic_table[atom.GetAtomicNum()]
-            charge = atom.GetFormalCharge()
-            charge = '' if charge == 0 else f' CHG={charge}'
-            x, y, z = self.atom_coords(atom_id, conformer)
-            atom_block += atom_line.format(atom_id+1,
-                                           atom_sym,
-                                           x, y, z,
-                                           charge)
+        n_atoms = self.mol.GetNumAtoms()
+        n_bonds = self.mol.GetNumBonds()
 
-        for bond in self.mol.GetBonds():
-            bond_id = bond.GetIdx()
-            atom1_id = bond.GetBeginAtomIdx() + 1
-            atom2_id = bond.GetEndAtomIdx() + 1
-            bond_order = int(bond.GetBondTypeAsDouble())
-            # Ensure that no information was lost when converting
-            # double to int.
-            assert bond_order == bond.GetBondTypeAsDouble()
-            bond_block += bond_line.format(bond_id, bond_order,
-                                           atom1_id, atom2_id)
+        dtype = np.dtype(object)
 
-        main_string = main_string.replace(
-                            "!!!ATOM!!!BLOCK!!!HERE!!!\n", atom_block)
+        atom_ids = np.array([np.arange(1, n_atoms+1)],
+                            dtype=dtype).T
 
-        return main_string.replace(
-                            "!!!BOND!!!BLOCK!!!HERE!!!\n", bond_block)
+        atom_symbols = np.array([[self.atom_symbol(i)]
+                                 for i in range(n_atoms)],
+                                dtype=dtype)
+
+        pos_mat = self.mol.GetConformer(conformer).GetPositions()
+
+        charges = np.array([[f' CHG={a.GetFormalCharge()}' if
+                             a.GetFormalCharge() else '']
+                            for a in self.mol.GetAtoms()],
+                           dtype=dtype)
+
+        atom_data = np.concatenate(
+                        [atom_ids, atom_symbols, pos_mat, charges],
+                        axis=1).reshape((-1, ))
+        atom_block = "M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n"*n_atoms
+        atom_block = atom_block.format(*atom_data)
+
+        bond_data = [prop for bond in self.mol.GetBonds() for prop in
+                     (bond.GetIdx(),
+                      int(bond.GetBondTypeAsDouble()),
+                      bond.GetBeginAtomIdx()+1,
+                      bond.GetEndAtomIdx()+1)]
+        bond_block = "M  V30 {} {} {} {}\n"*n_bonds
+        bond_block = bond_block.format(*bond_data)
+
+        return ("\n"
+                "     RDKit          3D\n"
+                "\n"
+                "  0  0  0  0  0  0  0  0  0  0999 V3000\n"
+                "M  V30 BEGIN CTAB\n"
+                f"M  V30 COUNTS {n_atoms} {n_bonds} 0 0 0\n"
+                "M  V30 BEGIN ATOM\n"
+                f"{atom_block}"
+                "M  V30 END ATOM\n"
+                "M  V30 BEGIN BOND\n"
+                f"{bond_block}"
+                "M  V30 END BOND\n"
+                "M  V30 END CTAB\n"
+                "M  END\n"
+                "\n"
+                "$$$$\n")
 
     def same(self, other):
         """
