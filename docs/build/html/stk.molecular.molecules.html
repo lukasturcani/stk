@@ -1353,26 +1353,6 @@ of the involved atoms.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.molecular.molecules.Molecule.position_matrix">
-<code class="descname">position_matrix</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.position_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the position of all atoms as a matrix.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The matrix has a shape <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">n]</span></code>. Each column holds the x,
-y and z coordinates of an atom. The index of the column
-corresponds to the id of the atom in the molecule.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.matrix</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="stk.molecular.molecules.Molecule.retag_atoms">
 <code class="descname">retag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.Molecule.retag_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds atom properties to atoms, using <a class="reference internal" href="#stk.molecular.molecules.Molecule.atom_props" title="stk.molecular.molecules.Molecule.atom_props"><code class="xref py py-attr docutils literal notranslate"><span class="pre">atom_props</span></code></a>.</p>
@@ -2153,12 +2133,12 @@ between the functional group positions.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The matrix has the shape <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">n]</span></code>. Each column holds the
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The array has the shape <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">n]</span></code>. Each column holds the
 x, y and z coordinates of a bonder centroid. The index of
 the column corresponds to the <code class="docutils literal notranslate"><span class="pre">fg_id</span></code> of the bonder
 centroid.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.matrix</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -2802,6 +2782,7 @@ centroids shoould be aligned.</li>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
     
 
   

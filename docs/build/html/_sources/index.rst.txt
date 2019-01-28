@@ -7,6 +7,7 @@ Welcome to ``stk``'s documentation!
 ===================================
 
 GitHub: https://www.github.com/lukasturcani/stk
+
 Slack: https://t.co/LCPzWhvsVO
 
 .. toctree::
