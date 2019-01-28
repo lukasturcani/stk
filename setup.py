@@ -17,5 +17,6 @@ setup(name='stk',
                         'scikit-learn',
                         'psutil',
                         'pywindowx==0.0.1',
+                        'pandas',
                         'seaborn'],
       python_requires='>=3.6')
