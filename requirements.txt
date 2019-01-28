@@ -5,3 +5,4 @@ scikit-learn
 psutil
 pywindowx==0.0.3
 pandas
+seaborn
