@@ -78,26 +78,23 @@ blocks on specific vertices and edges.
 .. code-block:: python
 
     cage = Cage([bb1, bb2, bb9, bb10],
-                FourPlusSix(bb_assignments={0: [0, 1, 3],
-                                            1: [2],
-                                            2: [0, 4, 5],
-                                            3: [1, 2, 3]}))
+                FourPlusSix(bb_positions={bb1: [0, 1, 3],
+                                          bb2: [2],
+                                          bb3: [0, 4, 5],
+                                          bb4: [1, 2, 3]}))
 
-What this code says, is that the :class:`.StructUnit` with index ``0``
-in :attr:`.MacroMolecule.building_blocks` will be placed on vertices
-``0``, ``1`` and ``3``. The :class:`.StructUnit` with index ``1`` in
-:attr:`.MacroMolecule.building_blocks` will be placed on vertex ``2``.
-Equally, the :class:`.StructUnit` with index 2 will be placed on edges
-``0``, ``4`` and ``5``.
+What this code says, is that ``bb1`` will be placed on vertices
+``0``, ``1`` and ``3``, ``bb2`` will be placed on vertex ``2``,
+``bb9`` will be placed on edges ``0``, ``4`` and ``5`` and
+``bb10`` will be placed on edges ``1``, ``2`` and ``3``.
 
 So what are vertices ``0``, ``1`` and ``3``? These identify each vertex in
 :attr:`.FourPlusSix.positions_A` by their index. The same is true for edges,
 edges ``0``, ``4`` and ``5`` are simply the eges with those indices in
 :attr:`.FourPlusSix.positions_B`.
 
-So in summary, the keys of ``bb_assignments`` identify the building blocks
-by their index in :attr:`.MacroMolecule.building_blocks` and the values
-identify the vertices or edges on which that building block is
+So in summary, the keys of ``bb_positions`` identify the building blocks
+the values identify the vertices or edges on which that building block is
 placed.
 
 Building structural isomers.
@@ -254,12 +251,12 @@ structural isomer of a multi-component cage!
 
 .. code-block:: python
 
-    isomer = Cage([bb1, bb2],
+    isomer = Cage([bb1, bb2, bb3, bb4],
                   FourPlusSix(A_alignments=[0, 1, 2, 0],
                               B_alignments=[1, 1, -1, 1, -1, 1],
-                              bb_assignments={0: [0, 1, 3],
-                                              1: [2],
-                                              2: [0, 4, 5],
-                                              3: [1, 2, 3]}))
+                              bb_positions={bb1: [0, 1, 3],
+                                            bb2: [2],
+                                            bb3: [0, 4, 5],
+                                            bb4: [1, 2, 3]}))
 
 Next step is to put this in a loop and do some screening.
