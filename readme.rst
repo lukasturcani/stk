@@ -117,7 +117,7 @@ __ https://chemrxiv.org/articles/An_Evolutionary_Algorithm_for_the_Discovery_of_
 * `Machine Learning for Organic Cage Property Prediction`_ | chemrxiv__
 
 __ https://chemrxiv.org/articles/Machine_Learning_for_Organic_Cage_Property_Prediction/6995018
-.. _`Machine Learning for Organic Cage Property Prediction`: https://something.com
+.. _`Machine Learning for Organic Cage Property Prediction`: https://pubs.acs.org/doi/10.1021/acs.chemmater.8b03572 
 
 
 * `A High-Throughput Screening Approach for the Optoelectronic Properties of Conjugated Polymers`_ | chemrxiv__
@@ -128,7 +128,7 @@ __ https://chemrxiv.org/articles/A_High-Throughput_Screening_Approach_for_the_Op
 * `Computationally-Inspired Discovery of an Unsymmetrical Porous Organic Cage`_ | chemrxiv__
 
 __ https://chemrxiv.org/articles/Computationally-Inspired_Discovery_of_an_Unsymmetrical_Porous_Organic_Cage/6863684
-.. _`Computationally-Inspired Discovery of an Unsymmetrical Porous Organic Cage`: https:://something.com
+.. _`Computationally-Inspired Discovery of an Unsymmetrical Porous Organic Cage`: https://pubs.rsc.org/en/content/articlelanding/2018/nr/c8nr06868b#!divAbstract 
 
 * `Maximising the Hydrogen Evolution Activity in Organic Photocatalysts by co-Polymerisation`_
 
