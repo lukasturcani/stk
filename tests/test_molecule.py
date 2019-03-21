@@ -115,6 +115,12 @@ def test_graph(amine2):
     assert len(graph.edges()) == amine2.mol.GetNumBonds()
 
 
+def test_position_matrix(amine2):
+    position_matrix = amine2.position_matrix()
+    for atom_id, atom_coords in amine2.all_atom_coords():
+        assert np.array_equal(position_matrix[:, atom_id], atom_coords)
+
+
 def test_max_diameter(tmp_amine2):
     # Make a position matrix which sets all atoms to the origin except
     # 2 and 13. These should be placed a distance of 100 apart.
