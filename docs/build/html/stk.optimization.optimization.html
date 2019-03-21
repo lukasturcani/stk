@@ -17,32 +17,34 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -153,12 +155,12 @@
 <span id="adding-optimization-functions"></span><h2>Extending stk: Adding optimization functions.<a class="headerlink" href="#extending-stk-adding-optimization-functions" title="Permalink to this headline">¶</a></h2>
 <p>New optimization functions are added by writing them in this module.
 The only requirement is that the first argument is <cite>mol</cite>. This allows
-users to identify which arguments are handled automatically by <code class="docutils literal notranslate"><span class="pre">mtk</span></code>
+users to identify which arguments are handled automatically by <code class="docutils literal notranslate"><span class="pre">stk</span></code>
 and which need to be defined in the input file. The convention is that
 if the optimization function takes the argument <cite>mol</cite>, the user does
 not have to specify it in the input file.</p>
 <p>An optimization function should update the <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule in
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.mol</span></code>. The return values of optimization functions
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.mol" title="stk.molecular.molecules.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.mol</span></code></a>. The return values of optimization functions
 are discarded by the GA.</p>
 <p>Optimizations can be complicated. If the use of helper functions is
 required make sure that they are private, i.e. that their names begin
@@ -398,26 +400,16 @@ structure.</li>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
