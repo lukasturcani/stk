@@ -8,13 +8,13 @@ Extending stk: Adding optimization functions.
 
 New optimization functions are added by writing them in this module.
 The only requirement is that the first argument is `mol`. This allows
-users to identify which arguments are handled automatically by ``mtk``
+users to identify which arguments are handled automatically by ``stk``
 and which need to be defined in the input file. The convention is that
 if the optimization function takes the argument `mol`, the user does
 not have to specify it in the input file.
 
 An optimization function should update the ``rdkit`` molecule in
-:attr:`.MacroMolecule.mol`. The return values of optimization functions
+:attr:`.Molecule.mol`. The return values of optimization functions
 are discarded by the GA.
 
 Optimizations can be complicated. If the use of helper functions is
