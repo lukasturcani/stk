@@ -972,6 +972,26 @@ class Molecule:
                 "\n"
                 "$$$$\n")
 
+    def position_matrix(self, conformer=-1):
+        """
+        Returns a matrix holding the atomic positions of a conformer.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The array has the shape ``[3, n]``. Each column holds the
+            x, y and z coordinates of a bonder centroid. The index of
+            the column corresponds to the atom id.
+
+        """
+
+        return self.mol.GetConformer(conformer).GetPositions().T
+
     def same(self, other):
         """
         Check if `other` has the same molecular structure.
