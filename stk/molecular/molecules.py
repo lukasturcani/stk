@@ -2530,7 +2530,7 @@ class StructUnit2(StructUnit):
 
 class StructUnit3(StructUnit):
     """
-    Represents building blocks with 3 functional groups.
+    Represents building blocks with 3 or more functional groups.
 
     """
 
