@@ -1646,7 +1646,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         centroids = it.combinations(self.bonder_centroids(conformer), 2)
         ids = it.combinations(range(len(self.bonder_ids)), 2)
         for (id1, id2), (c1, c2) in zip(ids, centroids):
-                yield id1, id2, euclidean(c1, c2)
+            yield id1, id2, euclidean(c1, c2)
 
     def bonder_direction_vectors(self, conformer=-1):
         """
