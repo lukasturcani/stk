@@ -179,7 +179,9 @@ from collections import Counter, defaultdict
 from inspect import signature
 
 from . import topologies
-from .functional_groups import functional_groups, react, periodic_react
+from .functional_groups import (functional_groups,
+                                react_many,
+                                periodic_react)
 from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
@@ -3467,6 +3469,7 @@ class Periodic(MacroMolecule):
         # the fg ids in the unit cells to the ids of the equivalent
         # fgs in the original unit cell  and checking the
         # `periodic_bond` to see which fg ids are connected.
+        fg_groups = []
         for cell in flatten(cells):
             for periodic_bond in self.periodic_bonds:
 
@@ -3492,9 +3495,9 @@ class Periodic(MacroMolecule):
                 # having a bond added.
                 fg2 = ccell.fgs[periodic_bond.fg2]
 
-                island, _ = react(island, True, fg1, fg2)
+                fg_groups.append(frozenset({fg1, fg2}))
 
-        return island
+        return react_many(island, True, fg_groups)[0]
 
     def _place_island(self, dimensions):
         """
