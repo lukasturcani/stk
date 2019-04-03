@@ -60,6 +60,7 @@ as an example.
 
 """
 
+from functools import partial
 import numpy as np
 from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
@@ -487,7 +488,7 @@ def periodic_react(mol, del_atoms, direction, *fgs):
     return emol.GetMol(), 1, periodic_bonds
 
 
-def diol_with_difluorne(mol, del_atoms, fg1, fg2):
+def diol_with_dihalogen(mol, del_atoms, fg1, fg2, dihalogen):
     """
     Crates bonds between functional groups.
 
@@ -506,6 +507,10 @@ def diol_with_difluorne(mol, del_atoms, fg1, fg2):
     fg2 : :class:`int`
         The id of the second functional group which
         is to be joined, as given by the 'fg_id' property.
+
+    halogen : :class:`str`
+        The name of the dihalogen functional group to use. For example,
+        ``'dibromine'`` or ``'difluorene'``.
 
     Returns
     -------
@@ -751,8 +756,15 @@ def amine3_with_amine3(mol, del_atoms, fg1, fg2):
 # of every functional group involved in the reaction along with how
 # many such functional groups are invovled.
 custom_reactions = {
+
     FGKey(['boronic_acid', 'diol']): boronic_acid_with_diol,
-    FGKey(['diol', 'difluorene']): diol_with_difluorne,
+
+    FGKey(['diol', 'difluorene']):
+        partial(diol_with_dihalogen, dihalogen='difluorene'),
+
+    FGKey(['diol', 'dibromine']):
+        partial(diol_with_dihalogen, dihalogen='dibromine'),
+
     FGKey(['amine3', 'amine3']): amine3_with_amine3
 
 }
