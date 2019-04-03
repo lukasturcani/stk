@@ -860,6 +860,13 @@ functional_groups = (
            bonder_smarts=[Match(smarts='[$([#6]([F])~[#6][F])]', n=2)],
            del_smarts=[Match(smarts='[$([F][#6]~[#6][F])]', n=2)]),
 
+    FGInfo(name='dibromine',
+           fg_smarts='[Br][#6]~[#6][Br]',
+           bonder_smarts=[
+               Match(smarts='[$([#6]([Br])~[#6][Br])]', n=2)
+           ],
+           del_smarts=[Match(smarts='[$([Br][#6]~[#6][Br])]', n=2)]),
+
     FGInfo(name='alkyne2',
            fg_smarts='[C]#[C][H]',
            bonder_smarts=[Match(smarts='[$([C]#[C][H])]', n=1)],
