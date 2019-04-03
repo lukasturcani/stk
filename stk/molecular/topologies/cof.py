@@ -365,7 +365,7 @@ class Edge:
             coords.append(macro_mol.fg_centroid(fg))
 
         for d, param in zip(self.bond, cell_params):
-                coords[1] += d*param
+            coords[1] += d*param
 
         return normalize_vector(coords[1] - coords[0])
 
@@ -624,10 +624,10 @@ class LinkerCOFLattice(COFLattice):
         # Identify which building block is ditopic and which is
         # tri or more topic.
         di = next(bb for bb in macro_mol.building_blocks if
-                  len(bb.functional_group_atoms()) == 2)
+                  len(bb.func_groups) == 2)
         multi = next(bb for bb in macro_mol.building_blocks if
-                     len(bb.functional_group_atoms()) >= 3)
-        nfgs = len(multi.functional_group_atoms())
+                     len(bb.func_groups) >= 3)
+        nfgs = len(multi.func_groups)
 
         # Calculate the size of the unit cell by scaling to the size of
         # building blocks.

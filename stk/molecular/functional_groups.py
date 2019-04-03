@@ -132,6 +132,9 @@ class Match:
         self.smarts = smarts
         self.n = n
 
+    def __eq__(self, other):
+        return self.smarts == other.smarts and self.n == other.n
+
     def __repr__(self):
         return f'Match({self.smarts!r}, {self.n!r})'
 
@@ -213,7 +216,10 @@ class FGInfo:
         self.del_smarts = del_smarts
 
     def __eq__(self, other):
-        return self.name == other.name
+        return (self.name == other.name and
+                self.fg_smarts == other.fg_smarts and
+                self.bonder_smarts == other.bonder_smarts and
+                self.del_smarts == other.del_smarts)
 
     def __repr__(self):
         return (f'FGInfo(name={self.name!r}, '
@@ -394,12 +400,12 @@ def react_many(mol, del_atoms, fg_groups):
                                           *fg_group)
             emol = rdkit.EditableMol(new_mol)
             bonds_made += new_bonds
-
-        bond = bond_orders.get(reaction_key,
-                               rdkit.rdchem.BondType.SINGLE)
-        bonder1, bonder2 = fg_bonders[fg_group]
-        emol.AddBond(bonder1, bonder2, bond)
-        bonds_made += 1
+        else:
+            bond = bond_orders.get(reaction_key,
+                                   rdkit.rdchem.BondType.SINGLE)
+            bonder1, bonder2 = fg_bonders[fg_group]
+            emol.AddBond(bonder1, bonder2, bond)
+            bonds_made += 1
 
     for atom_id in sorted(deleters, reverse=True):
         emol.RemoveAtom(atom_id)

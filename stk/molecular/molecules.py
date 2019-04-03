@@ -263,6 +263,8 @@ class CachedStructUnit(type):
         # initializer or get it from the path.
         if sig['functional_groups']:
             functional_groups = sig['functional_groups']
+            if functional_groups is None:
+                functional_groups = ()
         else:
             functional_groups = tuple((
                 fg.name for fg in fgs if fg.name in sig['file']
@@ -292,6 +294,11 @@ class FunctionalGroup:
         self.id = id_
         self.atom_ids = atom_ids
         self.info = info
+
+    def __eq__(self, other):
+        return (self.id == other.id and
+                self.atom_ids == other.atom_ids and
+                self.info == other.info)
 
     def __repr__(self):
         return (f"FunctionalGroup(id={self.id!r}, "
@@ -1592,7 +1599,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # If no functional group names passed, check if any functional
         # group names appear in the file path.
         if functional_groups is None:
-            functional_groups = [fg for fg in fgs if fg.name in file]
+            functional_groups = [
+                fg.name for fg in fgs if fg.name in file
+            ]
 
         self.func_groups = tuple(
             self.functional_groups(functional_groups)
@@ -2314,6 +2323,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
+        if functional_groups is None:
+            functional_groups = ()
+
         mol = rdkit.MolFromSmiles(smiles)
         rdkit.SanitizeMol(mol)
         H_mol = rdkit.AddHs(mol)
@@ -2342,7 +2354,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         obj.file = smiles
         obj.key = key
         obj.mol = mol
-        obj.func_groups = obj.functional_groups(functional_groups)
+        obj.func_groups = tuple(
+            obj.functional_groups(functional_groups)
+        )
         obj.func_group_infos = tuple(dedupe(
             iterable=(fg.info for fg in obj.func_groups),
             key=lambda info: info.name
