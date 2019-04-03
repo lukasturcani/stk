@@ -69,7 +69,7 @@ import numpy as np
 from inspect import signature
 from collections import Counter
 
-from ..functional_groups import react
+from ..functional_groups import Reactor, FunctionalGroup
 from ...utilities import dedupe, add_fragment_props, remake
 
 
@@ -169,13 +169,15 @@ class Topology(metaclass=TopologyMeta):
     Attributes
     ----------
     react_del : :class:`bool`
-        Toggles whether atoms with the ``'del'`` propety are deleted
-        by :func:`.react`.
+        Toggles whether deleter atoms are deleted by
+        :meth:`.Reactor.result`.
+
 
     """
 
     def __init__(self, react_del=True):
         self.react_del = react_del
+        self.func_groups = []
 
     def build(self, macro_mol, bb_conformers=None):
         """
@@ -209,12 +211,6 @@ class Topology(metaclass=TopologyMeta):
             bb_conformers = [-1 for _ in
                              range(len(macro_mol.building_blocks))]
 
-        # When running ``build()`` in parallel, the atom tags are
-        # cleared by the multiprocessing module. Make sure to reapply
-        # the tags before running ``build()``.
-        for bb in macro_mol.building_blocks:
-            bb.tag_atoms()
-
         # When building, only a single conformer should exist per
         # building block. Otherwise, rdkit.CombineMols won't work. It
         # only combines conformers with the same id.
@@ -227,11 +223,13 @@ class Topology(metaclass=TopologyMeta):
 
         self.place_mols(macro_mol)
         self.prepare(macro_mol)
+
+        reactor = Reactor(macro_mol.mol)
         for fgs in self.bonded_fgs(macro_mol):
-            macro_mol.mol, new_bonds = react(macro_mol.mol,
-                                             self.react_del,
-                                             *fgs)
-            macro_mol.bonds_made += new_bonds
+            reactor.react(*fgs)
+        macro_mol.mol = reactor.result(self.react_del)
+        macro_mol.bonds_made = reactor.bonds_made
+
         self.cleanup(macro_mol)
 
         # Make sure that the property cache of each atom is up to date.
@@ -348,20 +346,6 @@ class Topology(metaclass=TopologyMeta):
 
         return
 
-    def update_fg_id(self, macro_mol, mol):
-        """
-
-        """
-
-        mol = rdkit.Mol(mol)
-        max_id = max((a.GetIntProp('fg_id') for
-                      a in macro_mol.mol.GetAtoms() if
-                      a.HasProp('fg_id')), default=-1) + 1
-        for a in mol.GetAtoms():
-            if a.HasProp('fg_id'):
-                a.SetIntProp('fg_id', a.GetIntProp('fg_id')+max_id)
-        return mol
-
     def __str__(self):
         return repr(self)
 
@@ -407,7 +391,7 @@ class Linear(Topology):
 
     """
 
-    def __init__(self, repeating_unit, orientation, n, ends='h'):
+    def __init__(self, repeating_unit, orientation, n, ends='fg'):
         """
         Initializes a :class:`Linear` instance.
 
@@ -447,7 +431,7 @@ class Linear(Topology):
         self.orientation = tuple(orientation)
         self.n = n
         self.ends = ends
-        super().__init__()
+        super().__init__(react_del=False if ends == 'h' else True)
 
     def cleanup(self, macro_mol):
         """
@@ -469,7 +453,7 @@ class Linear(Topology):
 
     def hygrogen_ends(self, macro_mol):
         """
-        Removes all atoms tagged for deletion and adds hydrogens.
+        Removes all deleter atoms and adds hydrogens.
 
         In polymers, you want to replace the functional groups at the
         ends with hydrogen atoms.
@@ -485,12 +469,20 @@ class Linear(Topology):
 
         """
 
-        emol = rdkit.EditableMol(macro_mol.mol)
-        # Remove all extra atoms.
-        for atom in reversed(macro_mol.mol.GetAtoms()):
-            if atom.HasProp('del'):
-                emol.RemoveAtom(atom.GetIdx())
+        first_fg = min(self.func_groups, key=lambda fg: fg.id)
+        last_fg = max(self.func_groups, key=lambda fg: fg.id)
+        terminal = {first_fg.id, last_fg.id}
 
+        deleters = []
+        for func_group in self.func_groups:
+            if func_group.id in terminal:
+                deleters.extend(func_group.atom_ids)
+            else:
+                deleters.extend(func_group.deleter_ids)
+
+        emol = rdkit.EditableMol(macro_mol.mol)
+        for atom_id in sorted(deleters, reverse=True):
+            emol.RemoveAtom(atom_id)
         macro_mol.mol = remake(emol.GetMol())
         macro_mol.mol = rdkit.AddHs(macro_mol.mol, addCoords=True)
 
@@ -549,25 +541,42 @@ class Linear(Topology):
             bb_index = macro_mol.building_blocks.index(bb)
             add_fragment_props(monomer_mol, bb_index, i)
 
-            # Add fg_id tags.
-
-            # Check which funcitonal group is at the back and which
+            # Check which functional group is at the back and which
             # one at the front.
-            if len(bb.bonder_ids) == 1:
-                c1, c2 = bb.bonder_centroid(), bb.centroid()
-            else:
+            n_fgs = len(bb.func_groups)
+            if n_fgs != 1:
                 c1, c2 = list(bb.bonder_centroids())
-            front = 1 if c1[0] < c2[0] else 0
-            back = 1 if front != 1 else 0
+            # When there is only 1 fg it doesnt matter.
+            else:
+                c1, c2 = [0, 0], [0, 0]
 
-            for atom in monomer_mol.GetAtoms():
-                if atom.HasProp('fg'):
-                    fg_id = atom.GetIntProp('fg_id')
-                    fg_id = 2*i if fg_id == back else 2*i+1
-                    atom.SetIntProp('fg_id', fg_id)
+            front = 1 if c1[0] < c2[0] else 0
+
+            num_atoms = macro_mol.mol.GetNumAtoms()
 
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
                                               monomer_mol)
+
+            for fg in bb.func_groups:
+                atom_ids = np.array(fg.atom_ids) + num_atoms
+                atom_ids = tuple(atom_ids.tolist())
+
+                bonder_ids = np.array(fg.bonder_ids) + num_atoms
+                bonder_ids = tuple(bonder_ids.tolist())
+
+                deleter_ids = np.array(fg.deleter_ids) + num_atoms
+                deleter_ids = tuple(deleter_ids.tolist())
+
+                id_ = 2*i + 1 if fg.id == front else 2*i
+
+                func_group = FunctionalGroup(
+                                     id_=id_,
+                                     atom_ids=atom_ids,
+                                     bonder_ids=bonder_ids,
+                                     deleter_ids=deleter_ids,
+                                     info=fg.info
+                )
+                self.func_groups.append(func_group)
 
             bb.set_position_from_matrix(original_position)
 
@@ -587,8 +596,9 @@ class Linear(Topology):
 
         """
 
+        fgs = sorted(self.func_groups, key=lambda fg: fg.id)
         for i in range(1, 2*len(self.repeating_unit)*self.n-1, 2):
-            yield i, i+1
+            yield fgs[i], fgs[i+1]
 
     def _x_position(self, macro_mol, bb):
         """

@@ -66,7 +66,7 @@ from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
 import rdkit.Geometry.rdGeometry as rdkit_geo
 from collections import Counter
-from ..utilities import AtomicPeriodicBond
+from ..utilities import AtomicPeriodicBond, flatten
 
 
 class FGKey:
@@ -232,544 +232,360 @@ class FGInfo:
         return f'FGInfo({self.name!r})'
 
 
-def fg_name(mol, fg):
+class FunctionalGroup:
     """
-    Retruns the name of the functional group with id `fg`.
-
-    Parameters
-    ----------
-    mol : :class:`rdkit.Chem.rdchem.Mol`
-        An ``rdkit`` molecule with its functional groups tagged.
-
-    fg : :class:`int`
-        The id of a functional group as given by the 'fg_id' property.
-
-    Returns
-    -------
-    :class:`str`
-        The name of a functional group.
 
     """
 
-    for atom in mol.GetAtoms():
-        if atom.HasProp('fg_id') and atom.GetIntProp('fg_id') == fg:
-            return atom.GetProp('fg')
-    raise RuntimeError(f'No functional group with id {fg} found.')
+    def __init__(self, id_, atom_ids, bonder_ids, deleter_ids, info):
+        self.id = id_
+        self.atom_ids = atom_ids
+        self.bonder_ids = bonder_ids
+        self.deleter_ids = deleter_ids
+        self.info = info
+
+    def __eq__(self, other):
+        return (self.id == other.id and
+                self.atom_ids == other.atom_ids and
+                self.bonder_ids == other.bonder_ids and
+                self.deleter_ids == other.deleter_ids and
+                self.info == other.info)
+
+    def __hash__(self):
+        return id(self)
+
+    def __repr__(self):
+        return (f"FunctionalGroup(id={self.id!r}, "
+                f"atom_ids={self.atom_ids!r}, "
+                f"bonder_ids={self.bonder_ids!r}, "
+                f"deleter_ids={self.deleter_ids!r}, "
+                f"info={self.info!s})")
+
+    def __str__(self):
+        return repr(self)
 
 
-def react(mol, del_atoms, *fgs):
+class Reactor:
     """
-    Creates bonds between functional groups.
 
-    This function first looks at the functional group ids provided via
-    the `*fgs` argument and checks which functional groups are
-    involved in the reaction. If the functional groups are handled
-    by one of the custom reactions specified in
-    :data:`custom_reactions` then that function is executed.
-
-    In all other cases the function is assumed to have received two
-    functional groups to react via `*fgs`. In these functional groups
-    the atoms tagged ``'del'`` are deleted and the atoms tagged
-    ``'bonder'`` have a bond added. The bond is a single, unless
-    specified otherwise in :data:`bond_orders`.
-
-    Parameters
-    ----------
-    mol : :class:`rdkit.Chem.rdchem.Mol`
-        A molecule being assembled.
-
-    del : :class:`bool`
-        Toggles if atoms with the ``'del'`` property are deleted.
-
-    *fgs : :class:`int`
-        The ids of the functional groups to react. The ids are held
-        by atom of `mol` in the ``'fg_id'`` property.
-
-    Returns
-    -------
-    :class:`tuple`
-        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
-        the molecule with bonds added between the functional groups.
-
-        The second element is a :class:`int`. It is the number
-        of bonds added.
+    If some functional groups react via a special mechanism not covered
+    in by the base "react()" function the function should be placed
+    in this dict. The key should be a sorted tuple which holds the name
+    of every functional group involved in the reaction along with how
+    many such functional groups are invovled.
 
     """
 
-    names = [fg_name(mol, fg) for fg in fgs]
-    reaction_key = FGKey(names)
-    if reaction_key in custom_reactions:
-        return custom_reactions[reaction_key](mol, del_atoms, *fgs)
+    double = rdkit.rdchem.BondType.DOUBLE
+    triple = rdkit.rdchem.BondType.TRIPLE
+    bond_orders = {
+        FGKey(['amine', 'aldehyde']): double,
+        FGKey(['amide', 'aldehyde']): double,
+        FGKey(['nitrile', 'aldehyde']): double,
+        FGKey(['amide', 'amine']): double,
+        FGKey(['terminal_alkene', 'terminal_alkene']): double,
+        FGKey(['alkyne2', 'alkyne2']): triple
+    }
 
-    emol = rdkit.EditableMol(mol)
+    def __init__(self, mol):
 
-    bonders = []
-    for atom in mol.GetAtoms():
-        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
-            continue
-        if atom.HasProp('bonder'):
-            bonders.append(atom.GetIdx())
+        self.custom_reactions = {
 
-    bond = bond_orders.get(reaction_key, rdkit.rdchem.BondType.SINGLE)
-    bonder1, bonder2 = bonders
-    emol.AddBond(bonder1, bonder2, bond)
+            FGKey(['boronic_acid', 'diol']):
+                self.boronic_acid_with_diol,
 
-    for atom in reversed(mol.GetAtoms()):
-        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
-            continue
+            FGKey(['diol', 'difluorene']):
+                partial(self.diol_with_dihalogen,
+                        dihalogen='difluorene'),
 
-        if atom.HasProp('del') and del_atoms:
-            emol.RemoveAtom(atom.GetIdx())
+            FGKey(['diol', 'dibromine']):
+                partial(self.diol_with_dihalogen,
+                        dihalogen='dibromine'),
 
-    return emol.GetMol(), 1
+            FGKey(['phenyl_amine', 'phenyl_amine']):
+                self.phenyl_amine_with_phenyl_amine
 
+        }
 
-def react_many(mol, del_atoms, fg_groups):
-    """
-    Creates bonds between multiple sets of functional groups.
+        self.periodic_custom_reactions = {}
 
-    This function is much faster than calling :func:`react`
-    multiple times, but should behave in the same way. It
-    checks which functional groups are involved in each reaction and
-    if that reaction type is handled by one of the custom reactions
-    specified in :data:`custom_reactions`. If so, then that function is
-    executed.
+        self.mol = mol
+        self.emol = rdkit.EditableMol(mol)
+        self.periodic_bonds = []
+        self.bonds_made = 0
+        self.new_atom_coords = []
+        self.deleters = []
 
-    In all other cases the function assumes it has received two
-    functional groups to react per reaction. In these functional
-    groups, the atoms tagged ``'del'`` are deleted and the atoms tagged
-    ``'bonder'`` have a bond added. The bond is a single, unless
-    specified otherwise in :data:`bond_orders`.
+    def react(self, *fgs):
+        """
+        Creates bonds between functional groups.
 
-    Parameters
-    ----------
-    mol : :class:`rdkit.Chem.rdchem.Mol`
-        A molecule being assembled.
+        This function first looks at the functional groups provided via
+        the `*fgs` argument and checks which functional groups are
+        involved in the reaction. If the functional groups are handled
+        by one of the custom reactions specified in
+        :data:`custom_reactions` then that function is executed.
 
-    del : :class:`bool`
-        Toggles if atoms with the ``'del'`` property are deleted.
+        In all other cases the function is assumed to have received two
+        functional groups to react via `*fgs`. In these functional
+        groups the bonder atoms have a bond added. The bond is single,
+        unless otherwise specified in :attr:`bond_orders`.
 
-    fg_groups : :class:`list` of :class:`frozenset` of :class:`int`
-        A :class:`list` of the form
+        Parameters
+        ----------
+        *fgs : :class:`FunctionalGroup`
+            The functional groups to react.
 
-        .. code-block:: python
+        Returns
+        -------
+        None : :class:`NoneType`
 
-            fg_groups = [frozenset({1, 5}),
-                         frozenset({3, 4}),
-                         frozenset({2, 6, 7})]
+        """
 
-        It says that the functional groups ``1`` and ``5`` react
-        together, the functional groups ``3`` and ``4`` react together
-        and ``2``, ``6`` and ``7`` react together.
+        self.deleters.extend(flatten(fg.deleter_ids for fg in fgs))
 
-    Returns
-    -------
-    :class:`tuple`
-        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
-        the molecule with bonds added between the functional groups.
-
-        The second element is a :class:`int`. It is the number
-        of bonds added.
-
-    """
-
-    fg_bonders = {fg_group: [] for fg_group in fg_groups}
-    deleters = []
-
-    for atom in mol.GetAtoms():
-        if atom.HasProp('fg_id'):
-            fg_id = atom.GetIntProp('fg_id')
-            fg_group = next((fg_group for fg_group in fg_groups
-                            if fg_id in fg_group), None)
-
-            if fg_group is not None and atom.HasProp('bonder'):
-                fg_bonders[fg_group].append(atom.GetIdx())
-
-            elif fg_group is not None and atom.HasProp('del'):
-                deleters.append(atom.GetIdx())
-
-    bonds_made = 0
-    emol = rdkit.EditableMol(mol)
-    for fg_group in fg_groups:
-        names = [fg_name(mol, fg) for fg in fg_group]
+        names = [fg.info.name for fg in fgs]
         reaction_key = FGKey(names)
-
-        if reaction_key in custom_reactions:
-            reaction = custom_reactions[reaction_key]
-            new_mol, new_bonds = reaction(emol.GetMol(),
-                                          False,
-                                          *fg_group)
-            emol = rdkit.EditableMol(new_mol)
-            bonds_made += new_bonds
-        else:
-            bond = bond_orders.get(reaction_key,
-                                   rdkit.rdchem.BondType.SINGLE)
-            bonder1, bonder2 = fg_bonders[fg_group]
-            emol.AddBond(bonder1, bonder2, bond)
-            bonds_made += 1
-
-    for atom_id in sorted(deleters, reverse=True):
-        emol.RemoveAtom(atom_id)
-
-    return emol.GetMol(), bonds_made
-
-
-def periodic_react(mol, del_atoms, direction, *fgs):
-    """
-    Like :func:`react` but returns periodic bonds.
-
-    As periodic bonds are returned, no bonds are added to `mol`.
-
-    Parameters
-    ----------
-    mol : :class:`rdkit.Chem.rdchem.Mol`
-        A molecule being assembled.
-
-    del : :class:`bool`
-        Toggles if atoms with the ``'del'`` property are deleted.
-
-    direction : :class:`list` of :class:`int`
-        A 3 member list describing the axes along which the created
-        bonds are periodic. For example, ``[1, 0, 0]`` means that the
-        bonds are periodic along the x axis in the positive direction.
-
-    *fgs : :class:`int`
-        The ids of the functional groups to react. The ids are held
-        by atom of `mol` in the ``'fg_id'`` property.
-
-    Returns
-    -------
-    :class:`tuple`
-        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
-        the molecule after the reaction.
-
-        The second element is a :class:`int`. It is the number
-        of bonds added.
-
-        The third element is a :class:`list` holding
-        :class:`.AtomicPeriodicBond`.
-
-    """
-
-    names = [fg_name(mol, fg) for fg in fgs]
-    reaction_key = FGKey(names)
-    if reaction_key in periodic_custom_reactions:
-        return periodic_custom_reactions[reaction_key](mol,
-                                                       del_atoms,
-                                                       direction,
-                                                       *fgs)
-
-    emol = rdkit.EditableMol(mol)
-
-    bonders = {}
-    for atom in mol.GetAtoms():
-        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
-            continue
-        if atom.HasProp('bonder'):
-            bonders[atom.GetIntProp('fg_id')] = atom.GetIntProp('bonder')
-
-    bond = bond_orders.get(FGKey(names), rdkit.rdchem.BondType.SINGLE)
-
-    # Make sure the direction of the periodic bond is maintained.
-    fg1, fg2 = fgs
-    bonder1, bonder2 = bonders[fg1], bonders[fg2]
-    periodic_bonds = [AtomicPeriodicBond(bonder1,
-                                         bonder2,
-                                         bond,
-                                         direction)]
-
-    for atom in reversed(mol.GetAtoms()):
-        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
-            continue
-
-        if atom.HasProp('del') and del_atoms:
-            emol.RemoveAtom(atom.GetIdx())
-
-    return emol.GetMol(), 1, periodic_bonds
-
-
-def diol_with_dihalogen(mol, del_atoms, fg1, fg2, dihalogen):
-    """
-    Crates bonds between functional groups.
-
-    Parameters
-    ----------
-    mol : :class:`rdkit.Chem.rdchem.Mol`
-        A molecule being assembled.
-
-    del : :class:`bool`
-        Toggles if atoms with the ``'del'`` property are deleted.
-
-    fg1 : :class:`int`
-        The id of the first functional group which
-        is to be joined, as given by the 'fg_id' property.
-
-    fg2 : :class:`int`
-        The id of the second functional group which
-        is to be joined, as given by the 'fg_id' property.
-
-    halogen : :class:`str`
-        The name of the dihalogen functional group to use. For example,
-        ``'dibromine'`` or ``'difluorene'``.
-
-    Returns
-    -------
-    :class:`tuple`
-        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
-        the molecule with bonds added between the functional groups.
-
-        The second element is a :class:`int`. It is the number
-        of bonds added.
-
-    """
-
-    bond = rdkit.rdchem.BondType.SINGLE
-    fgs = {fg1, fg2}
-    oxygens = []
-    carbons = []
-    deleters = []
-
-    for a in reversed(mol.GetAtoms()):
-        if not a.HasProp('fg_id') or a.GetIntProp('fg_id') not in fgs:
-            continue
-
-        if a.HasProp('del'):
-            deleters.append(a)
-
-        if a.GetProp('fg') == dihalogen and a.HasProp('bonder'):
-            carbons.append(a)
-
-        if a.GetProp('fg') == 'diol' and a.HasProp('bonder'):
-            oxygens.append(a)
-
-    conf = mol.GetConformer()
-    distances = []
-    for c in carbons:
-        cpos = np.array([*conf.GetAtomPosition(c.GetIdx())])
-        for o in oxygens:
-            opos = np.array([*conf.GetAtomPosition(o.GetIdx())])
-            d = euclidean(cpos, opos)
-            distances.append((d, c.GetIdx(), o.GetIdx()))
-    distances.sort()
-
-    deduped_pairs = []
-    seen_o, seen_c = set(), set()
-    for d, c, o in distances:
-        if c not in seen_c and o not in seen_o:
-            deduped_pairs.append((c, o))
-            seen_c.add(c)
-            seen_o.add(o)
-
-    (c1, o1), (c2, o2), *_ = deduped_pairs
-    assert c1 != c2 and o1 != o2
-    emol = rdkit.EditableMol(mol)
-    emol.AddBond(c1, o1, bond)
-    emol.AddBond(c2, o2, bond)
-
-    if del_atoms:
-        for a in deleters:
-            emol.RemoveAtom(a.GetIdx())
-
-    return emol.GetMol(), 2
-
-
-def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
-    """
-    Crates bonds between functional groups.
-
-    Parameters
-    ----------
-    mol : :class:`rdkit.Chem.rdchem.Mol`
-        A molecule being assembled.
-
-    del : :class:`bool`
-        Toggles if atoms with the ``'del'`` property are deleted.
-
-    fg1 : :class:`int`
-        The id of the first functional group which
-        is to be joined, as given by the 'fg_id' property.
-
-    fg2 : :class:`int`
-        The id of the second functional group which
-        is to be joined, as given by the 'fg_id' property.
-
-    Returns
-    -------
-    :class:`tuple`
-        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
-        the molecule with bonds added between the functional groups.
-
-        The second element is a :class:`int`. It is the number
-        of bonds added.
-
-    """
-
-    bond = rdkit.rdchem.BondType.SINGLE
-    fgs = {fg1, fg2}
-    oxygens = []
-    deleters = []
-
-    for a in reversed(mol.GetAtoms()):
-        if not a.HasProp('fg_id') or a.GetIntProp('fg_id') not in fgs:
-            continue
-
-        if a.HasProp('del'):
-            deleters.append(a)
-
-        if a.GetProp('fg') == 'boronic_acid' and a.HasProp('bonder'):
-            boron = a
-
-        if a.GetProp('fg') == 'diol' and a.HasProp('bonder'):
-            oxygens.append(a)
-
-    emol = rdkit.EditableMol(mol)
-    emol.AddBond(boron.GetIdx(), oxygens[0].GetIdx(), bond)
-    emol.AddBond(boron.GetIdx(), oxygens[1].GetIdx(), bond)
-
-    if del_atoms:
-        for a in deleters:
-            emol.RemoveAtom(a.GetIdx())
-
-    return emol.GetMol(), 2
-
-
-def amine3_with_amine3(mol, del_atoms, fg1, fg2):
-    """
-    Crates bonds between functional groups.
-
-    Parameters
-    ----------
-    mol : :class:`rdkit.Chem.rdchem.Mol`
-        A molecule being assembled.
-
-    del : :class:`bool`
-        Toggles if atoms with the ``'del'`` property are deleted.
-
-    fg1 : :class:`int`
-        The id of the first functional group which
-        is to be joined, as given by the 'fg_id' property.
-
-    fg2 : :class:`int`
-        The id of the second functional group which
-        is to be joined, as given by the 'fg_id' property.
-
-    Returns
-    -------
-    :class:`tuple`
-        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
-        the molecule with bonds added between the functional groups.
-
-        The second element is a :class:`int`. It is the number
-        of bonds added.
-
-    """
-
-    fgs = {fg1, fg2}
-    atoms1, atoms2 = {}, {}
-    deleters = []
-
-    for a in mol.GetAtoms():
-        if not a.HasProp('fg_id') or a.GetIntProp('fg_id') not in fgs:
-            continue
-
-        if a.HasProp('bonder') and a.GetIntProp('fg_id') == fg1:
-            atoms1[a.GetSymbol()] = a.GetIdx()
-
-        if a.HasProp('bonder') and a.GetIntProp('fg_id') == fg2:
-            atoms2[a.GetSymbol()] = a.GetIdx()
-
-        if a.HasProp('del'):
-            deleters.append(a.GetIdx())
-
-    conf = mol.GetConformer()
-    n1_pos = np.array([*conf.GetAtomPosition(atoms1['N'])])
-    n2_pos = np.array([*conf.GetAtomPosition(atoms2['N'])])
-
-    c1_pos = np.array([*conf.GetAtomPosition(atoms1['C'])])
-    c2_pos = np.array([*conf.GetAtomPosition(atoms2['C'])])
-
-    emol = rdkit.EditableMol(mol)
-
-    n_joiner = emol.AddAtom(rdkit.Atom(6))
-    n_joiner_pos = (n1_pos + n2_pos) / 2
-    nh1 = emol.AddAtom(rdkit.Atom(1))
-    nh1_pos = n_joiner_pos + np.array([0, 0, 1])
-    nh2 = emol.AddAtom(rdkit.Atom(1))
-    nh2_pos = n_joiner_pos + np.array([0, 0, -1])
-
-    nc_joiner1 = emol.AddAtom(rdkit.Atom(6))
-    nc_joiner1_pos = (c1_pos + n2_pos) / 2
-    nc1h1 = emol.AddAtom(rdkit.Atom(1))
-    nc1h1_pos = nc_joiner1_pos + np.array([0, 0, 1])
-    nc1h2 = emol.AddAtom(rdkit.Atom(1))
-    nc1h2_pos = nc_joiner1_pos + np.array([0, 0, -1])
-
-    nc_joiner2 = emol.AddAtom(rdkit.Atom(6))
-    nc_joiner2_pos = (c2_pos + n1_pos) / 2
-    nc2h1 = emol.AddAtom(rdkit.Atom(1))
-    nc2h1_pos = nc_joiner2_pos + np.array([0, 0, 1])
-    nc2h2 = emol.AddAtom(rdkit.Atom(1))
-    nc2h2_pos = nc_joiner2_pos + np.array([0, 0, -1])
-
-    single = rdkit.rdchem.BondType.SINGLE
-    emol.AddBond(atoms1['N'], n_joiner, single)
-    emol.AddBond(atoms2['N'], n_joiner, single)
-    emol.AddBond(n_joiner, nh1, single)
-    emol.AddBond(n_joiner, nh2, single)
-
-    emol.AddBond(atoms1['C'], nc_joiner1, single)
-    emol.AddBond(atoms2['N'], nc_joiner1, single)
-    emol.AddBond(nc_joiner1, nc1h1, single)
-    emol.AddBond(nc_joiner1, nc1h2, single)
-
-    emol.AddBond(atoms2['C'], nc_joiner2, single)
-    emol.AddBond(atoms1['N'], nc_joiner2, single)
-    emol.AddBond(nc_joiner2, nc2h1, single)
-    emol.AddBond(nc_joiner2, nc2h2, single)
-
-    mol = emol.GetMol()
-    conf = mol.GetConformer()
-    conf.SetAtomPosition(n_joiner, rdkit_geo.Point3D(*n_joiner_pos))
-    conf.SetAtomPosition(nh1, rdkit_geo.Point3D(*nh1_pos))
-    conf.SetAtomPosition(nh2, rdkit_geo.Point3D(*nh2_pos))
-
-    conf.SetAtomPosition(nc_joiner1, rdkit_geo.Point3D(*nc_joiner1_pos))
-    conf.SetAtomPosition(nc1h1, rdkit_geo.Point3D(*nc1h1_pos))
-    conf.SetAtomPosition(nc1h2, rdkit_geo.Point3D(*nc1h2_pos))
-
-    conf.SetAtomPosition(nc_joiner2, rdkit_geo.Point3D(*nc_joiner2_pos))
-    conf.SetAtomPosition(nc2h1, rdkit_geo.Point3D(*nc2h1_pos))
-    conf.SetAtomPosition(nc2h2, rdkit_geo.Point3D(*nc2h2_pos))
-
-    if del_atoms:
-        emol = rdkit.EditableMol(mol)
-        for a in reversed(deleters):
-            emol.RemoveAtom(a)
-        mol = emol.GetMol()
-
-    return mol, 6
-
-
-# If some functional groups react via a special mechanism not covered
-# in by the base "react()" function the function should be placed
-# in this dict. The key should be a sorted tuple which holds the name
-# of every functional group involved in the reaction along with how
-# many such functional groups are invovled.
-custom_reactions = {
-
-    FGKey(['boronic_acid', 'diol']): boronic_acid_with_diol,
-
-    FGKey(['diol', 'difluorene']):
-        partial(diol_with_dihalogen, dihalogen='difluorene'),
-
-    FGKey(['diol', 'dibromine']):
-        partial(diol_with_dihalogen, dihalogen='dibromine'),
-
-    FGKey(['amine3', 'amine3']): amine3_with_amine3
-
-}
-
-periodic_custom_reactions = {}
+        if reaction_key in self.custom_reactions:
+            return self.custom_reactions[reaction_key](*fgs)
+
+        bond = self.bond_orders.get(reaction_key,
+                                    rdkit.rdchem.BondType.SINGLE)
+        fg1, fg2 = fgs
+        self.emol.AddBond(fg1.bonder_ids[0], fg2.bonder_ids[0], bond)
+        self.bonds_made += 1
+
+    def periodic_react(self, direction, *fgs):
+        """
+        Like :func:`react` but returns periodic bonds.
+
+        As periodic bonds are returned, no bonds are added to
+        :attr:`emol`.
+
+        Parameters
+        ----------
+        direction : :class:`list` of :class:`int`
+            A 3 member list describing the axes along which the created
+            bonds are periodic. For example, ``[1, 0, 0]`` means that
+            the bonds are periodic along the x axis in the positive
+            direction.
+
+        *fgs : :class:`FunctionalGroup`
+            The functional groups to react.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self.deleters.extend(flatten(fg.deleter_ids for fg in fgs))
+
+        names = [fg.info.name for fg in fgs]
+        reaction_key = FGKey(names)
+        if reaction_key in self.periodic_custom_reactions:
+            rxn_fn = self.periodic_custom_reactions[reaction_key]
+            return rxn_fn(direction, *fgs)
+
+        bond = self.bond_orders.get(reaction_key,
+                                    rdkit.rdchem.BondType.SINGLE)
+
+        # Make sure the direction of the periodic bond is maintained.
+        fg1, fg2 = fgs
+        self.periodic_bonds.append(
+            AtomicPeriodicBond(fg1.bonder_ids[0],
+                               fg2.bonder_ids[0],
+                               bond,
+                               direction)
+        )
+        self.bonds_made += 1
+
+    def result(self, del_atoms):
+        """
+
+        """
+
+        if self.new_atom_coords:
+            self.mol = self.emol.GetMol()
+            conf = self.mol.GetConformer()
+            for atom_id, coord in self.new_atom_coords:
+                point3d = rdkit_geo.Point3D(*coord)
+                conf.SetAtomPosition(atom_id, point3d)
+            self.emol = rdkit.EditableMol(self.mol)
+
+        if del_atoms:
+            for atom_id in sorted(self.deleters, reverse=True):
+                self.emol.RemoveAtom(atom_id)
+
+        return self.emol.GetMol()
+
+    def diol_with_dihalogen(self, fg1, fg2, dihalogen):
+        """
+        Creates bonds between functional groups.
+
+        Parameters
+        ----------
+        fg1 : :class:`.FunctionalGroup`
+            A functional group which undergoes the reaction.
+
+        fg2 : :class:`.FunctionalGroup`
+            A functional group which undergoes the reaction.
+
+        halogen : :class:`str`
+            The name of the dihalogen functional group to use. For example,
+            ``'dibromine'`` or ``'difluorene'``.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        conf = self.mol.GetConformer()
+        bond = rdkit.rdchem.BondType.SINGLE
+
+        diol = fg1 if fg1.info.name == 'diol' else fg2
+        dihalogen = fg2 if diol is fg1 else fg1
+
+        distances = []
+        for carbon in dihalogen.bonder_ids:
+            c_coord = np.array([*conf.GetAtomPosition(carbon)])
+            for oxygen in diol.bonder_ids:
+                o_coord = np.array([*conf.GetAtomPosition(oxygen)])
+                d = euclidean(c_coord, o_coord)
+                distances.append((d, carbon, oxygen))
+        distances.sort()
+
+        deduped_pairs = []
+        seen_o, seen_c = set(), set()
+        for d, c, o in distances:
+            if c not in seen_c and o not in seen_o:
+                deduped_pairs.append((c, o))
+                seen_c.add(c)
+                seen_o.add(o)
+
+        (c1, o1), (c2, o2), *_ = deduped_pairs
+        assert c1 != c2 and o1 != o2
+        self.emol.AddBond(c1, o1, bond)
+        self.emol.AddBond(c2, o2, bond)
+        self.bonds_made += 2
+
+    def boronic_acid_with_diol(self, fg1, fg2):
+        """
+        Creates bonds between functional groups.
+
+        Parameters
+        ----------
+        fg1 : :class:`.FunctionalGroup`
+            A functional group which undergoes the reaction.
+
+        fg2 : :class:`.FunctionalGroup`
+            A functional group which undergoes the reaction.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        bond = rdkit.rdchem.BondType.SINGLE
+
+        boron = fg1 if fg1.info.name == 'boronic_acid' else fg2
+        diol = fg2 if boron is fg1 else fg1
+
+        boron_atom = boron.bonder_ids[0]
+        self.emol.AddBond(boron_atom, diol.bonder_ids[0], bond)
+        self.emol.AddBond(boron_atom, diol.bonder_ids[1], bond)
+        self.bonds_made += 2
+
+    def phenyl_amine_with_phenyl_amine(self, fg1, fg2):
+        """
+        Creates bonds between functional groups.
+
+        Parameters
+        ----------
+        fg1 : :class:`.FunctionalGroup`
+            A functional group which undergoes the reaction.
+
+        fg2 : :class:`.FunctionalGroup`
+            A functional group which undergoes the reaction.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        c1 = next(a for a in fg1.bonder_ids
+                  if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 6)
+        n1 = next(a for a in fg1.bonder_ids
+                  if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 7)
+
+        c2 = next(a for a in fg2.bonder_ids
+                  if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 6)
+        n2 = next(a for a in fg2.bonder_ids
+                  if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 7)
+
+        conf = self.mol.GetConformer()
+        n1_pos = np.array([*conf.GetAtomPosition(n1)])
+        n2_pos = np.array([*conf.GetAtomPosition(n2)])
+
+        c1_pos = np.array([*conf.GetAtomPosition(c1)])
+        c2_pos = np.array([*conf.GetAtomPosition(c2)])
+
+        n_joiner = self.emol.AddAtom(rdkit.Atom(6))
+        n_joiner_pos = (n1_pos + n2_pos) / 2
+        self.new_atom_coords.append((n_joiner, n_joiner_pos))
+
+        nh1 = self.emol.AddAtom(rdkit.Atom(1))
+        nh1_pos = n_joiner_pos + np.array([0, 0, 1])
+        self.new_atom_coords.append((nh1, nh1_pos))
+
+        nh2 = self.emol.AddAtom(rdkit.Atom(1))
+        nh2_pos = n_joiner_pos + np.array([0, 0, -1])
+        self.new_atom_coords.append((nh2, nh2_pos))
+
+        nc_joiner1 = self.emol.AddAtom(rdkit.Atom(6))
+        nc_joiner1_pos = (c1_pos + n2_pos) / 2
+        self.new_atom_coords.append((nc_joiner1, nc_joiner1_pos))
+
+        nc1h1 = self.emol.AddAtom(rdkit.Atom(1))
+        nc1h1_pos = nc_joiner1_pos + np.array([0, 0, 1])
+        self.new_atom_coords.append((nc1h1, nc1h1_pos))
+
+        nc1h2 = self.emol.AddAtom(rdkit.Atom(1))
+        nc1h2_pos = nc_joiner1_pos + np.array([0, 0, -1])
+        self.new_atom_coords.append((nc1h2, nc1h2_pos))
+
+        nc_joiner2 = self.emol.AddAtom(rdkit.Atom(6))
+        nc_joiner2_pos = (c2_pos + n1_pos) / 2
+        self.new_atom_coords.append((nc_joiner2, nc_joiner2_pos))
+
+        nc2h1 = self.emol.AddAtom(rdkit.Atom(1))
+        nc2h1_pos = nc_joiner2_pos + np.array([0, 0, 1])
+        self.new_atom_coords.append((nc2h1, nc2h1_pos))
+
+        nc2h2 = self.emol.AddAtom(rdkit.Atom(1))
+        nc2h2_pos = nc_joiner2_pos + np.array([0, 0, -1])
+        self.new_atom_coords.append((nc2h2, nc2h2_pos))
+
+        single = rdkit.rdchem.BondType.SINGLE
+        self.emol.AddBond(n1, n_joiner, single)
+        self.emol.AddBond(n2, n_joiner, single)
+        self.emol.AddBond(n_joiner, nh1, single)
+        self.emol.AddBond(n_joiner, nh2, single)
+
+        self.emol.AddBond(c1, nc_joiner1, single)
+        self.emol.AddBond(n2, nc_joiner1, single)
+        self.emol.AddBond(nc_joiner1, nc1h1, single)
+        self.emol.AddBond(nc_joiner1, nc1h2, single)
+
+        self.emol.AddBond(c2, nc_joiner2, single)
+        self.emol.AddBond(n1, nc_joiner2, single)
+        self.emol.AddBond(nc_joiner2, nc2h1, single)
+        self.emol.AddBond(nc_joiner2, nc2h2, single)
+
+        self.bonds_made += 6
 
 
 functional_groups = (
@@ -885,7 +701,7 @@ functional_groups = (
            del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1),
                        Match(smarts='[$([C](#[C])[H])]', n=1)]),
 
-    FGInfo(name='amine3',
+    FGInfo(name='phenyl_amine',
            fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6]([H])',
            bonder_smarts=[
                Match(
@@ -911,13 +727,3 @@ functional_groups = (
     )
 
 functional_group_infos = {fg.name: fg for fg in functional_groups}
-
-double = rdkit.rdchem.BondType.DOUBLE
-triple = rdkit.rdchem.BondType.TRIPLE
-bond_orders = {
-    FGKey(['amine', 'aldehyde']): double,
-    FGKey(['amide', 'aldehyde']): double,
-    FGKey(['nitrile', 'aldehyde']): double,
-    FGKey(['amide', 'amine']): double,
-    FGKey(['terminal_alkene', 'terminal_alkene']): double,
-    FGKey(['alkyne2', 'alkyne2']): triple}
