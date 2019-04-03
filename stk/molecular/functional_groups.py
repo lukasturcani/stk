@@ -132,6 +132,12 @@ class Match:
         self.smarts = smarts
         self.n = n
 
+    def __repr__(self):
+        return f'Match({self.smarts!r}, {self.n!r})'
+
+    def __str__(self):
+        return repr(self)
+
 
 class FGInfo:
     """
@@ -205,6 +211,18 @@ class FGInfo:
         self.fg_smarts = fg_smarts
         self.bonder_smarts = bonder_smarts
         self.del_smarts = del_smarts
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __repr__(self):
+        return (f'FGInfo(name={self.name!r}, '
+                f'fg_smarts={self.fg_smarts!r}, '
+                f'bonder_smarts={self.bonder_smarts!r}, '
+                f'del_smarts={self.del_smarts!r})')
+
+    def __str__(self):
+        return f'FGInfo({self.name!r})'
 
 
 def fg_name(mol, fg):
@@ -825,9 +843,11 @@ functional_groups = (
     FGInfo(name='diol',
            fg_smarts='[H][O][#6]~[#6][O][H]',
            bonder_smarts=[
-                Match(smarts='[$([O]([H])[#6]~[#6][O][H])]', n=2)
+               Match(smarts='[$([O]([H])[#6]~[#6][O][H])]', n=2)
            ],
-           del_smarts=[Match(smarts='[$([H][O][#6]~[#6][O][H])]', n=2)]),
+           del_smarts=[
+               Match(smarts='[$([H][O][#6]~[#6][O][H])]', n=2)
+           ]),
 
     FGInfo(name='difluorene',
            fg_smarts='[F][#6]~[#6][F]',
@@ -843,14 +863,29 @@ functional_groups = (
     FGInfo(name='amine3',
            fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6]([H])',
            bonder_smarts=[
-            Match(smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6]([H]))]', n=1),
-            Match(smarts='[$([#6]([H])(~[#6]([H]))~[#6][N]([H])[H])]', n=1),
+               Match(
+                   smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6]([H]))]',
+                   n=1
+               ),
+               Match(
+                   smarts='[$([#6]([H])(~[#6]([H]))~[#6][N]([H])[H])]',
+                   n=1
+               ),
             ],
            del_smarts=[
-            Match(smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6]([H]))]', n=2),
-            Match(smarts='[$([H][#6](~[#6]([H]))~[#6][N]([H])[H])]', n=1)])
+               Match(
+                   smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6]([H]))]',
+                   n=2
+               ),
+               Match(
+                   smarts='[$([H][#6](~[#6]([H]))~[#6][N]([H])[H])]',
+                   n=1
+               )
+           ])
 
     )
+
+functional_group_infos = {fg.name: fg for fg in functional_groups}
 
 double = rdkit.rdchem.BondType.DOUBLE
 triple = rdkit.rdchem.BondType.TRIPLE

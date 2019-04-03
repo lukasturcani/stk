@@ -73,10 +73,10 @@ def test_core(amine2):
         assert not atom.HasProp('fg')
 
 
-def test_functional_group_atoms(amine2):
-        func_grp_mol = rdkit.MolFromSmarts(amine2.func_grp.fg_smarts)
-        fg_atoms = amine2.mol.GetSubstructMatches(func_grp_mol)
-        assert fg_atoms == amine2.functional_group_atoms()
+def test_functional_groups(amine2):
+    func_grp_mol = rdkit.MolFromSmarts(amine2.func_grp.fg_smarts)
+    fg_atoms = amine2.mol.GetSubstructMatches(func_grp_mol)
+    assert fg_atoms == amine2.functional_group_atoms()
 
 
 def test_is_core_atom(amine2):
@@ -95,7 +95,8 @@ def test_json_init(amine2):
     assert mol2.optimized
     assert mol2.bonder_ids == amine2.bonder_ids
     assert mol2.energy.__class__.__name__ == 'Energy'
-    assert mol2.func_grp.name == amine2.func_grp.name
+    assert mol2.func_groups == amine2.func_groups
+    assert mol2.func_group_infos == amine2.func_group_infos
     assert amine2 is not mol2
     assert amine2.atom_props == amine2.atom_props
 
