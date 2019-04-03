@@ -536,7 +536,7 @@ def diol_with_dihalogen(mol, del_atoms, fg1, fg2, dihalogen):
         if a.HasProp('del'):
             deleters.append(a)
 
-        if a.GetProp('fg') == 'difluorene' and a.HasProp('bonder'):
+        if a.GetProp('fg') == dihalogen and a.HasProp('bonder'):
             carbons.append(a)
 
         if a.GetProp('fg') == 'diol' and a.HasProp('bonder'):
