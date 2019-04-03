@@ -58,7 +58,7 @@ which make up the macromolecule:
 
 .. code-block:: python
 
-    bb = StructUnit('/path/to/struct/file.mol2', 'amine')
+    bb = StructUnit('/path/to/struct/file.mol2', ['amine'])
 
 The :class:`StructUnit` instances are initialized using paths to
 molecular structure files. (Initializing a :class:`StructUnit`
@@ -71,13 +71,11 @@ automatically completes steps 1 to 4.)
 
            bb.mol  # <rdkit.Chem.rdchem.Mol at 0x7f961a8f1f80>
 
-    2. Scan the path of the structure file for the name of a functional
-       group. (Alternatively the name of a functional group can be
-       supplied to the initializer).
+    2. Scan the path of the structure file for the names of functional
+       groups. (Alternatively the names of functional groups can be
+       supplied to the initializer). Find the :class:`.FGInfo` instance
+       for each functional group.
 
-       .. code-block:: python
-
-           bb.func_group.name  # 'amine'
 
 Which functional groups are recognized by ``stk``?
 
@@ -86,15 +84,26 @@ and a :class:`tuple` of instances of this class called
 :data:`functional_groups`. If you put an :class:`.FGInfo` instance into
 :data:`functional_groups`, the functional group will be recognized.
 
-    3. Place the :class:`.FGInfo` instance of the functional group into
-       :attr:`StructUnit.func_grp`.
-
-    4. Using :class:`.FGInfo`, tag atoms in the building block as
+    3. Using :class:`.FGInfo`, tag atoms in the building block as
        either ``'bonder'`` or ``'del'``. ``'bonder'`` signifies that
        the atoms form a bond during macromolecular assembly, while
        ``'del'`` means they are deleted. Also tag all atoms in the
        functional group with the tag ``'fg'`` which holds the name
        of the functional group.
+
+    4. Place the :class:`FunctionalGroup` instances into
+       :attr:`StructUnit.func_groups`. For every functional group name
+       supplied to the initializer, or found in the file path, ``stk``
+       finds functional groups of that type in the molecule and creates
+       a :class:`FunctionalGroup` instance for each match.
+
+       bb.func_groups
+       # (FunctionalGroup(id=0,
+       #                  atom_ids=(45, 21, 0),
+       #                  info=FGInfo('amine')),
+       #  FunctionalGroup(id=1,
+       #                  atom_ids=(47, 23, 15),
+       #                  info=FGInfo('amine')))
 
     5. Give the :class:`StructUnit` and :class:`.Topology` instances to
        the macromolecule's initializer.
