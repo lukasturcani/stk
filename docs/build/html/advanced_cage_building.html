@@ -236,14 +236,14 @@ placed.</p>
 <div class="section" id="building-structural-isomers">
 <h2>Building structural isomers.<a class="headerlink" href="#building-structural-isomers" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Begin by picking a topology.</p>
+<li><p>Begin by picking a topology.</p>
 <blockquote>
 <div><img alt="_images/topology.png" src="_images/topology.png" />
 <p>This is a <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.FourPlusSix" title="stk.molecular.topologies.cage.two_plus_three.FourPlusSix"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourPlusSix</span></code></a> with <code class="docutils literal notranslate"><span class="pre">4</span></code> vertices and <code class="docutils literal notranslate"><span class="pre">6</span></code> edges.
 The vertices a labelled <code class="docutils literal notranslate"><span class="pre">A</span></code>, <code class="docutils literal notranslate"><span class="pre">B</span></code>, <code class="docutils literal notranslate"><span class="pre">C</span></code> and <code class="docutils literal notranslate"><span class="pre">D</span></code>.</p>
 </div></blockquote>
 </li>
-<li><p class="first">Pick a three functionalized building block.</p>
+<li><p>Pick a three functionalized building block.</p>
 <blockquote>
 <div><img alt="_images/tritopic.png" src="_images/tritopic.png" />
 <p>For the purposes of drawing, we can simplify the representation of
@@ -252,7 +252,7 @@ Recall, that each building block is
 represented within <code class="docutils literal notranslate"><span class="pre">stk</span></code> as a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit3</span></code></a> instance.</p>
 </div></blockquote>
 </li>
-<li><p class="first">Place the building block on each vertex of the topology.</p>
+<li><p>Place the building block on each vertex of the topology.</p>
 <blockquote>
 <div><img alt="_images/placed.png" src="_images/placed.png" />
 <p>Notice that because we duplicate the building block to make the
@@ -264,7 +264,7 @@ in <code class="docutils literal notranslate"><span class="pre">stk</span></code
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>.</p>
 </div></blockquote>
 </li>
-<li><p class="first">Rotate each building block while keeping it on the vertex to minimize
+<li><p>Rotate each building block while keeping it on the vertex to minimize
 the distance between the <code class="docutils literal notranslate"><span class="pre">bonder</span></code> atoms and the edges of the
 topology. Let’s take a birds eye view of each vertex.</p>
 <img alt="_images/birds_eye1.png" src="_images/birds_eye1.png" />
@@ -290,7 +290,7 @@ functional groups were 120 degrees apart. Had they not been, they
 would have not been well aligned with their respective edges. Only the
 distance between the selected edge and <code class="docutils literal notranslate"><span class="pre">bonder</span></code> atom is minimized.</p>
 </li>
-<li><p class="first">If we had picked a different <code class="docutils literal notranslate"><span class="pre">bonder</span></code> atom at any of the vertices,
+<li><p>If we had picked a different <code class="docutils literal notranslate"><span class="pre">bonder</span></code> atom at any of the vertices,
 while keeping the selected edge the same, we would have assembled a
 different structural isomer. This is because a different bonder atom
 ends up connected at a different edge. For example</p>

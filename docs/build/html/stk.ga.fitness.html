@@ -355,24 +355,20 @@ the value returned by them in
 <dt id="stk.ga.fitness._c60_rotations">
 <code class="descclassname">stk.ga.fitness.</code><code class="descname">_c60_rotations</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>c60</em>, <em>n5fold</em>, <em>n2fold</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.fitness._c60_rotations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates C60 about its axes of symmetry while placed in <cite>macro_mol</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The cage which should have C60 placed inside it.</li>
-<li><strong>c60</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A StructUnit instance of C60.</li>
-<li><strong>n5fold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rotations along the 5-fold axis of symmetry.</li>
-<li><strong>n2fold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rotations along the 2-fold axis of symmetry per
-rotation along the 5-fold axis.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The cage which should have C60 placed inside it.</p></li>
+<li><p><strong>c60</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A StructUnit instance of C60.</p></li>
+<li><p><strong>n5fold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rotations along the 5-fold axis of symmetry.</p></li>
+<li><p><strong>n2fold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rotations along the 2-fold axis of symmetry per
+rotation along the 5-fold axis.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code> – An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> instance holding the cage / C60 complex.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code> – An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> instance holding the cage / C60 complex.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -385,106 +381,94 @@ and <a class="reference internal" href="#stk.ga.fitness.cage_target" title="stk.
 <p>The function returns a fitness vector consisting of:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>binding energy</li>
-<li>cavity of cage in complex</li>
-<li>asymmetry of cage in complex</li>
-<li>strain of cage in complex</li>
-<li>cavity of cage by itself</li>
-<li>asymmetry of cage by itself</li>
-<li>strain of cage by itself</li>
-<li>strain in select dihedral angles of the cage by itself</li>
+<li><p>binding energy</p></li>
+<li><p>cavity of cage in complex</p></li>
+<li><p>asymmetry of cage in complex</p></li>
+<li><p>strain of cage in complex</p></li>
+<li><p>cavity of cage by itself</p></li>
+<li><p>asymmetry of cage by itself</p></li>
+<li><p>strain of cage by itself</p></li>
+<li><p>strain in select dihedral angles of the cage by itself</p></li>
 </ol>
 </div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>func_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the external fitness function calling this one.
-Used for the key in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">progress_params</span></code></a>.</li>
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</li>
-<li><strong>target</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A molecule to be placed inside the cage cavity.</li>
-<li><strong>efunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the energy
-function used to calculate energies.</li>
-<li><strong>ofunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the optimization
-function to be run on the generated complexes.</li>
-<li><strong>rotation_func</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the rotation
-function to be used.</li>
-<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
-<li><strong>target_dihedral</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The target value for the dihedral angle.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the external fitness function calling this one.
+Used for the key in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">progress_params</span></code></a>.</p></li>
+<li><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</p></li>
+<li><p><strong>target</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A molecule to be placed inside the cage cavity.</p></li>
+<li><p><strong>efunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the energy
+function used to calculate energies.</p></li>
+<li><p><strong>ofunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the optimization
+function to be run on the generated complexes.</p></li>
+<li><p><strong>rotation_func</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the rotation
+function to be used.</p></li>
+<li><p><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</p></li>
+<li><p><strong>target_dihedral</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The target value for the dihedral angle.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The numpy array holding the fitness vector.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The numpy array holding the fitness vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the calculation of a fitness parameter fails.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="stk.ga.fitness._calc_fitness">
 <code class="descclassname">stk.ga.fitness.</code><code class="descname">_calc_fitness</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em>, <em>processes</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.fitness._calc_fitness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the fitness values of all members of a population.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>func_data</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – <p>A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> instance representing the chosen
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func_data</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – <p>A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> instance representing the chosen
 fitness function and any additional parameters it may require.</p>
 <p>Alternatively, it can be a function which takes 1
 argument: the molecule whose fitness is to be calculated.</p>
-</li>
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose members must have their fitness
-calculated.</li>
-<li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of parallel processes to create.</li>
+</p></li>
+<li><p><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose members must have their fitness
+calculated.</p></li>
+<li><p><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of parallel processes to create.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="stk.ga.fitness._calc_fitness_serial">
 <code class="descclassname">stk.ga.fitness.</code><code class="descname">_calc_fitness_serial</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.fitness._calc_fitness_serial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the fitness values of all members of a population.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>func_data</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – <p>A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> instance representing the chosen
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func_data</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – <p>A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> instance representing the chosen
 fitness function and any additional parameters it may require.</p>
 <p>Alternatively, it can be a function which takes 1
 argument: the molecule whose fitness is to be calculated.</p>
-</li>
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose members must have their fitness
-calculated.</li>
+</p></li>
+<li><p><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose members must have their fitness
+calculated.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -493,22 +477,18 @@ calculated.</li>
 <dd><p>Yields <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecules of cage / target complexes.</p>
 <p>If multiple complexes are returned, they will be different via a
 random rotation accross the x, y and z axes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage used to form the complex.</li>
-<li><strong>target</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – The target used to form the complex.</li>
-<li><strong>number</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of complexes to be returned.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage used to form the complex.</p></li>
+<li><p><strong>target</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – The target used to form the complex.</p></li>
+<li><p><strong>number</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of complexes to be returned.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code> – An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> instance holding the cage / target complex.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code> – An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> instance holding the cage / target complex.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -521,16 +501,14 @@ The folder will be placed in the current working directory, or
 if the GA is running, 1 above the current working dirctory. This
 prevents the generated molecules from being cleaned up by the GA
 when it’s finished.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The path of the <code class="docutils literal notranslate"><span class="pre">cage_target</span></code> folder.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The path of the <code class="docutils literal notranslate"><span class="pre">cage_target</span></code> folder.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -538,24 +516,23 @@ when it’s finished.</p>
 <code class="descclassname">stk.ga.fitness.</code><code class="descname">_param_labels</code><span class="sig-paren">(</span><em>*labels</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.fitness._param_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds the <code class="xref py py-attr docutils literal notranslate"><span class="pre">param_labels</span></code> attribute to a fitness function.</p>
 <p>The point of this decorator is described in <a class="reference internal" href="#plotting-note"><span class="std std-ref">A note on plotting.</span></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*labels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – This function takes an arbitrary number of strings. The strings
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>*labels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – This function takes an arbitrary number of strings. The strings
 are the y-axis labels for each graph made per variable in
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.progress_params</span></code></a>. The order of strings
 must correspond to the order of variables placed into
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.progress_params</span></code></a>.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The decorated function, with the attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">param_labels</span></code>
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.progress_params</span></code></a>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The decorated function, with the attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">param_labels</span></code>
 added. <code class="xref py py-attr docutils literal notranslate"><span class="pre">param_labels</span></code> holds the strings provided in
-<cite>*labels</cite>.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code></td>
-</tr>
-</tbody>
-</table>
+<cite>*labels</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code></p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">some_func</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
@@ -570,18 +547,17 @@ added. <code class="xref py py-attr docutils literal notranslate"><span class="p
 <dt id="stk.ga.fitness.building_block_atoms">
 <code class="descclassname">stk.ga.fitness.</code><code class="descname">building_block_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.fitness.building_block_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the number of atoms in the molecule.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule having its fitness calculated.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The number of atoms in <cite>macro_mol</cite>.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule having its fitness calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of atoms in <cite>macro_mol</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -592,47 +568,43 @@ added. <code class="xref py py-attr docutils literal notranslate"><span class="p
 listed order</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><cite>cavity</cite> - the diameter of the cage pore.</li>
-<li><cite>window</cite> - the diameter of the largest cage window.</li>
-<li><cite>asymmetry</cite> - the sum of the size differences of all the
-windows in <cite>macro_mol</cite>.</li>
-<li><cite>eng_per_bond</cite> - The formation energy of <cite>macro_mol</cite> per
-bond made.</li>
-<li><cite>prec_strain</cite> - The mean rmsd between the free building
-block and those in the macromolecule.</li>
-<li><cite>dihedral_strain</cite> - The % relative difference between the
+<li><p><cite>cavity</cite> - the diameter of the cage pore.</p></li>
+<li><p><cite>window</cite> - the diameter of the largest cage window.</p></li>
+<li><p><cite>asymmetry</cite> - the sum of the size differences of all the
+windows in <cite>macro_mol</cite>.</p></li>
+<li><p><cite>eng_per_bond</cite> - The formation energy of <cite>macro_mol</cite> per
+bond made.</p></li>
+<li><p><cite>prec_strain</cite> - The mean rmsd between the free building
+block and those in the macromolecule.</p></li>
+<li><p><cite>dihedral_strain</cite> - The % relative difference between the
 average dihedral angle within the molecule and a target
 value. The user must provide the SMARTS for the dihedral and
-the target value.</li>
+the target value.</p></li>
 </ol>
 </div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage whose fitness is to be calculated.</li>
-<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
-<li><strong>target_dihedral</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The target value for the dihedral angle.</li>
-<li><strong>pseudoformation_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – This fitness function calculates the formation energy using
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage whose fitness is to be calculated.</p></li>
+<li><p><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</p></li>
+<li><p><strong>target_dihedral</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The target value for the dihedral angle.</p></li>
+<li><p><strong>pseudoformation_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – This fitness function calculates the formation energy using
 <a class="reference internal" href="stk.molecular.energy.html#stk.molecular.energy.Energy.pseudoformation" title="stk.molecular.energy.Energy.pseudoformation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Energy.pseudoformation()</span></code></a>. This parameter defines the
 arguments passed to this method via a dictionary. The name of
 the argument is the key and the value of the argument is the
-value.</li>
+value.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The numpy array holding the fitness vector.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The numpy array holding the fitness vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the calculation of a fitness parameter fails.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -646,46 +618,42 @@ other function.</p>
 <p>The function returns a fitness vector consisting of:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>binding energy</li>
-<li>cavity of cage in complex</li>
-<li>asymmetry of cage in complex</li>
-<li>strain of cage in complex</li>
-<li>cavity of cage by itself</li>
-<li>asymmetry of cage by itself</li>
-<li>strain of cage by itself</li>
-<li>strain in select dihedral angles of the cage by itself</li>
+<li><p>binding energy</p></li>
+<li><p>cavity of cage in complex</p></li>
+<li><p>asymmetry of cage in complex</p></li>
+<li><p>strain of cage in complex</p></li>
+<li><p>cavity of cage by itself</p></li>
+<li><p>asymmetry of cage by itself</p></li>
+<li><p>strain of cage by itself</p></li>
+<li><p>strain in select dihedral angles of the cage by itself</p></li>
 </ol>
 </div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</li>
-<li><strong>c60</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A C60 molecule to be placed inside the cage cavity.</li>
-<li><strong>efunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the energy
-function used to calculate energies.</li>
-<li><strong>ofunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the optimization
-function to be run on the generated complexes.</li>
-<li><strong>n5fold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rotations along the 5-fold axis of symmetry.</li>
-<li><strong>n2fold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rotations along the 2 fold axis of symmetry per
-rotation along the 5-fold axis.</li>
-<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
-<li><strong>target_dihedral</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The target value for the dihedral angle.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</p></li>
+<li><p><strong>c60</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A C60 molecule to be placed inside the cage cavity.</p></li>
+<li><p><strong>efunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the energy
+function used to calculate energies.</p></li>
+<li><p><strong>ofunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the optimization
+function to be run on the generated complexes.</p></li>
+<li><p><strong>n5fold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rotations along the 5-fold axis of symmetry.</p></li>
+<li><p><strong>n2fold</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of rotations along the 2 fold axis of symmetry per
+rotation along the 5-fold axis.</p></li>
+<li><p><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</p></li>
+<li><p><strong>target_dihedral</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The target value for the dihedral angle.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The numpy array holding the fitness vector.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The numpy array holding the fitness vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the calculation of a fitness parameter fails.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -697,70 +665,66 @@ most stable conformation found is used.</p>
 <p>The function returns a fitness vector consisting of:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>binding energy</li>
-<li>cavity of cage in complex</li>
-<li>asymmetry of cage in complex</li>
-<li>strain of cage in complex</li>
-<li>cavity of cage by itself</li>
-<li>asymmetry of cage by itself</li>
-<li>strain of cage by itself</li>
-<li>strain in select dihedral angles of the cage by itself</li>
+<li><p>binding energy</p></li>
+<li><p>cavity of cage in complex</p></li>
+<li><p>asymmetry of cage in complex</p></li>
+<li><p>strain of cage in complex</p></li>
+<li><p>cavity of cage by itself</p></li>
+<li><p>asymmetry of cage by itself</p></li>
+<li><p>strain of cage by itself</p></li>
+<li><p>strain in select dihedral angles of the cage by itself</p></li>
 </ol>
 </div></blockquote>
 <p class="rubric">Notes</p>
 <p>This function modifies <cite>macro_mol</cite>. It places the calculated
 fitness parameters into <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">progress_params</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</li>
-<li><strong>target</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A molecule to be placed inside the cage cavity.</li>
-<li><strong>efunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the energy
-function used to calculate energies.</li>
-<li><strong>ofunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the optimization
-function to be run on the generated complexes.</li>
-<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
-<li><strong>target_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – A number representing the target value for the dihedral angle.</li>
-<li><strong>rotations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of times the target should be randomly rotated
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</p></li>
+<li><p><strong>target</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A molecule to be placed inside the cage cavity.</p></li>
+<li><p><strong>efunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the energy
+function used to calculate energies.</p></li>
+<li><p><strong>ofunc</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a> object representing the optimization
+function to be run on the generated complexes.</p></li>
+<li><p><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</p></li>
+<li><p><strong>target_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – A number representing the target value for the dihedral angle.</p></li>
+<li><p><strong>rotations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of times the target should be randomly rotated
 within the cage cavity in order to find the most stable
-conformation.</li>
+conformation.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The numpy array holding the fitness vector.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The numpy array holding the fitness vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the calculation of a fitness parameter fails.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="stk.ga.fitness.partial_raiser">
 <code class="descclassname">stk.ga.fitness.</code><code class="descname">partial_raiser</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.fitness.partial_raiser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates fitness or raises at random.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule having its fitness calculated.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The result of applying <a class="reference internal" href="#stk.ga.fitness.random_fitness_vector" title="stk.ga.fitness.random_fitness_vector"><code class="xref py py-func docutils literal notranslate"><span class="pre">random_fitness_vector()</span></code></a> to
-<cite>macro_mol</cite>.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code> – Raised at random.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule having its fitness calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The result of applying <a class="reference internal" href="#stk.ga.fitness.random_fitness_vector" title="stk.ga.fitness.random_fitness_vector"><code class="xref py py-func docutils literal notranslate"><span class="pre">random_fitness_vector()</span></code></a> to
+<cite>macro_mol</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>Exception</strong> – Raised at random.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -769,46 +733,41 @@ conformation.</li>
 <dd><p>Doens’t calculate a fitness value, raises an error instead.</p>
 <p>This function is used for tests to ensure that when fitness
 functions raise errors, they are handeled correctly.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule having its fitness calculated.</li>
-<li><strong>param1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>) – Dummy parameter, does nothing.</li>
-<li><strong>param2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>, optional) – Dummy keyword parameter, does nothing.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule having its fitness calculated.</p></li>
+<li><p><strong>param1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>) – Dummy parameter, does nothing.</p></li>
+<li><p><strong>param2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>, optional) – Dummy keyword parameter, does nothing.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong> – This function does not return. It only raises.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code> – An exception is always raised.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong> – This function does not return. It only raises.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>Exception</strong> – An exception is always raised.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="stk.ga.fitness.random_fitness">
 <code class="descclassname">stk.ga.fitness.</code><code class="descname">random_fitness</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.fitness.random_fitness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a random fitness value.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule for which a fitness value is to be calculated.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A random postive number.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule for which a fitness value is to be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A random postive number.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -818,18 +777,17 @@ functions raise errors, they are handeled correctly.</p>
 <p class="rubric">Notes</p>
 <p>This function places the array into
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">progress_params</span></code></a> of <cite>macro_mol</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule for which a fitness value is to be calculated.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An array holding the 4 random numbers.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule for which a fitness value is to be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array holding the 4 random numbers.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

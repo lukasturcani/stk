@@ -41,12 +41,12 @@ structure file:
 
 .. code-block:: python
 
-    monomer1 = StructUnit2('monomer1.mol', 'bromine')
-    monomer2 = StructUnit2('monomer2.mol', 'bromine')
-    monomer3 = StructUnit2('monomer3.mol', 'bromine')
+    monomer1 = StructUnit2('monomer1.mol', ['bromine'])
+    monomer2 = StructUnit2('monomer2.mol', ['bromine'])
+    monomer3 = StructUnit2('monomer3.mol', ['bromine'])
 
 The first argument is the path to the structure file and the second
-argument specifies the functional group of the monomer.
+argument specifies the reactive functional groups of the monomer.
 
 To assemble a polymer only a single line of code is required:
 
@@ -124,8 +124,8 @@ First we define the building blocks of the cage:
 
 .. code-block:: python
 
-    bb1 = StructUnit2('bb1.mol', 'amine')
-    bb2 = StructUnit3('bb2.mol', 'aldehyde')
+    bb1 = StructUnit2('bb1.mol', ['amine'])
+    bb2 = StructUnit3('bb2.mol', ['aldehyde'])
 
 Here is what they look like:
 
@@ -229,8 +229,8 @@ construct:
 
 .. code-block:: python
 
-    bb1 = StructUnit2('cof_bb1.mol', 'amine')
-    bb2 = StructUnit3('cof_bb2.mol', 'aldehyde'))
+    bb1 = StructUnit2('cof_bb1.mol', ['amine'])
+    bb2 = StructUnit3('cof_bb2.mol', ['aldehyde']))
     cof = Periodic([bb1, bb2], Honeycomb())
 
 Where the buliding blocks are:
@@ -362,7 +362,7 @@ Adding a new conformer to a :class:`.StructUnit` is simple
 
 .. code-block:: python
 
-    bb1 = StructUnit2('bb1_conf1.mol', 'amine') # Loads molecule into conformer 0.
+    bb1 = StructUnit2('bb1_conf1.mol', ['amine']) # Loads molecule into conformer 0.
     bb1.update_from_mol('bb1_conf2.mol', conformer=1) # Load into conformer 1.
 
 Lets take a look
@@ -376,7 +376,7 @@ Lets try this with a another building block as well
 
 .. code-block:: python
 
-    bb2 = StructUnit3('bb2_conf1.mol', 'aldehyde')
+    bb2 = StructUnit3('bb2_conf1.mol', ['aldehyde'])
     bb2 = bb2.update_from_mol('bb2_conf2.mol')
 
 .. image:: figures/bb2_confs.png
@@ -436,8 +436,8 @@ topologies:
 
 .. code-block:: python
 
-    bbs1 = [StructUnit2(path, 'aldehyde') for path in ('1.mol', '2.mol', '3.mol')]
-    bbs2 = [StructUnit3(path, 'amine') for path in ('4.mol', '5.mol', '6.mol')]
+    bbs1 = [StructUnit2(path, ['aldehyde']) for path in ('1.mol', '2.mol', '3.mol')]
+    bbs2 = [StructUnit3(path, ['amine']) for path in ('4.mol', '5.mol', '6.mol')]
     # Create 18 Cage molecules.
     pop2 = Population.init_all(Cage, [bbs1, bbs2], [FourPlusSix(), EightPlusTwelve()])
 
@@ -561,13 +561,13 @@ and selects building blocks which have the most atoms.
             amine_smiles = 'N' + backbone + 'N'
             amine_monomer = stk.StructUnit2.smiles_init(
                                              smiles=amine_smiles,
-                                             functional_group='amine')
+                                             functional_groups=['amine'])
             amines.append(amine_monomer)
 
             aldehyde_smiles = 'O=C' + backbone + 'C=O'
             aldehyde_monomer = stk.StructUnit2.smiles_init(
                                             smiles=aldehyde_smiles,
-                                            functional_group='aldehyde')
+                                            functional_groups=['aldehyde'])
             aldehydes.append(aldehyde_monomer)
 
     # List of the possible topologies the polymers can have. In this
@@ -647,13 +647,13 @@ and selects building blocks which have the most atoms.
     # molecule with one from the list "amines", defined earlier.
     mutation_func1 = {'NAME': 'random_bb',
                       'mols': amines,
-                      'key': lambda x: x.func_grp.name == 'amine'}
+                      'key': lambda x: x.func_group_infos[0].name == 'amine'}
 
     # mutation_func2 substitutes the aldehyde building block in the
     # molecule with one from the list "aldehydes", defined earlier.
     mutation_func2 = {'NAME': 'random_bb',
                       'mols': aldehydes,
-                      'key': lambda x: x.func_grp.name == 'aldehyde'}
+                      'key': lambda x: x.func_group_infos[0].name == 'aldehyde'}
 
     # Here we tell the GA which mutation functions we want to use.
     mutation_funcs = [mutation_func1, mutation_func2]
