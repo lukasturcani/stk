@@ -197,40 +197,33 @@ start with a leading underscore.</p>
 <code class="descname">funcs</code><a class="headerlink" href="#stk.ga.normalization.Normalization.funcs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Holds all the normalization functions to be applied each
 generation, in the order in which they are to be applied.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="stk.ga.normalization.Normalization.cage">
 <code class="descname">cage</code><span class="sig-paren">(</span><em>population</em>, <em>cavity</em>, <em>window</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.normalization.Normalization.cage" title="Permalink to this definition">¶</a></dt>
 <dd><p>A normalization function for use with <a class="reference internal" href="stk.ga.fitness.html#stk.ga.fitness.cage" title="stk.ga.fitness.cage"><code class="xref py py-func docutils literal notranslate"><span class="pre">cage()</span></code></a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose members need to have their fitness
-values normalized.</li>
-<li><strong>cavity</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The desired size of the cage cavity.</li>
-<li><strong>window</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The desired size of the largest cage window.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose members need to have their fitness
+values normalized.</p></li>
+<li><p><strong>cavity</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The desired size of the cage cavity.</p></li>
+<li><p><strong>window</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The desired size of the largest cage window.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -242,72 +235,63 @@ of the population’s members is an array. It raises the elements
 of the array to the powers in <cite>exponents</cite> and then multiplies
 them by the values in <cite>coefficients</cite>. Lastly, the individual
 array elements are summed to create a final value.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose members need to have their fitness
-values normalized.</li>
-<li><strong>coefficients</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Before summing all the elements in
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose members need to have their fitness
+values normalized.</p></li>
+<li><p><strong>coefficients</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Before summing all the elements in
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.fitness" title="stk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code></a>, they are multiplied by the
-values in this list.</li>
-<li><strong>exponents</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Before summing all the elements in the
+values in this list.</p></li>
+<li><p><strong>exponents</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Before summing all the elements in the
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.fitness" title="stk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code></a>, they are raised to the
-powers in this list.</li>
+powers in this list.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="stk.ga.normalization.Normalization.divide">
 <code class="descname">divide</code><span class="sig-paren">(</span><em>population</em>, <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.normalization.Normalization.divide" title="Permalink to this definition">¶</a></dt>
 <dd><p>Divides each fitness value by <cite>val</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population being normalized.</li>
-<li><strong>val</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The value by which each fitness value is divided.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population being normalized.</p></li>
+<li><p><strong>val</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The value by which each fitness value is divided.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="stk.ga.normalization.Normalization.invert">
 <code class="descname">invert</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.normalization.Normalization.invert" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises fitness values to the power of <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population to be normalized.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population to be normalized.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -341,18 +325,17 @@ the average molecular radius of the population and so on.</p>
 <p>Now these values can be combined in a reasonable way. However,
 that will have to be done by other normalization functions.
 This one only scales relative to the population average.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose fitness values are normalized.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>population</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – The population whose fitness values are normalized.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -401,20 +384,19 @@ prevent any of the values being <code class="docutils literal notranslate"><span
 </div>
 <p>The result is the same as before, only now all the first and
 second elements have been shifted.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>indices</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – This holds the indices of elements in the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>indices</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – This holds the indices of elements in the
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.fitness" title="stk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code></a> array which should be
-shifted.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
+shifted.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

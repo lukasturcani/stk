@@ -196,14 +196,11 @@ of <code class="docutils literal notranslate"><span class="pre">pop</span></code
 used. One will be chosen at random when a crossover operation
 is to be performed. The likelihood that each is selected is
 given by <a class="reference internal" href="#stk.ga.crossover.Crossover.weights" title="stk.ga.crossover.Crossover.weights"><code class="xref py py-attr docutils literal notranslate"><span class="pre">weights</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionData</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -211,14 +208,11 @@ given by <a class="reference internal" href="#stk.ga.crossover.Crossover.weights
 <code class="descname">num_crossovers</code><a class="headerlink" href="#stk.ga.crossover.Crossover.num_crossovers" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of crossover operations performed each time
 <a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation.gen_offspring" title="stk.ga.ga_population.GAPopulation.gen_offspring"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GAPopulation.gen_offspring()</span></code></a> is called.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -241,14 +235,11 @@ used.</p>
 entries must be the same as in <a class="reference internal" href="#stk.ga.crossover.Crossover.funcs" title="stk.ga.crossover.Crossover.funcs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">funcs</span></code></a>. Defaults to
 <code class="docutils literal notranslate"><span class="pre">None</span></code>, which means all crossover functions have an equal
 probability of selection.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -264,27 +255,23 @@ of a cage.</p>
 <p>If the parent cages do not have the same topology, then pairs
 of offspring are created for each topology. This means that
 there may be up to <code class="docutils literal notranslate"><span class="pre">4</span></code> offspring.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol1</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The first parent cage. Its building-block* and linker are
-combined with those of <cite>cage2</cite> to form new cages.</li>
-<li><strong>macro_mol2</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The second parent cage. Its building-block* and linker are
-combined with those of <cite>cage1</cite> to form new cages.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mol1</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The first parent cage. Its building-block* and linker are
+combined with those of <cite>cage2</cite> to form new cages.</p></li>
+<li><p><strong>macro_mol2</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The second parent cage. Its building-block* and linker are
+combined with those of <cite>cage1</cite> to form new cages.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A population of all the offspring generated by crossover of
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A population of all the offspring generated by crossover of
 <cite>macro_mol1</cite> with <cite>macro_mol2</cite>.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -344,28 +331,24 @@ building blocks are used to construct the offspring. The
 topoogy of the offspring one of the parent’s topologies, also
 selected at random. For obvious reasons, this approach works
 with any number of parents.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mols</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The parent molecules.</li>
-<li><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function, which takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> object
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mols</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The parent molecules.</p></li>
+<li><p><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function, which takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> object
 and returns its gene or category. To produce an offspring,
 one of the building blocks from each category is picked
-at random.</li>
-<li><strong>n_offspring</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The maximum number of offspring to create.</li>
+at random.</p></li>
+<li><p><strong>n_offspring</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The maximum number of offspring to create.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A population holding all the generated offspring.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A population holding all the generated offspring.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -379,29 +362,25 @@ offspring. <code class="docutils literal notranslate"><span class="pre">N</span>
 by <cite>n_offspring_building_blocks</cite>.</p>
 <p>The offspring inherit the topology of one of the parents,
 chosen at random.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol1</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The first parent.</li>
-<li><strong>macro_mol2</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The second parent.</li>
-<li><strong>n_offspring_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of building blocks each offspring is made from.</li>
-<li><strong>n_offspring</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of offspring to produce.</li>
-<li><strong>allow_duplicate_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Indicates whether the building blocks used to construct the
-offspring must all be unique.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mol1</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The first parent.</p></li>
+<li><p><strong>macro_mol2</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The second parent.</p></li>
+<li><p><strong>n_offspring_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of building blocks each offspring is made from.</p></li>
+<li><p><strong>n_offspring</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of offspring to produce.</p></li>
+<li><p><strong>allow_duplicate_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Indicates whether the building blocks used to construct the
+offspring must all be unique.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A population of all the offspring generated by crossover of
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A population of all the offspring generated by crossover of
 <cite>macro_mol1</cite> with <cite>macro_mol2</cite>.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

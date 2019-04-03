@@ -187,48 +187,43 @@
 <dt id="stk.optimization.macromodel._convert_maegz_to_mae">
 <code class="descclassname">stk.optimization.macromodel.</code><code class="descname">_convert_maegz_to_mae</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.macromodel._convert_maegz_to_mae" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts a <code class="docutils literal notranslate"><span class="pre">.maegz</span></code> file to a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized. The <code class="docutils literal notranslate"><span class="pre">.maegz</span></code> file holding
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized. The <code class="docutils literal notranslate"><span class="pre">.maegz</span></code> file holding
 its optimized structure is converted to a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file. Both
-versions are kept.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
+versions are kept.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="stk.optimization.macromodel._create_mae">
 <code class="descclassname">stk.optimization.macromodel.</code><code class="descname">_create_mae</code><span class="sig-paren">(</span><em>mol</em>, <em>macromodel_path</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.macromodel._create_mae" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file holding the molecule to be optimized.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
 structure file is converted to a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file. The original
-file is also kept.</li>
-<li><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the Schrodinger suite within the user’s
+file is also kept.</p></li>
+<li><p><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the Schrodinger suite within the user’s
 machine. For example, on a Linux machine this may be something
-like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</li>
+like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The full path of the newly created <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The full path of the newly created <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -236,27 +231,23 @@ like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodin
 <code class="descclassname">stk.optimization.macromodel.</code><code class="descname">_fix_bond_angle_in_com_file</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.macromodel._fix_bond_angle_in_com_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds lines fixing bond angles to <code class="docutils literal notranslate"><span class="pre">.com</span></code> body string.</p>
 <p>All bond angles of the molecule are fixed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
-<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The string holding all the lines containing fix commands for
-the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</p></li>
+<li><p><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The string holding all the lines containing fix commands for
+the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding lines containg fix commands for the <code class="docutils literal notranslate"><span class="pre">.com</span></code>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A string holding lines containg fix commands for the <code class="docutils literal notranslate"><span class="pre">.com</span></code>
 file. The string has the lines fixing bond angles added to it
 by this function.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -265,27 +256,23 @@ by this function.</p>
 <dd><p>Adds lines fixing bond distances to <code class="docutils literal notranslate"><span class="pre">.com</span></code> body string.</p>
 <p>Only bond distances which do not involve bonds created during
 assembly are fixed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
-<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The string holding all the lines containing fix commands for
-the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</p></li>
+<li><p><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The string holding all the lines containing fix commands for
+the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding lines containg fix commands for the <code class="docutils literal notranslate"><span class="pre">.com</span></code>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A string holding lines containg fix commands for the <code class="docutils literal notranslate"><span class="pre">.com</span></code>
 file. The string has the lines fixing bond distances added to
 it by this function.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -296,29 +283,25 @@ it by this function.</p>
 not involve a bond created during assembly a “FX” command is
 added to the string holding holding the body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
 <p>These lines replace the filler line in the main string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized.</li>
-<li><strong>main_string</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file which is to have fix commands
-added.</li>
-<li><strong>restricted</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – When <code class="docutils literal notranslate"><span class="pre">False</span></code> the block containing instructions to fix
-molecular parameters is not added to the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized.</p></li>
+<li><p><strong>main_string</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file which is to have fix commands
+added.</p></li>
+<li><p><strong>restricted</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – When <code class="docutils literal notranslate"><span class="pre">False</span></code> the block containing instructions to fix
+molecular parameters is not added to the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding the body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file with
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A string holding the body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file with
 instructions to fix the various bond distances and angles as
 described in the docstring.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -326,27 +309,23 @@ described in the docstring.</p>
 <code class="descclassname">stk.optimization.macromodel.</code><code class="descname">_fix_torsional_angle_in_com_file</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.macromodel._fix_torsional_angle_in_com_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds lines fixing torsional bond angles to <code class="docutils literal notranslate"><span class="pre">.com</span></code> body string.</p>
 <p>All torsional angles of the molecule are fixed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
-<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The string holding all the lines containing fix commands for
-the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</p></li>
+<li><p><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The string holding all the lines containing fix commands for
+the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding lines containg fix commands for the <code class="docutils literal notranslate"><span class="pre">.com</span></code>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A string holding lines containg fix commands for the <code class="docutils literal notranslate"><span class="pre">.com</span></code>
 file. The string has the lines fixing bond angles added to it
 by this function.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -359,25 +338,21 @@ and torsional angles are fixed, except for cases where it involves
 a bond added during assembly of the macromolecule.</p>
 <p>This fixing is implemented by creating a <code class="docutils literal notranslate"><span class="pre">.com</span></code> file with various
 “FX” commands written within its body.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized.</li>
-<li><strong>settings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – A dictionary of settings for the optimization. See
-<a class="reference internal" href="#stk.optimization.macromodel.macromodel_opt" title="stk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal notranslate"><span class="pre">macromodel_opt()</span></code></a> documentation.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized.</p></li>
+<li><p><strong>settings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – A dictionary of settings for the optimization. See
+<a class="reference internal" href="#stk.optimization.macromodel.macromodel_opt" title="stk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal notranslate"><span class="pre">macromodel_opt()</span></code></a> documentation.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -398,84 +373,76 @@ a bond added during assembly of the macromolecule.</p>
 output of the submission contains the message informing that the
 license was not found and in other cases it will be the log file.
 This function checks both of these sources for this message.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>output</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The output from submitting the minimization of the structure
-to the <code class="docutils literal notranslate"><span class="pre">bmin</span></code> program.</li>
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>, optional) – The molecule being optimized. If the <code class="docutils literal notranslate"><span class="pre">.log</span></code> file is not to
-be checked, the default <code class="docutils literal notranslate"><span class="pre">None</span></code> should be used.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The output from submitting the minimization of the structure
+to the <code class="docutils literal notranslate"><span class="pre">bmin</span></code> program.</p></li>
+<li><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>, optional) – The molecule being optimized. If the <code class="docutils literal notranslate"><span class="pre">.log</span></code> file is not to
+be checked, the default <code class="docutils literal notranslate"><span class="pre">None</span></code> should be used.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal notranslate"><span class="pre">True</span></code> if the license was found. <code class="docutils literal notranslate"><span class="pre">False</span></code> if the
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the license was found. <code class="docutils literal notranslate"><span class="pre">False</span></code> if the
 minimization did not occur due to a missing license.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="stk.optimization.macromodel._macromodel_md_opt">
 <code class="descclassname">stk.optimization.macromodel.</code><code class="descname">_macromodel_md_opt</code><span class="sig-paren">(</span><em>mol</em>, <em>macromodel_path</em>, <em>settings=None</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.macromodel._macromodel_md_opt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs a MD conformer search on <cite>mol</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule who’s structure must be optimized.</li>
-<li><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the Schrodinger suite within the user’s
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule who’s structure must be optimized.</p></li>
+<li><p><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the Schrodinger suite within the user’s
 machine. For example, on a Linux machine this may be something
-like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</li>
-<li><strong>settings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional) – <p>Each key is a string describing an MD parameter. The value is
+like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</p></li>
+<li><p><strong>settings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional) – <p>Each key is a string describing an MD parameter. The value is
 the corresponding value. Only values which need to be changed
 from the default need to be specified. The allowed parameters
 are:</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt>
-<dd>The amount in seconds the MD is allowed to run before
-being terminated. <code class="docutils literal notranslate"><span class="pre">None</span></code> means there is no timeout.</dd>
-<dt>’force_field’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">16</span></code>)</span></dt>
-<dd>The number of the force field to be used.</dd>
-<dt>’temp’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">300</span></code>)</span></dt>
-<dd>The temperature in Kelvin at which the MD is run.</dd>
-<dt>’confs’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">50</span></code>)</span></dt>
-<dd>The number of conformers sampled and optimized from the
-MD.</dd>
-<dt>’time_step’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">1.0</span></code>)</span></dt>
-<dd>The time step in <code class="docutils literal notranslate"><span class="pre">fs</span></code> for the MD.</dd>
-<dt>’eq_time’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">10</span></code>)</span></dt>
-<dd>The equilibriation time in <code class="docutils literal notranslate"><span class="pre">ps</span></code> before the MD is run.</dd>
-<dt>’sim_time’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">200</span></code>)</span></dt>
-<dd>The simulation time in <code class="docutils literal notranslate"><span class="pre">ps</span></code> of the MD.</dd>
-<dt>’max_iter’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">2500</span></code>)</span></dt>
-<dd>The maximum number of iterations done during the
-optimization.</dd>
-<dt>’gradient’ <span class="classifier-delimiter">:</span> <span class="classifier">float (default = <code class="docutils literal notranslate"><span class="pre">0.05</span></code>)</span></dt>
-<dd>The gradient at which optimization is stopped.</dd>
+<div><dl>
+<dt>’timeout’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt><dd><p>The amount in seconds the MD is allowed to run before
+being terminated. <code class="docutils literal notranslate"><span class="pre">None</span></code> means there is no timeout.</p>
+</dd>
+<dt>’force_field’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">16</span></code>)</span></dt><dd><p>The number of the force field to be used.</p>
+</dd>
+<dt>’temp’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">300</span></code>)</span></dt><dd><p>The temperature in Kelvin at which the MD is run.</p>
+</dd>
+<dt>’confs’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">50</span></code>)</span></dt><dd><p>The number of conformers sampled and optimized from the
+MD.</p>
+</dd>
+<dt>’time_step’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">1.0</span></code>)</span></dt><dd><p>The time step in <code class="docutils literal notranslate"><span class="pre">fs</span></code> for the MD.</p>
+</dd>
+<dt>’eq_time’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">10</span></code>)</span></dt><dd><p>The equilibriation time in <code class="docutils literal notranslate"><span class="pre">ps</span></code> before the MD is run.</p>
+</dd>
+<dt>’sim_time’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">200</span></code>)</span></dt><dd><p>The simulation time in <code class="docutils literal notranslate"><span class="pre">ps</span></code> of the MD.</p>
+</dd>
+<dt>’max_iter’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">2500</span></code>)</span></dt><dd><p>The maximum number of iterations done during the
+optimization.</p>
+</dd>
+<dt>’gradient’<span class="classifier">float (default = <code class="docutils literal notranslate"><span class="pre">0.05</span></code>)</span></dt><dd><p>The gradient at which optimization is stopped.</p>
+</dd>
 </dl>
 </div></blockquote>
-</li>
-<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be optimized.</li>
+</p></li>
+<li><p><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be optimized.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -492,25 +459,21 @@ optimization.</dd>
 <dt id="stk.optimization.macromodel._wait_for_file">
 <code class="descclassname">stk.optimization.macromodel.</code><code class="descname">_wait_for_file</code><span class="sig-paren">(</span><em>file_name</em>, <em>timeout=10</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.optimization.macromodel._wait_for_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stalls until a given file exists or <cite>timeout</cite> expires.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>file_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the file which should be waited for.</li>
-<li><strong>timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The number of seconds before the function stops waiting and
-returns.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the file which should be waited for.</p></li>
+<li><p><strong>timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The number of seconds before the function stops waiting and
+returns.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -524,40 +487,38 @@ building blocks during assembly are optimized.</p>
 number of windows the <cite>macro_mol</cite> has before running the MD. The MD
 is only run all windows are found  (i.e. the cage is not
 collapsed).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule who’s structure must be optimized.</li>
-<li><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the Schrodinger suite within the user’s
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule who’s structure must be optimized.</p></li>
+<li><p><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the Schrodinger suite within the user’s
 machine. For example, on a Linux machine this may be something
-like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</li>
-<li><strong>settings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional) – <p>A dictionary which maps the names of optimization parameters to
+like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</p></li>
+<li><p><strong>settings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional) – <p>A dictionary which maps the names of optimization parameters to
 their values. Valid values are:</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>’restricted’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (default = <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt>
-<dd>If <code class="docutils literal notranslate"><span class="pre">False</span></code> then all bonds are optimized, not just the
+<div><dl>
+<dt>’restricted’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (default = <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> then all bonds are optimized, not just the
 ones created during macromolecular assembly. If
 <code class="docutils literal notranslate"><span class="pre">True</span></code> then an optimization is performed only on the
 bonds added during molecular assembly. If
 <code class="docutils literal notranslate"><span class="pre">'both'</span></code> then a restricted optimization is performed
-first, followed by a regular optimization.</dd>
-<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt>
-<dd>The amount in seconds the optimization is allowed to
+first, followed by a regular optimization.</p>
+</dd>
+<dt>’timeout’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt><dd><p>The amount in seconds the optimization is allowed to
 run before being terminated. <code class="docutils literal notranslate"><span class="pre">None</span></code> means there is no
-timeout.</dd>
-<dt>’force_field’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">16</span></code>)</span></dt>
-<dd>The number of the force field to be used.</dd>
-<dt>’max_iter’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">2500</span></code>)</span></dt>
-<dd>The maximum number of iterations done during the
-optimization.</dd>
-<dt>’gradient’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">0.05</span></code>)</span></dt>
-<dd>The gradient at which optimization is stopped.</dd>
-<dt>’md’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (default = <code class="docutils literal notranslate"><span class="pre">False</span></code>)</span></dt>
-<dd>Toggles whether a MD conformer search should be
-performed.</dd>
+timeout.</p>
+</dd>
+<dt>’force_field’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">16</span></code>)</span></dt><dd><p>The number of the force field to be used.</p>
+</dd>
+<dt>’max_iter’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">2500</span></code>)</span></dt><dd><p>The maximum number of iterations done during the
+optimization.</p>
+</dd>
+<dt>’gradient’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">0.05</span></code>)</span></dt><dd><p>The gradient at which optimization is stopped.</p>
+</dd>
+<dt>’md’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (default = <code class="docutils literal notranslate"><span class="pre">False</span></code>)</span></dt><dd><p>Toggles whether a MD conformer search should be
+performed.</p>
+</dd>
 </dl>
 </div></blockquote>
 <p>Only values which need to be changed from the default need to
@@ -565,31 +526,27 @@ be specified. For exmaple,</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macromodel_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;max_iter&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">})</span>
 </pre></div>
 </div>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>md <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional</span></dt>
-<dd>A dictionary holding settings for the MD conformer search.
+</dd>
+</dl>
+<dl>
+<dt>md<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional</span></dt><dd><p>A dictionary holding settings for the MD conformer search.
 This parameter is used in the same way as <cite>settings</cite> except
 the values effect the MD only. See docstring of
-<a class="reference internal" href="#stk.optimization.macromodel._macromodel_md_opt" title="stk.optimization.macromodel._macromodel_md_opt"><code class="xref py py-func docutils literal notranslate"><span class="pre">_macromodel_md_opt()</span></code></a> for valid values.</dd>
-<dt>conformer <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional</span></dt>
-<dd>The id of the conformer to be optimized.</dd>
+<a class="reference internal" href="#stk.optimization.macromodel._macromodel_md_opt" title="stk.optimization.macromodel._macromodel_md_opt"><code class="xref py py-func docutils literal notranslate"><span class="pre">_macromodel_md_opt()</span></code></a> for valid values.</p>
+</dd>
+<dt>conformer<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional</span></dt><dd><p>The id of the conformer to be optimized.</p>
+</dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -599,40 +556,38 @@ the values effect the MD only. See docstring of
 <p>This function runs a restricted optimization. The structures of the
 building blocks are frozen and only the new bonds formed between
 building blocks during assembly are optimized.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule who’s structure must be optimized.</li>
-<li><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the Schrodinger suite within the user’s
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule who’s structure must be optimized.</p></li>
+<li><p><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the Schrodinger suite within the user’s
 machine. For example, on a Linux machine this may be something
-like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</li>
-<li><strong>settings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional) – <p>A dictionary which maps the names of optimization parameters to
+like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</p></li>
+<li><p><strong>settings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional) – <p>A dictionary which maps the names of optimization parameters to
 their values. Valid values are:</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>’restricted’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (default = <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt>
-<dd>If <code class="docutils literal notranslate"><span class="pre">False</span></code> then all bonds are optimized, not just the
+<div><dl>
+<dt>’restricted’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (default = <code class="docutils literal notranslate"><span class="pre">True</span></code>)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> then all bonds are optimized, not just the
 ones created during macromolecular assembly. If
 <code class="docutils literal notranslate"><span class="pre">True</span></code> then an optimization is performed only on the
 bonds added during molecular assembly. If
 <code class="docutils literal notranslate"><span class="pre">'both'</span></code> then a restricted optimization is performed
-first, followed by a regular optimization.</dd>
-<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt>
-<dd>The amount in seconds the optimization is allowed to
+first, followed by a regular optimization.</p>
+</dd>
+<dt>’timeout’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt><dd><p>The amount in seconds the optimization is allowed to
 run before being terminated. <code class="docutils literal notranslate"><span class="pre">None</span></code> means there is no
-timeout.</dd>
-<dt>’force_field’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">16</span></code>)</span></dt>
-<dd>The number of the force field to be used.</dd>
-<dt>’max_iter’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">2500</span></code>)</span></dt>
-<dd>The maximum number of iterations done during the
-optimization.</dd>
-<dt>’gradient’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">0.05</span></code>)</span></dt>
-<dd>The gradient at which optimization is stopped.</dd>
-<dt>’md’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (default = <code class="docutils literal notranslate"><span class="pre">False</span></code>)</span></dt>
-<dd>Toggles whether a MD conformer search should be
-performed.</dd>
+timeout.</p>
+</dd>
+<dt>’force_field’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">16</span></code>)</span></dt><dd><p>The number of the force field to be used.</p>
+</dd>
+<dt>’max_iter’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> (default = <code class="docutils literal notranslate"><span class="pre">2500</span></code>)</span></dt><dd><p>The maximum number of iterations done during the
+optimization.</p>
+</dd>
+<dt>’gradient’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> (default = <code class="docutils literal notranslate"><span class="pre">0.05</span></code>)</span></dt><dd><p>The gradient at which optimization is stopped.</p>
+</dd>
+<dt>’md’<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (default = <code class="docutils literal notranslate"><span class="pre">False</span></code>)</span></dt><dd><p>Toggles whether a MD conformer search should be
+performed.</p>
+</dd>
 </dl>
 </div></blockquote>
 <p>Only values which need to be changed from the default need to
@@ -640,31 +595,27 @@ be specified. For exmaple,</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macromodel_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;max_iter&#39;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">})</span>
 </pre></div>
 </div>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>md <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional</span></dt>
-<dd>A dictionary holding settings for the MD conformer search.
+</dd>
+</dl>
+<dl>
+<dt>md<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional</span></dt><dd><p>A dictionary holding settings for the MD conformer search.
 This parameter is used in the same way as <cite>settings</cite> except
 the values effect the MD only. See docstring of
-<a class="reference internal" href="#stk.optimization.macromodel._macromodel_md_opt" title="stk.optimization.macromodel._macromodel_md_opt"><code class="xref py py-func docutils literal notranslate"><span class="pre">_macromodel_md_opt()</span></code></a> for valid values.</dd>
-<dt>conformer <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional</span></dt>
-<dd>The id of the conformer to be optimized.</dd>
+<a class="reference internal" href="#stk.optimization.macromodel._macromodel_md_opt" title="stk.optimization.macromodel._macromodel_md_opt"><code class="xref py py-func docutils literal notranslate"><span class="pre">_macromodel_md_opt()</span></code></a> for valid values.</p>
+</dd>
+<dt>conformer<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional</span></dt><dd><p>The id of the conformer to be optimized.</p>
+</dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

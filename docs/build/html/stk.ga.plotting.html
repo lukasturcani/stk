@@ -153,32 +153,28 @@
 <code class="descclassname">stk.ga.plotting.</code><code class="descname">fitness_epp</code><span class="sig-paren">(</span><em>pop</em>, <em>plot_name=False</em>, <em>dump_name=None</em>, <em>xlabel='Generation'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.plotting.fitness_epp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the min, max and avg fitness values of each subpopulation.</p>
 <p>Also saves the plot data in a csv file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – A population containing any number of subpopulations and no
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pop</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – A population containing any number of subpopulations and no
 direct members. Each subpopulation represents a generation of
-the GA.</li>
-<li><strong>plot_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – The full path to where the plot should be saved. If <code class="docutils literal notranslate"><span class="pre">False</span></code>
+the GA.</p></li>
+<li><p><strong>plot_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – The full path to where the plot should be saved. If <code class="docutils literal notranslate"><span class="pre">False</span></code>
 then no plot is made. Useful if you only want the dump file and
-not graph.</li>
-<li><strong>dump_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The path to the file where the data to make the graph is
+not graph.</p></li>
+<li><p><strong>dump_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The path to the file where the data to make the graph is
 dumped. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then <cite>plot_name</cite> is used but with a
-<code class="docutils literal notranslate"><span class="pre">.csv</span></code> extension.</li>
-<li><strong>xlabel</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The label on the x-axis.</li>
+<code class="docutils literal notranslate"><span class="pre">.csv</span></code> extension.</p></li>
+<li><p><strong>xlabel</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The label on the x-axis.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -190,32 +186,28 @@ separate graph will be produced. Each will show subpopulations on
 the x-axis and the min, max and avg values of that
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.progress_params" title="stk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal notranslate"><span class="pre">progress_params</span></code></a> element on the y-axis.</p>
 <p>Also saves the plot data in a csv file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – A population containing any number of subpopulations and no
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pop</strong> (<a class="reference internal" href="stk.ga.ga_population.html#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – A population containing any number of subpopulations and no
 direct members. Each subpopulation represents a generation of
-the GA.</li>
-<li><strong>plot_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – The full path to where the plot should be saved. If <code class="docutils literal notranslate"><span class="pre">False</span></code>
+the GA.</p></li>
+<li><p><strong>plot_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – The full path to where the plot should be saved. If <code class="docutils literal notranslate"><span class="pre">False</span></code>
 then no plot is made. Useful if you only want the dump file and
-not graph.</li>
-<li><strong>dump_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The path to the file where the data to make the graph is
+not graph.</p></li>
+<li><p><strong>dump_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The path to the file where the data to make the graph is
 dumped. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then <cite>plot_name</cite> is used but with a
-<code class="docutils literal notranslate"><span class="pre">.csv</span></code> extension.</li>
-<li><strong>xlabel</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The label on the x-axis.</li>
+<code class="docutils literal notranslate"><span class="pre">.csv</span></code> extension.</p></li>
+<li><p><strong>xlabel</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The label on the x-axis.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -224,24 +216,20 @@ dumped. If <code class="docutils literal notranslate"><span class="pre">None</sp
 <dd><p>Saves a <code class="docutils literal notranslate"><span class="pre">.png</span></code> file holding a plot of <cite>counter</cite>.</p>
 <p>The counter should hold the number of times a certain population
 member was selected.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>counter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">collections.Counter</span></code>) – A counter of which members of a population were selected.</li>
-<li><strong>plot_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal notranslate"><span class="pre">.png</span></code> where the plot is to be saved.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>counter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">collections.Counter</span></code>) – A counter of which members of a population were selected.</p></li>
+<li><p><strong>plot_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal notranslate"><span class="pre">.png</span></code> where the plot is to be saved.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
