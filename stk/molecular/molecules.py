@@ -58,7 +58,7 @@ which make up the macromolecule:
 
 .. code-block:: python
 
-    bb = StructUnit('/path/to/struct/file.mol2', 'amine')
+    bb = StructUnit('/path/to/struct/file.mol2', ['amine'])
 
 The :class:`StructUnit` instances are initialized using paths to
 molecular structure files. (Initializing a :class:`StructUnit`
@@ -71,13 +71,11 @@ automatically completes steps 1 to 4.)
 
            bb.mol  # <rdkit.Chem.rdchem.Mol at 0x7f961a8f1f80>
 
-    2. Scan the path of the structure file for the name of a functional
-       group. (Alternatively the name of a functional group can be
-       supplied to the initializer).
+    2. Scan the path of the structure file for the names of functional
+       groups. (Alternatively the names of functional groups can be
+       supplied to the initializer). Find the :class:`.FGInfo` instance
+       for each functional group.
 
-       .. code-block:: python
-
-           bb.func_group.name  # 'amine'
 
 Which functional groups are recognized by ``stk``?
 
@@ -86,15 +84,26 @@ and a :class:`tuple` of instances of this class called
 :data:`functional_groups`. If you put an :class:`.FGInfo` instance into
 :data:`functional_groups`, the functional group will be recognized.
 
-    3. Place the :class:`.FGInfo` instance of the functional group into
-       :attr:`StructUnit.func_grp`.
-
-    4. Using :class:`.FGInfo`, tag atoms in the building block as
+    3. Using :class:`.FGInfo`, tag atoms in the building block as
        either ``'bonder'`` or ``'del'``. ``'bonder'`` signifies that
        the atoms form a bond during macromolecular assembly, while
        ``'del'`` means they are deleted. Also tag all atoms in the
        functional group with the tag ``'fg'`` which holds the name
        of the functional group.
+
+    4. Place the :class:`FunctionalGroup` instances into
+       :attr:`StructUnit.func_groups`. For every functional group name
+       supplied to the initializer, or found in the file path, ``stk``
+       finds functional groups of that type in the molecule and creates
+       a :class:`FunctionalGroup` instance for each match.
+
+       bb.func_groups
+       # (FunctionalGroup(id=0,
+       #                  atom_ids=(45, 21, 0),
+       #                  info=FGInfo('amine')),
+       #  FunctionalGroup(id=1,
+       #                  atom_ids=(47, 23, 15),
+       #                  info=FGInfo('amine')))
 
     5. Give the :class:`StructUnit` and :class:`.Topology` instances to
        the macromolecule's initializer.
@@ -179,7 +188,9 @@ from collections import Counter, defaultdict
 from inspect import signature
 
 from . import topologies
-from .functional_groups import functional_groups, react, periodic_react
+from .functional_groups import react_many, periodic_react
+from .functional_groups import functional_group_infos as fg_infos
+from .functional_groups import functional_groups as fgs
 from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
@@ -190,7 +201,8 @@ from ..utilities import (flatten,
                          rotation_matrix_arbitrary_axis,
                          atom_vdw_radii,
                          Cell,
-                         remake)
+                         remake,
+                         dedupe)
 
 
 logger = logging.getLogger(__name__)
@@ -256,15 +268,18 @@ class CachedStructUnit(type):
 
         mol = remake(self.init_funcs[ext](sig['file']))
 
-        # Get the name of the functional group provided to the
+        # Get the name of the functional groups provided to the
         # initializer or get it from the path.
-        if sig['functional_group']:
-            fg = sig['functional_group']
+        if sig['functional_groups']:
+            functional_groups = sig['functional_groups']
+            if functional_groups is None:
+                functional_groups = ()
         else:
-            fg = next((x.name for x in functional_groups if
-                       x.name in sig['file']), None)
+            functional_groups = tuple((
+                fg.name for fg in fgs if fg.name in sig['file']
+            ))
 
-        key = self.gen_key(mol, fg)
+        key = self.gen_key(mol, functional_groups)
         if key in self.cache and OPTIONS['cache']:
             return self.cache[key]
         else:
@@ -277,6 +292,30 @@ class CachedStructUnit(type):
 
 class MoleculeSubclassError(Exception):
     ...
+
+
+class FunctionalGroup:
+    """
+
+    """
+
+    def __init__(self, id_, atom_ids, info):
+        self.id = id_
+        self.atom_ids = atom_ids
+        self.info = info
+
+    def __eq__(self, other):
+        return (self.id == other.id and
+                self.atom_ids == other.atom_ids and
+                self.info == other.info)
+
+    def __repr__(self):
+        return (f"FunctionalGroup(id={self.id!r}, "
+                f"atom_ids={self.atom_ids!r}, "
+                f"info={self.info!s})")
+
+    def __str__(self):
+        return repr(self)
 
 
 class Molecule:
@@ -1506,10 +1545,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         extensions is provided, the correct initialization function
         will be used.
 
-    func_grp : :class:`.FGInfo`
-        The :class:`.FGInfo` instance holding information about the
-        functional group which will react when the building block
-        assembles to form macromolecules.
+    func_groups : :class:`tuple` of :class:`FunctionalGroup`
+
+    func_group_infos : :class:`frozenset` of :class:`str`
 
     """
 
@@ -1527,7 +1565,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                   '.pdb': partial(rdkit.MolFromPDBFile,
                                   sanitize=False, removeHs=False)}
 
-    def __init__(self, file, functional_group=None, name="", note=""):
+    def __init__(self, file, functional_groups=None, name="", note=""):
         """
         Initializes a :class:`StructUnit` instance.
 
@@ -1537,10 +1575,10 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             The full path of the molecular structure file holding the
             building block.
 
-        functional_group : :class:`str`, optional
-            The name of the functional group which is to have atoms
+        functional_groups : :class:`set` of :class:`str`, optional
+            The names of the functional groups which are to have atoms
             tagged. If ``None``, a functional group name found in the
-            path `file`  is used. If no functional group is provided
+            path `file`  is used. If no functional groups are provided
             to this parameter and the name of one is not present in
             `file`, no tagging is done.
 
@@ -1557,7 +1595,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         _, ext = os.path.splitext(file)
 
         if ext not in self.init_funcs:
-            raise TypeError(f'Unable to initialize from "{ext}" files.')
+            raise TypeError(
+                f'Unable to initialize from "{ext}" files.'
+            )
 
         self.mol = remake(self.init_funcs[ext](file))
         # Update the property cache of each atom. This updates things
@@ -1565,34 +1605,25 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         for atom in self.mol.GetAtoms():
             atom.UpdatePropertyCache()
 
-        # Define a generator which yields an ``FGInfo`` instance from
-        # `functional_groups`. The yielded ``FGInfo``instance
-        # represents the functional group of the molecule which will
-        # undergo bond formation. The generator determines the
-        # functional group of the molecule from the path of of the
-        # structure file.
+        # If no functional group names passed, check if any functional
+        # group names appear in the file path.
+        if functional_groups is None:
+            functional_groups = [
+                fg.name for fg in fgs if fg.name in file
+            ]
 
-        # The database of precursors should be organized so that any
-        # given structure file has the name of its functional group in
-        # its path. Each file should have the name of only one
-        # functional group in its path. If this is not the case, the
-        # generator will return the functional group which appears
-        # first in `functional_groups`.
-
-        # Assign the FGInfo instance from `functional_groups` which
-        # describes the functional group provided in `functional_group`
-        # or is found in the path name.
-        if functional_group:
-            self.func_grp = next((x for x in functional_groups if
-                                  x.name == functional_group), None)
-        else:
-            self.func_grp = next((x for x in functional_groups if
-                                  x.name in file), None)
+        self.func_groups = tuple(
+            self.functional_groups(functional_groups)
+        )
+        self.func_group_infos = tuple(dedupe(
+            iterable=(fg.info for fg in self.func_groups),
+            key=lambda info: info.name
+        ))
 
         # Calling this function labels the atoms in the rdkit molecule
         # as either atoms which form a bond during reactions or atoms
         # which get removed.
-        if self.func_grp:
+        if self.func_groups:
             self.tag_atoms()
 
         super().__init__(name, note)
@@ -1783,34 +1814,48 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                 emol.RemoveAtom(atomid)
         return emol.GetMol()
 
-    def functional_group_atoms(self):
+    def functional_groups(self, fg_names):
         """
-        Returns a container of atom ids of atoms in functional groups.
+        Finds given functional groups in the molecule.
+
+        Parameters
+        ----------
+        fg_names : :class:`list` of :class:`str`
+            The names of functional groups which are to be found
+            within the molecule.
 
         Returns
         -------
-        :class:`tuple`
-            The form of the returned tuple is:
-
-            .. code-block:: python
-
-                ((1, 2, 3), (4, 5, 6), (7, 8, 9))
-
-            This means that all atoms with ids ``1`` to ``9`` are in a
-            functional group and that the atoms ``1``, ``2`` and ``3``
-            all form one functional group together. So do ``4``, ``5``
-            and ``6`` and so on.
+        :class:`list` of :class:`FunctionalGroup`
+            A :class:`list` holding a :class:`FunctionalGroup``
+            instance for every matched functional group in the
+            molecule.
 
         """
 
-        # Generate a ``rdkit.Chem.rdchem.Mol`` instance which
-        # represents the functional group of the molecule.
-        func_grp_mol = rdkit.MolFromSmarts(self.func_grp.fg_smarts)
+        # Ensure that given the same fg names in a different order,
+        # the atoms get assigned to the a functional group with the
+        # same id.
+        fg_names = sorted(fg_names)
 
-        # Do a substructure search on the the molecule in `mol` to find
-        # which atoms match the functional group. Return the atom ids
-        # of those atoms.
-        return self.mol.GetSubstructMatches(func_grp_mol)
+        fgs = []
+        for fg_name in fg_names:
+            fg_info = fg_infos[fg_name]
+
+            # Generate a ``rdkit.Chem.rdchem.Mol`` instance which
+            # represents the functional group of the molecule.
+            func_grp_mol = rdkit.MolFromSmarts(fg_info.fg_smarts)
+
+            # Do a substructure search on the the molecule in `mol` to
+            # find which atoms match the functional group. For each
+            # match create a FunctionalGroup instance.
+            matches = self.mol.GetSubstructMatches(func_grp_mol)
+            for atom_ids in matches:
+                fg = FunctionalGroup(id_=len(fgs),
+                                     atom_ids=atom_ids,
+                                     info=fg_info)
+                fgs.append(fg)
+        return fgs
 
     def is_core_atom(self, atomid):
         """
@@ -1860,12 +1905,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
+        func_groups = [info.name for info in self.func_group_infos]
         return {
 
             'class': self.__class__.__name__,
-            'func_grp': (self.func_grp if
-                         self.func_grp is None else
-                         self.func_grp.name),
+            'func_groups': func_groups,
             'mol_block': self.mdl_mol_block(),
             'note': self.note,
             'name': self.name
@@ -1897,7 +1941,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                                          delete=False) as f:
             f.write(json_dict['mol_block'])
             f.seek(0)
-            obj = cls(f.name, json_dict['func_grp'],
+            obj = cls(f.name, json_dict['func_groups'],
                       (json_dict['name'] if
                        json_dict['load_names'] else ""),
                       json_dict['note'])
@@ -1905,7 +1949,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             return obj
 
     @staticmethod
-    def gen_key(rdkit_mol, functional_group):
+    def gen_key(rdkit_mol, functional_groups):
         """
         Generates the key used when caching the molecule.
 
@@ -1914,8 +1958,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         rdkit_mol : :class:`rdkit.Chem.rdchem.Mol`
             An ``rdkit`` instance of the molecule.
 
-        functional_group : :class:`str`
-            The name of the functional group being used to make
+        functional_groups : :class:`tuple` of :class:`str`
+            The name of the functional groups being used to make
             macromolecules.
 
         Returns
@@ -1925,11 +1969,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
             .. code-block:: python
 
-                ('amine', 'InChIString')
+                ('amine', 'bromine', 'InChIString')
 
         """
 
-        return functional_group, rdkit.MolToInchi(rdkit_mol)
+        return (*sorted(functional_groups),
+                rdkit.MolToInchi(rdkit_mol))
 
     def minimize_theta(self, v1, v2, axis, centroid, conformer=-1):
         """
@@ -2250,7 +2295,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     @classmethod
     def smiles_init(cls,
                     smiles,
-                    functional_group=None,
+                    functional_groups=None,
                     random_seed=4,
                     note="",
                     name=""):
@@ -2265,9 +2310,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         smiles : :class:`str`
             A SMILES string of the molecule.
 
-        functional_group : :class:`str`, optional
-            The name of the functional group which is to have atoms
-            tagged. If no functional group is provided to this
+        functional_groups : :class:`list` of :class:`str`, optional
+            The name of the functional groups which are to have atoms
+            tagged. If no functional groups are provided to this
             parameter, no tagging is done.
 
         random_seed : :class:`int`, optional
@@ -2287,10 +2332,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
+        if functional_groups is None:
+            functional_groups = ()
+
         mol = rdkit.MolFromSmiles(smiles)
         rdkit.SanitizeMol(mol)
         H_mol = rdkit.AddHs(mol)
-        key = cls.gen_key(H_mol, functional_group)
+        key = cls.gen_key(H_mol, functional_groups)
         if key in cls.cache and OPTIONS['cache']:
             return cls.cache[key]
 
@@ -2315,9 +2363,15 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         obj.file = smiles
         obj.key = key
         obj.mol = mol
-        obj.func_grp = next((x for x in functional_groups if
-                            x.name == functional_group), None)
-        if obj.func_grp:
+        obj.func_groups = tuple(
+            obj.functional_groups(functional_groups)
+        )
+        obj.func_group_infos = tuple(dedupe(
+            iterable=(fg.info for fg in obj.func_groups),
+            key=lambda info: info.name
+        ))
+
+        if obj.func_groups:
             obj.tag_atoms()
 
         Molecule.__init__(obj, note, name)
@@ -2325,7 +2379,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         cls.cache[key] = obj
         return obj
 
-    def _valid_tags(self, match_atoms, fgs, n):
+    def _valid_tags(self, match_atoms, n):
         """
         Ensures that only `n` atoms per functional group are tagged.
 
@@ -2333,10 +2387,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         ----------
         match_atoms : :class:`tuple`
             The atom ids of all matched atoms.
-
-        fgs : :class:`tuple`
-            The atom ids of all functional group atoms. Nested to
-            keep functional groups grouped.
 
         n : :class:`int`
             The maximum number of matched atoms per functional group
@@ -2351,7 +2401,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         match_atoms = set(flatten(match_atoms))
         # Keep only match atoms:
-        fgs = [[aid for aid in fg if aid in match_atoms] for fg in fgs]
+        fgs = [[aid for aid in fg.atom_ids if aid in match_atoms]
+               for fg in self.func_groups]
 
         # Make sure only `n` atoms per fg are returned.
         result = []
@@ -2384,13 +2435,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        fgs = self.functional_group_atoms()
-
         tag_id = 0
         for match in smarts:
             match_mol = rdkit.MolFromSmarts(match.smarts)
             match_atoms = mol.GetSubstructMatches(match_mol)
-            match_atoms = self._valid_tags(match_atoms, fgs, match.n)
+            match_atoms = self._valid_tags(match_atoms, match.n)
 
             for atom_id in match_atoms:
                 atom = mol.GetAtomWithIdx(atom_id)
@@ -2418,14 +2467,15 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        for fg_id, fg in enumerate(self.functional_group_atoms()):
-            for atom_id in fg:
+        for fg in self.func_groups:
+            for atom_id in fg.atom_ids:
                 atom = self.mol.GetAtomWithIdx(atom_id)
-                atom.SetProp('fg', self.func_grp.name)
-                atom.SetIntProp('fg_id', fg_id)
+                atom.SetProp('fg', fg.info.name)
+                atom.SetIntProp('fg_id', fg.id)
 
-        self._tag(self.mol, self.func_grp.bonder_smarts, 'bonder')
-        self._tag(self.mol, self.func_grp.del_smarts, 'del')
+        for info in self.func_group_infos:
+            self._tag(self.mol, info.bonder_smarts, 'bonder')
+            self._tag(self.mol, info.del_smarts, 'del')
 
     def untag_atoms(self):
         """
@@ -2453,14 +2503,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         if self.inchi != other.inchi:
             return False
 
-        if self.func_grp is None or other.func_grp is None:
-            return self.func_grp is None and other.func_grp is None
-
-        return self.func_grp.name == other.func_grp.name
+        return self.func_group_infos == other.func_group_infos
 
     def __hash__(self):
-        fg = None if self.func_grp is None else self.func_grp.name
-        return hash((self.inchi, fg))
+        fgs = [info.name for info in self.func_group_infos]
+        return hash(self.gen_key(self.mol, fgs))
 
 
 class StructUnit2(StructUnit):
@@ -2816,7 +2863,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 bb_conf = bb_conformers[i]
                 bb_blocks.append('{} {}\n{}'.format(
                     bb.__class__.__name__,
-                    None if bb.func_grp is None else bb.func_grp.name,
+                    [info.name for info in bb.func_group_infos],
                     bb.mdl_mol_block(bb_conf)))
 
             errormsg += '\n'.join(bb_blocks)
@@ -2868,7 +2915,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 bb_conf = bb_conformers[i]
                 bb_blocks.append('{} {}\n{}'.format(
                     bb.__class__.__name__,
-                    None if bb.func_grp is None else bb.func_grp.name,
+                    [info.name for info in bb.functional_group_infos],
                     bb.mdl_mol_block(bb_conf)))
 
             errormsg += '\n'.join(bb_blocks)
@@ -3467,6 +3514,7 @@ class Periodic(MacroMolecule):
         # the fg ids in the unit cells to the ids of the equivalent
         # fgs in the original unit cell  and checking the
         # `periodic_bond` to see which fg ids are connected.
+        fg_groups = []
         for cell in flatten(cells):
             for periodic_bond in self.periodic_bonds:
 
@@ -3492,9 +3540,9 @@ class Periodic(MacroMolecule):
                 # having a bond added.
                 fg2 = ccell.fgs[periodic_bond.fg2]
 
-                island, _ = react(island, True, fg1, fg2)
+                fg_groups.append(frozenset({fg1, fg2}))
 
-        return island
+        return react_many(island, True, fg_groups)[0]
 
     def _place_island(self, dimensions):
         """

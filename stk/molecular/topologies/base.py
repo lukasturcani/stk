@@ -239,7 +239,8 @@ class Topology(metaclass=TopologyMeta):
             atom.UpdatePropertyCache()
 
         # Restore the original conformers.
-        for bb, confs in zip(macro_mol.building_blocks, original_confs):
+        for bb, confs in zip(macro_mol.building_blocks,
+                             original_confs):
             bb.mol.RemoveAllConformers()
             for conf in confs:
                 bb.mol.AddConformer(conf)

@@ -677,15 +677,15 @@ class CageTopology(Topology):
 
         """
 
-        bb_fgs = max(len(bb.functional_group_atoms()) for
+        bb_fgs = max(len(bb.func_groups) for
                      bb in macro_mol.building_blocks)
         bb_map, lk_map = {}, {}
 
         if self.bb_positions is None:
             bbs = [bb for bb in macro_mol.building_blocks if
-                   len(bb.functional_group_atoms()) == bb_fgs]
+                   len(bb.func_groups) == bb_fgs]
             lks = [bb for bb in macro_mol.building_blocks if
-                   len(bb.functional_group_atoms()) != bb_fgs]
+                   len(bb.func_groups) != bb_fgs]
 
             for i in range(len(self.positions_A)):
                 bb_map[i] = np.random.choice(bbs)
@@ -700,7 +700,7 @@ class CageTopology(Topology):
                 if isinstance(bb, int):
                     bb = macro_mol.building_blocks[bb]
 
-                n_fgs = len(bb.functional_group_atoms())
+                n_fgs = len(bb.func_groups)
                 map_ = bb_map if n_fgs == bb_fgs else lk_map
                 for position in positions:
                     map_[position] = bb
@@ -829,7 +829,8 @@ class CageTopology(Topology):
         """
 
         bb_map, lk_map = self._bb_maps(macro_mol)
-        scale = max(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
+        scale = max(bb.max_diameter()[0]
+                    for bb in macro_mol.building_blocks)
 
         # This loop places all building-blocks* on the points at
         # `positions_A`. It then pairs all fgs which form a new bond
@@ -838,7 +839,7 @@ class CageTopology(Topology):
         # structure.
         for i, position in enumerate(self.positions_A):
             bb = bb_map[i]
-            n_bb = len(bb.functional_group_atoms())
+            n_bb = len(bb.func_groups)
             # Position the molecule on the vertex.
             aligner_edge_id = self.edge_alignments[i]
             aligner_edge = next((position.connected.index(x) for x in
@@ -875,7 +876,7 @@ class CageTopology(Topology):
         # make up the structure.
         for i, position in enumerate(self.positions_B):
             lk = lk_map[i]
-            n_lk = len(lk.functional_group_atoms())
+            n_lk = len(lk.func_groups)
             lk_mol = position.place_mol(scale,
                                         lk,
                                         int(self.B_alignments[i]),
@@ -939,7 +940,8 @@ class NoLinkerCageTopology(CageTopology):
 
     def place_mols(self, macro_mol):
 
-        scale = max(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
+        scale = max(bb.max_diameter()[0]
+                    for bb in macro_mol.building_blocks)
 
         bb_map = {}
         if self.bb_positions is None:
@@ -955,7 +957,7 @@ class NoLinkerCageTopology(CageTopology):
         for bb_index, (position, orientation) in bb_params:
             bb = bb_map[bb_index]
             ipos = bb.mol.GetConformer().GetPositions().T
-            n_bb = len(bb.functional_group_atoms())
+            n_bb = len(bb.func_groups)
 
             mol = position.place_mol(scale, bb, int(orientation))
             mol = self.update_fg_id(macro_mol, mol)

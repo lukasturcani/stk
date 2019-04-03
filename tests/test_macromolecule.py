@@ -67,19 +67,19 @@ def test_caching(amine2, aldehyde2):
 
 
 def test_json_init(polymer):
-        path = os.path.join('macromolecule_tests_output', 'mol.json')
-        polymer.dump(path)
-        mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
+    path = os.path.join('macromolecule_tests_output', 'mol.json')
+    polymer.dump(path)
+    mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
 
-        assert polymer is not mol2
-        assert polymer.bonder_ids == mol2.bonder_ids
-        assert polymer.atom_props == mol2.atom_props
-        assert polymer.bb_counter == mol2.bb_counter
-        assert polymer.topology == mol2.topology
-        assert polymer.bonds_made == mol2.bonds_made
-        assert polymer.unscaled_fitness == mol2.unscaled_fitness
-        assert polymer.progress_params == mol2.progress_params
-        assert all(bb1.same(bb2) and
-                   bb1.func_grp.name == bb2.func_grp.name
-                   for bb1, bb2 in
-                   zip(polymer.building_blocks, mol2.building_blocks))
+    assert polymer is not mol2
+    assert polymer.bonder_ids == mol2.bonder_ids
+    assert polymer.atom_props == mol2.atom_props
+    assert polymer.bb_counter == mol2.bb_counter
+    assert polymer.topology == mol2.topology
+    assert polymer.bonds_made == mol2.bonds_made
+    assert polymer.unscaled_fitness == mol2.unscaled_fitness
+    assert polymer.progress_params == mol2.progress_params
+    assert all(bb1.same(bb2) and
+               bb1.func_groups == bb2.func_groups
+               for bb1, bb2 in
+               zip(polymer.building_blocks, mol2.building_blocks))

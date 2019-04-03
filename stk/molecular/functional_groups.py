@@ -60,6 +60,7 @@ as an example.
 
 """
 
+from functools import partial
 import numpy as np
 from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
@@ -131,6 +132,15 @@ class Match:
     def __init__(self, smarts, n):
         self.smarts = smarts
         self.n = n
+
+    def __eq__(self, other):
+        return self.smarts == other.smarts and self.n == other.n
+
+    def __repr__(self):
+        return f'Match({self.smarts!r}, {self.n!r})'
+
+    def __str__(self):
+        return repr(self)
 
 
 class FGInfo:
@@ -206,6 +216,21 @@ class FGInfo:
         self.bonder_smarts = bonder_smarts
         self.del_smarts = del_smarts
 
+    def __eq__(self, other):
+        return (self.name == other.name and
+                self.fg_smarts == other.fg_smarts and
+                self.bonder_smarts == other.bonder_smarts and
+                self.del_smarts == other.del_smarts)
+
+    def __repr__(self):
+        return (f'FGInfo(name={self.name!r}, '
+                f'fg_smarts={self.fg_smarts!r}, '
+                f'bonder_smarts={self.bonder_smarts!r}, '
+                f'del_smarts={self.del_smarts!r})')
+
+    def __str__(self):
+        return f'FGInfo({self.name!r})'
+
 
 def fg_name(mol, fg):
     """
@@ -234,7 +259,7 @@ def fg_name(mol, fg):
 
 def react(mol, del_atoms, *fgs):
     """
-    Crates bonds between functional groups.
+    Creates bonds between functional groups.
 
     This function first looks at the functional group ids provided via
     the `*fgs` argument and checks which functional groups are
@@ -297,6 +322,96 @@ def react(mol, del_atoms, *fgs):
             emol.RemoveAtom(atom.GetIdx())
 
     return emol.GetMol(), 1
+
+
+def react_many(mol, del_atoms, fg_groups):
+    """
+    Creates bonds between multiple sets of functional groups.
+
+    This function is much faster than calling :func:`react`
+    multiple times, but should behave in the same way. It
+    checks which functional groups are involved in each reaction and
+    if that reaction type is handled by one of the custom reactions
+    specified in :data:`custom_reactions`. If so, then that function is
+    executed.
+
+    In all other cases the function assumes it has received two
+    functional groups to react per reaction. In these functional
+    groups, the atoms tagged ``'del'`` are deleted and the atoms tagged
+    ``'bonder'`` have a bond added. The bond is a single, unless
+    specified otherwise in :data:`bond_orders`.
+
+    Parameters
+    ----------
+    mol : :class:`rdkit.Chem.rdchem.Mol`
+        A molecule being assembled.
+
+    del : :class:`bool`
+        Toggles if atoms with the ``'del'`` property are deleted.
+
+    fg_groups : :class:`list` of :class:`frozenset` of :class:`int`
+        A :class:`list` of the form
+
+        .. code-block:: python
+
+            fg_groups = [frozenset({1, 5}),
+                         frozenset({3, 4}),
+                         frozenset({2, 6, 7})]
+
+        It says that the functional groups ``1`` and ``5`` react
+        together, the functional groups ``3`` and ``4`` react together
+        and ``2``, ``6`` and ``7`` react together.
+
+    Returns
+    -------
+    :class:`tuple`
+        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
+        the molecule with bonds added between the functional groups.
+
+        The second element is a :class:`int`. It is the number
+        of bonds added.
+
+    """
+
+    fg_bonders = {fg_group: [] for fg_group in fg_groups}
+    deleters = []
+
+    for atom in mol.GetAtoms():
+        if atom.HasProp('fg_id'):
+            fg_id = atom.GetIntProp('fg_id')
+            fg_group = next((fg_group for fg_group in fg_groups
+                            if fg_id in fg_group), None)
+
+            if fg_group is not None and atom.HasProp('bonder'):
+                fg_bonders[fg_group].append(atom.GetIdx())
+
+            elif fg_group is not None and atom.HasProp('del'):
+                deleters.append(atom.GetIdx())
+
+    bonds_made = 0
+    emol = rdkit.EditableMol(mol)
+    for fg_group in fg_groups:
+        names = [fg_name(mol, fg) for fg in fg_group]
+        reaction_key = FGKey(names)
+
+        if reaction_key in custom_reactions:
+            reaction = custom_reactions[reaction_key]
+            new_mol, new_bonds = reaction(emol.GetMol(),
+                                          False,
+                                          *fg_group)
+            emol = rdkit.EditableMol(new_mol)
+            bonds_made += new_bonds
+        else:
+            bond = bond_orders.get(reaction_key,
+                                   rdkit.rdchem.BondType.SINGLE)
+            bonder1, bonder2 = fg_bonders[fg_group]
+            emol.AddBond(bonder1, bonder2, bond)
+            bonds_made += 1
+
+    for atom_id in sorted(deleters, reverse=True):
+        emol.RemoveAtom(atom_id)
+
+    return emol.GetMol(), bonds_made
 
 
 def periodic_react(mol, del_atoms, direction, *fgs):
@@ -373,7 +488,7 @@ def periodic_react(mol, del_atoms, direction, *fgs):
     return emol.GetMol(), 1, periodic_bonds
 
 
-def diol_with_difluorne(mol, del_atoms, fg1, fg2):
+def diol_with_dihalogen(mol, del_atoms, fg1, fg2, dihalogen):
     """
     Crates bonds between functional groups.
 
@@ -392,6 +507,10 @@ def diol_with_difluorne(mol, del_atoms, fg1, fg2):
     fg2 : :class:`int`
         The id of the second functional group which
         is to be joined, as given by the 'fg_id' property.
+
+    halogen : :class:`str`
+        The name of the dihalogen functional group to use. For example,
+        ``'dibromine'`` or ``'difluorene'``.
 
     Returns
     -------
@@ -417,7 +536,7 @@ def diol_with_difluorne(mol, del_atoms, fg1, fg2):
         if a.HasProp('del'):
             deleters.append(a)
 
-        if a.GetProp('fg') == 'difluorene' and a.HasProp('bonder'):
+        if a.GetProp('fg') == dihalogen and a.HasProp('bonder'):
             carbons.append(a)
 
         if a.GetProp('fg') == 'diol' and a.HasProp('bonder'):
@@ -637,8 +756,15 @@ def amine3_with_amine3(mol, del_atoms, fg1, fg2):
 # of every functional group involved in the reaction along with how
 # many such functional groups are invovled.
 custom_reactions = {
+
     FGKey(['boronic_acid', 'diol']): boronic_acid_with_diol,
-    FGKey(['diol', 'difluorene']): diol_with_difluorne,
+
+    FGKey(['diol', 'difluorene']):
+        partial(diol_with_dihalogen, dihalogen='difluorene'),
+
+    FGKey(['diol', 'dibromine']):
+        partial(diol_with_dihalogen, dihalogen='dibromine'),
+
     FGKey(['amine3', 'amine3']): amine3_with_amine3
 
 }
@@ -735,14 +861,23 @@ functional_groups = (
     FGInfo(name='diol',
            fg_smarts='[H][O][#6]~[#6][O][H]',
            bonder_smarts=[
-                Match(smarts='[$([O]([H])[#6]~[#6][O][H])]', n=2)
+               Match(smarts='[$([O]([H])[#6]~[#6][O][H])]', n=2)
            ],
-           del_smarts=[Match(smarts='[$([H][O][#6]~[#6][O][H])]', n=2)]),
+           del_smarts=[
+               Match(smarts='[$([H][O][#6]~[#6][O][H])]', n=2)
+           ]),
 
     FGInfo(name='difluorene',
            fg_smarts='[F][#6]~[#6][F]',
            bonder_smarts=[Match(smarts='[$([#6]([F])~[#6][F])]', n=2)],
            del_smarts=[Match(smarts='[$([F][#6]~[#6][F])]', n=2)]),
+
+    FGInfo(name='dibromine',
+           fg_smarts='[Br][#6]~[#6][Br]',
+           bonder_smarts=[
+               Match(smarts='[$([#6]([Br])~[#6][Br])]', n=2)
+           ],
+           del_smarts=[Match(smarts='[$([Br][#6]~[#6][Br])]', n=2)]),
 
     FGInfo(name='alkyne2',
            fg_smarts='[C]#[C][H]',
@@ -753,14 +888,29 @@ functional_groups = (
     FGInfo(name='amine3',
            fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6]([H])',
            bonder_smarts=[
-            Match(smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6]([H]))]', n=1),
-            Match(smarts='[$([#6]([H])(~[#6]([H]))~[#6][N]([H])[H])]', n=1),
+               Match(
+                   smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6]([H]))]',
+                   n=1
+               ),
+               Match(
+                   smarts='[$([#6]([H])(~[#6]([H]))~[#6][N]([H])[H])]',
+                   n=1
+               ),
             ],
            del_smarts=[
-            Match(smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6]([H]))]', n=2),
-            Match(smarts='[$([H][#6](~[#6]([H]))~[#6][N]([H])[H])]', n=1)])
+               Match(
+                   smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6]([H]))]',
+                   n=2
+               ),
+               Match(
+                   smarts='[$([H][#6](~[#6]([H]))~[#6][N]([H])[H])]',
+                   n=1
+               )
+           ])
 
     )
+
+functional_group_infos = {fg.name: fg for fg in functional_groups}
 
 double = rdkit.rdchem.BondType.DOUBLE
 triple = rdkit.rdchem.BondType.TRIPLE

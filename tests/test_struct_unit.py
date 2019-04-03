@@ -8,8 +8,8 @@ if not os.path.exists('struct_unit_tests_output'):
 
 
 def test_init(amine2):
-    assert len(amine2.functional_group_atoms()) == 2
-    assert amine2.func_grp.name == 'amine'
+    assert len(amine2.func_groups) == 2
+    assert amine2.func_groups[0].info.name == 'amine'
 
 
 def test_all_bonder_distances(tmp_aldehyde3):
@@ -73,10 +73,12 @@ def test_core(amine2):
         assert not atom.HasProp('fg')
 
 
-def test_functional_group_atoms(amine2):
-        func_grp_mol = rdkit.MolFromSmarts(amine2.func_grp.fg_smarts)
-        fg_atoms = amine2.mol.GetSubstructMatches(func_grp_mol)
-        assert fg_atoms == amine2.functional_group_atoms()
+def test_functional_groups(amine2):
+    info = amine2.func_groups[0].info
+    func_grp_mol = rdkit.MolFromSmarts(info.fg_smarts)
+    fg_atoms = amine2.mol.GetSubstructMatches(func_grp_mol)
+    for fg in amine2.functional_groups([info.name]):
+        assert any(ids == fg.atom_ids for ids in fg_atoms)
 
 
 def test_is_core_atom(amine2):
@@ -95,9 +97,9 @@ def test_json_init(amine2):
     assert mol2.optimized
     assert mol2.bonder_ids == amine2.bonder_ids
     assert mol2.energy.__class__.__name__ == 'Energy'
-    assert mol2.func_grp.name == amine2.func_grp.name
     assert amine2 is not mol2
     assert amine2.atom_props == amine2.atom_props
+    assert mol2.func_groups == amine2.func_groups
 
 
 def test_caching():
@@ -107,15 +109,15 @@ def test_caching():
     # not affected by unexpected cache problems.
     try:
         stk.OPTIONS['cache'] = True
-        mol = stk.StructUnit.smiles_init('NCCCN', 'amine')
-        mol2 = stk.StructUnit.smiles_init('NCCCN', 'amine')
+        mol = stk.StructUnit.smiles_init('NCCCN', ['amine'])
+        mol2 = stk.StructUnit.smiles_init('NCCCN', ['amine'])
         assert mol is mol2
 
-        mol3 = stk.StructUnit.smiles_init('NCCCN', 'aldehyde3')
+        mol3 = stk.StructUnit.smiles_init('NCCCN', ['aldehyde'])
         assert mol3 is not mol
 
         stk.OPTIONS['cache'] = False
-        mol4 = stk.StructUnit.smiles_init('NCCCN', 'amine')
+        mol4 = stk.StructUnit.smiles_init('NCCCN', ['amine'])
         stk.OPTIONS['cache'] = True
         assert mol is not mol4
 
