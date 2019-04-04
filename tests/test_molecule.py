@@ -20,6 +20,10 @@ def test_all_atom_coords(amine2):
     assert natoms == i
 
 
+def test_atom_centroid():
+    assert False
+
+
 def test_atom_coords(amine2):
     """
     Tests `atom_coords`.

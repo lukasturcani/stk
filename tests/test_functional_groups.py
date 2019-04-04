@@ -7,6 +7,15 @@ if not os.path.exists('fg_tests_output'):
     os.mkdir('fg_tests_output')
 
 
+def test_remove_deleters(tmp_fg):
+    tmp_fg.remove_deleters([1, 2, 15, 55, 100, 300])
+    assert tmp_fg.atom_ids == [8, 1]
+
+
+def test_shifted_fg():
+    assert False
+
+
 def test_bi_fg_bb(diol2, difluorene_dibromine):
     p = stk.Polymer([diol2, difluorene_dibromine],
                     stk.Linear('ABAB', [1, 1, 0, 0], 4))

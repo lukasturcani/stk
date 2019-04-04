@@ -244,6 +244,57 @@ class FunctionalGroup:
         self.deleter_ids = deleter_ids
         self.info = info
 
+    def shifted_fg(self, id_, num_atoms):
+        """
+
+        """
+
+        atom_ids = tuple(id + num_atoms for id in self.atom_ids)
+        bonder_ids = tuple(id + num_atoms for id in self.bonder_ids)
+        deleter_ids = tuple(id + num_atoms for id in self.deleter_ids)
+
+        return self.__class__(id_=id_,
+                              atom_ids=atom_ids,
+                              bonder_ids=bonder_ids,
+                              deleter_ids=deleter_ids,
+                              info=self.info)
+
+    def remove_deleters(self, deleters):
+        """
+
+        """
+
+        self.atom_ids = self._remove_deleters(self.atom_ids,
+                                              deleters)
+
+        self.bonder_ids = self._remove_deleters(self.bonder_ids,
+                                                deleters)
+
+        self.deleter_ids = self._remove_deleters(self.deleter_ids,
+                                                 deleters)
+
+    def _remove_deleters(self, atom_ids, deleters):
+        id_changes = {atom_id: 0 for atom_id in atom_ids}
+
+        for atom_id in atom_ids:
+            for deleter in deleters:
+                if atom_id > deleter:
+                    id_changes[atom_id] += 1
+                elif atom_id == deleter:
+                    id_changes[atom_id] = None
+                if atom_id < deleter:
+                    break
+
+        new_atom_ids = []
+        for atom_id in atom_ids:
+            change = id_changes[atom_id]
+            if change is None:
+                continue
+            else:
+                new_atom_ids.append(atom_id - change)
+
+        return tuple(new_atom_ids)
+
     def __eq__(self, other):
         return (self.id == other.id and
                 self.atom_ids == other.atom_ids and
@@ -273,6 +324,9 @@ class Reactor:
     in this dict. The key should be a sorted tuple which holds the name
     of every functional group involved in the reaction along with how
     many such functional groups are invovled.
+
+    Attributes
+    ----------
 
     """
 
@@ -315,6 +369,7 @@ class Reactor:
         self.bonds_made = 0
         self.new_atom_coords = []
         self.deleters = []
+        self.func_groups = []
 
     def react(self, *fgs):
         """
@@ -343,6 +398,7 @@ class Reactor:
         """
 
         self.deleters.extend(flatten(fg.deleter_ids for fg in fgs))
+        self.func_groups.extend(fgs)
 
         names = [fg.info.name for fg in fgs]
         reaction_key = FGKey(names)
@@ -414,8 +470,13 @@ class Reactor:
             self.emol = rdkit.EditableMol(self.mol)
 
         if del_atoms:
-            for atom_id in sorted(self.deleters, reverse=True):
+            deleters = sorted(self.deleters)
+
+            for atom_id in reversed(deleters):
                 self.emol.RemoveAtom(atom_id)
+
+            for fg in self.func_groups:
+                fg.remove_deleters(deleters)
 
         return self.emol.GetMol()
 

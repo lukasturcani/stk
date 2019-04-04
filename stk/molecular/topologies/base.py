@@ -168,16 +168,14 @@ class Topology(metaclass=TopologyMeta):
 
     Attributes
     ----------
-    react_del : :class:`bool`
+    del_atoms : :class:`bool`
         Toggles whether deleter atoms are deleted by
         :meth:`.Reactor.result`.
 
-
     """
 
-    def __init__(self, react_del=True):
-        self.react_del = react_del
-        self.func_groups = []
+    def __init__(self, del_atoms=True):
+        self.del_atoms = del_atoms
 
     def build(self, macro_mol, bb_conformers=None):
         """
@@ -225,9 +223,11 @@ class Topology(metaclass=TopologyMeta):
         self.prepare(macro_mol)
 
         reactor = Reactor(macro_mol.mol)
+        macro_mol.func_groups = reactor.func_groups
+
         for fgs in self.bonded_fgs(macro_mol):
             reactor.react(*fgs)
-        macro_mol.mol = reactor.result(self.react_del)
+        macro_mol.mol = reactor.result(self.del_atoms)
         macro_mol.bonds_made = reactor.bonds_made
 
         self.cleanup(macro_mol)
@@ -389,6 +389,12 @@ class Linear(Topology):
         polymer are converted into hydrogem atoms. If ``'fg'`` they are
         kept as the original functional group.
 
+    _func_groups : :class:`list` of :class:`.FunctionalGroup`
+        Used internally during the build process. It is :class:`list`
+        of :class:`.FunctionalGroup` instances, corresponding to the
+        functional groups of the building blocks, after they have been
+        placed into a polymer chain but before they have been reacted.
+
     """
 
     def __init__(self, repeating_unit, orientation, n, ends='fg'):
@@ -431,7 +437,8 @@ class Linear(Topology):
         self.orientation = tuple(orientation)
         self.n = n
         self.ends = ends
-        super().__init__(react_del=False if ends == 'h' else True)
+        self._func_groups = []
+        super().__init__(del_atoms=False if ends == 'h' else True)
 
     def cleanup(self, macro_mol):
         """
@@ -469,12 +476,12 @@ class Linear(Topology):
 
         """
 
-        first_fg = min(self.func_groups, key=lambda fg: fg.id)
-        last_fg = max(self.func_groups, key=lambda fg: fg.id)
+        first_fg = min(self._func_groups, key=lambda fg: fg.id)
+        last_fg = max(self._func_groups, key=lambda fg: fg.id)
         terminal = {first_fg.id, last_fg.id}
 
         deleters = []
-        for func_group in self.func_groups:
+        for func_group in self._func_groups:
             if func_group.id in terminal:
                 deleters.extend(func_group.atom_ids)
             else:
@@ -558,25 +565,9 @@ class Linear(Topology):
                                               monomer_mol)
 
             for fg in bb.func_groups:
-                atom_ids = np.array(fg.atom_ids) + num_atoms
-                atom_ids = tuple(atom_ids.tolist())
-
-                bonder_ids = np.array(fg.bonder_ids) + num_atoms
-                bonder_ids = tuple(bonder_ids.tolist())
-
-                deleter_ids = np.array(fg.deleter_ids) + num_atoms
-                deleter_ids = tuple(deleter_ids.tolist())
-
                 id_ = 2*i + 1 if fg.id == front else 2*i
-
-                func_group = FunctionalGroup(
-                                     id_=id_,
-                                     atom_ids=atom_ids,
-                                     bonder_ids=bonder_ids,
-                                     deleter_ids=deleter_ids,
-                                     info=fg.info
-                )
-                self.func_groups.append(func_group)
+                func_group = fg.shifted_fg(id_, num_atoms)
+                self._func_groups.append(func_group)
 
             bb.set_position_from_matrix(original_position)
 
@@ -596,7 +587,7 @@ class Linear(Topology):
 
         """
 
-        fgs = sorted(self.func_groups, key=lambda fg: fg.id)
+        fgs = sorted(self._func_groups, key=lambda fg: fg.id)
         for i in range(1, 2*len(self.repeating_unit)*self.n-1, 2):
             yield fgs[i], fgs[i+1]
 

@@ -377,6 +377,29 @@ class Molecule:
             atom_position = conf.GetAtomPosition(atom_id)
             yield atom_id, np.array([*atom_position])
 
+    def atom_centroid(self, atom_ids, conformer=-1):
+        """
+        Return the centroid of a group of atoms.
+
+        Parameters
+        ----------
+        atom_ids : :class:`list` of :class:`int`
+            The ids of atoms which which are used to calculate the
+            centroid.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The centroid of atoms specified by `atom_ids`.
+
+        """
+
+        coords = (self.atom_coords(a, conformer) for a in atom_ids)
+        return sum(coords) / len(atom_ids)
+
     def atom_coords(self, atom_id, conformer=-1):
         """
         Return coordinates of an atom.
@@ -391,7 +414,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             An array holding the x, y and z coordinates of the atom.
 
         """
@@ -459,7 +482,7 @@ class Molecule:
 
         Parameters
         ----------
-        origin : :class:`numpy.array`
+        origin : :class:`numpy.ndarray`
             Holds the x, y and z coordinate of the position from which
             the cavity is measured.
 
@@ -524,7 +547,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             An array holding the coordinates of the center of mass.
 
         References
@@ -552,7 +575,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             A numpy array holding the position of the centroid.
 
         """
@@ -903,7 +926,7 @@ class Molecule:
         theta : :class:`float`
             The size of the rotation in radians.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The axis about which the rotation happens.
 
         conformer : :class:`int`, optional
@@ -961,11 +984,11 @@ class Molecule:
 
         Parameters
         ----------
-        start : :class:`numpy.array`
+        start : :class:`numpy.ndarray`
             A vector which is to be rotated so that it transforms to
             the `end` vector.
 
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             This array holds the vector, onto which `start` is rotated.
 
         conformer : :class:`int`, optional
@@ -1008,7 +1031,7 @@ class Molecule:
 
         Parameters
         ----------
-        position : :class:`numpy.array`
+        position : :class:`numpy.ndarray`
             This array holds the position on which the centroid of the
             molecule should be placed.
 
@@ -1047,7 +1070,7 @@ class Molecule:
 
         Parameters
         ----------
-        pos_mat : :class:`numpy.array`
+        pos_mat : :class:`numpy.ndarray`
             The matrix holds the coordinates on which the atoms of the
             molecule should be placed.
 
@@ -1081,7 +1104,7 @@ class Molecule:
 
         Parameters
         ----------
-        shift : :class:`numpy.array`
+        shift : :class:`numpy.ndarray`
             A numpy array holding the value of the shift along each
             axis.
 
@@ -1339,7 +1362,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
 
-    func_group_infos : :class:`frozenset` of :class:`str`
+    func_group_infos : :class:`tuple` of :class:`.FGInfo`
 
     """
 
@@ -1472,7 +1495,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             An array holding the midpoint of the bonder atoms.
 
         """
@@ -1495,7 +1518,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Yields
         ------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The bonder centroid of a functional group.
 
         """
@@ -1605,7 +1628,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The normalized direction vector running from the centroid
             of the bonder atoms to the molecular centroid.
 
@@ -1662,7 +1685,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The coordinates of a bonder centroid.
 
         """
@@ -1899,16 +1922,16 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        v1 : :class:`numpy.array`
+        v1 : :class:`numpy.ndarray`
             The vector which is rotated.
 
-        v2 : :class:`numpy.array`
+        v2 : :class:`numpy.ndarray`
             The vector which is stationary.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The vector about which the rotation happens.
 
-        centroid : :class:`numpy.array`
+        centroid : :class:`numpy.ndarray`
             The position vector at the center of the rotation.
 
         conformer : :class:`int`, optional
@@ -2001,7 +2024,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         theta : :class:`float`
             The size of the rotation in radians.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The axis about which rotation happens.
 
         conformer : :class:`int`, optional
@@ -2035,7 +2058,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        position : :class:`numpy.array`
+        position : :class:`numpy.ndarray`
             An array holding the desired the position. It holds
             the x, y and z coordinates, respectively.
 
@@ -2073,7 +2096,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             The vector with which the molecule's bonder atoms should be
             aligned.
 
@@ -2120,11 +2143,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        start : :class:`numpy.array`
+        start : :class:`numpy.ndarray`
             A vector which is to be rotated so that it transforms to
             the `end` vector.
 
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             This array holds the vector, onto which `start` is rotated.
 
         conformer : :class:`int`
@@ -2324,7 +2347,7 @@ class StructUnit2(StructUnit):
 
         Parameters
         ----------
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             The vector with which the molecule's bonder atoms should be
             aligned.
 
@@ -2351,10 +2374,10 @@ class StructUnit2(StructUnit):
 
         Parameters
         ----------
-        vector : :class:`numpy.array`
+        vector : :class:`numpy.ndarray`
             The vector to which the distance should be minimized.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The direction vector along which the rotation happens.
 
         conformer : :class:`int`, optional
@@ -2405,7 +2428,7 @@ class StructUnit3(StructUnit):
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             This array has the form ``[a, b, c, d]`` and represents the
             scalar equation of the plane formed by the bonder
             centroids.
@@ -2434,7 +2457,7 @@ class StructUnit3(StructUnit):
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             A unit vector which describes the normal to the plane of
             the bonder centroids.
 
@@ -2473,10 +2496,10 @@ class StructUnit3(StructUnit):
             The id of functional group which is to have angle
             minimized.
 
-        vector : :class:`numpy.array`
+        vector : :class:`numpy.ndarray`
             A vector with which the angle is minimized.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The vector about which the rotation happens.
 
         conformer : :class:`int`, optional
@@ -2507,7 +2530,7 @@ class StructUnit3(StructUnit):
 
         Parameters
         ----------
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             The vector with which the normal of plane of bonder
             centroids shoould be aligned.
 
@@ -2600,6 +2623,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         The number of bonds made during assembly. Added by
         :func:`.Topology.build`.
 
+    func_groups : :class:`list` of :class:`.FunctionalGroup`
+
     """
 
     def __init__(self,
@@ -2646,7 +2671,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         try:
             # Ask the ``Topology`` instance to assemble/build the
-            # macromolecule. This creates the `mol` attribute.
+            # macromolecule. This creates the `mol` and `func_groups`
+            # attributes.
             topology.build(self, bb_conformers)
 
         except Exception as ex:
@@ -2697,7 +2723,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         # Build a new molecule.
         try:
             # Ask the ``Topology`` instance to assemble/build the
-            # macromolecule. This creates the `mol` attribute.
+            # macromolecule. This creates the `mol` and `func_groups`
+            # attributes.
             self.topology.build(self, bb_conformers)
 
         except Exception as ex:
@@ -3218,7 +3245,7 @@ class Periodic(MacroMolecule):
         The key is an :class:`int` which represents a bonder atom.
         The value holds the position, element and bond type of
         every deleter atom removed from that bonder. The position is a
-        :class:`numpy.array`, the element is an :class:`int` and the
+        :class:`numpy.ndarray`, the element is an :class:`int` and the
         bond type is an :class:`rdkit.Chem.rdchem.BondType`.
 
     periodic_bonds : :class:`list` of :class:`.PeriodicBond`
@@ -3229,7 +3256,7 @@ class Periodic(MacroMolecule):
         :class:`.PeriodicBond` instances representing the bonds into
         this list.
 
-    cell_dimensions : :class:`list` of :class:`numpy.array`
+    cell_dimensions : :class:`list` of :class:`numpy.ndarray`
         The dimensions of the unit cell. The first array is the vector
         ``a`` the second is ``b`` and the third is ``c``. This should
         be added during the build process by the periodic topology.
@@ -3335,7 +3362,7 @@ class Periodic(MacroMolecule):
 
                 reactor.react(fg1, fg2)
 
-        return reactor.result()
+        return reactor.result(True)
 
     def _place_island(self, dimensions):
         """
@@ -3360,8 +3387,7 @@ class Periodic(MacroMolecule):
             a cell with the coordinates x, y, z can be accessed from
             the list using ``[x][y][z]``. For example,
 
-                >>> cells, island, bonder_map = \
-periodic._place_island([4, 4, 4])
+                >>> cells, island = periodic._place_island([4, 4, 4])
                 >>> cells[2][1][3]
                 <Cell at 0x7fa0155d54e0>
 
@@ -3370,9 +3396,7 @@ periodic._place_island([4, 4, 4])
             and the fourth along the z axis.
 
             The second member is an ``rdkit`` molecule of the island
-            being built. The third member is a :class:`dict` mapping
-            the ids of fgs in the island back to the id of the
-            equivalent fg in the original unit cell.
+            being built.
 
         """
 
@@ -3381,25 +3405,20 @@ periodic._place_island([4, 4, 4])
         island = rdkit.Mol()
 
         xdim, ydim, zdim = (range(d) for d in dimensions)
-        nfgs = 1 + max(atom.GetIntProp('fg_id') for atom in
-                       self.mol.GetAtoms() if atom.HasProp('fg_id'))
+        nfgs = len(self.func_groups)
+
         # For each dimension place a unit cell.
         for i, (x, y, z) in enumerate(it.product(xdim, ydim, zdim)):
             unit_cell = self.shift(x*a + y*b + z*c)
 
-            # Update fg_ids.
-            for atom in unit_cell.GetAtoms():
-                if not atom.HasProp('fg_id'):
-                    continue
-                atom.SetIntProp('fg_id', atom.GetIntProp('fg_id')+i*nfgs)
+            fgs = {}
+            for fg in self.func_groups:
+                id_ = fg.id + i*nfgs
+                new_fg = fg.shifted_fg(id_, island.GetNumAtoms())
+                fgs[fg.id] = new_fg
 
-            island = rdkit.CombineMols(island, unit_cell)
-            # `bonders` maps a bonder id in the original unit
-            # cell to the one currently being added to the
-            # island.
-            fgs = {fg.id: i*len(self.func_groups) + fg.id for
-                   fg in self.func_groups}
             cells[x][y][z] = Cell((x, y, z), fgs)
+            island = rdkit.CombineMols(island, unit_cell)
 
         return cells, island
 
@@ -3464,7 +3483,7 @@ periodic._place_island([4, 4, 4])
             A 6 member list holding the fix parameters for the unit
             cell.
 
-        atom_fix : :class:`numpy.array` of :class:`int`, optional
+        atom_fix : :class:`numpy.ndarray` of :class:`int`, optional
             An n by 3 array where n is the number of atoms in the
             unit cell. Each row has the fix parameters for a given
             atom.
