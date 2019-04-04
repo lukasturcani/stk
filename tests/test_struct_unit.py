@@ -135,6 +135,10 @@ def test_set_bonder_centroid(tmp_amine2):
                        atol=1e-8)
 
 
+def test_shift_fgs():
+    assert False
+
+
 def test_untag_atoms(tmp_amine2):
     assert any(a.HasProp('fg') for a in tmp_amine2.mol.GetAtoms())
     tmp_amine2.untag_atoms()

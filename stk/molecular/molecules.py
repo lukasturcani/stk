@@ -2184,6 +2184,14 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return self.mol
 
+    def shift_fgs(self, new_ids, num_atoms):
+        """
+
+        """
+
+        for id_, fg in zip(new_ids, self.func_groups):
+            yield fg.shifted_fg(id_=id_, num_atoms=num_atoms)
+
     def similar_molecules(self, mols):
         """
         Returns molecules from `mols` ordered by similarity.

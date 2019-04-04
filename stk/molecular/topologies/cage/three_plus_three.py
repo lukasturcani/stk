@@ -4,6 +4,7 @@ Defines cage topologies of building blocks with 3 functional groups.
 """
 
 import numpy as np
+from scipy.spatial.distance import euclidean
 
 from .base import NoLinkerCageTopology,  Vertex
 
@@ -35,15 +36,18 @@ class OnePlusOne(NoLinkerCageTopology):
             other_position = next(x for x in self.positions_A if
                                   x is not position)
 
-            position.fg_position_pairs = [(fg, other_position) for
-                                          fg in position.fg_ids]
+            position.fg_position_pairs = [
+                (fg, other_position) for fg in position.fgs
+            ]
 
             for fg1, vertex in position.fg_position_pairs:
                 # Get all the distances between the fg and the fgs
                 # on the vertex. Store this information on the vertex.
 
-                for fg2 in vertex.fg_ids:
-                    distance = macro_mol.fg_distance(fg1, fg2)
+                for fg2 in vertex.fgs:
+                    c1 = macro_mol.atom_centroid(fg1.bonder_ids)
+                    c2 = macro_mol.atom_centroid(fg2.bonder_ids)
+                    distance = euclidean(c1, c2)
                     position.distances.append((distance, fg1, fg2))
 
         paired = set()

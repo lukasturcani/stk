@@ -17,8 +17,10 @@ class TwoPlusFour(CageTopology):
 
     positions_A = [Vertex(0, 0, -1), Vertex(0, 0, 1)]
     alpha, beta = positions_A
-    beta.edge_plane_normal = lambda scale, alpha=alpha: np.multiply(
-                                        alpha.edge_plane_normal(scale), -1)
+    beta.edge_plane_normal = (
+        lambda scale, alpha=alpha:
+            np.multiply(alpha.edge_plane_normal(scale), -1)
+    )
 
     positions_B = [Edge(alpha, beta),
                    Edge(alpha, beta),
