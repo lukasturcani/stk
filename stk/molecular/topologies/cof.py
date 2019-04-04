@@ -73,7 +73,6 @@ from scipy.spatial.distance import euclidean
 import itertools as it
 
 from .base import Topology
-from ..functional_groups import FunctionalGroup
 from ...utilities import (PeriodicBond,
                           add_fragment_props,
                           normalize_vector)
@@ -734,38 +733,64 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         # The fragment with the larger fg ids has higher x and y
         # values - due to place_mols() implmentation. It is the "top"
         # fragment.
-        top = [3, 4, 5]
-        bottom = [0, 1, 2]
+        bottom = self._func_groups[:3]
+        top = self._func_groups[3:]
 
         # In the top fragment find the fg with the
         # largest y value and connect it to the fg in the
         # bottom fragment with the lowest y value. Note that the
         # connection must be registered as periodic, hence the
         # directions are 1/-1.
-        top_fg = max(top, key=lambda x: macro_mol.fg_centroid(x)[1])
-        bottom_fg = min(bottom,
-                        key=lambda x: macro_mol.fg_centroid(x)[1])
-        macro_mol.periodic_bonds.append(
-                            PeriodicBond(top_fg, bottom_fg, [0, 1, 0]))
+        top_fg = max(
+            top,
+            key=lambda x:
+                macro_mol.atom_centroid(x.bonder_ids)[1]
+        )
+        bottom_fg = min(
+            bottom,
+            key=lambda x:
+                macro_mol.atom_centroid(x.bonder_ids)[1]
+        )
+        macro_mol.func_groups.append(top_fg)
+        macro_mol.func_groups.append(bottom_fg)
+        periodic_bond = PeriodicBond(top_fg.id,
+                                     bottom_fg.id,
+                                     [0, 1, 0])
+        macro_mol.periodic_bonds.append(periodic_bond)
+
         # Do the same for the x-axis periodic bonds.
-        right_fg = max(top,
-                       key=lambda x: macro_mol.fg_centroid(x)[0])
-        left_fg = min(bottom,
-                      key=lambda x: macro_mol.fg_centroid(x)[0])
-        macro_mol.periodic_bonds.append(
-                            PeriodicBond(right_fg, left_fg, [1, 0, 0]))
+        right_fg = max(
+            top,
+            key=lambda x:
+                macro_mol.atom_centroid(x.bonder_ids)[0]
+        )
+        left_fg = min(
+            bottom,
+            key=lambda x:
+                macro_mol.atom_centroid(x.bonder_ids)[0]
+        )
+        macro_mol.func_groups.append(right_fg)
+        macro_mol.func_groups.append(left_fg)
+        periodic_bond = PeriodicBond(right_fg.id,
+                                     left_fg.id,
+                                     [1, 0, 0])
+        macro_mol.periodic_bonds.append(periodic_bond)
 
         # For the bond which gets created directly, find the bonder
         # atom in the bottom fragment closest to the position of the
         # top fragment.
-        bottom_fg2 = min(bottom,
-                         key=lambda x: euclidean(
-                                            self.vertices[1],
-                                            macro_mol.fg_centroid(x)))
-        top_fg2 = min(top,
-                      key=lambda x: euclidean(
-                                            self.vertices[0],
-                                            macro_mol.fg_centroid(x)))
+        bottom_fg2 = min(
+            bottom,
+            key=lambda x:
+                euclidean(self.vertices[1],
+                          macro_mol.atom_centroid(x.bonder_ids))
+        )
+        top_fg2 = min(
+            top,
+            key=lambda x:
+                euclidean(self.vertices[0],
+                          macro_mol.atom_centroid(x.bonder_ids))
+        )
         yield top_fg2, bottom_fg2
 
     def place_mols(self, macro_mol):
@@ -789,6 +814,9 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
 
         """
 
+        # Keep track of functional groups in the macromolecule.
+        self._func_groups = []
+
         # Get the building blocks.
         bb1, bb2 = macro_mol.building_blocks
         cell_size = self.scale_func(macro_mol)
@@ -800,6 +828,13 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         bb1.set_orientation2([0, 0, 1])
         bb1.minimize_theta2(0, [0, -1, 0], [0, 0, 1])
         # Add to the macromolecule.
+        for fg in bb1.func_groups:
+            new_fg = fg.shifted_fg(
+                        id_=len(self._func_groups),
+                        num_atoms=macro_mol.mol.GetNumAtoms()
+            )
+            self._func_groups.append(new_fg)
+
         add_fragment_props(bb1.mol,
                            macro_mol.building_blocks.index(bb1),
                            0)
@@ -809,12 +844,18 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         bb2.set_orientation2([0, 0, 1])
         bb2.minimize_theta2(0, [0, 1, 0], [0, 0, 1])
         # Add to the macromolecule.
+        for fg in bb2.func_groups:
+            new_fg = fg.shifted_fg(
+                        id_=len(self._func_groups),
+                        num_atoms=macro_mol.mol.GetNumAtoms()
+            )
+            self._func_groups.append(new_fg)
+
         add_fragment_props(bb2.mol,
                            macro_mol.building_blocks.index(bb2),
                            0)
 
         mol = rdkit.Mol(bb2.mol)
-        mol = self.update_fg_id(macro_mol, mol)
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
         macro_mol.bb_counter.update([bb1, bb2])
 

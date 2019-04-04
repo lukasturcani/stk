@@ -1,8 +1,9 @@
 import os
 import stk
 
-if not os.path.exists('linear_topology_tests'):
-    os.mkdir('linear_topology_tests')
+test_dir = 'linear_topology_tests_output'
+if not os.path.exists(test_dir):
+    os.mkdir(test_dir)
 
 
 def test_assembly(amine2, aldehyde2, boronic_acid2, diol2):
@@ -18,7 +19,7 @@ def test_assembly(amine2, aldehyde2, boronic_acid2, diol2):
     p3 = stk.Polymer([boronic_acid2, diol2],
                      stk.Linear('AB', [0, 0], repeat_units))
 
-    path = os.path.join('linear_topology_tests', 'p1.mol')
+    path = os.path.join(test_dir, 'p1.mol')
     p1.write(path)
     p2.write(path.replace('1', '2'))
     p3.write(path.replace('1', '3'))

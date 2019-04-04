@@ -3,7 +3,7 @@ import os
 from os.path import join
 import rdkit.Chem.AllChem as rdkit
 
-test_dir = 'cof_topology_tests'
+test_dir = 'cof_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 

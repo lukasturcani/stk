@@ -3,7 +3,7 @@ import os
 from os.path import join
 
 
-test_dir = 'cage_topology_tests'
+test_dir = 'cage_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 data_dir = os.path.join(os.getcwd(), 'data', 'cage_topologies')

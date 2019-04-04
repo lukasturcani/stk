@@ -69,7 +69,7 @@ import numpy as np
 from inspect import signature
 from collections import Counter
 
-from ..functional_groups import Reactor, FunctionalGroup
+from ..functional_groups import Reactor
 from ...utilities import dedupe, add_fragment_props, remake
 
 
