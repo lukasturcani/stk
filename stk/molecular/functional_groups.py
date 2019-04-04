@@ -11,7 +11,7 @@ Extending stk: Adding  more functional groups.
 
 If ``stk`` is to incorporate a new functional group, a new
 :class:`FGInfo` instance should be added to
-:data:`functional_groups`.
+:data:`functional_groups`, which is defined in this module.
 
 Adding a new :class:`FGInfo` instance to :data:`functional_groups` will
 allow :meth:`.Topology.build` to connect the functional group to
@@ -149,25 +149,23 @@ class FGInfo:
             bonder_smarts = [Match(smarts='[$([N]([H])[H])]', n=1),
                              Match(smarts='[$([H][N][H])]', n=1)]
 
-        Each string is SMARTS string which matches an atom in the
-        functional group which is to be tagged as ``'bonder'``. The
-        number represents how many matched atoms should be tagged, per
-        functional group.
+        Each string is SMARTS string which matches a bonder atom in the
+        functional group. The number represents how many matched atoms
+        should be used as bonders, per functional group.
 
         In the example, ``Match(smarts='[$([N]([H])[H])]', n=1)``
         matches the nitrogen atom in the amine functional group. The
         ``n=1`` means that 1 nitrogen atom per functional group will be
-        tagged as ``'bonder'``. The second
+        used as a bonder. The second
         ``Match(smarts='[$([H][N][H])]', n=1)``, matches the hydrogen
         atom in the amine functional group. Because ``n=1``, only 1 of
-        hydrogen atom per amine functional group will be tagged
-        ``'bonder'``. If instead
-        ``Match(smarts='[$([H][N][H])]', n=2)`` was used, then both of
-        the hydrogen atoms in the functional group would be tagged.
+        hydrogen atoms per amine functional group will be used as a
+        bonder. If instead ``Match(smarts='[$([H][N][H])]', n=2)`` was
+        used, then both of the hydrogen atoms in the functional group
+        would be used as bonders.
 
     del_smarts : :class:`list`
-        Same as :attr:`bonder_smarts` but matched atoms are tagged
-        as ``'del'``.
+        Same as :attr:`bonder_smarts` but matched atoms are deleters
 
     """
 
@@ -402,32 +400,102 @@ class Reactor:
     Performs reactions between functional groups of a molecule.
 
     This class is responsible for reacting the functional groups in a
-    molecule during assembly.
+    molecule during assembly. First, an instance of this class is
+    initialized with a :class:`rdkit.Mol`. This is the molecule which
+    is going to have atom and bonds added and removed.
+
+    .. python::
+
+        mol = rdkit.MolFromMolFile(...)
+        reactor = Reactor(mol)
+
+    We force the molecule to have atoms and bonds add or removed
+    between certain functional groups by using the :meth:`react`
+    method.
+
+    .. python::
+
+        # Represents a functional group found in mol.
+        fg1 = FunctionalGroup(id_=0,
+                              atom_ids=[1, 34, 3],
+                              bonder_ids=[1],
+                              deleter_ids=[34, 3],
+                              info=FGInfo('amine')
+        )
+
+        # Represents another functional group found in mol.
+        fg2 = FunctionalGroup(id_=1,
+                              atom_ids=[10, 2, 12],
+                              bonder_ids=[12],
+                              deleter_ids=[2, 10],
+                              info=FGInfo('aldehyde')
+        )
+
+        # Carry out a reaction between the atoms in fg1 and fg2.
+        reactor.react(fg1, fg2)
+
+        # Lets assume there a further functional groups in mol that
+        # we wish to react.
+        fg3 = FunctionalGroup(...)
+        fg4 = FunctionalGroup(...)
+        fg5 = FunctionalGroup(...)
+        fg6 = FunctionalGroup(...)
+        fg7 = FunctionalGroup(...)
+
+        reactor.react(fg3, fg4)
+
+        # Some reactions can take multiple functional groups.
+        # You can put in as many functional groups as you like, given
+        # an appropriate reaction is defined.
+        reactor.react(fg5, fg6, fg7)
+
+    Once we are done carrying out reactions on the molecule we can
+    get the resulting molecule.
+
+    .. python::
+
+        # product is an rdkit molecule, with the earlier reactions
+        # carried out and all deleter atoms removed.
+        product = reactor.result(del_atoms=True)
+
+    An obvious question given this tutorial, is what reaction does
+    :meth:`react` carry out? This is documented by :meth:`react`.
+    However, react in most cases, will carry out a default reaction,
+    which adds a bond between the bonder atoms of two functional
+    groups. The bond order of the added bond is single by default but
+    can be modified by editing :attr:`bond_orders`. Here you will
+    specify the :class:`ReactionKey` for a reaction and what bond order
+    you want that reaction to use.
+
+    The section below explains how you can ignore the default reaction
+    and add more complex reactions between functional groups when
+    necessary.
 
     .. _`adding complex reactions`:
 
     Extending stk: Adding complex reactions.
     ----------------------------------------
 
-    During assembly, two functional groups are provided to
-    :func:`react`. By default, placing an :class:`FGInfo` instance
-    into :data:`functional_groups` will result in the creation of a
-    single bond between the atoms tagged as ``'bonder'`` in the two
-    functional groups. In addtion, any atoms tagged as ``'del'`` will
-    be removed. The bond order of the created bond can be modified by
-    editing :data:`bond_orders`.
-
-    However, some reactions cannot be described by a simple combination
-    of adding a bond while deleting some existing atoms. For example,
+    For some reactions you may wish to forgo the default reaction and
+    do something more complex. This is neccessary because some
+    reactions cannot be described by the simple combination of adding a
+    bond while deleting some existing atoms. For example,
     consider the aldol reaction:
 
         CH3C(=O)CH3 + CH3C(=O)CH3 --> CH3(=O)CH2C(OH)(CH3)CH3
 
-    Here a ketone is converted into an alcohol. In order to support
-    more complex conversions, a specific function needs to be defined
-    which modifies the molecule as desired. The function then needs
-    to be added to :data:`custom_reactions`. See
-    :func:`boronic_acid_with_diol` as an example.
+    Here a ketone is converted into an alcohol. If you wish to
+    support a complex reaction, add it as a method within this class.
+    The method will need take some :class:`FunctionalGroup` instances
+    as arguments. These are the functional groups which react. Within
+    the method itself, the attribute :attr:`bonds_made` must be
+    incremented by the number of bonds added by the reaction. Beyond
+    that, the method should operate :attr:`emol` and add and remove
+    bonds from it as necessary. If the method adds atoms to
+    :attr:`emol` it should update :attr:`new_atom_coords`.
+
+    Once the method is defined, :attr:`custom_reactions` needs to
+    be updated.
 
     Attributes
     ----------
@@ -464,9 +532,21 @@ class Reactor:
     bonds_made : :class:`int`
         The number of bonds added.
 
-    new_atom_coords : :class:`list` of :class:`numpy.ndarray`
+    new_atom_coords : :class:`list` of :class:`tuple`
         When a new atom is added by the reactor, its desired
-        desired coordinates are placed here.
+        desired coordinates are placed here. The :class:`list`
+        has the form
+
+        .. python::
+
+            new_atom_coords = [
+                (32, np.array([12.1, 3.5, 0.1])),
+                (41, np.array([13.1, -42.1, 2.]))
+            ]
+
+        where the first element of each tuple is the atom id of a
+        newly added atom and the second element is a
+        :class:`numpy.ndarray` holding its desired coordinate.
 
     deleters : :class:`list` of :class:`int`
         The ids of atoms which are to be removed.
@@ -535,11 +615,11 @@ class Reactor:
         the `*fgs` argument and checks which functional groups are
         involved in the reaction. If the functional groups are handled
         by one of the custom reactions specified in
-        :data:`custom_reactions` then that function is executed.
+        :attr:`custom_reactions` then that function is executed.
 
         In all other cases the function is assumed to have received two
-        functional groups to react via `*fgs`. In these functional
-        groups the bonder atoms have a bond added. The bond is single,
+        functional groups to react. In these functional groups, the
+        bonder atoms have a bond added. The bond is single,
         unless otherwise specified in :attr:`bond_orders`.
 
         Parameters
@@ -614,9 +694,27 @@ class Reactor:
 
     def result(self, del_atoms):
         """
+        Creates the molecule after all reactions have been done.
+
+        This method will also update all the functional groups
+        passed with :meth:`react` calls. It will update the atom
+        ids to account for the fact that atoms have been deleted.
+
+        Parameters
+        ----------
+        del_atoms : :class:`bool`
+            Toggles if deleter atoms should be removed from the
+            product molecule.
+
+        Returns
+        -------
+        :class:`rdkit.Mol`
+            The product molecule.
 
         """
 
+        # If new atoms were added, update the positions in the
+        # conformer.
         if self.new_atom_coords:
             self.mol = self.emol.GetMol()
             conf = self.mol.GetConformer()
@@ -626,11 +724,15 @@ class Reactor:
             self.emol = rdkit.EditableMol(self.mol)
 
         if del_atoms:
+            # Needs to be sorted for fg.remove_deleters.
             deleters = sorted(self.deleters)
 
+            # Go in reverse order else atom ids change during loop.
             for atom_id in reversed(deleters):
                 self.emol.RemoveAtom(atom_id)
 
+            # Update all the functional groups to account for the fact
+            # that atoms have been removed.
             for fg in self.func_groups:
                 fg.remove_deleters(deleters)
 
