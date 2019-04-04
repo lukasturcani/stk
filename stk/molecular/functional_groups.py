@@ -1,6 +1,9 @@
 """
 Defines tools for dealing with functional groups and their reactions.
 
+See the documentation of :class:`Reactor` to see how reactions between
+functional groups are performed.
+
 .. _`adding functional groups`:
 
 Extending stk: Adding  more functional groups.
@@ -31,32 +34,8 @@ does not.
 
 If a new functional group is to connect to another functional group
 with a bond other than a single, the names of the functional groups
-should be added to :data:`bond_orders`, along with the desired bond
-order.
-
-Supporting complex reactions.
-.............................
-
-During assembly, two functional groups are provided to
-:func:`react`. By default, placing an :class:`FGInfo` instance into
-:data:`functional_groups` will result in the creation of a single bond
-between the atoms tagged as ``'bonder'`` in the two functional groups.
-In addtion, any atoms tagged as ``'del'`` will be removed. The bond
-order of the created bond can be modified by editing
-:data:`bond_orders`.
-
-However, some reactions cannot be described by a simple combination of
-adding a bond while deleting some existing atoms. For example, consider
-the aldol reaction:
-
-    CH3C(=O)CH3 + CH3C(=O)CH3 --> CH3(=O)CH2C(OH)(CH3)CH3
-
-Here a ketone is converted into an alcohol. In order to support more
-complex conversions, a specific function needs to be defined which
-modifies the molecule as desired. The function then needs
-to be added to :data:`custom_reactions`. See
-:func:`boronic_acid_with_diol`
-as an example.
+should be added to :attr:`Reactor.bond_orders`, along with the desired
+bond order.
 
 """
 
@@ -69,33 +48,35 @@ from collections import Counter
 from ..utilities import AtomicPeriodicBond, flatten
 
 
-class FGKey:
+class ReactionKey:
     """
     Used to create a key from a :class:`list` of fg names.
 
-    Used by :data:`bond_orders`, :data:`custom_reactions` and
-    :data:`periodic_custom_reactions`.
+    In effect, this creates a unique id for each reaction, given a
+    :class:`list` of functional groups involved in that reaction.
 
     Attributes
     ----------
     key : :class:`tuple`
-        A unique key based on the functional groups provided to the
-        intializer.
+        A unique key representing a reaction.
 
     """
 
-    def __init__(self, fgs):
+    def __init__(self, *fg_names):
         """
         Intializer.
 
         Paramters
         ---------
-        fgs : :class:`list` of :class:`str`
-            A :class:`list` holding the names of functional groups.
+        *fg_names : :class:`str`
+            The names of functional groups involved in a reaction.
 
         """
-        c = Counter(fgs)
-        self.key = tuple(sorted((key, value) for key, value in c.items()))
+
+        c = Counter(fg_names)
+        self.key = tuple(
+            sorted((key, value) for key, value in c.items())
+        )
 
     def __eq__(self, other):
         return self.key == other.key
@@ -104,8 +85,9 @@ class FGKey:
         return hash(self.key)
 
     def __repr__(self):
-        fg_names = [name for name, count in self.key
-                    for i in range(count)]
+        fg_names = ', '.join(repr(name) for name, count in self.key
+                             for i in range(count))
+
         return f'FGInfo({fg_names})'
 
     def __str__(self):
@@ -234,24 +216,80 @@ class FGInfo:
 
 class FunctionalGroup:
     """
+    Represents the functional group of a molecule.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the functional group.
+
+    atom_ids : :class:`tuple` of :class:`int`
+        The ids of atoms in the functional group.
+
+    bonder_ids : :class:`tuple` of :class:`int`
+        The ids of bonder atoms in the functional group.
+
+    deleter_ids : :class:`tuple` of :class:`int`
+        The ids of deleter atoms in the functional group.
+
+    info : :class:`FGInfo`
+        The :class:`FGInfo` of the functional group type.
 
     """
 
     def __init__(self, id_, atom_ids, bonder_ids, deleter_ids, info):
+        """
+        Initialize a functional group.
+
+        Parameters
+        ----------
+        id_ : :class:`int`
+            The id of the functional group.
+
+        atom_ids : :class:`tuple` of :class:`int`
+            The ids of atoms in the functional group.
+
+        bonder_ids : :class:`tuple` of :class:`int`
+            The ids of bonder atoms in the functional group.
+
+        deleter_ids : :class:`tuple` of :class:`int`
+            The ids of deleter atoms in the functional group.
+
+        info : :class:`FGInfo`
+            The :class:`FGInfo` of the functional group to which the
+            functional group belongs.
+
+        """
+
         self.id = id_
         self.atom_ids = atom_ids
         self.bonder_ids = bonder_ids
         self.deleter_ids = deleter_ids
         self.info = info
 
-    def shifted_fg(self, id_, num_atoms):
+    def shifted_fg(self, id_, shift):
         """
+        Create a new :class:`FunctionalGroup` with shifted ids.
+
+        Parameters
+        ----------
+        id_ : :class:`int`
+            The id of the new functional group.
+
+        shift : :class:`int`
+            The number to shift the atom ids by.
+
+        Returns
+        -------
+        :class:`FunctionalGroup`
+            A :class:`FunctionalGroup` with all the atom ids atoms
+            shifted upward by `shift`.
 
         """
 
-        atom_ids = tuple(id + num_atoms for id in self.atom_ids)
-        bonder_ids = tuple(id + num_atoms for id in self.bonder_ids)
-        deleter_ids = tuple(id + num_atoms for id in self.deleter_ids)
+        atom_ids = tuple(id + shift for id in self.atom_ids)
+        bonder_ids = tuple(id + shift for id in self.bonder_ids)
+        deleter_ids = tuple(id + shift for id in self.deleter_ids)
 
         return self.__class__(id_=id_,
                               atom_ids=atom_ids,
@@ -261,6 +299,21 @@ class FunctionalGroup:
 
     def remove_deleters(self, deleters):
         """
+        Update and remove atom ids based on `deleters`.
+
+        For each deleter atom that is smaller than an atom id, the
+        atom id is decreased by 1. If the atom id is equal to a
+        `deleters` atom id, it is removed.
+
+        Paramters
+        ---------
+        deleters : :class:`list` of :class:`int`
+            Ids of atoms which are being removed from the molecule.
+            Must be sorted in ascending order.
+
+        Returns
+        -------
+        None : :class:`NoneType`
 
         """
 
@@ -274,6 +327,31 @@ class FunctionalGroup:
                                                  deleters)
 
     def _remove_deleters(self, atom_ids, deleters):
+        """
+        Update and remove atom ids based on `deleters`.
+
+        For each deleter atom that is smaller than an atom id, the
+        atom id is decreased by 1. If the atom id is equal to a
+        `deleters` atom id, it is removed.
+
+        Parameters
+        ----------
+        atom_ids : :class:`tuple` of :class:`int`
+            The atom ids which need to be updated.
+
+        deleters : :class:`list` of :class:`int`
+            The ids of atoms which are being removed. Must be sorted in
+            ascending order.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`int`
+            The atom ids in `atom_ids` after the update.
+
+        """
+
+        # Map each atom id to the number of smaller deleter ids.
+        # If the atom id is to be deleted, map to None.
         id_changes = {atom_id: 0 for atom_id in atom_ids}
 
         for atom_id in atom_ids:
@@ -282,9 +360,12 @@ class FunctionalGroup:
                     id_changes[atom_id] += 1
                 elif atom_id == deleter:
                     id_changes[atom_id] = None
+                # Because the deleters are sorted, there will be no
+                # more deleters which are smaller than atom_id.
                 if atom_id < deleter:
                     break
 
+        # Apply the id changes to the original atom ids.
         new_atom_ids = []
         for atom_id in atom_ids:
             change = id_changes[atom_id]
@@ -318,45 +399,120 @@ class FunctionalGroup:
 
 class Reactor:
     """
+    Performs reactions between functional groups of a molecule.
 
-    If some functional groups react via a special mechanism not covered
-    in by the base "react()" function the function should be placed
-    in this dict. The key should be a sorted tuple which holds the name
-    of every functional group involved in the reaction along with how
-    many such functional groups are invovled.
+    This class is responsible for reacting the functional groups in a
+    molecule during assembly.
+
+    .. _`adding complex reactions`:
+
+    Extending stk: Adding complex reactions.
+    ----------------------------------------
+
+    During assembly, two functional groups are provided to
+    :func:`react`. By default, placing an :class:`FGInfo` instance
+    into :data:`functional_groups` will result in the creation of a
+    single bond between the atoms tagged as ``'bonder'`` in the two
+    functional groups. In addtion, any atoms tagged as ``'del'`` will
+    be removed. The bond order of the created bond can be modified by
+    editing :data:`bond_orders`.
+
+    However, some reactions cannot be described by a simple combination
+    of adding a bond while deleting some existing atoms. For example,
+    consider the aldol reaction:
+
+        CH3C(=O)CH3 + CH3C(=O)CH3 --> CH3(=O)CH2C(OH)(CH3)CH3
+
+    Here a ketone is converted into an alcohol. In order to support
+    more complex conversions, a specific function needs to be defined
+    which modifies the molecule as desired. The function then needs
+    to be added to :data:`custom_reactions`. See
+    :func:`boronic_acid_with_diol` as an example.
 
     Attributes
     ----------
+    bond_orders : :class:`dict`
+        When the default reaction is performed by :meth:`react`,
+        if the bond added between the two functional groups is not
+        single, the desired bond order should be placed in this
+        dictionary. The dictionary maps the reaction's
+        :class:`ReactionKey` to the desired bond order.
+
+    custom_reactions : :class:`dict`
+        Maps a :class:`ReactionKey` for a given reaction to a custom
+        method which carries out the reaction. This means that
+        :meth:`react` will use that method for carrying out that
+        reaction instead.
+
+    periodic_custom_reactions : :class:`dict`
+        Maps a :class:`ReactionKey` for a given reaction to a custom
+        method which carries out the reaction. This means that
+        :meth:`periodic_react` will use that method for carrying out
+        that reaction instead.
+
+    mol : :class:`rdkit.Mol`
+        The molecule on which the reactor adds and removes atoms and
+        bonds.
+
+    emol : :class:`rdkit.EditableMol`
+        An editable version of :attr:`mol`. Used for adding and
+        removing atoms and bonds.
+
+    periodic_bonds : :class:`list` of :class:`.AtomicPeriodicBond`
+        The periodic bonds added by the reactor.
+
+    bonds_made : :class:`int`
+        The number of bonds added.
+
+    new_atom_coords : :class:`list` of :class:`numpy.ndarray`
+        When a new atom is added by the reactor, its desired
+        desired coordinates are placed here.
+
+    deleters : :class:`list` of :class:`int`
+        The ids of atoms which are to be removed.
+
+    func_groups : :class:`list` of :class:`FunctionalGroup`
+        The functional groups which the reactor has reacted.
 
     """
 
     double = rdkit.rdchem.BondType.DOUBLE
     triple = rdkit.rdchem.BondType.TRIPLE
     bond_orders = {
-        FGKey(['amine', 'aldehyde']): double,
-        FGKey(['amide', 'aldehyde']): double,
-        FGKey(['nitrile', 'aldehyde']): double,
-        FGKey(['amide', 'amine']): double,
-        FGKey(['terminal_alkene', 'terminal_alkene']): double,
-        FGKey(['alkyne2', 'alkyne2']): triple
+        ReactionKey('amine', 'aldehyde'): double,
+        ReactionKey('amide', 'aldehyde'): double,
+        ReactionKey('nitrile', 'aldehyde'): double,
+        ReactionKey('amide', 'amine'): double,
+        ReactionKey('terminal_alkene', 'terminal_alkene'): double,
+        ReactionKey('alkyne2', 'alkyne2'): triple
     }
 
     def __init__(self, mol):
+        """
+        Initialize a :class:`Reactor`.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Mol`
+            The molecule on which the reactor adds and removes atoms
+            and bonds.
+
+        """
 
         self.custom_reactions = {
 
-            FGKey(['boronic_acid', 'diol']):
+            ReactionKey('boronic_acid', 'diol'):
                 self.boronic_acid_with_diol,
 
-            FGKey(['diol', 'difluorene']):
+            ReactionKey('diol', 'difluorene'):
                 partial(self.diol_with_dihalogen,
                         dihalogen='difluorene'),
 
-            FGKey(['diol', 'dibromine']):
+            ReactionKey('diol', 'dibromine'):
                 partial(self.diol_with_dihalogen,
                         dihalogen='dibromine'),
 
-            FGKey(['phenyl_amine', 'phenyl_amine']):
+            ReactionKey('phenyl_amine', 'phenyl_amine'):
                 self.phenyl_amine_with_phenyl_amine
 
         }
@@ -400,8 +556,8 @@ class Reactor:
         self.deleters.extend(flatten(fg.deleter_ids for fg in fgs))
         self.func_groups.extend(fgs)
 
-        names = [fg.info.name for fg in fgs]
-        reaction_key = FGKey(names)
+        names = (fg.info.name for fg in fgs)
+        reaction_key = ReactionKey(*names)
         if reaction_key in self.custom_reactions:
             return self.custom_reactions[reaction_key](*fgs)
 
@@ -437,8 +593,8 @@ class Reactor:
 
         self.deleters.extend(flatten(fg.deleter_ids for fg in fgs))
 
-        names = [fg.info.name for fg in fgs]
-        reaction_key = FGKey(names)
+        names = (fg.info.name for fg in fgs)
+        reaction_key = ReactionKey(*names)
         if reaction_key in self.periodic_custom_reactions:
             rxn_fn = self.periodic_custom_reactions[reaction_key]
             return rxn_fn(direction, *fgs)

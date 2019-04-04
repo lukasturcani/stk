@@ -2184,13 +2184,28 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return self.mol
 
-    def shift_fgs(self, new_ids, num_atoms):
+    def shift_fgs(self, new_ids, shift):
         """
+        Yield new functional groups with atomic ids shifted.
+
+        Parameters
+        ----------
+        new_ids : :class:`iterable` of :class:`int`
+            The ids assigned to the new functional groups.
+
+        num_atoms : :class:`int`
+            The number to shift each atom id by.
+
+        Yields
+        ------
+        :class:`.FunctionalGroup`
+            A functional group from :attr:`.func_groups` with atomic
+            ids shifted by `shift`.
 
         """
 
         for id_, fg in zip(new_ids, self.func_groups):
-            yield fg.shifted_fg(id_=id_, num_atoms=num_atoms)
+            yield fg.shifted_fg(id_=id_, shift=shift)
 
     def similar_molecules(self, mols):
         """
