@@ -411,11 +411,11 @@ class PeriodicBond:
 
     Parameters
     ----------
-    fg1 : :class:`int`
-        The id of the first functional group involved in the bond.
+    fg1 : :class:`.FunctionalGroup`
+        The first functional group involved in the bond.
 
-    fg2 : :class:`int`
-        The id of the second functional group involved in the bond.
+    fg2 : :class:`.FunctionalGroup`
+        The second functional group involved in the bond.
 
     direction : :class:`list` of :class:`int`
         A 3 member list describing the axes along which the bond is
@@ -425,11 +425,11 @@ class PeriodicBond:
 
     Attributes
     ----------
-    fg1 : :class:`int`
-        The id of the first functional group involved in the bond.
+    fg1 : :class:`.FunctionalGroup`
+        The first functional group involved in the bond.
 
-    fg2 : :class:`int`
-        The id of the second functional group involved in the bond.
+    fg2 : :class:`.FunctionalGroup`
+        The second functional group involved in the bond.
 
     direction : :class:`numpy.ndarray` of :class:`int`
         A 3 member list describing the axes along which the bond is

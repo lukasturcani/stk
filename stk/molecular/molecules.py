@@ -981,7 +981,7 @@ class Molecule:
 
     def save_rdkit_atom_props(self, prop_names):
         """
-        Updates :attr:`~.Molecule.atom_props` rdkit atom tags.
+        Updates :attr:`~.Molecule.atom_props` with rdkit atom tags.
 
         Parameters
         ----------
@@ -3441,13 +3441,11 @@ class Periodic(MacroMolecule):
                 # ccel as in "connected cell".
                 ccell = cells[x][y][z]
 
-                # `fg1` is the id of a fg, found in `cell`
-                # and equivalent to `periodic_bond.fg1`, having a
-                # bond added.
+                # `fg1` is found in `cell` and equivalent to
+                # `periodic_bond.fg1`, having a bond added.
                 fg1 = cell.fgs[periodic_bond.fg1]
-                # `fg2` is the id of a fg, found in
-                # `ccell` and equivalent to `periodic_bond.fg2`,
-                # having a bond added.
+                # `fg2`  is found in `ccell` and equivalent to
+                # `periodic_bond.fg2`, having a bond added.
                 fg2 = ccell.fgs[periodic_bond.fg2]
 
                 reactor.react(fg1, fg2)
@@ -3505,7 +3503,7 @@ class Periodic(MacroMolecule):
             for fg in self.func_groups:
                 id_ = fg.id + i*nfgs
                 new_fg = fg.shifted_fg(id_, island.GetNumAtoms())
-                fgs[fg.id] = new_fg
+                fgs[fg] = new_fg
 
             cells[x][y][z] = Cell((x, y, z), fgs)
             island = rdkit.CombineMols(island, unit_cell)

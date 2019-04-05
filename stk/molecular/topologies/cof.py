@@ -619,7 +619,7 @@ class LinkerCOFLattice(COFLattice):
             else:
                 macro_mol.func_groups.append(fg3)
                 macro_mol.func_groups.append(fg4)
-                periodic_bond = PeriodicBond(fg3.id, fg4.id, e.bond)
+                periodic_bond = PeriodicBond(fg3, fg4, e.bond)
                 macro_mol.periodic_bonds.append(periodic_bond)
 
     def place_mols(self, macro_mol):
@@ -766,9 +766,7 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         )
         macro_mol.func_groups.append(top_fg)
         macro_mol.func_groups.append(bottom_fg)
-        periodic_bond = PeriodicBond(top_fg.id,
-                                     bottom_fg.id,
-                                     [0, 1, 0])
+        periodic_bond = PeriodicBond(top_fg, bottom_fg, [0, 1, 0])
         macro_mol.periodic_bonds.append(periodic_bond)
 
         # Do the same for the x-axis periodic bonds.
@@ -784,9 +782,7 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         )
         macro_mol.func_groups.append(right_fg)
         macro_mol.func_groups.append(left_fg)
-        periodic_bond = PeriodicBond(right_fg.id,
-                                     left_fg.id,
-                                     [1, 0, 0])
+        periodic_bond = PeriodicBond(right_fg, left_fg, [1, 0, 0])
         macro_mol.periodic_bonds.append(periodic_bond)
 
         # For the bond which gets created directly, find the bonder
