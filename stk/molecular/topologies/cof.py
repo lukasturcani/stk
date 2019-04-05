@@ -241,9 +241,10 @@ class Vertex:
 
         """
 
-        aligner_edge = next((e for e in self.connected if
-                             all(b == 0 for b in e.bond)),
-                            self.connected[0])
+        edges = (
+            e for e in self.connected if all(b == 0 for b in e.bond)
+        )
+        aligner_edge = next(edges, self.connected[0])
         vindex = 0 if self is aligner_edge.v1 else 1
         return aligner_edge.joint_positions[vindex]
 
@@ -310,7 +311,7 @@ class Edge:
         macro_mol : :class:`.MacroMolecule`
             The macromolecule being built.
 
-        cell_params : :class:`list` of :class:`numpy.array`
+        cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
         mol : :class:`.StructUnit3`
@@ -322,7 +323,7 @@ class Edge:
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The rdkit instance of the placed `mol`.
 
         """
@@ -347,12 +348,12 @@ class Edge:
         macro_mol : :class:`.MacroMolecule`
             The macromolecule being assembled.
 
-        cell_params : :class:`list` of :class:`numpy.array`
+        cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The direction vector.
 
         """
@@ -374,12 +375,12 @@ class Edge:
 
         Parameters
         ----------
-        cell_params : :class:`list` of :class:`numpy.array`
+        cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The direction vector.
 
         """
@@ -390,16 +391,16 @@ class Edge:
 
     def calc_coord(self, cell_params):
         """
-        Calcualtes the position of the edge in a cell.
+        Calculates the position of the edge in a cell.
 
         Parameters
         ----------
-        cell_params : :class:`list` of :class:`numpy.array`
+        cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The position.
         """
 
@@ -419,12 +420,12 @@ class Edge:
         macro_mol : :class:`.MacroMolecule`
             The macromolecule being assembled.
 
-        cell_params : :class:`list` of :class:`numpy.array`
+        cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The centroid of the fgs connected to those on the edge.
 
         """
@@ -450,10 +451,10 @@ class Edge:
             The macromolecule being built.
 
         fgs : :class:`list` of :class:`.FunctionalGroup`
-            The functional groups which need to be mapped to
-            edge positions.
+            The functional groups which need to be mapped to edge
+            positions.
 
-        cell_params : :class:`list` of :class:`numpy.array`
+        cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
         Returns
@@ -488,7 +489,9 @@ def bb_size(macro_mol):
 
     """
 
-    return sum(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
+    return sum(
+        bb.max_diameter()[0] for bb in macro_mol.building_blocks
+    )
 
 
 def linker_cof_scale_func(macro_mol):
@@ -508,7 +511,8 @@ def linker_cof_scale_func(macro_mol):
 
     """
 
-    return bb_size(macro_mol)*((len(macro_mol.topology.vertices)+1)//1.5)
+    nice_number = (len(macro_mol.topology.vertices)+1) // 1.5
+    return bb_size(macro_mol) * nice_number
 
 
 class COFLattice(Topology):
@@ -545,7 +549,7 @@ class LinkerCOFLattice(COFLattice):
     which has two functional groups and one which has 3 or more
     functional groups.
 
-    This class will have to be extended by sublcasses which define
+    This class will have to be extended by subclasses which define
     the vertices and edges which a particular topology consists of.
 
     Attributes
@@ -565,8 +569,8 @@ class LinkerCOFLattice(COFLattice):
 
     multitopic_aligners : :class:`list` of :class:`int`
         For each vertex in the topology, holds the value of a
-        ``fg_id`` of the multitopic bulding block. This is the
-        functional group which gets aligned at a given edge.
+        functional group id of the multitopic bulding block. This is
+        the functional group which gets aligned at a given edge.
 
     """
 
@@ -588,6 +592,17 @@ class LinkerCOFLattice(COFLattice):
 
     def bonded_fgs(self, macro_mol):
         """
+        Yield functional groups to be bonded.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being assembled.
+
+        Yields
+        ------
+        :class:`tuple` of :class:`.FunctionalGroup`
+            The functional groups to bond.
 
         """
 
@@ -598,6 +613,7 @@ class LinkerCOFLattice(COFLattice):
 
             fg3 = e.fg_map[1]
             fg4 = e.v2.fg_map[e.joint_positions[1]]
+            # True if bond is not periodic.
             if all(b == 0 for b in e.bond):
                 yield fg3, fg4
             else:
@@ -626,19 +642,19 @@ class LinkerCOFLattice(COFLattice):
 
         # Identify which building block is ditopic and which is
         # tri or more topic.
-        di = next(bb for bb in macro_mol.building_blocks if
-                  len(bb.func_groups) == 2)
-        multi = next(bb for bb in macro_mol.building_blocks if
-                     len(bb.func_groups) >= 3)
+        di = next(bb for bb in macro_mol.building_blocks
+                  if len(bb.func_groups) == 2)
+        multi = next(bb for bb in macro_mol.building_blocks
+                     if len(bb.func_groups) >= 3)
+
+        # Keep track of the number of functional groups in the cof.
+        n_fgs = 0
 
         # Calculate the size of the unit cell by scaling to the size of
         # building blocks.
         size = self.scale_func(macro_mol)
         cell_params = [size*p for p in self.cell_dimensions]
         macro_mol.cell_dimensions = cell_params
-
-        # Keep count of the total number of fgs in the macro_mol.
-        n_fgs = 0
 
         # For each vertex in the topology, place a multitopic building
         # block on it. The Vertex object takes care of alignment.
@@ -647,11 +663,9 @@ class LinkerCOFLattice(COFLattice):
             n_atoms = macro_mol.mol.GetNumAtoms()
 
             # Make the functional groups of the bb being placed.
-            fgs = []
-            for multi_fg in multi.func_groups:
-                fg = multi_fg.shifted_fg(n_fgs, n_atoms)
-                fgs.append(fg)
-                n_fgs += 1
+            ids = range(n_fgs, n_fgs+len(multi.func_groups))
+            fgs = list(multi.shift_fgs(ids, n_atoms))
+            n_fgs += len(multi.func_groups)
 
             # Place the bb.
             aligner = self.multitopic_aligners[i]
@@ -672,11 +686,9 @@ class LinkerCOFLattice(COFLattice):
             n_atoms = macro_mol.mol.GetNumAtoms()
 
             # Make the functional groups of the bb being placed.
-            fgs = []
-            for di_fg in di.func_groups:
-                fg = di_fg.shifted_fg(n_fgs, n_atoms)
-                fgs.append(fg)
-                n_fgs += 1
+            ids = range(n_fgs, n_fgs+2)
+            fgs = list(di.shift_fgs(ids, n_atoms))
+            n_fgs += 2
 
             mol = e.place_mol(macro_mol,
                               cell_params,
@@ -824,10 +836,12 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         macro_mol.cell_dimensions = [cell_size*x for x in
                                      self.cell_dimensions]
         self.vertices = [cell_size*x for x in self.vertices]
+
         # Place and set orientation of the first building block.
         bb1.set_bonder_centroid(self.vertices[0])
         bb1.set_orientation2([0, 0, 1])
         bb1.minimize_theta2(0, [0, -1, 0], [0, 0, 1])
+
         # Add to the macromolecule.
         for fg in bb1.func_groups:
             new_fg = fg.shifted_fg(
@@ -840,10 +854,12 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
                            macro_mol.building_blocks.index(bb1),
                            0)
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb1.mol)
+
         # Place and set orientation of the second building block.
         bb2.set_bonder_centroid(self.vertices[1])
         bb2.set_orientation2([0, 0, 1])
         bb2.minimize_theta2(0, [0, 1, 0], [0, 0, 1])
+
         # Add to the macromolecule.
         for fg in bb2.func_groups:
             new_fg = fg.shifted_fg(
