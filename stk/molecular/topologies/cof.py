@@ -24,7 +24,7 @@ sits on the edges. To assemble a COF topology, first the vertices
 and edges are defined. They are represented by the classes
 :class:`Vertex` and :class:`Edge`. Each of these objects defines their
 positions in terms of the fractional coordinates along the
-``a``, ``b`` and ``c`` vectors of a unit cell. In addtion, each
+``a``, ``b`` and ``c`` vectors of a unit cell. In addition, each
 of these objects defines a set of "fg positiions".
 
 For edges, there are two fg positions, 0 and 1. 0 is the position
@@ -114,12 +114,11 @@ class Vertex:
             The building block to be placed.
 
         aligner : :class:`int`
-            The ``fg_id`` of a functional group. This is the
-            fg which gets aligned with an edge.
+            The id of the functional group to be aligned with an edge.
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The rdkit instance of the placed `mol`.
 
         """
@@ -129,9 +128,11 @@ class Vertex:
         mol.set_orientation2([0, 0, 1])
 
         mol.set_bonder_centroid(coord)
-        aligner_edge = next((e for e in self.connected if
-                             all(b == 0 for b in e.bond)),
-                            self.connected[0])
+
+        edges = (
+            e for e in self.connected if all(b == 0 for b in e.bond)
+        )
+        aligner_edge = next(edges, self.connected[0])
         vector = (aligner_edge.calc_coord(cell_params) - coord)
 
         mol.minimize_theta2(aligner, vector, [0, 0, 1])
@@ -146,7 +147,7 @@ class Vertex:
 
         Parameters
         ----------
-        cell_params : :class:`list` of :class:`numpy.array`
+        cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
         cell_position : :class:`list` of :class:`int`, optional
@@ -155,7 +156,7 @@ class Vertex:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The position.
 
         """
@@ -183,16 +184,16 @@ class Vertex:
         macro_mol : :class:`.MacroMolecule`
             The macromolecule being built.
 
-        cell_params : :class:`list` of :class:`numpy.array`
+        cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
         fgs : :class:`list` of :class:`.FunctionalGroup`
             The functional groups being placed on the vertex.
 
         aligned_fg : :class:`int`
-            The ``fg_id`` of a functional group. This is the
-            fg which gets aligned with an edge. The ``fg_id``
-            corresponods to the value in the building block.
+            The id of the functional group to be aligned with an edge.
+            The id corresponods to the value in the building block,
+            not the macromolecule.
 
         Returns
         -------
