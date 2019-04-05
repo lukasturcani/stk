@@ -206,8 +206,9 @@ class Topology(metaclass=TopologyMeta):
         """
 
         if bb_conformers is None:
-            bb_conformers = [-1 for _ in
-                             range(len(macro_mol.building_blocks))]
+            bb_conformers = [
+                -1 for _ in range(len(macro_mol.building_blocks))
+            ]
 
         # When building, only a single conformer should exist per
         # building block. Otherwise, rdkit.CombineMols won't work. It
@@ -249,18 +250,12 @@ class Topology(metaclass=TopologyMeta):
 
         The ``rdkit`` molecules of the building blocks are
         combined into a single ``rdkit`` molecule and placed into
-        `macro_mol.mol`. Beyond this, the function must give every
-        functional group in the macromolecule a unique id. This is
-        done by adding the property ``'fg_id'`` to every atom part
-        of a functional group in `macro_mol`. Atoms in the same
-        functional group will have the same value of ``'fg_id'`` while
-        atoms in different functional groups will have a different
-        ``'fg_id'``.
+        `macro_mol.mol`.
 
         The function is also reponsible for updating
         :attr:`~.MacroMolecule.bb_counter`.
 
-        Finally, this function must also add the tags ``'bb_index'``
+        This function must also add the tags ``'bb_index'``
         and ``'mol_index'`` to every atom in the molecule. The
         ``'bb_index'`` tag identifies which building block the atom
         belongs to. The building block is identified by its index
@@ -272,10 +267,9 @@ class Topology(metaclass=TopologyMeta):
         be added to the macromolecule. The utility function
         :func:`.add_fragment_props` is provided to help with this.
 
-
         Parameters
         ----------
-        macro_mol : :class:`MacroMolecule`
+        macro_mol : :class:`.MacroMolecule`
             The molecule being assembled.
 
         Raises
@@ -288,20 +282,17 @@ class Topology(metaclass=TopologyMeta):
 
     def bonded_fgs(self, macro_mol):
         """
-        An iterator which yields ids of functional groups to be bonded.
+        An iterator which yields functional groups to be bonded.
 
-        The ids of functional groups in `macro_mol` are assigned by
-        :meth:`place_mols`. The ids are stored as atom properties
-        under the name ``'fg_id'``, This method looks at the
-        macromolecule and determines which functional groups should be
-        bonded to create the final macromolecule. It then yields the
-        ids functional groups as a :class:`tuple`.
+        This iterator must yield :class:`tuple`s of
+        :class:`.FunctionalGroup` molecules. These are the functional
+        groups in the macromolecule which need to be bonded.
 
-        This :class:`tuple` gets passed to :func:`.react`.
+        This :class:`tuple` gets passed to :meth:`Reactor.react`.
 
         Parameters
         ----------
-        macro_mol : :class:`MacroMolecule`
+        macro_mol : :class:`.MacroMolecule`
             The molecule being assembled.
 
         Raises

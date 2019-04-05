@@ -19,38 +19,36 @@ class Vertex:
 
     Attributes
     ----------
-    coord : :class:`numpy.array`
-        An array which holds the x, y and z coordinates of the
-        vertex, in that order.
+    coord : :class:`numpy.ndarray`
+        The x, y and z coordinates of the vertex, in that order.
 
     connected : :class:`list` of (:class:`Edge` or :class:`Vertex`)
-        This :class:`list` holds the :class:`Edge` or :class:`Vertex`
-        instances which represent the edges or vertices connected to
-        this one.
+        The :class:`Edge` or :class:`Vertex` instances which represent
+        the edges or vertices connected to this one.
 
     fgs : :class:`list` of :class:`.FunctionalGroup`
-        This :class:`list` holds the fgs placed on the vertex.
+        The functional groups placed on the vertex.
 
     fg_position_pairs : :class:`list`
         A :class:`list` of the form
 
         .. code-block:: python
 
-            fg_position_pairs = [(4, v1), (8, v2)]
+            fg_position_pairs = [(fg1, v1), (fg2, v2)]
 
-        Where ``v1`` and ``v2`` are :class:`Vertex` instances.
+        Where ``v1`` and ``v2`` are :class:`Vertex` instances and
+        ``fg1`` and ``fg2`` are :class:`.FunctionalGroup` instances.
 
-        Each fg which  is paired to a neighboring vertex or
+        Each fg which is paired to a neighboring vertex or
         edge first. Only after this is the fg-fg pairing
-        performed. The fg-edge/vertex pairing is stored here. The
-        :class:`int` represents the id of the fg.
+        performed. The fg-(edge/vertex) pairing is stored here.
 
     distances : :class:`list`
         A :class:`list` of the form
 
         .. code-block:: python
 
-            distances = [(15.2, 5, 10), (18.4, 3, 8), ...]
+            distances = [(15.2, fg1, fg2), (18.4, fg3, fg4), ...]
 
         After fgs have been associated with vertices to which
         they join, the idividual fgs are paired up. To do this the
@@ -58,9 +56,9 @@ class Vertex:
         fg which is paired to the vertex is found. This
         information is stored here the first element of each
         :class:`tuple` the distance, and the second and third elements
-        represent the fgs.
+        represent are :class:`.FunctionalGroup` instances.
 
-    id_ : :class:`object`, optional
+    id : :class:`object`, optional
         An id to identify the vertex. Used by
         :meth:`CageTopology.place_mols`.
 
@@ -69,7 +67,7 @@ class Vertex:
         from connected vertices or set manually. If the position is
         derived from the vertices then the position of the building
         block being placed is derived from the bonder atoms in the
-        conncected vertices.
+        connected vertices.
 
     """
 
@@ -83,10 +81,10 @@ class Vertex:
             The x coordinate.
 
         y : :class:`int` or :class:`float`
-            The y coordiante
+            The y coordinate
 
         z : :class:`int` or :class:`float`
-            The z coordiante
+            The z coordinate
 
         id : :class:`object`, optional
             An id to identify the vertex.
@@ -159,8 +157,7 @@ class Vertex:
 
         Secondly, the building block is rotated so that a fg
         is aligned perfectly with an edge. This reduces the rms
-        distance between the edges and fgs to some extent,
-        probably.
+        distance between the edges and fgs to some extent, probably.
 
         Parameters
         ----------
@@ -185,7 +182,7 @@ class Vertex:
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The ``rdkit`` instance holding the building block molecule
             with the coordinates placed on the vertex and orientation
             set as described in the docstring.
@@ -204,9 +201,8 @@ class Vertex:
 
         # Next, define the direction vector going from the edge
         # centroid to the edge with which the fg is aligned.
-
-        building_block.set_bonder_centroid(
-                            self.bonder_centroid(macro_mol, scale))
+        bonder_centroid = self.bonder_centroid(macro_mol, scale)
+        building_block.set_bonder_centroid(bonder_centroid)
         vector = (self.connected[aligner_edge].coord*scale -
                   self.edge_centroid(scale))
 
@@ -234,13 +230,14 @@ class Vertex:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             A normalized vector which defines the normal pointed away
             from the origin.
 
         """
         # Get two of the direction vectors running between the edges.
-        v1, v2 = itertools.islice(self.edge_direction_vectors(scale), 2)
+        direction_vectors = self.edge_direction_vectors(scale)
+        v1, v2 = itertools.islice(direction_vectors, 2)
         # To get the normal to the plane get the cross product of these
         # vectors. Normalize it.
         normal = normalize_vector(np.cross(v1, v2))
@@ -288,7 +285,7 @@ class Vertex:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             This array has the form ``[a, b, c, d]`` and represents the
             scalar equation of the plane formed by the connected edges.
 
@@ -313,7 +310,7 @@ class Vertex:
 
         Yields
         ------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             A normalized direction vector running from one edge
             connected to the vertex to another.
 
@@ -356,7 +353,7 @@ class Vertex:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             An array which holds the x, y and z positions of the
             centroid of the edges connected to the vertex.
 
@@ -365,8 +362,8 @@ class Vertex:
         # The connected edges are held in the `edges`. To get the
         # centroid, add up all the x, y and z coordinates (separately)
         # and divide each sum by the number of edges.
-        return (sum(edge.coord*scale for edge in self.connected) /
-                len(self.connected))
+        coords = (edge.coord*scale for edge in self.connected)
+        return sum(coords) / len(self.connected)
 
     def bonder_centroid(self, macro_mol, scale):
         """
@@ -385,7 +382,7 @@ class Vertex:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The centroid of the bonder atoms.
 
         """
@@ -418,7 +415,7 @@ class Edge(Vertex):
 
     Attributes
     ----------
-    direction : :class:`numpy.array`
+    direction : :class:`numpy.ndarray`
         This vector represents the orientation of the edge. It is a
         normalized direction vector which runs from `v2` to `v1`,
         provided in the initalizer.
@@ -451,7 +448,8 @@ class Edge(Vertex):
                         id_,
                         custom_position)
 
-        self.connected.extend([v1, v2])
+        self.connected.append(v1)
+        self.connected.append(v2)
         v1.connected.append(self)
         v2.connected.append(self)
 
@@ -471,9 +469,9 @@ class Edge(Vertex):
         """
         Places a linker molecule on the coordinates of an edge.
 
-        It also orientates the linker so that a the fgs sit
-        exactly on the edge and the bulk of the linker points away from
-        the center of the cage.
+        It also orientates the linker so that the fgs sit exactly on
+        the edge and the bulk of the linker points away from the center
+        of the cage.
 
         Parameters
         ----------
@@ -493,7 +491,7 @@ class Edge(Vertex):
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The ``rdkit`` instance holding the linker molecule with the
             coordinates placed on the edge and orientation set as
             described in the docstring.
@@ -537,10 +535,10 @@ class CageTopology(Topology):
         The length of this :class:`list` must be equal to the number of
         building blocks in the cage. When cages are built one of the
         fgs of each building block is aligned with an edge
-        during placement. The :class:`int` is the ``fg_id`` of the
-        aligned functional group.
+        during placement. The :class:`int` is the id of the aligned
+        functional group.
 
-        If ``None`` then the functional group with ``fg_id`` of ``0``
+        If ``None`` then the functional group with id of ``0``
         is always aligned.
 
         For example,
@@ -550,14 +548,14 @@ class CageTopology(Topology):
             A_alignments = [0, 2, 1, 2]
 
         In this case there must be 4 building blocks in the cage. The
-        the first building block has its first (``fg_id = 0``) fg
-        aligned. The 2nd building block has the 3rd fg (``fg_id = 2``)
-        aligned. The 3rd building block has the 2nd fg (``fg_id = 1``)
-        aligned. The 4th building block has the 3rd fg (``fg_id = 2``)
+        the first building block has its first (``id = 0``) fg
+        aligned. The 2nd building block has the 3rd fg (``id = 2``)
+        aligned. The 3rd building block has the 2nd fg (``id = 1``)
+        aligned. The 4th building block has the 3rd fg (``id = 2``)
         aligned.
 
     B_alignments : :class:`list` of :class:`int`
-        The length of this :class:`list` should be euqal to the number
+        The length of this :class:`list` should be equal to the number
         of linkers in the cage. The linkers of a cage can have either 2
         functional groups or 3 or more, depending on the topology.
 
@@ -650,6 +648,10 @@ class CageTopology(Topology):
         equally ``bb2`` is replaced by ``1`` in ``bb_positions``
         because it has an index of ``1`` and so on.
 
+    _func_groups : :class:`list` of :class:`.FunctionalGroup`
+        Keeps track of the functional groups in the macromolecule
+        during assembly.
+
     """
 
     def __init__(self,
@@ -674,6 +676,20 @@ class CageTopology(Topology):
 
     def _bb_maps(self, macro_mol):
         """
+        Creates a maps from position to building block.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule which needs to have its building blocks
+            mapped to positions.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`dict`
+            Each :class:`dict` maps a position to the building block
+            which sits on it. The position is refered to its index
+            in :attr:`positions_A` or :attr:`positions_B`.
 
         """
 
@@ -693,7 +709,6 @@ class CageTopology(Topology):
                 lk_map[i] = np.random.choice(lks)
 
         else:
-
             for bb, positions in self.bb_positions.items():
                 # bb_positions can hold the StructUnits directly or
                 # refer to them by index.
@@ -835,10 +850,10 @@ class CageTopology(Topology):
         scale = max(bb.max_diameter()[0]
                     for bb in macro_mol.building_blocks)
 
-        # This loop places all building-blocks* on the points at
+        # This loop places all building blocks on the points at
         # `positions_A`. It then pairs all fgs which form a new bond
         # with the positions to which they will be bonding. It also
-        # counts the nubmer of building-blocks* which make up the
+        # counts the nubmer of building blocks which make up the
         # structure.
         for i, position in enumerate(self.positions_A):
             num_atoms = macro_mol.mol.GetNumAtoms()
@@ -857,6 +872,7 @@ class CageTopology(Topology):
                                macro_mol.building_blocks.index(bb),
                                i)
 
+            # Keep track of fgs in the macromolecule.
             first_id = len(self._func_groups)
             ids = range(first_id, first_id+n_bb)
             self._func_groups.extend(bb.shift_fgs(ids, num_atoms))
@@ -886,6 +902,7 @@ class CageTopology(Topology):
                                macro_mol.building_blocks.index(lk),
                                i)
 
+            # Keep track of fgs in the macromolecule.
             first_id = len(self._func_groups)
             ids = range(first_id, first_id+n_lk)
             self._func_groups.extend(lk.shift_fgs(ids, num_atoms))

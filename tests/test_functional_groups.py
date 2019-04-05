@@ -3,7 +3,7 @@ from os.path import join
 import stk
 
 test_dir = 'functional_group_tests_output'
-if not os.path.exists():
+if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 

@@ -1938,7 +1938,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                        json_dict['load_names'] else ""),
                       json_dict['note'])
             obj.optimized = json_dict['optimized']
-            obj.atom_props = json_dict['atom_props']
+            obj.atom_props = defaultdict(dict)
+            obj.atom_props.update(json_dict['atom_props'])
             return obj
 
     @staticmethod
