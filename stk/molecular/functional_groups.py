@@ -544,7 +544,7 @@ class Reactor:
         desired coordinates are placed here. The :class:`list`
         has the form
 
-        .. python::
+        .. code-block:: python
 
             new_atom_coords = [
                 (32, np.array([12.1, 3.5, 0.1])),
