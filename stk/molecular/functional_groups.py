@@ -404,7 +404,7 @@ class Reactor:
     initialized with a :class:`rdkit.Mol`. This is the molecule which
     is going to have atom and bonds added and removed.
 
-    .. python::
+    .. code-block:: python
 
         mol = rdkit.MolFromMolFile(...)
         reactor = Reactor(mol)
@@ -413,7 +413,7 @@ class Reactor:
     between certain functional groups by using the :meth:`react`
     method.
 
-    .. python::
+    .. code-block:: python
 
         # Represents a functional group found in mol.
         fg1 = FunctionalGroup(id_=0,
@@ -452,7 +452,7 @@ class Reactor:
     Once we are done carrying out reactions on the molecule we can
     get the resulting molecule.
 
-    .. python::
+    .. code-block:: python
 
         # product is an rdkit molecule, with the earlier reactions
         # carried out and all deleter atoms removed.
