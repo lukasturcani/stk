@@ -11,7 +11,7 @@ macromolecules. These are commonly refered to as ``building blocks`` in
 the documentation. :class:`StructUnit` holds information concerning
 only a single building block molecule. For example, the number of atoms
 and bonds a building block may have. It also has information about the
-functoinal groups present in the building block molecule (see
+functional groups present in the building block molecule (see
 :class:`.FGInfo`). The class also allows manipulation of the lone
 building block molecule, such as rotations and translations.
 
@@ -40,10 +40,11 @@ building blocks. The building should happen in
 :meth:`~.Topology.build` method places the assembled macromoleclue in
 :attr:`MacroMolecule.mol` as an ``rdkit`` molecule.
 
-:class:`StructUnit` labels atoms in the functional groups of the
-building blocks as either ``'bonder'`` or ``'del'`` (see its
-documentation). This tells the :class:`.Topology` instance which atoms
-form bonds and which are removed during assembly.
+:class:`StructUnit` contains :class:`.FunctionalGroup` instances
+representing functional groups used during macromolecular assembly.
+There are divided into bonders and deleters (see the documentation of
+:class:`.FGInfo` and :class:`.FunctionalGroup`), which determines
+which atoms form bonds and which are removed during assembly.
 
 .. _`macromolecular assembly`:
 
@@ -84,25 +85,23 @@ and a :class:`tuple` of instances of this class called
 :data:`functional_groups`. If you put an :class:`.FGInfo` instance into
 :data:`functional_groups`, the functional group will be recognized.
 
-    3. Using :class:`.FGInfo`, tag atoms in the building block as
-       either ``'bonder'`` or ``'del'``. ``'bonder'`` signifies that
-       the atoms form a bond during macromolecular assembly, while
-       ``'del'`` means they are deleted. Also tag all atoms in the
-       functional group with the tag ``'fg'`` which holds the name
-       of the functional group.
-
-    4. Place the :class:`FunctionalGroup` instances into
-       :attr:`StructUnit.func_groups`. For every functional group name
-       supplied to the initializer, or found in the file path, ``stk``
-       finds functional groups of that type in the molecule and creates
-       a :class:`FunctionalGroup` instance for each match.
+    3. Using :class:`.FGInfo` create :class:`.FunctionalGroup`
+       instances, which determine the bonder and deleter atoms in the
+       molecule. These identify which atoms form bonds during
+       macromolecular assembly and which ones are deleted. Place the
+       :class:`.FunctionalGroup` instances into
+       :attr:`StructUnit.func_groups`.
 
        bb.func_groups
        # (FunctionalGroup(id=0,
        #                  atom_ids=(45, 21, 0),
+       #                  bonder_ids=(21, ),
+       #                  deleter_ids=(0, 45),
        #                  info=FGInfo('amine')),
        #  FunctionalGroup(id=1,
        #                  atom_ids=(47, 23, 15),
+       #                  bonder_ids=(47, ),
+       #                  deleter_ids=(23, 15),
        #                  info=FGInfo('amine')))
 
     5. Give the :class:`StructUnit` and :class:`.Topology` instances to
@@ -130,18 +129,22 @@ and a :class:`tuple` of instances of this class called
     8. Use :meth:`.Topology.place_mols` to combine the ``rdkit``
        molecules of all the building blocks into a single ``rdkit``
        instance. The combined ``rdkit`` instance is placed into
-       ``macro_mol.mol``. :meth:`.Topology.place_mols` also gives
-       each functional group a unique id. Every atom in the
-       assembled molecule that belongs to a functional group is
-       given the tag ``'fg_id'``, whose value holds a unique id for
-       each functional group.
+       ``macro_mol.mol``. :meth:`.Topology.place_mols` also usually
+       keeps track of each functional group in the macromolecule.
+       If a buliding block is placed in a macromolecule, the atom
+       ids have to be shifted upward by some amount.
+       :meth:`.FunctionalGroup.shifted_fg` performs this operation.
 
     9. Use :meth:`.Topology.prepare` to run any additional operations
        before joining up the building blocks and deleting extra
        atoms, this method may do nothing.
 
-    10. Use :meth:`.Topology.bonded_fgs` to get the ids of functional
-        groups in the molecule to react using :func:`.react`.
+    10. Use :meth:`.Topology.bonded_fgs` to yield the functional groups
+        which react. The :class:`.FunctionalGroup`s in the
+        macromolecule are passed to :meth:`.Reactor.react`, which
+        performs the reaction. See the documentation of
+        :class:`Reactor` for information on how reactions are carried
+        out.
 
     11. Run :meth:`.Topology.cleanup` to perform any final operations
         on the assembled molecule. Can be nothing.
@@ -188,7 +191,7 @@ from collections import Counter, defaultdict
 from inspect import signature
 
 from . import topologies
-from .functional_groups import react_many, periodic_react
+from .functional_groups import Reactor, FunctionalGroup
 from .functional_groups import functional_group_infos as fg_infos
 from .functional_groups import functional_groups as fgs
 from .energy import Energy
@@ -294,30 +297,6 @@ class MoleculeSubclassError(Exception):
     ...
 
 
-class FunctionalGroup:
-    """
-
-    """
-
-    def __init__(self, id_, atom_ids, info):
-        self.id = id_
-        self.atom_ids = atom_ids
-        self.info = info
-
-    def __eq__(self, other):
-        return (self.id == other.id and
-                self.atom_ids == other.atom_ids and
-                self.info == other.info)
-
-    def __repr__(self):
-        return (f"FunctionalGroup(id={self.id!r}, "
-                f"atom_ids={self.atom_ids!r}, "
-                f"info={self.info!s})")
-
-    def __str__(self):
-        return repr(self)
-
-
 class Molecule:
     """
     The most basic class representing molecules.
@@ -329,7 +308,7 @@ class Molecule:
 
     Attributes
     ----------
-    mol : :class:`rdkit.Chem.rdchem.Mol`
+    mol : :class:`rdkit.Mol`
         An ``rdkit`` molecule instance representing the molecule.
 
     inchi : :class:`str`
@@ -339,29 +318,17 @@ class Molecule:
         Handles all things energy.
 
     atom_props : :class:`dict`
-        Maps atom id to a :class:`dict` holding the ``rdkit`` atom
-        properties of the atom. For example
+        Maps atom id to a :class:`dict` holding the properties of
+        that atom. For example
 
         .. code-block:: python
 
-            atom_props = {0: {'bonder': 0,
-                              'fg': 'amine',
-                              'fg_id': 1},
-                          5: {'fg': 'amine',
-                              'fg_id': 2,
-                              'del': 0}}
+            atom_props = {0: {'prop1': 0,
+                              'prop2': 'value1',
+                              'prop3': 10.},
 
-    bonder_ids : :class:`list`
-        Holds the id of bonder atoms in a nested :class:`list`
-
-        .. code-block:: python
-
-            bonder_ids = [[1, 3], [5, 6], [11, 14]]
-
-        This means atoms with ids ``1`` and ``3`` are bonder atoms with
-        ``fg_id`` of ``0``, atoms ``5`` and ``6`` are bonder atoms with
-        ``fg_id`` of ``1`` and ``11`` and ``14`` are bonder atoms with
-        ``fg_id`` of ``2``.
+                          5: {'prop1': 'value2',
+                              'prop5': 2.0}}
 
     optimized : :class:`bool`
         Indicates whether a :class:`Molecule` has been passed through
@@ -384,7 +351,7 @@ class Molecule:
         self.energy = Energy(self)
         self.name = name
         self.note = note
-        self.save_atom_props()
+        self.atom_props = defaultdict(dict)
 
     def __init_subclass__(cls, **kwargs):
         if cls.__name__ in cls.subclasses:
@@ -427,6 +394,29 @@ class Molecule:
             atom_position = conf.GetAtomPosition(atom_id)
             yield atom_id, np.array([*atom_position])
 
+    def atom_centroid(self, atom_ids, conformer=-1):
+        """
+        Return the centroid of a group of atoms.
+
+        Parameters
+        ----------
+        atom_ids : :class:`list` of :class:`int`
+            The ids of atoms which which are used to calculate the
+            centroid.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The centroid of atoms specified by `atom_ids`.
+
+        """
+
+        coords = (self.atom_coords(a, conformer) for a in atom_ids)
+        return sum(coords) / len(atom_ids)
+
     def atom_coords(self, atom_id, conformer=-1):
         """
         Return coordinates of an atom.
@@ -441,7 +431,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             An array holding the x, y and z coordinates of the atom.
 
         """
@@ -495,52 +485,6 @@ class Molecule:
 
         return self.mol.GetAtomWithIdx(atom_id).GetSymbol()
 
-    def bonder_centroids(self, conformer=-1):
-        """
-        Calculates the centriod of bonder atoms in each fg.
-
-        The centroids are yielded in order, with the centroid of
-        the functional group with ``fg_id`` of ``0`` first.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Yields
-        ------
-        :class:`numpy.array`
-            The bonder centroid of a functional group.
-
-        """
-
-        for atoms in self.bonder_ids:
-            yield (sum(self.atom_coords(a, conformer) for a in atoms)
-                   / len(atoms))
-
-    def bonder_centroid(self, conformer=-1):
-        """
-        Returns the centroid of the bonder atoms.
-
-        The calculation has two stages. First, the centroids of
-        bonder atoms within the same functional groups are found.
-        Second, the centroid of the centroids found in stage 1 is
-        calculated and returned.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`numpy.array`
-            An array holding the midpoint of the bonder atoms.
-
-        """
-
-        return sum(self.bonder_centroids(conformer)) / len(self.bonder_ids)
-
     def _cavity_size(self, origin, conformer):
         """
         Calculates diameter of the molecule from `origin`.
@@ -555,7 +499,7 @@ class Molecule:
 
         Parameters
         ----------
-        origin : :class:`numpy.array`
+        origin : :class:`numpy.ndarray`
             Holds the x, y and z coordinate of the position from which
             the cavity is measured.
 
@@ -620,7 +564,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             An array holding the coordinates of the center of mass.
 
         References
@@ -648,13 +592,33 @@ class Molecule:
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             A numpy array holding the position of the centroid.
 
         """
 
-        centroid = sum(x for _, x in self.all_atom_coords(conformer))
-        return np.divide(centroid, self.mol.GetNumAtoms())
+        coords = (
+            coord for _, coord in self.all_atom_coords(conformer)
+        )
+        return sum(coords) / self.mol.GetNumAtoms()
+
+    def core(self):
+        """
+        Return the molecule with no H or functional group atoms.
+
+        Returns
+        -------
+        :class:`rdkit.Mol`
+            The "core" of the molecule.
+
+        """
+
+        emol = rdkit.EditableMol(self.mol)
+        for atom in reversed(self.mol.GetAtoms()):
+            atomid = atom.GetIdx()
+            if not self.is_core_atom(atomid):
+                emol.RemoveAtom(atomid)
+        return emol.GetMol()
 
     def dihedral_strain(self,
                         dihedral_SMARTS='',
@@ -690,14 +654,15 @@ class Molecule:
         dihedral_info = []
         if len(atoms_dihedral) > 0 and len(atoms_dihedral[0]) != 0:
             for atoms_group in atoms_dihedral:
-                # Calculate the dihedral angle
+                # Calculate the dihedral angle.
                 dihedral_value = rdMolTransforms.GetDihedralDeg(
                                     self.mol.GetConformer(conformer),
                                     atoms_group[0],
                                     atoms_group[1],
                                     atoms_group[2],
                                     atoms_group[3])
-                # check that the dihedral is calculated in the right direction
+                # Check that the dihedral is calculated in the right
+                # direction.
                 if abs(dihedral_value) > 90:
                     dihedral_value = abs(dihedral_value)
                 else:
@@ -705,12 +670,14 @@ class Molecule:
 
                 dihedral_info.append(dihedral_value)
 
-            # Calculate the average dihedral value
+            # Calculate the average dihedral value.
             avg_dihedral = np.mean([abs(x) for x in dihedral_info])
-            # Calculate the relative diff with the target dihedral value
+            # Calculate the relative diff with the target dihedral
+            # value.
             diff = (abs(target - avg_dihedral) / target) * 100
         else:
-            # If the molecule does not contain the bond, give 1% strain.
+            # If the molecule does not contain the bond, give 1%
+            # strain.
             diff = 1
 
         return diff
@@ -733,68 +700,6 @@ class Molecule:
 
         with open(path, 'w') as f:
             json.dump(self.json(), f, indent=4)
-
-    def fg_centroid(self, fg_id, conformer=-1):
-        """
-        The centroid of bonder atoms in a functional group.
-
-        Parameters
-        ----------
-        fg_id : :class:`int`
-            The id of the functional group.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`numpy.array`
-            The coordinates of a bonder centroid.
-
-        Raises
-        ------
-        :class:`RuntimeError`
-            If `fg_id` is not found on any atoms.
-
-        """
-
-        s = np.array([0., 0., 0.])
-        c = 0
-        for a in self.mol.GetAtoms():
-            if (a.HasProp('fg_id') and
-                a.GetIntProp('fg_id') == fg_id and
-               a.HasProp('bonder')):
-                s += self.atom_coords(a.GetIdx())
-                c += 1
-        if not c:
-            raise RuntimeError(f'No fg_id of {fg_id}.')
-        return s / c
-
-    def fg_distance(self, fg1, fg2, conformer=-1):
-        """
-        The distance between the bonder centroids of two fgs.
-
-        Parameters
-        ----------
-        fg1 : :class:`int`
-            The ``fg_id`` of the first fg.
-
-        fg2 : :class:`int`
-            The ``fg_id`` of the second fg.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to use.
-
-        Returns
-        -------
-        :class:`float`
-            The distance between `fg1` and `fg2`.
-
-        """
-
-        c1 = self.fg_centroid(fg1, conformer)
-        c2 = self.fg_centroid(fg2, conformer)
-        return euclidean(c1, c2)
 
     @classmethod
     def from_dict(self, json_dict, optimized=True, load_names=True):
@@ -871,6 +776,30 @@ class Molecule:
 
         self.update_stereochemistry()
         return rdkit.MolToInchi(self.mol)
+
+    def is_core_atom(self, atom_id):
+        """
+        Returns ``True`` if atom is not H or part of a fg.
+
+        Parameters
+        ----------
+        atom_id : :class:`int`
+            The id of the atom being queried.
+
+        Returns
+        -------
+        :class:`bool`
+            Indicates whether the atom with `atom_id` is part of the
+            core.
+
+        """
+
+        atom = self.mol.GetAtomWithIdx(atom_id)
+        if atom.GetAtomicNum() == 1:
+            return False
+        return all(
+            atom_id not in fg.atom_ids for fg in self.func_groups
+        )
 
     @classmethod
     def load(cls, path, optimized=True, load_names=True):
@@ -1050,9 +979,14 @@ class Molecule:
 
         return self.inchi == other.inchi
 
-    def retag_atoms(self):
+    def save_rdkit_atom_props(self, prop_names):
         """
-        Adds atom properties to atoms, using :attr:`atom_props`.
+        Updates :attr:`~.Molecule.atom_props` with rdkit atom tags.
+
+        Parameters
+        ----------
+        prop_names : :class:`set` of :class:`str`
+            The names of atom properties which should be saved.
 
         Returns
         -------
@@ -1060,15 +994,12 @@ class Molecule:
 
         """
 
-        for atom_id, props in self.atom_props.items():
-            atom = self.mol.GetAtomWithIdx(atom_id)
-            for pname, pval in props.items():
-                if isinstance(pval, int):
-                    atom.SetIntProp(pname, pval)
-                elif isinstance(pval, bool):
-                    atom.SetBoolProp(pname, pval)
-                else:
-                    atom.SetProp(pname, pval)
+        for atom in self.mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            props = atom.GetPropsAsDict()
+            valid_props = props.keys() & prop_names
+            for prop_name in valid_props:
+                self.atom_props[atom_id][prop_name] = props[prop_name]
 
     def rotate(self, theta, axis, conformer=-1):
         """
@@ -1081,7 +1012,7 @@ class Molecule:
         theta : :class:`float`
             The size of the rotation in radians.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The axis about which the rotation happens.
 
         conformer : :class:`int`, optional
@@ -1108,36 +1039,6 @@ class Molecule:
         self.set_position_from_matrix(new_pos_mat, conformer)
         # Return the centroid of the molecule to the origin position.
         self.set_position(og_position, conformer)
-
-    def save_atom_props(self):
-        """
-        Updates :attr:`atom_props` and :attr:`bonder_ids`.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self.bonder_ids = bonder_ids = []
-        self.atom_props = atom_props = defaultdict(dict)
-
-        for atom in self.mol.GetAtoms():
-            atomid = atom.GetIdx()
-            prop_dict = atom.GetPropsAsDict(False, False)
-            for name, value in prop_dict.items():
-                atom_props[atomid][name] = value
-
-                if name == 'bonder':
-                    fg_id = atom.GetIntProp('fg_id')
-
-                    # Make sure bonder_ids
-                    # does not raise an index error.
-                    if len(bonder_ids) < fg_id + 1:
-                        diff = fg_id + 1 - len(bonder_ids)
-                        bonder_ids.extend([] for i in range(diff))
-
-                    bonder_ids[fg_id].append(atomid)
 
     def set_orientation(self, start, end, conformer=-1):
         """
@@ -1169,11 +1070,11 @@ class Molecule:
 
         Parameters
         ----------
-        start : :class:`numpy.array`
+        start : :class:`numpy.ndarray`
             A vector which is to be rotated so that it transforms to
             the `end` vector.
 
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             This array holds the vector, onto which `start` is rotated.
 
         conformer : :class:`int`, optional
@@ -1181,7 +1082,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The ``rdkit`` molecule in :attr:`~Molecule.mol`.
 
         """
@@ -1216,7 +1117,7 @@ class Molecule:
 
         Parameters
         ----------
-        position : :class:`numpy.array`
+        position : :class:`numpy.ndarray`
             This array holds the position on which the centroid of the
             molecule should be placed.
 
@@ -1225,7 +1126,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The ``rdkit`` molecule with the centroid placed at
             `position`. This is the same instance as that in
             :attr:`Molecule.mol`.
@@ -1255,7 +1156,7 @@ class Molecule:
 
         Parameters
         ----------
-        pos_mat : :class:`numpy.array`
+        pos_mat : :class:`numpy.ndarray`
             The matrix holds the coordinates on which the atoms of the
             molecule should be placed.
 
@@ -1289,7 +1190,7 @@ class Molecule:
 
         Parameters
         ----------
-        shift : :class:`numpy.array`
+        shift : :class:`numpy.ndarray`
             A numpy array holding the value of the shift along each
             axis.
 
@@ -1298,7 +1199,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             A copy of the molecule where the coordinates have been
             shifted by `shift`.
 
@@ -1400,7 +1301,7 @@ class Molecule:
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
 
-        mol = remake(rdkit.MolFromMolFile(path,
+        mol = remake(rdkit.MolFromMolFile(molFileName=path,
                                           sanitize=False,
                                           removeHs=False))
         conf = rdkit.Conformer(mol.GetConformer())
@@ -1545,9 +1446,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         extensions is provided, the correct initialization function
         will be used.
 
-    func_groups : :class:`tuple` of :class:`FunctionalGroup`
+    func_groups : :class:`tuple` of :class:`.FunctionalGroup`
+        The functional groups present in the molecule. The id of
+        each :class:`.FunctionalGroup` should match its index.
 
-    func_group_infos : :class:`frozenset` of :class:`str`
+    func_group_infos : :class:`tuple` of :class:`.FGInfo`
+        The functional group types present in the molecule.
 
     """
 
@@ -1575,7 +1479,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             The full path of the molecular structure file holding the
             building block.
 
-        functional_groups : :class:`set` of :class:`str`, optional
+        functional_groups : :class:`list` of :class:`str`, optional
             The names of the functional groups which are to have atoms
             tagged. If ``None``, a functional group name found in the
             path `file`  is used. If no functional groups are provided
@@ -1583,7 +1487,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             `file`, no tagging is done.
 
         name : :class:`str`, optional
-            A name which can be optionally given to the molcule for
+            A name which can be optionally given to the molecule for
             easy identification.
 
         note : :class:`str`, optional
@@ -1620,16 +1524,10 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             key=lambda info: info.name
         ))
 
-        # Calling this function labels the atoms in the rdkit molecule
-        # as either atoms which form a bond during reactions or atoms
-        # which get removed.
-        if self.func_groups:
-            self.tag_atoms()
-
         super().__init__(name, note)
 
     @classmethod
-    def init_random(cls, db, fg=None, name="", note=""):
+    def init_random(cls, db, functional_groups=None, name="", note=""):
         """
         Picks a random file from `db` to initialize from.
 
@@ -1638,8 +1536,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         db : :class:`str`
             A path to a database of molecular files.
 
-        fg : :class:`str`, optional
-            The name of a functional group which the molecules in `db`
+        functional_groups : :class`list` of :class:`str`, optional
+            The name of a functional groups which the molecules in `db`
             have. By default it is assumed the name is present in the
             path of the files.
 
@@ -1666,14 +1564,59 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         for molfile in files:
             try:
-                return cls(molfile, fg, name, note)
+                return cls(molfile, functional_groups, name, note)
 
             except Exception:
-                logger.warning(
-                    'Could not initialize {} from {}.'.format(
-                                                cls.__name__, molfile))
+                msg = (f'Could not initialize '
+                       f'{cls.__name__} from {molfile}.')
+                logger.warning(msg)
         raise RuntimeError(
-                f'No files in "{db}" could be initialized from.')
+            f'No files in "{db}" could be initialized from.'
+        )
+
+    def bonder_centroid(self, conformer=-1):
+        """
+        Returns the centroid of the bonder atoms.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            An array holding the midpoint of the bonder atoms.
+
+        """
+
+        # Take the centroid of the bonder centroids.
+        nfgs = len(self.func_groups)
+        return sum(self.bonder_centroids(conformer)) / nfgs
+
+    def bonder_centroids(self, conformer=-1):
+        """
+        Calculates the centriod of bonder atoms in each fg.
+
+        The centroids are yielded in order, with the centroid of
+        the functional group with an id of ``0`` first.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Yields
+        ------
+        :class:`numpy.ndarray`
+            The bonder centroid of a functional group.
+
+        """
+
+        for fg in self.func_groups:
+            bonder_coords = (self.atom_coords(bonder, conformer)
+                             for bonder in fg.bonder_ids)
+            yield sum(bonder_coords) / len(fg.bonder_ids)
 
     def all_bonder_distances(self, conformer=-1):
         """
@@ -1688,14 +1631,17 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         ------
         :class:`tuple`
             A :class:`tuple` of the form ``(3, 54, 12.54)``.
-            The first two elements are the ``fg_id`` of the involved
+            The first two elements are the ids of the involved
             functional groups and the third element is the distance
             between them.
 
         """
 
-        centroids = it.combinations(self.bonder_centroids(conformer), 2)
-        ids = it.combinations(range(len(self.bonder_ids)), 2)
+        centroids = it.combinations(
+                        iterable=self.bonder_centroids(conformer),
+                        r=2)
+        ids = it.combinations(iterable=range(len(self.func_groups)),
+                              r=2)
         for (id1, id2), (c1, c2) in zip(ids, centroids):
             yield id1, id2, euclidean(c1, c2)
 
@@ -1723,15 +1669,19 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
                 (3, 54, np.array([12.2, 43.3, 9.78]))
 
-            The first two elements of the tuple represent the
-            ``fg_id`` of the start and end fgs of the vector,
-            respectively. The array is the direction vector running
-            between the functional group positions.
+            The first two elements of the tuple represent the ids
+            of the start and end fgs of the vector, respectively. The
+            array is the direction vector running between the
+            functional group positions.
 
         """
 
-        centroids = it.combinations(self.bonder_centroids(conformer), 2)
-        ids = it.combinations(range(len(self.bonder_ids)), 2)
+        centroids = it.combinations(
+                        iterable=self.bonder_centroids(conformer),
+                        r=2)
+        ids = it.combinations(
+                  iterable=range(len(self.func_groups)),
+                  r=2)
         for (id1, id2), (c1, c2) in zip(ids, centroids):
             yield id2, id1, normalize_vector(c1-c2)
 
@@ -1749,8 +1699,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         :class:`numpy.ndarray`
             The array has the shape ``[3, n]``. Each column holds the
             x, y and z coordinates of a bonder centroid. The index of
-            the column corresponds to the ``fg_id`` of the bonder
-            centroid.
+            the column corresponds to the id of the functional group.
 
         """
 
@@ -1771,7 +1720,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             The normalized direction vector running from the centroid
             of the bonder atoms to the molecular centroid.
 
@@ -1780,8 +1729,10 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # If the bonder centroid and centroid are in the same position,
         # the centroid - centroid vector should be orthogonal to the
         # bonder direction vector.
-        if np.allclose(self.centroid(conformer),
-                       self.bonder_centroid(conformer), atol=1e-5):
+        close = np.allclose(a=self.centroid(conformer),
+                            b=self.bonder_centroid(conformer),
+                            atol=1e-5)
+        if close:
             *_, bvec = next(self.bonder_direction_vectors(conformer))
             # Construct a secondary vector by finding the minimum
             # component of bvec and setting it to 0.
@@ -1796,23 +1747,55 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             return normalize_vector(self.centroid(conformer) -
                                     self.bonder_centroid(conformer))
 
-    def core(self):
+    def fg_bonder_centroid(self, fg_id, conformer=-1):
         """
-        Return the molecule with no H or functional group atoms.
+        The centroid of bonder atoms in a functional group.
+
+        Parameters
+        ----------
+        fg_id : :class:`int`
+            The id of the functional group.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
-            The "core" of the molecule.
+        :class:`numpy.ndarray`
+            The coordinates of a bonder centroid.
 
         """
 
-        emol = rdkit.EditableMol(self.mol)
-        for atom in reversed(self.mol.GetAtoms()):
-            atomid = atom.GetIdx()
-            if not self.is_core_atom(atomid):
-                emol.RemoveAtom(atomid)
-        return emol.GetMol()
+        fg = self.func_groups[fg_id]
+        bonder_coords = (self.atom_coords(bonder, conformer)
+                         for bonder in fg.bonder_ids)
+        return sum(bonder_coords) / len(fg.bonder_ids)
+
+    def fg_distance(self, fg1, fg2, conformer=-1):
+        """
+        The distance between the bonder centroids of two fgs.
+
+        Parameters
+        ----------
+        fg1 : :class:`int`
+            The ``fg_id`` of the first fg.
+
+        fg2 : :class:`int`
+            The ``fg_id`` of the second fg.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
+        Returns
+        -------
+        :class:`float`
+            The distance between `fg1` and `fg2`.
+
+        """
+
+        c1 = self.fg_bonder_centroid(fg1, conformer)
+        c2 = self.fg_bonder_centroid(fg2, conformer)
+        return euclidean(c1, c2)
 
     def functional_groups(self, fg_names):
         """
@@ -1826,8 +1809,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`list` of :class:`FunctionalGroup`
-            A :class:`list` holding a :class:`FunctionalGroup``
+        :class:`list` of :class:`.FunctionalGroup`
+            A :class:`list` holding a :class:`.FunctionalGroup``
             instance for every matched functional group in the
             molecule.
 
@@ -1838,49 +1821,55 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # same id.
         fg_names = sorted(fg_names)
 
-        fgs = []
+        func_groups = []
         for fg_name in fg_names:
             fg_info = fg_infos[fg_name]
 
-            # Generate a ``rdkit.Chem.rdchem.Mol`` instance which
-            # represents the functional group of the molecule.
-            func_grp_mol = rdkit.MolFromSmarts(fg_info.fg_smarts)
+            # Find all fg atoms.
+            fg_query = rdkit.MolFromSmarts(fg_info.fg_smarts)
+            fg_atoms = self.mol.GetSubstructMatches(fg_query)
 
-            # Do a substructure search on the the molecule in `mol` to
-            # find which atoms match the functional group. For each
-            # match create a FunctionalGroup instance.
-            matches = self.mol.GetSubstructMatches(func_grp_mol)
-            for atom_ids in matches:
-                fg = FunctionalGroup(id_=len(fgs),
-                                     atom_ids=atom_ids,
+            # Find all bonder atoms.
+            bonder_atoms = [[] for i in range(len(fg_atoms))]
+
+            for match in fg_info.bonder_smarts:
+                query = rdkit.MolFromSmarts(match.smarts)
+                atoms = set(flatten(
+                    self.mol.GetSubstructMatches(query)
+                ))
+
+                # Get all the bonders grouped by fg.
+                bonders = [[aid for aid in fg if aid in atoms]
+                           for fg in fg_atoms]
+
+                for fg_id, fg in enumerate(bonders):
+                    bonder_atoms[fg_id].extend(fg[:match.n])
+
+            # Find all deleter atoms.
+            deleter_atoms = [[] for i in range(len(fg_atoms))]
+            for match in fg_info.del_smarts:
+                query = rdkit.MolFromSmarts(match.smarts)
+                atoms = set(flatten(
+                    self.mol.GetSubstructMatches(query)
+                ))
+
+                # Get all deleters grouped by fg.
+                deleters = [[aid for aid in fg if aid in atoms]
+                            for fg in fg_atoms]
+
+                for fg_id, fg in enumerate(deleters):
+                    deleter_atoms[fg_id].extend(fg[:match.n])
+
+            for atom_ids in zip(fg_atoms, bonder_atoms, deleter_atoms):
+                fg, bonders, deleters = atom_ids
+                fg = FunctionalGroup(id_=len(func_groups),
+                                     atom_ids=fg,
+                                     bonder_ids=tuple(bonders),
+                                     deleter_ids=tuple(deleters),
                                      info=fg_info)
-                fgs.append(fg)
-        return fgs
+                func_groups.append(fg)
 
-    def is_core_atom(self, atomid):
-        """
-        Returns ``True`` if atom is not H or part of a fg.
-
-        Parameters
-        ----------
-        atomid : :class:`int`
-            The id of the atom being queried.
-
-        Returns
-        -------
-        :class:`bool`
-            Indicates whether the atom with `atomid` is part of the
-            core.
-
-        """
-
-        atom = self.mol.GetAtomWithIdx(atomid)
-        if atom.GetAtomicNum() == 1:
-            return False
-        if atomid not in self.atom_props:
-            return True
-
-        return 'fg' not in self.atom_props[atomid]
+        return func_groups
 
     def json(self):
         """
@@ -1895,7 +1884,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                 'mol_block' : '''A string holding the V3000 mol
                                  block of the molecule.''',
                 'note' : 'This molecule is nice.',
-                'name' : 'benzene'
+                'name' : 'benzene',
+                'atom_props': {0: {'prop1': 1.0,
+                                   'prop2': 'value1'}}
             }
 
         Returns
@@ -1905,14 +1896,15 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        func_groups = [info.name for info in self.func_group_infos]
+        fg_names = [info.name for info in self.func_group_infos]
         return {
 
             'class': self.__class__.__name__,
-            'func_groups': func_groups,
+            'func_groups': fg_names,
             'mol_block': self.mdl_mol_block(),
             'note': self.note,
-            'name': self.name
+            'name': self.name,
+            'atom_props': self.atom_props
 
         }
 
@@ -1946,6 +1938,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                        json_dict['load_names'] else ""),
                       json_dict['note'])
             obj.optimized = json_dict['optimized']
+            obj.atom_props = defaultdict(dict)
+            obj.atom_props.update(json_dict['atom_props'])
             return obj
 
     @staticmethod
@@ -1955,7 +1949,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        rdkit_mol : :class:`rdkit.Chem.rdchem.Mol`
+        rdkit_mol : :class:`rdkit.Mol`
             An ``rdkit`` instance of the molecule.
 
         functional_groups : :class:`tuple` of :class:`str`
@@ -1973,8 +1967,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        return (*sorted(functional_groups),
-                rdkit.MolToInchi(rdkit_mol))
+        functional_groups = sorted(functional_groups)
+        return (*functional_groups, rdkit.MolToInchi(rdkit_mol))
 
     def minimize_theta(self, v1, v2, axis, centroid, conformer=-1):
         """
@@ -1984,16 +1978,16 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        v1 : :class:`numpy.array`
+        v1 : :class:`numpy.ndarray`
             The vector which is rotated.
 
-        v2 : :class:`numpy.array`
+        v2 : :class:`numpy.ndarray`
             The vector which is stationary.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The vector about which the rotation happens.
 
-        centroid : :class:`numpy.array`
+        centroid : :class:`numpy.ndarray`
             The position vector at the center of the rotation.
 
         conformer : :class:`int`, optional
@@ -2060,7 +2054,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        mol : :class:`rdkit.Chem.rdchem.Mol`
+        mol : :class:`rdkit.Mol`
             An ``rdkit`` molecule used for initialization.
 
         Returns
@@ -2086,7 +2080,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         theta : :class:`float`
             The size of the rotation in radians.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The axis about which rotation happens.
 
         conformer : :class:`int`, optional
@@ -2120,7 +2114,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        position : :class:`numpy.array`
+        position : :class:`numpy.ndarray`
             An array holding the desired the position. It holds
             the x, y and z coordinates, respectively.
 
@@ -2129,7 +2123,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The ``rdkit`` molecule after it has been shifted. The same
             instance as in :attr:`~Molecule.mol`.
 
@@ -2158,7 +2152,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             The vector with which the molecule's bonder atoms should be
             aligned.
 
@@ -2167,7 +2161,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The ``rdkit`` molecule in :attr:`~Molecule.mol`.
 
         """
@@ -2205,11 +2199,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        start : :class:`numpy.array`
+        start : :class:`numpy.ndarray`
             A vector which is to be rotated so that it transforms to
             the `end` vector.
 
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             This array holds the vector, onto which `start` is rotated.
 
         conformer : :class:`int`
@@ -2217,7 +2211,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The ``rdkit`` molecule in :attr:`~Molecule.mol`.
 
         """
@@ -2246,6 +2240,29 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return self.mol
 
+    def shift_fgs(self, new_ids, shift):
+        """
+        Yield new functional groups with atomic ids shifted.
+
+        Parameters
+        ----------
+        new_ids : :class:`iterable` of :class:`int`
+            The ids assigned to the new functional groups.
+
+        num_atoms : :class:`int`
+            The number to shift each atom id by.
+
+        Yields
+        ------
+        :class:`.FunctionalGroup`
+            A functional group from :attr:`.func_groups` with atomic
+            ids shifted by `shift`.
+
+        """
+
+        for id_, fg in zip(new_ids, self.func_groups):
+            yield fg.shifted_fg(id_=id_, shift=shift)
+
     def similar_molecules(self, mols):
         """
         Returns molecules from `mols` ordered by similarity.
@@ -2257,7 +2274,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        mols : :class:`iterable` of :class:`rdkit.Chem.rdchem.Mol`
+        mols : :class:`iterable` of :class:`rdkit.Mol`
             A group of molecules to which similarity is compared.
 
         Returns
@@ -2371,127 +2388,10 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             key=lambda info: info.name
         ))
 
-        if obj.func_groups:
-            obj.tag_atoms()
-
         Molecule.__init__(obj, note, name)
 
         cls.cache[key] = obj
         return obj
-
-    def _valid_tags(self, match_atoms, n):
-        """
-        Ensures that only `n` atoms per functional group are tagged.
-
-        Parameters
-        ----------
-        match_atoms : :class:`tuple`
-            The atom ids of all matched atoms.
-
-        n : :class:`int`
-            The maximum number of matched atoms per functional group
-            to be tagged.
-
-        Returns
-        -------
-        :class:`list` of :class:`int`
-            The ids of atoms to be tagged.
-
-        """
-
-        match_atoms = set(flatten(match_atoms))
-        # Keep only match atoms:
-        fgs = [[aid for aid in fg.atom_ids if aid in match_atoms]
-               for fg in self.func_groups]
-
-        # Make sure only `n` atoms per fg are returned.
-        result = []
-        for fg in fgs:
-            for i, atom_id in enumerate(fg):
-                if i >= n:
-                    break
-                result.append(atom_id)
-        return result
-
-    def _tag(self, mol, smarts, tag):
-        """
-        Adds an IntProp to atoms.
-
-        Parameters
-        ----------
-        mol : :class:`rdkit.Chem.rdchem.Mol`
-            The molecule which is to have atoms tagged.
-
-        smarts : :class:`list`
-            Either :attr:`.FGInfo.bonder_smarts` or
-            :attr:`.FGInfo.del_smarts`.
-
-        tag : :class:`str`
-            The name of the atom tag.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        tag_id = 0
-        for match in smarts:
-            match_mol = rdkit.MolFromSmarts(match.smarts)
-            match_atoms = mol.GetSubstructMatches(match_mol)
-            match_atoms = self._valid_tags(match_atoms, match.n)
-
-            for atom_id in match_atoms:
-                atom = mol.GetAtomWithIdx(atom_id)
-                atom.SetIntProp(tag, tag_id)
-                tag_id += 1
-
-    def tag_atoms(self):
-        """
-        Adds atom properties to atoms.
-
-        All atoms which form the functional group of the molecule have
-        the property ``'fg'`` added. Its value is set to the name of
-        the functional group. In addition each such atom is given
-        the property ``'fg_id'`` which is unique to each functional
-        group.
-
-        The atoms which form bonds during assembly have the property
-        called ``'bonder'`` added and set to a unique id number. Atoms
-        which are deleted during reactions have the property ``'del'``
-        set to a unique id number.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for fg in self.func_groups:
-            for atom_id in fg.atom_ids:
-                atom = self.mol.GetAtomWithIdx(atom_id)
-                atom.SetProp('fg', fg.info.name)
-                atom.SetIntProp('fg_id', fg.id)
-
-        for info in self.func_group_infos:
-            self._tag(self.mol, info.bonder_smarts, 'bonder')
-            self._tag(self.mol, info.del_smarts, 'del')
-
-    def untag_atoms(self):
-        """
-        Removes the tags added by :meth:`tag_atoms`.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for atom in self.mol.GetAtoms():
-            atom.ClearProp('fg')
-            atom.ClearProp('bonder')
-            atom.ClearProp('del')
-            atom.ClearProp('fg_id')
 
     def __str__(self):
         return "{} {}".format(self.__class__.__name__, list(self.key))
@@ -2526,7 +2426,7 @@ class StructUnit2(StructUnit):
 
         Parameters
         ----------
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             The vector with which the molecule's bonder atoms should be
             aligned.
 
@@ -2535,7 +2435,7 @@ class StructUnit2(StructUnit):
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The ``rdkit`` molecule in :attr:`~Molecule.mol`.
 
         """
@@ -2553,10 +2453,10 @@ class StructUnit2(StructUnit):
 
         Parameters
         ----------
-        vector : :class:`numpy.array`
+        vector : :class:`numpy.ndarray`
             The vector to which the distance should be minimized.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The direction vector along which the rotation happens.
 
         conformer : :class:`int`, optional
@@ -2568,11 +2468,12 @@ class StructUnit2(StructUnit):
 
         """
 
-        self.minimize_theta(self.centroid_centroid_dir_vector(conformer),
-                            vector,
-                            axis,
-                            self.bonder_centroid(conformer),
-                            conformer)
+        self.minimize_theta(
+            v1=self.centroid_centroid_dir_vector(conformer),
+            v2=vector,
+            axis=axis,
+            centroid=self.bonder_centroid(conformer),
+            conformer=conformer)
 
 
 class StructUnit3(StructUnit):
@@ -2594,8 +2495,8 @@ class StructUnit3(StructUnit):
         bonder centroids. The coefficents ``a``, ``b`` and ``c``
         describe the normal vector to the plane. The coefficent ``d``
         is found by substituting these coefficients along with the
-        ``x``, ``y`` and ``z`` variables in the scalar equation and
-        solving for ``d``. The variables ``x``, ``y`` and ``z`` are
+        x, y and z variables in the scalar equation and
+        solving for ``d``. The variables x, y and z are
         substituted by the coordinates of some point on the plane. For
         example, the position of one of the bonder centroids.
 
@@ -2606,7 +2507,7 @@ class StructUnit3(StructUnit):
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             This array has the form ``[a, b, c, d]`` and represents the
             scalar equation of the plane formed by the bonder
             centroids.
@@ -2635,23 +2536,26 @@ class StructUnit3(StructUnit):
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
             A unit vector which describes the normal to the plane of
             the bonder centroids.
 
         """
 
-        if sum(1 for _ in self.bonder_direction_vectors(conformer)) < 2:
+        if len(self.func_groups) < 3:
             raise ValueError(("StructUnit3 molecule "
                              "has fewer than 3 functional groups."))
 
-        vgen = (v for *_, v in self.bonder_direction_vectors(conformer))
-        v1, v2 = it.islice(vgen, 2)
+        direction_vectors = (
+            v for *_, v in self.bonder_direction_vectors(conformer)
+        )
+        v1, v2 = it.islice(direction_vectors, 2)
 
         normal_v = normalize_vector(np.cross(v1, v2))
 
-        theta = vector_theta(normal_v,
-                             self.centroid_centroid_dir_vector(conformer))
+        theta = vector_theta(
+                    normal_v,
+                    self.centroid_centroid_dir_vector(conformer))
 
         if theta > np.pi/2:
             normal_v *= -1
@@ -2672,10 +2576,10 @@ class StructUnit3(StructUnit):
             The id of functional group which is to have angle
             minimized.
 
-        vector : :class:`numpy.array`
+        vector : :class:`numpy.ndarray`
             A vector with which the angle is minimized.
 
-        axis : :class:`numpy.array`
+        axis : :class:`numpy.ndarray`
             The vector about which the rotation happens.
 
         conformer : :class:`int`, optional
@@ -2688,11 +2592,10 @@ class StructUnit3(StructUnit):
         """
 
         centroid = self.bonder_centroid(conformer)
+        fg = self.func_groups[fg_id]
 
-        fg_centroids = self.bonder_centroids(conformer)
-        for i in range(fg_id+1):
-            fg_centroid = next(fg_centroids)
-        v1 = fg_centroid - centroid
+        bonder_centroid = self.atom_centroid(fg.bonder_ids)
+        v1 = bonder_centroid - centroid
         self.minimize_theta(v1, vector, axis, centroid, conformer)
 
     def set_orientation2(self, end, conformer=-1):
@@ -2706,7 +2609,7 @@ class StructUnit3(StructUnit):
 
         Parameters
         ----------
-        end : :class:`numpy.array`
+        end : :class:`numpy.ndarray`
             The vector with which the normal of plane of bonder
             centroids shoould be aligned.
 
@@ -2715,7 +2618,7 @@ class StructUnit3(StructUnit):
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The ``rdkit`` molecule in :attr:`~Molecule.mol`.
 
         """
@@ -2799,6 +2702,12 @@ class MacroMolecule(Molecule, metaclass=Cached):
         The number of bonds made during assembly. Added by
         :func:`.Topology.build`.
 
+    func_groups : :class:`tuple` of :class:`.FunctionalGroup`
+        The remnants of building block functional groups present in the
+        molecule. These functional groups track which atoms belonged to
+        functional groups in the building block molecules. The id of
+        each :class:`.FunctionalGroup` should match its index.
+
     """
 
     def __init__(self,
@@ -2845,7 +2754,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         try:
             # Ask the ``Topology`` instance to assemble/build the
-            # macromolecule. This creates the `mol` attribute.
+            # macromolecule. This creates the `mol` and `func_groups`
+            # attributes.
             topology.build(self, bb_conformers)
 
         except Exception as ex:
@@ -2870,7 +2780,14 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
             raise MacroMoleculeBuildError(errormsg) from ex
 
+        self.func_groups = tuple(self.func_groups)
+
+        # Ensure that functional group ids are set correctly.
+        for id_, func_group in enumerate(self.func_groups):
+            func_group.id = id_
+
         super().__init__(name, note)
+        self.save_rdkit_atom_props({'mol_index', 'bb_index'})
 
     def add_conformer(self, bb_conformers):
         """
@@ -2896,7 +2813,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         # Build a new molecule.
         try:
             # Ask the ``Topology`` instance to assemble/build the
-            # macromolecule. This creates the `mol` attribute.
+            # macromolecule. This creates the `mol` and `func_groups`
+            # attributes.
             self.topology.build(self, bb_conformers)
 
         except Exception as ex:
@@ -2922,6 +2840,12 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
             raise MacroMoleculeBuildError(errormsg) from ex
 
+        self.func_groups = tuple(self.func_groups)
+
+        # Ensure that functional group ids are set correctly.
+        for id_, func_group in enumerate(self.func_groups):
+            func_group.id = id_
+
         # Get the new conformer.
         new_conf = rdkit.Conformer(self.mol.GetConformer())
         # Add it to the original molecule.
@@ -2945,38 +2869,25 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         Yields
         ------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The core of a building block molecule, as found in the
             macromolecule.
 
         """
 
-        done = set()
+        mols = defaultdict(set)
         for atom_id, props in self.atom_props.items():
-            # Ignore fragments which do not correspond to the molecule
-            # `bb`.
-            if (props.get('bb_index', None) != bb or
-               props.get('mol_index', None) in done):
-                continue
+            correct_bb = props.get('bb_index', float('nan')) == bb
+            if correct_bb and self.is_core_atom(atom_id):
+                mols[props['mol_index']].add(atom_id)
 
-            done.add(props['mol_index'])
-            # For each fragment make a new core. To preserve bond
-            # information, start with the macromolecule.
-            coremol = rdkit.EditableMol(self.mol)
-            # Remove any atoms not part of the core - atoms not in the
-            # fragment itself, hydrogens, atoms in the functional
-            # group.
-            for atom in reversed(self.mol.GetAtoms()):
-                atomid = atom.GetIdx()
-                bb_index = self.atom_props[atomid].get('bb_index', None)
-                mol_index = self.atom_props[atomid].get('mol_index', None)
-                fg = self.atom_props[atomid].get('fg', None)
-                if (bb_index != props['bb_index'] or
-                    mol_index != props['mol_index'] or
-                    atom.GetAtomicNum() == 1 or
-                   fg is not None):
-                    coremol.RemoveAtom(atomid)
-            yield coremol.GetMol()
+        for mol in mols.values():
+            core = rdkit.EditableMol(self.mol)
+            for atom in reversed(range(self.mol.GetNumAtoms())):
+                if atom not in mol:
+                    core.RemoveAtom(atom)
+
+            yield core.GetMol()
 
     def json(self):
         """
@@ -2995,7 +2906,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 'unscaled_fitness' : {'fitness_func1' : fitness1,
                                       'fitness_func2' : fitness2},
                 'note' : 'A nice molecule.',
-                'name' : 'Poly-Benzene'
+                'name' : 'Poly-Benzene',
+                'atom_props': {0: {'prop1': 1.0,
+                                   'prop2': 'value1'}}
             }
 
         Returns
@@ -3071,16 +2984,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.atom_props = {int(key): value for key, value in
                           json_dict['atom_props'].items()}
 
-        # Remake bonder_ids
-        obj.bonder_ids = bonder_ids = []
-        for atom_id, props in obj.atom_props.items():
-            if 'bonder' in props:
-                fg_id = props['fg_id']
-                if len(bonder_ids) < fg_id + 1:
-                    diff = fg_id + 1 - len(bonder_ids)
-                    bonder_ids.extend([] for i in range(diff))
-                bonder_ids[fg_id].append(atom_id)
-
         if OPTIONS['cache']:
             cls.cache[key] = obj
 
@@ -3106,15 +3009,15 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        return (frozenset(x.key for x in building_blocks),
-                repr(topology))
+        bb_keys = frozenset(x.key for x in building_blocks)
+        return bb_keys, repr(topology)
 
     def bb_distortion(self, bb_conformers=None, conformer=-1):
         """
         Rmsd difference of building blocks before and after assembly.
 
         The function looks at each building block in the macromolecule
-        and calculates the rmsd between the "free" verson and the one
+        and calculates the rmsd between the "free" version and the one
         present in the macromolecule. The mean of these rmsds is
         returned.
 
@@ -3141,7 +3044,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
         """
 
         if bb_conformers is None:
-            bb_conformers = [-1 for _ in range(len(self.building_blocks))]
+            bb_conformers = [
+                -1 for _ in range(len(self.building_blocks))
+            ]
 
         # Go through each of the building blocks. For each building
         # block get the core. Get the corrospending cores in the
@@ -3371,12 +3276,14 @@ class Cage(MacroMolecule):
             # Load an RDKit molecule object to pywindow.
 
             # As pywindow doesnt support multiple conformers, first
-            # make an rdkit molecule holding only the desired conformer.
+            # make an rdkit molecule holding only the desired
+            # conformer.
             new_mol = rdkit.Mol(self.mol)
             new_mol.RemoveAllConformers()
             new_mol.AddConformer(self.mol.GetConformer(conformer))
 
-            pw_molecule = pywindow.molecular.Molecule.load_rdkit_mol(new_mol)
+            loader = pywindow.molecular.Molecule.load_rdkit_mol
+            pw_molecule = loader(new_mol)
             # Find windows and get a single array with windows' sizes.
             all_windows = pw_molecule.calculate_windows()
 
@@ -3386,8 +3293,9 @@ class Cage(MacroMolecule):
 
         # pywindow sometimes detects super large windows by accident,
         # filter them out first.
-        valid_windows = [w for w in all_windows if w < 1e6]
-        return sorted(valid_windows, reverse=True)[:self.topology.n_windows]
+        valid_windows = sorted((w for w in all_windows if w < 1e6),
+                               reverse=True)
+        return valid_windows[:self.topology.n_windows]
 
 
 class Polymer(MacroMolecule):
@@ -3427,7 +3335,7 @@ class Periodic(MacroMolecule):
         The key is an :class:`int` which represents a bonder atom.
         The value holds the position, element and bond type of
         every deleter atom removed from that bonder. The position is a
-        :class:`numpy.array`, the element is an :class:`int` and the
+        :class:`numpy.ndarray`, the element is an :class:`int` and the
         bond type is an :class:`rdkit.Chem.rdchem.BondType`.
 
     periodic_bonds : :class:`list` of :class:`.PeriodicBond`
@@ -3438,7 +3346,7 @@ class Periodic(MacroMolecule):
         :class:`.PeriodicBond` instances representing the bonds into
         this list.
 
-    cell_dimensions : :class:`list` of :class:`numpy.array`
+    cell_dimensions : :class:`list` of :class:`numpy.ndarray`
         The dimensions of the unit cell. The first array is the vector
         ``a`` the second is ``b`` and the third is ``c``. This should
         be added during the build process by the periodic topology.
@@ -3465,7 +3373,7 @@ class Periodic(MacroMolecule):
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             An ``rdkit`` molecule of the island.
 
         """
@@ -3485,14 +3393,14 @@ class Periodic(MacroMolecule):
         ----------
         cells : nested :class:`list` of :class:`Cell`
 
-        island : :class:`rdkit.Chem.rdchem.Mol`
+        island : :class:`rdkit.Mol`
             The island molecule holding unit cells placed side by
             side like in a supercell but with no bonds running between
             them.
 
         Returns
         -------
-        :class:`rdkit.Chem.rdchem.Mol`
+        :class:`rdkit.Mol`
             The island with bonds added.
 
         """
@@ -3514,7 +3422,9 @@ class Periodic(MacroMolecule):
         # the fg ids in the unit cells to the ids of the equivalent
         # fgs in the original unit cell  and checking the
         # `periodic_bond` to see which fg ids are connected.
-        fg_groups = []
+
+        reactor = Reactor(island)
+
         for cell in flatten(cells):
             for periodic_bond in self.periodic_bonds:
 
@@ -3531,18 +3441,16 @@ class Periodic(MacroMolecule):
                 # ccel as in "connected cell".
                 ccell = cells[x][y][z]
 
-                # `fg1` is the id of a fg, found in `cell`
-                # and equivalent to `periodic_bond.fg1`, having a
-                # bond added.
+                # `fg1` is found in `cell` and equivalent to
+                # `periodic_bond.fg1`, having a bond added.
                 fg1 = cell.fgs[periodic_bond.fg1]
-                # `fg2` is the id of a fg, found in
-                # `ccell` and equivalent to `periodic_bond.fg2`,
-                # having a bond added.
+                # `fg2`  is found in `ccell` and equivalent to
+                # `periodic_bond.fg2`, having a bond added.
                 fg2 = ccell.fgs[periodic_bond.fg2]
 
-                fg_groups.append(frozenset({fg1, fg2}))
+                reactor.react(fg1, fg2)
 
-        return react_many(island, True, fg_groups)[0]
+        return reactor.result(True)
 
     def _place_island(self, dimensions):
         """
@@ -3567,8 +3475,7 @@ class Periodic(MacroMolecule):
             a cell with the coordinates x, y, z can be accessed from
             the list using ``[x][y][z]``. For example,
 
-                >>> cells, island, bonder_map = \
-periodic._place_island([4, 4, 4])
+                >>> cells, island = periodic._place_island([4, 4, 4])
                 >>> cells[2][1][3]
                 <Cell at 0x7fa0155d54e0>
 
@@ -3577,9 +3484,7 @@ periodic._place_island([4, 4, 4])
             and the fourth along the z axis.
 
             The second member is an ``rdkit`` molecule of the island
-            being built. The third member is a :class:`dict` mapping
-            the ids of fgs in the island back to the id of the
-            equivalent fg in the original unit cell.
+            being built.
 
         """
 
@@ -3588,25 +3493,20 @@ periodic._place_island([4, 4, 4])
         island = rdkit.Mol()
 
         xdim, ydim, zdim = (range(d) for d in dimensions)
-        nfgs = 1 + max(atom.GetIntProp('fg_id') for atom in
-                       self.mol.GetAtoms() if atom.HasProp('fg_id'))
+        nfgs = len(self.func_groups)
+
         # For each dimension place a unit cell.
         for i, (x, y, z) in enumerate(it.product(xdim, ydim, zdim)):
             unit_cell = self.shift(x*a + y*b + z*c)
 
-            # Update fg_ids.
-            for atom in unit_cell.GetAtoms():
-                if not atom.HasProp('fg_id'):
-                    continue
-                atom.SetIntProp('fg_id', atom.GetIntProp('fg_id')+i*nfgs)
+            fgs = {}
+            for fg in self.func_groups:
+                id_ = fg.id + i*nfgs
+                new_fg = fg.shifted_fg(id_, island.GetNumAtoms())
+                fgs[fg] = new_fg
 
-            island = rdkit.CombineMols(island, unit_cell)
-            # `bonders` maps a bonder id in the original unit
-            # cell to the one currently being added to the
-            # island.
-            fgs = {fg: i*len(self.bonder_ids) + fg for
-                   fg in range(len(self.bonder_ids))}
             cells[x][y][z] = Cell((x, y, z), fgs)
+            island = rdkit.CombineMols(island, unit_cell)
 
         return cells, island
 
@@ -3617,7 +3517,7 @@ periodic._place_island([4, 4, 4])
         Returns
         -------
         :class:`tuple`
-            The first member is a :class:`rdkit.Chem.rdchem.Mol`
+            The first member is a :class:`rdkit.Mol`
             where the functional groups involved in a periodic bond
             have been reacted. This means the deleter atoms have been
             removed.
@@ -3628,19 +3528,12 @@ periodic._place_island([4, 4, 4])
 
         """
 
-        self.retag_atoms()
-
-        # Ensure each bonder id is unique
-        i = 0
-        for atom in self.mol.GetAtoms():
-            if atom.HasProp('bonder'):
-                atom.SetIntProp('bonder', i)
-                i += 1
-
+        reactor = Reactor()
         mol = rdkit.Mol(self.mol)
         periodic_bonds = []
         for pb in self.periodic_bonds:
-            mol, _, new_bonds = periodic_react(mol,
+            mol, _, new_bonds = reactor.periodic_react(
+                                               mol,
                                                True,
                                                pb.direction,
                                                pb.fg1,
@@ -3649,8 +3542,11 @@ periodic._place_island([4, 4, 4])
 
         return mol, periodic_bonds
 
-    def write_gulp_input(self, path, keywords,
-                         cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None):
+    def write_gulp_input(self,
+                         path,
+                         keywords,
+                         cell_fix=None,
+                         atom_fix=None):
         """
         Writes a GULP input file of the unit cell.
 
@@ -3668,7 +3564,7 @@ periodic._place_island([4, 4, 4])
             A 6 member list holding the fix parameters for the unit
             cell.
 
-        atom_fix : :class:`numpy.array` of :class:`int`, optional
+        atom_fix : :class:`numpy.ndarray` of :class:`int`, optional
             An n by 3 array where n is the number of atoms in the
             unit cell. Each row has the fix parameters for a given
             atom.
@@ -3678,6 +3574,9 @@ periodic._place_island([4, 4, 4])
         None : :class:`NoneType`
 
         """
+
+        if cell_fix is None:
+            cell_fix = [0, 0, 0, 0, 0, 0]
 
         pmol, pbs = self.periodic_mol()
         mol = StructUnit.__new__(StructUnit)

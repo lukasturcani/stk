@@ -3,9 +3,16 @@ import os
 from os.path import join
 import rdkit.Chem.AllChem as rdkit
 
-test_dir = 'cof_topology_tests'
+test_dir = 'cof_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
+
+
+def test_aligning(amine2, aldehyde4_alt1):
+    for i in range(4):
+        top = stk.Kagome(multitopic_aligners=[i, 0, 0])
+        cof = stk.Periodic([amine2, aldehyde4_alt1], top)
+        cof.write(join(test_dir, f'aligning_{i}.sdf'))
 
 
 def test_honeycomb(amine2, aldehyde3):
@@ -122,8 +129,8 @@ def test_nolinkerhoneycomb(amine3, aldehyde3):
 
     assert cof.bonds_made == 1
     assert (cof.mol.GetNumAtoms() ==
-            amine3.mol.GetNumAtoms()*1 +
-            aldehyde3.mol.GetNumAtoms()*1 -
+            amine3.mol.GetNumAtoms() +
+            aldehyde3.mol.GetNumAtoms() -
             cof.bonds_made*3)
     assert (cof.mol.GetNumBonds() ==
             amine3.mol.GetNumBonds()*1 +

@@ -94,6 +94,12 @@ def amine3():
 
 
 @pytest.fixture(scope='session')
+def phenyl_amine():
+    smiles = 'Nc1ccc2cc3cc(N)ccc3cc2c1'
+    return stk.StructUnit2.smiles_init(smiles, ['phenyl_amine'])
+
+
+@pytest.fixture(scope='session')
 def aldehyde3():
     return stk.StructUnit3.smiles_init('O=CC(C=O)C=O', ['aldehyde'])
 
@@ -125,7 +131,27 @@ def amine4():
 
 @pytest.fixture(scope='session')
 def aldehyde4():
-    return stk.StructUnit3.smiles_init('O=CC(C=O)(C=O)C=O', ['aldehyde'])
+    return stk.StructUnit3.smiles_init('O=CC(C=O)(C=O)C=O',
+                                       ['aldehyde'])
+
+
+@pytest.fixture(scope='session')
+def aldehyde4_alt1():
+    return stk.StructUnit3.smiles_init('O=CC(OC=O)(C=O)C=O',
+                                       ['aldehyde'])
+
+
+@pytest.fixture(scope='session')
+def difluorene2():
+    smiles = 'Fc1c(F)cc(F)c(F)c1'
+    return stk.StructUnit2.smiles_init(smiles, ['difluorene'])
+
+
+@pytest.fixture(scope='session')
+def difluorene_dibromine():
+    smiles = 'Fc1c(F)cc(Br)c(Br)c1'
+    return stk.StructUnit2.smiles_init(smiles,
+                                       ['difluorene', 'dibromine'])
 
 
 @pytest.fixture(scope='session')
@@ -148,6 +174,24 @@ def cc3():
 @pytest.fixture(scope='session')
 def c60():
     return stk.StructUnit(join('data', 'c60.pdb'))
+
+
+@pytest.fixture(scope='session')
+def fg():
+    return stk.FunctionalGroup(id_=0,
+                               atom_ids=[10, 3, 1, 4, 43, 5, 32, 55],
+                               bonder_ids=[3, 32, 10],
+                               deleter_ids=[1, 55, 5],
+                               info=stk.functional_groups[0])
+
+
+@pytest.fixture
+def tmp_fg():
+    return stk.FunctionalGroup(id_=0,
+                               atom_ids=[10, 3, 1, 4, 43, 5, 32, 55],
+                               bonder_ids=[3, 32, 10],
+                               deleter_ids=[1, 55, 5],
+                               info=stk.functional_groups[0])
 
 
 @pytest.fixture(scope='session')

@@ -16,12 +16,25 @@ of what these methods should do is given by :meth:`Topology.place_mols`
 and :meth:`Topology.bonded_fgs`.
 
 The new class may optionally define the methods :meth:`prepare` and
-:meth:`cleanup`. The former perfroms operations on the molecule
-before it is joined up and has atoms deleted via :func:`.react`.
-The latter any final cleanup operations on the assembled molecule. For
-example, converting the end functional groups of a polymer into
-hydrogen atoms. See also :meth:`Topology.cleanup`.
+:meth:`cleanup`. The former performs operations on the molecule
+before it is joined up and has atoms deleted via
+:meth:`.Reactor.react`. The latter any final cleanup operations on the
+assembled molecule. For example, converting the end functional groups
+of a polymer into hydrogen atoms. See also :meth:`Topology.cleanup`.
 
+During the build process, every time a building block is placed
+in the macromolecule, new :class:`FunctionalGroup` instances must be
+made, which correspond to the functional groups added by virtue of
+adding the building block. These must be added to the
+:class:`Reactor` held in :attr:`.Topology.reactor`, specifically into
+its :attr:`.Reactor.func_groups` attribute. This means that the
+reactor will keep the atom ids in these functional groups up to date
+when it deletes atoms. However, note that any functional groups
+yielded by :meth:`.Topology.bonded_fgs` are automatically added, so
+they do not have to be managed manually. If you do not wish to
+automatically add the functional groups into
+:attr:`.Reactor.func_groups` you can toggle it in
+:attr:`Topology.track_fgs`.
 
 Cages
 .....
@@ -69,7 +82,7 @@ import numpy as np
 from inspect import signature
 from collections import Counter
 
-from ..functional_groups import react
+from ..functional_groups import Reactor
 from ...utilities import dedupe, add_fragment_props, remake
 
 
@@ -141,9 +154,10 @@ class TopologyMeta(type):
         # a repr of the object and place it in the `repr` attribute.
         # The __repr__() function in Topology will then just return
         # this attribute.
-        c = ', '.join("{!s}={!r}".format(key, value) for key, value in
-                      sorted(sig.items()))
-        obj._repr = "{}({})".format(self.__name__, c)
+        c = ', '.join(
+            f'{key!s}={value!r}' for key, value in sorted(sig.items())
+        )
+        obj._repr = f'{self.__name__}({c})'
         return obj
 
 
@@ -168,14 +182,23 @@ class Topology(metaclass=TopologyMeta):
 
     Attributes
     ----------
-    react_del : :class:`bool`
-        Toggles whether atoms with the ``'del'`` propety are deleted
-        by :func:`.react`.
+    del_atoms : :class:`bool`
+        Toggles whether deleter atoms are deleted by
+        :meth:`.Reactor.result`.
+
+    reactor : :class:`.Reactor`
+        The reactor which performs the reactions.
+
+    track_fgs : :class:`bool`
+        Toggles whether functional groups yielded by
+        :meth:`bonded_fgs` are automatically added into
+        :attr:`.Reactor.func_groups`.
 
     """
 
-    def __init__(self, react_del=True):
-        self.react_del = react_del
+    def __init__(self, del_atoms=True, track_fgs=True):
+        self.del_atoms = del_atoms
+        self.track_fgs = track_fgs
 
     def build(self, macro_mol, bb_conformers=None):
         """
@@ -206,14 +229,9 @@ class Topology(metaclass=TopologyMeta):
         """
 
         if bb_conformers is None:
-            bb_conformers = [-1 for _ in
-                             range(len(macro_mol.building_blocks))]
-
-        # When running ``build()`` in parallel, the atom tags are
-        # cleared by the multiprocessing module. Make sure to reapply
-        # the tags before running ``build()``.
-        for bb in macro_mol.building_blocks:
-            bb.tag_atoms()
+            bb_conformers = [
+                -1 for _ in range(len(macro_mol.building_blocks))
+            ]
 
         # When building, only a single conformer should exist per
         # building block. Otherwise, rdkit.CombineMols won't work. It
@@ -225,13 +243,18 @@ class Topology(metaclass=TopologyMeta):
         macro_mol.mol = rdkit.Mol()
         macro_mol.bb_counter = Counter()
 
+        self.reactor = Reactor()
         self.place_mols(macro_mol)
         self.prepare(macro_mol)
+
+        self.reactor.set_molecule(macro_mol.mol)
+        macro_mol.func_groups = self.reactor.func_groups
+
         for fgs in self.bonded_fgs(macro_mol):
-            macro_mol.mol, new_bonds = react(macro_mol.mol,
-                                             self.react_del,
-                                             *fgs)
-            macro_mol.bonds_made += new_bonds
+            self.reactor.react(*fgs, track_fgs=self.track_fgs)
+        macro_mol.mol = self.reactor.result(self.del_atoms)
+        macro_mol.bonds_made = self.reactor.bonds_made
+
         self.cleanup(macro_mol)
 
         # Make sure that the property cache of each atom is up to date.
@@ -251,18 +274,12 @@ class Topology(metaclass=TopologyMeta):
 
         The ``rdkit`` molecules of the building blocks are
         combined into a single ``rdkit`` molecule and placed into
-        `macro_mol.mol`. Beyond this, the function must give every
-        functional group in the macromolecule a unique id. This is
-        done by adding the property ``'fg_id'`` to every atom part
-        of a functional group in `macro_mol`. Atoms in the same
-        functional group will have the same value of ``'fg_id'`` while
-        atoms in different functional groups will have a different
-        ``'fg_id'``.
+        `macro_mol.mol`.
 
         The function is also reponsible for updating
         :attr:`~.MacroMolecule.bb_counter`.
 
-        Finally, this function must also add the tags ``'bb_index'``
+        This function must also add the tags ``'bb_index'``
         and ``'mol_index'`` to every atom in the molecule. The
         ``'bb_index'`` tag identifies which building block the atom
         belongs to. The building block is identified by its index
@@ -274,10 +291,9 @@ class Topology(metaclass=TopologyMeta):
         be added to the macromolecule. The utility function
         :func:`.add_fragment_props` is provided to help with this.
 
-
         Parameters
         ----------
-        macro_mol : :class:`MacroMolecule`
+        macro_mol : :class:`.MacroMolecule`
             The molecule being assembled.
 
         Raises
@@ -290,20 +306,17 @@ class Topology(metaclass=TopologyMeta):
 
     def bonded_fgs(self, macro_mol):
         """
-        An iterator which yields ids of functional groups to be bonded.
+        An iterator which yields functional groups to be bonded.
 
-        The ids of functional groups in `macro_mol` are assigned by
-        :meth:`place_mols`. The ids are stored as atom properties
-        under the name ``'fg_id'``, This method looks at the
-        macromolecule and determines which functional groups should be
-        bonded to create the final macromolecule. It then yields the
-        ids functional groups as a :class:`tuple`.
+        This iterator must yield :class:`tuple`s of
+        :class:`.FunctionalGroup` molecules. These are the functional
+        groups in the macromolecule which need to be bonded.
 
-        This :class:`tuple` gets passed to :func:`.react`.
+        This :class:`tuple` gets passed to :meth:`Reactor.react`.
 
         Parameters
         ----------
-        macro_mol : :class:`MacroMolecule`
+        macro_mol : :class:`.MacroMolecule`
             The molecule being assembled.
 
         Raises
@@ -347,20 +360,6 @@ class Topology(metaclass=TopologyMeta):
         """
 
         return
-
-    def update_fg_id(self, macro_mol, mol):
-        """
-
-        """
-
-        mol = rdkit.Mol(mol)
-        max_id = max((a.GetIntProp('fg_id') for
-                      a in macro_mol.mol.GetAtoms() if
-                      a.HasProp('fg_id')), default=-1) + 1
-        for a in mol.GetAtoms():
-            if a.HasProp('fg_id'):
-                a.SetIntProp('fg_id', a.GetIntProp('fg_id')+max_id)
-        return mol
 
     def __str__(self):
         return repr(self)
@@ -407,7 +406,7 @@ class Linear(Topology):
 
     """
 
-    def __init__(self, repeating_unit, orientation, n, ends='h'):
+    def __init__(self, repeating_unit, orientation, n, ends='fg'):
         """
         Initializes a :class:`Linear` instance.
 
@@ -447,7 +446,7 @@ class Linear(Topology):
         self.orientation = tuple(orientation)
         self.n = n
         self.ends = ends
-        super().__init__()
+        super().__init__(track_fgs=False)
 
     def cleanup(self, macro_mol):
         """
@@ -469,7 +468,7 @@ class Linear(Topology):
 
     def hygrogen_ends(self, macro_mol):
         """
-        Removes all atoms tagged for deletion and adds hydrogens.
+        Removes all deleter atoms and adds hydrogens.
 
         In polymers, you want to replace the functional groups at the
         ends with hydrogen atoms.
@@ -485,12 +484,13 @@ class Linear(Topology):
 
         """
 
-        emol = rdkit.EditableMol(macro_mol.mol)
-        # Remove all extra atoms.
-        for atom in reversed(macro_mol.mol.GetAtoms()):
-            if atom.HasProp('del'):
-                emol.RemoveAtom(atom.GetIdx())
+        deleters = []
+        for func_group in self.reactor.func_groups:
+            deleters.extend(func_group.deleter_ids)
 
+        emol = rdkit.EditableMol(macro_mol.mol)
+        for atom_id in sorted(deleters, reverse=True):
+            emol.RemoveAtom(atom_id)
         macro_mol.mol = remake(emol.GetMol())
         macro_mol.mol = rdkit.AddHs(macro_mol.mol, addCoords=True)
 
@@ -549,25 +549,26 @@ class Linear(Topology):
             bb_index = macro_mol.building_blocks.index(bb)
             add_fragment_props(monomer_mol, bb_index, i)
 
-            # Add fg_id tags.
-
-            # Check which funcitonal group is at the back and which
+            # Check which functional group is at the back and which
             # one at the front.
-            if len(bb.bonder_ids) == 1:
-                c1, c2 = bb.bonder_centroid(), bb.centroid()
-            else:
+            n_fgs = len(bb.func_groups)
+            if n_fgs != 1:
                 c1, c2 = list(bb.bonder_centroids())
-            front = 1 if c1[0] < c2[0] else 0
-            back = 1 if front != 1 else 0
+            # When there is only 1 fg it doesnt matter.
+            else:
+                c1, c2 = [0, 0], [0, 0]
 
-            for atom in monomer_mol.GetAtoms():
-                if atom.HasProp('fg'):
-                    fg_id = atom.GetIntProp('fg_id')
-                    fg_id = 2*i if fg_id == back else 2*i+1
-                    atom.SetIntProp('fg_id', fg_id)
+            front = 1 if c1[0] < c2[0] else 0
+
+            num_atoms = macro_mol.mol.GetNumAtoms()
 
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
                                               monomer_mol)
+
+            for fg in bb.func_groups:
+                id_ = 2*i + 1 if fg.id == front else 2*i
+                func_group = fg.shifted_fg(id_, num_atoms)
+                self.reactor.func_groups.append(func_group)
 
             bb.set_position_from_matrix(original_position)
 
@@ -587,8 +588,9 @@ class Linear(Topology):
 
         """
 
+        fgs = sorted(self.reactor.func_groups, key=lambda fg: fg.id)
         for i in range(1, 2*len(self.repeating_unit)*self.n-1, 2):
-            yield i, i+1
+            yield fgs[i], fgs[i+1]
 
     def _x_position(self, macro_mol, bb):
         """

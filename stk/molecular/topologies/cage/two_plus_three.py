@@ -19,8 +19,9 @@ class TwoPlusThree(CageTopology):
                                         Edge(a, b),
                                         Edge(a, b)]
 
-    b.edge_plane_normal = lambda scale, a=a: np.multiply(
-                                            a.edge_plane_normal(scale), -1)
+    b.edge_plane_normal = (
+        lambda scale, a=a: np.multiply(a.edge_plane_normal(scale), -1)
+    )
 
     alpha.coord = np.array([-1, -0.5*np.sqrt(3), 0])
     beta.coord = np.array([1, -0.5*np.sqrt(3), 0])
@@ -179,7 +180,9 @@ class Dodecahedron(CageTopology):
                    Vertex(x, -x, -x),
                    Vertex(-x, -x, -x)]
 
-    A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T = positions_A
+    A, B, C, D, E, F, G, *_ = positions_A
+    H, I, J, K, L, M, N, O, P, Q, R, S, T = _
+
     positions_B = [
          Edge(A, N), Edge(A, M), Edge(A, D), Edge(B, O), Edge(B, P),
          Edge(B, C), Edge(C, T), Edge(C, Q), Edge(D, S), Edge(D, R),

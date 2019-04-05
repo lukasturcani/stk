@@ -20,6 +20,19 @@ def test_all_atom_coords(amine2):
     assert natoms == i
 
 
+def test_atom_centroid(amine2):
+    assert np.allclose(a=amine2.atom_centroid([0]),
+                       b=amine2.atom_coords(0),
+                       atol=1e-6)
+
+    atom_ids = [0, 1, 2, 3]
+    coords = (amine2.atom_coords(id_) for id_ in atom_ids)
+    centroid = sum(coords) / len(atom_ids)
+    assert np.allclose(a=amine2.atom_centroid(atom_ids),
+                       b=centroid,
+                       atol=1e-6)
+
+
 def test_atom_coords(amine2):
     """
     Tests `atom_coords`.
@@ -104,6 +117,12 @@ def test_centroid_functions(tmp_amine2):
     assert np.allclose(new_centroid, tmp_amine2.centroid(), atol=1e-8)
 
 
+def test_core(amine2):
+    for atom in amine2.core().GetAtoms():
+        assert atom.GetAtomicNum() != 1
+        assert not atom.HasProp('fg')
+
+
 def test_graph(amine2):
     """
     Tests the output of the `graph` method.
@@ -113,6 +132,14 @@ def test_graph(amine2):
     graph = amine2.graph()
     assert len(graph.nodes()) == amine2.mol.GetNumAtoms()
     assert len(graph.edges()) == amine2.mol.GetNumBonds()
+
+
+def test_is_core_atom(amine2):
+    for atom in amine2.mol.GetAtoms():
+        atom_id = atom.GetIdx()
+        fg = any(atom_id in fg.atom_ids for fg in amine2.func_groups)
+        core = False if fg or atom.GetAtomicNum() == 1 else True
+        assert core is amine2.is_core_atom(atom_id)
 
 
 def test_position_matrix(amine2):

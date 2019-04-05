@@ -66,13 +66,31 @@ def test_caching(amine2, aldehyde2):
         stk.OPTIONS['cache'] = False
 
 
+def test_save_rdkit_atom_props(tmp_amine2):
+    assert 'int_test' not in tmp_amine2.atom_props[0]
+    assert 'int_test2' not in tmp_amine2.atom_props[0]
+    assert 'str_test' not in tmp_amine2.atom_props[2]
+
+    tmp_amine2.mol.GetAtomWithIdx(0).SetIntProp('int_test', 121)
+    tmp_amine2.mol.GetAtomWithIdx(2).SetProp('str_test', 'value')
+    tmp_amine2.save_rdkit_atom_props({'int_test'})
+
+    assert tmp_amine2.atom_props[0]['int_test'] == 121
+    assert 'int_test2' not in tmp_amine2.atom_props[0]
+    assert 'str_test' not in tmp_amine2.atom_props[2]
+
+    tmp_amine2.save_rdkit_atom_props({'int_test2', 'str_test'})
+    assert tmp_amine2.atom_props[0]['int_test'] == 121
+    assert 'int_test2' not in tmp_amine2.atom_props[0]
+    assert tmp_amine2.atom_props[2]['str_test'] == 'value'
+
+
 def test_json_init(polymer):
     path = os.path.join('macromolecule_tests_output', 'mol.json')
     polymer.dump(path)
     mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
 
     assert polymer is not mol2
-    assert polymer.bonder_ids == mol2.bonder_ids
     assert polymer.atom_props == mol2.atom_props
     assert polymer.bb_counter == mol2.bb_counter
     assert polymer.topology == mol2.topology
