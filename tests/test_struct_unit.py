@@ -82,7 +82,6 @@ def test_json_init(amine2):
 
     assert isinstance(amine2.file, str)
     assert mol2.optimized
-    assert mol2.bonder_ids == amine2.bonder_ids
     assert mol2.energy.__class__.__name__ == 'Energy'
     assert amine2 is not mol2
     assert amine2.atom_props == amine2.atom_props
@@ -124,9 +123,3 @@ def test_set_bonder_centroid(tmp_amine2):
 
 def test_shift_fgs():
     assert False
-
-
-def test_untag_atoms(tmp_amine2):
-    assert any(a.HasProp('fg') for a in tmp_amine2.mol.GetAtoms())
-    tmp_amine2.untag_atoms()
-    assert all(not a.HasProp('fg') for a in tmp_amine2.mol.GetAtoms())

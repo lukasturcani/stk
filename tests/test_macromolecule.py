@@ -76,7 +76,6 @@ def test_json_init(polymer):
     mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
 
     assert polymer is not mol2
-    assert polymer.bonder_ids == mol2.bonder_ids
     assert polymer.atom_props == mol2.atom_props
     assert polymer.bb_counter == mol2.bb_counter
     assert polymer.topology == mol2.topology

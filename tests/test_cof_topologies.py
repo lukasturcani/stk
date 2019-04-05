@@ -122,8 +122,8 @@ def test_nolinkerhoneycomb(amine3, aldehyde3):
 
     assert cof.bonds_made == 1
     assert (cof.mol.GetNumAtoms() ==
-            amine3.mol.GetNumAtoms()*1 +
-            aldehyde3.mol.GetNumAtoms()*1 -
+            amine3.mol.GetNumAtoms() +
+            aldehyde3.mol.GetNumAtoms() -
             cof.bonds_made*3)
     assert (cof.mol.GetNumBonds() ==
             amine3.mol.GetNumBonds()*1 +

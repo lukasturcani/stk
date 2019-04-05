@@ -843,12 +843,8 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         bb1.minimize_theta2(0, [0, -1, 0], [0, 0, 1])
 
         # Add to the macromolecule.
-        for fg in bb1.func_groups:
-            new_fg = fg.shifted_fg(
-                        id_=len(self._func_groups),
-                        num_atoms=macro_mol.mol.GetNumAtoms()
-            )
-            self._func_groups.append(new_fg)
+        fgs = bb1.shift_fgs(range(0, 3), macro_mol.mol.GetNumAtoms())
+        self._func_groups.extend(fgs)
 
         add_fragment_props(bb1.mol,
                            macro_mol.building_blocks.index(bb1),
@@ -861,12 +857,8 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         bb2.minimize_theta2(0, [0, 1, 0], [0, 0, 1])
 
         # Add to the macromolecule.
-        for fg in bb2.func_groups:
-            new_fg = fg.shifted_fg(
-                        id_=len(self._func_groups),
-                        num_atoms=macro_mol.mol.GetNumAtoms()
-            )
-            self._func_groups.append(new_fg)
+        fgs = bb2.shift_fgs(range(3, 6), macro_mol.mol.GetNumAtoms())
+        self._func_groups.extend(fgs)
 
         add_fragment_props(bb2.mol,
                            macro_mol.building_blocks.index(bb2),
