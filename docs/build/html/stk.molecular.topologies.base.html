@@ -165,11 +165,24 @@ the methods <code class="xref py py-meth docutils literal notranslate"><span cla
 of what these methods should do is given by <a class="reference internal" href="#stk.molecular.topologies.base.Topology.place_mols" title="stk.molecular.topologies.base.Topology.place_mols"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Topology.place_mols()</span></code></a>
 and <a class="reference internal" href="#stk.molecular.topologies.base.Topology.bonded_fgs" title="stk.molecular.topologies.base.Topology.bonded_fgs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Topology.bonded_fgs()</span></code></a>.</p>
 <p>The new class may optionally define the methods <code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare()</span></code> and
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">cleanup()</span></code>. The former perfroms operations on the molecule
-before it is joined up and has atoms deleted via <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal notranslate"><span class="pre">react()</span></code></a>.
-The latter any final cleanup operations on the assembled molecule. For
-example, converting the end functional groups of a polymer into
-hydrogen atoms. See also <a class="reference internal" href="#stk.molecular.topologies.base.Topology.cleanup" title="stk.molecular.topologies.base.Topology.cleanup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Topology.cleanup()</span></code></a>.</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">cleanup()</span></code>. The former performs operations on the molecule
+before it is joined up and has atoms deleted via
+<a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.Reactor.react" title="stk.molecular.functional_groups.Reactor.react"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Reactor.react()</span></code></a>. The latter any final cleanup operations on the
+assembled molecule. For example, converting the end functional groups
+of a polymer into hydrogen atoms. See also <a class="reference internal" href="#stk.molecular.topologies.base.Topology.cleanup" title="stk.molecular.topologies.base.Topology.cleanup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Topology.cleanup()</span></code></a>.</p>
+<p>During the build process, every time a building block is placed
+in the macromolecule, new <code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code> instances must be
+made, which correspond to the functional groups added by virtue of
+adding the building block. These must be added to the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Reactor</span></code> held in <a class="reference internal" href="#stk.molecular.topologies.base.Topology.reactor" title="stk.molecular.topologies.base.Topology.reactor"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Topology.reactor</span></code></a>, specifically into
+its <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.Reactor.func_groups" title="stk.molecular.functional_groups.Reactor.func_groups"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Reactor.func_groups</span></code></a> attribute. This means that the
+reactor will keep the atom ids in these functional groups up to date
+when it deletes atoms. However, note that any functional groups
+yielded by <a class="reference internal" href="#stk.molecular.topologies.base.Topology.bonded_fgs" title="stk.molecular.topologies.base.Topology.bonded_fgs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Topology.bonded_fgs()</span></code></a> are automatically added, so
+they do not have to be managed manually. If you do not wish to
+automatically add the functional groups into
+<a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.Reactor.func_groups" title="stk.molecular.functional_groups.Reactor.func_groups"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Reactor.func_groups</span></code></a> you can toggle it in
+<a class="reference internal" href="#stk.molecular.topologies.base.Topology.track_fgs" title="stk.molecular.topologies.base.Topology.track_fgs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Topology.track_fgs</span></code></a>.</p>
 </div>
 <div class="section" id="cages">
 <h3>Cages<a class="headerlink" href="#cages" title="Permalink to this headline">¶</a></h3>
@@ -208,7 +221,7 @@ positions from the vertices supplied during initialization.</p>
 topology is at the origin.</p>
 <dl class="class">
 <dt id="stk.molecular.topologies.base.Linear">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Linear</code><span class="sig-paren">(</span><em>repeating_unit</em>, <em>orientation</em>, <em>n</em>, <em>ends='h'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Linear" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Linear</code><span class="sig-paren">(</span><em>repeating_unit</em>, <em>orientation</em>, <em>n</em>, <em>ends='fg'</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.base.Topology</span></code></a></p>
 <p>A class represting linear polymers.</p>
 <dl class="attribute">
@@ -323,7 +336,7 @@ It then tries to place <cite>bb</cite> about 3 A away from <cite>macro_mol</cite
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Linear.hygrogen_ends">
 <code class="descname">hygrogen_ends</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Linear.hygrogen_ends" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes all atoms tagged for deletion and adds hydrogens.</p>
+<dd><p>Removes all deleter atoms and adds hydrogens.</p>
 <p>In polymers, you want to replace the functional groups at the
 ends with hydrogen atoms.</p>
 <dl class="field-list simple">
@@ -364,7 +377,7 @@ Functional groups are tagged with <code class="docutils literal notranslate"><sp
 
 <dl class="class">
 <dt id="stk.molecular.topologies.base.Topology">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>react_del=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>del_atoms=True</em>, <em>track_fgs=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Builds macromolecules.</p>
 <p>More accurately, child classes of <a class="reference internal" href="#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a> take care of
@@ -381,10 +394,34 @@ this is done will depend on what kind of macromolecules are being
 built. In addition, each child class must define methods which
 place the building blocks in approriate positions.</p>
 <dl class="attribute">
-<dt id="stk.molecular.topologies.base.Topology.react_del">
-<code class="descname">react_del</code><a class="headerlink" href="#stk.molecular.topologies.base.Topology.react_del" title="Permalink to this definition">¶</a></dt>
-<dd><p>Toggles whether atoms with the <code class="docutils literal notranslate"><span class="pre">'del'</span></code> propety are deleted
-by <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal notranslate"><span class="pre">react()</span></code></a>.</p>
+<dt id="stk.molecular.topologies.base.Topology.del_atoms">
+<code class="descname">del_atoms</code><a class="headerlink" href="#stk.molecular.topologies.base.Topology.del_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles whether deleter atoms are deleted by
+<a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.Reactor.result" title="stk.molecular.functional_groups.Reactor.result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Reactor.result()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.topologies.base.Topology.reactor">
+<code class="descname">reactor</code><a class="headerlink" href="#stk.molecular.topologies.base.Topology.reactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The reactor which performs the reactions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.Reactor" title="stk.molecular.functional_groups.Reactor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reactor</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.topologies.base.Topology.track_fgs">
+<code class="descname">track_fgs</code><a class="headerlink" href="#stk.molecular.topologies.base.Topology.track_fgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles whether functional groups yielded by
+<a class="reference internal" href="#stk.molecular.topologies.base.Topology.bonded_fgs" title="stk.molecular.topologies.base.Topology.bonded_fgs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bonded_fgs()</span></code></a> are automatically added into
+<a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.Reactor.func_groups" title="stk.molecular.functional_groups.Reactor.func_groups"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Reactor.func_groups</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
@@ -395,17 +432,14 @@ by <a class="reference internal" href="stk.molecular.functional_groups.html#stk.
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Topology.bonded_fgs">
 <code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology.bonded_fgs" title="Permalink to this definition">¶</a></dt>
-<dd><p>An iterator which yields ids of functional groups to be bonded.</p>
-<p>The ids of functional groups in <cite>macro_mol</cite> are assigned by
-<a class="reference internal" href="#stk.molecular.topologies.base.Topology.place_mols" title="stk.molecular.topologies.base.Topology.place_mols"><code class="xref py py-meth docutils literal notranslate"><span class="pre">place_mols()</span></code></a>. The ids are stored as atom properties
-under the name <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code>, This method looks at the
-macromolecule and determines which functional groups should be
-bonded to create the final macromolecule. It then yields the
-ids functional groups as a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>.</p>
-<p>This <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> gets passed to <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal notranslate"><span class="pre">react()</span></code></a>.</p>
+<dd><p>An iterator which yields functional groups to be bonded.</p>
+<p>This iterator must yield <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple`s</span> <span class="pre">of</span>
+<span class="pre">:class:</span></code>.FunctionalGroup` molecules. These are the functional
+groups in the macromolecule which need to be bonded.</p>
+<p>This <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> gets passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">Reactor.react()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>macro_mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code>) – The molecule being assembled.</p>
+<dd class="field-odd"><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule being assembled.</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><strong>NotImplementedError</strong> – </p>
@@ -465,16 +499,10 @@ building blocks.</p></li>
 <dd><p>Places building blocks.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecules of the building blocks are
 combined into a single <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule and placed into
-<cite>macro_mol.mol</cite>. Beyond this, the function must give every
-functional group in the macromolecule a unique id. This is
-done by adding the property <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> to every atom part
-of a functional group in <cite>macro_mol</cite>. Atoms in the same
-functional group will have the same value of <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> while
-atoms in different functional groups will have a different
-<code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code>.</p>
+<cite>macro_mol.mol</cite>.</p>
 <p>The function is also reponsible for updating
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.bb_counter" title="stk.molecular.molecules.MacroMolecule.bb_counter"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bb_counter</span></code></a>.</p>
-<p>Finally, this function must also add the tags <code class="docutils literal notranslate"><span class="pre">'bb_index'</span></code>
+<p>This function must also add the tags <code class="docutils literal notranslate"><span class="pre">'bb_index'</span></code>
 and <code class="docutils literal notranslate"><span class="pre">'mol_index'</span></code> to every atom in the molecule. The
 <code class="docutils literal notranslate"><span class="pre">'bb_index'</span></code> tag identifies which building block the atom
 belongs to. The building block is identified by its index
@@ -487,7 +515,7 @@ be added to the macromolecule. The utility function
 <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.add_fragment_props" title="stk.utilities.utilities.add_fragment_props"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_fragment_props()</span></code></a> is provided to help with this.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>macro_mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code>) – The molecule being assembled.</p>
+<dd class="field-odd"><p><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule being assembled.</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><strong>NotImplementedError</strong> – </p>
@@ -511,11 +539,6 @@ be added to the macromolecule. The utility function
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="method">
-<dt id="stk.molecular.topologies.base.Topology.update_fg_id">
-<code class="descname">update_fg_id</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.base.Topology.update_fg_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 

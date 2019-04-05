@@ -158,8 +158,7 @@ part of <code class="docutils literal notranslate"><span class="pre">stk</span><
 <dl class="attribute">
 <dt id="stk.utilities.utilities.AtomicPeriodicBond.bonder1">
 <code class="descname">bonder1</code><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder1" title="Permalink to this definition">¶</a></dt>
-<dd><p>The value of the <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> atom property of the first bonded
-atom.</p>
+<dd><p>The id of the first atom involved in the bond.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
@@ -170,8 +169,7 @@ atom.</p>
 <dl class="attribute">
 <dt id="stk.utilities.utilities.AtomicPeriodicBond.bonder2">
 <code class="descname">bonder2</code><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder2" title="Permalink to this definition">¶</a></dt>
-<dd><p>The value of the <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> atom property of the second
-bonded atom.</p>
+<dd><p>The id of the second atom involved in the bond.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
@@ -185,7 +183,7 @@ bonded atom.</p>
 <dd><p>The bond type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.BondType</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.BondType</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -200,48 +198,6 @@ along the x axis in the positive direction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.utilities.utilities.AtomicPeriodicBond.atom1">
-<code class="descname">atom1</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.atom1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the atom id of <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder1" title="stk.utilities.utilities.AtomicPeriodicBond.bonder1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder1</span></code></a> in <cite>mol</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A molecule with a periodic bond.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The atom id of <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder1" title="stk.utilities.utilities.AtomicPeriodicBond.bonder1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder1</span></code></a> in <cite>mol</cite>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>RuntimeError</strong> – If <cite>mol</cite> does not have an atom with <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> tag
-    equal to <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder1" title="stk.utilities.utilities.AtomicPeriodicBond.bonder1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder1</span></code></a>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.utilities.utilities.AtomicPeriodicBond.atom2">
-<code class="descname">atom2</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.AtomicPeriodicBond.atom2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the atom id of <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder2" title="stk.utilities.utilities.AtomicPeriodicBond.bonder2"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder2</span></code></a> in <cite>mol</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A molecule with a periodic bond.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The atom id of <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder2" title="stk.utilities.utilities.AtomicPeriodicBond.bonder2"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder2</span></code></a> in <cite>mol</cite>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>RuntimeError</strong> – If <cite>mol</cite> does not have an atom with <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> tag
-    equal to <a class="reference internal" href="#stk.utilities.utilities.AtomicPeriodicBond.bonder2" title="stk.utilities.utilities.AtomicPeriodicBond.bonder2"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder2</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -306,7 +262,7 @@ equivalent fgs in the cell.</p>
 <dd><p>The name of a function or method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -318,7 +274,7 @@ equivalent fgs in the cell.</p>
 <cite>name</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -369,8 +325,8 @@ conformer search.</p>
 <dl class="attribute">
 <dt id="stk.utilities.utilities.MAEExtractor.mae_path">
 <code class="descname">mae_path</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.mae_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>The path to the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file holding the conformers generated by
-the macromodel conformer search.</p>
+<dd><p>The path to the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file holding the conformers generated
+by the macromodel conformer search.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
@@ -381,9 +337,9 @@ the macromodel conformer search.</p>
 <dl class="attribute">
 <dt id="stk.utilities.utilities.MAEExtractor.content">
 <code class="descname">content</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.content" title="Permalink to this definition">¶</a></dt>
-<dd><p>The content of the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file hodling all the conformers from
-the macromodel conformer search. This holds other data such as
-their energies too.</p>
+<dd><p>The content of the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file hodling all the conformers
+from the macromodel conformer search. This holds other data
+such as their energies too.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
@@ -398,8 +354,8 @@ their energies too.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">energies</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">231.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">144.4</span><span class="p">),</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Each <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> holds the id and energy of every conformer in the
-<code class="docutils literal notranslate"><span class="pre">.mae</span></code> file, respectively.</p>
+<p>Each <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> holds the id and energy of every conformer
+in the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file, respectively.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
@@ -433,13 +389,36 @@ energy conformer.</p>
 <dl class="method">
 <dt id="stk.utilities.utilities.MAEExtractor.extract_conformers">
 <code class="descname">extract_conformers</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.extract_conformers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a series of <code class="docutils literal notranslate"><span class="pre">.mae</span></code> files holding the lowest energy conformers.</p>
+<dd><p>Creates <code class="docutils literal notranslate"><span class="pre">.mae</span></code> files holding the lowest energy conformers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of conformers to extract.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="stk.utilities.utilities.MAEExtractor.extract_energy">
 <code class="descname">extract_energy</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.extract_energy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts the energy value from a .mae energy data block.</p>
+<dd><p>Extracts the energy value from a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> energy data block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – An <code class="docutils literal notranslate"><span class="pre">.mae</span></code> energy data block.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The energy value extracted from <cite>block</cite> or <code class="docutils literal notranslate"><span class="pre">None</span></code> if
+one is not found.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -455,8 +434,8 @@ energy conformer.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">returned</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">23</span><span class="p">,</span> <span class="mf">123.3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">143.89</span><span class="p">),</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">150.6</span><span class="p">),</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Where each <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> holds the id and energy of the <cite>n</cite>
-lowest energy conformers, respectively</p>
+<p>Where each <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> holds the id and energy of the
+<cite>n</cite> lowest energy conformers, respectively.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
@@ -469,6 +448,14 @@ lowest energy conformers, respectively</p>
 <dt id="stk.utilities.utilities.MAEExtractor.maegz_to_mae">
 <code class="descname">maegz_to_mae</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.maegz_to_mae" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the .maegz file to a .mae file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -487,10 +474,8 @@ lowest energy conformers, respectively</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fg1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The value of the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> for atoms in the first functional
-group.</p></li>
-<li><p><strong>fg2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The value of the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> for atoms in the second
-functional group.</p></li>
+<li><p><strong>fg1</strong> (<a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – The first functional group involved in the bond.</p></li>
+<li><p><strong>fg2</strong> (<a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – The second functional group involved in the bond.</p></li>
 <li><p><strong>direction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – A 3 member list describing the axes along which the bond is
 periodic, when going from <a class="reference internal" href="#stk.utilities.utilities.PeriodicBond.fg1" title="stk.utilities.utilities.PeriodicBond.fg1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fg1</span></code></a> to <a class="reference internal" href="#stk.utilities.utilities.PeriodicBond.fg2" title="stk.utilities.utilities.PeriodicBond.fg2"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fg2</span></code></a>. For
 example, <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is periodic along
@@ -501,11 +486,10 @@ the x axis in the positive direction.</p></li>
 <dl class="attribute">
 <dt id="stk.utilities.utilities.PeriodicBond.fg1">
 <code class="descname">fg1</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.fg1" title="Permalink to this definition">¶</a></dt>
-<dd><p>The value of the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> for atoms in the first functional
-group.</p>
+<dd><p>The first functional group involved in the bond.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -513,11 +497,10 @@ group.</p>
 <dl class="attribute">
 <dt id="stk.utilities.utilities.PeriodicBond.fg2">
 <code class="descname">fg2</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.fg2" title="Permalink to this definition">¶</a></dt>
-<dd><p>The value of the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> for atoms in the second
-functional group.</p>
+<dd><p>The second functional group involved in the bond.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -559,10 +542,10 @@ atom in <cite>mol</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – A molecule which needs to have its atoms tagged.</p></li>
-<li><p><strong>bb_index</strong> (<em>int</em>) – The index of <cite>mol</cite> within <cite>building_blocks</cite> of some
+<li><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code>) – A molecule which needs to have its atoms tagged.</p></li>
+<li><p><strong>bb_index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The index of <cite>mol</cite> within <cite>building_blocks</cite> of some
 macromolecule.</p></li>
-<li><p><strong>mol_index</strong> (<em>int</em>) – If <cite>mol</cite> is the 5th molecule of building block with <cite>bb_index</cite>
+<li><p><strong>mol_index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – If <cite>mol</cite> is the 5th molecule of building block with <cite>bb_index</cite>
 to be added to a macromolecule, <cite>mol_index</cite> is 4.</p></li>
 </ul>
 </dd>
@@ -586,7 +569,7 @@ working directory.</p>
 <dd class="field-odd"><p><strong>None</strong></p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>NoneType</p>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -597,13 +580,13 @@ working directory.</p>
 <dd><p>Calculates the centroid of a group of coordinates.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>*coords</strong> (<em>numpy.array</em>) – Any number of numpy arrays holding x, y and z positions.</p>
+<dd class="field-odd"><p><strong>*coords</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – Any number of numpy arrays holding x, y and z positions.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The centroid of the coordinates <cite>coords</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>numpy.array</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -617,15 +600,15 @@ yielded at all.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterable</strong> (<em>iterable</em>) – An iterable of elements which are to be yielded, only once.</p></li>
-<li><p><strong>seen</strong> (<em>set</em><em> (</em><em>default = None</em><em>)</em>) – Holds items which are not to be yielded.</p></li>
-<li><p><strong>key</strong> (<em>callable</em>) – A function which gets applied to every member of <cite>iterable</cite>.
+<li><p><strong>iterable</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code>) – An iterable of elements which are to be yielded, only once.</p></li>
+<li><p><strong>seen</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code>, optional) – Holds items which are not to be yielded.</p></li>
+<li><p><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">callable</span></code>) – A function which gets applied to every member of <cite>iterable</cite>.
 The return of this function is checked for duplication rather
 than the member itself.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Yields</dt>
-<dd class="field-even"><p><em>object</em> – Element in <cite>iterable</cite> which is not in <cite>seen</cite> and has not been
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code> – Element in <cite>iterable</cite> which is not in <cite>seen</cite> and has not been
 yielded before.</p>
 </dd>
 </dl>
@@ -633,33 +616,33 @@ yielded before.</p>
 
 <dl class="function">
 <dt id="stk.utilities.utilities.flatten">
-<code class="descclassname">stk.utilities.utilities.</code><code class="descname">flatten</code><span class="sig-paren">(</span><em>iterable</em>, <em>excluded_types={&lt;class 'str'&gt;}</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">flatten</code><span class="sig-paren">(</span><em>iterable</em>, <em>excluded_types=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transforms an nested iterable into a flat one.</p>
 <p>For example</p>
-<blockquote>
-<div><p>[[1,2,3], [[4], [5],[[6]], 7]</p>
-</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[[</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">],[[</span><span class="mi">6</span><span class="p">]],</span> <span class="mi">7</span><span class="p">]</span>
+</pre></div>
+</div>
 <p>becomes</p>
-<blockquote>
-<div><p>[1,2,3,4,5,6,7]</p>
-</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">]</span>
+</pre></div>
+</div>
 <p>If a type is found in <cite>excluded_types</cite> it will not be yielded from.
-For example if <cite>str</cite> is in <cite>excluded_types</cite></p>
-<blockquote>
-<div><p>a = [“abcd”, [“efgh”]]</p>
-</div></blockquote>
+For example if <code class="docutils literal notranslate"><span class="pre">str</span></code> is in <cite>excluded_types</cite></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;abcd&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;efgh&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
 <p>“abcd” and “efgh” are yielded if <cite>a</cite> is passed to <cite>iterable</cite>. If
 <cite>str</cite> was not in <cite>excluded_types</cite> then “a”, “b”, “c”, “d”, “e”,
 “f”, “g” and “h” would all be yielded individually.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterable</strong> (<em>iterable</em>) – The iterable which is to be flattened</p></li>
-<li><p><strong>excluded_types</strong> (<em>set</em>) – Holds container types which are not be flattened.</p></li>
+<li><p><strong>iterable</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code>) – The iterable which is to be flattened</p></li>
+<li><p><strong>excluded_types</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code>, optional) – Holds container types which are not be flattened.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Yields</dt>
-<dd class="field-even"><p><em>object</em> – A nested element of <cite>iterable</cite>.</p>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code> – A nested element of <cite>iterable</cite>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -676,22 +659,23 @@ distance to <cite>coords2</cite> minimized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>coords1</strong> (<em>numpy.array</em>) – This array represents a matrix hodling coordinates which need
+<li><p><strong>coords1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – This array represents a matrix hodling coordinates which need
 to be rotated to minimize their rms distance to coordinates in
 <cite>coords2</cite>. The matrix is n x 3. Each row of the matrix holds
 the x, y and z coordinates of one point, respectively. Here
 <code class="docutils literal notranslate"><span class="pre">n</span></code> is the number of points.</p></li>
-<li><p><strong>coords2</strong> (<em>numpy.array</em>) – This array represents a matrix which holds the coordinates of
+<li><p><strong>coords2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – This array represents a matrix which holds the coordinates of
 points the distance to which should be minimized. The matrix is
-n x 3. Each row of the matrix holds the x, y and z coordinates
-of one point, respectively. Here <code class="docutils literal notranslate"><span class="pre">n</span></code> is the number of points.</p></li>
+<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">x</span> <span class="pre">3</span></code>. Each row of the matrix holds the x, y and z
+coordinates of one point, respectively. Here <code class="docutils literal notranslate"><span class="pre">n</span></code> is the
+number of points.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A rotation matrix. This will be a 3 x 3 matrix.</p>
+<dd class="field-even"><p>A rotation matrix. This will be a <code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">x</span> <span class="pre">3</span></code> matrix.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>numpy.array</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
 </dd>
 </dl>
 <p class="rubric">References</p>
@@ -710,7 +694,7 @@ of one point, respectively. Here <code class="docutils literal notranslate"><spa
 <dd class="field-odd"><p><strong>None</strong></p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>NoneType</p>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -721,15 +705,15 @@ of one point, respectively. Here <code class="docutils literal notranslate"><spa
 <dd><p>Returns the centroid of the coordinates held in <cite>matrix</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>matrix</strong> (<em>np.matrix</em>) – A n x 3 matrix. Each row holds the x, y and z coordinate of
-some point, respectively.</p>
+<dd class="field-odd"><p><strong>matrix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – A <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">x</span> <span class="pre">3</span></code> matrix. Each row holds the x, y and z
+coordinate of some point, respectively.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A numpy array which holds the x, y and z coordinates of the
-centroid of the coordinates in <cite>matrix</cite>.</p>
+<dd class="field-even"><p>A numpy array which holds the x, y and z
+coordinates of the centroid of the coordinates in <cite>matrix</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>numpy.array</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -737,17 +721,17 @@ centroid of the coordinates in <cite>matrix</cite>.</p>
 <dl class="function">
 <dt id="stk.utilities.utilities.mol_from_mae_file">
 <code class="descclassname">stk.utilities.utilities.</code><code class="descname">mol_from_mae_file</code><span class="sig-paren">(</span><em>mae_path</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.mol_from_mae_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a rdkit molecule from a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
+<dd><p>Creates a <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule from a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mol2_file</strong> (<em>str</em>) – The full path of the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file from which an rdkit molecule
+<dd class="field-odd"><p><strong>mol2_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file from which an rdkit molecule
 should be instantiated.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An rdkit instance of the molecule held in <cite>mae_file</cite>.</p>
+<dd class="field-even"><p>An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> instance of the molecule held in <cite>mae_file</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>rdkit.Chem.rdchem.Mol</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -758,21 +742,21 @@ should be instantiated.</p>
 <dd><p>Creates a rdkit molecule from a <code class="docutils literal notranslate"><span class="pre">.mol</span></code> (V3000) file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mol_file</strong> (<em>str</em>) – The full of the .mol file from which an rdkit molecule should
+<dd class="field-odd"><p><strong>mol_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full of the .mol file from which an rdkit molecule should
 be instantiated.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>An rdkit instance of the molecule held in <cite>mol2_file</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>rdkit.Chem.rdchem.Mol</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#stk.utilities.utilities.ChargedMolError" title="stk.utilities.utilities.ChargedMolError"><strong>ChargedMolError</strong></a> – If an atom row has more than 8 coloumns it is usually because
     there is a 9th coloumn indicating atomic charge. Such molecules
     are not currently supported, so an error is raised.</p></li>
-<li><p><a class="reference internal" href="#stk.utilities.utilities.MolFileError" title="stk.utilities.utilities.MolFileError"><strong>MolFileError</strong></a> – If the file is not a V3000 .mol file.</p></li>
+<li><p><a class="reference internal" href="#stk.utilities.utilities.MolFileError" title="stk.utilities.utilities.MolFileError"><strong>MolFileError</strong></a> – If the file is not a V3000 <code class="docutils literal notranslate"><span class="pre">.mol</span></code> file.</p></li>
 </ul>
 </dd>
 </dl>
@@ -785,13 +769,13 @@ be instantiated.</p>
 <p>A new vector is returned, the original vector is not modified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>vector</strong> (<em>np.array</em>) – The vector to be normalized.</p>
+<dd class="field-odd"><p><strong>vector</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – The vector to be normalized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The normalized vector.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.array</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -802,7 +786,7 @@ be instantiated.</p>
 <dd><p>Returns a translation + rotation quaternion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of length 3 holding the paramter for the
+<dd class="field-odd"><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of length 3 holding the parameter for the
 quarternion.</p>
 </dd>
 </dl>
@@ -817,13 +801,13 @@ pages 124-132. Academic, New York, 1992.</p>
 <dd><p>Remakes a molecule from scratch.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – The molecule to be remade.</p>
+<dd class="field-odd"><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code>) – The molecule to be remade.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The remade molecule.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -837,15 +821,15 @@ function yields <cite>vector2</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vector1</strong> (<em>numpy.array</em>) – The vector which needs to be transformed to <cite>vector2</cite>.</p></li>
-<li><p><strong>vector2</strong> (<em>numpy.array</em>) – The vector onto which <cite>vector1</cite> needs to be transformed.</p></li>
+<li><p><strong>vector1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The vector which needs to be transformed to <cite>vector2</cite>.</p></li>
+<li><p><strong>vector2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The vector onto which <cite>vector1</cite> needs to be transformed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A rotation matrix which transforms <cite>vector1</cite> to <cite>vector2</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
 </dd>
 </dl>
 <p class="rubric">References</p>
@@ -860,16 +844,16 @@ function yields <cite>vector2</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>angle</strong> (<em>int</em><em> or </em><em>float</em>) – The size of the rotation in radians.</p></li>
-<li><p><strong>axis</strong> (<em>numpy.array</em>) – A 3 element aray which represents a vector. The vector is the
+<li><p><strong>angle</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The size of the rotation in radians.</p></li>
+<li><p><strong>axis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – A 3 element aray which represents a vector. The vector is the
 axis about which the rotation is carried out.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A 3x3 array representing a rotation matrix.</p>
+<dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">3x3</span></code> array representing a rotation matrix.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>numpy.array</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -877,13 +861,13 @@ axis about which the rotation is carried out.</p></li>
 <dl class="function">
 <dt id="stk.utilities.utilities.tar_output">
 <code class="descclassname">stk.utilities.utilities.</code><code class="descname">tar_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.tar_output" title="Permalink to this definition">¶</a></dt>
-<dd><p>Places all the content in the <cite>output</cite> folder into a .tgz file.</p>
+<dd><p>Places all the content in the <code class="docutils literal notranslate"><span class="pre">output</span></code> folder into a .tgz file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>None</strong></p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>NoneType</p>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -893,14 +877,12 @@ axis about which the rotation is carried out.</p></li>
 <code class="descclassname">stk.utilities.utilities.</code><code class="descname">time_it</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.utilities.time_it" title="Permalink to this definition">¶</a></dt>
 <dd><p>Times the code executed within the indent.</p>
 <p>This is a context manager so it should be used as:</p>
-<blockquote>
-<div><dl class="simple">
-<dt>with time_it():</dt><dd><p>something1()
-something2()
-something3()</p>
-</dd>
-</dl>
-</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">time_it</span><span class="p">():</span>
+    <span class="n">something1</span><span class="p">()</span>
+    <span class="n">something2</span><span class="p">()</span>
+    <span class="n">something3</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>After all 3 functions are finished and the nested block is exited
 the time taken to process the entire block is printed.</p>
 </dd></dl>
@@ -911,13 +893,13 @@ the time taken to process the entire block is printed.</p>
 <dd><p>Extracts translation vector from quaternion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – A length 4 quaternion.</p>
+<dd class="field-odd"><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – A length 4 quaternion.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The translation vector encoded within <cite>q</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -929,15 +911,15 @@ the time taken to process the entire block is printed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vector1</strong> (<em>numpy.array</em>) – The first vector.</p></li>
-<li><p><strong>vector2</strong> (<em>numpy.array</em>) – The second vector.</p></li>
+<li><p><strong>vector1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The first vector.</p></li>
+<li><p><strong>vector2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The second vector.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The angle between <cite>vector1</cite> and <cite>vector2</cite> in radians.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
 </dd>
 </dl>
 </dd></dl>

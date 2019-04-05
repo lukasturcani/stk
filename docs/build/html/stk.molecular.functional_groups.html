@@ -81,10 +81,8 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">stk.molecular.functional_groups module</a><ul>
-<li><a class="reference internal" href="#extending-stk-adding-more-functional-groups">Extending stk: Adding  more functional groups.</a><ul>
-<li><a class="reference internal" href="#supporting-complex-reactions">Supporting complex reactions.</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#extending-stk-adding-more-functional-groups">Extending stk: Adding  more functional groups.</a></li>
+<li><a class="reference internal" href="#extending-stk-adding-complex-reactions">Extending stk: Adding complex reactions.</a></li>
 </ul>
 </li>
 </ul>
@@ -154,11 +152,13 @@
   <div class="section" id="module-stk.molecular.functional_groups">
 <span id="stk-molecular-functional-groups-module"></span><h1>stk.molecular.functional_groups module<a class="headerlink" href="#module-stk.molecular.functional_groups" title="Permalink to this headline">¶</a></h1>
 <p>Defines tools for dealing with functional groups and their reactions.</p>
+<p>See the documentation of <a class="reference internal" href="#stk.molecular.functional_groups.Reactor" title="stk.molecular.functional_groups.Reactor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reactor</span></code></a> to see how reactions between
+functional groups are performed.</p>
 <div class="section" id="extending-stk-adding-more-functional-groups">
 <span id="adding-functional-groups"></span><h2>Extending stk: Adding  more functional groups.<a class="headerlink" href="#extending-stk-adding-more-functional-groups" title="Permalink to this headline">¶</a></h2>
 <p>If <code class="docutils literal notranslate"><span class="pre">stk</span></code> is to incorporate a new functional group, a new
 <a class="reference internal" href="#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGInfo</span></code></a> instance should be added to
-<code class="xref py py-data docutils literal notranslate"><span class="pre">functional_groups</span></code>.</p>
+<code class="xref py py-data docutils literal notranslate"><span class="pre">functional_groups</span></code>, which is defined in this module.</p>
 <p>Adding a new <a class="reference internal" href="#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGInfo</span></code></a> instance to <code class="xref py py-data docutils literal notranslate"><span class="pre">functional_groups</span></code> will
 allow <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology.build" title="stk.molecular.topologies.base.Topology.build"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Topology.build()</span></code></a> to connect the functional group to
 all others during assembly. In most cases, nothing except adding this
@@ -178,29 +178,12 @@ works but:</p>
 <p>does not.</p>
 <p>If a new functional group is to connect to another functional group
 with a bond other than a single, the names of the functional groups
-should be added to <code class="xref py py-data docutils literal notranslate"><span class="pre">bond_orders</span></code>, along with the desired bond
-order.</p>
-<div class="section" id="supporting-complex-reactions">
-<h3>Supporting complex reactions.<a class="headerlink" href="#supporting-complex-reactions" title="Permalink to this headline">¶</a></h3>
-<p>During assembly, two functional groups are provided to
-<a class="reference internal" href="#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal notranslate"><span class="pre">react()</span></code></a>. By default, placing an <a class="reference internal" href="#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGInfo</span></code></a> instance into
-<code class="xref py py-data docutils literal notranslate"><span class="pre">functional_groups</span></code> will result in the creation of a single bond
-between the atoms tagged as <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> in the two functional groups.
-In addtion, any atoms tagged as <code class="docutils literal notranslate"><span class="pre">'del'</span></code> will be removed. The bond
-order of the created bond can be modified by editing
-<code class="xref py py-data docutils literal notranslate"><span class="pre">bond_orders</span></code>.</p>
-<p>However, some reactions cannot be described by a simple combination of
-adding a bond while deleting some existing atoms. For example, consider
-the aldol reaction:</p>
-<blockquote>
-<div><p>CH3C(=O)CH3 + CH3C(=O)CH3 –&gt; CH3(=O)CH2C(OH)(CH3)CH3</p>
-</div></blockquote>
-<p>Here a ketone is converted into an alcohol. In order to support more
-complex conversions, a specific function needs to be defined which
-modifies the molecule as desired. The function then needs
-to be added to <code class="xref py py-data docutils literal notranslate"><span class="pre">custom_reactions</span></code>. See
-<a class="reference internal" href="#stk.molecular.functional_groups.boronic_acid_with_diol" title="stk.molecular.functional_groups.boronic_acid_with_diol"><code class="xref py py-func docutils literal notranslate"><span class="pre">boronic_acid_with_diol()</span></code></a>
-as an example.</p>
+should be added to <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.bond_orders" title="stk.molecular.functional_groups.Reactor.bond_orders"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Reactor.bond_orders</span></code></a>, along with the desired
+bond order.</p>
+</div>
+<div class="section" id="extending-stk-adding-complex-reactions">
+<span id="adding-complex-reactions"></span><h2>Extending stk: Adding complex reactions.<a class="headerlink" href="#extending-stk-adding-complex-reactions" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference internal" href="#stk.molecular.functional_groups.Reactor" title="stk.molecular.functional_groups.Reactor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reactor</span></code></a>.</p>
 <dl class="class">
 <dt id="stk.molecular.functional_groups.FGInfo">
 <em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">FGInfo</code><span class="sig-paren">(</span><em>name</em>, <em>fg_smarts</em>, <em>bonder_smarts</em>, <em>del_smarts</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.FGInfo" title="Permalink to this definition">¶</a></dt>
@@ -239,20 +222,19 @@ macromolecules.</p>
                  <span class="n">Match</span><span class="p">(</span><span class="n">smarts</span><span class="o">=</span><span class="s1">&#39;[$([H][N][H])]&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
 </pre></div>
 </div>
-<p>Each string is SMARTS string which matches an atom in the
-functional group which is to be tagged as <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code>. The
-number represents how many matched atoms should be tagged, per
-functional group.</p>
+<p>Each string is SMARTS string which matches a bonder atom in the
+functional group. The number represents how many matched atoms
+should be used as bonders, per functional group.</p>
 <p>In the example, <code class="docutils literal notranslate"><span class="pre">Match(smarts='[$([N]([H])[H])]',</span> <span class="pre">n=1)</span></code>
 matches the nitrogen atom in the amine functional group. The
 <code class="docutils literal notranslate"><span class="pre">n=1</span></code> means that 1 nitrogen atom per functional group will be
-tagged as <code class="docutils literal notranslate"><span class="pre">'bonder'</span></code>. The second
+used as a bonder. The second
 <code class="docutils literal notranslate"><span class="pre">Match(smarts='[$([H][N][H])]',</span> <span class="pre">n=1)</span></code>, matches the hydrogen
 atom in the amine functional group. Because <code class="docutils literal notranslate"><span class="pre">n=1</span></code>, only 1 of
-hydrogen atom per amine functional group will be tagged
-<code class="docutils literal notranslate"><span class="pre">'bonder'</span></code>. If instead
-<code class="docutils literal notranslate"><span class="pre">Match(smarts='[$([H][N][H])]',</span> <span class="pre">n=2)</span></code> was used, then both of
-the hydrogen atoms in the functional group would be tagged.</p>
+hydrogen atoms per amine functional group will be used as a
+bonder. If instead <code class="docutils literal notranslate"><span class="pre">Match(smarts='[$([H][N][H])]',</span> <span class="pre">n=2)</span></code> was
+used, then both of the hydrogen atoms in the functional group
+would be used as bonders.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
@@ -263,8 +245,7 @@ the hydrogen atoms in the functional group would be tagged.</p>
 <dl class="attribute">
 <dt id="stk.molecular.functional_groups.FGInfo.del_smarts">
 <code class="descname">del_smarts</code><a class="headerlink" href="#stk.molecular.functional_groups.FGInfo.del_smarts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Same as <a class="reference internal" href="#stk.molecular.functional_groups.FGInfo.bonder_smarts" title="stk.molecular.functional_groups.FGInfo.bonder_smarts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder_smarts</span></code></a> but matched atoms are tagged
-as <code class="docutils literal notranslate"><span class="pre">'del'</span></code>.</p>
+<dd><p>Same as <a class="reference internal" href="#stk.molecular.functional_groups.FGInfo.bonder_smarts" title="stk.molecular.functional_groups.FGInfo.bonder_smarts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonder_smarts</span></code></a> but matched atoms are deleters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
@@ -295,20 +276,128 @@ as <code class="docutils literal notranslate"><span class="pre">'del'</span></co
 </dd></dl>
 
 <dl class="class">
-<dt id="stk.molecular.functional_groups.FGKey">
-<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">FGKey</code><span class="sig-paren">(</span><em>fgs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.FGKey" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.molecular.functional_groups.FunctionalGroup">
+<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">FunctionalGroup</code><span class="sig-paren">(</span><em>id_</em>, <em>atom_ids</em>, <em>bonder_ids</em>, <em>deleter_ids</em>, <em>info</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.FunctionalGroup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Used to create a key from a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of fg names.</p>
-<p>Used by <code class="xref py py-data docutils literal notranslate"><span class="pre">bond_orders</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">custom_reactions</span></code> and
-<code class="xref py py-data docutils literal notranslate"><span class="pre">periodic_custom_reactions</span></code>.</p>
+<p>Represents the functional group of a molecule.</p>
 <dl class="attribute">
-<dt id="stk.molecular.functional_groups.FGKey.key">
-<code class="descname">key</code><a class="headerlink" href="#stk.molecular.functional_groups.FGKey.key" title="Permalink to this definition">¶</a></dt>
-<dd><p>A unique key based on the functional groups provided to the
-intializer.</p>
+<dt id="stk.molecular.functional_groups.FunctionalGroup.id">
+<code class="descname">id</code><a class="headerlink" href="#stk.molecular.functional_groups.FunctionalGroup.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id of the functional group.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.FunctionalGroup.atom_ids">
+<code class="descname">atom_ids</code><a class="headerlink" href="#stk.molecular.functional_groups.FunctionalGroup.atom_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ids of atoms in the functional group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.FunctionalGroup.bonder_ids">
+<code class="descname">bonder_ids</code><a class="headerlink" href="#stk.molecular.functional_groups.FunctionalGroup.bonder_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ids of bonder atoms in the functional group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.FunctionalGroup.deleter_ids">
+<code class="descname">deleter_ids</code><a class="headerlink" href="#stk.molecular.functional_groups.FunctionalGroup.deleter_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ids of deleter atoms in the functional group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.FunctionalGroup.info">
+<code class="descname">info</code><a class="headerlink" href="#stk.molecular.functional_groups.FunctionalGroup.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGInfo</span></code></a> of the functional group type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#stk.molecular.functional_groups.FGInfo" title="stk.molecular.functional_groups.FGInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGInfo</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.functional_groups.FunctionalGroup._remove_deleters">
+<code class="descname">_remove_deleters</code><span class="sig-paren">(</span><em>atom_ids</em>, <em>deleters</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.FunctionalGroup._remove_deleters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update and remove atom ids based on <cite>deleters</cite>.</p>
+<p>For each deleter atom that is smaller than an atom id, the
+atom id is decreased by 1. If the atom id is equal to a
+<cite>deleters</cite> atom id, it is removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>atom_ids</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The atom ids which need to be updated.</p></li>
+<li><p><strong>deleters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The ids of atoms which are being removed. Must be sorted in
+ascending order.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The atom ids in <cite>atom_ids</cite> after the update.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.functional_groups.FunctionalGroup.remove_deleters">
+<code class="descname">remove_deleters</code><span class="sig-paren">(</span><em>deleters</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.FunctionalGroup.remove_deleters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update and remove atom ids based on <cite>deleters</cite>.</p>
+<p>For each deleter atom that is smaller than an atom id, the
+atom id is decreased by 1. If the atom id is equal to a
+<cite>deleters</cite> atom id, it is removed.</p>
+<dl>
+<dt>deleters<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></dt><dd><p>Ids of atoms which are being removed from the molecule.
+Must be sorted in ascending order.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.functional_groups.FunctionalGroup.shifted_fg">
+<code class="descname">shifted_fg</code><span class="sig-paren">(</span><em>id_</em>, <em>shift</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.FunctionalGroup.shifted_fg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new <a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a> with shifted ids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the new functional group.</p></li>
+<li><p><strong>shift</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number to shift the atom ids by.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a> with all the atom ids atoms
+shifted upward by <cite>shift</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -355,226 +444,425 @@ per functional group.</p>
 
 </dd></dl>
 
-<dl class="function">
-<dt id="stk.molecular.functional_groups.amine3_with_amine3">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">amine3_with_amine3</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.amine3_with_amine3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Crates bonds between functional groups.</p>
+<dl class="class">
+<dt id="stk.molecular.functional_groups.ReactionKey">
+<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">ReactionKey</code><span class="sig-paren">(</span><em>*fg_names</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.ReactionKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Used to create a key from a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of fg names.</p>
+<p>In effect, this creates a unique id for each reaction, given a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of functional groups involved in that reaction.</p>
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.ReactionKey.key">
+<code class="descname">key</code><a class="headerlink" href="#stk.molecular.functional_groups.ReactionKey.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique key representing a reaction.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A molecule being assembled.</p></li>
-<li><p><strong>del</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Toggles if atoms with the <code class="docutils literal notranslate"><span class="pre">'del'</span></code> property are deleted.</p></li>
-<li><p><strong>fg1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the first functional group which
-is to be joined, as given by the ‘fg_id’ property.</p></li>
-<li><p><strong>fg2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the second functional group which
-is to be joined, as given by the ‘fg_id’ property.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>The first element is an <code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>. It is
-the molecule with bonds added between the functional groups.</p>
-<p>The second element is a <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. It is the number
-of bonds added.</p>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="function">
-<dt id="stk.molecular.functional_groups.boronic_acid_with_diol">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">boronic_acid_with_diol</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.boronic_acid_with_diol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Crates bonds between functional groups.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.molecular.functional_groups.Reactor">
+<em class="property">class </em><code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">Reactor</code><span class="sig-paren">(</span><em>mol=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.Reactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Performs reactions between functional groups of a molecule.</p>
+<p>This class is responsible for reacting the functional groups in a
+molecule during assembly. First, an instance of this class is
+initialized with a <code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code>. This is the molecule which
+is going to have atom and bonds added and removed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromMolFile</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">reactor</span> <span class="o">=</span> <span class="n">Reactor</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We force the molecule to have atoms and bonds add or removed
+between certain functional groups by using the <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.react" title="stk.molecular.functional_groups.Reactor.react"><code class="xref py py-meth docutils literal notranslate"><span class="pre">react()</span></code></a>
+method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Represents a functional group found in mol.</span>
+<span class="n">fg1</span> <span class="o">=</span> <span class="n">FunctionalGroup</span><span class="p">(</span><span class="n">id_</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                      <span class="n">atom_ids</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+                      <span class="n">bonder_ids</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="n">deleter_ids</span><span class="o">=</span><span class="p">[</span><span class="mi">34</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+                      <span class="n">info</span><span class="o">=</span><span class="n">FGInfo</span><span class="p">(</span><span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Represents another functional group found in mol.</span>
+<span class="n">fg2</span> <span class="o">=</span> <span class="n">FunctionalGroup</span><span class="p">(</span><span class="n">id_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                      <span class="n">atom_ids</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+                      <span class="n">bonder_ids</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span>
+                      <span class="n">deleter_ids</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+                      <span class="n">info</span><span class="o">=</span><span class="n">FGInfo</span><span class="p">(</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Carry out a reaction between the atoms in fg1 and fg2.</span>
+<span class="n">reactor</span><span class="o">.</span><span class="n">react</span><span class="p">(</span><span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">)</span>
+
+<span class="c1"># Lets assume there a further functional groups in mol that</span>
+<span class="c1"># we wish to react.</span>
+<span class="n">fg3</span> <span class="o">=</span> <span class="n">FunctionalGroup</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">fg4</span> <span class="o">=</span> <span class="n">FunctionalGroup</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">fg5</span> <span class="o">=</span> <span class="n">FunctionalGroup</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">fg6</span> <span class="o">=</span> <span class="n">FunctionalGroup</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">fg7</span> <span class="o">=</span> <span class="n">FunctionalGroup</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="n">reactor</span><span class="o">.</span><span class="n">react</span><span class="p">(</span><span class="n">fg3</span><span class="p">,</span> <span class="n">fg4</span><span class="p">)</span>
+
+<span class="c1"># Some reactions can take multiple functional groups.</span>
+<span class="c1"># You can put in as many functional groups as you like, given</span>
+<span class="c1"># an appropriate reaction is defined.</span>
+<span class="n">reactor</span><span class="o">.</span><span class="n">react</span><span class="p">(</span><span class="n">fg5</span><span class="p">,</span> <span class="n">fg6</span><span class="p">,</span> <span class="n">fg7</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once we are done carrying out reactions on the molecule we can
+get the resulting molecule.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># product is an rdkit molecule, with the earlier reactions</span>
+<span class="c1"># carried out and all deleter atoms removed.</span>
+<span class="n">product</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">del_atoms</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that after <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.result" title="stk.molecular.functional_groups.Reactor.result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">result()</span></code></a> is run, all <a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>
+instances which were passed to <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.react" title="stk.molecular.functional_groups.Reactor.react"><code class="xref py py-meth docutils literal notranslate"><span class="pre">react()</span></code></a> have their atom ids
+updated to account for any atoms which have been deleted. If
+there are functional groups which were not reacted, but have
+atom ids which should be updated, they should be added to
+<a class="reference internal" href="#stk.molecular.functional_groups.Reactor.func_groups" title="stk.molecular.functional_groups.Reactor.func_groups"><code class="xref py py-attr docutils literal notranslate"><span class="pre">func_groups</span></code></a>.</p>
+<p>An obvious question given this tutorial, is what reaction does
+<a class="reference internal" href="#stk.molecular.functional_groups.Reactor.react" title="stk.molecular.functional_groups.Reactor.react"><code class="xref py py-meth docutils literal notranslate"><span class="pre">react()</span></code></a> carry out? This is documented by <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.react" title="stk.molecular.functional_groups.Reactor.react"><code class="xref py py-meth docutils literal notranslate"><span class="pre">react()</span></code></a>.
+However, react in most cases, will carry out a default reaction,
+which adds a bond between the bonder atoms of two functional
+groups. The bond order of the added bond is single by default but
+can be modified by editing <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.bond_orders" title="stk.molecular.functional_groups.Reactor.bond_orders"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bond_orders</span></code></a>. Here you will
+specify the <a class="reference internal" href="#stk.molecular.functional_groups.ReactionKey" title="stk.molecular.functional_groups.ReactionKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReactionKey</span></code></a> for a reaction and what bond order
+you want that reaction to use.</p>
+<p>For some reactions you may wish to forgo the default reaction and
+do something more complex. This is neccessary because some
+reactions cannot be described by the simple combination of adding a
+bond while deleting some existing atoms. For example,
+consider the aldol reaction:</p>
+<blockquote>
+<div><p>CH3C(=O)CH3 + CH3C(=O)CH3 –&gt; CH3(=O)CH2C(OH)(CH3)CH3</p>
+</div></blockquote>
+<p>Here a ketone is converted into an alcohol. If you wish to
+support a complex reaction, add it as a method within this class.
+The method will need take some <a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a> instances
+as arguments. These are the functional groups which react. Within
+the method itself, the attribute <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.bonds_made" title="stk.molecular.functional_groups.Reactor.bonds_made"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bonds_made</span></code></a> must be
+incremented by the number of bonds added by the reaction. Beyond
+that, the method should operate <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.emol" title="stk.molecular.functional_groups.Reactor.emol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">emol</span></code></a> and add and remove
+bonds from it as necessary. If the method adds atoms to
+<a class="reference internal" href="#stk.molecular.functional_groups.Reactor.emol" title="stk.molecular.functional_groups.Reactor.emol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">emol</span></code></a> it should update <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.new_atom_coords" title="stk.molecular.functional_groups.Reactor.new_atom_coords"><code class="xref py py-attr docutils literal notranslate"><span class="pre">new_atom_coords</span></code></a>.</p>
+<p>Once the method is defined, <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.custom_reactions" title="stk.molecular.functional_groups.Reactor.custom_reactions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">custom_reactions</span></code></a> needs to
+be updated.</p>
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.bond_orders">
+<code class="descname">bond_orders</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.bond_orders" title="Permalink to this definition">¶</a></dt>
+<dd><p>When the default reaction is performed by <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.react" title="stk.molecular.functional_groups.Reactor.react"><code class="xref py py-meth docutils literal notranslate"><span class="pre">react()</span></code></a>,
+if the bond added between the two functional groups is not
+single, the desired bond order should be placed in this
+dictionary. The dictionary maps the reaction’s
+<a class="reference internal" href="#stk.molecular.functional_groups.ReactionKey" title="stk.molecular.functional_groups.ReactionKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReactionKey</span></code></a> to the desired bond order.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A molecule being assembled.</p></li>
-<li><p><strong>del</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Toggles if atoms with the <code class="docutils literal notranslate"><span class="pre">'del'</span></code> property are deleted.</p></li>
-<li><p><strong>fg1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the first functional group which
-is to be joined, as given by the ‘fg_id’ property.</p></li>
-<li><p><strong>fg2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the second functional group which
-is to be joined, as given by the ‘fg_id’ property.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>The first element is an <code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>. It is
-the molecule with bonds added between the functional groups.</p>
-<p>The second element is a <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. It is the number
-of bonds added.</p>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="function">
-<dt id="stk.molecular.functional_groups.diol_with_dihalogen">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">diol_with_dihalogen</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg1</em>, <em>fg2</em>, <em>dihalogen</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.diol_with_dihalogen" title="Permalink to this definition">¶</a></dt>
-<dd><p>Crates bonds between functional groups.</p>
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.custom_reactions">
+<code class="descname">custom_reactions</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.custom_reactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps a <a class="reference internal" href="#stk.molecular.functional_groups.ReactionKey" title="stk.molecular.functional_groups.ReactionKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReactionKey</span></code></a> for a given reaction to a custom
+method which carries out the reaction. This means that
+<a class="reference internal" href="#stk.molecular.functional_groups.Reactor.react" title="stk.molecular.functional_groups.Reactor.react"><code class="xref py py-meth docutils literal notranslate"><span class="pre">react()</span></code></a> will use that method for carrying out that
+reaction instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.periodic_custom_reactions">
+<code class="descname">periodic_custom_reactions</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.periodic_custom_reactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps a <a class="reference internal" href="#stk.molecular.functional_groups.ReactionKey" title="stk.molecular.functional_groups.ReactionKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReactionKey</span></code></a> for a given reaction to a custom
+method which carries out the reaction. This means that
+<a class="reference internal" href="#stk.molecular.functional_groups.Reactor.periodic_react" title="stk.molecular.functional_groups.Reactor.periodic_react"><code class="xref py py-meth docutils literal notranslate"><span class="pre">periodic_react()</span></code></a> will use that method for carrying out
+that reaction instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.mol">
+<code class="descname">mol</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>The molecule on which the reactor adds and removes atoms and
+bonds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.emol">
+<code class="descname">emol</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.emol" title="Permalink to this definition">¶</a></dt>
+<dd><p>An editable version of <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.mol" title="stk.molecular.functional_groups.Reactor.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">mol</span></code></a>. Used for adding and
+removing atoms and bonds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.EditableMol</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.periodic_bonds">
+<code class="descname">periodic_bonds</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.periodic_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>The periodic bonds added by the reactor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.AtomicPeriodicBond" title="stk.utilities.utilities.AtomicPeriodicBond"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomicPeriodicBond</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.bonds_made">
+<code class="descname">bonds_made</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.bonds_made" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of bonds added.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.new_atom_coords">
+<code class="descname">new_atom_coords</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.new_atom_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>When a new atom is added by the reactor, its desired
+desired coordinates are placed here. The <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>
+has the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new_atom_coords</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.1</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])),</span>
+    <span class="p">(</span><span class="mi">41</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">13.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">42.1</span><span class="p">,</span> <span class="mf">2.</span><span class="p">]))</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>where the first element of each tuple is the atom id of a
+newly added atom and the second element is a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> holding its desired coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.deleters">
+<code class="descname">deleters</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.deleters" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ids of atoms which are to be removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.func_groups">
+<code class="descname">func_groups</code><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.func_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>The functional groups which the reactor keeps up to date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">bond_orders</code><em class="property"> = {FGInfo('aldehyde', 'amine'): rdkit.Chem.rdchem.BondType.DOUBLE, FGInfo('aldehyde', 'amide'): rdkit.Chem.rdchem.BondType.DOUBLE, FGInfo('aldehyde', 'nitrile'): rdkit.Chem.rdchem.BondType.DOUBLE, FGInfo('amide', 'amine'): rdkit.Chem.rdchem.BondType.DOUBLE, FGInfo('terminal_alkene', 'terminal_alkene'): rdkit.Chem.rdchem.BondType.DOUBLE, FGInfo('alkyne2', 'alkyne2'): rdkit.Chem.rdchem.BondType.TRIPLE}</em></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.functional_groups.Reactor.boronic_acid_with_diol">
+<code class="descname">boronic_acid_with_diol</code><span class="sig-paren">(</span><em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.boronic_acid_with_diol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates bonds between functional groups.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A molecule being assembled.</p></li>
-<li><p><strong>del</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Toggles if atoms with the <code class="docutils literal notranslate"><span class="pre">'del'</span></code> property are deleted.</p></li>
-<li><p><strong>fg1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the first functional group which
-is to be joined, as given by the ‘fg_id’ property.</p></li>
-<li><p><strong>fg2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the second functional group which
-is to be joined, as given by the ‘fg_id’ property.</p></li>
+<li><p><strong>fg1</strong> (<a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – A functional group which undergoes the reaction.</p></li>
+<li><p><strong>fg2</strong> (<a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – A functional group which undergoes the reaction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.functional_groups.Reactor.diol_with_dihalogen">
+<code class="descname">diol_with_dihalogen</code><span class="sig-paren">(</span><em>fg1</em>, <em>fg2</em>, <em>dihalogen</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.diol_with_dihalogen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates bonds between functional groups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fg1</strong> (<a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – A functional group which undergoes the reaction.</p></li>
+<li><p><strong>fg2</strong> (<a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – A functional group which undergoes the reaction.</p></li>
 <li><p><strong>halogen</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the dihalogen functional group to use. For example,
 <code class="docutils literal notranslate"><span class="pre">'dibromine'</span></code> or <code class="docutils literal notranslate"><span class="pre">'difluorene'</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>The first element is an <code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>. It is
-the molecule with bonds added between the functional groups.</p>
-<p>The second element is a <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. It is the number
-of bonds added.</p>
-</p>
+<dd class="field-even"><p><strong>None</strong></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="function">
-<dt id="stk.molecular.functional_groups.fg_name">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">fg_name</code><span class="sig-paren">(</span><em>mol</em>, <em>fg</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.fg_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retruns the name of the functional group with id <cite>fg</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule with its functional groups tagged.</p></li>
-<li><p><strong>fg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of a functional group as given by the ‘fg_id’ property.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The name of a functional group.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.double">
+<code class="descname">double</code><em class="property"> = rdkit.Chem.rdchem.BondType.DOUBLE</em><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.double" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<dl class="function">
-<dt id="stk.molecular.functional_groups.periodic_react">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">periodic_react</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>direction</em>, <em>*fgs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.periodic_react" title="Permalink to this definition">¶</a></dt>
-<dd><p>Like <a class="reference internal" href="#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal notranslate"><span class="pre">react()</span></code></a> but returns periodic bonds.</p>
-<p>As periodic bonds are returned, no bonds are added to <cite>mol</cite>.</p>
+<dl class="method">
+<dt id="stk.molecular.functional_groups.Reactor.periodic_react">
+<code class="descname">periodic_react</code><span class="sig-paren">(</span><em>direction</em>, <em>*fgs</em>, <em>track_fgs=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.periodic_react" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.react" title="stk.molecular.functional_groups.Reactor.react"><code class="xref py py-func docutils literal notranslate"><span class="pre">react()</span></code></a> but returns periodic bonds.</p>
+<p>As periodic bonds are returned, no bonds are added to
+<a class="reference internal" href="#stk.molecular.functional_groups.Reactor.emol" title="stk.molecular.functional_groups.Reactor.emol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">emol</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A molecule being assembled.</p></li>
-<li><p><strong>del</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Toggles if atoms with the <code class="docutils literal notranslate"><span class="pre">'del'</span></code> property are deleted.</p></li>
 <li><p><strong>direction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – A 3 member list describing the axes along which the created
-bonds are periodic. For example, <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the
-bonds are periodic along the x axis in the positive direction.</p></li>
-<li><p><strong>*fgs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The ids of the functional groups to react. The ids are held
-by atom of <cite>mol</cite> in the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> property.</p></li>
+bonds are periodic. For example, <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that
+the bonds are periodic along the x axis in the positive
+direction.</p></li>
+<li><p><strong>*fgs</strong> (<a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – The functional groups to react.</p></li>
+<li><p><strong>track_fgs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Toggles if functional groups are added to
+<a class="reference internal" href="#stk.molecular.functional_groups.Reactor.func_groups" title="stk.molecular.functional_groups.Reactor.func_groups"><code class="xref py py-attr docutils literal notranslate"><span class="pre">func_groups</span></code></a>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>The first element is an <code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>. It is
-the molecule after the reaction.</p>
-<p>The second element is a <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. It is the number
-of bonds added.</p>
-<p>The third element is a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> holding
-<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.AtomicPeriodicBond" title="stk.utilities.utilities.AtomicPeriodicBond"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomicPeriodicBond</span></code></a>.</p>
-</p>
+<dd class="field-even"><p><strong>None</strong></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="function">
-<dt id="stk.molecular.functional_groups.react">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">react</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>*fgs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.react" title="Permalink to this definition">¶</a></dt>
+<dl class="method">
+<dt id="stk.molecular.functional_groups.Reactor.phenyl_amine_with_phenyl_amine">
+<code class="descname">phenyl_amine_with_phenyl_amine</code><span class="sig-paren">(</span><em>fg1</em>, <em>fg2</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.phenyl_amine_with_phenyl_amine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates bonds between functional groups.</p>
-<p>This function first looks at the functional group ids provided via
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fg1</strong> (<a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – A functional group which undergoes the reaction.</p></li>
+<li><p><strong>fg2</strong> (<a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – A functional group which undergoes the reaction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.functional_groups.Reactor.react">
+<code class="descname">react</code><span class="sig-paren">(</span><em>*fgs</em>, <em>track_fgs=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.react" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates bonds between functional groups.</p>
+<p>This function first looks at the functional groups provided via
 the <cite>*fgs</cite> argument and checks which functional groups are
 involved in the reaction. If the functional groups are handled
 by one of the custom reactions specified in
-<code class="xref py py-data docutils literal notranslate"><span class="pre">custom_reactions</span></code> then that function is executed.</p>
+<a class="reference internal" href="#stk.molecular.functional_groups.Reactor.custom_reactions" title="stk.molecular.functional_groups.Reactor.custom_reactions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">custom_reactions</span></code></a> then that function is executed.</p>
 <p>In all other cases the function is assumed to have received two
-functional groups to react via <cite>*fgs</cite>. In these functional groups
-the atoms tagged <code class="docutils literal notranslate"><span class="pre">'del'</span></code> are deleted and the atoms tagged
-<code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> have a bond added. The bond is a single, unless
-specified otherwise in <code class="xref py py-data docutils literal notranslate"><span class="pre">bond_orders</span></code>.</p>
+functional groups to react. In these functional groups, the
+bonder atoms have a bond added. The bond is single,
+unless otherwise specified in <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.bond_orders" title="stk.molecular.functional_groups.Reactor.bond_orders"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bond_orders</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A molecule being assembled.</p></li>
-<li><p><strong>del</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Toggles if atoms with the <code class="docutils literal notranslate"><span class="pre">'del'</span></code> property are deleted.</p></li>
-<li><p><strong>*fgs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The ids of the functional groups to react. The ids are held
-by atom of <cite>mol</cite> in the <code class="docutils literal notranslate"><span class="pre">'fg_id'</span></code> property.</p></li>
+<li><p><strong>*fgs</strong> (<a class="reference internal" href="#stk.molecular.functional_groups.FunctionalGroup" title="stk.molecular.functional_groups.FunctionalGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionalGroup</span></code></a>) – The functional groups to react.</p></li>
+<li><p><strong>track_fgs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Toggles if functional groups are added to
+<a class="reference internal" href="#stk.molecular.functional_groups.Reactor.func_groups" title="stk.molecular.functional_groups.Reactor.func_groups"><code class="xref py py-attr docutils literal notranslate"><span class="pre">func_groups</span></code></a>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>The first element is an <code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>. It is
-the molecule with bonds added between the functional groups.</p>
-<p>The second element is a <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. It is the number
-of bonds added.</p>
-</p>
+<dd class="field-even"><p><strong>None</strong></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="function">
-<dt id="stk.molecular.functional_groups.react_many">
-<code class="descclassname">stk.molecular.functional_groups.</code><code class="descname">react_many</code><span class="sig-paren">(</span><em>mol</em>, <em>del_atoms</em>, <em>fg_groups</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.react_many" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates bonds between multiple sets of functional groups.</p>
-<p>This function is much faster than calling <a class="reference internal" href="#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal notranslate"><span class="pre">react()</span></code></a>
-multiple times, but should behave in the same way. It
-checks which functional groups are involved in each reaction and
-if that reaction type is handled by one of the custom reactions
-specified in <code class="xref py py-data docutils literal notranslate"><span class="pre">custom_reactions</span></code>. If so, then that function is
-executed.</p>
-<p>In all other cases the function assumes it has received two
-functional groups to react per reaction. In these functional
-groups, the atoms tagged <code class="docutils literal notranslate"><span class="pre">'del'</span></code> are deleted and the atoms tagged
-<code class="docutils literal notranslate"><span class="pre">'bonder'</span></code> have a bond added. The bond is a single, unless
-specified otherwise in <code class="xref py py-data docutils literal notranslate"><span class="pre">bond_orders</span></code>.</p>
+<dl class="method">
+<dt id="stk.molecular.functional_groups.Reactor.result">
+<code class="descname">result</code><span class="sig-paren">(</span><em>del_atoms</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the molecule after all reactions have been done.</p>
+<p>This method will also update all the functional groups
+passed with <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.react" title="stk.molecular.functional_groups.Reactor.react"><code class="xref py py-meth docutils literal notranslate"><span class="pre">react()</span></code></a> calls. It will update the atom
+ids to account for the fact that atoms have been deleted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A molecule being assembled.</p></li>
-<li><p><strong>del</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Toggles if atoms with the <code class="docutils literal notranslate"><span class="pre">'del'</span></code> property are deleted.</p></li>
-<li><p><strong>fg_groups</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – <p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of the form</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fg_groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">frozenset</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">}),</span>
-             <span class="nb">frozenset</span><span class="p">({</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">}),</span>
-             <span class="nb">frozenset</span><span class="p">({</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">})]</span>
-</pre></div>
-</div>
-<p>It says that the functional groups <code class="docutils literal notranslate"><span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">5</span></code> react
-together, the functional groups <code class="docutils literal notranslate"><span class="pre">3</span></code> and <code class="docutils literal notranslate"><span class="pre">4</span></code> react together
-and <code class="docutils literal notranslate"><span class="pre">2</span></code>, <code class="docutils literal notranslate"><span class="pre">6</span></code> and <code class="docutils literal notranslate"><span class="pre">7</span></code> react together.</p>
-</p></li>
-</ul>
+<dd class="field-odd"><p><strong>del_atoms</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Toggles if deleter atoms should be removed from the
+product molecule.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>The first element is an <code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>. It is
-the molecule with bonds added between the functional groups.</p>
-<p>The second element is a <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. It is the number
-of bonds added.</p>
-</p>
+<dd class="field-even"><p>The product molecule.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
+<dl class="method">
+<dt id="stk.molecular.functional_groups.Reactor.set_molecule">
+<code class="descname">set_molecule</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.set_molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.mol" title="stk.molecular.functional_groups.Reactor.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">mol</span></code></a> and <a class="reference internal" href="#stk.molecular.functional_groups.Reactor.emol" title="stk.molecular.functional_groups.Reactor.emol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">emol</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code>, optional) – The molecule on which the reactor adds and removes atoms
+and bonds.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>None</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.functional_groups.Reactor.triple">
+<code class="descname">triple</code><em class="property"> = rdkit.Chem.rdchem.BondType.TRIPLE</em><a class="headerlink" href="#stk.molecular.functional_groups.Reactor.triple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 
