@@ -136,6 +136,12 @@ def aldehyde4():
 
 
 @pytest.fixture(scope='session')
+def aldehyde4_alt1():
+    return stk.StructUnit3.smiles_init('O=CC(OC=O)(C=O)C=O',
+                                       ['aldehyde'])
+
+
+@pytest.fixture(scope='session')
 def difluorene2():
     smiles = 'Fc1c(F)cc(F)c(F)c1'
     return stk.StructUnit2.smiles_init(smiles, ['difluorene'])
