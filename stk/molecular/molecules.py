@@ -2881,9 +2881,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
             if correct_bb and self.is_core_atom(atom_id):
                 mols[props['mol_index']].add(atom_id)
 
-        for mol in mols:
+        for mol in mols.values():
             core = rdkit.EditableMol(self.mol)
-            for atom in range(self.mol.GetNumAtoms()):
+            for atom in reversed(range(self.mol.GetNumAtoms())):
                 if atom not in mol:
                     core.RemoveAtom(atom)
 
