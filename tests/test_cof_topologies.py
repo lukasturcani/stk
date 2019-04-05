@@ -8,6 +8,14 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
+def test_aligning(amine2, aldehyde4):
+    for i in range(4):
+        top = stk.Kagome(multitopic_aligners=[i, 0, 0])
+        cof = stk.Periodic([amine2, aldehyde4], top)
+        island = cof.island([5, 5, 1])
+        rdkit.MolToMolFile(island, join(test_dir, f'aligning_{i}.sdf'))
+
+
 def test_honeycomb(amine2, aldehyde3):
     cof = stk.Periodic([amine2, aldehyde3], stk.Honeycomb())
     path = join(test_dir, 'honeycomb.sdf')
