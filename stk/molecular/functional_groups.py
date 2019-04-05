@@ -37,6 +37,13 @@ with a bond other than a single, the names of the functional groups
 should be added to :attr:`Reactor.bond_orders`, along with the desired
 bond order.
 
+.. _`adding complex reactions`:
+
+Extending stk: Adding complex reactions.
+----------------------------------------
+
+See :class:`Reactor`.
+
 """
 
 from functools import partial
@@ -473,15 +480,6 @@ class Reactor:
     can be modified by editing :attr:`bond_orders`. Here you will
     specify the :class:`ReactionKey` for a reaction and what bond order
     you want that reaction to use.
-
-    The section below explains how you can ignore the default reaction
-    and add more complex reactions between functional groups when
-    necessary.
-
-    .. _`adding complex reactions`:
-
-    Extending stk: Adding complex reactions.
-    ----------------------------------------
 
     For some reactions you may wish to forgo the default reaction and
     do something more complex. This is neccessary because some
