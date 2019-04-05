@@ -20,8 +20,17 @@ def test_all_atom_coords(amine2):
     assert natoms == i
 
 
-def test_atom_centroid():
-    assert False
+def test_atom_centroid(amine2):
+    assert np.allclose(a=amine2.atom_centroid([0]),
+                       b=amine2.atom_coords(0),
+                       atol=1e-6)
+
+    atom_ids = [0, 1, 2, 3]
+    coords = (amine2.atom_coords(id_) for id_ in atom_ids)
+    centroid = sum(coords) / len(atom_ids)
+    assert np.allclose(a=amine2.atom_centroid(atom_ids),
+                       b=centroid,
+                       atol=1e-6)
 
 
 def test_atom_coords(amine2):
@@ -127,9 +136,10 @@ def test_graph(amine2):
 
 def test_is_core_atom(amine2):
     for atom in amine2.mol.GetAtoms():
-        core = (False if atom.HasProp('fg') or atom.GetAtomicNum() == 1
-                else True)
-        assert core is amine2.is_core_atom(atom.GetIdx())
+        atom_id = atom.GetIdx()
+        fg = any(atom_id in fg.atom_ids for fg in amine2.func_groups)
+        core = False if fg or atom.GetAtomicNum() == 1 else True
+        assert core is amine2.is_core_atom(atom_id)
 
 
 def test_position_matrix(amine2):

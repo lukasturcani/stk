@@ -170,6 +170,15 @@ def c60():
     return stk.StructUnit(join('data', 'c60.pdb'))
 
 
+@pytest.fixture(scope='session')
+def fg():
+    return stk.FunctionalGroup(id_=0,
+                               atom_ids=[10, 3, 1, 4, 43, 5, 32, 55],
+                               bonder_ids=[3, 32, 10],
+                               deleter_ids=[1, 55, 5],
+                               info=stk.functional_groups[0])
+
+
 @pytest.fixture
 def tmp_fg():
     return stk.FunctionalGroup(id_=0,

@@ -9,11 +9,24 @@ if not os.path.exists(test_dir):
 
 def test_remove_deleters(tmp_fg):
     tmp_fg.remove_deleters([1, 2, 15, 55, 100, 300])
-    assert tmp_fg.atom_ids == [8, 1]
+    assert tmp_fg.atom_ids == (8, 1, 2, 40, 3, 29)
+    assert tmp_fg.bonder_ids == (1, 29, 8)
+    assert tmp_fg.deleter_ids == (3, )
 
 
-def test_shifted_fg():
-    assert False
+def test_shifted_fg(fg):
+    shifted = fg.shifted_fg(fg.id+1, 20)
+    assert shifted is not fg
+    assert shifted.id == fg.id+1
+
+    for a1, a2 in zip(fg.atom_ids, shifted.atom_ids):
+        assert a1 + 20 == a2
+
+    for a1, a2 in zip(fg.bonder_ids, shifted.bonder_ids):
+        assert a1 + 20 == a2
+
+    for a1, a2 in zip(fg.bonder_ids, shifted.bonder_ids):
+        assert a1 + 20 == a2
 
 
 def test_bi_fg_bb(diol2, difluorene_dibromine):

@@ -458,6 +458,13 @@ class Reactor:
         # carried out and all deleter atoms removed.
         product = reactor.result(del_atoms=True)
 
+    Note that after :meth:`result` is run, all :class:`FunctionalGroup`
+    instances which were passed to :meth:`react` have their atom ids
+    updated to account for any atoms which have been deleted. If
+    there are functional groups which were not reacted, but have
+    atom ids which should be updated, they should be added to
+    :attr:`func_groups`.
+
     An obvious question given this tutorial, is what reaction does
     :meth:`react` carry out? This is documented by :meth:`react`.
     However, react in most cases, will carry out a default reaction,
@@ -552,7 +559,7 @@ class Reactor:
         The ids of atoms which are to be removed.
 
     func_groups : :class:`list` of :class:`FunctionalGroup`
-        The functional groups which the reactor has reacted.
+        The functional groups which the reactor keeps up to date.
 
     """
 
@@ -567,13 +574,13 @@ class Reactor:
         ReactionKey('alkyne2', 'alkyne2'): triple
     }
 
-    def __init__(self, mol):
+    def __init__(self, mol=None):
         """
         Initialize a :class:`Reactor`.
 
         Parameters
         ----------
-        mol : :class:`rdkit.Mol`
+        mol : :class:`rdkit.Mol`, optional
             The molecule on which the reactor adds and removes atoms
             and bonds.
 
@@ -599,15 +606,35 @@ class Reactor:
 
         self.periodic_custom_reactions = {}
 
-        self.mol = mol
-        self.emol = rdkit.EditableMol(mol)
+        if mol is not None:
+            self.set_molecule(mol)
+
         self.periodic_bonds = []
         self.bonds_made = 0
         self.new_atom_coords = []
         self.deleters = []
         self.func_groups = []
 
-    def react(self, *fgs):
+    def set_molecule(self, mol):
+        """
+        Update :attr:`mol` and :attr:`emol`.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Mol`, optional
+            The molecule on which the reactor adds and removes atoms
+            and bonds.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self.mol = mol
+        self.emol = rdkit.EditableMol(mol)
+
+    def react(self, *fgs, track_fgs=True):
         """
         Creates bonds between functional groups.
 
@@ -627,6 +654,10 @@ class Reactor:
         *fgs : :class:`FunctionalGroup`
             The functional groups to react.
 
+        track_fgs : :class:`bool`, optional
+            Toggles if functional groups are added to
+            :attr:`func_groups`.
+
         Returns
         -------
         None : :class:`NoneType`
@@ -634,7 +665,8 @@ class Reactor:
         """
 
         self.deleters.extend(flatten(fg.deleter_ids for fg in fgs))
-        self.func_groups.extend(fgs)
+        if track_fgs:
+            self.func_groups.extend(fgs)
 
         names = (fg.info.name for fg in fgs)
         reaction_key = ReactionKey(*names)
@@ -647,7 +679,7 @@ class Reactor:
         self.emol.AddBond(fg1.bonder_ids[0], fg2.bonder_ids[0], bond)
         self.bonds_made += 1
 
-    def periodic_react(self, direction, *fgs):
+    def periodic_react(self, direction, *fgs, track_fgs=True):
         """
         Like :func:`react` but returns periodic bonds.
 
@@ -665,6 +697,10 @@ class Reactor:
         *fgs : :class:`FunctionalGroup`
             The functional groups to react.
 
+        track_fgs : :class:`bool`, optional
+            Toggles if functional groups are added to
+            :attr:`func_groups`.
+
         Returns
         -------
         None : :class:`NoneType`
@@ -672,6 +708,8 @@ class Reactor:
         """
 
         self.deleters.extend(flatten(fg.deleter_ids for fg in fgs))
+        if track_fgs:
+            self.func_groups.extend(fgs)
 
         names = (fg.info.name for fg in fgs)
         reaction_key = ReactionKey(*names)

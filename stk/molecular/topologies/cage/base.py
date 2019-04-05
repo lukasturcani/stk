@@ -952,6 +952,7 @@ class NoLinkerCageTopology(CageTopology):
         self.bb_positions = bb_positions
         self.connect()
         self.del_atoms = True
+        self.track_fgs = True
 
     def place_mols(self, macro_mol):
 

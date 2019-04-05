@@ -121,5 +121,19 @@ def test_set_bonder_centroid(tmp_amine2):
                        atol=1e-8)
 
 
-def test_shift_fgs():
-    assert False
+def test_shift_fgs(amine4):
+    ids = [10, 20, 30, 40]
+    shifted = amine4.shift_fgs(ids, 32)
+
+    for i, (fg1, fg2) in enumerate(zip(amine4.func_groups, shifted)):
+        assert fg1 is not fg2
+        assert fg2.id == ids[i]
+
+        for a1, a2 in zip(fg1.atom_ids, fg2.atom_ids):
+            assert a1 + 32 == a2
+
+        for a1, a2 in zip(fg1.bonder_ids, fg2.bonder_ids):
+            assert a1 + 32 == a2
+
+        for a1, a2 in zip(fg1.deleter_ids, fg2.deleter_ids):
+            assert a1 + 32 == a2

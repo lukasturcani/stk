@@ -22,6 +22,20 @@ before it is joined up and has atoms deleted via
 assembled molecule. For example, converting the end functional groups
 of a polymer into hydrogen atoms. See also :meth:`Topology.cleanup`.
 
+During the build process, every time a building block is placed
+in the macromolecule, new :class:`FunctionalGroup` instances must be
+made, which correspond to the functional groups added by virtue of
+adding the building block. These must be added to the
+:class:`Reactor` held in :attr:`.Topology.reactor`, specifically into
+its :attr:`.Reactor.func_groups` attribute. This means that the
+reactor will keep the atom ids in these functional groups up to date
+when it deletes atoms. However, note that any functional groups
+yielded by :meth:`.Topology.bonded_fgs` are automatically added, so
+they do not have to be managed manually. If you do not wish to
+automatically add the functional groups into
+:attr:`.Reactor.func_groups` you can toggle it in
+:attr:`Topology.track_fgs`.
+
 Cages
 .....
 
@@ -172,10 +186,19 @@ class Topology(metaclass=TopologyMeta):
         Toggles whether deleter atoms are deleted by
         :meth:`.Reactor.result`.
 
+    reactor : :class:`.Reactor`
+        The reactor which performs the reactions.
+
+    track_fgs : :class:`bool`
+        Toggles whether functional groups yielded by
+        :meth:`bonded_fgs` are automatically added into
+        :attr:`.Reactor.func_groups`.
+
     """
 
-    def __init__(self, del_atoms=True):
+    def __init__(self, del_atoms=True, track_fgs=True):
         self.del_atoms = del_atoms
+        self.track_fgs = track_fgs
 
     def build(self, macro_mol, bb_conformers=None):
         """
@@ -220,16 +243,17 @@ class Topology(metaclass=TopologyMeta):
         macro_mol.mol = rdkit.Mol()
         macro_mol.bb_counter = Counter()
 
+        self.reactor = Reactor()
         self.place_mols(macro_mol)
         self.prepare(macro_mol)
 
-        reactor = Reactor(macro_mol.mol)
-        macro_mol.func_groups = reactor.func_groups
+        self.reactor.set_molecule(macro_mol.mol)
+        macro_mol.func_groups = self.reactor.func_groups
 
         for fgs in self.bonded_fgs(macro_mol):
-            reactor.react(*fgs)
-        macro_mol.mol = reactor.result(self.del_atoms)
-        macro_mol.bonds_made = reactor.bonds_made
+            self.reactor.react(*fgs, track_fgs=self.track_fgs)
+        macro_mol.mol = self.reactor.result(self.del_atoms)
+        macro_mol.bonds_made = self.reactor.bonds_made
 
         self.cleanup(macro_mol)
 
@@ -380,12 +404,6 @@ class Linear(Topology):
         polymer are converted into hydrogem atoms. If ``'fg'`` they are
         kept as the original functional group.
 
-    _func_groups : :class:`list` of :class:`.FunctionalGroup`
-        Used internally during the build process. It is :class:`list`
-        of :class:`.FunctionalGroup` instances, corresponding to the
-        functional groups of the building blocks, after they have been
-        placed into a polymer chain but before they have been reacted.
-
     """
 
     def __init__(self, repeating_unit, orientation, n, ends='fg'):
@@ -428,8 +446,7 @@ class Linear(Topology):
         self.orientation = tuple(orientation)
         self.n = n
         self.ends = ends
-        self._func_groups = []
-        super().__init__(del_atoms=False if ends == 'h' else True)
+        super().__init__(track_fgs=False)
 
     def cleanup(self, macro_mol):
         """
@@ -467,16 +484,9 @@ class Linear(Topology):
 
         """
 
-        first_fg = min(self._func_groups, key=lambda fg: fg.id)
-        last_fg = max(self._func_groups, key=lambda fg: fg.id)
-        terminal = {first_fg.id, last_fg.id}
-
         deleters = []
-        for func_group in self._func_groups:
-            if func_group.id in terminal:
-                deleters.extend(func_group.atom_ids)
-            else:
-                deleters.extend(func_group.deleter_ids)
+        for func_group in self.reactor.func_groups:
+            deleters.extend(func_group.deleter_ids)
 
         emol = rdkit.EditableMol(macro_mol.mol)
         for atom_id in sorted(deleters, reverse=True):
@@ -558,7 +568,7 @@ class Linear(Topology):
             for fg in bb.func_groups:
                 id_ = 2*i + 1 if fg.id == front else 2*i
                 func_group = fg.shifted_fg(id_, num_atoms)
-                self._func_groups.append(func_group)
+                self.reactor.func_groups.append(func_group)
 
             bb.set_position_from_matrix(original_position)
 
@@ -578,7 +588,7 @@ class Linear(Topology):
 
         """
 
-        fgs = sorted(self._func_groups, key=lambda fg: fg.id)
+        fgs = sorted(self.reactor.func_groups, key=lambda fg: fg.id)
         for i in range(1, 2*len(self.repeating_unit)*self.n-1, 2):
             yield fgs[i], fgs[i+1]
 
