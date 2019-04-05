@@ -108,6 +108,12 @@ def test_centroid_functions(tmp_amine2):
     assert np.allclose(new_centroid, tmp_amine2.centroid(), atol=1e-8)
 
 
+def test_core(amine2):
+    for atom in amine2.core().GetAtoms():
+        assert atom.GetAtomicNum() != 1
+        assert not atom.HasProp('fg')
+
+
 def test_graph(amine2):
     """
     Tests the output of the `graph` method.
@@ -117,6 +123,13 @@ def test_graph(amine2):
     graph = amine2.graph()
     assert len(graph.nodes()) == amine2.mol.GetNumAtoms()
     assert len(graph.edges()) == amine2.mol.GetNumBonds()
+
+
+def test_is_core_atom(amine2):
+    for atom in amine2.mol.GetAtoms():
+        core = (False if atom.HasProp('fg') or atom.GetAtomicNum() == 1
+                else True)
+        assert core is amine2.is_core_atom(atom.GetIdx())
 
 
 def test_position_matrix(amine2):

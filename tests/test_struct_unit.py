@@ -67,25 +67,12 @@ def test_centroid_centroid_dir_vector(aldehyde3):
                        atol=1e-8)
 
 
-def test_core(amine2):
-    for atom in amine2.core().GetAtoms():
-        assert atom.GetAtomicNum() != 1
-        assert not atom.HasProp('fg')
-
-
 def test_functional_groups(amine2):
     info = amine2.func_groups[0].info
     func_grp_mol = rdkit.MolFromSmarts(info.fg_smarts)
     fg_atoms = amine2.mol.GetSubstructMatches(func_grp_mol)
     for fg in amine2.functional_groups([info.name]):
         assert any(ids == fg.atom_ids for ids in fg_atoms)
-
-
-def test_is_core_atom(amine2):
-    for atom in amine2.mol.GetAtoms():
-        core = (False if atom.HasProp('fg') or atom.GetAtomicNum() == 1
-                else True)
-        assert core is amine2.is_core_atom(atom.GetIdx())
 
 
 def test_json_init(amine2):

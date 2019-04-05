@@ -66,6 +66,10 @@ def test_caching(amine2, aldehyde2):
         stk.OPTIONS['cache'] = False
 
 
+def test_save_rdkit_atom_props():
+    assert False
+
+
 def test_json_init(polymer):
     path = os.path.join('macromolecule_tests_output', 'mol.json')
     polymer.dump(path)
