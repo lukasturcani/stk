@@ -642,8 +642,8 @@ def kabsch(coords1, coords2):
     coords2 : :class:`numpy.ndarray`
         This array represents a matrix which holds the coordinates of
         points the distance to which should be minimized. The matrix is
-        ``n x 3``. Each row of the matrix holds the ``x``, ``y`` and
-        ``z`` coordinates of one point, respectively. Here ``n`` is the
+        ``n x 3``. Each row of the matrix holds the x, y and z
+        coordinates of one point, respectively. Here ``n`` is the
         number of points.
 
     Returns
@@ -702,13 +702,13 @@ def matrix_centroid(matrix):
     Parameters
     ----------
     matrix : :class:`np.ndarray`
-        A ``n x 3`` matrix. Each row holds the ``x``, ``y`` and ``z``
+        A ``n x 3`` matrix. Each row holds the x, y and z
         coordinate of some point, respectively.
 
     Returns
     -------
     :class:`numpy.ndarray`
-        A numpy array which holds the ``x``, ``y`` and ``z``
+        A numpy array which holds the x, y and z
         coordinates of the centroid of the coordinates in `matrix`.
 
     """

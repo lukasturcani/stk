@@ -16,12 +16,11 @@ of what these methods should do is given by :meth:`Topology.place_mols`
 and :meth:`Topology.bonded_fgs`.
 
 The new class may optionally define the methods :meth:`prepare` and
-:meth:`cleanup`. The former perfroms operations on the molecule
-before it is joined up and has atoms deleted via :func:`.react`.
-The latter any final cleanup operations on the assembled molecule. For
-example, converting the end functional groups of a polymer into
-hydrogen atoms. See also :meth:`Topology.cleanup`.
-
+:meth:`cleanup`. The former performs operations on the molecule
+before it is joined up and has atoms deleted via
+:meth:`.Reactor.react`. The latter any final cleanup operations on the
+assembled molecule. For example, converting the end functional groups
+of a polymer into hydrogen atoms. See also :meth:`Topology.cleanup`.
 
 Cages
 .....
@@ -141,9 +140,10 @@ class TopologyMeta(type):
         # a repr of the object and place it in the `repr` attribute.
         # The __repr__() function in Topology will then just return
         # this attribute.
-        c = ', '.join("{!s}={!r}".format(key, value) for key, value in
-                      sorted(sig.items()))
-        obj._repr = "{}({})".format(self.__name__, c)
+        c = ', '.join(
+            f'{key!s}={value!r}' for key, value in sorted(sig.items())
+        )
+        obj._repr = f'{self.__name__}({c})'
         return obj
 
 

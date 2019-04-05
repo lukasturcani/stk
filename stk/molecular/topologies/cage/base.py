@@ -23,7 +23,7 @@ class Vertex:
         An array which holds the x, y and z coordinates of the
         vertex, in that order.
 
-    connected : :class:`list` of :class:`Edge` or :class:`Vertex`
+    connected : :class:`list` of (:class:`Edge` or :class:`Vertex`)
         This :class:`list` holds the :class:`Edge` or :class:`Vertex`
         instances which represent the edges or vertices connected to
         this one.
@@ -273,13 +273,13 @@ class Vertex:
 
         This method returns the ``a``, ``b``, ``c`` and ``d``
         coefficients of this equation for the plane formed by the
-        connected edges. The coefficents ``a``, ``b`` and ``c`` decribe
-        the normal vector to the plane. The coefficent ``d`` is found
-        by substituting these coefficients along with the ``x``, ``y``
-        and ``z`` variables in the scalar equation and solving for
-        ``d``. The variables ``x``, ``y`` and ``z`` are substituted by
-        the coordinate of some point on the plane. For example, the
-        position of one of the connected edges.
+        connected edges. The coefficents ``a``, ``b`` and ``c``
+        describe the normal vector to the plane. The coefficent ``d``
+        is found by substituting these coefficients along with the
+        ``x``, ``y`` and ``z`` variables in the scalar equation and
+        solving for ``d``. The variables ``x``, ``y`` and ``z`` are
+        substituted by the coordinate of some point on the plane. For
+        example, the position of one of the connected edges.
 
         Parameters
         ----------

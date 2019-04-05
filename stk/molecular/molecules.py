@@ -2494,8 +2494,8 @@ class StructUnit3(StructUnit):
         bonder centroids. The coefficents ``a``, ``b`` and ``c``
         describe the normal vector to the plane. The coefficent ``d``
         is found by substituting these coefficients along with the
-        ``x``, ``y`` and ``z`` variables in the scalar equation and
-        solving for ``d``. The variables ``x``, ``y`` and ``z`` are
+        x, y and z variables in the scalar equation and
+        solving for ``d``. The variables x, y and z are
         substituted by the coordinates of some point on the plane. For
         example, the position of one of the bonder centroids.
 
