@@ -9,40 +9,34 @@ MacroModel is 3rd party software, it does not come with MMEA.
 import pytest
 import sys
 import os
-from os.path import join
-import numpy as np
 import stk
 
 mopac = pytest.mark.skipif(
     all('mopac' not in x for x in sys.argv),
-    reason="only run when explicitly asked")
+    reason="Only run when explicitly asked.")
 
-# Possible installation directories of MacroModel. Your computer's
-# must be present in order for this test to run successfully.
-dirs = [r'C:\Program Files\mopac\MOPAC2016.exe',
-        '/opt/mopac/MOPAC2016.exe']
-mopac_path = next((x for x in dirs if os.path.exists(x)), None)
-
-c1 = stk.Molecule.load(join('data', 'mopac', 'small_mol.json'))
-c2 = stk.Molecule.load(join('data', 'mopac', 'small_mol2.json'))
 outdir = 'mopac_tests_output'
-try:
+if not os.path.exists(outdir):
     os.mkdir(outdir)
-except Exception:
-    ...
 
 
 @mopac
-def test_mopac_opt():
+def test_mopac_opt(tmp_amine2, mopac_path):
     if outdir not in os.getcwd():
         os.chdir(outdir)
 
-    stk.mopac_opt(c1, mopac_path)
+    # Give conformer a distinct geometry.
+    tmp_amine2.set_position_from_matrix(
+        pos_mat=tmp_amine2.mol.GetConformer().GetPositions().T*4,
+        conformer=1)
+
+    tmp_amine2.write(os.path.join(outdir, 'before_opt.mol'))
+    stk.mopac_opt(tmp_amine2, mopac_path)
+    tmp_amine2.write(os.path.join(outdir, 'after_opt.mol'))
 
 
 @mopac
-def test_mopac_ip():
+def test_mopac_ip(amine2, mopac_path):
     if outdir not in os.getcwd():
         os.chdir(outdir)
-    assert np.allclose(
-        c2.energy.mopac_ip(mopac_path), 5.3975, atol=1e-2)
+    assert abs(amine2.energy.mopac_ip(mopac_path)-5.3975) < 1e02

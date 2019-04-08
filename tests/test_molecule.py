@@ -78,7 +78,7 @@ def test_atom_symbol(amine2):
 
 
 def test_cavity_size(cc3):
-    assert abs(cc3.cavity_size(conformer=1)-6.30569486) < 1e-4
+    assert abs(cc3.cavity_size(conformer=1)-5.622072210870494) < 1e-4
 
 
 def test_center_of_mass(amine2):

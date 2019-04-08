@@ -33,7 +33,7 @@ def test_macromodel_opt(tmp_cc3, macromodel_path):
     stk.macromodel_opt(
         tmp_cc3,
         macromodel_path,
-        {'md': True, 'gradient': 1, 'restricted': False},
+        {'md': True, 'gradient': 1, 'restricted': 'both'},
         {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2})
 
     tmp_cc3.write(join(outdir, 'mm_opt_after.mol'))
