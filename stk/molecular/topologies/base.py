@@ -552,21 +552,27 @@ class Linear(Topology):
             # Check which functional group is at the back and which
             # one at the front.
             n_fgs = len(bb.func_groups)
-            if n_fgs != 1:
+            if n_fgs == 2:
                 c1, c2 = list(bb.bonder_centroids())
-            # When there is only 1 fg it doesnt matter.
-            else:
-                c1, c2 = [0, 0], [0, 0]
+                front = 1 if c1[0] < c2[0] else 0
 
-            front = 1 if c1[0] < c2[0] else 0
+            # Flag to see if the first functional group in
+            # self.reactor.func_groups should be bonded.
+            if i == 0:
+                self.bond_first = True if n_fgs == 1 else False
 
             num_atoms = macro_mol.mol.GetNumAtoms()
-
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
                                               monomer_mol)
 
             for fg in bb.func_groups:
-                id_ = 2*i + 1 if fg.id == front else 2*i
+                if n_fgs == 2:
+                    id_ = 2*i + 1 if fg.id == front else 2*i
+                elif len(self.reactor.func_groups) == 0:
+                    id_ = 0
+                else:
+                    id_ = len(self.reactor.func_groups)
+
                 func_group = fg.shifted_fg(id_, num_atoms)
                 self.reactor.func_groups.append(func_group)
 
@@ -589,7 +595,9 @@ class Linear(Topology):
         """
 
         fgs = sorted(self.reactor.func_groups, key=lambda fg: fg.id)
-        for i in range(1, 2*len(self.repeating_unit)*self.n-1, 2):
+
+        start = 0 if self.bond_first else 1
+        for i in range(start, len(self.reactor.func_groups), 2):
             yield fgs[i], fgs[i+1]
 
     def _x_position(self, macro_mol, bb):
