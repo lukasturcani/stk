@@ -88,676 +88,677 @@
     "name": "",
     "atom_props": {
         "0": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "1": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "2": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "3": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "4": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "5": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "6": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "7": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "8": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "9": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "10": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "11": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "12": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "13": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "14": {
-            "mol_index": 0,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 0
         },
         "15": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "16": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "17": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "18": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "19": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "20": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "21": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "22": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "23": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "24": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "25": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "26": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "27": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "28": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "29": {
-            "mol_index": 1,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 1
         },
         "30": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "31": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "32": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "33": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "34": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "35": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "36": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "37": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "38": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "39": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "40": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "41": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "42": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "43": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "44": {
-            "mol_index": 2,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 2
         },
         "45": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "46": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "47": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "48": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "49": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "50": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "51": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "52": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "53": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "54": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "55": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "56": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "57": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "58": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "59": {
-            "mol_index": 3,
-            "bb_index": 1
+            "bb_index": 1,
+            "mol_index": 3
         },
         "60": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "61": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "62": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "63": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "64": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "65": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "66": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "67": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "68": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "69": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "70": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "71": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "72": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "73": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "74": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "75": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "76": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "77": {
-            "mol_index": 0,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 0
         },
         "78": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "79": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "80": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "81": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "82": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "83": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "84": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "85": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "86": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "87": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "88": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "89": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "90": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "91": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "92": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "93": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "94": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "95": {
-            "mol_index": 1,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 1
         },
         "96": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "97": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "98": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "99": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "100": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "101": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "102": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "103": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "104": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "105": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "106": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "107": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "108": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "109": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "110": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "111": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "112": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "113": {
-            "mol_index": 2,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 2
         },
         "114": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "115": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "116": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "117": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "118": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "119": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "120": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "121": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "122": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "123": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "124": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "125": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "126": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "127": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "128": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "129": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "130": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "131": {
-            "mol_index": 3,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 3
         },
         "132": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "133": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "134": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "135": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "136": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "137": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "138": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "139": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "140": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "141": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "142": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "143": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "144": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "145": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "146": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "147": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "148": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "149": {
-            "mol_index": 4,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 4
         },
         "150": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "151": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "152": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "153": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "154": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "155": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "156": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "157": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "158": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "159": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "160": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "161": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "162": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "163": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "164": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "165": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "166": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         },
         "167": {
-            "mol_index": 5,
-            "bb_index": 0
+            "bb_index": 0,
+            "mol_index": 5
         }
-    }
+    },
+    "func_groups": "(FunctionalGroup(id=0, atom_ids=(4, 11), bonder_ids=(4,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=1, atom_ids=(112,), bonder_ids=(112,), deleter_ids=(), info='amine'), FunctionalGroup(id=2, atom_ids=(0, 9), bonder_ids=(0,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=3, atom_ids=(76,), bonder_ids=(76,), deleter_ids=(), info='amine'), FunctionalGroup(id=4, atom_ids=(7, 13), bonder_ids=(7,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=5, atom_ids=(94,), bonder_ids=(94,), deleter_ids=(), info='amine'), FunctionalGroup(id=6, atom_ids=(15, 24), bonder_ids=(15,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=7, atom_ids=(77,), bonder_ids=(77,), deleter_ids=(), info='amine'), FunctionalGroup(id=8, atom_ids=(22, 28), bonder_ids=(22,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=9, atom_ids=(148,), bonder_ids=(148,), deleter_ids=(), info='amine'), FunctionalGroup(id=10, atom_ids=(19, 26), bonder_ids=(19,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=11, atom_ids=(130,), bonder_ids=(130,), deleter_ids=(), info='amine'), FunctionalGroup(id=12, atom_ids=(34, 41), bonder_ids=(34,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=13, atom_ids=(166,), bonder_ids=(166,), deleter_ids=(), info='amine'), FunctionalGroup(id=14, atom_ids=(30, 39), bonder_ids=(30,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=15, atom_ids=(95,), bonder_ids=(95,), deleter_ids=(), info='amine'), FunctionalGroup(id=16, atom_ids=(37, 43), bonder_ids=(37,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=17, atom_ids=(131,), bonder_ids=(131,), deleter_ids=(), info='amine'), FunctionalGroup(id=18, atom_ids=(45, 54), bonder_ids=(45,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=19, atom_ids=(113,), bonder_ids=(113,), deleter_ids=(), info='amine'), FunctionalGroup(id=20, atom_ids=(52, 58), bonder_ids=(52,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=21, atom_ids=(167,), bonder_ids=(167,), deleter_ids=(), info='amine'), FunctionalGroup(id=22, atom_ids=(49, 56), bonder_ids=(49,), deleter_ids=(), info='aldehyde'), FunctionalGroup(id=23, atom_ids=(149,), bonder_ids=(149,), deleter_ids=(), info='amine'))"
 }
