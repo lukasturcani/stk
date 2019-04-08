@@ -2948,7 +2948,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
             'progress_params': self.progress_params,
             'note': self.note,
             'name': self.name,
-            'atom_props': self.atom_props
+            'atom_props': self.atom_props,
+            'func_groups': repr(self.func_groups)
 
         }
 
@@ -3012,7 +3013,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.building_blocks = bbs
         obj.atom_props = {int(key): value for key, value in
                           json_dict['atom_props'].items()}
-
+        obj.func_groups = tuple(eval(json_dict['func_groups']))
         if OPTIONS['cache']:
             cls.cache[key] = obj
 
