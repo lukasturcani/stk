@@ -45,6 +45,18 @@ class TestMol(stk.Cage):
         self.topology = topology
         stk.Molecule.__init__(self, name, note)
         self.energy = TestEnergy(self)
+        self.func_groups = (
+            stk.FunctionalGroup(id_=0,
+                                atom_ids=[0, 1, 2, 3],
+                                bonder_ids=[0, 1],
+                                deleter_ids=[2],
+                                info='amine'),
+            stk.FunctionalGroup(id_=1,
+                                atom_ids=[10, 20, 30],
+                                bonder_ids=[10],
+                                deleter_ids=[20, 30],
+                                info='aldehyde')
+        )
 
     def windows(self, *_, **__):
         return [4, 3, 2, 1]
