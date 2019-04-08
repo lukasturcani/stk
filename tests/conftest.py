@@ -1,8 +1,16 @@
 import pytest
 import stk
+import os
 from os.path import join
 from collections import Counter
 import rdkit.Chem.AllChem as rdkit
+
+# Run tests in a directory so that that generated files are easy to
+# delete.
+output_dir = 'tests_output'
+if not os.path.exists(output_dir):
+    os.mkdir(output_dir)
+os.chdir(output_dir)
 
 stk.OPTIONS['cache'] = False
 
@@ -37,6 +45,18 @@ class TestMol(stk.Cage):
         self.topology = topology
         stk.Molecule.__init__(self, name, note)
         self.energy = TestEnergy(self)
+        self.func_groups = (
+            stk.FunctionalGroup(id_=0,
+                                atom_ids=[0, 1, 2, 3],
+                                bonder_ids=[0, 1],
+                                deleter_ids=[2],
+                                info='amine'),
+            stk.FunctionalGroup(id_=1,
+                                atom_ids=[10, 20, 30],
+                                bonder_ids=[10],
+                                deleter_ids=[20, 30],
+                                info='aldehyde')
+        )
 
     def windows(self, *_, **__):
         return [4, 3, 2, 1]
@@ -53,12 +73,17 @@ class TestMol(stk.Cage):
 
 def pytest_addoption(parser):
     parser.addoption('--macromodel_path', default='')
+    parser.addoption('--mopac_path', default='')
 
 
 def pytest_generate_tests(metafunc):
     if 'macromodel_path' in metafunc.fixturenames:
         mm_path = metafunc.config.getoption('macromodel_path')
-        metafunc.parametrize('macromodel_path', mm_path)
+        metafunc.parametrize('macromodel_path', [mm_path])
+
+    if 'mopac_path' in metafunc.fixturenames:
+        mopac_path = metafunc.config.getoption('mopac_path')
+        metafunc.parametrize('mopac_path', [mopac_path])
 
 
 @pytest.fixture(scope='session')
@@ -131,7 +156,7 @@ def aldehyde3_alt2():
 
 @pytest.fixture(scope='session')
 def boronic_acid4():
-    return stk.StructUnit3(join('data', 'boronic_acid.sdf'))
+    return stk.StructUnit3(join('..', 'data', 'boronic_acid.sdf'))
 
 
 @pytest.fixture(scope='session')
@@ -180,19 +205,19 @@ def polymer(amine2, aldehyde2):
 def cc3():
     # This has an unoptimized conformer in conformer 0 and an
     # optimized one in conformer 1.
-    return stk.Molecule.load(join('data', 'cc3.json'))
+    return stk.Molecule.load(join('..', 'data', 'cc3.json'))
 
 
 @pytest.fixture
 def tmp_cc3():
     # This has an unoptimized conformer in conformer 0 and an
     # optimized one in conformer 1.
-    return stk.Molecule.load(join('data', 'cc3.json'))
+    return stk.Molecule.load(join('..', 'data', 'cc3.json'))
 
 
 @pytest.fixture(scope='session')
 def c60():
-    return stk.StructUnit(join('data', 'c60.pdb'))
+    return stk.StructUnit(join('..', 'data', 'c60.pdb'))
 
 
 @pytest.fixture(scope='session')
@@ -224,6 +249,11 @@ def test_mol1():
     test_mol.mol = rdkit.Mol(bb1.mol)
     test_mol.bonds_made = 2
     return test_mol
+
+
+@pytest.fixture(scope='session')
+def mae_path():
+    return join('..', 'data', 'molecule.mae')
 
 
 @pytest.fixture(scope='session')
@@ -284,4 +314,4 @@ def pop(generate_population):
 
 @pytest.fixture(scope='session')
 def ga_input():
-    return stk.GAInput(join('data', 'inputfile.py'))
+    return stk.GAInput(join('..', 'data', 'inputfile.py'))

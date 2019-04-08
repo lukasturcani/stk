@@ -260,9 +260,10 @@ class FunctionalGroup:
         deleter_ids : :class:`tuple` of :class:`int`
             The ids of deleter atoms in the functional group.
 
-        info : :class:`FGInfo`
+        info : :class:`FGInfo` or :class:`str`
             The :class:`FGInfo` of the functional group to which the
-            functional group belongs.
+            functional group belongs. Can also be the name of the
+            :class:`FGInfo`.
 
         """
 
@@ -270,7 +271,12 @@ class FunctionalGroup:
         self.atom_ids = atom_ids
         self.bonder_ids = bonder_ids
         self.deleter_ids = deleter_ids
-        self.info = info
+
+        if isinstance(info, str):
+            self.info = next(fg_info for fg_info in functional_groups
+                             if fg_info.name == info)
+        else:
+            self.info = info
 
     def shifted_fg(self, id_, shift):
         """
@@ -392,11 +398,11 @@ class FunctionalGroup:
         return id(self)
 
     def __repr__(self):
-        return (f"FunctionalGroup(id={self.id!r}, "
+        return (f"FunctionalGroup(id_={self.id!r}, "
                 f"atom_ids={self.atom_ids!r}, "
                 f"bonder_ids={self.bonder_ids!r}, "
                 f"deleter_ids={self.deleter_ids!r}, "
-                f"info={self.info!s})")
+                f"info={self.info.name!r})")
 
     def __str__(self):
         return repr(self)
