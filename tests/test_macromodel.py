@@ -1,8 +1,8 @@
 """
 Tests functions which use MacroModel.
 
-These tests are only run when the --macromodel py.test option is used.
-MacroModel is 3rd party software, it does not come with MMEA.
+These tests are only run when the --macromodel_path pytest option is
+used. MacroModel is 3rd party software, it does not come with ``stk``.
 
 """
 
@@ -15,51 +15,51 @@ import stk
 
 macromodel = pytest.mark.skipif(
     all('macromodel' not in x for x in sys.argv),
-    reason="only run when explicitly asked")
+    reason="Only run when explicitly asked.")
 
-# Possible installation directories of MacroModel. Your computer's
-# must be present in order for this test to run successfully.
-dirs = [r'C:\Program Files\Schrodinger2016-3',
-        '/home/lukas/program_files/schrodinger2016-4',
-        '/opt/schrodinger2016-4',
-        '/home/lukas/opt/schrodinger2016-4',
-        '/opt/schrodinger2017-2']
-mm_path = next((x for x in dirs if os.path.exists(x)), None)
 
-c1 = stk.Molecule.load(join('data', 'macromodel', 'cage.json'))
-c2 = stk.Molecule.load(join('data', 'macromodel', 'small_mol.json'))
 outdir = 'macromodel_tests_output'
-try:
+if not os.path.exists(outdir):
     os.mkdir(outdir)
-except Exception:
-    ...
 
 
 @macromodel
-def test_macromodel_opt():
+def test_macromodel_opt(tmp_cc3, macromodel_path):
     if outdir not in os.getcwd():
         os.chdir(outdir)
+
+    tmp_cc3.write(join(outdir, 'mm_opt_before.mol'))
 
     stk.macromodel_opt(
-        c1, mm_path,
+        tmp_cc3,
+        macromodel_path,
         {'md': True, 'gradient': 1, 'restricted': False},
         {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2})
 
+    tmp_cc3.write(join(outdir, 'mm_opt_after.mol'))
+
 
 @macromodel
-def test_macromodel_cage_opt():
+def test_macromodel_cage_opt(tmp_cc3, macromodel_path):
     if outdir not in os.getcwd():
         os.chdir(outdir)
+
+    tmp_cc3.write(join(outdir, 'mm_cage_opt_before.mol'))
 
     stk.macromodel_cage_opt(
-        c1, mm_path,
+        tmp_cc3,
+        macromodel_path,
         {'md': True, 'gradient': 1, 'restricted': False},
         {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2})
 
+    tmp_cc3.write(join(outdir, 'mm_cage_opt_after.mol'))
+
 
 @macromodel
-def test_macromodel_eng():
+def test_macromodel_eng(amine2, macromodel_path):
     if outdir not in os.getcwd():
         os.chdir(outdir)
-    assert np.allclose(
-        c2.energy.macromodel(16, mm_path), 23.48, atol=1e-2)
+
+    assert np.allclose(a=amine2.energy.macromodel(16, macromodel_path),
+                       b=23.48,
+                       atol=1e-2)

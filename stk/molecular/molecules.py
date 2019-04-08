@@ -1897,11 +1897,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         """
 
         fg_names = [info.name for info in self.func_group_infos]
+        conformers = [(conf.GetId(), self.mdl_mol_block(conf.GetId()))
+                      for conf in self.mol.GetConformers()]
         return {
 
             'class': self.__class__.__name__,
             'func_groups': fg_names,
-            'mol_block': self.mdl_mol_block(),
+            'conformers': conformers,
             'note': self.note,
             'name': self.name,
             'atom_props': self.atom_props
@@ -1928,16 +1930,29 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
+        first_conf, *confs = json_dict['conformers']
         with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
-            f.write(json_dict['mol_block'])
+            conf_id, mol_block = first_conf
+            f.write(mol_block)
             f.seek(0)
             obj = cls(f.name, json_dict['func_groups'],
                       (json_dict['name'] if
                        json_dict['load_names'] else ""),
                       json_dict['note'])
+
+        obj.mol.GetConformer().SetId(conf_id)
         obj.optimized = json_dict['optimized']
         obj.atom_props = defaultdict(dict)
         obj.atom_props.update(json_dict['atom_props'])
+
+        for conf_id, mol_block in confs:
+            conf_mol = rdkit.MolFromMolBlock(molBlock=mol_block,
+                                             removHs=False,
+                                             sanitize=False)
+            conf = conf_mol.GetConformer()
+            conf.SetId(conf_id)
+            obj.mol.AddConformer(conf)
+
         return obj
 
     @staticmethod
@@ -2916,14 +2931,18 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
+        conformers = [(conf.GetId(), self.mdl_mol_block(conf.GetId()))
+                      for conf in self.mol.GetConformers()]
+
         return {
             'bb_counter': [(key.json(), val) for key, val in
                            self.bb_counter.items()],
             'bonds_made': self.bonds_made,
             'class': self.__class__.__name__,
-            'mol_block': self.mdl_mol_block(),
-            'building_blocks': [x.json() for x in
-                                self.building_blocks],
+            'conformers': conformers,
+            'building_blocks': [
+                x.json() for x in self.building_blocks
+            ],
             'topology': repr(self.topology),
             'unscaled_fitness': repr(self.unscaled_fitness),
             'progress_params': self.progress_params,
@@ -2963,9 +2982,21 @@ class MacroMolecule(Molecule, metaclass=Cached):
             return cls.cache[key]
 
         obj = cls.__new__(cls)
-        obj.mol = rdkit.MolFromMolBlock(json_dict['mol_block'],
+
+        (conf_id, mol_block), *confs = json_dict['conformers']
+        obj.mol = rdkit.MolFromMolBlock(molBlock=mol_block,
                                         sanitize=False,
                                         removeHs=False)
+        obj.mol.GetConformer().SetId(conf_id)
+
+        for conf_id, mol_block in confs:
+            conf_mol = rdkit.MolFromMolBlock(molBlock=mol_block,
+                                             sanitize=False,
+                                             removeHs=False)
+            conf = conf_mol.GetConformer()
+            conf.SetId(conf_id)
+            obj.mol.AddConformer(conf)
+
         obj.topology = topology
         obj.unscaled_fitness = eval(json_dict['unscaled_fitness'],
                                     np.__dict__)
