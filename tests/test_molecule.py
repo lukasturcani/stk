@@ -1,4 +1,3 @@
-from os.path import join
 import itertools as it
 import numpy as np
 from scipy.spatial.distance import euclidean
@@ -201,8 +200,7 @@ def test_shift(amine2):
         assert np.allclose(should_be, pos, atol=1e-8)
 
 
-def test_update_from_mae(tmp_amine2):
-    filename = join('data', 'molecule.mae')
-    tmp_amine2.update_from_mae(filename, 1)
+def test_update_from_mae(tmp_amine2, mae_path):
+    tmp_amine2.update_from_mae(mae_path, 1)
     assert abs(tmp_amine2.max_diameter(0)[0] -
                tmp_amine2.max_diameter(1)[0]) > 1

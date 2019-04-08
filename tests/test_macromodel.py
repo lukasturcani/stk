@@ -25,9 +25,6 @@ if not os.path.exists(outdir):
 
 @macromodel
 def test_macromodel_opt(tmp_cc3, macromodel_path):
-    if outdir not in os.getcwd():
-        os.chdir(outdir)
-
     tmp_cc3.write(join(outdir, 'mm_opt_before.mol'))
 
     stk.macromodel_opt(
@@ -41,9 +38,6 @@ def test_macromodel_opt(tmp_cc3, macromodel_path):
 
 @macromodel
 def test_macromodel_cage_opt(tmp_cc3, macromodel_path):
-    if outdir not in os.getcwd():
-        os.chdir(outdir)
-
     tmp_cc3.write(join(outdir, 'mm_cage_opt_before.mol'))
 
     stk.macromodel_cage_opt(
@@ -57,9 +51,6 @@ def test_macromodel_cage_opt(tmp_cc3, macromodel_path):
 
 @macromodel
 def test_macromodel_eng(amine2, macromodel_path):
-    if outdir not in os.getcwd():
-        os.chdir(outdir)
-
     assert np.allclose(a=amine2.energy.macromodel(16, macromodel_path),
                        b=23.48,
                        atol=1e-2)

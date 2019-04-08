@@ -1,8 +1,16 @@
 import pytest
 import stk
+import os
 from os.path import join
 from collections import Counter
 import rdkit.Chem.AllChem as rdkit
+
+# Run tests in a directory so that that generated files are easy to
+# delete.
+output_dir = 'tests_output'
+if not os.path.exists(output_dir):
+    os.mkdir(output_dir)
+os.chdir(output_dir)
 
 stk.OPTIONS['cache'] = False
 
@@ -136,7 +144,7 @@ def aldehyde3_alt2():
 
 @pytest.fixture(scope='session')
 def boronic_acid4():
-    return stk.StructUnit3(join('data', 'boronic_acid.sdf'))
+    return stk.StructUnit3(join('..', 'data', 'boronic_acid.sdf'))
 
 
 @pytest.fixture(scope='session')
@@ -185,19 +193,19 @@ def polymer(amine2, aldehyde2):
 def cc3():
     # This has an unoptimized conformer in conformer 0 and an
     # optimized one in conformer 1.
-    return stk.Molecule.load(join('data', 'cc3.json'))
+    return stk.Molecule.load(join('..', 'data', 'cc3.json'))
 
 
 @pytest.fixture
 def tmp_cc3():
     # This has an unoptimized conformer in conformer 0 and an
     # optimized one in conformer 1.
-    return stk.Molecule.load(join('data', 'cc3.json'))
+    return stk.Molecule.load(join('..', 'data', 'cc3.json'))
 
 
 @pytest.fixture(scope='session')
 def c60():
-    return stk.StructUnit(join('data', 'c60.pdb'))
+    return stk.StructUnit(join('..', 'data', 'c60.pdb'))
 
 
 @pytest.fixture(scope='session')
@@ -229,6 +237,11 @@ def test_mol1():
     test_mol.mol = rdkit.Mol(bb1.mol)
     test_mol.bonds_made = 2
     return test_mol
+
+
+@pytest.fixture(scope='session')
+def mae_path():
+    return join('..', 'data', 'molecule.mae')
 
 
 @pytest.fixture(scope='session')
@@ -289,4 +302,4 @@ def pop(generate_population):
 
 @pytest.fixture(scope='session')
 def ga_input():
-    return stk.GAInput(join('data', 'inputfile.py'))
+    return stk.GAInput(join('..', 'data', 'inputfile.py'))
