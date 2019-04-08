@@ -52,5 +52,5 @@ def test_macromodel_cage_opt(tmp_cc3, macromodel_path):
 @macromodel
 def test_macromodel_eng(amine2, macromodel_path):
     assert np.allclose(a=amine2.energy.macromodel(16, macromodel_path),
-                       b=23.48,
+                       b=49.0655,
                        atol=1e-2)
