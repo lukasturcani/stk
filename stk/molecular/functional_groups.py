@@ -398,7 +398,7 @@ class FunctionalGroup:
         return id(self)
 
     def __repr__(self):
-        return (f"FunctionalGroup(id={self.id!r}, "
+        return (f"FunctionalGroup(id_={self.id!r}, "
                 f"atom_ids={self.atom_ids!r}, "
                 f"bonder_ids={self.bonder_ids!r}, "
                 f"deleter_ids={self.deleter_ids!r}, "
