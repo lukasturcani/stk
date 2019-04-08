@@ -16,7 +16,7 @@ setup(name='stk',
                         'matplotlib',
                         'scikit-learn',
                         'psutil',
-                        'pywindowx==0.0.3',
+                        'pywindowx',
                         'pandas',
                         'seaborn'],
       python_requires='>=3.6')
