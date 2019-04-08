@@ -51,6 +51,16 @@ class TestMol(stk.Cage):
         return 4
 
 
+def pytest_addoption(parser):
+    parser.addoption('--macromodel_path', default='')
+
+
+def pytest_generate_tests(metafunc):
+    if 'macromodel_path' in metafunc.fixturenames:
+        mm_path = metafunc.config.getoption('macromodel_path')
+        metafunc.parametrize('macromodel_path', mm_path)
+
+
 @pytest.fixture(scope='session')
 def amine2():
     return stk.StructUnit2.smiles_init('NCCCN', ['amine'])
@@ -168,6 +178,15 @@ def polymer(amine2, aldehyde2):
 
 @pytest.fixture(scope='session')
 def cc3():
+    # This has an unoptimized conformer in conformer 0 and an
+    # optimized one in conformer 1.
+    return stk.Molecule.load(join('data', 'cc3.json'))
+
+
+@pytest.fixture
+def tmp_cc3():
+    # This has an unoptimized conformer in conformer 0 and an
+    # optimized one in conformer 1.
     return stk.Molecule.load(join('data', 'cc3.json'))
 
 
