@@ -378,7 +378,7 @@ class Topology(metaclass=TopologyMeta):
 
 class Linear(Topology):
     """
-    A class represting linear polymers.
+    A class representing linear polymers.
 
     Attributes
     ----------
