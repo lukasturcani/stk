@@ -597,7 +597,7 @@ class Linear(Topology):
         fgs = sorted(self.reactor.func_groups, key=lambda fg: fg.id)
 
         start = 0 if self.bond_first else 1
-        for i in range(start, len(self.reactor.func_groups), 2):
+        for i in range(start, len(self.reactor.func_groups)-1, 2):
             yield fgs[i], fgs[i+1]
 
     def _x_position(self, macro_mol, bb):
