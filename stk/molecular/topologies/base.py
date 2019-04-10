@@ -500,8 +500,6 @@ class Linear(Topology):
 
         The monomers are placed along the x-axis, so that the vector
         running between the functional groups is placed along the axis.
-        Functional groups are tagged with ``'fg_id'`` such that
-        ``'fg_id'`` increases along the x-axis.
 
         Parameters
         ----------
