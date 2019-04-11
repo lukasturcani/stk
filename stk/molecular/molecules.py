@@ -167,7 +167,6 @@ class does the assembly of the macromolecule from the building blocks.
 
 """
 
-import tempfile
 import warnings
 import logging
 import json
@@ -262,25 +261,34 @@ class CachedStructUnit(type):
         sig.apply_defaults()
         sig = sig.arguments
 
-        _, ext = os.path.splitext(sig['file'])
+        if isinstance(sig['mol'], str):
+            if os.path.exists(sig['mol']):
+                _, ext = os.path.splitext(sig['mol'])
 
-        # Ensure a valid file type was provided.
-        if ext not in self.init_funcs:
-            raise TypeError(('Unable to initialize'
-                             ' from "{}" files.').format(ext))
+                if ext not in self.init_funcs:
+                    raise TypeError(
+                        f'Unable to initialize from "{ext}" files.'
+                    )
+                mol = remake(self.init_funcs[ext](sig['mol']))
 
-        mol = remake(self.init_funcs[ext](sig['file']))
+            else:
+                mol = remake(rdkit.MolFromMolBlock(sig['mol']))
+
+        elif isinstance(sig['mol'], rdkit.Mol):
+            mol = remake(sig['mol'])
 
         # Get the name of the functional groups provided to the
         # initializer or get it from the path.
-        if sig['functional_groups']:
+        if sig['functional_groups'] is not None:
             functional_groups = sig['functional_groups']
-            if functional_groups is None:
-                functional_groups = ()
-        else:
+
+        elif os.path.exists(sig['mol']):
             functional_groups = tuple((
-                fg.name for fg in fgs if fg.name in sig['file']
+                fg.name for fg in fgs if fg.name in sig['mol']
             ))
+
+        else:
+            functional_groups = ()
 
         key = self.gen_key(mol, functional_groups)
         if key in self.cache and OPTIONS['cache']:
@@ -1469,15 +1477,18 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                   '.pdb': partial(rdkit.MolFromPDBFile,
                                   sanitize=False, removeHs=False)}
 
-    def __init__(self, file, functional_groups=None, name="", note=""):
+    def __init__(self, mol, functional_groups=None, name="", note=""):
         """
         Initializes a :class:`StructUnit` instance.
 
         Parameters
         ----------
-        file : :class:`str`
-            The full path of the molecular structure file holding the
-            building block.
+        mol : :class:`str` or :class:`rdkit.Mol`
+            Can be one of 3 things:
+
+                1. A path to a molecular structure file.
+                2. A :class:`rdkit.Mol` object.
+                3. V3000 MDL Mol block.
 
         functional_groups : :class:`list` of :class:`str`, optional
             The names of the functional groups which are to have atoms
@@ -1495,15 +1506,29 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        self.file = file
-        _, ext = os.path.splitext(file)
+        self.file = None
 
-        if ext not in self.init_funcs:
-            raise TypeError(
-                f'Unable to initialize from "{ext}" files.'
-            )
+        if isinstance(mol, str):
+            if os.path.exists(mol):
+                self.file = mol
+                _, ext = os.path.splitext(mol)
 
-        self.mol = remake(self.init_funcs[ext](file))
+                if ext not in self.init_funcs:
+                    raise TypeError(
+                        f'Unable to initialize from "{ext}" files.'
+                    )
+                self.mol = remake(self.init_funcs[ext](mol))
+
+            else:
+                self.mol = remake(
+                    rdkit.MolFromMolBlock(mol,
+                                          removeHs=False,
+                                          sanitize=False)
+                )
+
+        elif isinstance(mol, rdkit.Mol):
+            self.mol = remake(mol)
+
         # Update the property cache of each atom. This updates things
         # like valence.
         for atom in self.mol.GetAtoms():
@@ -1512,13 +1537,17 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # If no functional group names passed, check if any functional
         # group names appear in the file path.
         if functional_groups is None:
-            functional_groups = [
-                fg.name for fg in fgs if fg.name in file
-            ]
+            if os.path.exists(mol):
+                functional_groups = [
+                    fg.name for fg in fgs if fg.name in mol
+                ]
+            else:
+                functional_groups = []
 
         self.func_groups = tuple(
             self.functional_groups(functional_groups)
         )
+
         self.func_group_infos = tuple(dedupe(
             iterable=(fg.info for fg in self.func_groups),
             key=lambda info: info.name
@@ -1931,14 +1960,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         """
 
         first_conf, *confs = json_dict['conformers']
-        with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
-            conf_id, mol_block = first_conf
-            f.write(mol_block)
-            f.seek(0)
-            obj = cls(f.name, json_dict['func_groups'],
-                      (json_dict['name'] if
-                       json_dict['load_names'] else ""),
-                      json_dict['note'])
+        conf_id, mol_block = first_conf
+        name = json_dict['name'] if json_dict['load_names'] else ''
+        obj = cls(mol_block,
+                  json_dict['func_groups'],
+                  name,
+                  json_dict['note'])
 
         obj.mol.GetConformer().SetId(conf_id)
         obj.optimized = json_dict['optimized']
@@ -2059,28 +2086,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         new_pos_mat = np.dot(rot_mat, pos_mat)
         self.set_position_from_matrix(new_pos_mat, conformer)
         self.set_position(iposition, conformer)
-
-    @classmethod
-    def rdkit_init(cls, mol, functional_group=None, name="", note=""):
-        """
-        Uses an ``rdkit`` molecule for initialization.
-
-        Parameters
-        ----------
-        mol : :class:`rdkit.Mol`
-            An ``rdkit`` molecule used for initialization.
-
-        Returns
-        -------
-        :class:`StructUnit`
-            A :class:`StructUnit` of `mol`.
-
-        """
-
-        with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
-            f.write(rdkit.MolToMolBlock(mol, forceV3000=True))
-            f.seek(0)
-            return cls(f.name, functional_group, name, note)
 
     def rotate2(self, theta, axis, conformer=-1):
         """

@@ -11,6 +11,13 @@ def test_init(amine2):
     assert len(amine2.func_groups) == 2
     assert amine2.func_groups[0].info.name == 'amine'
 
+    amine2_1 = stk.StructUnit(amine2.mol, ['amine'])
+    assert amine2_1 == amine2
+
+    mol_block = rdkit.MolToMolBlock(amine2.mol, forceV3000=True)
+    amine2_2 = stk.StructUnit(mol_block, ['amine'])
+    assert amine2_2 == amine2
+
 
 def test_all_bonder_distances(tmp_aldehyde3):
     shape = (3, tmp_aldehyde3.mol.GetNumAtoms())
