@@ -527,10 +527,9 @@ class Linear(Topology):
         dirs = self.orientation*self.n
 
         # Go through the repeating unit and place each monomer.
-        bb_counter = macro_mol.bb_counter = {}
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             bb = mapping[label]
-            bb_counter[bb] = bb_counter.get(bb, 0) + 1
+            macro_mol.bb_counter.update([bb])
             original_position = bb.mol.GetConformer().GetPositions().T
 
             # Flip or not flip the monomer as given by the probability

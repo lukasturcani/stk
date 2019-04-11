@@ -198,7 +198,7 @@ def aldehyde6():
 @pytest.fixture(scope='session')
 def polymer(amine2, aldehyde2):
     return stk.Polymer([amine2, aldehyde2],
-                       stk.Linear('AB', [0, 0], 1))
+                       stk.Linear('AB', [0, 0], 3))
 
 
 @pytest.fixture(scope='session')
