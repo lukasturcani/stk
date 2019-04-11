@@ -261,24 +261,21 @@ class CachedStructUnit(type):
         sig.apply_defaults()
         sig = sig.arguments
 
-        self.file = sig['mol'] if os.path.exists(sig['mol']) else None
-        if os.path.exists(sig['mol']):
-            _, ext = os.path.splitext(sig['mol'])
+        if isinstance(sig['mol'], str):
+            if os.path.exists(sig['mol']):
+                _, ext = os.path.splitext(sig['mol'])
 
-            if ext not in self.init_funcs:
-                raise TypeError(
-                    f'Unable to initialize from "{ext}" files.'
-                )
-            mol = remake(self.init_funcs[ext](sig['mol']))
+                if ext not in self.init_funcs:
+                    raise TypeError(
+                        f'Unable to initialize from "{ext}" files.'
+                    )
+                mol = remake(self.init_funcs[ext](sig['mol']))
 
-        elif isinstance(sig['mol'], str) and 'V3000' in sig['mol']:
-            mol = remake(rdkit.MolFromMolBlock(sig['mol']))
+            else:
+                mol = remake(rdkit.MolFromMolBlock(sig['mol']))
 
         elif isinstance(sig['mol'], rdkit.Mol):
             mol = remake(sig['mol'])
-
-        else:
-            raise TypeError('Invalid value passed to "mol".')
 
         # Get the name of the functional groups provided to the
         # initializer or get it from the path.
@@ -1509,28 +1506,28 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        self.file = mol if os.path.exists(mol) else None
-        if os.path.exists(mol):
-            _, ext = os.path.splitext(mol)
+        self.file = None
 
-            if ext not in self.init_funcs:
-                raise TypeError(
-                    f'Unable to initialize from "{ext}" files.'
+        if isinstance(mol, str):
+            if os.path.exists(mol):
+                self.file = mol
+                _, ext = os.path.splitext(mol)
+
+                if ext not in self.init_funcs:
+                    raise TypeError(
+                        f'Unable to initialize from "{ext}" files.'
+                    )
+                self.mol = remake(self.init_funcs[ext](mol))
+
+            else:
+                self.mol = remake(
+                    rdkit.MolFromMolBlock(mol,
+                                          removeHs=False,
+                                          sanitize=False)
                 )
-            self.mol = remake(self.init_funcs[ext](mol))
-
-        elif isinstance(mol, str) and 'V3000' in mol:
-            self.mol = remake(
-                rdkit.MolFromMolBlock(mol,
-                                      removeHs=False,
-                                      sanitize=False)
-            )
 
         elif isinstance(mol, rdkit.Mol):
             self.mol = remake(mol)
-
-        else:
-            raise TypeError('Invalid value passed to "mol".')
 
         # Update the property cache of each atom. This updates things
         # like valence.
