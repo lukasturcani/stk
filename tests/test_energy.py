@@ -9,8 +9,10 @@ def test_rdkit(amine2):
 
 
 def test_formation(polymer, amine2):
-    reactant_energy = sum(mol.energy.rdkit('mmff') for
-                          mol in polymer.building_blocks)
+    reactant_energy = sum(
+        mol.energy.rdkit('mmff')*n
+        for mol, n in polymer.bb_counter.items()
+    )
     product_energy = (polymer.energy.rdkit('mmff') +
                       amine2.energy.rdkit('mmff'))
     form_energy = reactant_energy - product_energy
@@ -25,8 +27,10 @@ def test_formation(polymer, amine2):
 
 
 def test_pseudoformation(polymer):
-    reactant_energy = sum(mol.energy.rdkit('mmff') for
-                          mol in polymer.building_blocks)
+    reactant_energy = sum(
+            mol.energy.rdkit('mmff')*n
+            for mol, n in polymer.bb_counter.items()
+    )
     product_energy = polymer.energy.rdkit('mmff')
 
     pseudoform_energy = reactant_energy - product_energy
