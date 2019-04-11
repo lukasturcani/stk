@@ -1931,7 +1931,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         """
 
         first_conf, *confs = json_dict['conformers']
-        with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
+        with tempfile.NamedTemporaryFile('r+t',
+                                         suffix='.mol',
+                                         delete=True) as f:
             conf_id, mol_block = first_conf
             f.write(mol_block)
             f.seek(0)
@@ -2077,7 +2079,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
+        with tempfile.NamedTemporaryFile('r+t',
+                                         suffix='.mol',
+                                         delete=False) as f:
             f.write(rdkit.MolToMolBlock(mol, forceV3000=True))
             f.seek(0)
             return cls(f.name, functional_group, name, note)
