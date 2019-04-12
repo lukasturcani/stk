@@ -18,6 +18,9 @@ def test_init(amine2):
     amine2_2 = stk.StructUnit(mol_block, ['amine'])
     assert amine2_2 == amine2
 
+    amine2_3 = stk.StructUnit(amine2.mol)
+    assert amine2.same(amine2_3)
+
 
 def test_all_bonder_distances(tmp_aldehyde3):
     shape = (3, tmp_aldehyde3.mol.GetNumAtoms())

@@ -261,7 +261,8 @@ class CachedStructUnit(type):
         sig.apply_defaults()
         sig = sig.arguments
 
-        if isinstance(sig['mol'], str):
+        is_str = isinstance(sig['mol'], str)
+        if is_str:
             if os.path.exists(sig['mol']):
                 _, ext = os.path.splitext(sig['mol'])
 
@@ -282,7 +283,7 @@ class CachedStructUnit(type):
         if sig['functional_groups'] is not None:
             functional_groups = sig['functional_groups']
 
-        elif os.path.exists(sig['mol']):
+        elif is_str and os.path.exists(sig['mol']):
             functional_groups = tuple((
                 fg.name for fg in fgs if fg.name in sig['mol']
             ))
@@ -1537,7 +1538,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # If no functional group names passed, check if any functional
         # group names appear in the file path.
         if functional_groups is None:
-            if os.path.exists(mol):
+            if isinstance(mol, str) and os.path.exists(mol):
                 functional_groups = [
                     fg.name for fg in fgs if fg.name in mol
                 ]
