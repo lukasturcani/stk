@@ -129,9 +129,9 @@ def amine3():
 
 
 @pytest.fixture(scope='session')
-def phenyl_amine():
+def ring_amine():
     smiles = 'Nc1ccc2cc3cc(N)ccc3cc2c1'
-    return stk.StructUnit2.smiles_init(smiles, ['phenyl_amine'])
+    return stk.StructUnit2.smiles_init(smiles, ['ring_amine'])
 
 
 @pytest.fixture(scope='session')
