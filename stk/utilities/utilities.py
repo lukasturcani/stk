@@ -951,6 +951,8 @@ def remake(mol):
     for a in m.GetAtoms():
         a.UpdatePropertyCache()
 
+    rdkit.GetSSSR(m)
+
     return m
 
 
