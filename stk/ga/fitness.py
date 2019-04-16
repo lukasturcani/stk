@@ -230,7 +230,8 @@ from ..utilities import (matrix_centroid,
                          FunctionData,
                          rotation_matrix_arbitrary_axis,
                          daemon_logger,
-                         logged_call)
+                         logged_call,
+                         OPTIONS)
 
 from ..molecular import func_key
 from .. import optimization
@@ -287,9 +288,16 @@ def _calc_fitness(func_data, population, processes):
                                  ((logq, p_func, mem) for
                                   mem in population))
 
+    # Update the structures in the population.
+    sorted_new = sorted(evaluated, key=lambda m: m.key)
+    sorted_old = sorted(population, key=lambda m: m.key)
+    for old, new in zip(sorted_old, sorted_new):
+        old.__dict__ = dict(vars(new))
+
     # Make sure the cache is updated with the evaluated versions.
-    for member in evaluated:
-        member.update_cache()
+    if OPTIONS['cache']:
+        for member in evaluated:
+            member.update_cache()
 
     logq.put(None)
     log_thread.join()
