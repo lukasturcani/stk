@@ -6,7 +6,6 @@ Defines optimization functions which use MOPAC.
 import os
 import subprocess as sp
 import psutil
-import time
 import logging
 import rdkit.Chem.AllChem as rdkit
 from uuid import uuid4
@@ -125,8 +124,7 @@ def _run_mopac(mol, mopac_path, settings, timeout=7200):
     name, ext = os.path.splitext(mol._file)
     mop_file = name + '.mop'
 
-    print("", time.ctime(time.time()),
-          'Running MOPAC - {}.'.format(mol.name), sep='\n')
+    logger.info(f'Running MOPAC on "{mol.name}".')
 
     # To run MOPAC a command is issued to the console via
     # ``subprocess.Popen``. The command is the full path of the
@@ -194,7 +192,7 @@ def _mop_line(settings):
 
     # Add Hamiltonian info
     mopac_run_str = mopac_run_str + settings['hamiltonian']
-    # Add method and GNORM if 'OPT' otherwise just print the method
+    # Add method and GNORM if 'OPT' otherwise just write the method.
     if settings['method'] == 'OPT':
         gnorm_info = ' GNORM={} '.format(settings['gradient'])
         mopac_run_str = mopac_run_str + " " + settings['method'] + gnorm_info
@@ -242,14 +240,14 @@ def _create_mop(mol, settings):
 
     logger.info('\nCreating .mop file - {}.'.format(mol.name))
 
-    # Generate the mop file containing the MOPAC run info
+    # Generate the mop file containing the MOPAC run info.
     with open(mop_file, 'w') as mop:
-        # line for the run info
+        # Line for the run info.
         mop.write(_mop_line(settings) + "\n")
-        # line with the name of the molecule
+        # Line with the name of the molecule.
         mop.write(name + "\n\n")
 
-        # print the structural info
+        # Write the structural info.
         for atom in mol.GetAtoms():
             atom_id = atom.GetIdx()
             atom_symbol = atom.GetSymbol()

@@ -6,10 +6,44 @@ from os.path import join
 test_dir = 'cage_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
-data_dir = os.path.join(os.getcwd(), 'data', 'cage_topologies')
 
 
-# 3 + 4 topology tests.
+def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
+    # Regular cage topology.
+    bb_positions = {
+        amine2: [0, 1, 2, 3, 4],
+        amine2_alt3: [5],
+        aldehyde3: [0, 1, 2],
+        aldehyde3_alt3: [3]
+    }
+
+    bbs = [amine2, amine2_alt3, aldehyde3, aldehyde3_alt3]
+    for fg in range(3):
+        top = stk.FourPlusSix(bb_positions=bb_positions,
+                              A_alignments=[0, 0, 0, fg],
+                              B_alignments=[1, 1, 1, 1, 1, 1])
+        c = stk.Cage(bbs, top)
+        c.write(join(test_dir, f'4p6_valignment_{fg}.mol'))
+
+    top = stk.FourPlusSix(bb_positions=bb_positions,
+                          A_alignments=[0, 0, 0, 0],
+                          B_alignments=[1, 1, 1, 1, 1, -1])
+    c = stk.Cage(bbs, top)
+    c.write(join(test_dir, f'4p6_edge_alignment.mol'))
+
+    # No linker topology.
+    bbs = [aldehyde3, aldehyde3_alt3]
+    bb_positions = {
+        aldehyde3: [1, 2, 3],
+        aldehyde3_alt3: [0]
+    }
+    for fg in range(3):
+        top = stk.TwoPlusTwo(bb_positions=bb_positions,
+                             alignments=[fg, 0, 0, 0])
+        c = stk.Cage(bbs, top)
+        c.write(join(test_dir, f'2p2_valignment_{fg}.mol'))
+
+
 def test_SixPlusEight(aldehyde3, amine4):
     top = stk.SixPlusEight()
     amine_fg_count = 4
@@ -33,7 +67,6 @@ def test_SixPlusEight(aldehyde3, amine4):
     assert c.bb_counter[aldehyde3] == aldehyde_count
 
 
-# 2 + 4 topolgy tests.
 def test_TwoPlusFour(aldehyde2, amine4):
     top = stk.TwoPlusFour()
     amine_fg_count = 4
@@ -195,7 +228,6 @@ def test_TenPlusTwenty(aldehyde2, amine4):
     assert c.bb_counter[aldehyde2] == aldehyde_count
 
 
-# 3 + 3 cage topologies.
 def test_OnePlusOne(amine3, aldehyde3):
     top = stk.OnePlusOne(bb_positions={
                             0: [0],
@@ -274,7 +306,6 @@ def test_FourPlusFour(amine3, aldehyde3):
     assert c.bb_counter[aldehyde3] == aldehyde_count
 
 
-# 2 + 3 cage topologies.
 def test_TwoPlusThree(amine2, aldehyde3):
     top = stk.TwoPlusThree()
     amine_fg_count = 2
@@ -367,6 +398,23 @@ def test_multiFourPlusSix(amine2, amine2_alt1, amine2_alt2,
             aldehyde3_alt1.mol.GetNumBonds()*2 +
             aldehyde3_alt2.mol.GetNumBonds()*1 -
             c.bonds_made*2)
+
+
+def test_multiFourPlusFour(aldehyde3, aldehyde3_alt1, aldehyde3_alt2):
+    top = stk.FourPlusFour(
+                      bb_positions={
+                          aldehyde3: [0, 1],
+                          aldehyde3_alt1: [2, 3, 4, 6, 7],
+                          aldehyde3_alt2: [5]
+                       }
+    )
+    bbs = [aldehyde3, aldehyde3_alt1, aldehyde3_alt2]
+    c = stk.Cage(bbs, top)
+    c.write(join(test_dir, 'multi_FourPlusFour.mol'))
+
+    assert c.bb_counter[aldehyde3] == 2
+    assert c.bb_counter[aldehyde3_alt1] == 5
+    assert c.bb_counter[aldehyde3_alt2] == 1
 
 
 def test_FourPlusSix2(amine2, aldehyde3):

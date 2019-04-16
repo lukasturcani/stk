@@ -18,6 +18,9 @@ import re
 from collections import deque
 import tarfile
 
+# Holds global stk options.
+OPTIONS = {}
+
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
               'Al': 2, 'Sb': 2, 'Ar': 1.88, 'As': 1.85, 'Ba': 2,

@@ -1,5 +1,6 @@
 import os
 import stk
+import pickle
 
 if not os.path.exists('macromolecule_tests_output'):
     os.mkdir('macromolecule_tests_output')
@@ -102,3 +103,8 @@ def test_json_init(polymer):
                bb1.func_groups == bb2.func_groups
                for bb1, bb2 in
                zip(polymer.building_blocks, mol2.building_blocks))
+
+
+def test_pickle(polymer):
+    result = pickle.loads(pickle.dumps(polymer))
+    assert result.same(polymer)

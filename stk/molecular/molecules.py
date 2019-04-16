@@ -204,16 +204,14 @@ from ..utilities import (flatten,
                          atom_vdw_radii,
                          Cell,
                          remake,
-                         dedupe)
+                         dedupe,
+                         OPTIONS)
 
 
 logger = logging.getLogger(__name__)
 
-OPTIONS = {
-    # Toggle caching of molecules.
-    'cache': True
-
-}
+# Toggle the caching of molecules.
+OPTIONS['cache'] = True
 
 
 class Cached(type):

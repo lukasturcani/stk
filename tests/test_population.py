@@ -232,6 +232,13 @@ def test_min(generate_population):
     assert np.allclose(np.min(m, axis=0), minuf, atol=1e-8)
 
 
+def test_optimize(tmp_polymer_pop):
+    assert all(not m.optimized for m in tmp_polymer_pop)
+    fn = stk.FunctionData('do_not_optimize')
+    tmp_polymer_pop.optimize(fn)
+    assert all(m.optimized for m in tmp_polymer_pop)
+
+
 def test_remove_duplicates_between_subpops(generate_population):
     """
     Ensure that duplicates are correctly removed from a population.

@@ -2,6 +2,7 @@ import os
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import stk
+import pickle
 
 if not os.path.exists('struct_unit_tests_output'):
     os.mkdir('struct_unit_tests_output')
@@ -147,3 +148,8 @@ def test_shift_fgs(amine4):
 
         for a1, a2 in zip(fg1.deleter_ids, fg2.deleter_ids):
             assert a1 + 32 == a2
+
+
+def test_pickle(amine2):
+    result = pickle.loads(pickle.dumps(amine2))
+    assert result.same(amine2)

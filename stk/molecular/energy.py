@@ -670,8 +670,6 @@ class Energy(metaclass=EMeta):
                       else getattr(self, func.name)(**func.params))
 
         eng = e_reactants - e_products
-        print(self.molecule.bb_counter)
-        print(1, e_reactants, e_products)
         return eng
 
     def rdkit(self, forcefield, conformer=-1):
@@ -1436,20 +1434,19 @@ def _create_mop(file_root, molecule, settings):
 
     logger.info('Creating .mop file - {}.'.format(file_root))
 
-    # Generate the mop file containing the MOPAC run info
+    # Generate the mop file containing the MOPAC run info.
     with open(mop_file, 'w') as mop:
-        # line for the run info
+        # Line for the run info.
         mop.write(_mop_line(settings) + "\n")
-        # line with the name of the molecule
+        # Line with the name of the molecule.
         mop.write(file_root + "\n\n")
 
-        # print the structural info
+        # Write the structural info.
         for atom in mol.GetAtoms():
             atom_id = atom.GetIdx()
-            atom_symbol = atom.GetSymbol()
+            symbol = atom.GetSymbol()
             x, y, z = mol.GetConformer().GetAtomPosition(atom_id)
-            atom_info = "{}   {}   +1  {}   +1  {}   +1 \n".format(atom_symbol,
-                                                                   x, y, z)
+            atom_info = f'{symbol}   {x}   +1  {y}   +1  {z}   +1 \n'
             mop.write(atom_info)
 
     return mop_file
