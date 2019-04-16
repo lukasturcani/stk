@@ -127,6 +127,16 @@ def boronic_acid2():
                                        ['boronic_acid'])
 
 
+@pytest.fixture
+def tmp_bromine2():
+    return stk.StructUnit2.smiles_init('[Br]CCC[Br]', ['bromine'])
+
+
+@pytest.fixture
+def tmp_bromine2_alt1():
+    return stk.StructUnit2.smiles_init('[Br]CNC[Br]', ['bromine'])
+
+
 @pytest.fixture(scope='session')
 def diol2():
     return stk.StructUnit2.smiles_init('Oc1cc2cc(O)c(O)nc2cc1O',
@@ -327,6 +337,20 @@ def generate_population(struct_units2, struct_units3):
 @pytest.fixture(scope='session')
 def pop(generate_population):
     return generate_population()
+
+
+@pytest.fixture
+def tmp_polymer_pop(tmp_bromine2, tmp_bromine2_alt1):
+    p1 = stk.Polymer([tmp_bromine2, tmp_bromine2_alt1],
+                     stk.Linear('AB', [0, 0], 1))
+    p2 = stk.Polymer([tmp_bromine2, tmp_bromine2_alt1],
+                     stk.Linear('ABBA', [0, 0], 1))
+    p3 = stk.Polymer([tmp_bromine2, tmp_bromine2_alt1],
+                     stk.Linear('ABA', [0, 0], 1))
+    p4 = stk.Polymer([tmp_bromine2, tmp_bromine2_alt1],
+                     stk.Linear('AAB', [0, 0], 1))
+
+    return stk.Population(p1, p2, p3, p4)
 
 
 @pytest.fixture(scope='session')
