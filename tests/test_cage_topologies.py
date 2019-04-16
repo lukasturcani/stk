@@ -6,10 +6,16 @@ from os.path import join
 test_dir = 'cage_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
-data_dir = os.path.join(os.getcwd(), 'data', 'cage_topologies')
 
 
-# 3 + 4 topology tests.
+def test_bb_positions():
+    assert False
+
+
+def test_alignements():
+    assert False
+
+
 def test_SixPlusEight(aldehyde3, amine4):
     top = stk.SixPlusEight()
     amine_fg_count = 4
@@ -33,7 +39,6 @@ def test_SixPlusEight(aldehyde3, amine4):
     assert c.bb_counter[aldehyde3] == aldehyde_count
 
 
-# 2 + 4 topolgy tests.
 def test_TwoPlusFour(aldehyde2, amine4):
     top = stk.TwoPlusFour()
     amine_fg_count = 4
@@ -195,7 +200,6 @@ def test_TenPlusTwenty(aldehyde2, amine4):
     assert c.bb_counter[aldehyde2] == aldehyde_count
 
 
-# 3 + 3 cage topologies.
 def test_OnePlusOne(amine3, aldehyde3):
     top = stk.OnePlusOne(bb_positions={
                             0: [0],
@@ -274,7 +278,6 @@ def test_FourPlusFour(amine3, aldehyde3):
     assert c.bb_counter[aldehyde3] == aldehyde_count
 
 
-# 2 + 3 cage topologies.
 def test_TwoPlusThree(amine2, aldehyde3):
     top = stk.TwoPlusThree()
     amine_fg_count = 2
