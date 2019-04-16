@@ -1,11 +1,20 @@
 from distutils.core import setup
-from stk import __version__
+import re
+from os.path import join
+
+
+def get_version():
+    with open(join('stk', '__init__.py'), 'r') as f:
+        content = f.read()
+    p = re.compile(r'^__version__ = [\'"]([^\'\"]*)[\'"]', re.M)
+    return p.search(content).group(1)
+
 
 setup(name='stk',
       author='Lukas Turcani',
       author_email='lukasturcani93@gmail.com',
       url='https://www.github.com/lukasturcani/stk',
-      version=__version__,
+      version=get_version(),
       packages=['stk',
                 'stk.utilities',
                 'stk.molecular',
