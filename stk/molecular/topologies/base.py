@@ -268,6 +268,10 @@ class Topology(metaclass=TopologyMeta):
             for conf in confs:
                 bb.mol.AddConformer(conf)
 
+        # Reactor can't be pickled because it contains an EditableMol,
+        # which can't be pickled.
+        self.reactor = None
+
     def place_mols(self, macro_mol):
         """
         Places building blocks.
