@@ -271,7 +271,11 @@ class CachedStructUnit(type):
                 mol = remake(self.init_funcs[ext](sig['mol']))
 
             else:
-                mol = remake(rdkit.MolFromMolBlock(sig['mol']))
+                mol = remake(
+                    rdkit.MolFromMolBlock(molBlock=sig['mol'],
+                                          sanitize=False,
+                                          removeHs=False)
+                )
 
         elif isinstance(sig['mol'], rdkit.Mol):
             mol = remake(sig['mol'])
@@ -1520,7 +1524,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
             else:
                 self.mol = remake(
-                    rdkit.MolFromMolBlock(mol,
+                    rdkit.MolFromMolBlock(molBlock=mol,
                                           removeHs=False,
                                           sanitize=False)
                 )
