@@ -35,7 +35,7 @@ import logging
 from threading import Thread
 
 from .macromodel import macromodel_opt, macromodel_cage_opt
-from ..utilities import daemon_logger, logged_call
+from ..utilities import daemon_logger, logged_call, OPTIONS
 
 
 logger = logging.getLogger(__name__)
@@ -83,9 +83,17 @@ def _optimize_all(func_data, population, processes):
         optimized = pool.starmap(logged_call,
                                  ((logq, p_func, mem) for
                                   mem in population))
+
+    # Update the structures in the population.
+    sorted_opt = sorted(optimized, key=lambda m: m.key)
+    sorted_pop = sorted(population, key=lambda m: m.key)
+    for old, new in zip(sorted_pop, sorted_opt):
+        old.__dict__ = dict(vars(new))
+
     # Make sure the cache is updated with the optimized versions.
-    for member in optimized:
-        member.update_cache()
+    if OPTIONS['cache']:
+        for member in optimized:
+            member.update_cache()
 
     logq.put(None)
     log_thread.join()

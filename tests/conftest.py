@@ -4,6 +4,11 @@ import os
 from os.path import join
 from collections import Counter
 import rdkit.Chem.AllChem as rdkit
+import logging
+
+
+logging.getLogger('stk').setLevel(logging.DEBUG)
+
 
 # Run tests in a directory so that that generated files are easy to
 # delete.
@@ -107,6 +112,11 @@ def amine2_alt2():
 
 
 @pytest.fixture(scope='session')
+def amine2_alt3():
+    return stk.StructUnit2.smiles_init('NC(Cl)CN', ['amine'])
+
+
+@pytest.fixture(scope='session')
 def aldehyde2():
     return stk.StructUnit2.smiles_init('O=CCC=O', ['aldehyde'])
 
@@ -152,6 +162,12 @@ def aldehyde3_alt1():
 @pytest.fixture(scope='session')
 def aldehyde3_alt2():
     return stk.StructUnit3.smiles_init('O=C[Si](C=O)C=O', ['aldehyde'])
+
+
+@pytest.fixture(scope='session')
+def aldehyde3_alt3():
+    return stk.StructUnit3.smiles_init('O=CC(Cl)C(C=O)C=O',
+                                       ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
@@ -299,6 +315,7 @@ def generate_population(struct_units2, struct_units3):
 
         # Initialize final population of subpopulations and cages.
         p = stk.Population(sub1, sub2, *mols[8:])
+        p.assign_names_from(0, True)
 
         stk.OPTIONS['cache'] = False
 
