@@ -974,7 +974,7 @@ def _cage_target(func_name,
         mm_complex.energy = Energy(mm_complex)
         mm_complex.topology = macro_mol.topology
         mm_complex.building_blocks = macro_mol.building_blocks
-        mm_complex.bonder_ids = macro_mol.bonder_ids
+        mm_complex.func_groups = macro_mol.func_groups
         optfunc(mm_complex, **ofunc.params)
         macromol_complexes.append(mm_complex)
 
@@ -1018,7 +1018,7 @@ def _cage_target(func_name,
 
     cmplx_cage = cls.__new__(cls)
     cmplx_cage.building_blocks = list(macro_mol.building_blocks)
-    cmplx_cage.bonder_ids = list(macro_mol.bonder_ids)
+    cmplx_cage.func_groups = list(macro_mol.func_groups)
     cmplx_cage.atom_props = dict(macro_mol.atom_props)
     cmplx_cage.mol = cmplx_cage_mol
     cmplx_cage.topology = macro_mol.topology
@@ -1181,7 +1181,7 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     g = c60.graph()
     ids = next(x for x in nx.cycle_basis(g) if len(x) == 5)
     # Place the coordinates of those atoms in a matrix.
-    ring_matrix = np.matrix([c60.atom_coords(id_) for id_ in ids])
+    ring_matrix = np.array([c60.atom_coords(id_) for id_ in ids])
 
     # Get the centroid of the ring.
     ring_centroid = matrix_centroid(ring_matrix)
