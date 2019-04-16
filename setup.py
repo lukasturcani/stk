@@ -1,10 +1,11 @@
 from distutils.core import setup
+from stk import __version__
 
 setup(name='stk',
       author='Lukas Turcani',
       author_email='lukasturcani93@gmail.com',
       url='https://www.github.com/lukasturcani/stk',
-      version='2019.04.16.1',
+      version=__version__,
       packages=['stk',
                 'stk.utilities',
                 'stk.molecular',
