@@ -693,7 +693,7 @@ class Molecule:
 
         return diff
 
-    def dump(self, path):
+    def dump(self, path, include_attrs=None):
         """
         Writes a JSON :class:`dict` of the molecule to a file.
 
@@ -703,6 +703,11 @@ class Molecule:
             The full path to the file to which the JSON dict should be
             written.
 
+        include_attrs : :class:`list` of :class:`str`, optional
+            The names of attributes of the molecule to be added to
+            the JSON. Each attribute is saved as a string using
+            :func:`repr`.
+
         Returns
         -------
         None : :class:`NoneType`
@@ -710,7 +715,7 @@ class Molecule:
         """
 
         with open(path, 'w') as f:
-            json.dump(self.json(), f, indent=4)
+            json.dump(self.json(include_attrs), f, indent=4)
 
     @classmethod
     def from_dict(self, json_dict, optimized=True, load_names=True):
@@ -1903,7 +1908,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return func_groups
 
-    def json(self):
+    def json(self, include_attrs=None):
         """
         Returns a JSON representation of the molecule.
 
@@ -1921,6 +1926,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                                    'prop2': 'value1'}}
             }
 
+        Parameters
+        ----------
+        include_attrs : :class:`list` of :class:`str`, optional
+            The names of attributes of the molecule to be added to
+            the JSON. Each attribute is saved as a string using
+            :func:`repr`.
+
         Returns
         -------
         :class:`dict`
@@ -1928,10 +1940,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
+        if include_attrs is None:
+            include_attrs = []
+
         fg_names = [info.name for info in self.func_group_infos]
         conformers = [(conf.GetId(), self.mdl_mol_block(conf.GetId()))
                       for conf in self.mol.GetConformers()]
-        return {
+        json = {
 
             'class': self.__class__.__name__,
             'func_groups': fg_names,
@@ -1941,6 +1956,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             'atom_props': self.atom_props
 
         }
+
+        json.update(
+            {attr: repr(getattr(self, attr)) for attr in include_attrs}
+        )
+
+        return json
 
     @classmethod
     def _json_init(cls, json_dict):
@@ -1962,18 +1983,20 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        first_conf, *confs = json_dict['conformers']
+        d = dict(json_dict)
+        d.pop('class')
+        first_conf, *confs = d.pop('conformers')
         conf_id, mol_block = first_conf
-        name = json_dict['name'] if json_dict['load_names'] else ''
+        name = d.pop('name') if d.pop('load_names') else ''
         obj = cls(mol_block,
-                  json_dict['func_groups'],
+                  d.pop('func_groups'),
                   name,
-                  json_dict['note'])
+                  d.pop('note'))
 
         obj.mol.GetConformer().SetId(conf_id)
-        obj.optimized = json_dict['optimized']
+        obj.optimized = d.pop('optimized')
         obj.atom_props = defaultdict(dict)
-        obj.atom_props.update(json_dict['atom_props'])
+        obj.atom_props.update(d.pop('atom_props'))
 
         for conf_id, mol_block in confs:
             conf_mol = rdkit.MolFromMolBlock(molBlock=mol_block,
@@ -1982,6 +2005,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             conf = conf_mol.GetConformer()
             conf.SetId(conf_id)
             obj.mol.AddConformer(conf)
+
+        for attr, val in d.items():
+            setattr(obj, attr, eval(val))
 
         return obj
 
@@ -2910,7 +2936,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
             yield core.GetMol()
 
-    def json(self):
+    def json(self, include_attrs=None):
         """
         Returns a JSON representation of the molecule.
 
@@ -2932,6 +2958,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
                                    'prop2': 'value1'}}
             }
 
+        Parameters
+        ----------
+        include_attrs : :class:`list` of :class:`str`, optional
+            The names of attributes of the molecule to be added to
+            the JSON. Each attribute is saved as a string using
+            :func:`repr`.
+
         Returns
         -------
         :class:`dict`
@@ -2939,10 +2972,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
+        if include_attrs is None:
+            include_attrs = []
+
         conformers = [(conf.GetId(), self.mdl_mol_block(conf.GetId()))
                       for conf in self.mol.GetConformers()]
 
-        return {
+        json = {
             'bb_counter': [(key.json(), val) for key, val in
                            self.bb_counter.items()],
             'bonds_made': self.bonds_made,
@@ -2960,6 +2996,11 @@ class MacroMolecule(Molecule, metaclass=Cached):
             'func_groups': repr(self.func_groups)
 
         }
+
+        json.update(
+            {attr: repr(getattr(self, attr)) for attr in include_attrs}
+        )
+        return json
 
     @classmethod
     def _json_init(cls, json_dict):
@@ -2981,10 +3022,14 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
+        d = dict(json_dict)
+        d.pop('building_blocks')
+        d.pop('class')
+
         bb_counter = Counter({Molecule.from_dict(key): val for
-                              key, val in json_dict['bb_counter']})
+                              key, val in d.pop('bb_counter')})
         bbs = list(bb_counter)
-        topology = eval(json_dict['topology'],  topologies.__dict__)
+        topology = eval(d.pop('topology'),  topologies.__dict__)
 
         key = cls.gen_key(bbs, topology)
         if key in cls.cache and OPTIONS['cache']:
@@ -2992,7 +3037,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         obj = cls.__new__(cls)
 
-        (conf_id, mol_block), *confs = json_dict['conformers']
+        (conf_id, mol_block), *confs = d.pop('conformers')
         obj.mol = rdkit.MolFromMolBlock(molBlock=mol_block,
                                         sanitize=False,
                                         removeHs=False)
@@ -3007,23 +3052,26 @@ class MacroMolecule(Molecule, metaclass=Cached):
             obj.mol.AddConformer(conf)
 
         obj.topology = topology
-        obj.unscaled_fitness = eval(json_dict['unscaled_fitness'],
+        obj.unscaled_fitness = eval(d.pop('unscaled_fitness'),
                                     np.__dict__)
         obj.fitness = None
-        obj.progress_params = json_dict['progress_params']
+        obj.progress_params = d.pop('progress_params')
         obj.bb_counter = bb_counter
-        obj.bonds_made = json_dict['bonds_made']
+        obj.bonds_made = d.pop('bonds_made')
         obj.energy = Energy(obj)
-        obj.optimized = json_dict['optimized']
-        obj.note = json_dict['note']
-        obj.name = json_dict['name'] if json_dict['load_names'] else ""
+        obj.optimized = d.pop('optimized')
+        obj.note = d.pop('note')
+        obj.name = d.pop('name') if d.pop('load_names') else ''
         obj.key = key
         obj.building_blocks = bbs
         obj.atom_props = {int(key): value for key, value in
-                          json_dict['atom_props'].items()}
-        obj.func_groups = tuple(eval(json_dict['func_groups']))
+                          d.pop('atom_props').items()}
+        obj.func_groups = tuple(eval(d.pop('func_groups')))
         if OPTIONS['cache']:
             cls.cache[key] = obj
+
+        for attr, val in d.items():
+            setattr(obj, attr, eval(val))
 
         return obj
 

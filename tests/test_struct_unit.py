@@ -86,17 +86,27 @@ def test_functional_groups(amine2):
         assert any(ids == fg.atom_ids for ids in fg_atoms)
 
 
-def test_json_init(amine2):
+def test_json_init(tmp_amine2):
     path = os.path.join('struct_unit_tests_output', 'mol.json')
-    amine2.dump(path)
+
+    tmp_amine2.test_attr1 = 'something'
+    tmp_amine2.test_attr2 = 12
+    tmp_amine2.test_attr3 = ['12', 'something', 21]
+    include_attrs = ['test_attr1', 'test_attr2', 'test_attr3']
+
+    tmp_amine2.dump(path, include_attrs)
     mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
 
-    assert isinstance(amine2.file, str)
+    assert isinstance(tmp_amine2.file, str)
     assert mol2.optimized
     assert mol2.energy.__class__.__name__ == 'Energy'
-    assert amine2 is not mol2
-    assert amine2.atom_props == amine2.atom_props
-    assert mol2.func_groups == amine2.func_groups
+    assert tmp_amine2 is not mol2
+    assert tmp_amine2.atom_props == tmp_amine2.atom_props
+    assert mol2.func_groups == tmp_amine2.func_groups
+
+    assert tmp_amine2.test_attr1 == mol2.test_attr1
+    assert tmp_amine2.test_attr2 == mol2.test_attr2
+    assert tmp_amine2.test_attr3 == mol2.test_attr3
 
 
 def test_caching():
