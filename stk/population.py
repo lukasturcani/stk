@@ -499,7 +499,7 @@ class Population:
 
         return n
 
-    def dump(self, path):
+    def dump(self, path, include_attrs=None):
         """
         Dumps the population to a file.
 
@@ -520,6 +520,11 @@ class Population:
             The full path of the file to which the population should
             be dumped.
 
+        include_attrs : :class:`list` of :class:`str`, optional
+            The names of attributes of the molecules to be added to
+            the JSON. Each attribute is saved as a string using
+            :func:`repr`.
+
         Returns
         -------
         None : :class:`NoneType`
@@ -527,7 +532,7 @@ class Population:
         """
 
         with open(path, 'w') as f:
-            json.dump(self.to_list(), f, indent=4)
+            json.dump(self.to_list(include_attrs), f, indent=4)
 
     @classmethod
     def from_list(cls, pop_list, member_init):
@@ -842,13 +847,20 @@ class Population:
         for subpop in self.populations:
             subpop.remove_members(key)
 
-    def to_list(self):
+    def to_list(self, include_attrs=None):
         """
         Converts the population to a list representation.
 
         The population and any subpopulations are represented as lists
         (and sublists), while members are represented by their JSON
         dictionaries (as strings).
+
+        Parameters
+        ----------
+        include_attrs : :class:`list` of :class:`str`, optional
+            The names of attributes of the molecules to be added to
+            the JSON. Each attribute is saved as a string using
+            :func:`repr`.
 
         Returns
         -------
@@ -857,9 +869,16 @@ class Population:
 
         """
 
-        pop = [x.json() for x in self.members]
+        if include_attrs is None:
+            include_attrs = []
+
+        include_attrs = set(include_attrs)
+        pop = [
+            m.json(list(include_attrs & m.__dict__.keys()))
+            for m in self.members
+        ]
         for sp in self.populations:
-            pop.append(sp.to_list())
+            pop.append(sp.to_list(include_attrs))
         return pop
 
     def write(self, dir_path, use_name=False):

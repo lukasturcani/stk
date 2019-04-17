@@ -139,24 +139,47 @@ def test_has_structure():
 
 
 def test_load(generate_population):
-    # Other tests except the cache to be turned off. Make sure it is
+    # Other tests expect the cache to be turned off. Make sure it is
     # off after this test.
     try:
         pop = generate_population(cache=True)
         pname = join(odir, 'pop.json')
-        pop.dump(pname)
+
+        # Add optional attrs to one of the mooecules.
+        first = pop[0]
+        first.test_attr1 = 'something'
+        first.test_attr2 = 12
+        first.test_attr3 = ['12', 'something', 21]
+        include_attrs = ['test_attr1', 'test_attr2', 'test_attr3']
+
+        pop.dump(pname, include_attrs=include_attrs)
 
         stk.OPTIONS['cache'] = True
         p0 = stk.Population.load(pname, stk.Molecule.from_dict)
+        # Check that the molecule has the extra attributes.
+        assert p0[0].test_attr1 == first.test_attr1
+        assert p0[0].test_attr2 == first.test_attr2
+        assert p0[0].test_attr3 == first.test_attr3
+
+        # Check that other molecules do not have extra attributes.
+        assert all(not hasattr(p0[1], attr) for attr in include_attrs)
 
         stk.OPTIONS['cache'] = False
         p1 = stk.Population.load(pname, stk.Molecule.from_dict)
+        # Check that the molecule has the extra attributes.
+        assert p1[0].test_attr1 == first.test_attr1
+        assert p1[0].test_attr2 == first.test_attr2
+        assert p1[0].test_attr3 == first.test_attr3
 
         for m in p1:
             assert m not in p0
 
         stk.OPTIONS['cache'] = True
         p2 = stk.Population.load(pname, stk.Molecule.from_dict)
+        # Check that the molecule has the extra attributes.
+        assert p2[0].test_attr1 == first.test_attr1
+        assert p2[0].test_attr2 == first.test_attr2
+        assert p2[0].test_attr3 == first.test_attr3
 
         for m in p2:
             assert m in p0
