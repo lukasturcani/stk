@@ -86,23 +86,34 @@ def test_save_rdkit_atom_props(tmp_amine2):
     assert tmp_amine2.atom_props[2]['str_test'] == 'value'
 
 
-def test_json_init(polymer):
+def test_json_init(tmp_polymer):
+
     path = os.path.join('macromolecule_tests_output', 'mol.json')
-    polymer.dump(path)
+
+    tmp_polymer.test_attr1 = 'something'
+    tmp_polymer.test_attr2 = 12
+    tmp_polymer.test_attr3 = ['12', 'something', 21]
+    include_attrs = ['test_attr1', 'test_attr2', 'test_attr3']
+
+    tmp_polymer.dump(path, include_attrs=include_attrs)
     mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
 
-    assert polymer is not mol2
-    assert polymer.func_groups == mol2.func_groups
-    assert polymer.atom_props == mol2.atom_props
-    assert polymer.bb_counter == mol2.bb_counter
-    assert polymer.topology == mol2.topology
-    assert polymer.bonds_made == mol2.bonds_made
-    assert polymer.unscaled_fitness == mol2.unscaled_fitness
-    assert polymer.progress_params == mol2.progress_params
+    assert tmp_polymer.__class__ is mol2.__class__
+    assert tmp_polymer is not mol2
+    assert tmp_polymer.func_groups == mol2.func_groups
+    assert tmp_polymer.atom_props == mol2.atom_props
+    assert tmp_polymer.bb_counter == mol2.bb_counter
+    assert tmp_polymer.topology == mol2.topology
+    assert tmp_polymer.bonds_made == mol2.bonds_made
+    assert tmp_polymer.unscaled_fitness == mol2.unscaled_fitness
+    assert tmp_polymer.progress_params == mol2.progress_params
     assert all(bb1.same(bb2) and
                bb1.func_groups == bb2.func_groups
                for bb1, bb2 in
-               zip(polymer.building_blocks, mol2.building_blocks))
+               zip(tmp_polymer.building_blocks, mol2.building_blocks))
+    assert tmp_polymer.test_attr1 == mol2.test_attr1
+    assert tmp_polymer.test_attr2 == mol2.test_attr2
+    assert tmp_polymer.test_attr3 == mol2.test_attr3
 
 
 def test_pickle(polymer):

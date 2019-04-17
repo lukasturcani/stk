@@ -227,6 +227,12 @@ def polymer(amine2, aldehyde2):
                        stk.Linear('AB', [0, 0], 3))
 
 
+@pytest.fixture
+def tmp_polymer(amine2, aldehyde2):
+    return stk.Polymer([amine2, aldehyde2],
+                       stk.Linear('AB', [0, 0], 3))
+
+
 @pytest.fixture(scope='session')
 def cc3():
     # This has an unoptimized conformer in conformer 0 and an
