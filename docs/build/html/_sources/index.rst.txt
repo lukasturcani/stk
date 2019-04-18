@@ -632,7 +632,7 @@ and selects building blocks which have the most atoms.
     # parameters can be specified optionally. All other parameters
     # must be specified as key-value pairs.
     crossover_funcs = [{'NAME': 'genetic_recombination',
-                        'key': lambda x: x.func_grp.name}]
+                        'key': lambda x: x.func_group_infos[0].name}]
 
     # ################################################################
     # Mutation functions.

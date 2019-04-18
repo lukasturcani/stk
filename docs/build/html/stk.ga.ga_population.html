@@ -24,7 +24,6 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -178,11 +177,14 @@ methods can serve as a guide to how this should be done.</p>
 instances of classes such as <a class="reference internal" href="stk.ga.selection.html#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selection</span></code></a>,
 <a class="reference internal" href="stk.ga.mutation.html#stk.ga.mutation.Mutation" title="stk.ga.mutation.Mutation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutation</span></code></a> and <a class="reference internal" href="stk.ga.crossover.html#stk.ga.crossover.Crossover" title="stk.ga.crossover.Crossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crossover</span></code></a>, which carry out GA
 operations on the population.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a></p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -202,35 +204,37 @@ process pool creates unncessary overhead.</p>
 <p>This method will result in the modification of the
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.unscaled_fitness" title="stk.molecular.molecules.MacroMolecule.unscaled_fitness"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.unscaled_fitness</span></code></a> attribute of molecules
 held by the population.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of parallel processes to create.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>None</strong></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of parallel processes to create.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="stk.ga.ga_population.GAPopulation.exit">
 <code class="descname">exit</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.exit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks the if the EA exit criterion has been satisfied.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>progress</strong> (<a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – population where each subpopulation is a previous generation.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the exit criterion is satisfied, else
-<code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>progress</strong> (<a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – population where each subpopulation is a previous generation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> if the exit criterion is satisfied, else
+<code class="docutils literal notranslate"><span class="pre">False</span></code>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -245,19 +249,20 @@ selected for mutation is defined in the
 <p>The mutation function(s) to be used are defined in the
 <a class="reference internal" href="stk.ga.mutation.html#stk.ga.mutation.Mutation" title="stk.ga.mutation.Mutation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutation</span></code></a> instance held by the population via its
 <a class="reference internal" href="#stk.ga.ga_population.GAPopulation.ga_tools" title="stk.ga.ga_population.GAPopulation.ga_tools"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ga_tools</span></code></a> attribute.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>counter_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The name of the <code class="docutils literal notranslate"><span class="pre">.png</span></code> file which holds a graph showing
-which members were selected for mutation.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A population holding mutants created by mutating the
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instances held by the population.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>counter_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The name of the <code class="docutils literal notranslate"><span class="pre">.png</span></code> file which holds a graph showing
+which members were selected for mutation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A population holding mutants created by mutating the
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instances held by the population.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -268,22 +273,26 @@ which members were selected for mutation.</p>
 generation of molecules is defined in the <a class="reference internal" href="stk.ga.selection.html#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selection</span></code></a>
 instance held by the population via its <a class="reference internal" href="#stk.ga.ga_population.GAPopulation.ga_tools" title="stk.ga.ga_population.GAPopulation.ga_tools"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ga_tools</span></code></a>
 attribute.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pop_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The size of the next generation.</p></li>
-<li><p><strong>counter_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The name of the <code class="docutils literal notranslate"><span class="pre">.png</span></code> file holding a graph showing which
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The size of the next generation.</li>
+<li><strong>counter_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The name of the <code class="docutils literal notranslate"><span class="pre">.png</span></code> file holding a graph showing which
 members were selected for the next generation. If <code class="docutils literal notranslate"><span class="pre">''</span></code>
-then no file is made.</p></li>
+then no file is made.</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A population holding the next generation of molecules.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A population holding the next generation of molecules.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -298,64 +307,77 @@ selected for crossover is defined in the
 <p>The crossover function(s) to be used are defined in the
 <a class="reference internal" href="stk.ga.crossover.html#stk.ga.crossover.Crossover" title="stk.ga.crossover.Crossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crossover</span></code></a> instance held by the population via its
 <a class="reference internal" href="#stk.ga.ga_population.GAPopulation.ga_tools" title="stk.ga.ga_population.GAPopulation.ga_tools"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ga_tools</span></code></a> attribute.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>counter_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The name of the <code class="docutils literal notranslate"><span class="pre">.png</span></code> file showing which members were
-selected for crossover.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A population of offspring, created by crossing
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>counter_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The name of the <code class="docutils literal notranslate"><span class="pre">.png</span></code> file showing which members were
+selected for crossover.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A population of offspring, created by crossing
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instances contained in the
-population.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></p>
-</dd>
-</dl>
+population.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#stk.ga.ga_population.GAPopulation" title="stk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="stk.ga.ga_population.GAPopulation.init_all">
 <em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>processes=None</em>, <em>duplicates=False</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <a class="reference internal" href="stk.population.html#stk.population.Population.init_all" title="stk.population.Population.init_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Population.init_all()</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ga_tools</strong> (<a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a>, optional) – The <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a> instance to use.</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ga_tools</strong> (<a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a>, optional) – The <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a> instance to use.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="stk.ga.ga_population.GAPopulation.init_diverse">
 <em class="property">classmethod </em><code class="descname">init_diverse</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_diverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <a class="reference internal" href="stk.population.html#stk.population.Population.init_diverse" title="stk.population.Population.init_diverse"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Population.init_diverse()</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ga_tools</strong> (<a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a>, optional) – The <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a> instance to use.</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ga_tools</strong> (<a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a>, optional) – The <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a> instance to use.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="stk.ga.ga_population.GAPopulation.init_from_files">
 <em class="property">classmethod </em><code class="descname">init_from_files</code><span class="sig-paren">(</span><em>folder</em>, <em>moltype</em>, <em>glob_pattern='*'</em>, <em>ga_tools=&lt;stk.ga.ga_tools.GATools object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_from_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <a class="reference internal" href="stk.population.html#stk.population.Population.init_from_files" title="stk.population.Population.init_from_files"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Population.init_from_files()</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ga_tools</strong> (<a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a>, optional) – The <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a> instance to use.</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ga_tools</strong> (<a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a>, optional) – The <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a> instance to use.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="stk.ga.ga_population.GAPopulation.init_random">
 <em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em>, <em>ga_tools</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_population.GAPopulation.init_random" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <a class="reference internal" href="stk.population.html#stk.population.Population.init_random" title="stk.population.Population.init_random"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Population.init_random()</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ga_tools</strong> (<a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a>, optional) – The <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a> instance to use.</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ga_tools</strong> (<a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a>, optional) – The <a class="reference internal" href="stk.ga.ga_tools.html#stk.ga.ga_tools.GATools" title="stk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal notranslate"><span class="pre">GATools</span></code></a> instance to use.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -371,14 +393,16 @@ population, along with their order, are defined in the
 <p class="rubric">Notes</p>
 <p>This method modifies the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.fitness" title="stk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.fitness</span></code></a>
 attribute of molecules held by the population.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>None</strong></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -389,28 +413,29 @@ attribute of molecules held by the population.</p>
 the <a class="reference internal" href="stk.ga.selection.html#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selection</span></code></a> instance held by the population via the
 <a class="reference internal" href="#stk.ga.ga_population.GAPopulation.ga_tools" title="stk.ga.ga_population.GAPopulation.ga_tools"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ga_tools</span></code></a> attribute. The instance defines 3 selection
 functions, 1 for each <cite>type</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – <p>A string specifying the type of selection to be performed.
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – <p>A string specifying the type of selection to be performed.
 Valid values will correspond to names of attributes of the
 <a class="reference internal" href="stk.ga.selection.html#stk.ga.selection.Selection" title="stk.ga.selection.Selection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selection</span></code></a> class.</p>
 <p>Valid values are:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">'generational'</span></code> - selects the next generation</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'crossover'</span></code> - selects molecules for crossover</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'mutation'</span></code> - selects molecules for mutation</p></li>
+<li><code class="docutils literal notranslate"><span class="pre">'generational'</span></code> - selects the next generation</li>
+<li><code class="docutils literal notranslate"><span class="pre">'crossover'</span></code> - selects molecules for crossover</li>
+<li><code class="docutils literal notranslate"><span class="pre">'mutation'</span></code> - selects molecules for mutation</li>
 </ul>
 </div></blockquote>
-</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A generator which yields molecules or tuples of them.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">generator</span></code></p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A generator which yields molecules or tuples of them.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">generator</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

@@ -24,7 +24,6 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -665,7 +664,7 @@ and selects building blocks which have the most atoms.</p>
 <span class="c1"># parameters can be specified optionally. All other parameters</span>
 <span class="c1"># must be specified as key-value pairs.</span>
 <span class="n">crossover_funcs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;genetic_recombination&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">func_grp</span><span class="o">.</span><span class="n">name</span><span class="p">}]</span>
+                    <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">func_group_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">}]</span>
 
 <span class="c1"># ################################################################</span>
 <span class="c1"># Mutation functions.</span>
@@ -929,17 +928,17 @@ defining a simple function in the appropriate module or a method in the
 appropriate class.</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><a class="reference internal" href="stk.molecular.molecules.html#adding-macromolecules"><span class="std std-ref">Extending stk: Adding new macromolecules.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.molecular.topologies.base.html#adding-topologies"><span class="std std-ref">Extending stk: Adding new topologies.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.molecular.functional_groups.html#adding-functional-groups"><span class="std std-ref">Extending stk: Adding  more functional groups.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.optimization.optimization.html#adding-optimization-functions"><span class="std std-ref">Extending stk: Adding optimization functions.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.molecular.energy.html#adding-energy-functions"><span class="std std-ref">Extending stk: Adding more energy functions.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.ga.mutation.html#adding-mutation-functions"><span class="std std-ref">Extending stk: Adding mutation functions.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.ga.crossover.html#adding-crossover-functions"><span class="std std-ref">Extending stk: Adding crossover functions.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.ga.fitness.html#adding-fitness-functions"><span class="std std-ref">Extending stk: Adding fitness functions.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.ga.normalization.html#adding-normalization-functions"><span class="std std-ref">Extending stk: Adding normalization functions.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.ga.selection.html#adding-selection-functions"><span class="std std-ref">Extending stk: Adding selection functions.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.ga.ga_exit.html#adding-exit-functions"><span class="std std-ref">Extending stk: Adding exit functions.</span></a></p></li>
+<li><a class="reference internal" href="stk.molecular.molecules.html#adding-macromolecules"><span class="std std-ref">Extending stk: Adding new macromolecules.</span></a></li>
+<li><a class="reference internal" href="stk.molecular.topologies.base.html#adding-topologies"><span class="std std-ref">Extending stk: Adding new topologies.</span></a></li>
+<li><a class="reference internal" href="stk.molecular.functional_groups.html#adding-functional-groups"><span class="std std-ref">Extending stk: Adding  more functional groups.</span></a></li>
+<li><a class="reference internal" href="stk.optimization.optimization.html#adding-optimization-functions"><span class="std std-ref">Extending stk: Adding optimization functions.</span></a></li>
+<li><a class="reference internal" href="stk.molecular.energy.html#adding-energy-functions"><span class="std std-ref">Extending stk: Adding more energy functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.mutation.html#adding-mutation-functions"><span class="std std-ref">Extending stk: Adding mutation functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.crossover.html#adding-crossover-functions"><span class="std std-ref">Extending stk: Adding crossover functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.fitness.html#adding-fitness-functions"><span class="std std-ref">Extending stk: Adding fitness functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.normalization.html#adding-normalization-functions"><span class="std std-ref">Extending stk: Adding normalization functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.selection.html#adding-selection-functions"><span class="std std-ref">Extending stk: Adding selection functions.</span></a></li>
+<li><a class="reference internal" href="stk.ga.ga_exit.html#adding-exit-functions"><span class="std std-ref">Extending stk: Adding exit functions.</span></a></li>
 </ul>
 </div></blockquote>
 </div>
@@ -947,11 +946,11 @@ appropriate class.</p>
 <h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
-<li><p><a class="reference internal" href="stk.molecular.molecules.html#macromolecular-assembly"><span class="std std-ref">A more detailed description of macromolecular assembly.</span></a></p></li>
-<li><p><a class="reference internal" href="stk.molecular.topologies.cof.html#cof-assembly"><span class="std std-ref">How the assembly process works for 2D COF topologies.</span></a></p></li>
-<li><p><a class="reference internal" href="advanced_cage_building.html"><span class="doc">Advanced Cage Building</span></a></p></li>
-<li><p><a class="reference internal" href="caching.html"><span class="doc">Caching</span></a></p></li>
-<li><p><a class="reference external" href="https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826">https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826</a></p></li>
+<li><a class="reference internal" href="stk.molecular.molecules.html#macromolecular-assembly"><span class="std std-ref">A more detailed description of macromolecular assembly.</span></a></li>
+<li><a class="reference internal" href="stk.molecular.topologies.cof.html#cof-assembly"><span class="std std-ref">How the assembly process works for 2D COF topologies.</span></a></li>
+<li><a class="reference internal" href="advanced_cage_building.html"><span class="doc">Advanced Cage Building</span></a></li>
+<li><a class="reference internal" href="caching.html"><span class="doc">Caching</span></a></li>
+<li><a class="reference external" href="https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826">https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826</a></li>
 </ul>
 </div></blockquote>
 </div>
@@ -959,9 +958,9 @@ appropriate class.</p>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
 </ul>
 </div>
 
