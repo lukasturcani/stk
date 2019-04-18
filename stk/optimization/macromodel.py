@@ -14,7 +14,7 @@ from uuid import uuid4
 import logging
 import gzip
 
-from ..utilities import MAEExtractor
+from ..utilities import MAEExtractor, move_generated_macromodel_files
 
 
 logger = logging.getLogger(__name__)
@@ -199,7 +199,7 @@ def macromodel_opt(mol,
                               conformer=conformer)
 
     finally:
-        _move_generated_files(basename, output_dir)
+        move_generated_macromodel_files(basename, output_dir)
 
 
 def macromodel_cage_opt(mol,
@@ -368,7 +368,7 @@ def macromodel_cage_opt(mol,
                                    conformer=conformer)
 
     finally:
-        _move_generated_files(basename, output_dir)
+        move_generated_macromodel_files(basename, output_dir)
 
 
 def _macromodel_md_opt(mol,
@@ -493,28 +493,7 @@ def _macromodel_md_opt(mol,
                                   conformer=conformer)
 
     finally:
-        _move_generated_files(basename, output_dir)
-
-
-def _move_generated_files(basename, output_dir):
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
-
-    extensions = [
-        '.mol',
-        '.mae',
-        '.com',
-        '.log',
-        '-mon.maegz',
-        '-out.maegz',
-        '-out.mmo',
-        '-out.mae',
-        '-out.ou1'
-    ]
-    for ext in extensions:
-        if os.path.exists(f'{basename}{ext}'):
-            os.rename(f'{basename}{ext}',
-                      f'{output_dir}/{basename}{ext}')
+        move_generated_macromodel_files(basename, output_dir)
 
 
 def _run_bmin(macro_mol, macromodel_path, timeout):
