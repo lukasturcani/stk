@@ -181,8 +181,6 @@ def macromodel_opt(mol,
                                output_dir=output_dir,
                                conformer=conformer)
 
-        _move_generated_files(basename, output_dir)
-
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
         if vals['force_field'] == 14:
@@ -199,6 +197,9 @@ def macromodel_opt(mol,
                               md=md,
                               output_dir=output_dir,
                               conformer=conformer)
+
+    finally:
+        _move_generated_files(basename, output_dir)
 
 
 def macromodel_cage_opt(mol,
@@ -349,8 +350,6 @@ def macromodel_cage_opt(mol,
                                        output_dir=output_dir,
                                        conformer=conformer)
 
-        _move_generated_files(basename, output_dir)
-
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
         if vals['force_field'] == 14:
@@ -367,6 +366,9 @@ def macromodel_cage_opt(mol,
                                    md=md,
                                    output_dir=output_dir,
                                    conformer=conformer)
+
+    finally:
+        _move_generated_files(basename, output_dir)
 
 
 def _macromodel_md_opt(mol,
@@ -474,7 +476,6 @@ def _macromodel_md_opt(mol,
         # Extract the lowest energy conformer into its own .mae file.
         conformer_mae = MAEExtractor(mol._file).path
         mol.update_from_mae(conformer_mae, conformer)
-        _move_generated_files(basename, output_dir)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
@@ -490,6 +491,9 @@ def _macromodel_md_opt(mol,
                                   settings=vals,
                                   output_dir=output_dir,
                                   conformer=conformer)
+
+    finally:
+        _move_generated_files(basename, output_dir)
 
 
 def _move_generated_files(basename, output_dir):
