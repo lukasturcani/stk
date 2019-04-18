@@ -483,6 +483,9 @@ def _macromodel_md_opt(mol,
 
 
 def _move_generated_files(basename, output_dir):
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+
     extensions = [
         '.mol',
         '.mae',
