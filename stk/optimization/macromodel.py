@@ -143,14 +143,12 @@ def macromodel_opt(mol,
     vals.update(settings)
 
     try:
-        if output_dir is None:
-            output_dir = str(uuid4().int)
-
-        if os.path.exists(output_dir):
-            os.mkdir(output_dir)
-
         basename = str(uuid4().int)
+        if output_dir is None:
+            output_dir = basename
+
         mol._file = f'{basename}.mol'
+
         # First write a .mol file of the molecule.
         mol.write(mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
@@ -180,6 +178,7 @@ def macromodel_opt(mol,
             _macromodel_md_opt(mol=mol,
                                macromodel_path=macromodel_path,
                                settings=md,
+                               output_dir=output_dir,
                                conformer=conformer)
 
         _move_generated_files(basename, output_dir)
@@ -305,13 +304,10 @@ def macromodel_cage_opt(mol,
     vals.update(settings)
 
     try:
-        if output_dir is None:
-            output_dir = str(uuid4().int)
-
-        if os.path.exists(output_dir):
-            os.mkdir(output_dir)
-
         basename = str(uuid4().int)
+        if output_dir is None:
+            output_dir = basename
+
         mol._file = f'{basename}.mol'
 
         # First write a .mol file of the molecule.
@@ -350,6 +346,7 @@ def macromodel_cage_opt(mol,
                     _macromodel_md_opt(mol=mol,
                                        macromodel_path=macromodel_path,
                                        settings=md,
+                                       output_dir=output_dir,
                                        conformer=conformer)
 
         _move_generated_files(basename, output_dir)
@@ -375,6 +372,7 @@ def macromodel_cage_opt(mol,
 def _macromodel_md_opt(mol,
                        macromodel_path,
                        settings=None,
+                       output_dir=None,
                        conformer=-1):
     """
     Runs a MD conformer search on `mol`.
@@ -425,6 +423,11 @@ def _macromodel_md_opt(mol,
             'gradient' : float (default = ``0.05``)
                 The gradient at which optimization is stopped.
 
+    output_dir : :class:`str`, optional
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
+
     conformer : :class:`int`, optional
         The id of the conformer to be optimized.
 
@@ -453,7 +456,12 @@ def _macromodel_md_opt(mol,
 
     logger.info('Running MD on "{}".'.format(mol.name))
     try:
-        mol._file = '{}.mol'.format(uuid4().int)
+        basename = str(uuid4().int)
+        if output_dir is None:
+            output_dir = basename
+
+        mol._file = f'{basename}.mol'
+
         # First write a .mol file of the molecule.
         mol.write(mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
@@ -466,6 +474,7 @@ def _macromodel_md_opt(mol,
         # Extract the lowest energy conformer into its own .mae file.
         conformer_mae = MAEExtractor(mol._file).path
         mol.update_from_mae(conformer_mae, conformer)
+        _move_generated_files(basename, output_dir)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
@@ -476,10 +485,11 @@ def _macromodel_md_opt(mol,
                         'Trying OPLS_2005.').format(mol.name))
 
         vals['force_field'] = 14
-        return _macromodel_md_opt(mol,
-                                  macromodel_path,
-                                  vals,
-                                  conformer)
+        return _macromodel_md_opt(mol=mol,
+                                  macromodel_path=macromodel_path,
+                                  settings=vals,
+                                  output_dir=output_dir,
+                                  conformer=conformer)
 
 
 def _move_generated_files(basename, output_dir):
