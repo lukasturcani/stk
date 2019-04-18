@@ -908,7 +908,9 @@ def _fix_distance_in_com_file(mol, fix_block):
 
     """
 
-    bonder_ids = set(fg.bonder_ids for fg in mol.func_groups)
+    bonder_ids = set(
+        bid for fg in mol.func_groups for bid in fg.bonder_ids
+    )
 
     # Go through all the bonds in the rdkit molecule. If the bond
     # is not between bonder atoms add a fix line to the ``fix_block``.
