@@ -25,28 +25,30 @@ if not os.path.exists(outdir):
 
 @macromodel
 def test_macromodel_opt(tmp_cc3, macromodel_path):
-    tmp_cc3.write(join(outdir, 'mm_opt_before.mol'))
+    tmp_cc3.write(join(outdir, 'mm_opt_before.mol'), conformer=0)
 
     stk.macromodel_opt(
         tmp_cc3,
         macromodel_path,
         {'md': True, 'gradient': 1, 'restricted': 'both'},
-        {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2})
+        {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2},
+        conformer=0)
 
-    tmp_cc3.write(join(outdir, 'mm_opt_after.mol'))
+    tmp_cc3.write(join(outdir, 'mm_opt_after.mol'), conformer=0)
 
 
 @macromodel
 def test_macromodel_cage_opt(tmp_cc3, macromodel_path):
-    tmp_cc3.write(join(outdir, 'mm_cage_opt_before.mol'))
+    tmp_cc3.write(join(outdir, 'mm_cage_opt_before.mol'), conformer=0)
 
     stk.macromodel_cage_opt(
         tmp_cc3,
         macromodel_path,
         {'md': True, 'gradient': 1, 'restricted': False},
-        {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2})
+        {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2},
+        conformer=0)
 
-    tmp_cc3.write(join(outdir, 'mm_cage_opt_after.mol'))
+    tmp_cc3.write(join(outdir, 'mm_cage_opt_after.mol'), conformer=0)
 
 
 @macromodel
