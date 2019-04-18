@@ -132,9 +132,9 @@ class GAInput:
 
             # Load the StructUnits used to build the initial population
             # from a folder.
-            amines2 = [stk.StructUnit2(filename, 'amine')
+            amines2 = [stk.StructUnit2(filename, ['amine'])
                        for filename in iglob('path/amine2/*.mol')]
-            aldehydes3 = [stk.StructUnit3(filename, 'aldehyde')
+            aldehydes3 = [stk.StructUnit3(filename, ['aldehyde'])
                           for filename
                           in iglob('path/aldehyde3/*.mol')]
             # Topologies used to construct the initial population.
@@ -195,7 +195,7 @@ class GAInput:
 
             crossover_fn1 = {
                 'NAME': 'genetic_recombination',
-                'key': lambda x: x.func_grp.name
+                'key': lambda x: x.func_group_infos[0].name
             }
 
             crossover_fn2 = {
@@ -218,25 +218,27 @@ class GAInput:
             # mutation_func1 substitutes the amine building block in
             # the molecule with one from the list "amines".
 
-            amines2 = [stk.StructUnit2(filename, 'amine')
+            amines2 = [stk.StructUnit2(filename, ['amine'])
                        for filename in iglob('path/amine2/*.mol')]
 
             mutation_fn1 = {
                 'NAME': 'random_bb',
                 'mols': amines,
-                'key': lambda x: x.func_grp.name == 'amine'}
+                'key': lambda x: x.func_group_infos[0].name == 'amine'}
 
             # mutation_func2 substitutes the aldehyde building block in
             # the molecule with one from the list "aldehydes".
 
-            aldehydes3 = [stk.StructUnit3(filename, 'aldehyde')
+            aldehydes3 = [stk.StructUnit3(filename, ['aldehyde'])
                           for filename
                           in iglob('path/aldehyde3/*.mol')]
 
             mutation_fn2 = {
                 'NAME': 'random_bb',
                 'mols': aldehydes,
-                'key': lambda x: x.func_grp.name == 'aldehyde'}
+                'key': lambda x:
+                       x.func_group_infos[0].name == 'aldehyde'
+            }
 
             mutation_funcs = [mutation_fn1, mutation_fn2]
 

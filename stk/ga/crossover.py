@@ -241,10 +241,10 @@ class Crossover:
 
         .. code-block:: python
 
-            bb1 = StructUnit2('filename1.mol', 'amine')
-            bb2 = StructUnit3('filename2.mol', 'aldehyde')
-            bb3 = StructUnit2('filename3.mol', 'aldehyde')
-            bb4 = StructUnit3('filename4.mol', 'amine')
+            bb1 = StructUnit2('filename1.mol', ['amine'])
+            bb2 = StructUnit3('filename2.mol', ['aldehyde'])
+            bb3 = StructUnit2('filename3.mol', ['aldehyde'])
+            bb4 = StructUnit3('filename4.mol', ['amine'])
 
         We can define a function which analyzes a building block
         molecule and returns the gene it belongs to, for example
@@ -252,7 +252,7 @@ class Crossover:
         .. code-block:: python
 
             def determine_gene(building_block):
-                return building_block.func_grp.name
+                return building_block.func_group_infos[0].name
 
         Here, we can see that the gene to which each building block
         molecule belongs is given by the functional group name.
