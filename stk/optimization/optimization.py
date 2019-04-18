@@ -1,10 +1,10 @@
 """
-Defines optimization functions.
+Defines optimizers..
 
-.. _`adding optimization functions`:
+.. _`adding optimizaters`:
 
-Extending stk: Adding optimization functions.
----------------------------------------------
+Extending stk: Adding optimizers.
+---------------------------------
 
 New optimization functions are added by writing them in this module.
 The only requirement is that the first argument is `mol`. This allows
@@ -28,261 +28,378 @@ file, not any of the helper functions or classes.
 """
 
 import rdkit.Chem.AllChem as rdkit
-import multiprocessing as mp
-from functools import partial, wraps
+from functools import wraps
 import numpy as np
 import logging
-from threading import Thread
-
-from .macromodel import macromodel_opt, macromodel_cage_opt
-from ..utilities import daemon_logger, logged_call, OPTIONS
+import warnings
 
 
 logger = logging.getLogger(__name__)
 
 
-def _optimize_all(fn, population, processes):
+def _add_skipping(optimize):
     """
-    Run opt function on all population members in parallel.
+    Adds skipping to `optimize`.
+
+    Decorates `optimize` so that before running it checks if the
+    :attr:`.Molecule.optimized` attribute is ``True``. If it is,
+    then the function is not run.
 
     Parameters
     ----------
-    fn : :class:`function`
-        An optimization function, which takes a single argument,
-        the molecule to be optimized.
-
-    population : :class:`.Population`
-        The :class:`.Population` instance who's members are to be
-        optimized.
-
-    processes : :class:`int`
-        The number of parallel processes to create.
+    optimize : :class:`function`
+        A function which is to have skipping added to it.
 
     Returns
     -------
-    None : :class:`NoneType`
+    :class:`function`
 
     """
 
-    manager = mp.Manager()
-    logq = manager.Queue()
-    log_thread = Thread(target=daemon_logger, args=(logq, ))
-    log_thread.start()
+    @wraps(optimize)
+    def inner(self, mol, conformer=-1):
+        if self.skip_optimized and mol.optimized:
+            logger.info(f'Skipping {mol.name}.')
+            return
+        return optimize(mol, conformer)
 
-    opt_fn = _OptimizationFunc(fn)
-
-    # Apply the function to every member of the population, in
-    # parallel.
-    with mp.get_context('spawn').Pool(processes) as pool:
-        optimized = pool.starmap(logged_call,
-                                 ((logq, opt_fn, mem) for
-                                  mem in population))
-
-    # Update the structures in the population.
-    sorted_opt = sorted(optimized, key=lambda m: m.key)
-    sorted_pop = sorted(population, key=lambda m: m.key)
-    for old, new in zip(sorted_pop, sorted_opt):
-        old.__dict__ = dict(vars(new))
-
-    # Make sure the cache is updated with the optimized versions.
-    if OPTIONS['cache']:
-        for member in optimized:
-            member.update_cache()
-
-    logq.put(None)
-    log_thread.join()
+    return inner
 
 
-def _optimize_all_serial(fn, population):
+class Optimizer:
     """
-    Run opt function on all population members sequentially.
+    A base class for optimizers.
 
-    Parameters
+    Attributes
     ----------
-    fn : :class:`function`
-        An optimization function, which takes a single argument,
-        the molecule to be optimized.
-
-    population : :class:`.Population`
-        The :class:`.Population` instance who's members are to be
-        optimized.
-
-    Returns
-    -------
-    None : :class:`NoneType`
+    skip_optimized : :class:`bool`
+        If ``True`` then :meth:`optimize` returns immediately for
+        molecules where :attr:`.Molecule.optimized` is``True``.
 
     """
 
-    opt_fn = _OptimizationFunc(fn)
-
-    # Apply the function to every member of the population.
-    for member in population:
-        opt_fn(member)
-
-
-class _OptimizationFunc:
-    """
-    A decorator for optimization functions.
-
-    This decorator is applied to all optimization functions
-    automatically in :func:`_optimize_all`. It should not be applied
-    explicitly when defining the functions.
-
-    This decorator prevents optimization functions from raising if
-    they fail (necessary for multiprocessing) and prevents them from
-    being run twice on the same molecule.
-
-    """
-
-    def __init__(self, func):
-        wraps(func)(self)
-
-    def __call__(self, mol):
+    def __init__(self, skip_optimized=False):
         """
-        Decorates and calls the optimization function.
+        Initializes an :class:`Optimizer`.
+
+        Parameters
+        ----------
+        skip_optimized : :class:`bool`, optional
+            If ``True`` then :meth:`optimize` returns immediately for
+            molecules where :attr:`.Molecule.optimized` is``True``.
+
+        """
+
+        self.skip_optimized = skip_optimized
+
+    def __init_subclass__(cls, **kwargs):
+        cls.optimize = _add_skipping(cls.optimize)
+        return super().__init_subclass__(**kwargs)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
 
+        conformer : :class:`int`, optional
+            The conformer to use.
+
         Returns
         -------
-        :class:`.Molecule`
-            The optimized molecule.
+        None : :class:`NoneType`
 
         """
 
-        if mol.optimized:
-            logger.info(f'Skipping {mol.name}.')
-            return mol
-
-        try:
-            logger.info(f'Optimizing {mol.name}.')
-            self.__wrapped__(mol)
-
-        except Exception as ex:
-            errormsg = (f'Optimization function '
-                        f'"{self.__wrapped__.func.__name__}()" '
-                        f'failed on molecule "{mol.name}".')
-            logger.error(errormsg, exc_info=True)
-
-        finally:
-            mol.optimized = True
-            return mol
+        raise NotImplementedError()
 
 
-def partial_raiser(mol, fn):
+class OptimizerPipeline(Optimizer):
+    """
+    Chains multiple :class:`Optimizer` instances together.
+
+    Attributes
+    ----------
+    optimizers : :class:`tuple` of :class:`Optimizer`
+        A number of optimizers, each of which gets applied to a
+        molecule, based on the order in this :class:`tuple`.
+
+    Examples
+    --------
+    Let's say we want to embed a molecule with ETKDG first and then
+    minimize it with the MMFF force field.
+
+    >>> import rdkit.Chem.AllChem as rdkit
+    >>> mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+    >>> etkdg = RDKitEmbedder(rdkit.ETKDG())
+    >>> mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
+    >>> optimizer = OptimizerPipeline(etkdg, mmff)
+    >>> optimizer.optimize(mol)
+
+    """
+
+    def __init__(self, *optimizers, skip_optimized=False):
+        """
+        Initializes a :class:`OptimizerPipeline` instance.
+
+        Parameters
+        ----------
+        *optimizers : :class:`Optimizer`
+            A number of optimizers, each of which gets applied to a
+            molecule, based on the order given.
+
+        """
+
+        self.optimizers = optimizers
+        super().__init__(skip_optimized=skip_optimized)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        for optimizer in self.optimizers:
+            cls_name = optimizer.__class__.__name__
+            logger.info(f'Using {cls_name} on "{mol.name}."')
+            optimizer.optimize(mol, conformer)
+
+
+class CageOptimizerPipeline(OptimizerPipeline):
+    """
+    Applies optimizations to cages.
+
+    The difference between this class and :class:`.OptimizerPipeline`
+    is that after each optimizer in the pipeline is used, the number
+    of windows in the cage is determined. If there are fewer windows
+    than expected, it means that the cage is collapsed and the pipeline
+    is stopped early.
+
+    """
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Cage`
+            The cage to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        for optimizer in self.optimizers:
+            optimizer.optimize(mol, conformer)
+
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                windows = mol.windows(conformer)
+
+            expected_windows = mol.topology.n_windows
+            if windows is None or len(windows) != expected_windows:
+                return
+
+
+class RaisingOptimizer(Optimizer):
     """
     Raises and optimizes at random.
 
-    Parameters
-    ----------
-    mol : :class:`.Molecule`
-        The molecule being optimized.
+    This optimizer is used for debugging to simulate optimization
+    functions which sometimes completely successfully and sometimes
+    randomly fail.
 
+    Attributes
+    ----------
     fn : :class:`function`
-        An optimization function to be used, must take a single
-        argument, the molecule to be optimized.
+        When the optimizer does not fail, it uses this optimization
+        function to optimize molecules.
 
-    Returns
-    -------
-    None : :class:`.NoneType`
+    fail_chance : :class:`float`
+        The probability that the optimizer will raise an error each
+        time :meth:`optimize` is used.
 
-    """
-
-    if not np.random.choice([0, 1]):
-        raise Exception('Partial raiser.')
-
-    fn(mol)
-
-
-def raiser(mol, param1, param2=2):
-    """
-    Doens't optimize, raises an error instead.
-
-    This function is used to test that when optimization functions
-    raise errors during multiprocessing, they are handled correctly.
-
-    Parameters
-    ---------
-    param1 : :class:`object`
-        Dummy parameter, does nothing.
-
-    param2 : :class:`object`, optional
-        Dummy keyword parameter, does nothing.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-        This function does not return. It only raises.
-
-    Raises
-    ------
-    :class:`Exception`
-        An exception is always raised.
+    Examples
+    --------
+    >>> mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+    >>> etkdg = RDKitEmbedder(rdkit.ETKDG())
+    >>> partial_raiser = RaisingOptimizer(etkdg.optimize)
+    >>> partial_raiser.optimize(mol)
 
     """
 
-    raise Exception('Raiser optimization function used.')
+    def __init__(self, fn, fail_chance=0.5, skip_optimized=False):
+        """
+        Initializes :class:`PartialRaiser`.
+
+        Parameters
+        ----------
+        fn : :class:`function`
+            When the optimizer does not fail, it uses this optimization
+            function to optimize molecules.
+
+        fail_chance : :class:`float`, optional
+            The probability that the optimizer will raise an error each
+            time :meth:`optimize` is used.
+
+        skip_optimized : :class:`bool`, optional
+            If ``True`` then :meth:`optimize` returns immediately for
+            molecules where :attr:`.Molecule.optimized` is``True``.
+
+        """
+
+        self.fn = fn
+        self.fail_chance = fail_chance
+        super().__init__(skip_optimized=skip_optimized)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if np.random.rand() < self.fail_chance:
+            raise Exception('RaisingOptimizer.')
+        self.fn(mol)
 
 
-def rdkit_optimization(mol, embed=False, conformer=-1):
+class RDKitForceField(Optimizer):
     """
-    Optimizes the structure of the molecule using ``rdkit``.
+    Optimizes the structure of molecules using ``rdkit``.
 
-    Uses the ``MMFF`` forcefield.
-
-    Parameters
+    Attributes
     ----------
-    mol : :class:`.Molecule`
-        The molecule who's structure should be optimized.
+    rdkit_fn : :class:`function`
+        An rdkit optimization function, for example
+        :func:`rdkit.UFFOptimizeMolecule` or
+        :func:`rdkit.MMFFOptimizeMolecule`.
 
-    embed : :class:`bool`, optional
+    embed : :class:`bool`
         When ``True`` the structure is guessed before an optimization
         is carried out. This guess structure overrides any previous
         structure.
 
-    conformer : :class:`int`, optional
-        The conformer to use.
+    Examples
+    --------
+    Use MMFF to optimize a molcule.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    >>> import rdkit.Chem.AllChem as rdkit
+    >>> mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+    >>> ff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
+    >>> ff.optimize(mol)
 
     """
 
-    if conformer == -1:
-        conformer = mol.mol.GetConformer(conformer).GetId()
+    def __init__(self, rdkit_fn, embed=False, skip_optimized=False):
+        """
+        Initializes a :class:`RDKitForceField` instance.
 
-    if embed:
-        conf_id = rdkit.EmbedMolecule(mol.mol, clearConfs=False)
-        new_conf = rdkit.Conformer(mol.mol.GetConformer(conf_id))
-        mol.mol.RemoveConformer(conf_id)
-        mol.mol.RemoveConformer(conformer)
-        new_conf.SetId(conformer)
-        mol.mol.AddConformer(new_conf)
+        Parameters
+        ----------
+        rdkit_fn : :class:`function`
+            An rdkit optimization function, for example
+            :func:`rdkit.UFFOptimizeMolecule` or
+            :func:`rdkit.MMFFOptimizeMolecule`.
 
-    # Sanitize then optimize the rdkit molecule.
-    rdkit.SanitizeMol(mol.mol)
-    rdkit.MMFFOptimizeMolecule(mol.mol, confId=conformer)
+        embed : :class:`bool`
+            When ``True`` the structure is guessed before an
+            optimization is carried out. This guess structure overrides
+            any previous structure.
+
+        skip_optimized : :class:`bool`, optional
+            If ``True`` then :meth:`optimize` returns immediately for
+            molecules where :attr:`.Molecule.optimized` is``True``.
+
+        """
+
+        self.rdkit_fn = rdkit_fn
+        self.embed = embed
+        super().__init__(skip_optimized=skip_optimized)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if conformer == -1:
+            conformer = mol.mol.GetConformer(conformer).GetId()
+
+        if self.embed:
+            conf_id = rdkit.EmbedMolecule(mol.mol, clearConfs=False)
+            new_conf = rdkit.Conformer(mol.mol.GetConformer(conf_id))
+            mol.mol.RemoveConformer(conf_id)
+            mol.mol.RemoveConformer(conformer)
+            new_conf.SetId(conformer)
+            mol.mol.AddConformer(new_conf)
+
+        # Sanitize then optimize the rdkit molecule.
+        rdkit.SanitizeMol(mol.mol)
+        self.rdkit_fn(mol.mol, confId=conformer)
 
 
-def rdkit_ETKDG(mol, conformer=-1):
+def RDKitEmbedder(Optimizer):
     """
-    Does a conformer search with :func:`rdkit.ETKDG` [#]_.
+    Uses :func:`rdkit.EmbedMolecule` to find an optimized structure.
 
-    Parameters
+    Attributes
     ----------
-    mol : :class:`.Molecule`
-        The molecule who's structure should be optimized.
+    params : :class:`rdkit.EmbedParameters`
+        The parameters used for the embedding.
 
-    conformer : :class:`int`, optional
-        The conformer to use.
+    Examples
+    --------
+    Use ETKDG to generate an optimized structure.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    >>> import rdkit.Chem.AllChem as rdkit
+    >>> mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+    >>> embedder = RDKitEmbedder(rdkit.ETKDG())
+    >>> embedder.optimize(mol)
 
     References
     ----------
@@ -290,12 +407,48 @@ def rdkit_ETKDG(mol, conformer=-1):
 
     """
 
-    if conformer == -1:
-        conformer = mol.mol.GetConformer(conformer).GetId()
+    def __init__(self, params, skip_optimized=False):
+        """
+        Initializes a :class:`RDKitEmbedder` instance.
 
-    conf_id = rdkit.EmbedMolecule(mol.mol, rdkit.ETKDG())
-    new_conf = rdkit.Conformer(mol.mol.GetConformer(conf_id))
-    mol.mol.RemoveConformer(conf_id)
-    mol.mol.RemoveConformer(conformer)
-    new_conf.SetId(conformer)
-    mol.mol.AddConformer(new_conf)
+        Parameters
+        ----------
+        params : :class:`rdkit.EmbedParameters`
+            The parameters used for the embedding.
+
+        skip_optimized : :class:`bool`, optional
+            If ``True`` then :meth:`optimize` returns immediately for
+            molecules where :attr:`.Molecule.optimized` is``True``.
+
+        """
+
+        self.params = params
+        super().__init__(skip_optimized=skip_optimized)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if conformer == -1:
+            conformer = mol.mol.GetConformer(conformer).GetId()
+
+        conf_id = rdkit.EmbedMolecule(mol.mol, self.params)
+        new_conf = rdkit.Conformer(mol.mol.GetConformer(conf_id))
+        mol.mol.RemoveConformer(conf_id)
+        mol.mol.RemoveConformer(conformer)
+        new_conf.SetId(conformer)
+        mol.mol.AddConformer(new_conf)

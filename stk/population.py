@@ -716,6 +716,144 @@ class Population:
 
         return np.min([key(member) for member in self], axis=0)
 
+
+
+def _optimize_all(fn, population, processes):
+    """
+    Run opt function on all population members in parallel.
+
+    Parameters
+    ----------
+    fn : :class:`function`
+        An optimization function, which takes a single argument,
+        the molecule to be optimized.
+
+    population : :class:`.Population`
+        The :class:`.Population` instance who's members are to be
+        optimized.
+
+    processes : :class:`int`
+        The number of parallel processes to create.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
+    manager = mp.Manager()
+    logq = manager.Queue()
+    log_thread = Thread(target=daemon_logger, args=(logq, ))
+    log_thread.start()
+
+    opt_fn = _OptimizationFunc(fn)
+
+    # Apply the function to every member of the population, in
+    # parallel.
+    with mp.get_context('spawn').Pool(processes) as pool:
+        optimized = pool.starmap(logged_call,
+                                 ((logq, opt_fn, mem) for
+                                  mem in population))
+
+    # Update the structures in the population.
+    sorted_opt = sorted(optimized, key=lambda m: m.key)
+    sorted_pop = sorted(population, key=lambda m: m.key)
+    for old, new in zip(sorted_pop, sorted_opt):
+        old.__dict__ = dict(vars(new))
+
+    # Make sure the cache is updated with the optimized versions.
+    if OPTIONS['cache']:
+        for member in optimized:
+            member.update_cache()
+
+    logq.put(None)
+    log_thread.join()
+
+
+def _optimize_all_serial(fn, population):
+    """
+    Run opt function on all population members sequentially.
+
+    Parameters
+    ----------
+    fn : :class:`function`
+        An optimization function, which takes a single argument,
+        the molecule to be optimized.
+
+    population : :class:`.Population`
+        The :class:`.Population` instance who's members are to be
+        optimized.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
+    opt_fn = _OptimizationFunc(fn)
+
+    # Apply the function to every member of the population.
+    for member in population:
+        opt_fn(member)
+
+class _OptimizationFunc:
+    """
+    A decorator for optimization functions.
+
+    This decorator is applied to all optimization functions
+    automatically in :func:`_optimize_all`. It should not be applied
+    explicitly when defining the functions.
+
+    This decorator prevents optimization functions from raising if
+    they fail (necessary for multiprocessing) and prevents them from
+    being run twice on the same molecule.
+
+    """
+
+    def __init__(self, func):
+        wraps(func)(self)
+
+    def __call__(self, mol):
+        """
+        Decorates and calls the optimization function.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The optimized molecule.
+
+        """
+
+        if mol.optimized:
+            logger.info(f'Skipping {mol.name}.')
+            return mol
+
+        try:
+            logger.info(f'Optimizing {mol.name}.')
+            self.__wrapped__(mol)
+
+        except Exception as ex:
+            errormsg = (f'Optimization function '
+                        f'"{self.__wrapped__.func.__name__}()" '
+                        f'failed on molecule "{mol.name}".')
+            logger.error(errormsg, exc_info=True)
+
+        finally:
+            mol.optimized = True
+            return mol
+
+
+    def _optimize_parallel(self, fn, processes):
+        ...
+
+    def _optimize_serial(self, fn):
+        ...
+
     def optimize(self, fn, processes=psutil.cpu_count()):
         """
         Optimizes the structures of molecules in the population.

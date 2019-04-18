@@ -15,7 +15,7 @@ import logging
 import gzip
 
 from ..utilities import MAEExtractor, move_generated_macromodel_files
-
+from .optimizers import Optimizer
 
 logger = logging.getLogger(__name__)
 
@@ -45,532 +45,398 @@ class _LewisStructureError(Exception):
         self.message = message
 
 
-def macromodel_opt(mol,
-                   macromodel_path,
-                   settings=None,
-                   md=None,
-                   output_dir=None,
-                   conformer=-1):
+class _MacroModel(Optimizer):
     """
-    Optimizes the molecule using MacroModel.
 
-    This function runs a restricted optimization. The structures of the
-    building blocks are frozen and only the new bonds formed between
-    building blocks during assembly are optimized.
-
-    Parameters
+    Attributes
     ----------
-    mol : :class:`.Molecule`
-        The molecule who's structure must be optimized.
-
     macromodel_path : :class:`str`
         The full path of the Schrodinger suite within the user's
         machine. For example, on a Linux machine this may be something
         like ``'/opt/schrodinger2017-2'``.
 
-    settings : :class:`dict`, optional
-        A dictionary which maps the names of optimization parameters to
-        their values. Valid values are:
+    timeout : :class:`float`
+        The amount in seconds the MD is allowed to run before
+        being terminated. ``None`` means there is no timeout.
 
-            'restricted' : :class:`bool` (default = ``True``)
-                If ``False`` then all bonds are optimized, not just the
-                ones created during macromolecular assembly. If
-                ``True`` then an optimization is performed only on the
-                bonds added during molecular assembly. If
-                ``'both'`` then a restricted optimization is performed
-                first, followed by a regular optimization.
+    """
 
-            'timeout' : :class:`float` (default = ``None``)
-                The amount in seconds the optimization is allowed to
-                run before being terminated. ``None`` means there is no
-                timeout.
+    def __init__(self, macromodel_path, timeout, skip_optimized):
+        """
 
-            'force_field' : :class:`int` (default = ``16``)
-                The number of the force field to be used.
+        """
 
-            'max_iter' : :class:`int` (default = ``2500``)
-                The maximum number of iterations done during the
-                optimization.
+        self.macromodel_path = macromodel_path
+        self.timeout = timeout
+        super().__init__(skip_optimized=skip_optimized)
 
-            'gradient' : :class:`float` (default = ``0.05``)
-                The gradient at which optimization is stopped.
+    def run_bmin(self, mol):
 
-            'md' : :class:`bool` (default = ``False``)
-                Toggles whether a MD conformer search should be
-                performed.
+        logger.info(f'Running bmin on "{mol.name}".')
 
-        Only values which need to be changed from the default need to
-        be specified. For exmaple,
+        # To run MacroModel a command is issued to the console via
+        # ``subprocess.Popen``. The command is the full path of the
+        # ``bmin`` program. ``bmin`` is located in the Schrodinger
+        # installation folder.
+        file_root, ext = os.path.splitext(mol._file)
+        log_file = file_root + '.log'
+        opt_app = os.path.join(self.macromodel_path, "bmin")
+        # The first member of the list is the command, the following ones
+        # are any additional arguments.
 
-        .. code-block:: python
+        opt_cmd = [opt_app, file_root, "-WAIT", "-LOCAL"]
 
-            macromodel_opt(mol, 'path', {'max_iter' : 10})
+        incomplete = True
+        while incomplete:
+            opt_proc = psutil.Popen(opt_cmd,
+                                    stdout=sp.PIPE,
+                                    stderr=sp.STDOUT,
+                                    universal_newlines=True)
+            try:
+                proc_out, _ = opt_proc.communicate(
+                                                  timeout=self.timeout)
+
+            except sp.TimeoutExpired:
+                logger.warning(('Minimization took too long'
+                                ' and was terminated '
+                                f'by force on "{mol.name}".'))
+                self.kill_bmin(mol)
+                proc_out = ""
+
+            logger.debug(
+                f'Output of bmin on "{mol.name}" was: {proc_out}.')
+
+            with open(log_file, 'r') as log:
+                log_content = log.read()
+
+            # Check the log for error reports.
+            if ("termination due to error condition           21-" in
+               log_content):
+                raise _OptimizationError(("`bmin` crashed due to"
+                                          " an error condition. "
+                                          "See .log file."))
+
+            if ("FATAL do_nosort_typing: NO MATCH found for atom " in
+               log_content):
+                raise _ForceFieldError(
+                            'The log implies the force field failed.')
+
+            if (("FATAL gen_lewis_structure(): could not find best"
+                 " Lewis structure") in log_content and
+                ("skipping input structure  due to "
+                 "forcefield interaction errors") in log_content):
+                raise _LewisStructureError(
+                        '`bmin` failed due to poor Lewis structure.')
+
+            # If optimization fails because a wrong Schrodinger path
+            # was given, raise.
+            if 'The system cannot find the path specified' in proc_out:
+                raise _PathError(('Wrong Schrodinger path supplied to'
+                                  ' `macromodel_opt` function.'))
+
+            # If optimization fails because the license is not found, rerun
+            # the function.
+            if self.license_found(proc_out, mol):
+                incomplete = False
+
+        # Make sure the .maegz file created by the optimization is present.
+        maegz = file_root + '-out.maegz'
+        self.wait_for_file(maegz)
+        if not os.path.exists(log_file) or not os.path.exists(maegz):
+            raise _OptimizationError(('The .log and/or .maegz '
+                                      'files were not created by '
+                                      'the optimization.'))
 
 
-    md : :class:`dict`, optional
-        A dictionary holding settings for the MD conformer search.
-        This parameter is used in the same way as `settings` except
-        the values effect the MD only. See docstring of
-        :func:`_macromodel_md_opt` for valid values.
+class MacroModelForceField(_MacroModel):
+    """
+    Uses MacroModel to optimize molecules.
 
+    Attributes
+    ----------
     output_dir : :class:`str`, optional
         The name of the directory into which files generated during
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
 
-    conformer : :class:`int`, optional
-        The id of the conformer to be optimized.
+    restricted : :class:`bool`, optional
+        If ``False`` then all bonds are optimized, not just the ones
+        created during macromolecular assembly. If ``True`` then an
+        optimization is performed only on the bonds added during
+        molecular assembly. If ``'both'`` then a restricted
+        optimization is performed first, followed by a regular
+        optimization.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    force_field : :class:`int`, optional
+        The number of the force field to be used.
+
+    maximum_iterations : :class:`int`, optional
+        The maximum number of iterations done during the optimization.
+
+    minimum_gradient : :class:`float`, optional
+        The gradient at which optimization is stopped.
 
     """
 
-    if settings is None:
-        settings = {}
-    if md is None:
-        md = {}
+    def __init__(self,
+                 macromodel_path,
+                 output_dir=None,
+                 restricted='both',
+                 timeout=None,
+                 force_field=16,
+                 maximum_iterations=2500,
+                 minimum_gradient=0.05,
+                 skip_optimized=False):
+        """
+        Initializes a :class:`MacroModelForceField` object.
 
-    vals = {
-             'restricted': True,
-             'timeout': None,
-             'force_field': 16,
-             'max_iter': 2500,
-             'gradient': 0.05,
-             'md': False
-            }
-    vals.update(settings)
+        Parameters
+        ----------
+        macromodel_path : :class:`str`
+            The full path of the Schrodinger suite within the user's
+            machine. For example, on a Linux machine this may be
+            something like ``'/opt/schrodinger2017-2'``.
 
-    try:
+        output_dir : :class:`str`, optional
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
+
+        restricted : :class:`bool`, optional
+            If ``False`` then all bonds are optimized, not just the
+            ones created during macromolecular assembly. If ``True``
+            then an optimization is performed only on the bonds added
+            during molecular assembly. If ``'both'`` then a restricted
+            optimization is performed first, followed by a regular
+            optimization.
+
+        timeout : :class:`float`, optional
+            The amount in seconds the optimization is allowed to run
+            before being terminated. ``None`` means there is no
+            timeout.
+
+        force_field : :class:`int`, optional
+            The number of the force field to be used.
+
+        maximum_iterations : :class:`int`, optional
+            The maximum number of iterations done during the
+            optimization.
+
+        minimum_gradient : :class:`float`, optional
+            The gradient at which optimization is stopped.
+
+        skip_optimized : :class:`bool`, optional
+            If ``True`` then :meth:`optimize` returns immediately for
+            molecules where :attr:`.Molecule.optimized` is``True``.
+
+        """
+
+        self.output_dir = output_dir
+        self.restricted = restricted
+        self.force_field = force_field
+        self.maximum_iterations = maximum_iterations
+        self.minimum_gradient = minimum_gradient
+        super().__init__(macromodel_path=macromodel_path,
+                         timeout=timeout,
+                         skip_optimized=skip_optimized)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         basename = str(uuid4().int)
-        if output_dir is None:
+        if self.output_dir is None:
             output_dir = basename
+        else:
+            output_dir = self.output_dir
 
         mol._file = f'{basename}.mol'
 
         # First write a .mol file of the molecule.
         mol.write(mol._file, conformer)
-        # MacroModel requires a ``.mae`` file as input. This creates a
-        # ``.mae`` file holding the molecule.
-        _create_mae(mol, macromodel_path)
+        # MacroModel requires a ``.mae`` file as input.
+        self.create_mae(mol)
         # generate the ``.com`` file for the MacroModel run.
-        _generate_com(mol, vals)
+        self.generate_com(mol)
         # Run the optimization.
-        _run_bmin(mol, macromodel_path, vals['timeout'])
-        # Get the ``.maegz`` file output from the optimization and
-        # convert it to a ``.mae`` file.
-        _convert_maegz_to_mae(mol)
+        self.run_bmin(mol)
+        # Get the ``.maegz`` optimization output to a ``.mae``.
+        self.convert_maegz_to_mae(mol)
         mol.update_from_mae(f'{basename}.mae', conformer)
 
-        if vals['restricted'] == 'both':
-            new_vals = dict(vals)
-            new_vals['md'] = False
-            new_vals['restricted'] = False
-            macromodel_opt(mol=mol,
-                           macromodel_path=macromodel_path,
-                           settings=new_vals,
-                           md={},
-                           output_dir=output_dir,
-                           conformer=conformer)
+        if self.restricted == 'both':
+            self.restricted = False
+            self.optimize(mol, conformer)
+            self.restricted = 'both'
 
-        if vals['md']:
-            _macromodel_md_opt(mol=mol,
-                               macromodel_path=macromodel_path,
-                               settings=md,
-                               output_dir=output_dir,
-                               conformer=conformer)
-
-    except _ForceFieldError as ex:
-        # If OPLS_2005 has been tried already - record an exception.
-        if vals['force_field'] == 14:
-            raise ex
-
-        # If OPLSE_2005 has not been tried - try it.
-        logger.warning(('Minimization with OPLS3 failed on "{}". '
-                        'Trying OPLS_2005.').format(mol.name))
-
-        vals['force_field'] = 14
-        return macromodel_opt(mol=mol,
-                              macromodel_path=macromodel_path,
-                              settings=vals,
-                              md=md,
-                              output_dir=output_dir,
-                              conformer=conformer)
-
-    finally:
         move_generated_macromodel_files(basename, output_dir)
 
 
-def macromodel_cage_opt(mol,
-                        macromodel_path,
-                        settings=None,
-                        md=None,
-                        output_dir=None,
-                        conformer=-1):
+class MacroModelMD(_MacroModel):
     """
-    Optimizes the molecule using MacroModel.
+    Runs a MD conformer search using MacroModel.
 
-    This function runs a restricted optimization. The structures of the
-    building blocks are frozen and only the new bonds formed between
-    building blocks during assembly are optimized.
-
-    This function differes from `macromodel_opt` in that it checks the
-    number of windows the `macro_mol` has before running the MD. The MD
-    is only run all windows are found  (i.e. the cage is not
-    collapsed).
-
-    Parameters
+    Attributes
     ----------
-    mol : :class:`.Molecule`
-        The molecule who's structure must be optimized.
-
-    macromodel_path : :class:`str`
-        The full path of the Schrodinger suite within the user's
-        machine. For example, on a Linux machine this may be something
-        like ``'/opt/schrodinger2017-2'``.
-
-    settings : :class:`dict`, optional
-        A dictionary which maps the names of optimization parameters to
-        their values. Valid values are:
-
-            'restricted' : :class:`bool` (default = ``True``)
-                If ``False`` then all bonds are optimized, not just the
-                ones created during macromolecular assembly. If
-                ``True`` then an optimization is performed only on the
-                bonds added during molecular assembly. If
-                ``'both'`` then a restricted optimization is performed
-                first, followed by a regular optimization.
-
-            'timeout' : :class:`float` (default = ``None``)
-                The amount in seconds the optimization is allowed to
-                run before being terminated. ``None`` means there is no
-                timeout.
-
-            'force_field' : :class:`int` (default = ``16``)
-                The number of the force field to be used.
-
-            'max_iter' : :class:`int` (default = ``2500``)
-                The maximum number of iterations done during the
-                optimization.
-
-            'gradient' : :class:`float` (default = ``0.05``)
-                The gradient at which optimization is stopped.
-
-            'md' : :class:`bool` (default = ``False``)
-                Toggles whether a MD conformer search should be
-                performed.
-
-        Only values which need to be changed from the default need to
-        be specified. For exmaple,
-
-        .. code-block:: python
-
-            macromodel_opt(mol, 'path', {'max_iter' : 10})
-
-
-    md : :class:`dict`, optional
-        A dictionary holding settings for the MD conformer search.
-        This parameter is used in the same way as `settings` except
-        the values effect the MD only. See docstring of
-        :func:`_macromodel_md_opt` for valid values.
-
-    output_dir : :class:`str`, optional
+    output_dir : :class:`str`
         The name of the directory into which files generated during
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
 
-    conformer : :class:`int`, optional
-        The id of the conformer to be optimized.
+    force_field : :class:`int`
+        The number of the force field to be used.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    temperature : :class:`float`
+        The temperature in Kelvin at which the MD is run.
+
+    conformers : :class:`int`
+        The number of conformers sampled and optimized from the MD.
+
+    time_step : :class:`float`
+        The time step in ``fs`` for the MD.
+
+    eq_time : :class:`float`
+        The equilibriation time in ``ps`` before the MD is run.
+
+    simulation_time : :class:`float`
+        The simulation time in ``ps`` of the MD.
+
+    maximum_iterations : :class:`int`
+        The maximum number of iterations done during the optimization.
+
+    minimum_gradient : :class:`float`
+        The gradient at which optimization is stopped.
 
     """
 
-    if settings is None:
-        settings = {}
-    if md is None:
-        md = {}
+    def __init__(self,
+                 macromodel_path,
+                 output_dir=None,
+                 timeout=None,
+                 force_field=16,
+                 temperature=300,
+                 conformers=50,
+                 time_step=1.0,
+                 eq_time=10,
+                 simulation_time=200,
+                 maximum_iterations=2500,
+                 minimum_gradient=0.05,
+                 skip_optimized=False):
+        """
+        Runs a MD conformer search on `mol`.
 
-    vals = {
-         'restricted': True,
-         'timeout': None,
-         'force_field': 16,
-         'max_iter': 2500,
-         'gradient': 0.05,
-         'md': False
-    }
-    vals.update(settings)
+        Parameters
+        ----------
+        macromodel_path : :class:`str`
+            The full path of the Schrodinger suite within the user's
+            machine. For example, on a Linux machine this may be
+            something like ``'/opt/schrodinger2017-2'``.
 
-    try:
+        output_dir : :class:`str`
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
+
+        timeout : :class:`float`
+            The amount in seconds the MD is allowed to run before
+            being terminated. ``None`` means there is no timeout.
+
+        force_field : :class:`int`
+            The number of the force field to be used.
+
+        temperature : :class:`float`
+            The temperature in Kelvin at which the MD is run.
+
+        conformers' : :class:`int`
+            The number of conformers sampled and optimized from the MD.
+
+        time_step : :class:`float`
+            The time step in ``fs`` for the MD.
+
+        eq_time : :class:`float`
+            The equilibriation time in ``ps`` before the MD is run.
+
+        simulation_time : :class:`float`
+            The simulation time in ``ps`` of the MD.
+
+        maximum_iterations : :class:`int`
+            The maximum number of iterations done during the
+            optimization.
+
+        minimum_gradient : :class:`float`
+            The gradient at which optimization is stopped.
+
+        skip_optimized : :class:`bool`, optional
+            If ``True`` then :meth:`optimize` returns immediately for
+            molecules where :attr:`.Molecule.optimized` is``True``.
+
+        """
+
+        self.output_dir = output_dir
+        self.force_field = force_field
+        self.temperature = temperature
+        self.conformers = conformers
+        self.time_step = time_step
+        self.eq_time = eq_time
+        self.simulation_time = simulation_time
+        self.maximum_iterations = maximum_iterations
+        self.minimum_gradient = minimum_gradient
+        super().__init__(macromodel_path=macromodel_path,
+                         timeout=timeout,
+                         skip_optimized=skip_optimized)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         basename = str(uuid4().int)
-        if output_dir is None:
+        if self.output_dir is None:
             output_dir = basename
+        else:
+            output_dir = self.output_dir
 
         mol._file = f'{basename}.mol'
 
         # First write a .mol file of the molecule.
         mol.write(mol._file, conformer)
-        # MacroModel requires a ``.mae`` file as input. This creates a
-        # ``.mae`` file holding the molecule.
-        _create_mae(mol, macromodel_path)
-        # generate the ``.com`` file for the MacroModel run.
-        _generate_com(mol, vals)
-        # Run the optimization.
-        _run_bmin(mol, macromodel_path, vals['timeout'])
-        # Get the ``.maegz`` file output from the optimization and
-        # convert it to a ``.mae`` file.
-        _convert_maegz_to_mae(mol)
-        mol.update_from_mae(f'{basename}.mae', conformer)
-
-        if vals['restricted'] == 'both':
-            new_vals = dict(vals)
-            new_vals['md'] = False
-            new_vals['restricted'] = False
-            macromodel_opt(mol=mol,
-                           macromodel_path=macromodel_path,
-                           settings=new_vals,
-                           md={},
-                           output_dir=output_dir,
-                           conformer=conformer)
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            windows = mol.windows(conformer)
-            if windows is not None:
-                all_windows = (len(windows) ==
-                               mol.topology.n_windows)
-
-                if vals['md'] and all_windows:
-                    _macromodel_md_opt(mol=mol,
-                                       macromodel_path=macromodel_path,
-                                       settings=md,
-                                       output_dir=output_dir,
-                                       conformer=conformer)
-
-    except _ForceFieldError as ex:
-        # If OPLS_2005 has been tried already - record an exception.
-        if vals['force_field'] == 14:
-            raise ex
-
-        # If OPLSE_2005 has not been tried - try it.
-        logger.warning(('Minimization with OPLS3 failed on "{}". '
-                        'Trying OPLS_2005.').format(mol.name))
-
-        vals['force_field'] = 14
-        return macromodel_cage_opt(mol=mol,
-                                   macromodel_path=macromodel_path,
-                                   settings=vals,
-                                   md=md,
-                                   output_dir=output_dir,
-                                   conformer=conformer)
-
-    finally:
-        move_generated_macromodel_files(basename, output_dir)
-
-
-def _macromodel_md_opt(mol,
-                       macromodel_path,
-                       settings=None,
-                       output_dir=None,
-                       conformer=-1):
-    """
-    Runs a MD conformer search on `mol`.
-
-    Parameters
-    ----------
-    mol : :class:`.Molecule`
-        The molecule who's structure must be optimized.
-
-    macromodel_path : :class:`str`
-        The full path of the Schrodinger suite within the user's
-        machine. For example, on a Linux machine this may be something
-        like ``'/opt/schrodinger2017-2'``.
-
-    settings : :class:`dict`, optional
-        Each key is a string describing an MD parameter. The value is
-        the corresponding value. Only values which need to be changed
-        from the default need to be specified. The allowed parameters
-        are:
-
-            'timeout' : :class:`float` (default = ``None``)
-                The amount in seconds the MD is allowed to run before
-                being terminated. ``None`` means there is no timeout.
-
-            'force_field' : :class:`int` (default = ``16``)
-                The number of the force field to be used.
-
-            'temp' : :class:`float` (default = ``300``)
-                The temperature in Kelvin at which the MD is run.
-
-            'confs' : :class:`int` (default = ``50``)
-                The number of conformers sampled and optimized from the
-                MD.
-
-            'time_step' : :class:`float` (default = ``1.0``)
-                The time step in ``fs`` for the MD.
-
-            'eq_time' : :class:`float` (default = ``10``)
-                The equilibriation time in ``ps`` before the MD is run.
-
-            'sim_time' : :class:`float` (default = ``200``)
-                The simulation time in ``ps`` of the MD.
-
-            'max_iter' : :class:`int` (default = ``2500``)
-                The maximum number of iterations done during the
-                optimization.
-
-            'gradient' : float (default = ``0.05``)
-                The gradient at which optimization is stopped.
-
-    output_dir : :class:`str`, optional
-        The name of the directory into which files generated during
-        the optimization are written, if ``None`` then
-        :func:`uuid.uuid4` is used.
-
-    conformer : :class:`int`, optional
-        The id of the conformer to be optimized.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
-    if settings is None:
-        settings = {}
-
-    vals = {
-               'timeout': None,
-               'force_field': 16,
-               'temp': 300,
-               'confs': 50,
-               'time_step': 1.0,
-               'eq_time': 10,
-               'sim_time': 200,
-               'max_iter': 2500,
-               'gradient': 0.05
-              }
-
-    vals.update(settings)
-
-    logger.info('Running MD on "{}".'.format(mol.name))
-    try:
-        basename = str(uuid4().int)
-        if output_dir is None:
-            output_dir = basename
-
-        mol._file = f'{basename}.mol'
-
-        # First write a .mol file of the molecule.
-        mol.write(mol._file, conformer)
-        # MacroModel requires a ``.mae`` file as input. This creates a
-        # ``.mae`` file holding the molecule.
-        _create_mae(mol, macromodel_path)
+        # MacroModel requires a ``.mae`` file as input.
+        self.create_mae(mol)
         # Generate the ``.com`` file for the MacroModel MD run.
-        _generate_md_com(mol, vals)
+        self.generate_com(mol)
         # Run the optimization.
-        _run_bmin(mol, macromodel_path, vals['timeout'])
+        self.run_bmin(mol)
         # Extract the lowest energy conformer into its own .mae file.
         conformer_mae = MAEExtractor(mol._file).path
         mol.update_from_mae(conformer_mae, conformer)
-
-    except _ForceFieldError as ex:
-        # If OPLS_2005 has been tried already - record an exception.
-        if vals['force_field'] == 14:
-            raise ex
-        # If OPLSE_2005 has not been tried - try it.
-        logger.warning(('Minimization with OPLS3 failed on "{}". '
-                        'Trying OPLS_2005.').format(mol.name))
-
-        vals['force_field'] = 14
-        return _macromodel_md_opt(mol=mol,
-                                  macromodel_path=macromodel_path,
-                                  settings=vals,
-                                  output_dir=output_dir,
-                                  conformer=conformer)
-
-    finally:
         move_generated_macromodel_files(basename, output_dir)
-
-
-def _run_bmin(macro_mol, macromodel_path, timeout):
-
-    logger.info('Running bmin on "{}".'.format(macro_mol.name))
-
-    # To run MacroModel a command is issued to the console via
-    # ``subprocess.Popen``. The command is the full path of the
-    # ``bmin`` program. ``bmin`` is located in the Schrodinger
-    # installation folder.
-    file_root, ext = os.path.splitext(macro_mol._file)
-    log_file = file_root + '.log'
-    opt_app = os.path.join(macromodel_path, "bmin")
-    # The first member of the list is the command, the following ones
-    # are any additional arguments.
-
-    opt_cmd = [opt_app, file_root, "-WAIT", "-LOCAL"]
-
-    incomplete = True
-    while incomplete:
-        opt_proc = psutil.Popen(opt_cmd,
-                                stdout=sp.PIPE,
-                                stderr=sp.STDOUT,
-                                universal_newlines=True)
-        try:
-            proc_out, _ = opt_proc.communicate(timeout=timeout)
-
-        except sp.TimeoutExpired:
-            logger.warning(('Minimization took too long'
-                            ' and was terminated '
-                            f'by force on "{macro_mol.name}".'))
-            _kill_bmin(macro_mol, macromodel_path)
-            proc_out = ""
-
-        logger.debug(
-            f'Output of bmin on "{macro_mol.name}" was: {proc_out}.')
-
-        with open(log_file, 'r') as log:
-            log_content = log.read()
-
-        # Check the log for error reports.
-        if ("termination due to error condition           21-" in
-           log_content):
-            raise _OptimizationError(("`bmin` crashed due to"
-                                      " an error condition. "
-                                      "See .log file."))
-
-        if ("FATAL do_nosort_typing: NO MATCH found for atom " in
-           log_content):
-            raise _ForceFieldError(
-                            'The log implies the force field failed.')
-
-        if (("FATAL gen_lewis_structure(): could not find best Lewis"
-             " structure") in log_content and
-            ("skipping input structure  due to "
-             "forcefield interaction errors") in log_content):
-            raise _LewisStructureError(
-                    '`bmin` failed due to poor Lewis structure.')
-
-        # If optimization fails because a wrong Schrodinger path was
-        # given, raise.
-        if 'The system cannot find the path specified' in proc_out:
-            raise _PathError(('Wrong Schrodinger path supplied to'
-                              ' `macromodel_opt` function.'))
-
-        # If optimization fails because the license is not found, rerun
-        # the function.
-        if _license_found(proc_out, macro_mol):
-            incomplete = False
-
-    # Make sure the .maegz file created by the optimization is present.
-    maegz = file_root + '-out.maegz'
-    _wait_for_file(maegz)
-    if not os.path.exists(log_file) or not os.path.exists(maegz):
-        raise _OptimizationError(('The .log and/or .maegz '
-                                  'files were not created by '
-                                  'the optimization.'))
 
 
 def _kill_bmin(macro_mol, macromodel_path):
