@@ -17,6 +17,7 @@ import gzip
 import re
 from collections import deque
 import tarfile
+from glob import iglob
 
 # Holds global stk options.
 OPTIONS = {}
@@ -885,6 +886,14 @@ def mol_from_mol_file(mol_file):
     mol = e_mol.GetMol()
     mol.AddConformer(conf)
     return mol
+
+
+def move_generated_macromodel_files(basename, output_dir):
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+
+    for filename in iglob(f'{basename}*'):
+        os.rename(filename, f'{output_dir}/{filename}')
 
 
 def normalize_vector(vector):

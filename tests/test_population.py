@@ -255,10 +255,13 @@ def test_min(generate_population):
     assert np.allclose(np.min(m, axis=0), minuf, atol=1e-8)
 
 
+def do_not_opt(mol):
+    return
+
+
 def test_optimize(tmp_polymer_pop):
     assert all(not m.optimized for m in tmp_polymer_pop)
-    fn = stk.FunctionData('do_not_optimize')
-    tmp_polymer_pop.optimize(fn)
+    tmp_polymer_pop.optimize(do_not_opt)
     assert all(m.optimized for m in tmp_polymer_pop)
 
 

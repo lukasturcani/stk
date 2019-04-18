@@ -41,15 +41,15 @@ from ..utilities import daemon_logger, logged_call, OPTIONS
 logger = logging.getLogger(__name__)
 
 
-def _optimize_all(func_data, population, processes):
+def _optimize_all(fn, population, processes):
     """
     Run opt function on all population members in parallel.
 
     Parameters
     ----------
-    func_data : :class:`.FunctionData`
-        The :class:`.FunctionData` object which represents the chosen
-        optimization function.
+    fn : :class:`function`
+        An optimization function, which takes a single argument,
+        the molecule to be optimized.
 
     population : :class:`.Population`
         The :class:`.Population` instance who's members are to be
@@ -69,19 +69,13 @@ def _optimize_all(func_data, population, processes):
     log_thread = Thread(target=daemon_logger, args=(logq, ))
     log_thread.start()
 
-    # Using the name of the function stored in `func_data` get the
-    # function object from one of the functions defined within the
-    # module.
-    func = globals()[func_data.name]
-    # Provide the function with any additional paramters it may
-    # require.
-    p_func = _OptimizationFunc(partial(func, **func_data.params))
+    opt_fn = _OptimizationFunc(fn)
 
     # Apply the function to every member of the population, in
     # parallel.
     with mp.get_context('spawn').Pool(processes) as pool:
         optimized = pool.starmap(logged_call,
-                                 ((logq, p_func, mem) for
+                                 ((logq, opt_fn, mem) for
                                   mem in population))
 
     # Update the structures in the population.
@@ -99,15 +93,15 @@ def _optimize_all(func_data, population, processes):
     log_thread.join()
 
 
-def _optimize_all_serial(func_data, population):
+def _optimize_all_serial(fn, population):
     """
     Run opt function on all population members sequentially.
 
     Parameters
     ----------
-    func_data : :class:`.FunctionData`
-        The :class:`.FunctionData` object which represents the chosen
-        optimization function.
+    fn : :class:`function`
+        An optimization function, which takes a single argument,
+        the molecule to be optimized.
 
     population : :class:`.Population`
         The :class:`.Population` instance who's members are to be
@@ -119,17 +113,11 @@ def _optimize_all_serial(func_data, population):
 
     """
 
-    # Using the name of the function stored in `func_data` get the
-    # function object from one of the functions defined within the
-    # module.
-    func = globals()[func_data.name]
-    # Provide the function with any additional paramters it may
-    # require.
-    p_func = _OptimizationFunc(partial(func, **func_data.params))
+    opt_fn = _OptimizationFunc(fn)
 
     # Apply the function to every member of the population.
     for member in population:
-        p_func(member)
+        opt_fn(member)
 
 
 class _OptimizationFunc:
@@ -184,29 +172,7 @@ class _OptimizationFunc:
             return mol
 
 
-def do_not_optimize(mol):
-    """
-    Skips the optimization step.
-
-    This is very useful when debugging so you do not waste your time
-    waiting for molecules to get optimized. Use this in the input file
-    in place of an optimization function when necessary.
-
-    Parameters
-    ----------
-    mol : :class:`.Molecule`
-        A molecule which will not be optimized.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
-    return
-
-
-def partial_raiser(mol, ofunc):
+def partial_raiser(mol, fn):
     """
     Raises and optimizes at random.
 
@@ -215,9 +181,9 @@ def partial_raiser(mol, ofunc):
     mol : :class:`.Molecule`
         The molecule being optimized.
 
-    ofunc : :class:`.FunctionData`
-        A :class:`.FunctionData` object representing the optimization
-        function to be used.
+    fn : :class:`function`
+        An optimization function to be used, must take a single
+        argument, the molecule to be optimized.
 
     Returns
     -------
@@ -228,7 +194,7 @@ def partial_raiser(mol, ofunc):
     if not np.random.choice([0, 1]):
         raise Exception('Partial raiser.')
 
-    globals()[ofunc.name](mol, **ofunc.params)
+    fn(mol)
 
 
 def raiser(mol, param1, param2=2):
