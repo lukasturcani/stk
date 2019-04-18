@@ -502,7 +502,10 @@ def _move_generated_files(basename, output_dir):
         '.com',
         '.log',
         '-mon.maegz',
-        '-out.maegz'
+        '-out.maegz',
+        '-out.mmo',
+        '-out.mae',
+        '-out.ou1'
     ]
     for ext in extensions:
         if os.path.exists(f'{basename}{ext}'):
