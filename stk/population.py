@@ -716,7 +716,7 @@ class Population:
 
         return np.min([key(member) for member in self], axis=0)
 
-    def optimize(self, func_data, processes=psutil.cpu_count()):
+    def optimize(self, fn, processes=psutil.cpu_count()):
         """
         Optimizes the structures of molecules in the population.
 
@@ -735,10 +735,10 @@ class Population:
 
         Parameters
         ----------
-        func_data : :class:`.FunctionData`
-            Holds the name and arguments of an optimization function
-            defined in :mod:`~stk.optimization`. The function is used
-            to optimize the molecules in the population.
+        fn : :class:`function`
+            An optimization function applied to all molecules in
+            the population. The function must take a single argument,
+            the molecule.
 
         processes : :class:`int`
             The number of parallel processes to create. Optimization
@@ -751,9 +751,9 @@ class Population:
         """
 
         if processes == 1:
-            _optimize_all_serial(func_data, self)
+            _optimize_all_serial(fn, self)
         else:
-            _optimize_all(func_data, self, processes)
+            _optimize_all(fn, self, processes)
 
     def remove_duplicates(self,
                           between_subpops=True,
