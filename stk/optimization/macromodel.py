@@ -14,7 +14,7 @@ from uuid import uuid4
 import logging
 import gzip
 
-from ..utilities import MAEExtractor, flatten
+from ..utilities import MAEExtractor
 
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,7 @@ def macromodel_opt(mol,
                    macromodel_path,
                    settings=None,
                    md=None,
+                   output_dir=None,
                    conformer=-1):
     """
     Optimizes the molecule using MacroModel.
@@ -112,6 +113,11 @@ def macromodel_opt(mol,
         the values effect the MD only. See docstring of
         :func:`_macromodel_md_opt` for valid values.
 
+    output_dir : :class:`str`, optional
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
+
     conformer : :class:`int`, optional
         The id of the conformer to be optimized.
 
@@ -137,7 +143,14 @@ def macromodel_opt(mol,
     vals.update(settings)
 
     try:
-        mol._file = '{}.mol'.format(uuid4().int)
+        if output_dir is None:
+            output_dir = str(uuid4().int)
+
+        if os.path.exists(output_dir):
+            os.mkdir(output_dir)
+
+        basename = str(uuid4().int)
+        mol._file = f'{basename}.mol'
         # First write a .mol file of the molecule.
         mol.write(mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
@@ -150,8 +163,7 @@ def macromodel_opt(mol,
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
         _convert_maegz_to_mae(mol)
-        mol.update_from_mae(mol._file.replace('.mol', '.mae'),
-                            conformer)
+        mol.update_from_mae(f'{basename}.mae', conformer)
 
         if vals['restricted'] == 'both':
             new_vals = dict(vals)
@@ -160,13 +172,17 @@ def macromodel_opt(mol,
             macromodel_opt(mol=mol,
                            macromodel_path=macromodel_path,
                            settings=new_vals,
-                           md={})
+                           md={},
+                           output_dir=output_dir,
+                           conformer=conformer)
 
         if vals['md']:
-            _macromodel_md_opt(mol,
-                               macromodel_path,
-                               md,
-                               conformer)
+            _macromodel_md_opt(mol=mol,
+                               macromodel_path=macromodel_path,
+                               settings=md,
+                               conformer=conformer)
+
+        _move_generated_files(basename, output_dir)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
@@ -178,17 +194,19 @@ def macromodel_opt(mol,
                         'Trying OPLS_2005.').format(mol.name))
 
         vals['force_field'] = 14
-        return macromodel_opt(mol,
-                              macromodel_path,
-                              vals,
-                              md,
-                              conformer)
+        return macromodel_opt(mol=mol,
+                              macromodel_path=macromodel_path,
+                              settings=vals,
+                              md=md,
+                              output_dir=output_dir,
+                              conformer=conformer)
 
 
 def macromodel_cage_opt(mol,
                         macromodel_path,
                         settings=None,
                         md=None,
+                        output_dir=None,
                         conformer=-1):
     """
     Optimizes the molecule using MacroModel.
@@ -257,6 +275,11 @@ def macromodel_cage_opt(mol,
         the values effect the MD only. See docstring of
         :func:`_macromodel_md_opt` for valid values.
 
+    output_dir : :class:`str`, optional
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
+
     conformer : :class:`int`, optional
         The id of the conformer to be optimized.
 
@@ -272,17 +295,25 @@ def macromodel_cage_opt(mol,
         md = {}
 
     vals = {
-             'restricted': True,
-             'timeout': None,
-             'force_field': 16,
-             'max_iter': 2500,
-             'gradient': 0.05,
-             'md': False
-            }
+         'restricted': True,
+         'timeout': None,
+         'force_field': 16,
+         'max_iter': 2500,
+         'gradient': 0.05,
+         'md': False
+    }
     vals.update(settings)
 
     try:
-        mol._file = '{}.mol'.format(uuid4().int)
+        if output_dir is None:
+            output_dir = str(uuid4().int)
+
+        if os.path.exists(output_dir):
+            os.mkdir(output_dir)
+
+        basename = str(uuid4().int)
+        mol._file = f'{basename}.mol'
+
         # First write a .mol file of the molecule.
         mol.write(mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
@@ -295,8 +326,7 @@ def macromodel_cage_opt(mol,
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
         _convert_maegz_to_mae(mol)
-        mol.update_from_mae(mol._file.replace('.mol', '.mae'),
-                            conformer)
+        mol.update_from_mae(f'{basename}.mae', conformer)
 
         if vals['restricted'] == 'both':
             new_vals = dict(vals)
@@ -305,7 +335,9 @@ def macromodel_cage_opt(mol,
             macromodel_opt(mol=mol,
                            macromodel_path=macromodel_path,
                            settings=new_vals,
-                           md={})
+                           md={},
+                           output_dir=output_dir,
+                           conformer=conformer)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -315,10 +347,12 @@ def macromodel_cage_opt(mol,
                                mol.topology.n_windows)
 
                 if vals['md'] and all_windows:
-                    _macromodel_md_opt(mol,
-                                       macromodel_path,
-                                       md,
-                                       conformer)
+                    _macromodel_md_opt(mol=mol,
+                                       macromodel_path=macromodel_path,
+                                       settings=md,
+                                       conformer=conformer)
+
+        _move_generated_files(basename, output_dir)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
@@ -330,11 +364,12 @@ def macromodel_cage_opt(mol,
                         'Trying OPLS_2005.').format(mol.name))
 
         vals['force_field'] = 14
-        return macromodel_cage_opt(mol,
-                                   macromodel_path,
-                                   vals,
-                                   md,
-                                   conformer)
+        return macromodel_cage_opt(mol=mol,
+                                   macromodel_path=macromodel_path,
+                                   settings=vals,
+                                   md=md,
+                                   output_dir=output_dir,
+                                   conformer=conformer)
 
 
 def _macromodel_md_opt(mol,
@@ -445,6 +480,21 @@ def _macromodel_md_opt(mol,
                                   macromodel_path,
                                   vals,
                                   conformer)
+
+
+def _move_generated_files(basename, output_dir):
+    extensions = [
+        '.mol',
+        '.mae',
+        '.com',
+        '.log',
+        '-mon.maegz',
+        '-out.maegz'
+    ]
+    for ext in extensions:
+        if os.path.exists(f'{basename}{ext}'):
+            os.rename(f'{basename}{ext}',
+                      f'{output_dir}/{basename}{ext}')
 
 
 def _run_bmin(macro_mol, macromodel_path, timeout):
