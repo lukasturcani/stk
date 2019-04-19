@@ -298,6 +298,36 @@ class CageOptimizerPipeline(OptimizerPipeline):
             optimizer.optimize(mol, conformer)
 
 
+class NullOptimizer(Optimizer):
+    """
+    Does not perform optimizations.
+
+    """
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Does not optimizes a molecule.
+
+        This function just returns immediately without changing the
+        molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            A molecule.
+
+        conformer : :class:`int`, optional
+            A conformer.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        return
+
+
 class RaisingOptimizerError(Exception):
     ...
 

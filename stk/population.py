@@ -11,8 +11,14 @@ import json
 from glob import iglob
 import multiprocessing as mp
 import psutil
+from functools import wraps
+import logging
+from threading import Thread
 
-from .utilities import dedupe
+from .utilities import dedupe, OPTIONS, daemon_logger, logged_call
+
+
+logger = logging.getLogger(__name__)
 
 
 class Population:
@@ -704,20 +710,47 @@ class Population:
 
         return np.min([key(member) for member in self], axis=0)
 
-    def _optimize_parallel(self, fn, processes):
-        ...
+    def _optimize_parallel(self, optimizer, processes):
+        manager = mp.Manager()
+        logq = manager.Queue()
+        log_thread = Thread(target=daemon_logger, args=(logq, ))
+        log_thread.start()
 
-    def _optimize_serial(self, fn):
-        ...
+        opt_fn = _OptimizeGuard(optimizer.optimize)
 
-    def optimize(self, fn, processes=psutil.cpu_count()):
+        # Apply the function to every member of the population, in
+        # parallel.
+        with mp.get_context('spawn').Pool(processes) as pool:
+            optimized = pool.starmap(logged_call,
+                                     ((logq, opt_fn, mem) for
+                                      mem in self))
+
+        # Update the structures in the population.
+        sorted_opt = sorted(optimized, key=lambda m: m.key)
+        sorted_pop = sorted(self, key=lambda m: m.key)
+        for old, new in zip(sorted_pop, sorted_opt):
+            old.__dict__ = dict(vars(new))
+
+        # Make sure the cache is updated with the optimized versions.
+        if OPTIONS['cache']:
+            for member in optimized:
+                member.update_cache()
+
+        logq.put(None)
+        log_thread.join()
+
+    def _optimize_serial(self, optimizer):
+        for member in self:
+            optimizer.optimize(member)
+
+    def optimize(self, optimizer, processes=psutil.cpu_count()):
         """
         Optimizes the structures of molecules in the population.
 
         The molecules are optimized serially or in parallel depending
         if `processes` is ``1`` or more. The serial version may be
         faster in cases where all molecules have already been
-        optimized. This is because all optimizations will be skipped.
+        optimized, for example if optimized molecules are skipped.
         In this case creating a parallel process pool creates
         unncessary overhead.
 
@@ -729,10 +762,8 @@ class Population:
 
         Parameters
         ----------
-        fn : :class:`function`
-            An optimization function applied to all molecules in
-            the population. The function must take a single argument,
-            the molecule.
+        optimizer : :class:`.Optimizer`
+            The optimizer used to carry out the optimizations.
 
         processes : :class:`int`
             The number of parallel processes to create. Optimization
@@ -744,11 +775,10 @@ class Population:
 
         """
 
-        ...
-        # if processes == 1:
-        #     _optimize_all_serial(fn, self)
-        # else:
-        #     _optimize_all(fn, self, processes)
+        if processes == 1:
+            self._optimize_serial(optimizer)
+        else:
+            self._optimize_parallel(optimizer, processes)
 
     def remove_duplicates(self,
                           between_subpops=True,
@@ -1095,131 +1125,45 @@ class Population:
         return str(self)
 
 
-# def _optimize_all(fn, population, processes):
-#     """
-#     Run opt function on all population members in parallel.
-#
-#     Parameters
-#     ----------
-#     fn : :class:`function`
-#         An optimization function, which takes a single argument,
-#         the molecule to be optimized.
-#
-#     population : :class:`.Population`
-#         The :class:`.Population` instance who's members are to be
-#         optimized.
-#
-#     processes : :class:`int`
-#         The number of parallel processes to create.
-#
-#     Returns
-#     -------
-#     None : :class:`NoneType`
-#
-#     """
-#
-#     manager = mp.Manager()
-#     logq = manager.Queue()
-#     log_thread = Thread(target=daemon_logger, args=(logq, ))
-#     log_thread.start()
-#
-#     opt_fn = _OptimizationFunc(fn)
-#
-#     # Apply the function to every member of the population, in
-#     # parallel.
-#     with mp.get_context('spawn').Pool(processes) as pool:
-#         optimized = pool.starmap(logged_call,
-#                                  ((logq, opt_fn, mem) for
-#                                   mem in population))
-#
-#     # Update the structures in the population.
-#     sorted_opt = sorted(optimized, key=lambda m: m.key)
-#     sorted_pop = sorted(population, key=lambda m: m.key)
-#     for old, new in zip(sorted_pop, sorted_opt):
-#         old.__dict__ = dict(vars(new))
-#
-#     # Make sure the cache is updated with the optimized versions.
-#     if OPTIONS['cache']:
-#         for member in optimized:
-#             member.update_cache()
-#
-#     logq.put(None)
-#     log_thread.join()
-#
-#
-# def _optimize_all_serial(fn, population):
-#     """
-#     Run opt function on all population members sequentially.
-#
-#     Parameters
-#     ----------
-#     fn : :class:`function`
-#         An optimization function, which takes a single argument,
-#         the molecule to be optimized.
-#
-#     population : :class:`.Population`
-#         The :class:`.Population` instance who's members are to be
-#         optimized.
-#
-#     Returns
-#     -------
-#     None : :class:`NoneType`
-#
-#     """
-#
-#     opt_fn = _OptimizationFunc(fn)
-#
-#     # Apply the function to every member of the population.
-#     for member in population:
-#         opt_fn(member)
-#
-# class _OptimizationFunc:
-#     """
-#     A decorator for optimization functions.
-#
-#     This decorator is applied to all optimization functions
-#     automatically in :func:`_optimize_all`. It should not be applied
-#     explicitly when defining the functions.
-#
-#     This decorator prevents optimization functions from raising if
-#     they fail (necessary for multiprocessing) and prevents them from
-#     being run twice on the same molecule.
-#
-#     """
-#
-#     def __init__(self, func):
-#         wraps(func)(self)
-#
-#     def __call__(self, mol):
-#         """
-#         Decorates and calls the optimization function.
-#
-#         Parameters
-#         ----------
-#         mol : :class:`.Molecule`
-#             The molecule to be optimized.
-#
-#         Returns
-#         -------
-#         :class:`.Molecule`
-#             The optimized molecule.
-#
-#         """
-#
-#         if mol.optimized:
-#             logger.info(f'Skipping {mol.name}.')
-#             return mol
-#
-#         try:
-#             logger.info(f'Optimizing {mol.name}.')
-#             self.__wrapped__(mol)
-#
-#         except Exception as ex:
-#             errormsg = (f'Optimization function '
-#                         f'"{self.__wrapped__.func.__name__}()" '
-#                         f'failed on molecule "{mol.name}".')
-#             logger.error(errormsg, exc_info=True)
-#
-#         finally:
-#             mol.optimized = True
-#             return mol
+class _OptimizeGuard:
+    """
+    A decorator for optimization functions.
+
+    This decorator should be applied to all functions which are to
+    be used with :mod:`multiprocessing`. It prevents functions from
+    raising if they fail, which prevents the multiprocessing pool
+    from hanging.
+
+    """
+
+    def __init__(self, func):
+        wraps(func)(self)
+
+    def __call__(self, mol, conformer=-1):
+        """
+        Decorates and calls the function.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The optimized molecule.
+
+        """
+
+        try:
+            logger.info(f'Optimizing {mol.name}.')
+            self.__wrapped__(mol, conformer)
+
+        except Exception:
+            errormsg = (f'Function '
+                        f'"{self.__wrapped__.func.__name__}()" '
+                        f'failed on molecule "{mol.name}".')
+            logger.error(errormsg, exc_info=True)
+
+        finally:
+            return mol
