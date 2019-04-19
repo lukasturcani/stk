@@ -9,7 +9,7 @@ import seaborn as sns
 import numpy as np
 import pandas as pd
 
-from . import fitness
+from . import fitness_calculators
 
 plt.switch_backend('agg')
 
@@ -135,7 +135,7 @@ def parameter_epp(pop,
 
     sns.set(style='darkgrid')
     func_name = pop.ga_tools.fitness.name
-    fitness_func = vars(fitness)[func_name]
+    fitness_func = vars(fitness_calculators)[func_name]
 
     # Exit if a function which does not have param_labels was used.
     if not hasattr(fitness_func, 'param_labels'):
