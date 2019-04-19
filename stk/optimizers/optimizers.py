@@ -100,7 +100,7 @@ def _add_skipping(optimize):
         if self.skip_optimized and mol.optimized:
             logger.info(f'Skipping {mol.name}.')
             return
-        return optimize(mol, conformer)
+        return optimize(self, mol, conformer)
 
     return inner
 
@@ -250,15 +250,20 @@ class CageOptimizerPipeline(OptimizerPipeline):
         """
 
         for optimizer in self.optimizers:
-            optimizer.optimize(mol, conformer)
-
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 windows = mol.windows(conformer)
 
             expected_windows = mol.topology.n_windows
             if windows is None or len(windows) != expected_windows:
+                logger.info(
+                    f'"{mol.name}" is collapsed, exiting early.'
+                )
                 return
+
+            cls_name = optimizer.__class__.__name__
+            logger.info(f'Using {cls_name} on "{mol.name}."')
+            optimizer.optimize(mol, conformer)
 
 
 class RaisingOptimizerError(Exception):
@@ -412,7 +417,7 @@ class RDKitForceField(Optimizer):
         self.rdkit_fn(mol.mol, confId=conformer)
 
 
-def RDKitEmbedder(Optimizer):
+class RDKitEmbedder(Optimizer):
     """
     Uses :func:`rdkit.EmbedMolecule` to find an optimized structure.
 

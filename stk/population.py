@@ -12,10 +12,7 @@ from glob import iglob
 import multiprocessing as mp
 import psutil
 
-from .molecular import Molecule
 from .utilities import dedupe
-from .optimization.optimization import (_optimize_all_serial,
-                                        _optimize_all)
 
 
 class Population:
@@ -70,12 +67,6 @@ class Population:
             placed into the :attr:`members` or :attr:`populations`
             attributes, respectively.
 
-        Raises
-        ------
-        :class:`TypeError`
-            If :class:`.Molecule` or :class:`.Population` objects are
-            not provided to the initializer.
-
         """
 
         self.populations = []
@@ -84,11 +75,8 @@ class Population:
         for arg in args:
             if isinstance(arg, Population):
                 self.populations.append(arg)
-            elif isinstance(arg, Molecule):
-                self.members.append(arg)
             else:
-                raise TypeError(('Must use Population and Molecule '
-                                 'objects for initialization.'))
+                self.members.append(arg)
 
     @classmethod
     def init_all(cls,

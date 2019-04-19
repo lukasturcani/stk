@@ -201,7 +201,6 @@ from inspect import signature as sig
 import logging
 
 from ..utilities import FunctionData, move_generated_macromodel_files
-from ..optimization.mopac import mopac_opt
 
 
 logger = logging.getLogger(__name__)
@@ -1104,7 +1103,7 @@ class Energy(metaclass=EMeta):
 
         # Now generate a new molecule
         mol2 = copy.deepcopy(self.molecule)
-        # Run the mopac optimisation
+        # Run the mopac optimization
         mopac_opt(mol2, mopac_path, vals)
         # Extract the energy by using the self.mopac method
         vals['method'] = 'NOOPT'
