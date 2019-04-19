@@ -1,38 +1,20 @@
 """
-Defines crossover operations via the :class:`Crossover` class.
+Defines crossers.
 
-.. _`adding crossover functions`:
+Crossers are objects which take a group of molecules and recombine
+them to produce offspring molecules. How crossers are used can be
+seen in the documentation of :class:`GeneticRecombination`,
+:class:`BuildingBlockLinkerExchange` and :class:`Jumble`.
 
-Extending stk: Adding crossover functions.
-------------------------------------------
+.. _`adding crossers`:
 
-If a new crossover operation is to be added to ``stk`` it should be
-added as a method in the :class:`Crossover` class defined in this
-module. The only requirement is that the function returns the offpsring
-in a :class:`.GAPopulation` instance. The function will be called with
-each parent selected by the crossover selection function in a
-separate argument. For example if you wish to define a function
-which carries out crossover across two parents
+Extending stk: Adding crossers.
+-------------------------------
 
-.. code-block:: python
-
-    def crossover_fn_example(self, macro_mol1, macro_mol2, param1):
-        ...
-
-or with a variable number of parents
-
-.. code-block:: python
-
-    def crossover_fn_example2(self, *macro_mol, param2):
-        ...
-
-and of course any where in between is valid too. Just make sure that
-the crossover selection function selects the number of parents that the
-crossover function expects to receive when running the GA.
-
-If the crossover function does not fit neatly into a single function
-make sure that any helper functions are private, i.e. that their names
-start with a leading underscore.
+Crossers are simple classes which inherit :class:`Crosser` and
+define a method called :meth:`~Crosser.crossover`. The method
+can take any number of molecules and returns a :class:`list`
+of offspring molecules.
 
 """
 
@@ -49,7 +31,7 @@ from ..utilities import dedupe
 logger = logging.getLogger(__name__)
 
 
-class Crossover:
+class Crosser:
     """
     Carries out crossover operations on the population.
 
@@ -98,36 +80,6 @@ class Crossover:
         probability of selection.
 
     """
-
-    def __init__(self, funcs, num_crossovers, weights=None):
-        """
-        Intializes a :class:`Crossover` object.
-
-        Parameters
-        ----------
-        funcs : :class:`list` of :class:`.FunctionData`
-            This lists holds all the crossover functions which are to
-            be used. One will be chosen at random when a crossover
-            operation is to be performed. The likelihood that each is
-            selected is given by :attr:`weights`.
-
-        num_crossovers : :class:`int`
-            The number of crossover operations performed each time
-            :meth:`.GAPopulation.gen_offspring` is called.
-
-        weights : :class:`list` of :class:`float`, optional
-            Each float corresponds to the probability of selecting the
-            crossover function in :attr:`funcs` at the corresponding
-            index. This means entries in this list must sum to 1 and
-            the number of entries must be the same as in :attr:`funcs`.
-            Defaults to ``None``, which means all crossover functions
-            have an equal probability of selection.
-
-        """
-
-        self.funcs = funcs
-        self.weights = weights
-        self.num_crossovers = num_crossovers
 
     def __call__(self, population, counter_path=''):
         """

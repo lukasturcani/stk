@@ -62,6 +62,111 @@ class Mutator:
         raise NotImplementedError()
 
 
+class RandomMutation(Mutator):
+    """
+    Uses a random :class:`Mutator` to carry out mutations.
+
+    Attributes
+    ----------
+    mutators : :class:`tuple` of :class:`Mutator`
+        :class:`Mutator`s which are used to carry out the mutations.
+
+    weights : :class:`list` of :class:`float`
+        The probability that each :class:`Mutator` will be selected
+        to carry out a mutation.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        # Create a molecule which is to be mutated.
+        bb1 = StructUnit2.smiles_init('NCCN', ['amine'])
+        bb2 = StructUnit3.smiles_init('O=CCC(=O)CC=O', ['aldehyde'])
+        cage = Cage([bb1, bb2], FourPlusSix())
+
+
+        # Create the first mutator.
+        topologies = [
+            TwoPlusThree(),
+            EightPlusTwelve(),
+            Dodecahedron()
+        ]
+        random_topology = RandomTopology(topologies)
+
+        # Create the second and third mutator.
+        building_blocks = [
+            StructUnit2.smiles_init('NC[Si]CCN', ['amine']),
+            StructUnit2.smiles_init('NCCCCCCCN', ['amine']),
+            StructUnit2.smiles_init('NC1CCCCC1N', ['amine'])
+        ]
+
+        random_bb = RandomBuildingBlock(
+            building_blocks=building_blocks,
+            key=lambda mol: mol.func_group_infos[0].name == 'amine'
+        )
+
+        similar_bb = SimilarBuildingBlock(
+            building_blocks=building_blocks,
+            key=lambda mol: mol.func_group_infos[0].name == 'amine'
+        )
+
+        # Create the mutator used to carry out the mutations.
+        random_mutator = RandomMutation(random_topology,
+                                        random_bb,
+                                        similar_bb)
+
+        # Mutate a molecule, one of random_topology,
+        # random_bb or similar_bb will be used.
+        mutant1 = random_mutator.mutate(cage)
+
+        # Mutate the molecule a second time, one of random_topology,
+        # random_bb or similar_bb will be used.
+        mutant2 = random_mutator.mutate(cage)
+
+        # Mutate a mutant, one of random_topology,
+        # random_bb or similar_bb will be used.
+        mutant3 = random_mutator.mutate(mutant1)
+
+    """
+
+    def __init__(self, *mutators, weights=None):
+        """
+        Initializes a :class:`RandomMutation` instance.
+
+        Parameters
+        ----------
+        *mutators : :class:`Mutator`
+            :class:`Mutator`s which are used to carry out the mutations.
+
+        weights : :class:`list` of :class:`float`, optional
+            The probability that each :class:`Mutator` will be selected
+            to carry out a mutation.
+
+        """
+
+        self.mutators = mutators
+        self.weights = weights
+
+    def mutate(self, mol):
+        """
+        Create a mutant by using a mutator in :attr:`mutators`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule which is to be mutated.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The produced mutant.
+
+        """
+
+        mutator = np.random.choice(self.mutators, p=self.weights)
+        return mutator.mutate(mol)
+
+
 class RandomBuildingBlock(Mutator):
     """
     Substitutes random building blocks.
