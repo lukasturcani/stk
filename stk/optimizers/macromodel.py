@@ -301,7 +301,7 @@ class _MacroModel(Optimizer):
             if time.time() - start > 600:
                 break
 
-    def license_found(output, mol=None):
+    def license_found(self, output, mol=None):
         """
         Checks to see if minimization failed due to a missing license.
 
@@ -348,6 +348,7 @@ class _MacroModel(Optimizer):
 
         return True
 
+    @staticmethod
     def com_line(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
         return (f' {arg1:<5}{arg2:>7}{arg3:>7}'
                 f'{arg4:>7}{arg5:>7}{arg6:>11.4f}'
