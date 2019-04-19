@@ -233,6 +233,11 @@ class _MacroModel(Optimizer):
                         'bmin failed due to poor Lewis structure.'
                 )
 
+            if 'MDYN error encountered' in log_content:
+                raise MacroModelOptimizationError(
+                    'MD error during optimization.'
+                )
+
             # If optimization fails because a wrong Schrodinger path
             # was given, raise.
             if 'The system cannot find the path specified' in output:
@@ -898,7 +903,7 @@ class MacroModelMD(_MacroModel):
                  restricted='both',
                  temperature=300,
                  conformers=50,
-                 time_step=1.0,
+                 time_step=0.5,
                  eq_time=10,
                  simulation_time=200,
                  maximum_iterations=2500,

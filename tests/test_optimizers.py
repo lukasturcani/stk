@@ -19,32 +19,32 @@ def test_raising_optimizer(tmp_polymer):
 
     never_raiser = stk.RaisingOptimizer(fn=etkdg.optimize,
                                         fail_chance=0)
-    tmp_polymer.write(join(odir, 'before_raising_optimizer.mol'))
+    tmp_polymer.write(join(odir, 'raising_optimizer_before.mol'))
     never_raiser.optimize(tmp_polymer)
-    tmp_polymer.write(join(odir, 'after_raising_optimizer.mol'))
+    tmp_polymer.write(join(odir, 'raising_optimizer_after.mol'))
 
 
 def test_rdkit_force_field(tmp_polymer):
-    tmp_polymer.write(join(odir, 'before_rdkit_force_field.mol'))
+    tmp_polymer.write(join(odir, 'rdkit_force_field_before.mol'))
     mmff = stk.RDKitForceField(rdkit.MMFFOptimizeMolecule)
     mmff.optimize(tmp_polymer)
-    tmp_polymer.write(join(odir, 'after_rdkit_force_field.mol'))
+    tmp_polymer.write(join(odir, 'rdkit_force_field_after.mol'))
 
 
 def test_rdkit_embedder(tmp_polymer):
-    tmp_polymer.write(join(odir, 'before_rdkit_embed.mol'))
+    tmp_polymer.write(join(odir, 'rdkit_embed_before.mol'))
     etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
     etkdg.optimize(tmp_polymer)
-    tmp_polymer.write(join(odir, 'after_rdkit_embed.mol'))
+    tmp_polymer.write(join(odir, 'rdkit_embed_after.mol'))
 
 
 def test_optimizer_pipeline(tmp_polymer):
-    tmp_polymer.write(join(odir, 'before_pipeline.mol'))
+    tmp_polymer.write(join(odir, 'pipeline_before.mol'))
     etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
     mmff = stk.RDKitForceField(rdkit.MMFFOptimizeMolecule)
     pipeline = stk.OptimizerPipeline(etkdg, mmff)
     pipeline.optimize(tmp_polymer)
-    tmp_polymer.write(join(odir, 'after_pipeline.mol'))
+    tmp_polymer.write(join(odir, 'pipeline_after.mol'))
 
 
 def test_optimizer_skipping(tmp_polymer):
