@@ -56,8 +56,9 @@ def test_optimizer_skipping(tmp_polymer):
     skipper.optimize(tmp_polymer)
 
 
-def test_cage_pipeline(tmp_cc3):
+def test_cage_pipeline(tmp_cc3, tmp_cage):
     mmff = stk.RDKitForceField(rdkit.MMFFOptimizeMolecule)
     etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
-    pipeline = stk.CageOptimizerPipeline(mmff, etkdg)
+    pipeline = stk.CageOptimizerPipeline(etkdg, mmff)
+    pipeline.optimize(tmp_cage)
     pipeline.optimize(tmp_cc3)

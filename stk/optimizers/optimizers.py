@@ -76,6 +76,35 @@ import warnings
 logger = logging.getLogger(__name__)
 
 
+def _add_optimized_toggle(optimize):
+    """
+    Adds toggling of :attr:`.Molecule.optimized`
+
+    Decorates `optimize` so that after running the attribute
+    :attr:`.Molecule.optimized` is set to ``True``
+
+    Parameters
+    ----------
+    optimize : :class:`function`
+        A function which is to have :attr:`.Molecule.optimized`
+        toggling added to it.
+
+    Returns
+    -------
+    :class:`function`
+        The decorated function.
+
+    """
+
+    @wraps(optimize)
+    def inner(self, mol, conformer=-1):
+        r = optimize(self, mol, conformer)
+        mol.optimized = True
+        return r
+
+    return inner
+
+
 def _add_skipping(optimize):
     """
     Adds skipping to `optimize`.
@@ -92,13 +121,14 @@ def _add_skipping(optimize):
     Returns
     -------
     :class:`function`
+        The decorated function.
 
     """
 
     @wraps(optimize)
     def inner(self, mol, conformer=-1):
         if self.skip_optimized and mol.optimized:
-            logger.info(f'Skipping {mol.name}.')
+            logger.info(f'Skipping "{mol.name}".')
             return
         return optimize(self, mol, conformer)
 
@@ -133,6 +163,7 @@ class Optimizer:
 
     def __init_subclass__(cls, **kwargs):
         cls.optimize = _add_skipping(cls.optimize)
+        cls.optimize = _add_optimized_toggle(cls.optimize)
         return super().__init_subclass__(**kwargs)
 
     def optimize(self, mol, conformer=-1):
@@ -215,7 +246,7 @@ class OptimizerPipeline(Optimizer):
 
         for optimizer in self.optimizers:
             cls_name = optimizer.__class__.__name__
-            logger.info(f'Using {cls_name} on "{mol.name}."')
+            logger.info(f'Using {cls_name} on "{mol.name}".')
             optimizer.optimize(mol, conformer)
 
 
@@ -254,6 +285,7 @@ class CageOptimizerPipeline(OptimizerPipeline):
                 warnings.simplefilter("ignore")
                 windows = mol.windows(conformer)
 
+            logger.debug(f'Windows found: {windows}.')
             expected_windows = mol.topology.n_windows
             if windows is None or len(windows) != expected_windows:
                 logger.info(
@@ -262,7 +294,7 @@ class CageOptimizerPipeline(OptimizerPipeline):
                 return
 
             cls_name = optimizer.__class__.__name__
-            logger.info(f'Using {cls_name} on "{mol.name}."')
+            logger.info(f'Using {cls_name} on "{mol.name}".')
             optimizer.optimize(mol, conformer)
 
 
