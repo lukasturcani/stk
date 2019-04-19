@@ -903,7 +903,7 @@ class MacroModelMD(_MacroModel):
                  restricted='both',
                  temperature=300,
                  conformers=50,
-                 time_step=0.5,
+                 time_step=0.1,
                  eq_time=10,
                  simulation_time=200,
                  maximum_iterations=2500,
