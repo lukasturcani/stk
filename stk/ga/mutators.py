@@ -1,25 +1,22 @@
 """
-Defines mutation operations via the :class:`Mutation` class.
+Defines mutators.
 
-.. _`adding mutation functions`:
+Mutators are objects which mutate molecules. They inherit
+:class:`Mutator` and define a method :meth:`~Mutator.mutate`. This
+method must take a single molecule and return a mutant.
 
-Extending stk: Adding mutation functions.
------------------------------------------
+Examples of how mutators are work can be seen the documentation of
+:class:`RandomBuildingBlock`, :class:`SimilarBuildingBlock`,
+:class:`RandomTopology`.
 
-If a new mutation operation is to be added to ``stk`` it should be
-added as a method in the :class:`Mutation` class defined in this
-module. The only requirement is that the first argument is `macro_mol`,
-excluding any `self` or `cls` arguments.
+.. _`adding mutators functions`:
 
-The naming requirement of `macro_mol` exists to help users identify
-which arguments are handled automatically by ``stk`` and which they
-need to define in the input file. The convention is that if the
-mutation function takes an argument called  `macro_mol` it does not
-have to be specified in the input file.
+Extending stk: Adding mutators.
+--------------------------------
 
-If the mutation function does not fit neatly into a single function,
-make sure that any helper functions are private, i.e. that their names
-start with a leading underscore.
+Mutators must simple inherit the :class:`Mutator` class and define a
+method called :meth:`~Mutatator.mutate`, which take a single molecule
+and returns a mutant molecule. There are no requirements besides this.
 
 """
 
@@ -160,7 +157,7 @@ class RandomBuildingBlock(Mutator):
         Parameters
         ----------
         macro_mol : :class:`.MacroMolecule`
-            The molecules which is to have its building block
+            The molecule which is to have its building block
             substituted.
 
         Returns
@@ -225,6 +222,11 @@ class SimilarBuildingBlock(Mutator):
         Indicates whether the building blocks used to construct the
         mutant must all be unique.
 
+    _similar_bbs : :class:`dict`
+        Maps a :class:`.MacroMolecule` to :class:`iterator`s which
+        yield the most similar molecules in :attr:`building_blocks`,
+        in order.
+
     Examples
     --------
     .. code-block:: python
@@ -287,6 +289,7 @@ class SimilarBuildingBlock(Mutator):
         self.building_blocks = building_blocks
         self.key = key
         self.duplicate_building_blocks = duplicate_building_blocks
+        self._similar_bbs = {}
         super().__init__()
 
     def mutate(self, mol):
@@ -296,7 +299,7 @@ class SimilarBuildingBlock(Mutator):
         Parameters
         ----------
         macro_mol : :class:`.MacroMolecule`
-            The molecules which is to have its building block
+            The molecule which is to have its building block
             substituted.
 
         Returns
@@ -306,11 +309,6 @@ class SimilarBuildingBlock(Mutator):
 
         """
 
-        if not hasattr(self, '_similar_bb'):
-            # This will map every macro_mol to a set of iterators which
-            # yield the most similar building blocks. 1 iterator for
-            # each previously chosen building block.
-            self._similar_bb = {}
         if mol not in self._similar_bb:
             # Maps the macro_mol to a dict. The dict maps each
             # building block of the macro mol to an iterator.
@@ -322,7 +320,7 @@ class SimilarBuildingBlock(Mutator):
         valid_bbs = [bb for bb in mol.building_blocks if self.key(bb)]
         chosen_bb = np.random.choice(valid_bbs)
 
-        # Create a mapping from rdkit molecules to the StructUnits.
+        # Create a mapping from inchis to the StructUnits.
         mol_map = {
             struct_unit.inchi: struct_unit
             for struct_unit in self.building_blocks
@@ -333,15 +331,17 @@ class SimilarBuildingBlock(Mutator):
         if chosen_bb not in self._similar_bb[mol]:
             rdkit_mols = (m.mol for m in self.building_blocks)
             self._similar_bb[mol][chosen_bb] = iter(
-                      chosen_bb.similar_molecules(rdkit_mols))
+                      chosen_bb.similar_molecules(rdkit_mols)
+            )
 
         try:
-            sim_mol = next(self._similar_bb[mol][chosen_bb])[-1]
+            _, sim_mol = next(self._similar_bb[mol][chosen_bb])
         except StopIteration:
             rdkit_mols = (m.mol for m in self.building_blocks)
             self._similar_bb[mol][chosen_bb] = iter(
-                      chosen_bb.similar_molecules(rdkit_mols))
-            sim_mol = next(self._similar_bb[mol][chosen_bb])[-1]
+                chosen_bb.similar_molecules(rdkit_mols)
+            )
+            _, sim_mol = next(self._similar_bb[mol][chosen_bb])
 
         sim_mol_inchi = rdkit.MolToInchi(sim_mol)
         sim_struct_unit = mol_map[sim_mol_inchi]
@@ -349,51 +349,64 @@ class SimilarBuildingBlock(Mutator):
         # If the most similar molecule in `mols` is itself, then take
         # the next most similar one.
         if sim_struct_unit is chosen_bb:
-            sim_mol = next(self._similar_bb[mol][chosen_bb])[-1]
+            _, sim_mol = next(self._similar_bb[mol][chosen_bb])
             sim_mol_inchi = rdkit.MolToInchi(sim_mol)
             sim_struct_unit = mol_map[sim_mol_inchi]
 
         # Build the new MacroMolecule.
-        new_bbs = [bb for bb in mol.building_blocks if
-                   bb is not chosen_bb]
+        new_bbs = [
+            bb for bb in mol.building_blocks if bb is not chosen_bb
+        ]
         new_bbs.append(sim_struct_unit)
         return mol.__class__(new_bbs, mol.topology)
 
 
 class RandomTopology(Mutator):
     """
+    Changes topologies at random.
 
-        Changes `macro_mol` topology to a random one from `topologies`.
+    Parameters
+    ----------
+    topologies : :class:`list` of :class:`.Topology`
+        This lists holds the topology instances from which one is
+        selected at random to form a mutant.
 
-        A new instance of the same type as `macro_mol` is created. I.e.
-        if `macro_mol` was a :class:`.Polymer` instance then a
-        :class:`.Polymer` instance will be returned.
+    Examples
+    --------
+    ..code-block:: python
 
-        Parameters
-        ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule which is to be mutated.
+        # Create a molecule which is to be mutated.
+        bb1 = StructUnit2.smiles_init('NCCN', ['amine'])
+        bb2 = StructUnit3.smiles_init('O=CCC(=O)CC=O', ['aldehyde'])
+        cage = Cage([bb1, bb2], FourPlusSix())
 
-        topologies : :class:`list` of :class:`.Topology`
-            This lists holds the topology instances from which one is
-            selected at random to form a new molecule.
+        # Create topologies used for substition.
+        topologies = [
+            TwoPlusThree(),
+            EightPlusTwelve(),
+            Dodecahedron()
+        ]
+
+        # Create the mutator.
+        random_topology = RandomTopology(topologies)
+
+        # Mutate a molecule.
+        mutant1 = random_topology.mutate(cage)
+
+        # Mutate the molecule a second time.
+        mutant2 = random_topology.mutate(cage)
+
+        # Mutate a mutant.
+        mutant3 = random_topology.mutate(mutant1)
 
     """
 
     def __init__(self, topologies):
         """
-
-        Changes `macro_mol` topology to a random one from `topologies`.
-
-        A new instance of the same type as `macro_mol` is created. I.e.
-        if `macro_mol` was a :class:`.Polymer` instance then a
-        :class:`.Polymer` instance will be returned.
+        Initializes a :class:`RandomTopology` instance.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule which is to be mutated.
-
         topologies : :class:`list` of :class:`.Topology`
             This lists holds the topology instances from which one is
             selected at random to form a new molecule.
@@ -405,18 +418,22 @@ class RandomTopology(Mutator):
 
     def mutate(self, mol):
         """
+        Substitute a random topology.
 
+        Parameters
+        ----------
+        mol : :class:`.MacroMolecule`
+            The molecule which is to have its topology substituted.
 
         Returns
         -------
         :class:`.MacroMolecule`
-            A molecule generated by initializing a new instance
-            with all the same parameters as `macro_mol` except for the
-            topology.
+            The produced mutant.
 
         """
 
-        tops = [x for x in topologies if
-                repr(x) != repr(macro_mol.topology)]
+        tops = [
+            x for x in self.topologies if repr(x) != repr(mol.topology)
+        ]
         topology = np.random.choice(tops)
-        return macro_mol.__class__(macro_mol.building_blocks, topology)
+        return mol.__class__(mol.building_blocks, topology)
