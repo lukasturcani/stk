@@ -223,7 +223,89 @@ class GAPopulation(Population):
 
         """
         counter_name='crossover_counter.png'
-        return
+        """
+        Carries out crossover operations on `population`.
+
+        This function selects members of `population` and crosses
+        them until either all possible parents have been crossed or the
+        required number of successful crossover operations has been
+        performed.
+
+        The offspring generated are returned together in a
+        :class:`.GAPopulation` instance. Any molecules that are created
+        via crossover and match a molecule present in the original
+        population are removed.
+
+        Parameters
+        ----------
+        population : :class:`.GAPopulation`
+            The population instance who's members are to be crossed.
+
+        counter_path : :class:`str`, optional
+            The name of the ``.png`` file showing which members were
+            selected for crossover. If ``''``, then no file is made.
+
+        Returns
+        -------
+        :class:`.GAPopulation`
+            A population with all the offspring generated held in its
+            :attr:`~.Population.members` attribute. This does not
+            include offspring which correspond to molecules already
+            present in `population`.
+
+        """
+
+        offspring_pop = GAPopulation(ga_tools=population.ga_tools)
+        counter = Counter()
+
+        parent_pool = islice(population.select('crossover'),
+                             self.num_crossovers)
+        for i, parents in enumerate(parent_pool, 1):
+            logger.info('Crossover number {}. Finish when {}.'.format(
+                                           i, self.num_crossovers))
+            counter.update(parents)
+            # Get the crossover function.
+            func_data = np.random.choice(self.funcs, p=self.weights)
+            func = getattr(self, func_data.name)
+            logger.info(f'Using {func.__name__}.')
+
+            try:
+                # Apply the crossover function and supply any
+                # additional arguments to it.
+                offspring = func(*parents, **func_data.params)
+
+                # Print the names of offspring which have been returned
+                # from the cache.
+                for o in offspring:
+                    if o.name:
+                        logger.debug(('Offspring "{}" retrieved '
+                                      'from cache.').format(o.name))
+
+                # Add the new offspring to the offspring population.
+                offspring_pop.add_members(offspring)
+
+            except Exception:
+                errormsg = ('Crossover function "{}()" failed on '
+                            'molecules PARENTS.').format(
+                            func_data.name)
+
+                pnames = ' and '.join('"{}"'.format(p.name) for
+                                      p in parents)
+                errormsg = errormsg.replace('PARENTS', pnames)
+                logger.error(errormsg, exc_info=True)
+
+        # Make sure that only original molecules are left in the
+        # offspring population.
+        offspring_pop -= population
+
+        if counter_path:
+            # Update counter with unselected members and plot counter.
+            for member in population:
+                if member not in counter.keys():
+                    counter.update({member: 0})
+            plot_counter(counter, counter_path)
+
+        return offspring_pop
 
     def normalize_fitness_values(self):
         """

@@ -6,8 +6,9 @@ Mutators are objects which mutate molecules. They inherit
 method must take a single molecule and return a mutant.
 
 Examples of how mutators are work can be seen the documentation of
-:class:`RandomBuildingBlock`, :class:`SimilarBuildingBlock`,
-:class:`RandomTopology`.
+the various :class:`Mutator` classes, for example
+:class:`RandomBuildingBlock`, :class:`SimilarBuildingBlock`
+or :class:`RandomMutation`.
 
 .. _`adding mutators functions`:
 
@@ -149,7 +150,7 @@ class RandomMutation(Mutator):
 
     def mutate(self, mol):
         """
-        Create a mutant by using a mutator in :attr:`mutators`.
+        Create a mutant with a :class:`Mutator` in :attr:`mutators`.
 
         Parameters
         ----------
