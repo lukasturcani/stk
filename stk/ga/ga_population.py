@@ -9,9 +9,7 @@ carrying out GA operations.
 from collections import Counter
 import psutil
 
-from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
-from .ga_tools import GATools
 from ..population import Population
 
 
@@ -37,130 +35,27 @@ class GAPopulation(Population):
     instances. The :meth:`gen_offspring` and :meth:`gen_mutants`
     methods can serve as a guide to how this should be done.
 
-    Attributes
-    ----------
-    ga_tools : :class:`.GATools`
-        An instance of the :class:`.GATools` class. It stores
-        instances of classes such as :class:`.Selection`,
-        :class:`.Mutation` and :class:`.Crossover`, which carry out GA
-        operations on the population.
-
     """
 
-    def __init__(self, *args, ga_tools=GATools.init_empty()):
+    def set_ga_tools(self,
+                     generation_selector,
+                     mutation_selector,
+                     crossover_selector,
+                     mutator,
+                     crosser,
+                     fitness_calculator,
+                     fitness_normalizer):
         """
-        Intializes a population.
-
-        Parameters
-        ----------
-        *args : :class:`.Molecule`, :class:`Population`
-            A population is initialized with the :class:`.Molecule` and
-            :class:`Population` instances it should hold. These are
-            placed into the :attr:`members` or :attr:`populations`
-            attributes, respectively.
-
-        ga_tools : :class:`.GATools`, optional
-            The :class:`.GATools` object holding the GA settings via
-            the other GA related classes.
 
         """
 
-        super().__init__(*args)
-        self.ga_tools = ga_tools
-
-    @classmethod
-    def init_all(cls,
-                 macromol_class,
-                 building_blocks,
-                 topologies,
-                 processes=None,
-                 duplicates=False,
-                 ga_tools=GATools.init_empty()):
-        """
-        See :meth:`.Population.init_all`.
-
-        Parameters
-        ----------
-        ga_tools : :class:`.GATools`, optional
-            The :class:`.GATools` instance to use.
-
-        """
-
-        p = super().init_all(macromol_class,
-                             building_blocks,
-                             topologies,
-                             processes,
-                             duplicates)
-        p.ga_tools = ga_tools
-        return p
-
-    @classmethod
-    def init_diverse(cls,
-                     macromol_class,
-                     building_blocks,
-                     topologies,
-                     size,
-                     ga_tools=GATools.init_empty()):
-        """
-        See :meth:`.Population.init_diverse`.
-
-        Parameters
-        ----------
-        ga_tools : :class:`.GATools`, optional
-            The :class:`.GATools` instance to use.
-
-        """
-
-        p = super().init_diverse(macromol_class,
-                                 building_blocks,
-                                 topologies,
-                                 size)
-        p.ga_tools = ga_tools
-        return p
-
-    @classmethod
-    def init_from_files(cls,
-                        folder,
-                        moltype,
-                        glob_pattern='*',
-                        ga_tools=GATools.init_empty()):
-        """
-        See :meth:`.Population.init_from_files`.
-
-        Parameters
-        ----------
-        ga_tools : :class:`.GATools`, optional
-            The :class:`.GATools` instance to use.
-
-        """
-
-        p = super().init_from_files(folder, moltype, glob_pattern)
-        p.ga_tools = ga_tools
-        return p
-
-    @classmethod
-    def init_random(cls,
-                    macromol_class,
-                    building_blocks,
-                    topologies,
-                    size,
-                    ga_tools):
-        """
-        See :meth:`.Population.init_random`
-
-        Parameters
-        ----------
-        ga_tools : :class:`.GATools`, optional
-            The :class:`.GATools` instance to use.
-
-        """
-
-        p = super().init_random(macromol_class,
-                                building_blocks,
-                                topologies,
-                                size)
-        p.ga_tools = ga_tools
-        return p
+        self.generation_selector = generation_selector
+        self.mutation_selector = mutation_selector
+        self.crossover_selector = crossover_selector
+        self.mutator = mutator
+        self.crosser = crosser
+        self.fitness_calculator = fitness_calculator
+        self.fitness_normalizer = fitness_normalizer
 
     def calculate_member_fitness(self, processes=psutil.cpu_count()):
         """
@@ -199,26 +94,7 @@ class GAPopulation(Population):
         else:
             _calc_fitness(self.ga_tools.fitness, self, processes)
 
-    def exit(self, progress):
-        """
-        Checks the if the EA exit criterion has been satisfied.
-
-        Parameters
-        ----------
-        progress : :class:`GAPopulation`
-            population where each subpopulation is a previous generation.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if the exit criterion is satisfied, else
-            ``False``.
-
-        """
-
-        return self.ga_tools.exit(self, progress)
-
-    def gen_mutants(self, counter_name='mutation_counter.png'):
+    def gen_mutants(self):
         """
         Returns a :class:`GAPopulation` of mutants.
 
@@ -245,52 +121,80 @@ class GAPopulation(Population):
             :class:`.MacroMolecule` instances held by the population.
 
         """
-
-        return self.ga_tools.mutation(self, counter_name)
-
-    def gen_next_gen(self, pop_size, counter_path=''):
         """
-        Returns a population holding the next generation of structures.
+        Carries out mutation operations on `population`.
 
-        The selection function to be used for selecting the next
-        generation of molecules is defined in the :class:`.Selection`
-        instance held by the population via its :attr:`ga_tools`
-        attribute.
+        This function selects members of `population` to be mutated
+        and mutates them. This goes on until either all possible
+        molecules have been mutated or the required number of
+        mutation operations have been performed.
+
+        The mutants generated are returned together in a
+        :class:`.GAPopulation` object. Any mutants already present in
+        `population` are removed.
 
         Parameters
         ----------
-        pop_size : :class:`int`
-            The size of the next generation.
+        population : :class:`.GAPopulation`
+            The population who's members are to be mutated.
 
         counter_path : :class:`str`, optional
-            The name of the ``.png`` file holding a graph showing which
-            members were selected for the next generation. If ``''``
-            then no file is made.
+            The path to the ``.png`` file showing which members were
+            selected for mutation. If ``''`` then no file is made.
 
         Returns
         -------
-        :class:`GAPopulation`
-            A population holding the next generation of molecules.
+        :class:`.GAPopulation`
+            A population with all the mutants generated held in
+            :attr:`~.Population.members`. This does not include mutants
+            which correspond to molecules already present in
+            `population`.
 
         """
 
-        new_gen = GAPopulation(ga_tools=self.ga_tools)
+        counter_name='mutation_counter.png'
+        mutant_pop = GAPopulation(ga_tools=population.ga_tools)
         counter = Counter()
-        for member in self.select('generational'):
-            counter.update([member])
-            new_gen.members.append(member)
-            if len(new_gen) == pop_size:
-                break
+
+        parent_pool = islice(population.select('mutation'),
+                             self.num_mutations)
+        for i, parent in enumerate(parent_pool, 1):
+            logger.info('Mutation number {}. Finish when {}.'.format(
+                                          i, self.num_mutations))
+            counter.update([parent])
+            func_data = np.random.choice(self.funcs, p=self.weights)
+            func = getattr(self, func_data.name)
+            logger.info(f'Using {func.__name__}.')
+
+            try:
+                mutant = func(parent, **func_data.params)
+
+                # If the mutant was retrieved from the cache, log the
+                # name.
+                if mutant.name:
+                    logger.debug(('Mutant "{}" retrieved from '
+                                  'cache.').format(mutant.name))
+
+                mutant_pop.members.append(mutant)
+
+            except Exception as ex:
+                errormsg = ('Mutation function "{}()" '
+                            'failed on molecule "{}".').format(
+                             func_data.name, parent.name)
+                logger.error(errormsg, exc_info=True)
+
+        mutant_pop -= population
 
         if counter_path:
-            for member in self:
+            # Update counter with unselected members.
+            for member in population:
                 if member not in counter.keys():
                     counter.update({member: 0})
             plot_counter(counter, counter_path)
 
-        return new_gen
+        return mutant_pop
 
-    def gen_offspring(self, counter_name='crossover_counter.png'):
+    def gen_offspring(self):
         """
         Returns a :class:`GAPopulation` of offspring molecules.
 
@@ -318,8 +222,8 @@ class GAPopulation(Population):
             population.
 
         """
-
-        return self.ga_tools.crossover(self, counter_name)
+        counter_name='crossover_counter.png'
+        return
 
     def normalize_fitness_values(self):
         """
@@ -344,50 +248,4 @@ class GAPopulation(Population):
 
         """
 
-        return self.ga_tools.normalization(self)
-
-    def select(self, type='generational'):
-        """
-        Returns a generator for yielding members of the population.
-
-        Members are yielded based on the selection function defined in
-        the :class:`.Selection` instance held by the population via the
-        :attr:`ga_tools` attribute. The instance defines 3 selection
-        functions, 1 for each `type`.
-
-        Parameters
-        ----------
-        type : :class:`str`, optional
-            A string specifying the type of selection to be performed.
-            Valid values will correspond to names of attributes of the
-            :class:`.Selection` class.
-
-            Valid values are:
-
-                * ``'generational'`` - selects the next generation
-                * ``'crossover'`` - selects molecules for crossover
-                * ``'mutation'`` - selects molecules for mutation
-
-        Returns
-        -------
-        :class:`generator`
-           A generator which yields molecules or tuples of them.
-
-        """
-
-        return self.ga_tools.selection(self, type)
-
-    def __getitem__(self, key):
-        p = super().__getitem__(key)
-        p.ga_tools = self.ga_tools
-        return p
-
-    def __sub__(self, other):
-        p = super().__sub__(other)
-        p.ga_tools = self.ga_tools
-        return p
-
-    def __add__(self, other):
-        p = super().__add__(other)
-        p.ga_tools = self.ga_tools
-        return p
+        return
