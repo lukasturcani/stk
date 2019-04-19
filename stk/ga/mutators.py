@@ -48,6 +48,17 @@ class Mutator:
 
     def mutate(self, mol):
         """
+        Mutates a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be mutated.
+
+        Returns
+        -------
+        mol : :class:`.Molecule`
+            The mutant molecule.
 
         """
 
@@ -80,28 +91,34 @@ class RandomBuildingBlock(Mutator):
 
     Examples
     --------
-    >>> # Create a molecule which is to be mutated.
-    >>> bb1 = StructUnit2.smiles_init('NCCN', ['amine'])
-    >>> bb2 = StructUnit2.smiles_init('O=CCC=O', ['aldehyde'])
-    >>> polymer = Polymer([bb1, bb2], Linear('AB', [0, 0], n=3))
+    .. code-block:: python
 
-    >>> # Create molecules used to substitute building blocks.
-    >>> mols = [
+        # Create a molecule which is to be mutated.
+        bb1 = StructUnit2.smiles_init('NCCN', ['amine'])
+        bb2 = StructUnit2.smiles_init('O=CCC=O', ['aldehyde'])
+        polymer = Polymer([bb1, bb2], Linear('AB', [0, 0], n=3))
+
+        # Create molecules used to substitute building blocks.
+        building_blocks = [
             StructUnit2.smiles_init('NC[Si]CCN', ['amine']),
             StructUnit2.smiles_init('NCCCCCCCN', ['amine']),
             StructUnit2.smiles_init('NC1CCCCC1N', ['amine'])
         ]
-    >>> # Create the mutator.
-    >>> random_bb = RandomBuildingBlock(
-               mols=mols,
-               key=lambda mol: mol.func_group_infos[0].name == 'amine'
+
+        # Create the mutator.
+        random_bb = RandomBuildingBlock(
+            building_blocks=building_blocks,
+            key=lambda mol: mol.func_group_infos[0].name == 'amine'
         )
-    >>> # Mutate a molecule.
-    >>> mutant1 = random_bb.mutate(polymer)
-    >>> # Mutate the molecule a second time.
-    >>> mutant2 = random_bb.mutate(polymer)
-    >>> # Mutate a mutant.
-    >>> mutant3 = random_bb.mutate(mutant1)
+
+        # Mutate a molecule.
+        mutant1 = random_bb.mutate(polymer)
+
+        # Mutate the molecule a second time.
+        mutant2 = random_bb.mutate(polymer)
+
+        # Mutate a mutant.
+        mutant3 = random_bb.mutate(mutant1)
 
     """
 
@@ -115,17 +132,17 @@ class RandomBuildingBlock(Mutator):
         Parameters
         ----------
         building_blocks : :class:`list` of :class:`.StructUnit`
-            A group of molecules which are used to replace building blocks
-            in molecules being mutated.
+            A group of molecules which are used to replace building
+            blocks in molecules being mutated.
 
         key : :class:`function`
             A function which takes a :class:`.StructUnit` and returns
             ``True`` or ``False``. This function is applied to every
-            building block of the molecule being mutated. Building blocks
-            which returned ``True`` are liable for substition by one of the
-            molecules in :attr:`building_blocks`.
+            building block of the molecule being mutated. Building
+            blocks which returned ``True`` are liable for substition by
+            one of the molecules in :attr:`building_blocks`.
 
-        duplicate_building_blocks : :class:`bool`
+        duplicate_building_blocks : :class:`bool`, optional
             Indicates whether the building blocks used to construct the
             mutant must all be unique.
 
@@ -210,28 +227,34 @@ class SimilarBuildingBlock(Mutator):
 
     Examples
     --------
-    >>> # Create a molecule which is to be mutated.
-    >>> bb1 = StructUnit2.smiles_init('NCCN', ['amine'])
-    >>> bb2 = StructUnit2.smiles_init('O=CCC=O', ['aldehyde'])
-    >>> polymer = Polymer([bb1, bb2], Linear('AB', [0, 0], n=3))
+    .. code-block:: python
 
-    >>> # Create molecules used to substitute building blocks.
-    >>> mols = [
+        # Create a molecule which is to be mutated.
+        bb1 = StructUnit2.smiles_init('NCCN', ['amine'])
+        bb2 = StructUnit2.smiles_init('O=CCC=O', ['aldehyde'])
+        polymer = Polymer([bb1, bb2], Linear('AB', [0, 0], n=3))
+
+        # Create molecules used to substitute building blocks.
+        building_blocks = [
             StructUnit2.smiles_init('NC[Si]CCN', ['amine']),
             StructUnit2.smiles_init('NCCCCCCCN', ['amine']),
             StructUnit2.smiles_init('NC1CCCCC1N', ['amine'])
         ]
-    >>> # Create the mutator.
-    >>> random_bb = RandomBuildingBlock(
-               mols=mols,
-               key=lambda mol: mol.func_group_infos[0].name == 'amine'
+
+        # Create the mutator.
+        similar_bb = SimilarBuildingBlock(
+            building_blocks=building_blocks,
+            key=lambda mol: mol.func_group_infos[0].name == 'amine'
         )
-    >>> # Mutate a molecule.
-    >>> mutant1 = random_bb.mutate(polymer)
-    >>> # Mutate the molecule a second time.
-    >>> mutant2 = random_bb.mutate(polymer)
-    >>> # Mutate a mutant.
-    >>> mutant3 = random_bb.mutate(mutant1)
+
+        # Mutate a molecule.
+        mutant1 = random_bb.mutate(polymer)
+
+        # Mutate the molecule a second time.
+        mutant2 = random_bb.mutate(polymer)
+
+        # Mutate a mutant.
+        mutant3 = random_bb.mutate(mutant1)
 
     """
 
@@ -240,22 +263,22 @@ class SimilarBuildingBlock(Mutator):
                  key,
                  duplicate_building_blocks):
         """
-        Initializes a :class:`SimilarBuildingBlock` instance.
+        Initializes a :class:`RandomBuildingBlock` instance.
 
         Parameters
         ----------
         building_blocks : :class:`list` of :class:`.StructUnit`
-            A group of molecules which are used to replace building blocks
-            in molecules being mutated.
+            A group of molecules which are used to replace building
+            blocks in molecules being mutated.
 
         key : :class:`function`
             A function which takes a :class:`.StructUnit` and returns
             ``True`` or ``False``. This function is applied to every
-            building block of the molecule being mutated. Building blocks
-            which returned ``True`` are liable for substition by one of the
-            molecules in :attr:`building_blocks`.
+            building block of the molecule being mutated. Building
+            blocks which returned ``True`` are liable for substition by
+            one of the molecules in :attr:`building_blocks`.
 
-        duplicate_building_blocks : :class:`bool`
+        duplicate_building_blocks : :class:`bool`, optional
             Indicates whether the building blocks used to construct the
             mutant must all be unique.
 
