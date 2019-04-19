@@ -24,7 +24,7 @@ if not os.path.exists(outdir):
 
 
 @macromodel
-def test_macromodel_opt(tmp_cc3, macromodel_path):
+def test_force_field(tmp_cc3, macromodel_path):
     tmp_cc3.write(join(outdir, 'mm_opt_before.mol'), conformer=0)
 
     stk.macromodel_opt(
@@ -39,7 +39,7 @@ def test_macromodel_opt(tmp_cc3, macromodel_path):
 
 
 @macromodel
-def test_macromodel_cage_opt(tmp_cc3, macromodel_path):
+def test_md(tmp_cc3, macromodel_path):
     tmp_cc3.write(join(outdir, 'mm_cage_opt_before.mol'), conformer=0)
 
     stk.macromodel_cage_opt(
@@ -54,7 +54,7 @@ def test_macromodel_cage_opt(tmp_cc3, macromodel_path):
 
 
 @macromodel
-def test_macromodel_eng(amine2, macromodel_path):
+def test_energy(amine2, macromodel_path):
     a = amine2.energy.macromodel(forcefield=16,
                                  macromodel_path=macromodel_path,
                                  output_dir='energy_calc')
