@@ -894,6 +894,7 @@ class MacroModelMD(_MacroModel):
                  output_dir=None,
                  timeout=None,
                  force_field=16,
+                 restricted='both',
                  temperature=300,
                  conformers=50,
                  time_step=1.0,
@@ -912,38 +913,46 @@ class MacroModelMD(_MacroModel):
             machine. For example, on a Linux machine this may be
             something like ``'/opt/schrodinger2017-2'``.
 
-        output_dir : :class:`str`
+        output_dir : :class:`str`, optional
             The name of the directory into which files generated during
             the optimization are written, if ``None`` then
             :func:`uuid.uuid4` is used.
 
-        timeout : :class:`float`
+        timeout : :class:`float`, optional
             The amount in seconds the MD is allowed to run before
             being terminated. ``None`` means there is no timeout.
 
-        force_field : :class:`int`
+        force_field : :class:`int`, optional
             The number of the force field to be used.
 
-        temperature : :class:`float`
+        restricted : :class:`bool`, optional
+            If ``False`` then all bonds are optimized, not just the
+            ones created during macromolecular assembly. If ``True``
+            then an optimization is performed only on the bonds added
+            during molecular assembly. If ``'both'`` then a restricted
+            optimization is performed first, followed by a regular
+            optimization.
+
+        temperature : :class:`float`, optional
             The temperature in Kelvin at which the MD is run.
 
-        conformers' : :class:`int`
+        conformers' : :class:`int`, optional
             The number of conformers sampled and optimized from the MD.
 
-        time_step : :class:`float`
+        time_step : :class:`float`, optional
             The time step in ``fs`` for the MD.
 
-        eq_time : :class:`float`
+        eq_time : :class:`float`, optional
             The equilibriation time in ``ps`` before the MD is run.
 
-        simulation_time : :class:`float`
+        simulation_time : :class:`float`, optional
             The simulation time in ``ps`` of the MD.
 
-        maximum_iterations : :class:`int`
+        maximum_iterations : :class:`int`, optional
             The maximum number of iterations done during the
             optimization.
 
-        minimum_gradient : :class:`float`
+        minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
 
         skip_optimized : :class:`bool`, optional
@@ -961,6 +970,7 @@ class MacroModelMD(_MacroModel):
                          output_dir=output_dir,
                          timeout=timeout,
                          force_field=force_field,
+                         restricted=restricted,
                          maximum_iterations=maximum_iterations,
                          minimum_gradient=minimum_gradient,
                          skip_optimized=skip_optimized)
