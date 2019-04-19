@@ -1,29 +1,68 @@
 """
-Defines optimizers..
+Defines optimizers.
 
-.. _`adding optimizaters`:
+Optimizers are objects used to optimize molecules. Each optimizer is
+initialized with some settings and used to optimize a molecule
+with :meth:`Optimizer.optimize`.
+
+.. code-block:: python
+
+    import rdkit.Chem.AllChem as rdkit
+    mol = StructUnit2.smiles_init('NCCCN', ['amine'])
+    mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
+    mmff.optimize(mol)
+
+    # Optionally, a conformer can be provided.
+    mmff.optimize(mol, conformer=2)
+
+    # Optimizers also work with MacroMolecule objects.
+    polymer = Polymer([mol], Linear('A', [0], n=3))
+    etkdg = RDKitEmbedder(rdkit.ETKDG())
+    etkdg.optimize(polymer)
+
+Sometimes it is desirable to chain multiple optimizations, one after
+another. For example, before running an optimization, it may be
+desirable to embed a molecule first, to generate an initial structure.
+:class:`OptimizerPipeline` may be used for this.
+
+.. code-block:: python
+
+    # Create a new optimizer which chains the previously defined
+    # mmff and etkdg optimizers.
+    opt_pipeline = OptimizerPipeline(etkdg, mmff)
+
+    # Run each optimizer in sequence.
+    opt_pipeline.optimize(polymer)
+
+By default, running :meth:`Optimizer.optimize` twice in a row will
+perform an optimization a second time on a molecule. If we want to
+skip optimizations on molecules which have already been optimized
+we can use the :attr:`skip_optimized` flag.
+
+.. code-block:: python
+
+    skipping_etkdg = RDKitEmbedder(rdkit.ETKDG(), skip_optimized=True)
+    # This does nothing because polymer has already been optimized by
+    # the other optimizers.
+    skipping_etkdg.optimize(polymer)
+
+When :attr:`skip_optimized` is set to ``True`` the optimizer will
+check the :attr:`.Molecule.optimized` flag on the molecule. If the
+flag is set to ``True``, then no optimization will take place.
+
+.. _`adding optimizers`:
 
 Extending stk: Adding optimizers.
 ---------------------------------
 
-New optimization functions are added by writing them in this module.
-The only requirement is that the first argument is `mol`. This allows
-users to identify which arguments are handled automatically by ``stk``
-and which need to be defined in the input file. The convention is that
-if the optimization function takes the argument `mol`, the user does
-not have to specify it in the input file.
-
-An optimization function should update the ``rdkit`` molecule in
-:attr:`.Molecule.mol`. The return values of optimization functions
-are discarded by the GA.
-
-Optimizations can be complicated. If the use of helper functions is
-required make sure that they are private, i.e. that their names begin
-with a leading underscore. In the event that the optimization is so
-complex that it requires its own module or file, place it in the same
-folder as this file. Then import the optimization function here. Make
-sure that only the optimization functions are imported back into this
-file, not any of the helper functions or classes.
+New optimizers are added by writing them in this module or in a
+separate module in this directory. An optimizer is defined as a new
+class which inherits :class:`Optimizer`. The new optimizer class must
+define a :meth:`~Optimizer.optimize` method. The method must take 2
+arguments a mandatory `mol` argument and an optional `conformer`
+argument. :meth:`~Optimizer.optimize` will take a molecule and change
+its structure however it likes. Beyond this there are no requirements
+for optimizers.
 
 """
 
@@ -307,14 +346,9 @@ class RDKitForceField(Optimizer):
         :func:`rdkit.UFFOptimizeMolecule` or
         :func:`rdkit.MMFFOptimizeMolecule`.
 
-    embed : :class:`bool`
-        When ``True`` the structure is guessed before an optimization
-        is carried out. This guess structure overrides any previous
-        structure.
-
     Examples
     --------
-    Use MMFF to optimize a molcule.
+    Use MMFF to optimize a molecule.
 
     >>> import rdkit.Chem.AllChem as rdkit
     >>> mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
@@ -323,7 +357,7 @@ class RDKitForceField(Optimizer):
 
     """
 
-    def __init__(self, rdkit_fn, embed=False, skip_optimized=False):
+    def __init__(self, rdkit_fn, skip_optimized=False):
         """
         Initializes a :class:`RDKitForceField` instance.
 
@@ -334,11 +368,6 @@ class RDKitForceField(Optimizer):
             :func:`rdkit.UFFOptimizeMolecule` or
             :func:`rdkit.MMFFOptimizeMolecule`.
 
-        embed : :class:`bool`
-            When ``True`` the structure is guessed before an
-            optimization is carried out. This guess structure overrides
-            any previous structure.
-
         skip_optimized : :class:`bool`, optional
             If ``True`` then :meth:`optimize` returns immediately for
             molecules where :attr:`.Molecule.optimized` is``True``.
@@ -346,7 +375,6 @@ class RDKitForceField(Optimizer):
         """
 
         self.rdkit_fn = rdkit_fn
-        self.embed = embed
         super().__init__(skip_optimized=skip_optimized)
 
     def optimize(self, mol, conformer=-1):
@@ -369,14 +397,6 @@ class RDKitForceField(Optimizer):
 
         if conformer == -1:
             conformer = mol.mol.GetConformer(conformer).GetId()
-
-        if self.embed:
-            conf_id = rdkit.EmbedMolecule(mol.mol, clearConfs=False)
-            new_conf = rdkit.Conformer(mol.mol.GetConformer(conf_id))
-            mol.mol.RemoveConformer(conf_id)
-            mol.mol.RemoveConformer(conformer)
-            new_conf.SetId(conformer)
-            mol.mol.AddConformer(new_conf)
 
         # Sanitize then optimize the rdkit molecule.
         rdkit.SanitizeMol(mol.mol)
