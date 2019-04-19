@@ -22,16 +22,14 @@ if not os.path.exists(outdir):
 
 @mopac
 def test_mopac_opt(tmp_amine2, mopac_path):
-    if outdir not in os.getcwd():
-        os.chdir(outdir)
-
     # Give conformer a distinct geometry.
     tmp_amine2.set_position_from_matrix(
         pos_mat=tmp_amine2.mol.GetConformer().GetPositions().T*4,
         conformer=1)
 
     tmp_amine2.write(os.path.join(outdir, 'before_opt.mol'))
-    stk.mopac_opt(tmp_amine2, mopac_path)
+    mopac = stk.MOPAC(mopac_path)
+    mopac.optimize(tmp_amine2)
     tmp_amine2.write(os.path.join(outdir, 'after_opt.mol'))
 
 

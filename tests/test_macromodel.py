@@ -24,33 +24,86 @@ if not os.path.exists(outdir):
 
 
 @macromodel
-def test_force_field(tmp_cc3, macromodel_path):
-    tmp_cc3.write(join(outdir, 'mm_opt_before.mol'), conformer=0)
+def test_restricted_force_field(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'rmm_ff_before.mol'), conformer=0)
 
-    stk.macromodel_opt(
-        tmp_cc3,
-        macromodel_path,
-        {'md': True, 'gradient': 1, 'restricted': 'both'},
-        {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2},
-        output_dir='opt_odir',
-        conformer=0)
-
-    tmp_cc3.write(join(outdir, 'mm_opt_after.mol'), conformer=0)
+    mm = stk.MacroModelForceField(macromodel_path=macromodel_path,
+                                  output_dir='rmm_ff',
+                                  restricted=True,
+                                  minimum_gradient=1)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'rmm_ff_after.mol'), conformer=0)
 
 
 @macromodel
-def test_md(tmp_cc3, macromodel_path):
-    tmp_cc3.write(join(outdir, 'mm_cage_opt_before.mol'), conformer=0)
+def test_unrestricted_force_field(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'umm_ff_before.mol'),
+                  conformer=0)
 
-    stk.macromodel_cage_opt(
-        tmp_cc3,
-        macromodel_path,
-        {'md': True, 'gradient': 1, 'restricted': False},
-        {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2},
-        output_dir='cage_opt_odir',
-        conformer=0)
+    mm = stk.MacroModelForceField(macromodel_path=macromodel_path,
+                                  output_dir='umm_ff',
+                                  restricted=False,
+                                  minimum_gradient=1)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'umm_ff_after.mol'), conformer=0)
 
-    tmp_cc3.write(join(outdir, 'mm_cage_opt_after.mol'), conformer=0)
+
+@macromodel
+def test_both_force_field(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'bmm_ff_before.mol'),
+                  conformer=0)
+
+    mm = stk.MacroModelForceField(macromodel_path=macromodel_path,
+                                  output_dir='bmm_ff',
+                                  restricted='both',
+                                  minimum_gradient=1)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'bmm_ff_after.mol'), conformer=0)
+
+
+@macromodel
+def test_restricted_md(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'rmm_md_before.mol'), conformer=0)
+
+    mm = stk.MacroModelMD(macrmodel_path=macromodel_path,
+                          output_dir='rmm_md',
+                          minimum_gradient=1,
+                          restricted=True,
+                          simulation_time=20,
+                          eq_time=2,
+                          conformers=2)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'rmm_md_after.mol'), conformer=0)
+
+
+@macromodel
+def test_unrestricted_md(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'umm_md_before.mol'), conformer=0)
+
+    mm = stk.MacroModelMD(macrmodel_path=macromodel_path,
+                          output_dir='umm_md',
+                          minimum_gradient=1,
+                          restricted=False,
+                          simulation_time=20,
+                          eq_time=2,
+                          conformers=2)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'umm_md_after.mol'), conformer=0)
+
+
+@macromodel
+def test_both_md(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'bmm_md_before.mol'), conformer=0)
+
+    mm = stk.MacroModelMD(macrmodel_path=macromodel_path,
+                          output_dir='bmm_md',
+                          minimum_gradient=1,
+                          restricted='both',
+                          simulation_time=20,
+                          eq_time=2,
+                          conformers=2)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'bmm_md_after.mol'), conformer=0)
 
 
 @macromodel

@@ -261,6 +261,10 @@ class CageOptimizerPipeline(OptimizerPipeline):
                 return
 
 
+class RaisingOptimizerError(Exception):
+    ...
+
+
 class RaisingOptimizer(Optimizer):
     """
     Raises and optimizes at random.
@@ -328,10 +332,15 @@ class RaisingOptimizer(Optimizer):
         -------
         None : :class:`NoneType`
 
+        Raises
+        ------
+        :class:`RaisingOptimizerError`
+            This error is raised at random.
+
         """
 
         if np.random.rand() < self.fail_chance:
-            raise Exception('RaisingOptimizer.')
+            raise RaisingOptimizerError('Used RaisingOptimizer.')
         self.fn(mol)
 
 
