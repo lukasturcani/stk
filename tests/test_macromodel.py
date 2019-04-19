@@ -65,7 +65,7 @@ def test_both_force_field(tmp_cc3, macromodel_path):
 def test_restricted_md(tmp_cc3, macromodel_path):
     tmp_cc3.write(join(outdir, 'rmm_md_before.mol'), conformer=0)
 
-    mm = stk.MacroModelMD(macrmodel_path=macromodel_path,
+    mm = stk.MacroModelMD(macromodel_path=macromodel_path,
                           output_dir='rmm_md',
                           minimum_gradient=1,
                           restricted=True,
@@ -80,7 +80,7 @@ def test_restricted_md(tmp_cc3, macromodel_path):
 def test_unrestricted_md(tmp_cc3, macromodel_path):
     tmp_cc3.write(join(outdir, 'umm_md_before.mol'), conformer=0)
 
-    mm = stk.MacroModelMD(macrmodel_path=macromodel_path,
+    mm = stk.MacroModelMD(macromodel_path=macromodel_path,
                           output_dir='umm_md',
                           minimum_gradient=1,
                           restricted=False,
@@ -95,7 +95,7 @@ def test_unrestricted_md(tmp_cc3, macromodel_path):
 def test_both_md(tmp_cc3, macromodel_path):
     tmp_cc3.write(join(outdir, 'bmm_md_before.mol'), conformer=0)
 
-    mm = stk.MacroModelMD(macrmodel_path=macromodel_path,
+    mm = stk.MacroModelMD(macromodel_path=macromodel_path,
                           output_dir='bmm_md',
                           minimum_gradient=1,
                           restricted='both',
