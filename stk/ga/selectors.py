@@ -231,6 +231,15 @@ class Fittest(Selector):
 
         """
 
+        if self.elitism is not None or self.truncation is not None:
+            population = sorted(population, reverse=True)
+
+            if self.elitism is not None:
+                population = population[:self.elitism]
+
+            elif self.truncation is not None:
+                population = population[:-self.truncation]
+
         # For each batch, sum the fitness values of all molecules in
         # in the batch.
         batches = (
@@ -301,7 +310,6 @@ class Roulette(Selector):
               elitism=elitism,
               truncation=truncation)
 
-
     def select(self, population):
         """
         Yields individuals using roulette selection.
@@ -330,6 +338,15 @@ class Roulette(Selector):
         .. [#] http://tinyurl.com/csc3djm
 
         """
+
+        if self.elitism is not None or self.truncation is not None:
+            population = sorted(population, reverse=True)
+
+            if self.elitism is not None:
+                population = population[:self.elitism]
+
+            elif self.truncation is not None:
+                population = population[:-self.truncation]
 
         yielded = set()
         truncation = truncation if truncation is None else -truncation
@@ -422,6 +439,15 @@ class DeterministicSampling(Selector):
             The next selected population member.
 
         """
+
+        if self.elitism is not None or self.truncation is not None:
+            population = sorted(population, reverse=True)
+
+            if self.elitism is not None:
+                population = population[:self.elitism]
+
+            elif self.truncation is not None:
+                population = population[:-self.truncation]
 
         truncation = truncation if truncation is None else -truncation
         pop = sorted(population, reverse=True)[:truncation]
@@ -542,6 +568,15 @@ class StochasticSampling(Selector):
             The next selected population member.
 
         """
+
+        if self.elitism is not None or self.truncation is not None:
+            population = sorted(population, reverse=True)
+
+            if self.elitism is not None:
+                population = population[:self.elitism]
+
+            elif self.truncation is not None:
+                population = population[:-self.truncation]
 
         yielded = set()
         truncation = truncation if truncation is None else -truncation
