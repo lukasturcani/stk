@@ -30,7 +30,7 @@ underscore.
 """
 
 
-class Exit:
+class Exiter:
     """
     Checks if the exit criterion for the GA has been satisfied.
 

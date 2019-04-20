@@ -28,171 +28,193 @@ start with a leading underscore.
 
 """
 
-import itertools
+import itertools as it
 import numpy as np
+import logging
 
 
-class Selection:
+logger = logging.getLogger(__name__)
+
+
+class SelectorError(Exception):
+    ...
+
+
+class Selector:
     """
-    A class for handling all types of selection in the GA.
+    Selects molecules from a population.
 
-    Whenever a population needs to have some of its members selected
-    for GA operations such as mutation, selection or generational
-    selection, it delegates this task to an instance of this class. The
-    population holds the instance in :attr:`.GAPopulation.ga_tools`.
-
-    To illustrate how a :class:`Selection` instance works it is best
-    to use an example.
-
-    .. code-block:: python
-
-        # 1. Create FunctionData objects which describe the selection
-        #    functions to be used. These will correspond to methods
-        #    in the Selection class.
-
-        # For selecting members of the next generation.
-        gen_select_fn = FunctionData('fittest')
-
-        # For selecting molecules for crossover.
-        crossover_select_fn = FunctionData('crossover_roulette', n=5)
-
-        # For selecting molecules to mutate.
-        mutation_select_fn = FunctionData('stochastic_sampling',
-                                          elites=2, duplicates=True)
-
-
-
-        # 2. Create a Selection instance using the chosen functions.
-
-        sel = Selection(gen_select_fn,
-                        crossover_select_fn,
-                        mutation_select_fn)
-
-        # 3. Create a population from which "sel" will select members.
-        pop = GAPopulation(mol1, mol2, mol3, mol4)
-
-        # 4. Now the selection instance can be used to select members
-        #    of "pop".
-
-        # To select members of the next generation, call the selection
-        # instance with the population as an argument, and a string
-        # to indicate generational selection is desired.
-        next_gen = sel(pop, 'generational')
-
-        # Note that next_gen is a generator, which yields the
-        # selected molecules.
-        next_gen  # <generator object ... >
-
-        for mol in next_gen:
-            mol  # A molecule in "pop".
-
-        # To select members for crossover, the same idea as for
-        # generational selection applies.
-        crossover_mols = sel(pop, 'crossover')
-
-        # Again, "crossover_mols" is a generator. This time it yields
-        # tuples of molecules however. This is because 2 or more
-        # molecules are required per crossover operation.
-
-
-        # Finally, to select molecules for mutation.
-        mols_to_mutate = sel(pop, 'mutation')
-
-        # Again, "mols_to_mutate" is a generator yielding single
-        # molecules.
-
-    By providing the strings ``'generational'``, ``'crossover'`` and
-    ``'mutation'``, the :class:`Selection` instance knows to pick the
-    correct function from the :class:`.FunctionData` instances provided
-    during initialization.
-
-    Note that duplicates are not considered during selection. If a
-    molecule is present in the population twice, its chance of
-    selection does not double.
+    Molecules are selected in batches, and each batch is selected
+    based on its fitness. Batches may be of size 1, if single molecules
+    are to be yielded.
 
     Attributes
     ----------
-    generational : :class:`.FunctionData`
-        This holds the :class:`.FunctionData` object representing the
-        selection function used for selecting the next generation of
-        molecules.
+    batch_size : :class:`int`
+        The number of molecules yielded at once.
 
-    crossover : :class:`.FunctionData`
-        Holds the :class:`.FunctionData` object representing the
-        selection function used for selecting molecules for crossover.
+    elitism : :class:`int`
+        If not ``None`` then the number determines how many of the
+        most fit molecules are exclusively used for selection. For
+        example, if :attr:`elitism` is ``5`` then only the top 5
+        fittest molecules can be selected.
 
-    mutation : :class:`.FunctionData`
-        Holds the :class:`.FunctionData` object representing the
-        selection function used for selecting molecules to mutate.
+    truncation : :class:`int`
+        If not ``None`` then the number determines how many of the
+        least fit molecules are removed from the population before
+        selection takes place.
 
     """
 
-    def __init__(self, generational, crossover, mutation):
+    def __init__(self, batch_size, elitism, truncation):
         """
-        Initializes a :class:`Selection` instance.
+        Initializes a :class:`Selector` instance.
 
         Parameters
         ----------
-        generational : :class:`.FunctionData`
-            This holds the :class:`.FunctionData` object representing
-            the selection function used for selecting the next
-            generation of molecules.
+        batch_size : :class:`int`
+            The number of molecules yielded at once.
 
-        crossover : :class:`.FunctionData`
-            Holds the :class:`.FunctionData` object representing the
-            selection function used for selecting molecules for
-            crossover.
+        elitism : :class:`int`
+            If not ``None`` then the number determines how many of the
+            most fit molecules are exclusively used for selection. For
+            example, if :attr:`elitism` is ``5`` then only the top 5
+            fittest molecules can be selected.
 
-        mutation : :class:`.FunctionData`
-            Holds the :class:`.FunctionData` object representing the
-            selection function used for selecting molecules to mutate.
+        truncation : :class:`int`
+            If not ``None`` then the number determines how many of the
+            least fit molecules are removed from the population before
+            selection takes place.
+
+        Raises
+        ------
+        :class:`SelectorError`
+            If both `elitism` and `truncation` are not ``None``.
 
         """
 
-        self.generational = generational
-        self.crossover = crossover
-        self.mutation = mutation
+        if elitism is not None and truncation is not None:
+            raise SelectorError()
 
-    def __call__(self, population, type_):
+        self.batch_size = batch_size
+        self.elitism = elitism
+        self.truncation = truncation
+
+    def select(self, population):
         """
-        Yields members from population.
+        Selects molecules from `population`.
 
         Parameters
         ----------
-        population : :class:`.GAPopulation`
-            The population from which members should be selected.
-
-        type_ : :class:`str`
-            The name of a :class:`.Selection` attribute. The name
-            corresponds to the type of selection that is desired:
-            ``'generational'``, ``'crossover'`` or ``'mutation'``.
+        population : :class:`.Population`
+            A :class:`.Population` from which molecules are selected.
 
         Yields
-        -------
-        :class:`.MacroMolecule` or :class:`tuple`
-            :class:`.MacroMolecule` instances are yielded unless
-            `type_` is ``'crossover'``. In this case a tuple of
-            :class:`.MacroMolecule` instances is yielded.
+        ------
+        :class:`tuple` of :class:`.Molecule`
+            A batch of selected molecules.
 
         """
 
-        # Make a population without any duplicates.
-        unique_pop = population.__class__(*population)
-        unique_pop.remove_duplicates()
+        return NotImplementedError()
 
-        # Get the attribute with the name provided as a string in
-        # `type_`. This returns a ``FunctionData`` object holding the
-        # name of the method which needs to be implemented and any
-        # required parameters and their values.
-        func_data = getattr(self, type_)
-        # Using the name of the method, get the method object with
-        # ``getattr``.
-        func = getattr(self, func_data.name)
-        # Call the method on the population and provide any additional
-        # parameters which may be necessary.
-        yield from func(unique_pop, **func_data.params)
 
-    def fittest(self, population):
+class SelectorPipeline(Selector):
+    """
+    Applies a set of :class:`Selector`s in order.
+
+    This selector does not inherit any attributes from its base
+    class.
+
+    Attributes
+    ----------
+    selectors : :class:`tuple` of :class:`Selector`
+        The selectors which get used to select molecules.
+
+    """
+
+    def __init__(self, *selectors):
+        """
+        Initializes a :class:`SelectorPipeline` instance.
+
+        Parameters
+        ----------
+        selectors : :class:`tuple` of :class:`Selector`
+            The selectors which get used to select molecules.
+
+        """
+
+        self.selectors = selectors
+
+    def select(self, population):
+        """
+        Selects molecules from `population`.
+
+        Parameters
+        ----------
+        population : :class:`.Population`
+            A :class:`.Population` from which molecules are selected.
+
+        Yields
+        ------
+        :class:`tuple` of :class:`.Molecule`
+            A batch of selected molecules.
+
+        """
+
+        for selector in self.selectors:
+            logger.info(
+                f'Using {selector.__class__.__name__} for selection.'
+            )
+            yield from selector.select(population)
+
+
+class Fittest(Selector):
+    """
+    Selects molecules, fittest first.
+
+    Examples
+    --------
+    Yielding molecules one at a time. For example, if molecules need
+    to be selected for mutation or the next generation.
+
+    .. code-block:: python
+
+    Yielding multiple molecules at once. For example, if molecules need
+    to be selected for crossover.
+
+    .. code-block:: python
+
+
+    """
+
+    def __init__(self, batch_size=1, elitism=None, truncation=None):
+        """
+        Initializes a :class:`Fittest` instance.
+
+        Parameters
+        ----------
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
+
+        elitism : :class:`int`, optional
+            If not ``None`` then the number determines how many of the
+            most fit molecules are exclusively used for selection. For
+            example, if :attr:`elitism` is ``5`` then only the top 5
+            fittest molecules can be selected.
+
+        truncation : :class:`int`, optional
+            If not ``None`` then the number determines how many of the
+            least fit molecules are removed from the population before
+            selection takes place.
+
+        """
+
+        super(batch_size=batch_size,
+              elitism=elitism,
+              truncation=truncation)
+
+    def select(self, population):
         """
         Yields members of the population, fittest first.
 
@@ -209,11 +231,78 @@ class Selection:
 
         """
 
-        for ind in sorted(population, reverse=True):
-            yield ind
+        # For each batch, sum the fitness values of all molecules in
+        # in the batch.
+        batches = (
+            (batch, sum(m.fitness for m in batch))
+            for batch in it.combinations(population, self.batch_size)
+        )
 
-    def roulette(self, population, elites=0,
-                 truncation=None, duplicates=False):
+        # Sort by total fitness value of each batch.
+        batches = sorted(batches, reverse=True, key=lambda x: x[1])
+        for batch, fitness in batches:
+            yield batch
+
+
+class Roulette(Selector):
+    """
+    Uses roulette selection to select molecules.
+
+    Attributes
+    ----------
+    duplicates : :class:`bool`
+        If ``True`` the same member can be yielded in more than
+        one batch.
+
+    use_rank : :class:`bool`
+        When ``True`` the fitness value of an individual is
+        calculated as ``f = 1/rank``.
+
+    """
+
+    def __init__(self,
+                 duplicates=False,
+                 use_rank=False,
+                 batch_size=1,
+                 elitism=None,
+                 truncation=None):
+        """
+        Initializes a :class:`Roulette` instance.
+
+        Parameters
+        ----------
+        duplicates : :class:`bool`, optional
+            If ``True`` the same member can be yielded in more than
+            one batch.
+
+        use_rank : :class:`bool`, optional
+            When ``True`` the fitness value of an individual is
+            calculated as ``f = 1/rank``.
+
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
+
+        elitism : :class:`int`, optional
+            If not ``None`` then the number determines how many of the
+            most fit molecules are exclusively used for selection. For
+            example, if :attr:`elitism` is ``5`` then only the top 5
+            fittest molecules can be selected.
+
+        truncation : :class:`int`, optional
+            If not ``None`` then the number determines how many of the
+            least fit molecules are removed from the population before
+            selection takes place.
+
+        """
+
+        self.duplicates = duplicates
+        self.use_rank = use_rank
+        super(batch_size=batch_size,
+              elitism=elitism,
+              truncation=truncation)
+
+
+    def select(self, population):
         """
         Yields individuals using roulette selection.
 
@@ -230,18 +319,6 @@ class Selection:
         ----------
         population : :class:`.GAPopulation`
             The population from which individuals are to be selected.
-
-        elites : :class:`int`, optional
-            The number of the fittest members which are guaranteed to
-            be yielded first.
-
-        truncation : :class:`int`, optional
-            The number of least fit members which will never be
-            yielded.
-
-        duplicates : :class:`bool`, optional
-            If ``True`` the same member can be yielded more than
-            once.
 
         Yields
         ------
@@ -275,7 +352,42 @@ class Selection:
             yielded.add(selected) if not duplicates else None
             yield selected
 
-    def deterministic_sampling(self, population, truncation=None):
+
+class DeterministicSampling(Selector):
+    """
+
+    Examples
+    --------
+
+    """
+
+    def __init__(self, batch_size=1, elitism=None, truncation=None):
+        """
+        Initializes a :class:`DeterministicSampling` instance.
+
+        Parameters
+        ----------
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
+
+        elitism : :class:`int`, optional
+            If not ``None`` then the number determines how many of the
+            most fit molecules are exclusively used for selection. For
+            example, if :attr:`elitism` is ``5`` then only the top 5
+            fittest molecules can be selected.
+
+        truncation : :class:`int`, optional
+            If not ``None`` then the number determines how many of the
+            least fit molecules are removed from the population before
+            selection takes place.
+
+        """
+
+        super(batch_size=batch_size,
+              elitism=elitism,
+              truncation=truncation)
+
+    def select(self, population, truncation=None):
         """
         Yields individuals using deterministic sampling.
 
@@ -324,9 +436,65 @@ class Selection:
         for r, mem in sorted(decimals, reverse=True):
             yield mem
 
-    def stochastic_sampling(self, population,
-                            elites=0, truncation=None,
-                            duplicates=False, use_rank=False):
+
+class StochasticSampling(Selector):
+    """
+    Uses stochastic sampling to select molecules.
+
+    Attributes
+    ----------
+    duplicates : :class:`bool`
+        If ``True`` the same member can be yielded in more than
+        one batch.
+
+    use_rank : :class:`bool`
+        When ``True`` the fitness value of an individual is
+        calculated as ``f = 1/rank``.
+
+    """
+
+    def __init__(self,
+                 duplicates=False,
+                 use_rank=False,
+                 batch_size=1,
+                 elitism=None,
+                 truncation=None):
+        """
+        Initializes a :class:`StochasticSampling` instance.
+
+        Parameters
+        ----------
+        duplicates : :class:`bool`, optional
+            If ``True`` the same member can be yielded in more than
+            one batch.
+
+        use_rank : :class:`bool`, optional
+            When ``True`` the fitness value of an individual is
+            calculated as ``f = 1/rank``.
+
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
+
+        elitism : :class:`int`, optional
+            If not ``None`` then the number determines how many of the
+            most fit molecules are exclusively used for selection. For
+            example, if :attr:`elitism` is ``5`` then only the top 5
+            fittest molecules can be selected.
+
+        truncation : :class:`int`, optional
+            If not ``None`` then the number determines how many of the
+            least fit molecules are removed from the population before
+            selection takes place.
+
+        """
+
+        self.duplicates = duplicates
+        self.use_rank = use_rank
+        super(batch_size=batch_size,
+              elitism=elitism,
+              truncation=truncation)
+
+    def select(self, population):
         """
         Yields individuals via stochastic sampling.
 
@@ -470,153 +638,3 @@ class Selection:
             selected = np.random.choice(valid_pop, p=weights)
             yielded.add(selected) if not duplicates else None
             yield selected
-
-    def all_combinations(self, population):
-        """
-        Yields every possible pairing of individuals from a population.
-
-        This yields members regardless of which subpopulation they are
-        in. Each pair is only returned once. This means if ``(1,2)`` is
-        yielded ``(2,1)`` will not be.
-
-        Parameters
-        ----------
-        population : :class:`.GAPopulation`
-            The population from which parents should be selected.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.MacroMolecule`
-            The :class:`.MacroMolecule` instances which are to be
-            crossed.
-
-        """
-
-        # Get all combinations of size 2.
-        for mol1, mol2 in itertools.combinations(population, 2):
-            yield mol1, mol2
-
-    def all_combinations_n_fittest(self, population, n):
-        """
-        Yields all pairings of the `n` fittest individuals.
-
-        The pairings are yielded with in order of fitness, with most
-        fit pair yielded first.
-
-        Parameters
-        ----------
-        population : :class:`.GAPopulation`
-            The population from which parents should be selected.
-
-        n : :class:`int`
-            The number of individuals used for making offspring.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.MacroMolecule`
-            The :class:`.MacroMolecule` instances which are to be
-            crossed.
-
-        """
-
-        n_fittest = itertools.islice(self.fittest(population), n)
-        for ind1, ind2 in itertools.combinations(n_fittest, 2):
-            yield ind1, ind2
-
-    def crossover_roulette(self, population, truncation=None):
-        """
-        Yields parents using roulette selection.
-
-        In roulette selection the probability an individual is selected
-        is given by its fitness. If the total fitness is the sum of all
-        fitness values, the chance an individuals is selected is given
-        by::
-
-            p = individual fitness / total fitness,
-
-        where ``p`` is the probability of selection [#]_.
-
-        Parameters
-        ----------
-        population : :class:`.GAPopulation`
-            The population from which parents are selected.
-
-        truncation : :class:`int`, optional
-            The number of least fit members which will never be
-            yielded.
-
-        Yields
-        ------
-        :class:`numpy.ndarray` of :class:`.MacroMolecule`
-            The selected parent pair.
-
-        References
-        ----------
-        .. [#] http://tinyurl.com/csc3djm
-
-        """
-
-        truncation = truncation if truncation is None else -truncation
-        pop = sorted(population, reverse=True)[:truncation]
-
-        while True:
-            total = sum(ind.fitness for ind in pop)
-            weights = [ind.fitness / total for ind in pop]
-            yield np.random.choice(pop, 2, False, weights)
-
-    def crossover_deterministic_sampling(self, population,
-                                         truncation=None):
-        """
-        Yields parents according to determnistic sampling.
-
-        In determnistic sampling the mean fitness value of the
-        population is calculated, ``<f>``. For each individual a
-        normalized fitness value is then calculated via::
-
-            fn = f / <f>
-
-        where ``fn`` is the normalized fitness value and ``f`` is the
-        original fitness value.
-
-        Deterministic sampling then creates a temporary, parent
-        population of the same size as the original population. An
-        individual is guaranteed to be placed into the parent
-        population ``n`` times, where ``n`` is the integer part of
-        ``fn``. Any remaining slots are given to individuals with the
-        largest decimal values.
-
-        Parents are then randomly selected from the parent population.
-
-        Parameters
-        ----------
-        population : :class:`.GAPopulation`
-            The population from which parents are selected.
-
-        truncation : :class:`int`, optional
-            The number of least fit members which will never be
-            yielded.
-
-        Yields
-        ------
-        :class:`numpy.ndarray` of :class:`.MacroMolecule`
-            The selected parent pair.
-
-        """
-
-        truncation = truncation if truncation is None else -truncation
-        pop = sorted(population, reverse=True)[:truncation]
-
-        mean = np.mean([ind.fitness for ind in pop])
-
-        parent_pop = []
-        for ind in pop:
-            fn = ind.fitness / mean
-            if int(fn) < 1 and len(parent_pop) >= len(pop):
-                break
-
-            fn = 1 if int(fn) < 1 else int(fn)
-            for x in range(fn):
-                parent_pop.append(ind)
-
-        while True:
-            yield np.random.choice(parent_pop, 2, False)
