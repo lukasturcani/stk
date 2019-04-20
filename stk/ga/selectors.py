@@ -50,6 +50,14 @@ class Selector:
 
     Attributes
     ----------
+    duplicates : :class:`bool`
+        If ``True`` the same member can be yielded in more than
+        one batch.
+
+    use_rank : :class:`bool`
+        When ``True`` the fitness value of an individual is
+        calculated as ``f = 1/rank``.
+
     batch_size : :class:`int`
         The number of molecules yielded at once.
 
@@ -66,12 +74,25 @@ class Selector:
 
     """
 
-    def __init__(self, batch_size, elitism, truncation):
+    def __init__(self,
+                 duplicates,
+                 use_rank,
+                 batch_size,
+                 elitism,
+                 truncation):
         """
         Initializes a :class:`Selector` instance.
 
         Parameters
         ----------
+        duplicates : :class:`bool`
+            If ``True`` the same member can be yielded in more than
+            one batch.
+
+        use_rank : :class:`bool`
+            When ``True`` the fitness value of an individual is
+            calculated as ``f = 1/rank``.
+
         batch_size : :class:`int`
             The number of molecules yielded at once.
 
@@ -188,12 +209,20 @@ class Fittest(Selector):
 
     """
 
-    def __init__(self, batch_size=1, elitism=None, truncation=None):
+    def __init__(self,
+                 duplicates=True,
+                 batch_size=1,
+                 elitism=None,
+                 truncation=None):
         """
         Initializes a :class:`Fittest` instance.
 
         Parameters
         ----------
+        duplicates : :class:`bool`, optional
+            If ``True`` the same member can be yielded in more than
+            one batch.
+
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
@@ -210,7 +239,9 @@ class Fittest(Selector):
 
         """
 
-        super(batch_size=batch_size,
+        super(duplicates=duplicates,
+              use_rank=False,
+              batch_size=batch_size,
               elitism=elitism,
               truncation=truncation)
 
@@ -249,8 +280,37 @@ class Fittest(Selector):
 
         # Sort by total fitness value of each batch.
         batches = sorted(batches, reverse=True, key=lambda x: x[1])
-        for batch, fitness in batches:
-            yield batch
+
+        batches = (batch for batch, fitness in batches)
+
+        if not self.duplicates:
+            batches = self._no_duplicates(batches)
+
+        yield from batches
+
+    @staticmethod
+    def _no_duplicates(batches):
+        """
+        Makes sure that no molecules is yielded in more than one batch.
+
+        Parameters
+        ----------
+        batches : :class:`iterable`
+            An :class:`iterable` yielding :class:`tuple` of
+            :class:`.Molecule`.
+
+        Yields
+        ------
+        :class:`tuple` of :class:`.Molecule`
+            Batches of molecules, none of which share molecules.
+
+        """
+
+        seen = set()
+        for batch in batches:
+            if all(mol not in seen for mol in batch):
+                seen.update(batch)
+                yield batch
 
 
 class Roulette(Selector):
@@ -259,18 +319,15 @@ class Roulette(Selector):
 
     Attributes
     ----------
-    duplicates : :class:`bool`
-        If ``True`` the same member can be yielded in more than
-        one batch.
+    duplicate_batches : :class:`bool`
+        If ``True`` then the same batch can be yielded more than once.
 
-    use_rank : :class:`bool`
-        When ``True`` the fitness value of an individual is
-        calculated as ``f = 1/rank``.
 
     """
 
     def __init__(self,
-                 duplicates=False,
+                 duplicates=True,
+                 duplicate_batches=True,
                  use_rank=False,
                  batch_size=1,
                  elitism=None,
@@ -283,6 +340,10 @@ class Roulette(Selector):
         duplicates : :class:`bool`, optional
             If ``True`` the same member can be yielded in more than
             one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` then the same batch can be yielded more than
+            once.
 
         use_rank : :class:`bool`, optional
             When ``True`` the fitness value of an individual is
@@ -304,9 +365,10 @@ class Roulette(Selector):
 
         """
 
-        self.duplicates = duplicates
-        self.use_rank = use_rank
-        super(batch_size=batch_size,
+        self.duplicate_batches = duplicate_batches
+        super(duplicates=duplicates,
+              use_rank=use_rank,
+              batch_size=batch_size,
               elitism=elitism,
               truncation=truncation)
 
@@ -348,42 +410,58 @@ class Roulette(Selector):
             elif self.truncation is not None:
                 population = population[:-self.truncation]
 
-        yielded = set()
-        truncation = truncation if truncation is None else -truncation
-        pop = sorted(population, reverse=True)[:truncation]
+        yielded_mols = set()
+        yielded_batches = set()
 
-        for x in range(elites):
-            yielded.add(pop[x]) if not duplicates else None
-            yield pop[x]
-
-        while True:
-            valid_pop = [ind for ind in pop if ind not in yielded]
-
-            if not valid_pop:
-                break
-
+        valid_pop = list(population)
+        while valid_pop:
             total = sum(ind.fitness for ind in valid_pop)
             weights = [ind.fitness / total for ind in valid_pop]
 
             selected = np.random.choice(valid_pop, p=weights)
             yielded.add(selected) if not duplicates else None
             yield selected
+            valid_pop = [ind for ind in population if ind not in yielded]
 
 
 class DeterministicSampling(Selector):
     """
+    Uses deterministic sampling to select molecules.
+
+    Attributes
+    ----------
+    duplicate_batches : :class:`bool`
+        If ``True`` then the same batch can be yielded more than once.
 
     Examples
     --------
 
     """
 
-    def __init__(self, batch_size=1, elitism=None, truncation=None):
+    def __init__(self,
+                 duplicates=True,
+                 duplicate_batches=True,
+                 use_rank=False,
+                 batch_size=1,
+                 elitism=None,
+                 truncation=None):
         """
         Initializes a :class:`DeterministicSampling` instance.
 
         Parameters
         ----------
+        duplicates : :class:`bool`, optional
+            If ``True`` the same member can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` then the same batch can be yielded more than
+            once.
+
+        use_rank : :class:`bool`, optional
+            When ``True`` the fitness value of an individual is
+            calculated as ``f = 1/rank``.
+
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
@@ -400,7 +478,10 @@ class DeterministicSampling(Selector):
 
         """
 
-        super(batch_size=batch_size,
+        self.duplicate_batches = duplicate_batches
+        super(duplicates=duplicates,
+              use_rank=use_rank,
+              batch_size=batch_size,
               elitism=elitism,
               truncation=truncation)
 
@@ -469,18 +550,14 @@ class StochasticSampling(Selector):
 
     Attributes
     ----------
-    duplicates : :class:`bool`
-        If ``True`` the same member can be yielded in more than
-        one batch.
-
-    use_rank : :class:`bool`
-        When ``True`` the fitness value of an individual is
-        calculated as ``f = 1/rank``.
+    duplicate_batches : :class:`bool`
+        If ``True`` then the same batch can be yielded more than once.
 
     """
 
     def __init__(self,
-                 duplicates=False,
+                 duplicates=True,
+                 duplicate_batches=True,
                  use_rank=False,
                  batch_size=1,
                  elitism=None,
@@ -493,6 +570,10 @@ class StochasticSampling(Selector):
         duplicates : :class:`bool`, optional
             If ``True`` the same member can be yielded in more than
             one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` then the same batch can be yielded more than
+            once.
 
         use_rank : :class:`bool`, optional
             When ``True`` the fitness value of an individual is
@@ -514,9 +595,10 @@ class StochasticSampling(Selector):
 
         """
 
-        self.duplicates = duplicates
-        self.use_rank = use_rank
-        super(batch_size=batch_size,
+        self.duplicate_batches = duplicate_batches
+        super(duplicates=duplicates,
+              use_rank=use_rank,
+              batch_size=batch_size,
               elitism=elitism,
               truncation=truncation)
 
