@@ -5,10 +5,9 @@ Defines :class:`Selector` classes.
 method, which is used to select molecules from a :class:`.Population`.
 
 :class:`Selector`s can be combined to generate more complex selection
-processes using :class:`.Pipeline` or :class:`SelectorFunnel`. Examples
-of how this can happen is given in the documentation of those two
-classes.
-
+processes, such as stochastic sampling, using :class:`.Pipeline` or
+:class:`SelectorFunnel`. Examples of how this can happen are given in
+the documentation of these two classes.
 
 .. _`adding selectors`:
 
@@ -17,6 +16,8 @@ Extending stk: Adding selectors.
 
 When a new :class:`Selector` is to be added it must inherit
 :class:`Selector` and define a :meth:`~Selection.select` method.
+:meth:`~Selection.select` must take a single argument, which is the
+:class:`Population` from which molecules are selected.
 
 """
 
@@ -243,11 +244,35 @@ class Fittest(Selector):
 
     .. code-block:: python
 
+        # Make a population holding some molecules.
+        pop = Population(...)
+
+        # Make the selector.
+        fittest = Fittest()
+
+        # Select the molecules.
+        for selected, in fittest.select(pop):
+            # Do stuff with each selected molecule, like apply a
+            # mutation to it to generate a mutant.
+            mutant = mutator.mutate(selected)
+
     Yielding multiple molecules at once. For example, if molecules need
     to be selected for crossover.
 
     .. code-block:: python
 
+        # Make a population holding some molecules.
+        pop = Population(...)
+
+        # Make the selector.
+        fittest = Fittest(batch_size=2)
+
+        # Select the molecules.
+        for selected in fittest.select(pop):
+            # selected is a tuple of length 2, holding the selected
+            # molecules. You can do stuff with the selected molecules
+            # Like apply crossover operations on them.
+            offspring = list(crosser.crossover(*selectd))
 
     """
 
@@ -327,6 +352,40 @@ class Roulette(Selector):
 
     Examples
     --------
+    Yielding molecules one at a time. For example, if molecules need
+    to be selected for mutation or the next generation.
+
+    .. code-block:: python
+
+        # Make a population holding some molecules.
+        pop = Population(...)
+
+        # Make the selector.
+        roulette = Roulette()
+
+        # Select the molecules.
+        for selected, in roulette.select(pop):
+            # Do stuff with each selected molecule, like apply a
+            # mutation to it to generate a mutant.
+            mutant = mutator.mutate(selected)
+
+    Yielding multiple molecules at once. For example, if molecules need
+    to be selected for crossover.
+
+    .. code-block:: python
+
+        # Make a population holding some molecules.
+        pop = Population(...)
+
+        # Make the selector.
+        roulette = Roulette(batch_size=2)
+
+        # Select the molecules.
+        for selected in roulette.select(pop):
+            # selected is a tuple of length 2, holding the selected
+            # molecules. You can do stuff with the selected molecules
+            # Like apply crossover operations on them.
+            offspring = list(crosser.crossover(*selectd))
 
     """
 
@@ -417,8 +476,8 @@ class AboveAverage(Selector):
     Yields above average batches of molecules.
 
     The fitness of a batch is the sum of all fitness values of the
-    molecules in the batch. Contrary to the name, this
-    selector will also yield a batch which has exactly average fitness.
+    molecules in the batch. Contrary to the name, this selector will
+    also yield a batch which has exactly average fitness.
 
     Attributes
     ----------
@@ -430,6 +489,40 @@ class AboveAverage(Selector):
 
     Examples
     --------
+    Yielding molecules one at a time. For example, if molecules need
+    to be selected for mutation or the next generation.
+
+    .. code-block:: python
+
+        # Make a population holding some molecules.
+        pop = Population(...)
+
+        # Make the selector.
+        above_avg = AboveAverage()
+
+        # Select the molecules.
+        for selected, in above_avg.select(pop):
+            # Do stuff with each selected molecule, like apply a
+            # mutation to it to generate a mutant.
+            mutant = mutator.mutate(selected)
+
+    Yielding multiple molecules at once. For example, if molecules need
+    to be selected for crossover.
+
+    .. code-block:: python
+
+        # Make a population holding some molecules.
+        pop = Population(...)
+
+        # Make the selector.
+        above_avg = AboveAverage(batch_size=2)
+
+        # Select the molecules.
+        for selected in above_avg.select(pop):
+            # selected is a tuple of length 2, holding the selected
+            # molecules. You can do stuff with the selected molecules
+            # Like apply crossover operations on them.
+            offspring = list(crosser.crossover(*selectd))
 
     """
 
