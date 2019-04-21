@@ -579,7 +579,7 @@ class AboveAverage(Selector):
 
         Yields
         ------
-        :class:`tuple` of :class:`.MacroMolecule`
+        :class:`tuple` of :class:`.Molecule`
             The next selected batch of molecules.
 
         """
