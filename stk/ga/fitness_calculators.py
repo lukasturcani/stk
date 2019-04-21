@@ -217,128 +217,20 @@ import rdkit.Chem.AllChem as rdkit
 import copy
 import os
 import warnings
-from functools import partial, wraps
+from functools import wraps
 import networkx as nx
-import multiprocessing as mp
 from collections import Counter
 from os.path import join
 from uuid import uuid4
 import logging
-from threading import Thread
 
 from ..utilities import (matrix_centroid,
                          FunctionData,
-                         rotation_matrix_arbitrary_axis,
-                         daemon_logger,
-                         logged_call,
-                         OPTIONS)
+                         rotation_matrix_arbitrary_axis)
 
 from ..molecular import func_key
 
 logger = logging.getLogger(__name__)
-
-
-def _calc_fitness(func_data, population, processes):
-    """
-    Calculates the fitness values of all members of a population.
-
-    Parameters
-    ----------
-    func_data : :class:`.FunctionData`, :class:`function`
-        A :class:`.FunctionData` instance representing the chosen
-        fitness function and any additional parameters it may require.
-
-        Alternatively, it can be a function which takes 1
-        argument: the molecule whose fitness is to be calculated.
-
-    population : :class:`.GAPopulation`
-        The population whose members must have their fitness
-        calculated.
-
-    processes : :class:`int`
-        The number of parallel processes to create.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
-    manager = mp.Manager()
-    logq = manager.Queue()
-    log_thread = Thread(target=daemon_logger, args=(logq, ))
-    log_thread.start()
-
-    # Get the fitness function object.
-    if isinstance(func_data, FunctionData):
-        func = globals()[func_data.name]
-        # Make sure it won't raise errors while using multiprocessing.
-        p_func = _FitnessFunc(partial(func, **func_data.params))
-
-    # If the func_data is not a FunctionData object it must be a
-    # function which can be directly called on a molecule.
-    else:
-        p_func = _FitnessFunc(func_data)
-
-    # Apply the function to every member of the population, in
-    # parallel.
-    with mp.get_context('spawn').Pool(processes) as pool:
-        evaluated = pool.starmap(logged_call,
-                                 ((logq, p_func, mem) for
-                                  mem in population))
-
-    # Update the structures in the population.
-    sorted_new = sorted(evaluated, key=lambda m: m.key)
-    sorted_old = sorted(population, key=lambda m: m.key)
-    for old, new in zip(sorted_old, sorted_new):
-        old.__dict__ = dict(vars(new))
-
-    # Make sure the cache is updated with the evaluated versions.
-    if OPTIONS['cache']:
-        for member in evaluated:
-            member.update_cache()
-
-    logq.put(None)
-    log_thread.join()
-
-
-def _calc_fitness_serial(func_data, population):
-    """
-    Calculates the fitness values of all members of a population.
-
-    Parameters
-    ----------
-    func_data : :class:`.FunctionData`, :class:`function`
-        A :class:`.FunctionData` instance representing the chosen
-        fitness function and any additional parameters it may require.
-
-        Alternatively, it can be a function which takes 1
-        argument: the molecule whose fitness is to be calculated.
-
-    population : :class:`.GAPopulation`
-        The population whose members must have their fitness
-        calculated.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
-    # Get the fitness function object.
-    if isinstance(func_data, FunctionData):
-        func = globals()[func_data.name]
-        # Make sure it won't raise errors while using multiprocessing.
-        p_func = _FitnessFunc(partial(func, **func_data.params))
-
-    # If the func_data is not a FunctionData object it must be a
-    # function which can be directly called on a molecule.
-    else:
-        p_func = _FitnessFunc(func_data)
-
-    # Apply the function to every member of the population.
-    for member in population:
-        p_func(member)
 
 
 def _param_labels(*labels):
@@ -383,95 +275,33 @@ def _param_labels(*labels):
     return add_labels
 
 
-class _FitnessFunc:
+class RandomFitness(FitnessCalculator):
     """
-    A decorator for fitness functions.
-
-    This decorator is applied to all fitness functions automatically in
-    :func:`_calc_fitness`. It should not be applied explicitly when
-    defining the functions.
-
-    The decorator prevents fitness functions from raising if
-    they fail (necessary for ``multiprocessing`` compatibility),
-    prevents them from being run twice on the same molecule and stores
-    the value returned by them in
-    :attr:`.MacroMolecule.unscaled_fitness`.
 
     """
 
-    def __init__(self, func):
+    def fitness(self, mol):
         """
-        Initializes a :class:`_FitnessFunc` instance.
-
-        Parameters
-        ----------
-        func : :class:`function`
-            The fitness function to be decorated.
-
-        """
-
-        wraps(func)(self)
-
-    def __call__(self, macro_mol):
-        """
-        Decorates and calls the fitness function.
+        Returns a random fitness value.
 
         Parameters
         ----------
         macro_mol : :class:`.MacroMolecule`
-            The molecule to have its fitness calculated.
+            The molecule for which a fitness value is to be calculated.
 
         Returns
         -------
-        :class:`.MacroMolecule`
-            `macro_mol` with its fitness calculated.
+        :class:`float`
+            A random postive number.
 
         """
 
-        func_name = self.__wrapped__.func.__name__
-
-        # If the fitness function has already been applied to this
-        # molecule, return.
-        if func_name in macro_mol.unscaled_fitness:
-            logger.info(f'Skipping {macro_mol.name}.')
-            return macro_mol
-
-        try:
-            logger.info(f'Calculating fitness of {macro_mol.name}.')
-            val = self.__wrapped__(macro_mol)
-
-        except Exception as ex:
-            val = None
-            errormsg = (f'Fitness function "{func_name}()" '
-                        f'failed on molecule "{macro_mol.name}".')
-            logger.error(errormsg, exc_info=True)
-
-        finally:
-            macro_mol.unscaled_fitness[func_name] = val
-            return macro_mol
+        return abs(np.random.normal(50, 20))
 
 
-def random_fitness(macro_mol):
-    """
-    Returns a random fitness value.
-
-    Parameters
-    ----------
-    macro_mol : :class:`.MacroMolecule`
-        The molecule for which a fitness value is to be calculated.
-
-    Returns
-    -------
-    :class:`float`
-        A random postive number.
-
-    """
-
-    return abs(np.random.normal(50, 20))
-
-
-@_param_labels('var1', 'var2', 'var3', 'var4')
-def random_fitness_vector(macro_mol):
+#@_param_labels('var1', 'var2', 'var3', 'var4')
+class RandomFitnessVector(FitnessCalculator):
+    def fitness(mol):
     """
     Returns a 4 element array of random numbers.
 
@@ -502,7 +332,7 @@ def random_fitness_vector(macro_mol):
     return f
 
 
-def building_block_atoms(macro_mol):
+class BuildingBlockAtoms(FitnessCalculator):
     """
     Returns the number of atoms in the molecule.
 
@@ -518,73 +348,8 @@ def building_block_atoms(macro_mol):
 
     """
 
-    return macro_mol.mol.GetNumAtoms()
-
-
-def raiser(macro_mol, param1, param2=2):
-    """
-    Doens't calculate a fitness value, raises an error instead.
-
-    This function is used for tests to ensure that when fitness
-    functions raise errors, they are handeled correctly.
-
-    Parameters
-    ---------
-    macro_mol : :class:`.MacroMolecule`
-        The molecule having its fitness calculated.
-
-    param1 : :class:`object`
-        Dummy parameter, does nothing.
-
-    param2 : :class:`object`, optional
-        Dummy keyword parameter, does nothing.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-        This function does not return. It only raises.
-
-    Raises
-    ------
-    :class:`Exception`
-        An exception is always raised.
-
-    """
-
-    raise Exception('Raiser fitness function used.')
-
-
-@_param_labels('var1', 'var2', 'var3', 'var4')
-def partial_raiser(macro_mol):
-    """
-    Calculates fitness or raises at random.
-
-    Parameters
-    ----------
-    macro_mol : :class:`.MacroMolecule`
-        The molecule having its fitness calculated.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        The result of applying :func:`random_fitness_vector` to
-        `macro_mol`.
-
-    Raises
-    ------
-    :class:`Exception`
-        Raised at random.
-
-    """
-
-    if np.random.choice([0, 1]):
-        raise Exception('Partial raiser.')
-
-    r = random_fitness_vector(macro_mol)
-    n1 = 'partial_raiser'
-    n2 = 'random_fitness_vector'
-    macro_mol.progress_params[n1] = macro_mol.progress_params[n2]
-    return r
+    def fitness(mol):
+        return mol.mol.GetNumAtoms()
 
 
 # Provides labels for the progress plotter.
@@ -594,7 +359,9 @@ def partial_raiser(macro_mol):
                'Energy per Bond',
                'Precursors Strain',
                'Dihedral Strain')
-def cage(macro_mol,
+class CageFitness(FitnessCalculator):
+
+    def fitness(macro_mol,
          pseudoformation_params={'func': FunctionData('rdkit',
                                                       forcefield='mmff')},
          dihedral_SMARTS='',
@@ -693,7 +460,9 @@ def cage(macro_mol,
                'Asymmetry',
                'Precursors Strain',
                'Dihedral Strain')
-def cage_target(macro_mol,
+class CageTargetFitness(FitnessCalculator):
+
+    def fitness(macro_mol,
                 target,
                 efunc,
                 ofunc,
@@ -780,7 +549,10 @@ def cage_target(macro_mol,
                'Asymmetry',
                'Precursors Strain',
                'Dihedral Strain')
-def cage_c60(macro_mol,
+class CageC60Fitness(FitnessCalculator):
+
+
+    def fitness(macro_mol,
              c60,
              efunc,
              ofunc,
