@@ -10,10 +10,10 @@ the various :class:`Mutator` classes, for example
 :class:`RandomBuildingBlock`, :class:`SimilarBuildingBlock`
 or :class:`RandomMutation`.
 
-.. _`adding mutators functions`:
+.. _`adding mutators`:
 
 Extending stk: Adding mutators.
---------------------------------
+-------------------------------
 
 Mutators must simple inherit the :class:`Mutator` class and define a
 method called :meth:`~Mutatator.mutate`, which take a single molecule
