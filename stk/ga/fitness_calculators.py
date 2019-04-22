@@ -8,6 +8,9 @@ is used to calculate the fitness of molecules. A
 :class:`FitnessCalculator.fitness_values`. The calculator can be
 pickled if the calculated values are to be saved.
 
+See :class:`PropertyVector` for examples of how a
+:class:`FitnessCalculator` may be used.
+
 .. _`adding fitness functions`:
 
 Extending stk: Adding fitness calculators.
