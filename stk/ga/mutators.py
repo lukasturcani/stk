@@ -5,7 +5,7 @@ Mutators are objects which mutate molecules. They inherit
 :class:`Mutator` and define a method :meth:`~Mutator.mutate`. This
 method must take a single molecule and return a mutant.
 
-Examples of how mutators are work can be seen the documentation of
+Examples of how mutators work can be seen the documentation of
 the various :class:`Mutator` classes, for example
 :class:`RandomBuildingBlock`, :class:`SimilarBuildingBlock`
 or :class:`RandomMutation`.

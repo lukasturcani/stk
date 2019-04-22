@@ -1,17 +1,37 @@
 """
 Module for defining fitness calculators.
 
-Fitness calculators are classes which derive :class:`FitnessCalculator`
-and define a :meth:`~FitnessCalculator.fitness` method. This method
-is used to calculate the fitness of molecules. A
-:class:`FitnessCalculator` will hold calculated fitness values in
-:class:`FitnessCalculator.fitness_values`. The calculator can be
-pickled if the calculated values are to be saved.
+Fitness calculators are classes which inherit
+:class:`FitnessCalculator and define a
+:meth:`~FitnessCalculator.fitness` method. This method is used to
+calculate the fitness of molecules. A :class:`FitnessCalculator` will
+hold calculated fitness values in
+:class:`FitnessCalculator.fitness_values`. The method will also
+create a :attr:`fitness` attribute on the molecules it evaluates,
+which holds the fitness value. The calculator can be pickled if the
+calculated values are to be saved. The calculated
+fitness may also be ``None`` to indicate a failed calculation. Beyond
+this, the values calculated by :meth:`~FitnessCalculator.fitness`
+can be anything, as long as the :attr:`fitness` value after the
+:class:`FitnessNormalizer` is app
 
-See :class:`PropertyVector` for examples of how a
-:class:`FitnessCalculator` may be used.
 
-.. _`adding fitness functions`:
+For examples of how a :class:`FitnessCalculator` may be used, look
+at the documentation of classes which inherit it, for example
+:class:`PropertyVector`.
+
+How fitness values are calculated.
+----------------------------------
+
+During the GA fitness values are initially calculated by a
+fitness calculator, which is an instance of a class inheriting
+:class:`FitnessCalculator`. After this, fitness normalization takes
+place through an instance of a class inheriting
+:class:`.FitnessNormalizer`
+
+
+
+.. _`adding fitness calculators`:
 
 Extending stk: Adding fitness calculators.
 ------------------------------------------
@@ -162,8 +182,9 @@ class FitnessCalculator:
 
         Returns
         -------
-        :class:`float`
-            The fitness value of a `conformer` of `mol`.
+        :class:`object`
+            The fitness value of a `conformer` of `mol`. Can be
+            ``None`` to indicate a failed calculation.
 
         """
 
@@ -186,6 +207,11 @@ class PropertyVector(FitnessCalculator):
     to a :class:`list`. The :class:`list` forms the property vector of
     the molecule and it is returned as the fitness value of the
     molecule.
+
+    If any of the :class:`function`s returns ``None``, then instead of
+    a :class:`list` the fitness value will be ``None``. In essence,
+    :class:`PropertyVector` requires that all properties were
+    successfully calculated.
 
     Attributes
     ----------
@@ -395,7 +421,8 @@ class PropertyVector(FitnessCalculator):
         Returns
         -------
         :class:`list`
-            A :class:`list` of properties of the `mol`.
+            A :class:`list` of properties of the `mol`. Will be
+            ``None`` if any of the
 
         """
 
@@ -404,5 +431,13 @@ class PropertyVector(FitnessCalculator):
             logger.info(
                 f'Using {property_fn.__name__} on "{mol.name}".'
             )
-            property_vector.append(property_fn(mol, conformer))
+            r = property_fn(mol, conformer)
+            if r is None:
+                logger.warning(
+                    f'Using '
+                    f'{property_fn.__name__} on "{mol.name}" failed.'
+                )
+                return None
+            else:
+                property_vector.append(r)
         return property_vector

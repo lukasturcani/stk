@@ -3,6 +3,9 @@ Defines :class:`Selector` classes.
 
 :class:`Selector`s are classes which define the :meth:`Selector.select`
 method, which is used to select molecules from a :class:`.Population`.
+Examples of how :class:`Selector` classes can be used is given their
+documentation, for example :class:`Fittest`, :class:`Roulette` or
+:class:`AboveAverage`.
 
 :class:`Selector`s can be combined to generate more complex selection
 processes, such as stochastic sampling, using :class:`.Pipeline` or
