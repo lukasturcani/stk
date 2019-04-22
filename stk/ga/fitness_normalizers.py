@@ -48,7 +48,8 @@ def _handle_failed_molecules(normalize):
 
     This decorator makes :meth:`~FitnessNormalizer.normalize` methods
     set the fitness of molecules with a :attr:`fitness` of ``None`` to
-    half the minimum fitness in the population.
+    half the minimum fitness in the population, if
+    :attr:`handle_failed` is ``True```.
 
     Parameters
     ----------
@@ -69,10 +70,12 @@ def _handle_failed_molecules(normalize):
             lambda m: m.fitness is None
         )
         r = normalize(self, valid_pop)
-        minimum_fitness = min(m.fitness for m in valid_pop)
-        for member in population:
-            if member.fitness is None:
-                member.fitness = minimum_fitness/2
+
+        if self.handle_failed:
+            minimum_fitness = min(m.fitness for m in valid_pop)
+            for member in population:
+                if member.fitness is None:
+                    member.fitness = minimum_fitness/2
         return r
 
     return inner
@@ -82,7 +85,19 @@ class FitnessNormalizer:
     """
     Normalizes fitness values across a :class:`.Population`.
 
+    Attributes
+    ----------
+    handle_failed : :class:`bool`
+        If ``True``, the normalized :attr:`fitness` value of molecules
+        with a :attr:`fitness` value of ``None`` is half the minimum
+        normalized fitness value in the population. If ``False`` the
+        normalization keeps ``None`` in the :attr:`fitness` attribute
+        of molecules.
+
     """
+
+    def __init__(self):
+        self.handle_failed = True
 
     def __init_subclass__(cls, **kwargs):
         cls.normalize = _handle_failed_molecules(cls.normalize)
@@ -228,6 +243,7 @@ class Power(FitnessNormalizer):
         """
 
         self.power = power
+        super.__init__()
 
     def normalize(self, population):
         """
@@ -367,6 +383,7 @@ class Multiply(FitnessNormalizer):
         """
 
         self.coefficient = coefficient
+        super().__init__()
 
     def normalize(self, population):
         """
