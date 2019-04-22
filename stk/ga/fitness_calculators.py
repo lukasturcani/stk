@@ -212,764 +212,360 @@ and ``'Molecule Radius / m-9'``, respectively.
 
 """
 
-import numpy as np
-import rdkit.Chem.AllChem as rdkit
-import copy
-import os
-import warnings
 from functools import wraps
-import networkx as nx
-from collections import Counter
-from os.path import join
-from uuid import uuid4
 import logging
-
-from ..utilities import (matrix_centroid,
-                         FunctionData,
-                         rotation_matrix_arbitrary_axis)
-
-from ..molecular import func_key
 
 logger = logging.getLogger(__name__)
 
 
-def _param_labels(*labels):
+def _add_fitness_update(fitness):
     """
-    Adds the :attr:`param_labels` attribute to a fitness function.
+    Makes fitness functions add a :attr:`fitness` attribute.
 
-    The point of this decorator is described in :ref:`plotting-note`.
+    The attribute is added to the :class:`.Molecule` objects evaluated
+    by the :meth:`~FitnessCalculator.fitness` method.
 
     Parameters
     ----------
-    *labels : :class:`str`
-        This function takes an arbitrary number of strings. The strings
-        are the y-axis labels for each graph made per variable in
-        :attr:`.MacroMolecule.progress_params`. The order of strings
-        must correspond to the order of variables placed into
-        :attr:`.MacroMolecule.progress_params`.
+    fitness : :class:`function`
+        A fitness function, which is a
+        :meth:`~FitnessCalculator.fitness` method of a
+        :class:`FitnessCalculator`.
 
     Returns
     -------
     :class:`function`
-        The decorated function, with the attribute :attr:`param_labels`
-        added. :attr:`param_labels` holds the strings provided in
-        `*labels`.
-
-    Examples
-    --------
-
-    .. code-block:: python
-
-        @_param_labels('ONE', 'TWO', 'THREE')
-        def some_func(...):
-            return 1
-
-        some_func.param_labels  # ['ONE', 'TWO', 'THREE']
+        The decorated fitness function.
 
     """
 
-    def add_labels(func):
-        func.param_labels = labels
-        return func
+    @wraps(fitness)
+    def inner(self, mol, conformer=-1):
+        r = fitness(self, mol, conformer)
+        mol.fitness = r
+        return r
 
-    return add_labels
+    return inner
 
 
-class RandomFitness(FitnessCalculator):
+def _add_fitness_caching(fitness):
+    """
+    Gives fitness functions the option skip re-calculatations.
+
+    Parameters
+    ----------
+    fitness : :class:`function`
+        A fitness function, which is a
+        :meth:`~FitnessCalculator.fitness` method of a
+        :class:`FitnessCalculator`.
+
+    Returns
+    -------
+    :class:`function`
+        The decorated fitness function.
+
     """
 
+    @wraps(fitness)
+    def inner(self, mol, conformer=-1):
+        key = (mol, conformer)
+        if self.use_cache and key in self.fitness_values:
+            return self.fitness_values[(mol, conformer)]
+
+        r = fitness(self, mol, conformer)
+        self.fitness_values[key] = r
+        return r
+
+    return inner
+
+
+class FitnessCalculator:
+    """
+    Calculates and stores fitness values of molecules.
+
+    A :class:`FitnessCalculator` will automatically add a
+    :attr:`fitness` attribute to any :class:`.Molecule` objects
+    it calculates a fitness value for. The attribute will hold the
+    calculated fitness value
+
+    Attributes
+    ----------
+    use_cache : :bool`True`
+        If ``True`` then fitness values for molecules and conformers
+        already held in :attr:`fitness_values` are not re-calculated
+        and the value stored is used.
+
+    fitness_values : :class:`dict`
+        Stores fitness values of molecules in the form:
+
+        .. code-block:: python
+
+            fitness_values = {
+                (mol1, conf1): 12.2,
+                (mol1, conf3): 124.31,
+                (mol2, conf1): 0.2
+            }
+
+        where ``mol1`` and ``mol2`` are :class:`.Molecule` objects
+        and ``conf1`` and ``conf3`` are :class:`int` which are the
+        conformers used to calculate the fitness values.
+
     """
 
-    def fitness(self, mol):
+    def __init__(self, use_cache=True):
+        self.use_cache = use_cache
+        self.fitness_values = {}
+
+    def __init_subclass__(cls, **kwargs):
+        cls.fitness = _add_fitness_update(cls.fitness)
+        cls.fitness = _add_fitness_caching(cls.fitness)
+
+    def fitness(self, mol, conformer=-1):
         """
-        Returns a random fitness value.
+        Calculates the fitness value of a molecule.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The molecule for which a fitness value is to be calculated.
+        mol : :class:`.Molecule`
+            The molecule whose fitness should be calculated.
+
+        conformer : :class:`int`, optional
+            The conformer of `mol` to use.
 
         Returns
         -------
         :class:`float`
-            A random postive number.
+            The fitness value of a `conformer` of `mol`.
 
         """
 
-        return abs(np.random.normal(50, 20))
-
-
-#@_param_labels('var1', 'var2', 'var3', 'var4')
-class RandomFitnessVector(FitnessCalculator):
-    def fitness(mol):
-    """
-    Returns a 4 element array of random numbers.
-
-    Notes
-    -----
-    This function places the array into
-    :attr:`~.MacroMolecule.progress_params` of `macro_mol`.
-
-    Parameters
-    ----------
-    macro_mol : :class:`.MacroMolecule`
-        The molecule for which a fitness value is to be calculated.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        An array holding the 4 random numbers.
-
-    """
-
-    # Make a random fitness vector.
-    f = abs(np.random.normal(50, 20, 4))
-    # This multiplication ensures that the elements of the fitness
-    # vector all have different oraders of magnitude and that some
-    # are negative.
-    f = np.multiply(f, np.array([0.01, 1, 10, -100]))
-    macro_mol.progress_params['random_fitness_vector'] = f.tolist()
-    return f
-
-
-class BuildingBlockAtoms(FitnessCalculator):
-    """
-    Returns the number of atoms in the molecule.
-
-    Parameters
-    ----------
-    macro_mol : :class:`.MacroMolecule`
-        The molecule having its fitness calculated.
-
-    Returns
-    -------
-    :class:`int`
-        The number of atoms in `macro_mol`.
-
-    """
-
-    def fitness(mol):
-        return mol.mol.GetNumAtoms()
+        raise NotImplementedError()
 
 
 # Provides labels for the progress plotter.
-@_param_labels('Cavity Difference',
-               'Window Difference',
-               'Asymmetry',
-               'Energy per Bond',
-               'Precursors Strain',
-               'Dihedral Strain')
-class CageFitness(FitnessCalculator):
-
-    def fitness(macro_mol,
-         pseudoformation_params={'func': FunctionData('rdkit',
-                                                      forcefield='mmff')},
-         dihedral_SMARTS='',
-         target_dihedral=180):
+# @_param_labels('Cavity Difference',
+#                'Window Difference',
+#                'Asymmetry',
+#                'Energy per Bond',
+#                'Precursors Strain',
+#                'Dihedral Strain')
+class PropertyVector(FitnessCalculator):
     """
-    Returns the fitness vector of a cage.
+    Calculates the a set of properties of a molecule.
 
-    The fitness vector consists of the following properties in the
-    listed order
+    This :class:`FitnessCalculator` applies a series of
+    :class:`function`s to a :class:`.Molecule` and appends each result
+    to a :class:`list`. The :class:`list` forms the property vector of
+    the molecule and it is returned as the fitness value of the
+    molecule.
 
-        1. `cavity` - the diameter of the cage pore.
-        2. `window` - the diameter of the largest cage window.
-        3. `asymmetry` - the sum of the size differences of all the
-           windows in `macro_mol`.
-        4. `eng_per_bond` - The formation energy of `macro_mol` per
-           bond made.
-        5. `prec_strain` - The mean rmsd between the free building
-           block and those in the macromolecule.
-        6. `dihedral_strain` - The % relative difference between the
-           average dihedral angle within the molecule and a target
-           value. The user must provide the SMARTS for the dihedral and
-           the target value.
-
-    Parameters
+    Attributes
     ----------
-    macro_mol : :class:`.Cage`
-        The cage whose fitness is to be calculated.
+    property_fns : :class:`tuple` of :class:`function`
+        A group of :class:`function`s, each of which is used to
+        calculate a single property of the molecule. Each function must
+        take 2 arguments, `mol` and `conformer`. `mol` accepts a
+        :class:`.Molecule` object and `conformer` accepts an
+        :class:`int`. These are the molecule and the conformer id used
+        to calculate the property.
 
-    dihedral_SMARTS : :class:`str`, optional
-        The SMARTS code for the dihedral of interest.
 
-    target_dihedral : :class:`float`, optional
-        The target value for the dihedral angle.
+    Examples
+    --------
+    Use on :class:`.StructUnit` objects.
 
-    pseudoformation_params : dict, optional
-        This fitness function calculates the formation energy using
-        :meth:`.Energy.pseudoformation`. This parameter defines the
-        arguments passed to this method via a dictionary. The name of
-        the argument is the key and the value of the argument is the
-        value.
+    .. code-block:: python
 
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        The numpy array holding the fitness vector.
+        # Create the molecules which are to have fitness values
+        # evaluated.
+        mol1 = StructUnit.smiles_init('NCCN', ['amine'])
+        mol2 = StructUnit2.smiles_init('NC[Si]CCCN', ['amine'])
+        mol3 = StructUnit3.smiles_init('O=CCC(C=O)CCC=O', ['aldehyde'])
 
-    Raises
-    ------
-    :class:`ValueError`
-        If the calculation of a fitness parameter fails.
+        # Create the functions which calculate the molecule properties.
+        def atom_number(mol, conformer):
+            return mol.mol.GetNumAtoms()
+
+        def diameter(mol, conformer):
+            return mol.max_diamater(conformer)
+
+        def energy(mol, conformer):
+            energy_calculator = MMFFEnergy()
+            return energy_calculator.energy(mol, conformer)
+
+        # Create the fitness calculator.
+        fitness_calculator = PropertyVector(atom_number,
+                                            diameter,
+                                            energy)
+
+        # Calculate the fitness vector of mol1. It will be a list
+        # holding the number of atoms, diameter and energy of mol1,
+        # respectively.
+        mol1_fitness = fitness_calculator.fitness(mol1)
+        # The molecule will also have a fitness attribute holding the
+        # result.
+        if mol1.fitness == mol1_fitness:
+            print('Fitness attribute added.')
+
+        # Calculate the fitness vector of mol2. It will be a list
+        # holding the number of atoms, diameter and energy of mol2,
+        # respectively.
+        mol2_fitness = fitness_calculator.fitness(mol2)
+        # The molecule will also have a fitness attribute holding the
+        # result.
+        if mol2.fitness == mol2_fitness:
+            print('Fitness attribute added.')
+
+        # Calculate the fitness vector of mol3. It will be a list
+        # holding the number of atoms, diameter and energy of mol3,
+        # respectively.
+        mol3_fitness = fitness_calculator.fitness(mol3)
+        # The molecule will also have a fitness attribute holding the
+        # result.
+        if mol3.fitness == mol3_fitness:
+            print('Fitness attribute added.')
+
+        # The fitness calculate will have all the results saved in
+        # its fitness_values attribute.
+        print(fitness_calculator.fitness_values)
+
+
+    Use on :class:`.MacroMolecule` objects, :class:`.Polymer`
+
+    .. code-block:: python
+
+        # First create molecules whose fitness value we wish to
+        # caclculate.
+        bb1 = StructUnit2.smiles_init('[Br]CC[Br]', ['bromine'])
+        polymer1 = Polymer([bb1], Linear('A', [0], n=5))
+
+        bb2 = StructUnit2.smiles_init('[Br]CCNNCC[Br]', ['bromine'])
+        polymer2 = Polymer([bb1, bb2], Linear('AB', [0, 0], n=2))
+
+        # Create the functions which calculate the molecule properties.
+        def atom_number(mol, conformer):
+            return mol.mol.GetNumAtoms()
+
+        def diameter(mol, conformer):
+            return mol.max_diamater(conformer)
+
+        def monomer_number(mol, conformer):
+            return mol.topology.n * len(mol.topology.repeating_unit)
+
+        # Create the fitness calculator.
+        fitness_calculator = PropertyVector(atom_number,
+                                            diameter,
+                                            monomer_number)
+
+        # Calculate the fitness vector of polymer1. It will be a list
+        # holding the number of atoms, diameter and the number of
+        # monomers in polymer1, espectively.
+        polymer1_fitness = fitness_calculator.fitness(polymer1)
+        # The molecule will also have a fitness attribute holding the
+        # result.
+        if polymer1.fitness == polymer1_fitness:
+            print('Fitness attribute added.')
+
+        # Calculate the fitness vector of polymer2. It will be a list
+        # holding the number of atoms, diameter and the number of
+        # monomers in polymer2, espectively.
+        polymer2_fitness = fitness_calculator.fitness(polymer2)
+        # The molecule will also have a fitness attribute holding the
+        # result.
+        if polymer2.fitness == polymer2_fitness:
+            print('Fitness attribute added.')
+
+        # The fitness calculate will have all the results saved in
+        # its fitness_values attribute.
+        print(fitness_calculator.fitness_values)
+
+    Use on :class:`.MacroMolecule` objects, :class:`.Cage`
+
+    .. code-block:: python
+
+        # First create molecules whose fitness value we wish to
+        # caclculate.
+        bb1 = StructUnit2.smiles_init('NCCN', ['amine'])
+        bb2 = StructUnit3.smiles_init('O=CCCC(C=O)CC=O', ['aldehyde'])
+
+        cage1 = Cage([bb1, bb2], FourPlusSix())
+        cage2 = Cage([bb1, bb2], EightPlusTwelve())
+
+        # Create the functions which calculate the molecule properties.
+        def cavity_size(mol, conformer):
+            return mol.cavity_size(conformer)
+
+        def window_variance(mol, conformer):
+            return mol.window_variance(conformer)
+
+        # Create the fitness calculator.
+        fitness_calculator = PropertyVector(cavity_size,
+                                            window_variance)
+
+        # Calculate the fitness vector of cage1. It will be a list
+        # holding the cavity size and window variance, respectively.
+        cage1_fitness = fitness_calculator.fitness(cage1)
+        # The molecule will also have a fitness attribute holding the
+        # result.
+        if cage1.fitness == cage1_fitness:
+            print('Fitness attribute added.')
+
+        # Calculate the fitness vector of cage2. It will be a list
+        # holding the cavity size and window variance, respectively.
+        cage2_fitness = fitness_calculator.fitness(cage2)
+        # The molecule will also have a fitness attribute holding the
+        # result.
+        if cage2.fitness == cage2_fitness:
+            print('Fitness attribute added.')
+
+        # The fitness calculate will have all the results saved in
+        # its fitness_values attribute.
+        print(fitness_calculator.fitness_values)
+
 
     """
 
-    # Prevents warnings from getting printed when using
-    # multiprocessing.
-    warnings.filterwarnings('ignore')
-
-    cavity = macro_mol.cavity_size()
-    window = max(macro_mol.windows())
-    asymmetry = macro_mol.window_difference()
-
-    logger.debug('Calculating cage energy.')
-    e_per_bond = macro_mol.energy.pseudoformation(
-                                           **pseudoformation_params)
-    e_per_bond /= macro_mol.bonds_made
-
-    prec_strain = macro_mol.bb_distortion()
-
-    dihedral_strain = macro_mol.dihedral_strain(dihedral_SMARTS,
-                                                target_dihedral)
-
-    macro_mol.progress_params['cage'] = [cavity,
-                                         window,
-                                         asymmetry,
-                                         e_per_bond,
-                                         prec_strain,
-                                         dihedral_strain]
-
-    if None in macro_mol.progress_params['cage']:
-        raise ValueError(('At least one'
-                         ' fitness parameter not calculated.'))
-
-    return np.array([cavity,
-                     window,
-                     asymmetry,
-                     e_per_bond,
-                     prec_strain,
-                     dihedral_strain])
-
-
-@_param_labels('Binding Energy',
-               'Complex Cavity',
-               'Complex Asymmetry',
-               'Complex Strain',
-               'Cavity',
-               'Asymmetry',
-               'Precursors Strain',
-               'Dihedral Strain')
-class CageTargetFitness(FitnessCalculator):
-
-    def fitness(macro_mol,
-                target,
-                efunc,
-                ofunc,
-                dihedral_SMARTS="",
-                target_value=180,
-                rotations=0):
-    """
-    Returns the fitness vector of a cage / target complex.
-
-    The target is randomly rotated inside the cage's cavity and the
-    most stable conformation found is used.
-
-    The function returns a fitness vector consisting of:
-
-        1. binding energy
-        2. cavity of cage in complex
-        3. asymmetry of cage in complex
-        4. strain of cage in complex
-        5. cavity of cage by itself
-        6. asymmetry of cage by itself
-        7. strain of cage by itself
-        8. strain in select dihedral angles of the cage by itself
-
-    Notes
-    -----
-    This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
-
-    Parameters
-    ----------
-    macro_mol : :class:`.Cage`
-        The cage which is to have its fitness calculated.
-
-    target : :class:`.StructUnit`
-        A molecule to be placed inside the cage cavity.
-
-    efunc : :class:`.FunctionData`
-        A :class:`.FunctionData` object representing the energy
-        function used to calculate energies.
-
-    ofunc : :class:`.FunctionData`
-        A :class:`.FunctionData` object representing the optimization
-        function to be run on the generated complexes.
-
-    dihedral_SMARTS : :class:`str`, optional
-        The SMARTS code for the dihedral of interest.
-
-    target_value : :class:`float`, optional
-        A number representing the target value for the dihedral angle.
-
-    rotations : :class:`int`, optional
-        The number of times the target should be randomly rotated
-        within the cage cavity in order to find the most stable
-        conformation.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        The numpy array holding the fitness vector.
-
-    Raises
-    ------
-    :class:`ValueError`
-        If the calculation of a fitness parameter fails.
-
-    """
-
-    return _cage_target('cage_target',
-                        macro_mol,
-                        target,
-                        efunc,
-                        ofunc,
-                        FunctionData('_generate_complexes',
-                                     number=rotations+1),
-                        dihedral_SMARTS,
-                        target_value)
-
-
-@_param_labels('Binding Energy',
-               'Complex Cavity',
-               'Complex Asymmetry',
-               'Complex Strain',
-               'Cavity',
-               'Asymmetry',
-               'Precursors Strain',
-               'Dihedral Strain')
-class CageC60Fitness(FitnessCalculator):
-
-
-    def fitness(macro_mol,
-             c60,
-             efunc,
-             ofunc,
-             n5fold,
-             n2fold,
-             dihedral_SMARTS='',
-             target_dihedral=180):
-    """
-    Calculates the fitness vector of a cage / C60 complex.
-
-    The difference between this function and :func:`cage_target` is
-    that the rotations are specifically aimed at sampling C60 entirely
-    and systematically. Rather than the random sampling used by the
-    other function.
-
-    The function returns a fitness vector consisting of:
-
-        1. binding energy
-        2. cavity of cage in complex
-        3. asymmetry of cage in complex
-        4. strain of cage in complex
-        5. cavity of cage by itself
-        6. asymmetry of cage by itself
-        7. strain of cage by itself
-        8. strain in select dihedral angles of the cage by itself
-
-    Parameters
-    ----------
-    macro_mol : :class:`.Cage`
-        The cage which is to have its fitness calculated.
-
-    c60 : :class:`.StructUnit`
-        A C60 molecule to be placed inside the cage cavity.
-
-    efunc : :class:`.FunctionData`
-        A :class:`.FunctionData` object representing the energy
-        function used to calculate energies.
-
-    ofunc : :class:`.FunctionData`
-        A :class:`.FunctionData` object representing the optimization
-        function to be run on the generated complexes.
-
-    n5fold : :class:`int`
-        The number of rotations along the 5-fold axis of symmetry.
-
-    n2fold : :class:`int`
-        The number of rotations along the 2 fold axis of symmetry per
-        rotation along the 5-fold axis.
-
-    dihedral_SMARTS : :class:`str`, optional
-        The SMARTS code for the dihedral of interest.
-
-    target_dihedral : :class:`float`, optional
-        The target value for the dihedral angle.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        The numpy array holding the fitness vector.
-
-    Raises
-    ------
-    :class:`ValueError`
-        If the calculation of a fitness parameter fails.
-
-    """
-    return _cage_target('cage_c60',
-                        macro_mol,
-                        c60,
-                        efunc,
-                        ofunc,
-                        FunctionData('_c60_rotations',
-                                     n5fold=n5fold,
-                                     n2fold=n2fold),
-                        dihedral_SMARTS,
-                        target_dihedral)
-
-
-def _cage_target(func_name,
-                 macro_mol,
-                 target,
-                 efunc,
-                 ofunc,
-                 rotation_func,
-                 dihedral_SMARTS,
-                 target_dihedral):
-    """
-    A general fitness function for calculating fitness of complexes.
-
-    This function should be wrapped by other fitness functions which
-    define their own rotation function. For example :func:`cage_c60`
-    and :func:`cage_target`.
-
-    The function returns a fitness vector consisting of:
-
-        1. binding energy
-        2. cavity of cage in complex
-        3. asymmetry of cage in complex
-        4. strain of cage in complex
-        5. cavity of cage by itself
-        6. asymmetry of cage by itself
-        7. strain of cage by itself
-        8. strain in select dihedral angles of the cage by itself
-
-    Parameters
-    ----------
-    func_name : :class:`str`
-        The name of the external fitness function calling this one.
-        Used for the key in :attr:`~.MacroMolecule.progress_params`.
-
-    macro_mol : :class:`.Cage`
-        The cage which is to have its fitness calculated.
-
-    target : :class:`.StructUnit`
-        A molecule to be placed inside the cage cavity.
-
-    efunc : :class:`.FunctionData`
-        A :class:`.FunctionData` object representing the energy
-        function used to calculate energies.
-
-    ofunc : :class:`.FunctionData`
-        A :class:`.FunctionData` object representing the optimization
-        function to be run on the generated complexes.
-
-    rotation_func : :class:`.FunctionData`
-        A :class:`.FunctionData` object representing the rotation
-        function to be used.
-
-    dihedral_SMARTS : :class:`str`, optional
-        The SMARTS code for the dihedral of interest.
-
-    target_dihedral : :class:`float`, optional
-        The target value for the dihedral angle.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        The numpy array holding the fitness vector.
-
-    Raises
-    ------
-    :class:`ValueError`
-        If the calculation of a fitness parameter fails.
-
-    """
-
-    warnings.filterwarnings('ignore')
-    cls = macro_mol.__class__
-    Energy = macro_mol.energy.__class__
-
-    # Create a folder to hold all the complexes generated by this
-    # function.
-    folder_path = _make_cage_target_folder()
-    # Transform the FunctionData instances into functions.
-    optfunc = ... #getattr(optimization, ofunc.name)
-    rot_func = globals()[rotation_func.name]
-
-    # Make a template name for all the complexes generated by this
-    # function. If `macro_mol` has a `name` attribute use that as the
-    # template. If `macro_mol` does not have a `name` the template will
-    # just be a random, unique number.
-    name = getattr(macro_mol, 'name', str(uuid4().int))
-
-    # Make a copy version of `macro_mol` which is unoptimizted.
-    unopt_macro_mol = copy.deepcopy(macro_mol)
-    unopt_macro_mol.topology.build(unopt_macro_mol)
-
-    # This function creates a new molecule holding both the target
-    # and the cage centered at the origin. It then calculates the
-    # energy of this complex and compares it to the energies of the
-    # molecules when separate. The more stable the complex relative
-    # to the individuals the higher the fitness.
-
-    # Create rdkit instances of the target in the cage for each
-    # rotation.
-    rdkit_complexes = rot_func(unopt_macro_mol, target,
-                               **rotation_func.params)
-
-    # Optimize the strcuture of the cage/target complexes.
-    macromol_complexes = []
-    logger.debug('Optimizing complex structures.')
-    for i, complex_ in enumerate(rdkit_complexes):
-        # In order to use the optimization functions, first the data
-        # is loaded into a ``Cage`` instance and its .mol
-        # file is written to the disk.
-        mm_complex = cls.__new__(cls)
-        mm_complex.mol = complex_
-        mm_complex.name = name + '_COMPLEX_{0}'.format(i)
-        mm_complex.optimized = False
-        mm_complex.energy = Energy(mm_complex)
-        mm_complex.topology = macro_mol.topology
-        mm_complex.building_blocks = macro_mol.building_blocks
-        mm_complex.func_groups = macro_mol.func_groups
-        optfunc(mm_complex, **ofunc.params)
-        macromol_complexes.append(mm_complex)
-
-    # Calculate the energy of the complex and compare to the
-    # individual energies. If more than complex was made, use the
-    # most stable version.
-    mm_energy = getattr(macro_mol.energy,
-                        efunc.name)(**efunc.params)
-    target_energy = getattr(target.energy, efunc.name)(**efunc.params)
-
-    energy_separate = mm_energy + target_energy
-
-    logger.debug('Calculating complex energies.')
-    min_eng_cmplx = min(macromol_complexes,
-                        key=lambda x:
-                        getattr(x.energy, efunc.name)(**efunc.params))
-
-    # Write the most stable complex to a file.
-    min_eng_cmplx.write(join(folder_path, min_eng_cmplx.name+'.mol'))
-
-    ekey = func_key(getattr(Energy, efunc.name),
-                    (min_eng_cmplx.energy, ), efunc.params)
-
-    binding_energy = (min_eng_cmplx.energy.values[ekey] -
-                      energy_separate)
-
-    frag1, frag2 = rdkit.GetMolFrags(min_eng_cmplx.mol,
-                                     asMols=True,
-                                     sanitizeFrags=False)
-
-    cage_counter = Counter(x.GetAtomicNum() for x in
-                           macro_mol.mol.GetAtoms())
-    frag_counters = [(frag1, Counter(x.GetAtomicNum() for x in
-                     frag1.GetAtoms())),
-
-                     (frag2, Counter(x.GetAtomicNum() for x in
-                      frag2.GetAtoms()))]
-
-    cmplx_cage_mol = next(frag for frag, counter in frag_counters if
-                          counter == cage_counter)
-
-    cmplx_cage = cls.__new__(cls)
-    cmplx_cage.building_blocks = list(macro_mol.building_blocks)
-    cmplx_cage.func_groups = list(macro_mol.func_groups)
-    cmplx_cage.atom_props = dict(macro_mol.atom_props)
-    cmplx_cage.mol = cmplx_cage_mol
-    cmplx_cage.topology = macro_mol.topology
-    cmplx_cage.name = min_eng_cmplx.name + '_no_target'
-    # Calculate fitness parameters of cage in complex.
-    cmplx_cavity = cmplx_cage.cavity_size()
-    cmplx_asymmetry = cmplx_cage.window_difference()
-    cmplx_strain = cmplx_cage.bb_distortion()
-
-    # Write the cage without the target to a file.
-    cmplx_cage.write(join(folder_path, cmplx_cage.name+'.mol'))
-
-    # Calculate fitness parameters of cage by itself.
-    cavity = macro_mol.cavity_size()
-    asymmetry = macro_mol.window_difference()
-    prec_strain = macro_mol.bb_distortion()
-    dihedral_strain = macro_mol.dihedral_strain(dihedral_SMARTS,
-                                                target_dihedral)
-    macro_mol.progress_params[func_name] = [binding_energy,
-                                            cmplx_cavity,
-                                            cmplx_asymmetry,
-                                            cmplx_strain,
-                                            cavity,
-                                            asymmetry,
-                                            prec_strain,
-                                            dihedral_strain]
-
-    if None in macro_mol.progress_params[func_name]:
-        raise ValueError(('At least one'
-                         ' fitness parameter not calculated.'),
-                         macro_mol.progress_params[func_name])
-
-    return np.array([binding_energy,
-                     cmplx_cavity,
-                     cmplx_asymmetry,
-                     cmplx_strain,
-                     cavity,
-                     asymmetry,
-                     prec_strain,
-                     dihedral_strain])
-
-
-def _make_cage_target_folder():
-    """
-    Creates a folder to store molecules made by :func:`_cage_target`.
-
-    The function creates a folder called ``cage_target``.
-    Inside will be any complexes formed by the :func:`_cage_target`.
-    The folder will be placed in the current working directory, or
-    if the GA is running, 1 above the current working dirctory. This
-    prevents the generated molecules from being cleaned up by the GA
-    when it's finished.
-
-    Returns
-    -------
-    :class:`str`
-        The path of the ``cage_target`` folder.
-
-    """
-
-    dir_path = os.getcwd()
-    if join('output', 'scratch') in dir_path:
-        dir_path = dir_path.replace('scratch', 'cage_target')
-    else:
-        dir_path = join(dir_path, 'cage_target')
-
-    try:
-        os.mkdir(dir_path)
-    except Exception:
-        pass
-
-    return dir_path
-
-
-def _generate_complexes(macro_mol, target, number=1):
-    """
-    Yields ``rdkit`` molecules of cage / target complexes.
-
-    If multiple complexes are returned, they will be different via a
-    random rotation accross the x, y and z axes.
-
-    Parameters
-    ----------
-    macro_mol : :class:`.Cage`
-        The cage used to form the complex.
-
-    target : :class:`.StructUnit`
-        The target used to form the complex.
-
-    number : :class:`int`, optional
-        The number of complexes to be returned.
-
-    Yields
-    ------
-    :class:`rdkit.Chem.rdchem.Mol`
-        An ``rdkit`` instance holding the cage / target complex.
-
-    """
-
-    # First place both the target and cage at the origin.
-    macro_mol.set_position([0, 0, 0])
-    target.set_position([0, 0, 0])
-
-    # Get the position matrix of the target molecule.
-    og_pos_mat = target.position_matrix()
-
-    # Carry out every rotation and yield a complex for each case.
-    for i in range(number):
-        rot_target = copy.deepcopy(target)
-
-        rot1 = np.random.rand() * 2*np.pi
-        rot2 = np.random.rand() * 2*np.pi
-        rot3 = np.random.rand() * 2*np.pi
-
-        rot_mat1 = rotation_matrix_arbitrary_axis(rot1, [1, 0, 0])
-        rot_mat2 = rotation_matrix_arbitrary_axis(rot2, [0, 1, 0])
-        rot_mat3 = rotation_matrix_arbitrary_axis(rot3, [0, 0, 1])
-
-        new_pos_mat = np.dot(rot_mat1, og_pos_mat)
-        new_pos_mat = np.dot(rot_mat2, new_pos_mat)
-        new_pos_mat = np.dot(rot_mat3, new_pos_mat)
-
-        rot_target.set_position_from_matrix(new_pos_mat)
-
-        yield rdkit.CombineMols(macro_mol.mol, rot_target.mol)
-
-
-def _c60_rotations(macro_mol, c60, n5fold, n2fold):
-    """
-    Rotates C60 about its axes of symmetry while placed in `macro_mol`.
-
-    Parameters
-    ----------
-    macro_mol : :class:`.MacroMolecule`
-        The cage which should have C60 placed inside it.
-
-    c60 : :class:`.StructUnit`
-        A StructUnit instance of C60.
-
-    n5fold : :class:`int`
-        The number of rotations along the 5-fold axis of symmetry.
-
-    n2fold : :class:`int`
-        The number of rotations along the 2-fold axis of symmetry per
-        rotation along the 5-fold axis.
-
-    Yields
-    ------
-    :class:`rdkit.Chem.rdchem.Mol`
-        An ``rdkit`` instance holding the cage / C60 complex.
-
-    """
-
-    macro_mol.set_position([0, 0, 0])
-    c60.set_position([0, 0, 0])
-
-    # Step 1: Align the 5 membered ring with the z-axis.
-
-    # Find a the ids of atoms in a membered ring.
-    g = c60.graph()
-    ids = next(x for x in nx.cycle_basis(g) if len(x) == 5)
-    # Place the coordinates of those atoms in a matrix.
-    ring_matrix = np.array([c60.atom_coords(id_) for id_ in ids])
-
-    # Get the centroid of the ring.
-    ring_centroid = matrix_centroid(ring_matrix)
-    # Align the centroid of the ring with the z-axis.
-    c60.set_orientation(ring_centroid, [0, 0, 1])
-    aligned_c60 = copy.deepcopy(c60)
-
-    # Step 2: Get the rotation angles and apply the rotations. Yield
-    # the resulting complex.
-
-    # Get the angles of the 5 and 2 fold rotations.
-    angles5fold = np.arange(0, 72/180*np.pi, 72/180*np.pi/n5fold)
-    angles2fold = np.arange(0, np.pi, np.pi/n2fold)
-
-    for angle5 in angles5fold:
-        for angle2 in angles2fold:
-            buckyball = copy.deepcopy(aligned_c60)
-            buckyball.rotate(angle5, [0, 0, 1])
-            buckyball.rotate(angle2, [0, 1, 0])
-            yield rdkit.CombineMols(macro_mol.mol, buckyball.mol)
+    def __init__(self, *property_fns):
+        """
+        Initializes a :class:`CageFitness` instance.
+
+        Parameters
+        ----------
+        *property_fns : :class:`tuple` of :class:`function`
+            A group of :class:`function`s, each of which is used to
+            calculate a single property of the molecule. Each function
+            must take 2 arguments, `mol` and `conformer`. `mol` accepts
+            a :class:`.Molecule` object and `conformer` accepts an
+            :class:`int`. These are the molecule and the conformer id
+            used to calculate the property.
+
+        """
+
+        self.property_fns = property_fns
+
+    def fitness(self, mol, conformer=-1):
+        """
+        Returns the property vector of a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule whose property vector should be calculated.
+
+        conformer : :class:`int`, optional
+            The conformer of `mol` to use.
+
+        Returns
+        -------
+        :class:`list`
+            A :class:`list` of properties of the `mol`.
+
+        """
+
+        property_vector = []
+        for property_fn in self.property_fns:
+            logger.info(
+                f'Using {property_fn.__name__} on "{mol.name}".'
+            )
+            property_vector.append(property_fn(mol, conformer))
+        return property_vector
