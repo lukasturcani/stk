@@ -6,7 +6,7 @@ Fitness calculators are classes which inherit
 :meth:`~FitnessCalculator.fitness` method. This method is used to
 calculate the fitness of molecules. A :class:`FitnessCalculator` will
 hold calculated fitness values in
-:class:`FitnessCalculator.fitness_values`. The method will also
+:attr:`FitnessCalculator.fitness_values`. The method will also
 create a :attr:`fitness` attribute on the molecules it evaluates,
 which holds the fitness value. The values calculated by
 :meth:`~FitnessCalculator.fitness` can be any Python object, as long as
@@ -14,21 +14,23 @@ the :attr:`fitness` value after :class:`FitnessNormalizer.normalize` is
 applied is set to a positive, non-zero :class:`float`. The calculated
 fitness may also be ``None`` to indicate a failed calculation.
 
-The calculator can be pickled if the calculated values are to be saved.
+The :class:`FitnessCalculator` can be pickled if the calculated values
+are to be saved.
 
 For examples of how a :class:`FitnessCalculator` may be used, look
 at the documentation of classes which inherit it, for example
 :class:`PropertyVector`.
 
-During the GA fitness values are initially calculated by a
+During the GA, fitness values are initially calculated by a
 fitness calculator, which is an instance of a
 :class:`FitnessCalculator`. After this, fitness normalization takes
 place through an instance of a :class:`.FitnessNormalizer`. The
 difference between fitness calculation and normalization is that
 a fitness calculation always returns the same fitness value for a
-given molecule, while fitness normalization updates fitness values
-based on all the molecules in a population, for example by dividing
-the fitness value by the average fitness in the population.
+given molecule and conformer, while fitness normalization updates
+existing fitness values based on all the fitness values in a
+population, for example by dividing the fitness value of all molecules
+by the mean fitness across the population.
 
 .. _`adding fitness calculators`:
 

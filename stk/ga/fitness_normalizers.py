@@ -8,7 +8,7 @@ After :meth:`~FitnessNormalizer.normalize` is run, every
 :class:`.Molecule` in the population must hold a positive, non-zero
 :class:`float` in its :attr:`fitness` attribute. However, before
 :meth:`~FitnessNormalizer.normalize` the values in the :attr:`fitness`
-attribute can be literally anything. It is the job of the
+attribute can be any Python object. It is the job of the
 :class:`FitnessNormalizer` to convert these to positive, non-zero
 :class:`float`s.
 
