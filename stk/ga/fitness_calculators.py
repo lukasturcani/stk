@@ -33,7 +33,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _add_fitness_update(fitness):
+def _add_fitness_attribute_creation(fitness):
     """
     Makes fitness functions add a :attr:`fitness` attribute.
 
@@ -144,8 +144,9 @@ class FitnessCalculator:
         self.fitness_values = {}
 
     def __init_subclass__(cls, **kwargs):
-        cls.fitness = _add_fitness_update(cls.fitness)
+        cls.fitness = _add_fitness_attribute_creation(cls.fitness)
         cls.fitness = _add_fitness_caching(cls.fitness)
+        return super().__init_subclass__(**kwargs)
 
     def fitness(self, mol, conformer=-1):
         """
@@ -319,18 +320,20 @@ class PropertyVector(FitnessCalculator):
         cage2 = Cage([bb1, bb2], EightPlusTwelve())
 
         # Create the functions which calculate the molecule properties.
-        def cavity_size(mol, conformer):
-            return mol.cavity_size(conformer)
+        def cavity_difference(mol, conformer):
+            # Calculate the difference from a cavity size of 5.
+            return abs(mol.cavity_size(conformer)-5)
 
         def window_variance(mol, conformer):
             return mol.window_variance(conformer)
 
         # Create the fitness calculator.
-        fitness_calculator = PropertyVector(cavity_size,
+        fitness_calculator = PropertyVector(cavity_difference,
                                             window_variance)
 
         # Calculate the fitness vector of cage1. It will be a list
-        # holding the cavity size and window variance, respectively.
+        # holding how different the cavity size is from 5 Angstrom and
+        # window variance, respectively.
         cage1_fitness = fitness_calculator.fitness(cage1)
         # The molecule will also have a fitness attribute holding the
         # result.
@@ -338,7 +341,8 @@ class PropertyVector(FitnessCalculator):
             print('Fitness attribute added.')
 
         # Calculate the fitness vector of cage2. It will be a list
-        # holding the cavity size and window variance, respectively.
+        # holding how different the cavity size is from 5 Angstrom and
+        # window variance, respectively.
         cage2_fitness = fitness_calculator.fitness(cage2)
         # The molecule will also have a fitness attribute holding the
         # result.

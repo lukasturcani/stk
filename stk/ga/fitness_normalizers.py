@@ -50,140 +50,68 @@ start with a leading underscore.
 """
 
 import numpy as np
-import copy
 import logging
-from functools import partial
-
-from .ga_population import GAPopulation
-from ..utilities import FunctionData
+from functools import wraps
 
 
 logger = logging.getLogger(__name__)
 
 
-class Normalization:
+def _remove_failed_molecules(normalize):
     """
-    A class for carrying out normalization of fitness values.
-
-    Attributes
-    ----------
-    funcs : :class:`list` of :class:`.FunctionData`
-        Holds all the normalization functions to be applied each
-        generation, in the order in which they are to be applied.
 
     """
 
-    def __init__(self, funcs):
+    @wraps(normalize)
+    def inner(self, population):
+        population = population.init_copy(population)
+        population.remove_members(
+            lambda m: not hasattr(m, 'fitness') or m.fitness is None
+        )
+        return normalize(self, population)
+
+    return inner
+
+
+class FitnessNormalizer:
+    """
+    Normalizes fitness values across a :class:`.Population`.
+
+    """
+
+    def __init_subclass__(cls, **kwargs):
+        cls.normalize = _remove_failed_molecules(cls.normalize)
+        return super().__init_subclass__(**kwargs)
+
+    def normalize(self, population):
         """
-        Initializes a :class:`Normalization` instance.
+        Normalizes the fitness values in `population`.
 
         Parameters
         ----------
-        funcs : :class:`list` of :class:`.FunctionData` and :class:`function`
-            Holds all the normalization functions to be applied each
-            generation, in the order in which they are to be applied.
-
-            Can be either :class:`.FunctionData` instances which must
-            refer to methods defined in :class:`Normalization` or
-            can be normalization functions directly. If normalization
-            functions are provided directly they must take a single
-            argument, which is the population getting normalized and
-            follow all requirements described in :mod:`normalization`.
-
-        """
-
-        self.funcs = funcs
-
-    def __call__(self, population):
-        """
-        Applies the normalization functions on `population`.
-
-        Parameters
-        ----------
-        population : :class:`.GAPopulation`
-            The population whose members need to have their fitness
-            values normalized.
+        population : :class:`.Population`
+            A :class:`.Population` of molecules whose fitness values
+            should be normalized.
 
         Returns
         -------
         None : :class:`NoneType`
+            The :attr:`fitness` attributes of the molecules in
+            `population` are modified in place.
 
         """
 
-        if isinstance(population.ga_tools.fitness, FunctionData):
-            fitness_func = population.ga_tools.fitness.name
-        else:
-            fitness_func = population.ga_tools.fitness.__name__
+        raise NotImplementedError()
 
-        # First make sure that all the fitness values are reset and
-        # hold the value of the approraite fitness function.
-        for macro_mol in population:
-            # If the unscaled fitness value is None it means that the
-            # fitness calculation failed - assign the minimum fitness
-            # value.
-            if macro_mol.unscaled_fitness[fitness_func] is None:
-                macro_mol.fitness = 1e-4
-            else:
-                macro_mol.fitness = copy.deepcopy(
-                            macro_mol.unscaled_fitness[fitness_func])
 
-        # Make a population of members where all fitness values are
-        # valid. No point in normalizing molecules whose fitness value
-        # was ``None``. The advantage of this is that when writing
-        # normalization functions you can assume all fitness values
-        # have the same type.
+class CombinePropertyVector(FitnessNormalizer):
+    """
 
-        valid_pop = GAPopulation(*(mol for mol in population if
-                                 mol.unscaled_fitness[fitness_func]
-                                 is not None))
+    """
 
-        # Remove duplicates, otherwise the normalization function may
-        # be applied to the same molecule twice in a single step.
-        valid_pop.remove_duplicates()
-
-        # If there were no valid molecules, no need to normalize.
-        if len(valid_pop) == 0:
-            return
-
-        for func_data in self.funcs:
-            if isinstance(func_data, FunctionData):
-                fn = getattr(self, func_data.name)
-                fn = partial(fn, **func_data.params)
-                name = func_data.name
-            else:
-                fn = func_data
-                name = fn.__name__
-
-            logger.debug('Applying "{}()".'.format(name))
-            fn(valid_pop)
-
-    def cage(self, population, cavity, window):
-        """
-        A normalization function for use with :func:`.cage`
-
-        Parameters
-        ----------
-        population : :class:`.GAPopulation`
-            The population whose members need to have their fitness
-            values normalized.
-
-        cavity : :class:`float`
-            The desired size of the cage cavity.
-
-        window : :class:`float`
-            The desired size of the largest cage window.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for mem in population:
-            cavity_diff = abs(mem.fitness[0] - cavity)
-            window_diff = abs(mem.fitness[1] - window)
-            mem.fitness = [cavity_diff, window_diff,
-                           *mem.fitness[2:]]
+    def __init__(self, coefficients, exponents):
+        self.coefficents = coefficients
+        self.exponents = exponents
 
     def combine(self, population, coefficients, exponents):
         """
