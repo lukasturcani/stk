@@ -1,214 +1,26 @@
 """
-Module for defining fitness functions.
+Module for defining fitness calculators.
 
-How fitness values are calculated.
-----------------------------------
-
-The basic outline of the fitness calculation procedure for a single
-molecule is as follows,
-
-.. code-block:: python
-
-    # 1. Start with a MacroMolecule instance.
-    mol = Polymer([monomer1, monomer2], SomeTopology())
-
-    # This new instance has had no fitness functions applied to it
-    # and therefore its "fitness" and "unscaled_fitness" attributes
-    # are empty.
-    mol.fitness  # None
-    mol.unscaled_fitness  # {}
-
-    # 2. Apply a fitness function to the MacroMolecule.
-    mol.unscaled_fitness['random_fitness'] = random_fitness(mol)
-
-    # This adds the unscaled fitness value into the "unscaled_fitness"
-    # attribute, but does not change the "fitness" attribute.
-    mol.fitness  # None
-    mol.unscaled_fitness  # {'random_fitness': 34}
-
-    # 3.Copy the value from "unscaled_fitness" into "fitness".
-    mol.fitness = deepcopy(mol.unscaled_fitness['random_fitness'])
-
-    mol.fitness  # 34
-    mol.unscaled_fitness  # {'random_fitness': 34}
-
-    # 4. Apply any number of normalization functions to the fitness
-    #    value. Normalization functions can be skipped altogether.
-
-    # Normalization functions act on a population of MacroMolecules,
-    # i.e. they normalize the fitness values across the population. So
-    # first step is to put the molecule into a population.
-    pop = GAPopulation(mol)
-
-    # Apply the normalization function.
-    norm_func(pop)
-
-    mol.fitness  # 12
-    mol.unscaled_fitness  # {'random_fitness': 34}
-
-    # Multiple normalization functions may be applied.
-    norm_func2(pop)
-
-    mol.fitness  # 200
-    mol.unscaled_fitness  # {'random_fitness': 34}
-
-When running the GA, this process is much simplified,
-
-.. code-block:: python
-
-    # Start with a population of molecules, representing a GA
-    # generation.
-    pop = GAPopulation(mol1, mol2, mol3)
-
-    mol1.fitness  # None
-    mol1.unscaled_fitness  # {}
-
-    mol2.fitness  # None
-    mol2.unscaled_fitness  # {}
-
-    mol3.fitness  # None
-    mol3.unscaled_fitness  # {}
-
-    # Calculate the unscaled fitness values of all molecules.
-    pop.calculate_member_fitness()
-
-    mol1.fitness  # None
-    mol1.unscaled_fitness  # {'random_fitness': 12}
-
-    mol2.fitness  # None
-    mol2.unscaled_fitness  # {'random_fitness': 34}
-
-    mol3.fitness  # None
-    mol3.unscaled_fitness  # {'random_fitness': 22}
-
-    # Apply the normalization functions.
-    pop.normalize_fitness_values()
-
-    mol1.fitness  # 3
-    mol1.unscaled_fitness  # {'random_fitness': 12}
-
-    mol2.fitness  # 1
-    mol2.unscaled_fitness  # {'random_fitness': 34}
-
-    mol3.fitness  # 2
-    mol3.unscaled_fitness  # {'random_fitness': 22}
-
-The method :meth:`.GAPopulation.normalize_fitness_values` automatically
-copies the fitness value from :attr:`.MacroMolecule.unscaled_fitness`
-into :attr:`.MacroMolecule.fitness` before applying any normalization
-functions. A fitness function is only applied once per molecule,
-because the result depends only on the molecule. However, normalization
-functions are re-applied every generation. This is because for some
-normalization functions, the returned value for a molecule may also
-depend on the other molecules in the population. At each generation,
-a fresh copy of the value from :attr:`.MacroMolecule.unscaled_fitness`
-is made into :attr:`.MacroMolecule.fitness`. This means that the
-normalization functions always start from the unscaled fitness value.
+Fitness calculators are classes which derive :class:`FitnessCalculator`
+and define a :meth:`~FitnessCalculator.fitness` method. This method
+is used to calculate the fitness of molecules. A
+:class:`FitnessCalculator` will hold calculated fitness values in
+:class:`FitnessCalculator.fitness_values`. The calculator can be
+pickled if the calculated values are to be saved.
 
 .. _`adding fitness functions`:
 
-Extending stk: Adding fitness functions.
-----------------------------------------
+Extending stk: Adding fitness calculators.
+------------------------------------------
 
-To add a new fitness function simply write it as a function in this
-module. It will need to take the :class:`.MacroMolecule` instance as
-its first argument and this argument should be called `macro_mol`. The
-purpose of this is to help users identify which arguments are handled
-automatically by ``stk`` and which they need to define in the input
-file. The convention is that if the fitness function takes an argument
-called `macro_mol`, they do not have to specify that argument in the
-input file.
+A new class inheriting :class:`FitnessCalculator` must be added.
+The class must define a :meth:`~FitnessCalculator.fitness` method,
+which takes two arguments. The first is `mol` which takes a
+:class:`.Molecule` object and is the molecule whose fitness is to be
+calculated. The second is `conformer` and it is an :class:`int` holding
+the conformer id of the conformer used for calculating the fitness.
+`conformer` is should be an optional argument, defaulting to ``-1``.
 
-A fitness function must return the value which represents the fitness
-of the molecule `macro_mol`. If a fitness function is meant to be
-paired with a normalization function it can return any value or
-object it likes. Just as long as the normalization functions know how
-to deal with it and convert it to a number.
-
-.. code-block:: python
-
-    def random_fitness(macro_mol):
-        return abs(np.random.normal(50, 20))
-
-Obviously, this is a just toy example but all the key components of
-fitness functions are there. More complex fitness functions can take
-an arbitrary number arguments, and will likely use molecular properties
-to calculate a fitness value. Here is a fitness function which rewards
-molecules for having a desired size.
-
-.. code-block:: python
-
-    def size(macro_mol, desired_size):
-        return abs(macro_mol.max_diameter() - desired_size)
-
-A fitness function may be complex and may not fit neatly into a single
-function. For example, the :func:`cage_target` needs to call
-:func:`_generate_complexes` in order to sample various conformations
-before outputting a fitness value. This is fine. Define helper
-functions such as :func:`_generate_complexes` within this module but
-make sure they are private. This means that names of helper functions
-begin with a leading underscore.
-
-.. _plotting-note:
-
-A note on plotting.
--------------------
-
-As mentioned before, some fitness functions may be complex and as a
-result manipulate all sorts of data. Typically, in order to measure the
-progress of a GA, the fitness values in the population are tracked
-across generations. However, let's say that some hypothetical fitness
-function also calculates the energies of molecules. It may be quite
-interesting plot the evolution of energies across generations too, even
-if the energy is not directly reflect in the final fitness value. If
-this is the case, the fitness function may assign to the
-:attr:`.MacroMolecule.progress_params` attribute of `macro_mol`,
-
-.. code-block:: python
-
-    def example_func(macro_mol):
-        mol_energy = macro_mol.energy.some_energy_func()
-        macro_mol.progress_params['example_func'] = [mol_energy]
-        ...
-
-Now a plot showing the change in ``mol_energy`` across generations will
-be made too, along with the plot showing the changes in fitness.
-
-What if two things are needed to be kept track of? Simple,
-
-.. code-block:: python
-
-    def example_func(macro_mol):
-        mol_energy = macro_mol.energy.some_energy_func()
-        mol_radius = macro_mol.max_diamater() / 2
-        macro_mol.progress_params['example_func'] = [mol_energy,
-                                                     mol_radius]
-        ...
-
-Great, now a separate progress plot ``mol_energy`` and ``mol_radius``
-will be made.
-
-How will the y-axes be labelled in each plot? The decorator
-:func:`_param_labels` exists for this.
-
-Let's create a basic outline of a some fitness function:
-
-.. code-block:: python
-
-    @_param_labels('Molecule Energy / J mol-1', 'Mol Radius / m-9')
-    def some_fitness_fn(macro_mol, some_param):
-        ...
-        calculate_stuff()
-        ...
-        macro_mol.progress_params['some_fitness_fn'] = [mol_energy,
-                                                        mol_radius]
-        ...
-        return fitness_value
-
-If this function is used in the GA, a progress plot will be made for
-each variable placed in :attr:`.MacroMolecule.progress_params` and
-they will have their y-axes labelled ``'Molecule Energy / J mol-1'``
-and ``'Molecule Radius / m-9'``, respectively.
 
 """
 
@@ -290,10 +102,10 @@ class FitnessCalculator:
 
     Attributes
     ----------
-    use_cache : :bool`True`
+    use_cache : :class:`bool`
         If ``True`` then fitness values for molecules and conformers
         already held in :attr:`fitness_values` are not re-calculated
-        and the value stored is used.
+        and the value already stored is used.
 
     fitness_values : :class:`dict`
         Stores fitness values of molecules in the form:
@@ -312,7 +124,19 @@ class FitnessCalculator:
 
     """
 
-    def __init__(self, use_cache=True):
+    def __init__(self, use_cache):
+        """
+        Initializes a :class:`FitnessCalculator` instance.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            If ``True`` then fitness values for molecules and
+            conformers already held in :attr:`fitness_values` are not
+            re-calculated and the value already stored is used.
+
+        """
+
         self.use_cache = use_cache
         self.fitness_values = {}
 
@@ -525,7 +349,7 @@ class PropertyVector(FitnessCalculator):
 
     """
 
-    def __init__(self, *property_fns):
+    def __init__(self, *property_fns, use_cache=True):
         """
         Initializes a :class:`CageFitness` instance.
 
@@ -539,9 +363,15 @@ class PropertyVector(FitnessCalculator):
             :class:`int`. These are the molecule and the conformer id
             used to calculate the property.
 
+        use_cache : :class:`bool`
+            If ``True`` then fitness values for molecules and
+            conformers already held in :attr:`fitness_values` are not
+            re-calculated and the value stored is used.
+
         """
 
         self.property_fns = property_fns
+        super.__init__(use_cache=use_cache)
 
     def fitness(self, mol, conformer=-1):
         """
