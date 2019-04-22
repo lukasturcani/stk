@@ -36,9 +36,14 @@ class Crosser:
 
     """
 
-    def crossover(self):
+    def crossover(self, *mols):
         """
         Applies a crossover operation on some molecules.
+
+        Parameters
+        ----------
+        *mols : :class:`.Molecule`
+            The molecules on which a crossover operation is performed.
 
         Yields
         -------

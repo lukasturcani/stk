@@ -14,6 +14,7 @@ import psutil
 from functools import wraps
 import logging
 from threading import Thread
+from collections import Counter
 
 from .utilities import dedupe, OPTIONS, daemon_logger, logged_call
 
@@ -1123,6 +1124,204 @@ class Population:
 
     def __repr__(self):
         return str(self)
+
+
+class GAPopulation(Population):
+    """
+    Used for applying GA operations to molecules.
+
+    Attributes
+    ----------
+    generation_selector : :class:`.Selector`
+        A :class:`.Selector` used to select molecules in the next
+        generation.
+
+    mutation_selector : :class:`.Selector`
+        A :class:`.Selector` used to select molecules for mutation.
+
+    crossover_selector : :class:`.Selector`
+        A :class:`.Selector` used to select molecules for crossover.
+
+    mutator : :class:`.Mutator`
+        Carries out the mutation of molecules.
+
+    crosser : :class:`.Crosser`
+        Carries out the crossover of molecules.
+
+    fitness_calculator : :class:`.FitnessCalculator`
+        Calculates the fitness values of molecules.
+
+    fitness_normalizer : :class:`.FitnessNormalizer`
+        Normalizes fitness values of molecules.
+
+    """
+
+    def set_ga_tools(self,
+                     generation_selector,
+                     mutation_selector,
+                     crossover_selector,
+                     mutator,
+                     crosser,
+                     fitness_calculator,
+                     fitness_normalizer):
+        """
+        Sets the GA calculators.
+
+        Parameters
+        ----------
+        generation_selector : :class:`.Selector`
+            A :class:`.Selector` used to select molecules in the next
+            generation.
+
+        mutation_selector : :class:`.Selector`
+            A :class:`.Selector` used to select molecules for mutation.
+
+        crossover_selector : :class:`.Selector`
+            A :class:`.Selector` used to select molecules for crossover.
+
+        mutator : :class:`.Mutator`
+            Carries out the mutation of molecules.
+
+        crosser : :class:`.Crosser`
+            Carries out the crossover of molecules.
+
+        fitness_calculator : :class:`.FitnessCalculator`
+            Calculates the fitness values of molecules.
+
+        fitness_normalizer : :class:`.FitnessNormalizer`
+            Normalizes fitness values of molecules.
+
+        """
+
+        self.generation_selector = generation_selector
+        self.mutation_selector = mutation_selector
+        self.crossover_selector = crossover_selector
+        self.mutator = mutator
+        self.crosser = crosser
+        self.fitness_calculator = fitness_calculator
+        self.fitness_normalizer = fitness_normalizer
+
+    def calculate_member_fitness(self, processes=psutil.cpu_count()):
+        """
+        Calculates the fitness values of molecules.
+
+        Parameters
+        ----------
+        processes : :class:`int`
+            The number of processes to create. If ``1`` then fitness
+            values are calculated serially.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if processes == 1:
+            self._calculate_fitness_serial()
+        else:
+            self._calculate_fitness_parallel(processes)
+
+    def _calculate_fitness_serial(self):
+        for mol in self:
+            self.fitness_calculator.fitness(mol)
+
+    def _calculate_fitness_parallel(self, processes):
+        manager = mp.Manager()
+        logq = manager.Queue()
+        log_thread = Thread(target=daemon_logger, args=(logq, ))
+        log_thread.start()
+
+        fitness_fn = _Guard(self.fitness_calculator.fitness)
+
+        # Apply the function to every member of the population, in
+        # parallel.
+        with mp.get_context('spawn').Pool(processes) as pool:
+            evaluated = pool.starmap(logged_call,
+                                     ((logq, fitness_fn, mol) for
+                                      mol in self))
+
+        # Update the molecules in the population.
+        sorted_new = sorted(evaluated, key=lambda m: m.key)
+        sorted_old = sorted(self, key=lambda m: m.key)
+        for old, new in zip(sorted_old, sorted_new):
+            old.__dict__ = dict(vars(new))
+
+        # Make sure the cache is updated.
+        if OPTIONS['cache']:
+            for member in evaluated:
+                member.update_cache()
+
+        logq.put(None)
+        log_thread.join()
+
+    def gen_mutants(self):
+        """
+        Creates mutants.
+
+        The function uses :attr:`mutation_selector` to select molecules
+        and :attr:`mutator` to create the mutants.
+
+        Returns
+        -------
+        :class:`list` of :class:`.Molecule`
+            The generated mutants, minus those already in the
+            population.
+
+        """
+
+        mutants = []
+        parents = self.mutation_selector.select(self)
+        for i, parent in enumerate(parents, 1):
+            logger.info(
+                f'Mutation number {i}. '
+                f'Finish when {self.mutation_selector.num}.'
+            )
+            mutant = self.mutator.mutate(parent)
+            if mutant not in self:
+                mutants.append(mutant)
+
+        return mutants
+
+    def gen_offspring(self):
+        """
+        Creates offspring.
+
+        The function uses :attr:`crossover_selector` to select
+        molecules and :attr:`crosser` to create the offspring.
+
+        Returns
+        -------
+        :class:`list` of :class:`.Molecule`
+            The generated offspring, minus those already in the
+            population.
+
+        """
+
+        offspring = []
+        parent_batches = self.crossover_selector.select(self)
+        for i, parents in enumerate(parent_batches, 1):
+            logger.info(
+                f'Crossover number {i}. '
+                f'Finish when {self.crossover_selector.num}.'
+            )
+            child = self.crosser.crossover(*parents)
+            if child not in self:
+                offspring.append(child)
+
+        return offspring
+
+    def normalize_fitness_values(self):
+        """
+        Uses :attr:`fitness_normalizer` to normalize fitness values.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self.fitness_normalizer.normalize(self)
 
 
 class _OptimizeGuard:

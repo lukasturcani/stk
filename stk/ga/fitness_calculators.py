@@ -106,6 +106,10 @@ def _add_fitness_caching(fitness):
     def inner(self, mol, conformer=-1):
         key = (mol, conformer)
         if self.use_cache and key in self.fitness_values:
+            logger.info(
+                'Using cached fitness value '
+                f'for "{mol.name}" conformer {conformer}.'
+            )
             return self.fitness_values[(mol, conformer)]
 
         r = fitness(self, mol, conformer)
