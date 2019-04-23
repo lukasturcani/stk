@@ -193,7 +193,6 @@ from . import topologies
 from .functional_groups import Reactor, FunctionalGroup
 from .functional_groups import functional_group_infos as fg_infos
 from .functional_groups import functional_groups as fgs
-from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
                          normalize_vector,
@@ -325,9 +324,6 @@ class Molecule:
     inchi : :class:`str`
         The InChI of the molecule.
 
-    energy : :class:`.Energy`
-        Handles all things energy.
-
     atom_props : :class:`dict`
         Maps atom id to a :class:`dict` holding the properties of
         that atom. For example
@@ -354,7 +350,6 @@ class Molecule:
     subclasses = {}
 
     def __init__(self, name="", note=""):
-        self.energy = Energy(self)
         self.name = name
         self.note = note
         self.atom_props = defaultdict(dict)
@@ -3019,7 +3014,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.topology = topology
         obj.bb_counter = bb_counter
         obj.bonds_made = d.pop('bonds_made')
-        obj.energy = Energy(obj)
         obj.note = d.pop('note')
         obj.name = d.pop('name') if d.pop('load_names') else ''
         obj.key = key
