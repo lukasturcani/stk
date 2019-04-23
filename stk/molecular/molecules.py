@@ -181,7 +181,7 @@ from rdkit.Chem import rdMolTransforms
 
 from rdkit import DataStructs
 from glob import glob
-from functools import total_ordering, partial
+from functools import partial
 from scipy.spatial.distance import euclidean
 from scipy.optimize import minimize
 from sklearn.metrics.pairwise import euclidean_distances
@@ -193,7 +193,6 @@ from . import topologies
 from .functional_groups import Reactor, FunctionalGroup
 from .functional_groups import functional_group_infos as fg_infos
 from .functional_groups import functional_groups as fgs
-from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
                          normalize_vector,
@@ -325,9 +324,6 @@ class Molecule:
     inchi : :class:`str`
         The InChI of the molecule.
 
-    energy : :class:`.Energy`
-        Handles all things energy.
-
     atom_props : :class:`dict`
         Maps atom id to a :class:`dict` holding the properties of
         that atom. For example
@@ -340,10 +336,6 @@ class Molecule:
 
                           5: {'prop1': 'value2',
                               'prop5': 2.0}}
-
-    optimized : :class:`bool`
-        Indicates whether a :class:`Molecule` has been passed through
-        an optimization function or not.
 
     name : :class:`str`
         A name which can be optionally given to the molecule for easy
@@ -358,8 +350,6 @@ class Molecule:
     subclasses = {}
 
     def __init__(self, name="", note=""):
-        self.optimized = False
-        self.energy = Energy(self)
         self.name = name
         self.note = note
         self.atom_props = defaultdict(dict)
@@ -718,7 +708,7 @@ class Molecule:
             json.dump(self.json(include_attrs), f, indent=4)
 
     @classmethod
-    def from_dict(self, json_dict, optimized=True, load_names=True):
+    def from_dict(self, json_dict, load_names=True):
         """
         Creates a :class:`Molecule` from a JSON :class:`dict`.
 
@@ -730,9 +720,6 @@ class Molecule:
         json_dict : :class:`dict`
             A :class:`dict` holding the JSON representation of a
             molecule.
-
-        optimized : :class:`bool`, optional
-            The value passed to :attr:`Molecule.optimized`
 
         load_names : :class:`bool`, optional
             If ``True`` then the ``name`` key stored in `json_dict`
@@ -747,7 +734,6 @@ class Molecule:
 
         # Get the class of the object.
         c = self.subclasses[json_dict['class']]
-        json_dict['optimized'] = optimized
         json_dict['load_names'] = load_names
         return c._json_init(json_dict)
 
@@ -818,7 +804,7 @@ class Molecule:
         )
 
     @classmethod
-    def load(cls, path, optimized=True, load_names=True):
+    def load(cls, path, load_names=True):
         """
         Creates a :class:`Molecule` from a JSON file.
 
@@ -829,9 +815,6 @@ class Molecule:
         ----------
         path : :class:`str`
             The full path holding a JSON representation to a molecule.
-
-        optimized : :class:`bool`, optional
-            The value passed to :attr:`Molecule.optimized`.
 
         load_names : :class:`bool`, optional
             If ``True`` then the ``name`` key stored in the JSON file
@@ -847,7 +830,7 @@ class Molecule:
         with open(path, 'r') as f:
             json_dict = json.load(f)
 
-        return cls.from_dict(json_dict, optimized, load_names)
+        return cls.from_dict(json_dict, load_names)
 
     def max_diameter(self, conformer=-1):
         """
@@ -1266,6 +1249,24 @@ class Molecule:
         new_mol.RemoveAllConformers()
         new_mol.AddConformer(conf)
         return new_mol
+
+    def update_cache(self):
+        """
+        Update attributes of cached molecule.
+
+        Using ``multiprocessing`` returns modified copies of molecules.
+        In order to ensure that the cached molecules have
+        their attributes updated to the values of the copies, this
+        method must be run on the copies.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if self.key in self.__class__.cache:
+            self.__class__.cache[self.key].__dict__ = dict(vars(self))
 
     def update_from_mae(self, path, conformer=-1):
         """
@@ -1994,13 +1995,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                   d.pop('note'))
 
         obj.mol.GetConformer().SetId(conf_id)
-        obj.optimized = d.pop('optimized')
         obj.atom_props = defaultdict(dict)
         obj.atom_props.update(d.pop('atom_props'))
 
         for conf_id, mol_block in confs:
             conf_mol = rdkit.MolFromMolBlock(molBlock=mol_block,
-                                             removHs=False,
+                                             removeHs=False,
                                              sanitize=False)
             conf = conf_mol.GetConformer()
             conf.SetId(conf_id)
@@ -2446,16 +2446,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     def __repr__(self):
         return str(self)
 
-    def __eq__(self, other):
-        if self.inchi != other.inchi:
-            return False
-
-        return self.func_group_infos == other.func_group_infos
-
-    def __hash__(self):
-        fgs = [info.name for info in self.func_group_infos]
-        return hash(self.gen_key(self.mol, fgs))
-
 
 class StructUnit2(StructUnit):
     """
@@ -2678,7 +2668,6 @@ class MacroMoleculeBuildError(Exception):
     ...
 
 
-@total_ordering
 class MacroMolecule(Molecule, metaclass=Cached):
     """
     A representing assembled macromolecules.
@@ -2696,12 +2685,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
     macromolecule should be defined within this class while specific
     non-general data should be included in the derived classes.
 
-    Note the equality operator ``==`` compares :attr:`fitness`. This
-    means two different macromolecules compare equal if they happen to
-    have the same fitness. The operator is not to be used to check if
-    one macromolecule is the same structurally as another. To do this,
-    use :meth:`~Molecule.same`.
-
     Attributes
     ----------
     building_blocks : :class:`list` of :class:`StructUnit`
@@ -2718,32 +2701,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     topology : :class:`.Topology`
         Defines the shape of macromolecule and assembles it.
-
-    fitness : :class:`float`
-        The fitness value of the macromolecule, used by the GA.
-
-    unscaled_fitness : :class:`dict`
-        The dictionary holds the name of a fitness function as the
-        key and the value it calculated for unscaled_fitness as the
-        value. For example,
-
-        .. code-block:: python
-
-            unscaled_fitness = {'fitness_func1': 12.3,
-                                'fitness_func2': 49.2}
-
-        where ``'fitness_func1'`` and ``'fitness_func2'`` are the
-        names of the fintess functions applied on the molecule.
-
-    progress_params : :class:`dict`
-        Holds the fitness parameters which the GA should track to make
-        progress plots. The key is the name of a fitness function. Has
-        the form
-
-        .. code-block:: python
-
-            unscaled_fitness = {'fitness_func1': [8, 49]
-                                'fitness_func2': [78, 4.2, 32.3]}
 
     bonds_made : :class:`int`
         The number of bonds made during assembly. Added by
@@ -2793,9 +2750,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         if bb_conformers is None:
             bb_conformers = [-1 for _ in range(len(building_blocks))]
 
-        self.fitness = None
-        self.unscaled_fitness = {}
-        self.progress_params = {}
         self.building_blocks = building_blocks
         self.topology = topology
 
@@ -2947,11 +2901,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
             {
                 'class' : 'Polymer',
                 'mol_block' : '''A string holding the V3000 mol
-                                 block of the molecule.'''
-                'building_blocks' : {bb1.json(), bb2.json()}
-                'topology' : 'Copolymer(repeating_unit="AB")'
-                'unscaled_fitness' : {'fitness_func1' : fitness1,
-                                      'fitness_func2' : fitness2},
+                                 block of the molecule.''',
+                'building_blocks' : {bb1.json(), bb2.json()},
+                'topology' : 'Copolymer(repeating_unit="AB")',
                 'note' : 'A nice molecule.',
                 'name' : 'Poly-Benzene',
                 'atom_props': {0: {'prop1': 1.0,
@@ -2988,8 +2940,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 x.json() for x in self.building_blocks
             ],
             'topology': repr(self.topology),
-            'unscaled_fitness': repr(self.unscaled_fitness),
-            'progress_params': self.progress_params,
             'note': self.note,
             'name': self.name,
             'atom_props': self.atom_props,
@@ -3052,14 +3002,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
             obj.mol.AddConformer(conf)
 
         obj.topology = topology
-        obj.unscaled_fitness = eval(d.pop('unscaled_fitness'),
-                                    np.__dict__)
-        obj.fitness = None
-        obj.progress_params = d.pop('progress_params')
         obj.bb_counter = bb_counter
         obj.bonds_made = d.pop('bonds_made')
-        obj.energy = Energy(obj)
-        obj.optimized = d.pop('optimized')
         obj.note = d.pop('note')
         obj.name = d.pop('name') if d.pop('load_names') else ''
         obj.key = key
@@ -3152,32 +3096,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 n += 1
         return rmsd / n
 
-    def update_cache(self):
-        """
-        Update attributes of cached molecule.
-
-        When an instance of :class:`MacroMolecule` is first created it
-        is cached. Using ``multiprocessing`` to perform optimizations
-        or calculate fitness returns modified copies of the cached
-        molecules. In order to ensure that the cached molecules have
-        their attributes updated to the values of the copies, this
-        method must be run on the copies.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        if self.key in self.__class__.cache:
-            self.__class__.cache[self.key].__dict__ = dict(vars(self))
-
-    def __eq__(self, other):
-        return self.fitness == other.fitness
-
-    def __lt__(self, other):
-        return self.fitness < other.fitness
-
     def __str__(self):
         return "{}(building_blocks={}, topology={!r})".format(
                         self.__class__.__name__,
@@ -3186,9 +3104,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     def __repr__(self):
         return str(self)
-
-    def __hash__(self):
-        return id(self)
 
 
 class Cage(MacroMolecule):

@@ -110,10 +110,10 @@ def test_centroid_functions(tmp_amine2):
     """
 
     # Save the coordinates of the new centroid.
-    new_centroid = tmp_amine2.centroid() + np.array([10, 20, 4])
-    tmp_amine2.set_position(new_centroid)
+    new_centroid = tmp_amine2.centroid(0) + np.array([10, 20, 4])
+    tmp_amine2.set_position(new_centroid, 0)
     # Check that the centroid is at the desired position.
-    assert np.allclose(new_centroid, tmp_amine2.centroid(), atol=1e-8)
+    assert np.allclose(new_centroid, tmp_amine2.centroid(0), atol=1e-8)
 
 
 def test_core(amine2):
@@ -183,8 +183,8 @@ def test_set_position_from_matrix(tmp_amine2):
     # The new position matrix just sets all atomic positions to origin.
     new_pos_mat = np.array([[0 for x in range(3)] for y in
                             range(tmp_amine2.mol.GetNumAtoms())])
-    tmp_amine2.set_position_from_matrix(new_pos_mat.T)
-    for _, atom_coord in tmp_amine2.all_atom_coords():
+    tmp_amine2.set_position_from_matrix(new_pos_mat.T, 0)
+    for _, atom_coord in tmp_amine2.all_atom_coords(0):
         assert np.allclose(atom_coord, [0, 0, 0], atol=1e-8)
 
 

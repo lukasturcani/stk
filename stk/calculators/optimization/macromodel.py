@@ -13,7 +13,7 @@ from uuid import uuid4
 import logging
 import gzip
 
-from ..utilities import MAEExtractor, move_generated_macromodel_files
+from ...utilities import MAEExtractor, move_generated_macromodel_files
 from .optimizers import Optimizer
 
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ class _MacroModel(Optimizer):
         machine. For example, on a Linux machine this may be something
         like ``'/opt/schrodinger2017-2'``.
 
-    output_dir : :class:`str`, optional
+    output_dir : :class:`str`
         The name of the directory into which files generated during
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
@@ -86,7 +86,7 @@ class _MacroModel(Optimizer):
                  force_field,
                  maximum_iterations,
                  minimum_gradient,
-                 skip_optimized):
+                 use_cache):
         """
         Initializes a :class:`_MacroModel` instance.
 
@@ -125,9 +125,9 @@ class _MacroModel(Optimizer):
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
 
-        skip_optimized : :class:`bool`, optional
-            If ``True`` then :meth:`optimize` returns immediately for
-            molecules where :attr:`.Molecule.optimized` is``True``.
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
 
         """
 
@@ -138,7 +138,7 @@ class _MacroModel(Optimizer):
         self.force_field = force_field
         self.maximum_iterations = maximum_iterations
         self.minimum_gradient = minimum_gradient
-        super().__init__(skip_optimized=skip_optimized)
+        super().__init__(use_cache=use_cache)
 
     def run_bmin(self, mol):
         """
@@ -706,7 +706,7 @@ class MacroModelForceField(_MacroModel):
                  force_field=16,
                  maximum_iterations=2500,
                  minimum_gradient=0.05,
-                 skip_optimized=False):
+                 use_cache=False):
         """
         Initializes a :class:`MacroModelForceField` object.
 
@@ -745,9 +745,9 @@ class MacroModelForceField(_MacroModel):
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
 
-        skip_optimized : :class:`bool`, optional
-            If ``True`` then :meth:`optimize` returns immediately for
-            molecules where :attr:`.Molecule.optimized` is``True``.
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
 
         """
 
@@ -758,7 +758,7 @@ class MacroModelForceField(_MacroModel):
                          minimum_gradient=minimum_gradient,
                          restricted=restricted,
                          timeout=timeout,
-                         skip_optimized=skip_optimized)
+                         use_cache=use_cache)
 
     def generate_com(self, mol):
         """
@@ -908,7 +908,7 @@ class MacroModelMD(_MacroModel):
                  simulation_time=200,
                  maximum_iterations=2500,
                  minimum_gradient=0.05,
-                 skip_optimized=False):
+                 use_cache=False):
         """
         Runs a MD conformer search on `mol`.
 
@@ -961,9 +961,9 @@ class MacroModelMD(_MacroModel):
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
 
-        skip_optimized : :class:`bool`, optional
-            If ``True`` then :meth:`optimize` returns immediately for
-            molecules where :attr:`.Molecule.optimized` is``True``.
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
 
         """
 
@@ -979,7 +979,7 @@ class MacroModelMD(_MacroModel):
                          restricted=restricted,
                          maximum_iterations=maximum_iterations,
                          minimum_gradient=minimum_gradient,
-                         skip_optimized=skip_optimized)
+                         use_cache=use_cache)
 
     def generate_com(self, mol):
         """

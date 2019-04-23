@@ -22,14 +22,6 @@ os.chdir(output_dir)
 stk.OPTIONS['cache'] = False
 
 
-class TestEnergy(stk.Energy):
-    def pseudoformation(self, *_, **__):
-        return 12
-
-    def rdkit(self, *_, **__):
-        return 12
-
-
 class TestMol(stk.Cage):
     def __init__(self,
                  building_blocks,
@@ -40,9 +32,6 @@ class TestMol(stk.Cage):
         if bb_conformers is None:
             bb_conformers = [-1 for _ in range(len(building_blocks))]
 
-        self.fitness = None
-        self.unscaled_fitness = {}
-        self.progress_params = {}
         self.building_blocks = building_blocks
         self.bb_counter = Counter(building_blocks)
         self.bonds_made = len(building_blocks) - 1
@@ -51,7 +40,6 @@ class TestMol(stk.Cage):
             self.mol = rdkit.CombineMols(self.mol, bb.mol)
         self.topology = topology
         stk.Molecule.__init__(self, name, note)
-        self.energy = TestEnergy(self)
         self.func_groups = (
             stk.FunctionalGroup(id_=0,
                                 atom_ids=[0, 1, 2, 3],
@@ -95,16 +83,30 @@ def pytest_generate_tests(metafunc):
 
 @pytest.fixture(scope='session')
 def amine2():
-    return stk.StructUnit2.smiles_init(smiles='NCCCN',
-                                       functional_groups=['amine'],
-                                       name='amine2')
+    amine2 = stk.StructUnit2.smiles_init(smiles='NCCCN',
+                                         functional_groups=['amine'],
+                                         name='amine2')
+    # Make a second conformer with a distinct geometry.
+    amine2.mol.AddConformer(amine2.mol.GetConformer(), True)
+    amine2.set_position_from_matrix(
+        pos_mat=amine2.mol.GetConformer().GetPositions().T*4,
+        conformer=1
+    )
+    return amine2
 
 
 @pytest.fixture
 def tmp_amine2():
-    return stk.StructUnit2.smiles_init(smiles='NCCCN',
-                                       functional_groups=['amine'],
-                                       name='tmp_amine2')
+    amine2 = stk.StructUnit2.smiles_init(smiles='NCCCN',
+                                         functional_groups=['amine'],
+                                         name='tmp_amine2')
+    # Make a second conformer with a distinct geometry.
+    amine2.mol.AddConformer(amine2.mol.GetConformer(), True)
+    amine2.set_position_from_matrix(
+        pos_mat=amine2.mol.GetConformer().GetPositions().T*4,
+        conformer=1
+    )
+    return amine2
 
 
 @pytest.fixture(scope='session')
@@ -130,6 +132,7 @@ def amine2_alt3():
 
 @pytest.fixture(scope='session')
 def aldehyde2():
+
     return stk.StructUnit2.smiles_init(smiles='O=CCC=O',
                                        functional_groups=['aldehyde'],
                                        name='aldehyde2')
@@ -182,16 +185,32 @@ def ring_amine():
 
 @pytest.fixture(scope='session')
 def aldehyde3():
-    return stk.StructUnit3.smiles_init(smiles='O=CC(C=O)C=O',
-                                       functional_groups=['aldehyde'],
-                                       name='aldehyde3')
+    aldehyde3 = stk.StructUnit3.smiles_init(
+                                smiles='O=CC(C=O)C=O',
+                                functional_groups=['aldehyde'],
+                                name='aldehyde3')
+    # Make a second conformer with a distinct geometry.
+    aldehyde3.mol.AddConformer(aldehyde3.mol.GetConformer(), True)
+    aldehyde3.set_position_from_matrix(
+        pos_mat=aldehyde3.mol.GetConformer().GetPositions().T*4,
+        conformer=1
+    )
+    return aldehyde3
 
 
 @pytest.fixture
 def tmp_aldehyde3():
-    return stk.StructUnit3.smiles_init(smiles='O=CC(C=O)C=O',
-                                       functional_groups=['aldehyde'],
-                                       name='tmp_aldehyde3')
+    aldehyde3 = stk.StructUnit3.smiles_init(
+                                smiles='O=CC(C=O)C=O',
+                                functional_groups=['aldehyde'],
+                                name='tmp_aldehyde3')
+    # Make a second conformer with a distinct geometry.
+    aldehyde3.mol.AddConformer(aldehyde3.mol.GetConformer(), True)
+    aldehyde3.set_position_from_matrix(
+        pos_mat=aldehyde3.mol.GetConformer().GetPositions().T*4,
+        conformer=1
+    )
+    return aldehyde3
 
 
 @pytest.fixture(scope='session')
