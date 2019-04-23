@@ -85,7 +85,7 @@ class MOPAC(Optimizer):
                  charge=0,
                  fileout='PDBOUT',
                  timeout=172800,
-                 skip_optimized=False):
+                 use_cache=False):
         """
         Initializes a :class:`MOPAC` instance.
 
@@ -141,9 +141,9 @@ class MOPAC(Optimizer):
             days or ``172,800`` seconds. ``None`` means there
             is no timeout.
 
-        skip_optimized : :class:`bool`, optional
-            If ``True`` then :meth:`optimize` returns immediately for
-            molecules where :attr:`.Molecule.optimized` is``True``.
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
 
         References
         ----------
@@ -159,7 +159,7 @@ class MOPAC(Optimizer):
         self.charge = charge
         self.fileout = fileout
         self.timeout = timeout
-        super().__init__(skip_optimized=skip_optimized)
+        super().__init__(use_cache=use_cache)
 
     def optimize(self, mol, conformer=-1):
         """

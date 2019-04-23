@@ -1,10 +1,16 @@
+from .energy_calculators import EnergyCalculator, EnergyError
+
+
 class MacroModelEnergy(EnergyCalculator):
-    @exclude('macromodel_path')
-    def macromodel(self,
-                   forcefield,
-                   macromodel_path,
-                   output_dir=None,
-                   conformer=-1):
+    def __init__(self,
+                 macromodel_path,
+                 output_dir=None,
+                 force_field=16):
+        self.macromodel_path = macromodel_path
+        self.output_dir = output_dir
+        self.force_field = force_field
+
+    def energy(self, mol, conformer=-1):
         """
         Calculates the energy using macromodel.
 
@@ -13,7 +19,7 @@ class MacroModelEnergy(EnergyCalculator):
 
         Parameters
         ----------
-        forcefield : :class:`int`
+        force_field : :class:`int`
             The id number of the forcefield to be used by macromodel.
 
         macromodel_path : :class:`str`

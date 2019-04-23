@@ -189,19 +189,20 @@ Notes.
 
 """
 
-import os
 import rdkit.Chem.AllChem as rdkit
-import subprocess as sp
-import psutil
-import copy
-from uuid import uuid4
-from inspect import signature as sig
 import logging
-
-from ..utilities import FunctionData, move_generated_macromodel_files
 
 
 logger = logging.getLogger(__name__)
+
+
+class EnergyError(Exception):
+    """
+    Indicates a failed energy calculation.
+
+    """
+
+    ...
 
 
 class EnergyCalculator:
@@ -229,87 +230,78 @@ class EnergyCalculator:
 
     """
 
-    def __init__(self, molecule):
-        """
-        Initializes a :class:`Energy` instance.
-
-        Parameters
-        ----------
-        molecules : :class:`.Molecule`
-            The molecule on which all the energy calculation are
-            performed.
-
-        """
-
-        self.molecule = molecule
-        self.values = {}
+    def energy(self, mol, conformer=-1):
+        raise NotImplementedError()
 
 
 class FormationEnergy(EnergyCalculator):
+    """
+    Calculates the formation energy.
 
-    @exclude('force_e_calc')
-    def formation(self,
-                  func,
-                  products,
-                  building_blocks=None,
-                  force_e_calc=False,
-                  conformer=-1):
+    The formation energy is calculated under the assumption that
+    the molecule in :attr:`molecule` is composed of the molecules
+    in `building_blocks` and that during formation molecules in
+    `products` are formed in addition to :attr:`molecule`.
+
+    Attributes
+    ----------
+    products : :class:`list`
+        A :class:`list` of the form
+
+        .. code-block:: python
+
+            products = [(4, mol1), (2, mol2)]
+
+        Where ``mol1`` and ``mol2`` are :class:`.Molecule` objects
+        of molecules produced in addition to :attr:`molecule`
+        during its formation reaction. The numbers represent the
+        number of each molecule made per :attr:`molecule`.
+
+
+    """
+
+    def __init__(self,
+                 energy_calculator,
+                 reactants,
+                 other_products,
+                 reactant_conformers=None,
+                 other_product_conformers=None,
+                 use_cache=True):
         """
-        Calculates the formation energy.
-
-        The formation energy is calculated under the assumption that
-        the molecule in :attr:`molecule` is composed of the molecules
-        in `building_blocks` and that during formation molecules in
-        `products` are formed in addition to :attr:`molecule`.
+        Initializes a :class:`FormationEnergy` instance.
 
         Parameters
         ----------
-        func : :class:`.FunctionData`
-            A :class:`.FunctionData` object which describes the method
-            used to calculate the energies. For example:
 
-            .. code-block:: python
+        """
 
-                func  = FunctionData('rdkit', forcefield='uff')
+        if reactant_conformers is None:
+            reactant_conformers = [-1 for i in range(len(reactants))]
 
-        products : :class:`list`
-            A :class:`list` of the form
+        if other_product_conformers is None:
+            other_product_conformers = [
+                -1 for i in range(len(other_product_conformers))
+            ]
 
-            .. code-block:: python
+        self.energy_calculator = energy_calculator
+        self.reactants = reactants
+        self.other_products = other_products
+        self.reactant_conformers = reactant_conformers
+        self.other_product_conformers = other_product_conformers
+        super().__init__(use_cache=use_cache)
 
-                products = [(4, mol1), (2, mol2)]
+    def energy(self, mol, conformer=-1):
+        """
+        Calculates the formation energy of `mol`.
 
-            Where ``mol1`` and ``mol2`` are :class:`.Molecule` objects
-            of molecules produced in addition to :attr:`molecule`
-            during its formation reaction. The numbers represent the
-            number of each molecule made per :attr:`molecule`.
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The :class:`.Molecule` whose formation energy is to be
+            calculated.
 
-        building_blocks : :class:`list`, optional
-            A :class:`list` of the form
-
-            .. code-block:: python
-
-                building_blocks = [(2, mol1), (3, mol2)]
-
-            Where ``mol1`` and ``mol2`` are :class:`.Molecule` objects
-            which react to for :attr:`molecule`. The numbers represetnt
-            the amount of each building block required to form 1
-            :attr:`molecule`.
-
-            This argument can be omitted when the formation energy of a
-            :class:`.MacroMolecule` instance is being found, as they
-            keep this data stored elsewhere already.
-
-        force_e_calc : :class:`bool`, optional
-            If this is ``True`` then all molecules in
-            `building_blocks`, `products` and :attr:`molecule` will
-            have their energies recalculated. Even if the energy values
-            have already been found with the chosen forcefield and
-            method. If ``False`` the energy is only calculated if the
-            value has not already been found.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
+        conformer : :class:`int`, optinal
+            The conformer of `mol` to use.
 
         Returns
         -------
@@ -318,142 +310,29 @@ class FormationEnergy(EnergyCalculator):
 
         """
 
-        # Get the function used to calculate the energies.
-        efunc = getattr(self, func.name)
-        # Get the key of the function used to calculate the energies.
-        fkey = func_key(efunc, None, func.params)
+        product_energy = self.energy_calculator.energy(mol, conformer)
+        other_products = zip(self.other_products,
+                             self.other_product_conformers)
+        for product, conformer in other_products:
+            product_energy += self.energy_calculator.energy(product,
+                                                            conformer)
 
-        # Recalculate energies if requested.
-        if force_e_calc:
-            for _, mol in products:
-                getattr(mol.energy, func.name)(**func.params)
+        reactants = zip(self.reactants, self.reactant_conformers)
+        reactant_energy = sum(
+            self.energy_calculator.energy(reactant, conformer)
+            for reactant, conformer in reactants
+        )
 
-        # Get the total energy of the products.
-        e_products = 0
-        for n, mol in products:
-            # If the energy has not been calculated already, calculate
-            # it now.
-            if fkey not in mol.energy.values.keys():
-                getattr(mol.energy, func.name)(**func.params)
+        return product_energy - reactant_energy
 
-            e_products += n * mol.energy.values[fkey]
 
-        eng = self.pseudoformation(func,
-                                   building_blocks,
-                                   force_e_calc,
-                                   conformer)
-        eng -= e_products
-        return eng
+class MMFFEnergy(EnergyCalculator):
+    """
 
-    def pseudoformation(self,
-                        func,
-                        building_blocks=None,
-                        force_e_calc=False,
-                        conformer=-1):
+    """
+
+    def energy(self, mol, conformer=-1):
         """
-        Calculates the formation energy, sans other products.
-
-        This is the formation energy if the energy of the other
-        products of the reaction is not taken into account.
-
-        Parameters
-        ----------
-        func : :class:`.FunctionData`
-            A :class:`.FunctionData` object which describes the method
-            used to calculate the energies. For example:
-
-            .. code-block:: python
-
-                func  = FunctionData('rdkit', forcefield='uff')
-
-        building_blocks : :class:`list`, optional
-            A :class:`list` of the form
-
-            .. code-block:: python
-
-                building_blocks = [(2, mol1), (3, mol2)]
-
-            Where ``mol1`` and ``mol2`` are :class:`.Molecule` objects
-            which react to for :attr:`molecule`. The numbers represetnt
-            the amount of each building block required to form 1
-            :attr:`molecule`.
-
-            This argument can be omitted when the formation energy of a
-            :class:`.MacroMolecule` instance is being found, as they
-            keep this data stored elsewhere already.
-
-        force_e_calc : :class:`bool`, optional
-            If this is ``True`` then all molecules in
-            `building_blocks`, `products` and :attr:`molecule` will
-            have their energies recalculated. Even if the energy values
-            have already been found with the chosen forcefield and
-            method. If ``False`` the energy is only calculated if the
-            value has not already been found.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        float : :class:`float`
-            The pseudoformation energy.
-
-        """
-
-        # Get the function used to calculate the energies.
-        efunc = getattr(self, func.name)
-        # Get the key of the function used to calculate the energies.
-        fkey = func_key(efunc, None, func.params)
-
-        if building_blocks is None:
-            building_blocks = ((n, mol) for mol, n in
-                               self.molecule.bb_counter.items())
-
-        # Recalculate energies if requested.
-        if force_e_calc:
-            for _, mol in building_blocks:
-                molf = getattr(mol.energy, func.name)
-                molf(**func.params)
-
-            getattr(self, func.name)(**func.params)
-
-        # Sum the energy of building blocks under the chosen
-        # forcefield.
-        e_reactants = 0
-        for n, mol in building_blocks:
-            # If the calculation has not been done already, perform it.
-            if fkey not in mol.energy.values.keys():
-                molf = getattr(mol.energy, func.name)
-                molf(**func.params)
-
-            e_reactants += n * mol.energy.values[fkey]
-
-        # Get the energy of `self.molecule`. The only product whose
-        # energy matters in pseudoformation.
-        e_products = (self.values[fkey] if fkey in self.values.keys()
-                      else getattr(self, func.name)(**func.params))
-
-        eng = e_reactants - e_products
-        return eng
-
-
-class RDKitEnergy(Energy):
-    def rdkit(self, forcefield, conformer=-1):
-        """
-        Uses ``rdkit`` to calculate the energy.
-
-        Parameters
-        ----------
-        forcefield : :class:`str`
-            The name of the forcefield to be used.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`float`
-            The calculated energy.
 
         """
 
@@ -470,267 +349,9 @@ class RDKitEnergy(Energy):
                   rdkit.MMFFGetMoleculeProperties(self.molecule.mol),
                   confId=conformer)
 
-        eng = ff.CalcEnergy()
-        return eng
+        return self.force_field(self.molecule.mol, confId=conformer)
 
 
-def formation_key(fargs, fkwargs):
-    """
-    Generates the key of :meth:`Energy.formation`.
-
-    Parameters
-    ----------
-    fargs : :class:`tuple`
-        The arguments with which :meth:`Energy.formation` was called.
-
-    fkwargs : :class:`dict`
-        The keyword arguments with which :meth:`Energy.formation` was
-        called.
-
-    Returns
-    -------
-    :class:`.FunctionData`
-        The :class:`.FunctionData` object representing the key of
-        :meth:`Energy.formation`, when called with the arguments
-        `fargs` and keyword arguments `fkwargs`.
-
-    """
-
-    fsig = sig(Energy.formation)
-
-    # Get a dictionary of all the supplied parameters.
-    bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
-    # Get a dictionary of all the default initialized parameters.
-    default = {key: value.default for key, value in
-               dict(fsig.parameters).items() if
-               key not in bound.keys()}
-
-    # Combine the two sets of parameters and get rid of the `self`
-    # parameter, if present.
-    bound.update(default)
-    if 'self' in bound.keys():
-        bound.pop('self')
-
-    # Replace the energy function to be used with the key of the
-    # energy function to be used.
-    efuncdata = bound['func']
-    efunc = getattr(Energy, efuncdata.name)
-    bound['func'] = func_key(efunc, None, efuncdata.params)
-
-    # Don't want this paramter in the key as it doenst affect the
-    # result.
-    bound.pop('force_e_calc')
-
-    # Return an FunctionData object representing the function and
-    # chosen parameters.
-    return FunctionData('formation', **bound)
-
-
-Energy.formation.key = formation_key
-
-
-def pseudoformation_key(fargs, fkwargs):
-    """
-    Generates key of the :meth:`Energy.pseudoformation`.
-
-    Parameters
-    ----------
-    fargs : :class:`tuple`
-        The arguments with which :meth:`Energy.pseudoformation` was
-        called.
-
-    fkwargs : :class:`dict`
-        The keyword arguments with which :meth:`Energy.pseudoformation`
-        was called.
-
-    Returns
-    -------
-    :class:`.FunctionData`
-        The :class:`.FunctionData` object representing the key when
-        :meth:`Energy.pseudoformation` is called with the arguments
-        `fargs` and keyword arguments `fkwargs`.
-
-    """
-
-    fsig = sig(Energy.pseudoformation)
-
-    # Get a dictionary of all the supplied parameters.
-    bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
-    # Get a dictionary of all the default initialized parameters.
-    default = {key: value.default for key, value in
-               dict(fsig.parameters).items() if
-               key not in bound.keys()}
-
-    # Combine the two sets of parameters and get rid of the `self`
-    # parameter, if present.
-    bound.update(default)
-    if 'self' in bound.keys():
-        bound.pop('self')
-
-    # Replace the energy function to be used with the key of the
-    # energy function to be used.
-    efuncdata = bound['func']
-    efunc = getattr(Energy, efuncdata.name)
-    bound['func'] = func_key(efunc, None, efuncdata.params)
-
-    # Don't want this paramter in the key as it doenst affect the
-    # result.
-    bound.pop('force_e_calc')
-
-    # Return an FunctionData object representing the function and
-    # chosen parameters.
-    return FunctionData('pseudoformation', **bound)
-
-
-Energy.pseudoformation.key = pseudoformation_key
-
-
-def _run_mopac(file_root, mopac_path, timeout=3600):
-
-    mop_file = file_root + '.mop'
-
-    logger.info(f'Running MOPAC - {file_root}.')
-
-    # To run MOPAC a command is issued to the console via
-    # ``subprocess.Popen``. The command is the full path of the
-    # ``mopac`` program.
-    file_root, ext = os.path.splitext(mop_file)
-    opt_cmd = [mopac_path, file_root]
-    opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE,
-                            stderr=sp.STDOUT,
-                            universal_newlines=True)
-
-    try:
-        if timeout:
-            proc_out, _ = opt_proc.communicate(timeout=timeout)
-        else:
-            proc_out, _ = opt_proc.communicate()
-    except sp.TimeoutExpired:
-        logger.info(('Minimization took too long and was terminated '
-                     'by force - {}').format(file_root))
-        _kill_mopac(file_root)
-
-
-def _kill_mopac(file_root):
-    """
-    Stops an in-progress MOPAC run.
-
-    To kill a MOPAC run, a file with the molecule's name and a ``.end``
-    extension is written.
-
-    Parameters
-    ----------
-    file_root : :class:`str`
-        The molecule's name.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-    end_file = file_root + '.end'
-
-    with open(end_file, 'w') as end:
-        end.write('SHUT')
-
-
-def _mop_line(settings):
-    """
-    Formats `settings` into a MOPAC input string.
-
-    Parameters
-    ----------
-    settings : :class:`dict`
-        Dictionary defined in :func:`mopac_opt`, where all the run
-        details are defined.
-
-    Returns
-    -------
-    :class:`str`
-        String containing all the MOPAC keywords correctly formatted
-        for the input file.
-
-    """
-
-    # Generate an empty string
-    mopac_run_str = ""
-
-    # Add Hamiltonian info
-    mopac_run_str = mopac_run_str + settings['hamiltonian']
-    # Forcing a single point calculation
-    mopac_run_str = mopac_run_str + ' NOOPT '
-    # Add EPS info
-    eps_info = ' EPS={} '.format(settings['eps'])
-    mopac_run_str = mopac_run_str + eps_info
-    # Add Charge info
-    charge_info = ' CHARGE={} '.format(settings['charge'])
-    mopac_run_str = mopac_run_str + charge_info
-
-    return mopac_run_str
-
-
-def _create_mop(file_root, molecule, settings):
-    """
-    Creates the ``.mop`` file holding the molecule to be optimized.
-
-    Parameters
-    ----------
-    mol : :class:`.Molecule`
-        The molecule which is to be optimized. Its molecular
-        structure file is converted to a ``.mop`` file. The original
-        file is also kept.
-
-    settings : :class:`dict`
-        Dictionary defined by the MOPAC methods, where all the run
-        details are defined.
-
-    Returns
-    -------
-    :class:`str`
-        The full path of the newly created ``.mop`` file.
-
-    """
-
-    mop_file = file_root + '.mop'
-    mol = molecule.mol
-
-    logger.info('Creating .mop file - {}.'.format(file_root))
-
-    # Generate the mop file containing the MOPAC run info.
-    with open(mop_file, 'w') as mop:
-        # Line for the run info.
-        mop.write(_mop_line(settings) + "\n")
-        # Line with the name of the molecule.
-        mop.write(file_root + "\n\n")
-
-        # Write the structural info.
-        for atom in mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            symbol = atom.GetSymbol()
-            x, y, z = mol.GetConformer().GetAtomPosition(atom_id)
-            atom_info = f'{symbol}   {x}   +1  {y}   +1  {z}   +1 \n'
-            mop.write(atom_info)
-
-    return mop_file
-
-
-def _extract_MOPAC_en(file_root):
-    mopac_out = file_root + '.arc'
-
-    with open(mopac_out) as outfile:
-        target = "TOTAL ENERGY"
-        energy_str = str([x for x in outfile.readlines() if target in x][0])
-        energy_val = float(energy_str.split()[3])
-
-    return energy_val
-
-
-def _extract_MOPAC_dipole(file_root):
-    mopac_out = file_root + '.arc'
-
-    with open(mopac_out) as outfile:
-        target = "DIPOLE"
-        energy_str = str([x for x in outfile.readlines() if target in x][0])
-        energy_val = float(energy_str.split()[2])
-
-    return energy_val
+class UFFEnergy(EnergyCalculator):
+    def energy(self, mol, conformer=-1):
+        ...

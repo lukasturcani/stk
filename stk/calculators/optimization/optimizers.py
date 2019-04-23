@@ -9,7 +9,7 @@ with :meth:`Optimizer.optimize`.
 
     import rdkit.Chem.AllChem as rdkit
     mol = StructUnit2.smiles_init('NCCCN', ['amine'])
-    mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
+    mmff = MMFF()
     mmff.optimize(mol)
 
     # Optionally, a conformer can be provided.
@@ -23,32 +23,33 @@ with :meth:`Optimizer.optimize`.
 Sometimes it is desirable to chain multiple optimizations, one after
 another. For example, before running an optimization, it may be
 desirable to embed a molecule first, to generate an initial structure.
-:class:`OptimizerPipeline` may be used for this.
+:class:`.Sequence` may be used for this.
 
 .. code-block:: python
 
     # Create a new optimizer which chains the previously defined
     # mmff and etkdg optimizers.
-    opt_pipeline = OptimizerPipeline(etkdg, mmff)
+    optimizer_sequence = Sequence(etkdg, mmff)
 
     # Run each optimizer in sequence.
-    opt_pipeline.optimize(polymer)
+    optimizer_sequence.optimize(polymer)
 
 By default, running :meth:`Optimizer.optimize` twice in a row will
 perform an optimization a second time on a molecule. If we want to
 skip optimizations on molecules which have already been optimized
-we can use the :attr:`skip_optimized` flag.
+we can use the :attr:`use_cache` flag.
 
 .. code-block:: python
 
-    skipping_etkdg = RDKitEmbedder(rdkit.ETKDG(), skip_optimized=True)
-    # This does nothing because polymer has already been optimized by
-    # the other optimizers.
-    skipping_etkdg.optimize(polymer)
+    caching_etkdg = RDKitEmbedder(rdkit.ETKDG(), use_cache=True)
+    # First optimize call runs an optimization.
+    caching_etkdg.optimize(polymer)
+    # Second call does nothing.
+    caching_etkdg.optimize(polymer)
 
-When :attr:`skip_optimized` is set to ``True`` the optimizer will
-check the :attr:`.Molecule.optimized` flag on the molecule. If the
-flag is set to ``True``, then no optimization will take place.
+Caching is done on a per :class:`Optimizer` basis. Just because the
+molecule has been cached by one :class:`Optimizer` does not mean that
+another :class:`Optimizer` will no longer optimize the molecule.
 
 .. _`adding optimizers`:
 
@@ -75,42 +76,14 @@ from functools import wraps
 logger = logging.getLogger(__name__)
 
 
-def _add_optimized_toggle(optimize):
+def _add_cache_use(optimize):
     """
-    Adds toggling of :attr:`.Molecule.optimized`
-
-    Decorates `optimize` so that after running the attribute
-    :attr:`.Molecule.optimized` is set to ``True``
-
-    Parameters
-    ----------
-    optimize : :class:`function`
-        A function which is to have :attr:`.Molecule.optimized`
-        toggling added to it.
-
-    Returns
-    -------
-    :class:`function`
-        The decorated function.
-
-    """
-
-    @wraps(optimize)
-    def inner(self, mol, conformer=-1):
-        r = optimize(self, mol, conformer)
-        mol.optimized = True
-        return r
-
-    return inner
-
-
-def _add_skipping(optimize):
-    """
-    Adds skipping to `optimize`.
+    Makes :meth:`~Optimizer.optimize` use the :attr:`~Optimizer.cache`.
 
     Decorates `optimize` so that before running it checks if the
-    :attr:`.Molecule.optimized` attribute is ``True``. If it is,
-    then the function is not run.
+    :class:`.Molecule` and conformer have already been optimized by the
+    optimizer. If so, and :attr:`~Optimizer.cache` is ``True``, then
+    the molecule is skipped and no optimization is performed.
 
     Parameters
     ----------
@@ -126,10 +99,12 @@ def _add_skipping(optimize):
 
     @wraps(optimize)
     def inner(self, mol, conformer=-1):
-        if self.skip_optimized and mol.optimized:
+        key = (mol, conformer)
+        if self.use_cache and key in self.cache:
             logger.info(f'Skipping "{mol.name}".')
-            return
-        return optimize(self, mol, conformer)
+        else:
+            optimize(self, mol, conformer)
+            self.cache.add(key)
 
     return inner
 
@@ -140,30 +115,44 @@ class Optimizer:
 
     Attributes
     ----------
-    skip_optimized : :class:`bool`
-        If ``True`` then :meth:`optimize` returns immediately for
-        molecules where :attr:`.Molecule.optimized` is``True``.
+    cache : :class:`set`
+        A :class:`set` of the form
+
+            cache = {
+                (mol1, conformer1),
+                (mol1, conformer2),
+                (mol2, conformer2)
+            }
+
+        which holds every :class:`Molecule` and conformer optimized
+        by the :class:`Optimizer`. Here ``mol1`` and ``mol2`` are
+        :class:`.Molecule` objects and ``conformer1`` and
+        ``conformer2`` are :class:`int`, which are the ids of the
+        optimized conformers of the molecules.
+
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule and conformer.
 
     """
 
-    def __init__(self, skip_optimized, *args, **kwargs):
+    def __init__(self, use_cache=False):
         """
         Initializes an :class:`Optimizer`.
 
         Parameters
         ----------
-        skip_optimized : :class:`bool`
-            If ``True`` then :meth:`optimize` returns immediately for
-            molecules where :attr:`.Molecule.optimized` is``True``.
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
 
         """
 
-        self.skip_optimized = skip_optimized
-        super(*args, skip_optimized=skip_optimized, **kwargs)
+        self.cache = set()
+        self.use_cache = use_cache
 
     def __init_subclass__(cls, **kwargs):
-        cls.optimize = cls._add_skipping(cls.optimize)
-        cls.optimize = cls._add_optimized_toggle(cls.optimize)
+        cls.optimize = _add_cache_use(cls.optimize)
         return super().__init_subclass__(**kwargs)
 
     def optimize(self, mol, conformer=-1):
@@ -189,15 +178,35 @@ class Optimizer:
 
 class CageOptimizerSequence(Optimizer):
     """
-    Applies optimizations to cages.
+    Applies a sequence of :class:`Optimizer`s to a :class:`.Cage`.
 
-    The difference between this class and :class:`.OptimizerPipeline`
-    is that after each optimizer in the pipeline is used, the number
-    of windows in the cage is determined. If there are fewer windows
-    than expected, it means that the cage is collapsed and the pipeline
-    is stopped early.
+    Before each :class:`Optimizer` in the sequence is applied to the
+    :class:`.Cage`, it is checked to see if it is collapsed. If it is
+    collapsed, the optiimzation sequence ends immediately.
+
+    Attributes
+    ----------
+    optimizers : :class:`tuple` of :class:`Optimizer`
+        The :class:`Optimizer`s which are used to optimize a
+        :class:`.Cage` molecule.
 
     """
+
+    def __init__(self, *optimizers):
+        """
+        Initializes a :class:`CageOptimizerSequence` instance.
+
+        Parameters
+        ----------
+        *optimizers : :class:`Optimizer`
+            The :class:`Optimizers` used in sequence to optimize
+            :class:`.Cage` molecules.
+
+        """
+
+        self.optimizers = optimizers
+        # "optimizers" should toggle use_cache for themselves.
+        super().__init__(use_cache=False)
 
     def optimize(self, mol, conformer=-1):
         """
@@ -243,7 +252,7 @@ class NullOptimizer(Optimizer):
 
     def optimize(self, mol, conformer=-1):
         """
-        Does not optimizes a molecule.
+        Does not optimize a molecule.
 
         This function just returns immediately without changing the
         molecule.
@@ -265,6 +274,85 @@ class NullOptimizer(Optimizer):
         return
 
 
+class TryCatchOptimizer(Optimizer):
+    """
+    Try to optimize with a :class:`Optimizer`, use another on failure.
+
+    Attributes
+    ----------
+    try_optimizer : :class:`Optimizer`
+        The optimizer which is used initially to try and optimize a
+        :class:`.Molecule`.
+
+    catch_optimizer : :class:`Optimizer`
+        If :attr:`try_optimizer` raises an error, this optimizer is
+        run on the :class:`.Molecule` instead.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        # Create some molecules to optimize.
+        mol1 = StructUnit2.smiles_init('NCCN', []'amine'])
+        mol2 = StructUnit.smiles_init('CCCCC')
+        mol3 = StructUnit.smiles_init('O=CCCN')
+
+        # Create an optimizer which may fail.
+        uff = UFF()
+
+        # Create a backup optimizer.
+        mmff = MMFF()
+
+        # Make an optimizer which tries to run raiser and if that
+        # raises an error, will run mmff on the molecule instead.
+        try_catch = TryCatchOptimizer(try_optimizer=uff,
+                                      catch_optimizer=mmff)
+
+        # Optimize the molecules. In each case if the optimization with
+        # UFF fails, MMFF is used to optimize the molecule instead.
+        try_catch.optimize(mol1)
+        try_catch.optimize(mol2)
+        try_catch.optimzie(mol3)
+
+
+    """
+
+    def __init__(self, try_optimizer, catch_optimizer):
+        self.try_optimizer = try_optimizer
+        self.catch_optimizer = catch_optimizer
+        # try and catch optimizers should toggle use_cache themselves.
+        super.__init__(use_cache=False)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        try:
+            return self.try_optimizer.optimize(mol, conformer)
+        except Exception:
+            try_name = self.try_optimizer.__class__.__name__
+            catch_name = self.catch_optimizer.__class__.__name__
+            logger.error(
+                f'{try_name} failed, trying {catch_name}.',
+                exc_info=True
+            )
+            return self.catch_optimizer.optimize(mol, conformer)
+
+
 class RaisingOptimizerError(Exception):
     ...
 
@@ -279,9 +367,9 @@ class RaisingOptimizer(Optimizer):
 
     Attributes
     ----------
-    fn : :class:`function`
-        When the optimizer does not fail, it uses this optimization
-        function to optimize molecules.
+    optimizer : :class:`Optimizer`
+        When the optimizer does not fail, it uses this
+        :class:`Optimizer` to optimize molecules.
 
     fail_chance : :class:`float`
         The probability that the optimizer will raise an error each
@@ -289,36 +377,35 @@ class RaisingOptimizer(Optimizer):
 
     Examples
     --------
-    >>> mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-    >>> etkdg = RDKitEmbedder(rdkit.ETKDG())
-    >>> partial_raiser = RaisingOptimizer(etkdg.optimize)
-    >>> partial_raiser.optimize(mol)
+    .. code-block:: python
+
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        etkdg = RDKitEmbedder(rdkit.ETKDG())
+        partial_raiser = RaisingOptimizer(etkdg)
+        partial_raiser.optimize(mol)
 
     """
 
-    def __init__(self, fn, fail_chance=0.5, skip_optimized=False):
+    def __init__(self, optimizer, fail_chance=0.5):
         """
         Initializes :class:`PartialRaiser`.
 
         Parameters
         ----------
-        fn : :class:`function`
-            When the optimizer does not fail, it uses this optimization
-            function to optimize molecules.
+        optimizer : :class:`Optimizer`
+            When the optimizer does not fail, it uses this
+            :class:`Optimizer` to optimize molecules.
 
         fail_chance : :class:`float`, optional
             The probability that the optimizer will raise an error each
             time :meth:`optimize` is used.
 
-        skip_optimized : :class:`bool`, optional
-            If ``True`` then :meth:`optimize` returns immediately for
-            molecules where :attr:`.Molecule.optimized` is``True``.
-
         """
 
-        self.fn = fn
+        self.optimizer = optimizer
         self.fail_chance = fail_chance
-        super().__init__(skip_optimized=skip_optimized)
+        # "optmizer" should toggle use_cache for itself.
+        super().__init__(use_cache=False)
 
     def optimize(self, mol, conformer=-1):
         """
@@ -345,54 +432,26 @@ class RaisingOptimizer(Optimizer):
 
         if np.random.rand() < self.fail_chance:
             raise RaisingOptimizerError('Used RaisingOptimizer.')
-        self.fn(mol)
+        return self.optimizer.optimize(mol)
 
 
-class RDKitForceField(Optimizer):
+class MMFF(Optimizer):
     """
-    Optimizes the structure of molecules using ``rdkit``.
-
-    Attributes
-    ----------
-    rdkit_fn : :class:`function`
-        An rdkit optimization function, for example
-        :func:`rdkit.UFFOptimizeMolecule` or
-        :func:`rdkit.MMFFOptimizeMolecule`.
+    Use the MMFF force field to optimize molecules.
 
     Examples
     --------
-    Use MMFF to optimize a molecule.
+    .. code-block:: python
 
-    >>> import rdkit.Chem.AllChem as rdkit
-    >>> mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-    >>> ff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
-    >>> ff.optimize(mol)
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        mmff = MMFF()
+        mmff.optimize(mol)
 
     """
 
-    def __init__(self, rdkit_fn, skip_optimized=False):
-        """
-        Initializes a :class:`RDKitForceField` instance.
-
-        Parameters
-        ----------
-        rdkit_fn : :class:`function`
-            An rdkit optimization function, for example
-            :func:`rdkit.UFFOptimizeMolecule` or
-            :func:`rdkit.MMFFOptimizeMolecule`.
-
-        skip_optimized : :class:`bool`, optional
-            If ``True`` then :meth:`optimize` returns immediately for
-            molecules where :attr:`.Molecule.optimized` is``True``.
-
-        """
-
-        self.rdkit_fn = rdkit_fn
-        super().__init__(skip_optimized=skip_optimized)
-
     def optimize(self, mol, conformer=-1):
         """
-        Optimizes a molecule.
+        Optimizes a molecule with the MMFF force field.
 
         Parameters
         ----------
@@ -411,9 +470,49 @@ class RDKitForceField(Optimizer):
         if conformer == -1:
             conformer = mol.mol.GetConformer(conformer).GetId()
 
-        # Sanitize then optimize the rdkit molecule.
+        # Needs to be sanitized to get force field params.
         rdkit.SanitizeMol(mol.mol)
-        self.rdkit_fn(mol.mol, confId=conformer)
+        rdkit.MMFFOptimizeMolecule(mol.mol, confId=conformer)
+
+
+class UFF(Optimizer):
+    """
+    Use the UFF force field to optimize molecules.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        uff = UFF()
+        uff.optimize(mol)
+
+    """
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule with the UFF force field.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if conformer == -1:
+            conformer = mol.mol.GetConformer(conformer).GetId()
+
+        # Needs to be sanitized to get force field params.
+        rdkit.SanitizeMol(mol.mol)
+        rdkit.UFFOptimizeMolecule(mol.mol, confId=conformer)
 
 
 class RDKitEmbedder(Optimizer):
@@ -429,10 +528,12 @@ class RDKitEmbedder(Optimizer):
     --------
     Use ETKDG to generate an optimized structure.
 
-    >>> import rdkit.Chem.AllChem as rdkit
-    >>> mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-    >>> embedder = RDKitEmbedder(rdkit.ETKDG())
-    >>> embedder.optimize(mol)
+    .. code-block:: python
+
+        import rdkit.Chem.AllChem as rdkit
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        embedder = RDKitEmbedder(rdkit.ETKDG())
+        embedder.optimize(mol)
 
     References
     ----------
@@ -440,7 +541,7 @@ class RDKitEmbedder(Optimizer):
 
     """
 
-    def __init__(self, params, skip_optimized=False):
+    def __init__(self, params, use_cache=False):
         """
         Initializes a :class:`RDKitEmbedder` instance.
 
@@ -449,14 +550,14 @@ class RDKitEmbedder(Optimizer):
         params : :class:`rdkit.EmbedParameters`
             The parameters used for the embedding.
 
-        skip_optimized : :class:`bool`, optional
-            If ``True`` then :meth:`optimize` returns immediately for
-            molecules where :attr:`.Molecule.optimized` is``True``.
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
 
         """
 
         self.params = params
-        super().__init__(skip_optimized=skip_optimized)
+        super().__init__(use_cache=use_cache)
 
     def optimize(self, mol, conformer=-1):
         """

@@ -19,8 +19,6 @@ from collections import deque
 import tarfile
 from glob import iglob
 
-# Holds global stk options.
-OPTIONS = {}
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
@@ -124,52 +122,6 @@ class MolFileError(Exception):
 class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg
-
-
-class FunctionData:
-    """
-    Stores information about functions and their parameters.
-
-    Attributes
-    ----------
-    name : :class:`str`
-        The name of a function or method.
-
-    params : :class:`dict`
-        The parameters of the function or method who's name is held by
-        `name`.
-
-    """
-
-    __slots__ = ['name', 'params']
-
-    def __init__(self, name, **kwargs):
-        self.name = name
-        self.params = kwargs
-
-    def __hash__(self):
-        return 1
-
-    def __eq__(self, other):
-
-        same_length = len(self) == len(other)
-        same_items = all(x in other.params.items() for x in
-                         self.params.items())
-        same_name = self.name == other.name
-
-        return same_length and same_items and same_name
-
-    def __len__(self):
-        return len(self.params.items())
-
-    def __str__(self):
-        params = ", ".join(
-            f"{key}={value!r}" for key, value in self.params.items()
-        )
-        return f"FunctionData({self.name!r}, {params})"
-
-    def __repr__(self):
-        return str(self)
 
 
 class LazyAttr:

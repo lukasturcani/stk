@@ -1,6 +1,13 @@
+from .electronic_property_calculators import (
+    ElectronicPropertyCalculator
+)
+
+
 class MOPACElectronicProperties(ElectronicPropertyCalculator):
-    @exclude('mopac_path')
-    def mopac_dipole(self, mopac_path, settings=None):
+    def __init__(self, mopac_path):
+        self.mopac_path = mopac_path
+
+    def dipole_moment(self, mol, conformer=-1):
         """
         Calculates the dipole moment using MOPAC.
 
@@ -87,9 +94,7 @@ class MOPACElectronicProperties(ElectronicPropertyCalculator):
         _run_mopac(file_root, mopac_path)
         return _extract_MOPAC_dipole(file_root)
 
-
-    @exclude('mopac_path')
-    def mopac_ea(self, mopac_path, settings=None):
+    def electron_affinity(self, mol, conformer=-1):
         """
         Calculates the electron affinity using MOPAC.
 
@@ -200,8 +205,7 @@ class MOPACElectronicProperties(ElectronicPropertyCalculator):
         # Calculate the EA (eV)
         return en2 - en1
 
-    @exclude('mopac_path')
-    def mopac_ip(self, mopac_path, settings=None):
+    def ionization_potential(self, mol, conformer=-1):
         """
         Calculates the ionization potential using MOPAC.
 
@@ -311,3 +315,154 @@ class MOPACElectronicProperties(ElectronicPropertyCalculator):
         en2 = mol2.energy.mopac(mopac_path, vals)
         # Calculate the IP (eV)
         return en2 - en1
+
+
+def _run_mopac(file_root, mopac_path, timeout=3600):
+
+    mop_file = file_root + '.mop'
+
+    logger.info(f'Running MOPAC - {file_root}.')
+
+    # To run MOPAC a command is issued to the console via
+    # ``subprocess.Popen``. The command is the full path of the
+    # ``mopac`` program.
+    file_root, ext = os.path.splitext(mop_file)
+    opt_cmd = [mopac_path, file_root]
+    opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE,
+                            stderr=sp.STDOUT,
+                            universal_newlines=True)
+
+    try:
+        if timeout:
+            proc_out, _ = opt_proc.communicate(timeout=timeout)
+        else:
+            proc_out, _ = opt_proc.communicate()
+    except sp.TimeoutExpired:
+        logger.info(('Minimization took too long and was terminated '
+                     'by force - {}').format(file_root))
+        _kill_mopac(file_root)
+
+
+def _kill_mopac(file_root):
+    """
+    Stops an in-progress MOPAC run.
+
+    To kill a MOPAC run, a file with the molecule's name and a ``.end``
+    extension is written.
+
+    Parameters
+    ----------
+    file_root : :class:`str`
+        The molecule's name.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+    end_file = file_root + '.end'
+
+    with open(end_file, 'w') as end:
+        end.write('SHUT')
+
+
+def _mop_line(settings):
+    """
+    Formats `settings` into a MOPAC input string.
+
+    Parameters
+    ----------
+    settings : :class:`dict`
+        Dictionary defined in :func:`mopac_opt`, where all the run
+        details are defined.
+
+    Returns
+    -------
+    :class:`str`
+        String containing all the MOPAC keywords correctly formatted
+        for the input file.
+
+    """
+
+    # Generate an empty string
+    mopac_run_str = ""
+
+    # Add Hamiltonian info
+    mopac_run_str = mopac_run_str + settings['hamiltonian']
+    # Forcing a single point calculation
+    mopac_run_str = mopac_run_str + ' NOOPT '
+    # Add EPS info
+    eps_info = ' EPS={} '.format(settings['eps'])
+    mopac_run_str = mopac_run_str + eps_info
+    # Add Charge info
+    charge_info = ' CHARGE={} '.format(settings['charge'])
+    mopac_run_str = mopac_run_str + charge_info
+
+    return mopac_run_str
+
+
+def _create_mop(file_root, molecule, settings):
+    """
+    Creates the ``.mop`` file holding the molecule to be optimized.
+
+    Parameters
+    ----------
+    mol : :class:`.Molecule`
+        The molecule which is to be optimized. Its molecular
+        structure file is converted to a ``.mop`` file. The original
+        file is also kept.
+
+    settings : :class:`dict`
+        Dictionary defined by the MOPAC methods, where all the run
+        details are defined.
+
+    Returns
+    -------
+    :class:`str`
+        The full path of the newly created ``.mop`` file.
+
+    """
+
+    mop_file = file_root + '.mop'
+    mol = molecule.mol
+
+    logger.info('Creating .mop file - {}.'.format(file_root))
+
+    # Generate the mop file containing the MOPAC run info.
+    with open(mop_file, 'w') as mop:
+        # Line for the run info.
+        mop.write(_mop_line(settings) + "\n")
+        # Line with the name of the molecule.
+        mop.write(file_root + "\n\n")
+
+        # Write the structural info.
+        for atom in mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            symbol = atom.GetSymbol()
+            x, y, z = mol.GetConformer().GetAtomPosition(atom_id)
+            atom_info = f'{symbol}   {x}   +1  {y}   +1  {z}   +1 \n'
+            mop.write(atom_info)
+
+    return mop_file
+
+
+def _extract_MOPAC_en(file_root):
+    mopac_out = file_root + '.arc'
+
+    with open(mopac_out) as outfile:
+        target = "TOTAL ENERGY"
+        energy_str = str([x for x in outfile.readlines() if target in x][0])
+        energy_val = float(energy_str.split()[3])
+
+    return energy_val
+
+
+def _extract_MOPAC_dipole(file_root):
+    mopac_out = file_root + '.arc'
+
+    with open(mopac_out) as outfile:
+        target = "DIPOLE"
+        energy_str = str([x for x in outfile.readlines() if target in x][0])
+        energy_val = float(energy_str.split()[2])
+
+    return energy_val
