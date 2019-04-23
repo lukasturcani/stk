@@ -1,5 +1,4 @@
 from .utilities import *
-from .ga import *
 from .molecular import *
 from .calculators import *
 from .populations import *
