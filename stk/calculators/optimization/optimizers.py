@@ -3,7 +3,7 @@ Defines optimizers.
 
 Optimizers are objects used to optimize molecules. Each optimizer is
 initialized with some settings and used to optimize a molecule
-with :meth:`Optimizer.optimize`.
+with :meth:`~Optimizer.optimize`.
 
 .. code-block:: python
 
@@ -48,22 +48,21 @@ we can use the :attr:`use_cache` flag.
     caching_etkdg.optimize(polymer)
 
 Caching is done on a per :class:`Optimizer` basis. Just because the
-molecule has been cached by one :class:`Optimizer` does not mean that
-another :class:`Optimizer` will no longer optimize the molecule.
+molecule has been cached by one :class:`Optimizer` instance does not
+mean that a different :class:`Optimizer` instance will no longer
+optimize the molecule.
 
 .. _`adding optimizers`:
 
-Extending stk: Adding optimizers.
----------------------------------
+Extending stk: Making new optimizers.
+-------------------------------------
 
-New optimizers are added by writing them in this module or in a
-separate module in this directory. An optimizer is defined as a new
-class which inherits :class:`Optimizer`. The new optimizer class must
-define a :meth:`~Optimizer.optimize` method. The method must take 2
+New optimizers can be made by simply making a class which inherits the
+:class:`Optimizer` class. In addition to this, the new class must
+define a :meth:`~Optimize.optimize` method. The method must take 2
 arguments a mandatory `mol` argument and an optional `conformer`
 argument. :meth:`~Optimizer.optimize` will take a molecule and change
-its structure however it likes. Beyond this there are no requirements
-for optimizers.
+its structure however it likes. Beyond this there are no requirements.
 
 """
 
@@ -82,8 +81,8 @@ def _add_cache_use(optimize):
 
     Decorates `optimize` so that before running it checks if the
     :class:`.Molecule` and conformer have already been optimized by the
-    optimizer. If so, and :attr:`~Optimizer.cache` is ``True``, then
-    the molecule is skipped and no optimization is performed.
+    optimizer. If so, and :attr:`~Optimizer.use_cache` is ``True``,
+    then the molecule is skipped and no optimization is performed.
 
     Parameters
     ----------
@@ -101,7 +100,10 @@ def _add_cache_use(optimize):
     def inner(self, mol, conformer=-1):
         key = (mol, conformer)
         if self.use_cache and key in self.cache:
-            logger.info(f'Skipping "{mol.name}".')
+            logger.info(
+                f'Skipping optimization on '
+                f'"{mol.name}" conformer {conformer}.'
+            )
         else:
             optimize(self, mol, conformer)
             self.cache.add(key)
@@ -381,7 +383,8 @@ class RaisingOptimizer(Optimizer):
 
         mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
         etkdg = RDKitEmbedder(rdkit.ETKDG())
-        partial_raiser = RaisingOptimizer(etkdg)
+        partial_raiser = RaisingOptimizer(etkdg, fail_chance=0.75)
+        # 75 % chance an error will be raised by calling optimize.
         partial_raiser.optimize(mol)
 
     """

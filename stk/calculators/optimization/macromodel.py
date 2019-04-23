@@ -50,7 +50,7 @@ class _MacroModel(Optimizer):
         machine. For example, on a Linux machine this may be something
         like ``'/opt/schrodinger2017-2'``.
 
-    output_dir : :class:`str`, optional
+    output_dir : :class:`str`
         The name of the directory into which files generated during
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.

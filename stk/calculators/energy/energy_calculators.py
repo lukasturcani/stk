@@ -1,196 +1,61 @@
 """
 Defines energy calculators.
 
+Energy calculators are objects which calculate the energy of molecules.
+Each :class:`EnergyCalculator` is initialized with some settings and
+calculates the energy of a molecule with
+:meth:`~EnergyCalculator.energy`.
+
+.. code-block:: python
+
+    # Energy calculators work with any Molecule objects, such as
+    # StructUnit, Polymer, Cage, etc.
+    mol1 = StructUnit(...)
+    mol2 = Cage(...)
+    mol3 = Polymer(...)
+
+    # Create the energy calculator.
+    mmff = MMFFEnergy()
+
+    # Calculate energies of various molecules.
+    mol1_energy = mmff.energy(mol1)
+    # We can optionally specify a conformer.
+    mol2_energy = mmff.energy(mol2, conformer=1)
+    mol3_energy = mmff.energy(mol3)
+
+By default, calling :meth:`~EnergyCalculator.energy` twice on the
+will calculate the energy a second time. However, we can use the
+:attr:`~EnergyCalculator.use_cache` option to prevent recalculations
+when the same molecule and conformer are given to the same energy
+calculator a second time.
+
+.. code-block:: python
+
+    caching_mmff = MMFFEnergy(use_cache=True)
+    # Calculate the energy the first time.
+    energy1 = caching_mmff.energy(mol1)
+    # The second time, the enegy is returned directly from memory, a
+    # second calculation is not run.
+    energy2 = caching_mmff.enegy(mol2)
+
 .. _`adding energy calculators`:
 
-Extending stk: Adding energy calculators.
------------------------------------------
+Extending stk: Making new energy calculators.
+---------------------------------------------
 
-It may well be the case that more ways to calculate the energy of
-molcules will need to be added. For example, if support for using some
-external software to perform the calculations needs to be added.
-
-In order to add a new function which calculates the energy, just add it
-as a method to :class:`Energy`. There really aren't any requirements
-beyond this, just make sure the energy value is what the method
-returns.
-
-If the energy method does not fit neatly into a single method, feel
-free to split it up. Make sure that any helper methods are
-private, i.e. that their names start with a leading underscore. Only
-the main method which the user will use should be public.
-
-To calculate the energy of some :class:`.Molecule` object the only
-thing that is needed is calling one of the :class:`Energy` methods:
-
-    >>>  molecule.energy.rdkit('uff')
-    OUT: 16.501
-
-Here, :meth:`Energy.rdkit` was used as an example and ``molecule``
-is just some :class:`.Molecule` instance. Each :class:`.Molecule`
-object has an :class:`Energy` instance in its :attr:`~.Molecule.energy`
-attribute.
-
-Each :class:`Energy` instance also has a :attr:`~Energy.values`
-attribute, which stores the result of previous calculations. Using the
-molecule from the previous example:
-
-    >>>  molecule.energy.values
-    OUT: {FunctionData('rdkit', forcefield='uff'): 16.501}
-
-I.E. this indicates that :meth:`Energy.rdkit` was called with the
-`forcefield` argument set to ``'uff'`` and the result was ``16.501``.
-
-Calling any method of :class:`Energy` updates the dictionary
-automatically. When adding a new method to the class, no mechanism for
-updating the dictionary needs to be provided. Writing the method within
-the class is enough for it to update the :attr:`~Energy.values`
-dictionary when called.
-
-Sometimes a function will require a parameter which does not affect the
-outcome of the energy calculation. For example, to calculate the energy
-using the MacroModel program, :meth:`Energy.macromodel` can be used:
-
-.. code-block:: python
-
-    molecule.energy.macromodel(forcefield=16,
-                               macromodel_path='path/to/macromodel/dir')
-
-This function requires the number of a forcefield (``16``) and the
-directory where MacroModel is installed on the users computer
-(``'path/to/macromodel/dir'``). However, the directory does not affect
-the value of the calculated energy. When running:
-
-    >>> molecule.energy.values
-
-We want the output to be:
-
-.. code-block:: python
-
-    OUT: {FunctionData('rdkit', forcefield=uff): 16.501,
-          FunctionData('macromodel', forcefield=16): 200}
-
-(Assuming we are still dealing with the same ``molecule`` instance from
-the :meth:`~Energy.rdkit` example, both calculated energies will be
-kept in the dictionary.)
-
-However, if we just define :meth:`Energy.macromodel` within
-:class:`Energy`, and then run it:
-
-.. code-block:: python
-
-    molecule.energy.macromodel(forcefield=16,
-                               macromodel_path='path/to/macromodel/dir')
-
-The output of
-
-    >>> molecule.energy.values
-
-will be
-
-.. code-block:: python
-
-    OUT: {FunctionData('rdkit', forcefield=uff) : 16.501,
-          FunctionData('macromolecule',
-                       forcefield=16,
-                       macromodel_path='path/to/macromodel/dir'): 200}
-
-In order to make sure that the `macromodel_path` is excluded from the
-key, decorate :meth:`Energy.macromodel` with the :func:`exclude()`
-decorator. For example:
-
-.. code-block:: python
-
-    @exclude('macromodel_path')
-    def macromodel(self, forcefield, macromodel_path):
-        ...
-
-Now the parameter `macromodel_path` will not form part of the key in
-the :attr:`~Energy.values` dictionary. If there were 2 parameters you
-wanted to exlude:
-
-.. code-block:: python
-
-    @exclude('exclude1', 'exclude2')
-    def energy_func(include1, include2, exclude1, exclude2):
-        ...
-
-and so on.
-
-Sometimes even this isn't enough to get the key to look exactly the way
-we want. For exmple:
-
-.. code-block:: python
-
-    @exclude('force_e_calc')
-    def formation(self,
-                  func,
-                  products,
-                  building_blocks=None,
-                  force_e_calc=False):
-        ...
-
-The `func` parameter of this function is a :class:`.FunctionData`
-instance, which holds the data of one of the other :class:`Energy`
-methods. This includes all data the method requires to run, even
-software directories if needed. As a result, the key when running this
-function may look like this:
-
-.. code-block:: python
-
-    FunctionData('pseudoformation',
-                 building_blocks=None,
-                 func=FunctionData('macromodel',
-                                   forcefield=16,
-                                   macromodel_path='/opt/schrodinger2017-2'))
-
-Notice that the path of the MacroModel installation was kept nested in
-the key of :meth:`Energy.formation`. This is undesirable. To make this
-work properly, a completely custom mechanism for making the
-key of the :meth:`Energy.formation` is necessary. To do this, define a
-function in this module. For example:
-
-.. code-block:: python
-
-    def formation_key(fargs, fkwargs):
-        ...
-
-And set the :attr:`key` attribute of the energy method to the newly
-defined function:
-
-.. code-block:: python
-
-    Energy.formation.key = formation_key
-
-The `fargs` and `fkwargs` arguments are the arguments and keyword
-arguments with which :meth:`Energy.formation` was called, including
-`self`. The :func:`formation_key` function should return a
-:class:`.FunctionData` instance which will act as the key. In our case
-the function was defined so that the key is:
-
-.. code-block:: python
-
-    FunctionData('formation',
-                 products=[],
-                 building_blocks=None,
-                 func=FunctionData('macromodel', forcefield=16))
-
-Notes.
-------
-
-#. Make sure to use the `values` dictionary instead of running the same
-   calculation repeatedly.
-
-#. The automatic updating of the dictionary is  achieved by the
-   :class:`EMeta` metaclass, :func:`EMethod` descriptor and
-   :func:`e_logger` decorator. You do not need to worry about these,
-   but information about how they work is provided in the docstring of
-   :class:`EMeta`.
+New energy calculators can be made by simply making a class which
+inherits the :class:`EnergyCalculator` class. In addition to this,
+the new class must define a :meth:`~EnergyCalculator.energy` method.
+The method must take 2 arguments, a mandatory `mol` argument and an
+optional `conformer` argument. The method will then calculate and
+return the energy. There are no requirements regarding how it should
+go about calculating the energy.
 
 """
 
 import rdkit.Chem.AllChem as rdkit
 import logging
+from functools import wraps
 
 
 logger = logging.getLogger(__name__)
@@ -205,89 +70,200 @@ class EnergyError(Exception):
     ...
 
 
+def _add_cache_use(energy):
+    """
+    Makes :meth:`~EnergyCalculator.energy` use the cache.
+
+    Decorates `energy` so that before running it checks if the
+    :class:`.Molecule` and conformer have already had their energy
+    calculated. If so, and :attr:`~EnergyCalculator.use_cache` is
+    ``True``, then the energy value in the
+    :attr:`~EnergyCalculator.cache` is returned.
+
+    Parameters
+    ----------
+    energy : :class:`function`
+        A function which is to have cache use added to it.
+
+    Returns
+    -------
+    :class:`function`
+        The decorated function.
+
+    """
+
+    @wraps(energy)
+    def inner(self, mol, conformer=-1):
+        key = (mol, conformer)
+        if self.use_cache and key in self.cache:
+            logger.info(
+                f'Using cached energy value with '
+                f'"{mol.name}" conformer {conformer}.'
+            )
+        else:
+            self.cache[key] = energy(self, mol, conformer)
+
+        return self.cache[key]
+
+    return inner
+
+
 class EnergyCalculator:
     """
-    Handles all things related to a molecule's energy.
-
-    An instance of this class will be placed in
-    :attr:`.Molecule.energy` of each :class:`.Molecule` instance.
+    Calculate the energy of molecules.
 
     Attributes
     ----------
-    molecule : :class:`.Molecule`
-        The molecule on which all the energy calculation are performed.
+    cache : :class:`dict`
+        A :class:`dict` hodling calculated energy values of the form
 
-    values : :class:`dict`
-        A :class:`dict` of the form
+            cache = {
+                (mol1, conformer1): 12.2,
+                (mol1, conformer2): 2.0,
+                (mol2, conformer2): 321.12
+            }
 
-        .. code-block:: python
+        which holds every :class:`Molecule` and conformer whose energy
+        was calculated by the :class:`EnergyCalculator`. Here ``mol1``
+        and ``mol2`` are :class:`.Molecule` objects and ``conformer1``
+        and ``conformer2`` are :class:`int`s, which are the ids of the
+        conformers passed to :meth:`energy`.
 
-            values = {FunctionData('method1', param='a'): 34}
-
-        Where the :class:`.FunctionData` instance identifies an
-        :class:`Energy` method which was run and the parameters which
-        were used, while the key holds the result of the calculation.
+    use_cache : :class:`bool`
+        If ``True`` :meth:`energy` will not run twice on the same
+        molecule and conformer, but will instead return the previously
+        calculated value.
 
     """
 
+    def __init__(self, use_cache=False):
+        """
+        Initializes a :class:`EnergyCalculator` instance.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`energy` will not run twice on the same
+            molecule and conformer, but will instead return the previously
+            calculated value.
+
+        """
+
+        self.cache = {}
+        self.use_cache = use_cache
+
+    def __init_subclass__(cls, **kwargs):
+        cls.enegy = _add_cache_use(cls.energy)
+        return super().__init_subclass__(**kwargs)
+
     def energy(self, mol, conformer=-1):
+        """
+        Calculates the energy of `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The :class:`.Molecule` whose energy is to be calculated.
+
+        conformer : :class:`int`, optinal
+            The conformer of `mol` to use.
+
+        Returns
+        -------
+        :class:`float`
+            The energy.
+
+        """
+
         raise NotImplementedError()
 
 
 class FormationEnergy(EnergyCalculator):
     """
-    Calculates the formation energy.
-
-    The formation energy is calculated under the assumption that
-    the molecule in :attr:`molecule` is composed of the molecules
-    in `building_blocks` and that during formation molecules in
-    `products` are formed in addition to :attr:`molecule`.
+    Calculates the formation energy of a molecule.
 
     Attributes
     ----------
-    products : :class:`list`
-        A :class:`list` of the form
+    energy_calculator : :class:`EnergyCalculator`
+        The :class:`EnergyCalculator` used to calculate the energy of
+        all reactant and product molecules.
 
-        .. code-block:: python
+    reactants : :class:`list` of :class:`.Molecule`
+        The reactants. If there are multiples of the same reactant
+        then it must appear multiple times in this :class:`list`.
 
-            products = [(4, mol1), (2, mol2)]
+    products : :class:`list` of :class:`.Molecule`
+        The molecules which are produced as a result of the formation
+        reaction. This :class:`list` must omit the :class:`.Molecule`
+        passed to :meth:`energy`. If there are multiples of the same
+        product, it must appear multiple times in this :class:`list`.
 
-        Where ``mol1`` and ``mol2`` are :class:`.Molecule` objects
-        of molecules produced in addition to :attr:`molecule`
-        during its formation reaction. The numbers represent the
-        number of each molecule made per :attr:`molecule`.
+    reactant_conformers : :class:`list` of :class:`int`
+        The conformer ids of the molecules in :attr:`reactants` to use.
 
+    product_conformers : :class:`list` of :class:`int`
+        The conformer ids of the molecules in :attr:`products` to use.
+
+    Examples
+    --------
 
     """
 
     def __init__(self,
                  energy_calculator,
                  reactants,
-                 other_products,
+                 products,
                  reactant_conformers=None,
-                 other_product_conformers=None,
+                 product_conformers=None,
                  use_cache=True):
         """
         Initializes a :class:`FormationEnergy` instance.
 
         Parameters
         ----------
+        energy_calculator : :class:`EnergyCalculator`
+            The :class:`EnergyCalculator` used to calculate the energy
+            of all reactant and product molecules.
+
+        reactants : :class:`list` of :class:`.Molecule`
+            The reactants. If there are multiples of the same reactant
+            then it must appear multiple times in this :class:`list`.
+
+        products : :class:`list` of :class:`.Molecule`
+            The molecules which are produced as a result of the
+            formation reaction. This :class:`list` must omit the
+            :class:`.Molecule` passed to :meth:`energy`. If there are
+            multiples of the same product, it must appear multiple
+            times in this :class:`list`.
+
+        reactant_conformers : :class:`list` of :class:`int`, optional
+            The conformer ids of the molecules in :attr:`reactants` to
+            use.
+
+        product_conformers : :class:`list` of :class:`int`, optional
+            The conformer ids of the molecules in :attr:`products` to
+            use.
+
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`energy` will not run twice on the same
+            molecule and conformer, but will instead return the
+            previously calculated value.
 
         """
 
         if reactant_conformers is None:
             reactant_conformers = [-1 for i in range(len(reactants))]
 
-        if other_product_conformers is None:
-            other_product_conformers = [
-                -1 for i in range(len(other_product_conformers))
+        if product_conformers is None:
+            product_conformers = [
+                -1 for i in range(len(product_conformers))
             ]
 
         self.energy_calculator = energy_calculator
         self.reactants = reactants
-        self.other_products = other_products
+        self.products = products
         self.reactant_conformers = reactant_conformers
-        self.other_product_conformers = other_product_conformers
+        self.product_conformers = product_conformers
         super().__init__(use_cache=use_cache)
 
     def energy(self, mol, conformer=-1):
@@ -310,12 +286,12 @@ class FormationEnergy(EnergyCalculator):
 
         """
 
-        product_energy = self.energy_calculator.energy(mol, conformer)
-        other_products = zip(self.other_products,
-                             self.other_product_conformers)
-        for product, conformer in other_products:
-            product_energy += self.energy_calculator.energy(product,
-                                                            conformer)
+        products = zip(self.products,  self.product_conformers)
+        product_energy = sum(
+            self.energy_calculator.energy(product, conformer)
+            for product, conformer in products
+        )
+        product_energy += self.energy_calculator.energy(mol, conformer)
 
         reactants = zip(self.reactants, self.reactant_conformers)
         reactant_energy = sum(
@@ -328,30 +304,99 @@ class FormationEnergy(EnergyCalculator):
 
 class MMFFEnergy(EnergyCalculator):
     """
+    Uses the MMFF force field to calculate energies.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        # Create a molecules whose energy we want to know.
+        mol1 = StructUnit.smiles_init('CCCNCCCN')
+        mol2 = Polymer(...)
+        mol3 = Cage(...)
+
+        # Create the energy calculator.
+        mmff = MMFFEnergy()
+
+        # Calculate the energies.
+        energy1 = mmff.energy(mol1)
+        energy2 = mmff.energy(mol2)
+        energy3 = mmff.energy(mol3)
 
     """
 
     def energy(self, mol, conformer=-1):
         """
+        Calculates the energy of `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The :class:`.Molecule` whose energy is to be calculated.
+
+        conformer : :class:`int`, optinal
+            The conformer of `mol` to use.
+
+        Returns
+        -------
+        :class:`float`
+            The energy.
 
         """
 
-        logger.debug('Starting rdkit energy calculation.')
-        if forcefield == 'uff':
-            self.molecule.mol.UpdatePropertyCache()
-            ff = rdkit.UFFGetMoleculeForceField(self.molecule.mol,
-                                                confId=conformer)
-        if forcefield == 'mmff':
-            rdkit.GetSSSR(self.molecule.mol)
-            self.molecule.mol.UpdatePropertyCache()
-            ff = rdkit.MMFFGetMoleculeForceField(
-                  self.molecule.mol,
-                  rdkit.MMFFGetMoleculeProperties(self.molecule.mol),
-                  confId=conformer)
+        rdkit.GetSSSR(mol.mol)
+        mol.mol.UpdatePropertyCache()
+        ff = rdkit.MMFFGetMoleculeForceField(
+            mol.mol,
+            rdkit.MMFFGetMoleculeProperties(mol.mol),
+            confId=conformer
+        )
 
-        return self.force_field(self.molecule.mol, confId=conformer)
+        return ff.CalcEnergy()
 
 
 class UFFEnergy(EnergyCalculator):
+    """
+    Uses the UFF force field to calculate energies.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        # Create a molecules whose energy we want to know.
+        mol1 = StructUnit.smiles_init('CCCNCCCN')
+        mol2 = Polymer(...)
+        mol3 = Cage(...)
+
+        # Create the energy calculator.
+        uff = UFFEnergy()
+
+        # Calculate the energies.
+        energy1 = uff.energy(mol1)
+        energy2 = uff.energy(mol2)
+        energy3 = uff.energy(mol3)
+
+    """
+
     def energy(self, mol, conformer=-1):
-        ...
+        """
+        Calculates the energy of `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The :class:`.Molecule` whose energy is to be calculated.
+
+        conformer : :class:`int`, optinal
+            The conformer of `mol` to use.
+
+        Returns
+        -------
+        :class:`float`
+            The energy.
+
+        """
+
+        mol.mol.UpdatePropertyCache()
+        ff = rdkit.UFFGetMoleculeForceField(mol.mol, confId=conformer)
+        return ff.CalcEnergy()
