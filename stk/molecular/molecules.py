@@ -210,6 +210,9 @@ from ..utilities import (flatten,
 
 logger = logging.getLogger(__name__)
 
+# Toggle the caching of molecules.
+OPTIONS['cache'] = True
+
 
 class Cached(type):
     """

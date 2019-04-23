@@ -100,10 +100,12 @@ def _add_cache_use(energy):
                 f'Using cached energy value with '
                 f'"{mol.name}" conformer {conformer}.'
             )
+            return self.cache[key]
         else:
-            self.cache[key] = energy(self, mol, conformer)
-
-        return self.cache[key]
+            e = energy(self, mol, conformer)
+            if self.use_cache:
+                self.cache[key] = e
+            return e
 
     return inner
 

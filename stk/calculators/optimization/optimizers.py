@@ -106,7 +106,8 @@ def _add_cache_use(optimize):
             )
         else:
             optimize(self, mol, conformer)
-            self.cache.add(key)
+            if self.use_cache:
+                self.cache.add(key)
 
     return inner
 

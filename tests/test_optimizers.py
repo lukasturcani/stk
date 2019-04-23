@@ -24,7 +24,14 @@ def test_raising_optimizer(tmp_polymer):
     tmp_polymer.write(join(odir, 'raising_optimizer_after.mol'))
 
 
-def test_rdkit_force_field(tmp_polymer):
+def test_mmff(tmp_polymer):
+    tmp_polymer.write(join(odir, 'rdkit_force_field_before.mol'))
+    mmff = stk.RDKitForceField(rdkit.MMFFOptimizeMolecule)
+    mmff.optimize(tmp_polymer)
+    tmp_polymer.write(join(odir, 'rdkit_force_field_after.mol'))
+
+
+def test_uff(tmp_polymer):
     tmp_polymer.write(join(odir, 'rdkit_force_field_before.mol'))
     mmff = stk.RDKitForceField(rdkit.MMFFOptimizeMolecule)
     mmff.optimize(tmp_polymer)
@@ -38,7 +45,7 @@ def test_rdkit_embedder(tmp_polymer):
     tmp_polymer.write(join(odir, 'rdkit_embed_after.mol'))
 
 
-def test_optimizer_pipeline(tmp_polymer):
+def test_optimize_sequence(tmp_polymer):
     tmp_polymer.write(join(odir, 'pipeline_before.mol'))
     etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
     mmff = stk.RDKitForceField(rdkit.MMFFOptimizeMolecule)
@@ -47,7 +54,7 @@ def test_optimizer_pipeline(tmp_polymer):
     tmp_polymer.write(join(odir, 'pipeline_after.mol'))
 
 
-def test_optimizer_skipping(tmp_polymer):
+def test_cache_use(tmp_polymer):
     etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
     skipper = stk.RDKitEmbedder(rdkit.ETKDG(), skip_optimized=True)
 
@@ -56,7 +63,7 @@ def test_optimizer_skipping(tmp_polymer):
     skipper.optimize(tmp_polymer)
 
 
-def test_cage_pipeline(tmp_cc3, tmp_cage):
+def test_cage_optimizer_sequence(tmp_cc3, tmp_cage):
     mmff = stk.RDKitForceField(rdkit.MMFFOptimizeMolecule)
     etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
     pipeline = stk.CageOptimizerPipeline(etkdg, mmff)

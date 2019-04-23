@@ -5,34 +5,34 @@ def test_mmff(amine2):
     mmff = stk.MMFFEnergy()
     assert mmff.energy(amine2) < mmff.energy(amine2, 1)
 
+
+def test_uff(amine2):
+    uff = stk.UFFEnergy()
+    assert uff.energy(amine2) < uff.energy(amine2, 1)
+
+
+def test_cache_use(amine2):
+    mmff = stk.MMFFEnergy()
+    mmff.energy(amine2)
+    # Since use_cache is False the cache should be empty.
+    assert not mmff.cache
+
     # To test that the cache is not being used, put a random object
     # into it, and test that it was not returned.
     obj = object()
     mmff.cache[(amine2, 1)] = obj
     assert mmff.energy(amine2, 1) is not obj
 
+    # Test that the cache is being filled when use_cache is True.
+    cached_mmff = stk.MMFFEnergy(use_cache=True)
+    assert not cached_mmff.cache
+    cached_mmff.energy(amine2)
+    assert cached_mmff.cache
+
     # Test that the cache is being used by putting a random object into
     # it and making sure it gets returned.
-    cached_mmff = stk.MMFFEnergy(use_cache=True)
     cached_mmff.cache[(amine2, 1)] = obj
     assert mmff.energy(amine2, 1) is obj
-
-
-def test_uff(amine2):
-    uff = stk.UFFEnergy()
-    assert uff.energy(amine2) < uff.energy(amine2, 1)
-
-    # To test that the cache is not being used, put a random object
-    # into it, and test that it was not returned.
-    obj = object()
-    uff.cache[(amine2, 1)] = obj
-    assert uff.energy(amine2, 1) is not obj
-
-    # Test that the cache is being used by putting a random object into
-    # it and making sure it gets returned.
-    cached_uff = stk.UFFEnergy(use_cache=True)
-    cached_uff.cache[(amine2, 1)] = obj
-    assert uff.energy(amine2, 1) is obj
 
 
 def test_formation(polymer, amine2):
