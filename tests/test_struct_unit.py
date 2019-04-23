@@ -13,11 +13,11 @@ def test_init(amine2):
     assert amine2.func_groups[0].info.name == 'amine'
 
     amine2_1 = stk.StructUnit(amine2.mol, ['amine'])
-    assert amine2_1 == amine2
+    assert amine2_1.same(amine2)
 
     mol_block = rdkit.MolToMolBlock(amine2.mol, forceV3000=True)
     amine2_2 = stk.StructUnit(mol_block, ['amine'])
-    assert amine2_2 == amine2
+    assert amine2_2.same(amine2)
 
     amine2_3 = stk.StructUnit(amine2.mol)
     assert amine2.same(amine2_3)
@@ -95,11 +95,9 @@ def test_json_init(tmp_amine2):
     include_attrs = ['test_attr1', 'test_attr2', 'test_attr3']
 
     tmp_amine2.dump(path, include_attrs)
-    mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
+    mol2 = stk.Molecule.load(path)
 
     assert isinstance(tmp_amine2.file, str)
-    assert mol2.optimized
-    assert mol2.energy.__class__.__name__ == 'Energy'
     assert tmp_amine2 is not mol2
     assert tmp_amine2.atom_props == tmp_amine2.atom_props
     assert mol2.func_groups == tmp_amine2.func_groups
@@ -136,8 +134,8 @@ def test_caching():
 
 
 def test_set_bonder_centroid(tmp_amine2):
-    tmp_amine2.set_bonder_centroid([1, 2, 3])
-    assert np.allclose(tmp_amine2.bonder_centroid(),
+    tmp_amine2.set_bonder_centroid([1, 2, 3], 0)
+    assert np.allclose(tmp_amine2.bonder_centroid(0),
                        [1, 2, 3],
                        atol=1e-8)
 

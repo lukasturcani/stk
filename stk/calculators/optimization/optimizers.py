@@ -23,13 +23,13 @@ with :meth:`~Optimizer.optimize`.
 Sometimes it is desirable to chain multiple optimizations, one after
 another. For example, before running an optimization, it may be
 desirable to embed a molecule first, to generate an initial structure.
-:class:`.Sequence` may be used for this.
+:class:`OptimizerSequence` may be used for this.
 
 .. code-block:: python
 
     # Create a new optimizer which chains the previously defined
     # mmff and etkdg optimizers.
-    optimizer_sequence = Sequence(etkdg, mmff)
+    optimizer_sequence = OptimizerSequence(etkdg, mmff)
 
     # Run each optimizer in sequence.
     optimizer_sequence.optimize(polymer)
@@ -98,7 +98,7 @@ def _add_cache_use(optimize):
 
     @wraps(optimize)
     def inner(self, mol, conformer=-1):
-        key = (mol, conformer)
+        key = (mol.key, conformer)
         if self.use_cache and key in self.cache:
             logger.info(
                 f'Skipping optimization on '
@@ -177,6 +177,73 @@ class Optimizer:
         """
 
         raise NotImplementedError()
+
+
+class OptimizerSequence(Optimizer):
+    """
+    Applies optimizers in sequence.
+
+    Attributes
+    ----------
+    optimizers : :class:`tuple` of :class:`Optimizer`
+        A number of optimizers, each of which gets applied to a
+        molecule, based on the order in this :class:`tuple`.
+
+    Examples
+    --------
+    Let's say we want to embed a molecule with ETKDG first and then
+    minimize it with the MMFF force field.
+
+    .. code-block:: python
+
+        import rdkit.Chem.AllChem as rdkit
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        etkdg = RDKitEmbedder(rdkit.ETKDG())
+        mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
+        optimizer = OptimizerPipeline(etkdg, mmff)
+        optimizer.optimize(mol)
+
+    """
+
+    def __init__(self, *optimizers):
+        """
+        Initializes a :class:`OptimizerSequence` instance.
+
+        Parameters
+        ----------
+        *optimizers : :class:`Optimizer`
+            A number of optimizers, each of which gets applied to a
+            molecule, based on the order given.
+
+        """
+
+        self.optimizers = optimizers
+        # skip_optimized is False because it is the job of the
+        # optimizers in calculators to toggle skipping for themselves.
+        super().__init__(use_cache=False)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Chains multiple :class:`Optimizer` instances together.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        for optimizer in self.optimizers:
+            cls_name = optimizer.__class__.__name__
+            logger.info(f'Using {cls_name} on "{mol.name}".')
+            optimizer.optimize(mol, conformer)
 
 
 class CageOptimizerSequence(Optimizer):
@@ -324,7 +391,7 @@ class TryCatchOptimizer(Optimizer):
         self.try_optimizer = try_optimizer
         self.catch_optimizer = catch_optimizer
         # try and catch optimizers should toggle use_cache themselves.
-        super.__init__(use_cache=False)
+        super().__init__(use_cache=False)
 
     def optimize(self, mol, conformer=-1):
         """

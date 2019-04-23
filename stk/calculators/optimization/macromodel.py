@@ -13,7 +13,7 @@ from uuid import uuid4
 import logging
 import gzip
 
-from ..utilities import MAEExtractor, move_generated_macromodel_files
+from ...utilities import MAEExtractor, move_generated_macromodel_files
 from .optimizers import Optimizer
 
 logger = logging.getLogger(__name__)

@@ -1,4 +1,4 @@
-class ElectronicPropetyCalculator:
+class ElectronicPropertyCalculator:
     def dipole_moment(self, mol, conformer=-1):
         raise NotImplementedError()
 

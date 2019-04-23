@@ -2,7 +2,7 @@ from uuid import uuid4
 import os
 import subprocess as sp
 
-from ..utilities import move_generated_macromodel_files
+from ...utilities import move_generated_macromodel_files
 from .energy_calculators import EnergyCalculator, EnergyError
 
 

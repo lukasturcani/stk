@@ -730,6 +730,8 @@ class Population:
         sorted_pop = sorted(self, key=lambda m: m.key)
         for old, new in zip(sorted_pop, sorted_opt):
             old.__dict__ = dict(vars(new))
+            if optimizer.use_cache:
+                optimizer.cache.add((old.key, -1))
 
         # Make sure the cache is updated with the optimized versions.
         if OPTIONS['cache']:
@@ -1156,7 +1158,7 @@ class _OptimizeGuard:
         """
 
         try:
-            logger.info(f'Optimizing {mol.name}.')
+            logger.info(f'Optimizing "{mol.name}".')
             self.__wrapped__(mol, conformer)
 
         except Exception:

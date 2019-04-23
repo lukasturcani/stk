@@ -2000,7 +2000,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         for conf_id, mol_block in confs:
             conf_mol = rdkit.MolFromMolBlock(molBlock=mol_block,
-                                             removHs=False,
+                                             removeHs=False,
                                              sanitize=False)
             conf = conf_mol.GetConformer()
             conf.SetId(conf_id)
@@ -2445,16 +2445,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def __repr__(self):
         return str(self)
-
-    def __eq__(self, other):
-        if self.inchi != other.inchi:
-            return False
-
-        return self.func_group_infos == other.func_group_infos
-
-    def __hash__(self):
-        fgs = [info.name for info in self.func_group_infos]
-        return hash(self.gen_key(self.mol, fgs))
 
 
 class StructUnit2(StructUnit):

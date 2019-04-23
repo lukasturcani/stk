@@ -20,7 +20,7 @@ def test_cache_use(amine2):
     # To test that the cache is not being used, put a random object
     # into it, and test that it was not returned.
     obj = object()
-    mmff.cache[(amine2, 1)] = obj
+    mmff.cache[(amine2.key, 1)] = obj
     assert mmff.energy(amine2, 1) is not obj
 
     # Test that the cache is being filled when use_cache is True.
@@ -31,8 +31,8 @@ def test_cache_use(amine2):
 
     # Test that the cache is being used by putting a random object into
     # it and making sure it gets returned.
-    cached_mmff.cache[(amine2, 1)] = obj
-    assert mmff.energy(amine2, 1) is obj
+    cached_mmff.cache[(amine2.key, 1)] = obj
+    assert cached_mmff.energy(amine2, 1) is obj
 
 
 def test_formation(polymer, amine2):

@@ -94,7 +94,7 @@ def _add_cache_use(energy):
 
     @wraps(energy)
     def inner(self, mol, conformer=-1):
-        key = (mol, conformer)
+        key = (mol.key, conformer)
         if self.use_cache and key in self.cache:
             logger.info(
                 f'Using cached energy value with '
@@ -155,7 +155,7 @@ class EnergyCalculator:
         self.use_cache = use_cache
 
     def __init_subclass__(cls, **kwargs):
-        cls.enegy = _add_cache_use(cls.energy)
+        cls.energy = _add_cache_use(cls.energy)
         return super().__init_subclass__(**kwargs)
 
     def energy(self, mol, conformer=-1):
@@ -257,9 +257,7 @@ class FormationEnergy(EnergyCalculator):
             reactant_conformers = [-1 for i in range(len(reactants))]
 
         if product_conformers is None:
-            product_conformers = [
-                -1 for i in range(len(product_conformers))
-            ]
+            product_conformers = [-1 for i in range(len(products))]
 
         self.energy_calculator = energy_calculator
         self.reactants = reactants

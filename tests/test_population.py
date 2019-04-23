@@ -256,9 +256,10 @@ def test_min(generate_population):
 
 
 def test_optimize(tmp_polymer_pop):
-    assert all(not m.optimized for m in tmp_polymer_pop)
-    tmp_polymer_pop.optimize(stk.NullOptimizer())
-    assert all(m.optimized for m in tmp_polymer_pop)
+    optimizer = stk.NullOptimizer(use_cache=True)
+    assert not optimizer.cache
+    tmp_polymer_pop.optimize(optimizer)
+    assert len(optimizer.cache) == len(tmp_polymer_pop)
 
 
 def test_remove_duplicates_between_subpops(generate_population):
