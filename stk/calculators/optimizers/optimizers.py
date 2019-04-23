@@ -66,12 +66,11 @@ for optimizers.
 
 """
 
-import rdkit.Chem.AllChem as rdkit
-from functools import wraps
-import numpy as np
 import logging
+import numpy as np
+import rdkit.Chem.AllChem as rdkit
 import warnings
-
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
@@ -147,23 +146,24 @@ class Optimizer:
 
     """
 
-    def __init__(self, skip_optimized=False):
+    def __init__(self, skip_optimized, *args, **kwargs):
         """
         Initializes an :class:`Optimizer`.
 
         Parameters
         ----------
-        skip_optimized : :class:`bool`, optional
+        skip_optimized : :class:`bool`
             If ``True`` then :meth:`optimize` returns immediately for
             molecules where :attr:`.Molecule.optimized` is``True``.
 
         """
 
         self.skip_optimized = skip_optimized
+        super(*args, skip_optimized=skip_optimized, **kwargs)
 
     def __init_subclass__(cls, **kwargs):
-        cls.optimize = _add_skipping(cls.optimize)
-        cls.optimize = _add_optimized_toggle(cls.optimize)
+        cls.optimize = cls._add_skipping(cls.optimize)
+        cls.optimize = cls._add_optimized_toggle(cls.optimize)
         return super().__init_subclass__(**kwargs)
 
     def optimize(self, mol, conformer=-1):
@@ -187,70 +187,7 @@ class Optimizer:
         raise NotImplementedError()
 
 
-class OptimizerPipeline(Optimizer):
-    """
-    Chains multiple :class:`Optimizer` instances together.
-
-    Attributes
-    ----------
-    optimizers : :class:`tuple` of :class:`Optimizer`
-        A number of optimizers, each of which gets applied to a
-        molecule, based on the order in this :class:`tuple`.
-
-    Examples
-    --------
-    Let's say we want to embed a molecule with ETKDG first and then
-    minimize it with the MMFF force field.
-
-    >>> import rdkit.Chem.AllChem as rdkit
-    >>> mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-    >>> etkdg = RDKitEmbedder(rdkit.ETKDG())
-    >>> mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
-    >>> optimizer = OptimizerPipeline(etkdg, mmff)
-    >>> optimizer.optimize(mol)
-
-    """
-
-    def __init__(self, *optimizers, skip_optimized=False):
-        """
-        Initializes a :class:`OptimizerPipeline` instance.
-
-        Parameters
-        ----------
-        *optimizers : :class:`Optimizer`
-            A number of optimizers, each of which gets applied to a
-            molecule, based on the order given.
-
-        """
-
-        self.optimizers = optimizers
-        super().__init__(skip_optimized=skip_optimized)
-
-    def optimize(self, mol, conformer=-1):
-        """
-        Optimizes a molecule.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for optimizer in self.optimizers:
-            cls_name = optimizer.__class__.__name__
-            logger.info(f'Using {cls_name} on "{mol.name}".')
-            optimizer.optimize(mol, conformer)
-
-
-class CageOptimizerPipeline(OptimizerPipeline):
+class CageOptimizerSequence(Optimizer):
     """
     Applies optimizations to cages.
 
