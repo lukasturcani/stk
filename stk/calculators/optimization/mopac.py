@@ -250,12 +250,16 @@ class MOPAC(Optimizer):
         Returns
         -------
         :class:`str`
-            String containing all the MOPAC keywords correctly formatted
-            for the input file.
+            String containing all the MOPAC keywords correctly
+            formatted for the input file.
 
         """
 
-        grad = f'GNORM={self.minimum_gradient}' if self.method == 'OPT' else ''
+        if self.method == 'OPT':
+            grad = f'GNORM={self.minimum_gradient}'
+        else:
+            grad = ''
+
         return (
             f'{self.hamiltonian} {self.method} {self.method} {grad} '
             f'EPS={self.eps} CHARGE={self.charge} {self.fileout} LET '
