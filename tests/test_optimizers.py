@@ -64,6 +64,7 @@ def test_cache_use(tmp_polymer):
     assert not opt2.cache
     opt2.optimize(tmp_polymer)
     assert (tmp_polymer.key, -1) in opt2.cache
+    opt2.optimize(tmp_polymer)
 
 
 def test_cage_optimizer_sequence(tmp_cc3, tmp_cage):
