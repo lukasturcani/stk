@@ -70,10 +70,7 @@ mutator = stk.RandomMutation(
 # Optimizer.
 # #####################################################################
 
-optimizer = stk.OptimizerSequence(
-    stk.RDKitEmbedder(rdkit.ETKDG()),
-    stk.MMFF()
-)
+optimizer = stk.MMFF()
 
 # #####################################################################
 # Fitness calculator.

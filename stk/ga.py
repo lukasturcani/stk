@@ -198,6 +198,11 @@ def ga_run(input_file):
     if hasattr(input_file, 'tar_output'):
         tar_output = input_file.tar_output
 
+    logging_level = logging.INFO
+    if hasattr(input_file, 'logging_level'):
+        logging_level = input_file.logging_level
+    rootlogger.setLevel(logging_level)
+
     pop.set_ga_tools(generation_selector=generation_selector,
                      mutation_selector=mutation_selector,
                      crossover_selector=crossover_selector,
@@ -232,6 +237,8 @@ def ga_run(input_file):
     history = GAHistory(database_dump, progress_dump)
     progress = history.progress
 
+    # 3. Run the GA.
+    id_ = pop.assign_names_from(0)
     logger.info('Optimizing the population.')
     pop.optimize(optimizer, processes)
 
@@ -247,8 +254,6 @@ def ga_run(input_file):
     progress.add_subpopulation(pop)
     history.db(pop)
 
-    # 3. Run the GA.
-    id_ = pop.assign_names_from(0)
     gen = 0
     while exiter.exit(progress):
         gen += 1
@@ -333,7 +338,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     loader = SourceFileLoader('input_file', abspath(args.input_file))
     input_file = loader.load_module()
-    rootlogger.setLevel(input_file.logging_level)
 
     for x in range(args.loops):
         ga_run(input_file)
