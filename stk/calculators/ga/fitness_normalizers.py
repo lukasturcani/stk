@@ -240,7 +240,7 @@ class Power(FitnessNormalizer):
         """
 
         self.power = power
-        super.__init__()
+        super().__init__()
 
     def normalize(self, population):
         """
@@ -401,7 +401,7 @@ class Multiply(FitnessNormalizer):
         """
 
         for mol in population:
-            mol.fitness = np.multiply(mol.fitness, self.coefficent)
+            mol.fitness = np.multiply(mol.fitness, self.coefficient)
 
 
 class Sum(FitnessNormalizer):
@@ -680,6 +680,9 @@ class ShiftUp(FitnessNormalizer):
         mins = np.min(fmat, axis=0)
         # Convert all the ones which are not to be shifted to 0 and
         # multiply the which are to be shifted by 1.01.
+        is_array = isinstance(mins, np.ndarray)
+        if not is_array:
+            mins = np.array([mins])
         shift = np.zeros(len(mins))
         for i, min_ in enumerate(mins):
             if min_ <= 0:

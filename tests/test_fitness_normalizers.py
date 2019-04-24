@@ -8,6 +8,7 @@ import stk
 
 def test_power(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
     normalizer = stk.Power(2)
+    normalizer.handle_failed = False
 
     tmp_amine2.fitness = 1
     tmp_amine2_alt1.fitness = 2
@@ -26,13 +27,14 @@ def test_power(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
 
     normalizer.normalize(pop)
 
-    assert tmp_amine2.fitness.tolist() == [2, 4, 9]
+    assert tmp_amine2.fitness.tolist() == [1, 4, 9]
     assert tmp_amine2_alt1.fitness.tolist() == [16, 25, 36]
     assert tmp_amine2_alt2.fitness.tolist() == [49, 64, 81]
 
 
 def test_multiply(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
     normalizer = stk.Multiply(2)
+    normalizer.handle_failed = False
 
     tmp_amine2.fitness = 1
     tmp_amine2_alt1.fitness = 2
@@ -58,6 +60,7 @@ def test_multiply(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
 
 def test_sum(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
     normalizer = stk.Sum()
+    normalizer.handle_failed = False
 
     tmp_amine2.fitness = [1, 2, 3]
     tmp_amine2_alt1.fitness = [4, 5, 6]
@@ -73,6 +76,7 @@ def test_sum(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
 
 def test_scale_by_mean(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
     normalizer = stk.ScaleByMean()
+    normalizer.handle_failed = False
 
     tmp_amine2.fitness = 1
     tmp_amine2_alt1.fitness = 2
@@ -85,9 +89,9 @@ def test_scale_by_mean(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
     assert tmp_amine2_alt1.fitness == 1
     assert tmp_amine2_alt2.fitness == 1.5
 
-    tmp_amine2.fitness = [1, 2, 3]
-    tmp_amine2_alt1.fitness = [10, 20, 30]
-    tmp_amine2_alt2.fitness = [100, 200, 300]
+    tmp_amine2.fitness = [1, 10, 100]
+    tmp_amine2_alt1.fitness = [2, 20, 200]
+    tmp_amine2_alt2.fitness = [3, 30, 300]
 
     normalizer.normalize(pop)
 
@@ -98,6 +102,7 @@ def test_scale_by_mean(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
 
 def test_shift_up(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
     normalizer = stk.ShiftUp()
+    normalizer.handle_failed = False
 
     tmp_amine2.fitness = 1
     tmp_amine2_alt1.fitness = -2
