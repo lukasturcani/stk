@@ -741,7 +741,7 @@ class Population:
         log_thread = Thread(target=daemon_logger, args=(logq, ))
         log_thread.start()
 
-        opt_fn = _OptimizeGuard(optimizer.optimize)
+        opt_fn = _Guard(optimizer.optimize)
 
         # Apply the function to every member of the population, in
         # parallel.
@@ -749,6 +749,11 @@ class Population:
             optimized = pool.starmap(logged_call,
                                      ((logq, opt_fn, mem) for
                                       mem in self))
+
+        # If anything failed, raise an error.
+        for result in optimized:
+            if isinstance(result, Exception):
+                raise result
 
         # Update the structures in the population.
         sorted_opt = sorted(optimized, key=lambda m: m.key)
@@ -1152,7 +1157,7 @@ class Population:
         return str(self)
 
 
-class _OptimizeGuard:
+class _Guard:
     """
     A decorator for optimization functions.
 
@@ -1182,15 +1187,19 @@ class _OptimizeGuard:
 
         """
 
+        fn = self.__wrapped__.__name__
         try:
-            logger.info(f'Optimizing "{mol.name}".')
+            logger.info(
+                f'Running "{fn}()" on '
+                f'"{mol.name}" conformer {conformer}.'
+            )
             self.__wrapped__(mol, conformer)
-
-        except Exception:
-            errormsg = (f'Function '
-                        f'"{self.__wrapped__.func.__name__}()" '
-                        f'failed on molecule "{mol.name}".')
-            logger.error(errormsg, exc_info=True)
-
-        finally:
             return mol
+
+        except Exception as ex:
+            errormsg = (
+                f'"{fn}()" failed on molecule '
+                f'"{mol.name}" conformer {conformer}.'
+            )
+            logger.error(errormsg, exc_info=True)
+            return ex
