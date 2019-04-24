@@ -101,7 +101,7 @@ class GAHistory:
 
     @staticmethod
     def log_file_content(progress):
-        for sp in progress:
+        for sp in progress.populations:
             for mol in sp:
                 yield f'{mol.name} {mol.key} {mol.fitness}'
             yield '\n'
@@ -127,8 +127,6 @@ class GAHistory:
         if not logger.isEnabledFor(logging.INFO):
             return
 
-        s = 'Population log:\n'
-
         try:
             u = '-'*os.get_terminal_size().columns
         except OSError:
@@ -136,16 +134,16 @@ class GAHistory:
             # stdout is not connceted to a terminal.
             u = '-'*100
 
-        s += u
-        s += '\n{:<10}\t{:<40}\t{}\n'.format('molecule',
-                                             'fitness',
-                                             'unscaled_fitness')
-        s += u
-        for mem in sorted(pop, reverse=True):
-            uf = {n: str(v) for n, v in mem.unscaled_fitness.items()}
-            memstring = ('\n{0.name:<10}\t'
-                         '{0.fitness:<40}\t{1}').format(mem, uf)
-            s += memstring + '\n' + u
+        molecule = 'molecule'
+        fitness = 'fitness'
+
+        sorted_pop = sorted(pop, reverse=True, key=lambda m: m.fitness)
+        mols = '\n'.join(
+            f'\n{mol.name:<10}\t{mol.fitness:<40}\n{u}'
+            for mol in sorted_pop
+        )
+        s = (f'Population log:\n{u}\n{molecule:<10}\t'
+             f'{fitness:<40}\n{u}\n{mols}\n')
         logger.info(s)
 
 
@@ -159,7 +157,7 @@ def ga_run(input_file):
 
     pop = input_file.population
     optimizer = input_file.optimizer
-    fitness_calculator = input_file.fitness_normalizer
+    fitness_calculator = input_file.fitness_calculator
     crosser = input_file.crosser
     mutator = input_file.mutator
     generation_selector = input_file.generation_selector

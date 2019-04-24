@@ -11,7 +11,7 @@ import stk
 carbon = 'C'
 building_blocks = [
     stk.StructUnit2.smiles_init(f'[Br]{carbon*i}[Br]', ['bromine'])
-    for i in range(100)
+    for i in range(2, 27)
 ]
 
 topologies = [
