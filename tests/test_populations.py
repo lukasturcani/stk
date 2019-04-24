@@ -261,6 +261,10 @@ def test_optimize(tmp_polymer_pop):
     tmp_polymer_pop.optimize(optimizer)
     assert len(optimizer.cache) == len(tmp_polymer_pop)
 
+    raiser = stk.RaisingOptimizer(optimizer, 1)
+    with pytest.raises(stk.RaisingOptimizerError):
+        tmp_polymer_pop.optimize(raiser)
+
 
 def test_remove_duplicates_between_subpops(generate_population):
     """

@@ -432,8 +432,8 @@ class RaisingOptimizer(Optimizer):
     Raises and optimizes at random.
 
     This optimizer is used for debugging to simulate optimization
-    functions which sometimes completely successfully and sometimes
-    randomly fail.
+    functions which sometimes completes successfully and sometimes
+    randomly fails.
 
     Attributes
     ----------
