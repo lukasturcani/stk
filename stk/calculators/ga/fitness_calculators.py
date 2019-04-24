@@ -110,7 +110,7 @@ def _add_cache_use(fitness):
                 'Using cached fitness value '
                 f'for "{mol.name}" conformer {conformer}.'
             )
-            return self.cache[(mol, conformer)]
+            return self.cache[key]
         else:
             r = fitness(self, mol, conformer)
             if self.use_cache:

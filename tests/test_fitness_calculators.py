@@ -25,3 +25,44 @@ def test_property_vector(test_mol1):
                         test_mol1.bb_distortion(),
                         test_mol1.dihedral_strain()],
                        atol=1e-6)
+
+
+def test_cache_use(tmp_amine2):
+    calc = stk.PropertyVector(lambda mol, conformer: 1,
+                              use_cache=False)
+    calc.fitness(tmp_amine2)
+
+    # Since use_cache is False the cache should be empty.
+    assert not calc.cache
+
+    # To test that the cache is not being used, put a random object
+    # into it, and test that it was not returned.
+    obj = object()
+    calc.cache[(tmp_amine2.key, 1)] = obj
+    assert calc.fitness(tmp_amine2, 1) is not obj
+
+    # Test that the cache is being filled when use_cache is True.
+    calc = stk.PropertyVector(lambda mol, conformer: 1)
+    assert not calc.cache
+    calc.fitness(tmp_amine2)
+    assert calc.cache
+
+    # Test that the cache is being used by putting a random object into
+    # it and making sure it gets returned.
+    calc.cache[(tmp_amine2.key, 1)] = obj
+    print(calc.cache)
+    assert calc.fitness(tmp_amine2, 1) is obj
+
+
+def test_attribute_creation(tmp_amine2):
+    calc = stk.PropertyVector(lambda mol, conformer: 1,
+                              use_cache=False)
+    assert not hasattr(tmp_amine2, 'fitness')
+    calc.fitness(tmp_amine2)
+    assert tmp_amine2.fitness == [1]
+
+    calc = stk.PropertyVector(lambda mol, conformer: 2)
+    del tmp_amine2.fitness
+    assert not hasattr(tmp_amine2, 'fitness')
+    calc.fitness(tmp_amine2)
+    assert tmp_amine2.fitness == [2]
