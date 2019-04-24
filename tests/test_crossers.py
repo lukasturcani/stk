@@ -32,9 +32,8 @@ def test_jumble(polymer, polymer_alt1, polymer_alt2):
     jumble = stk.Jumble(num_offspring_building_blocks=2,
                         duplicate_building_blocks=True)
     cohort2 = list(jumble.crossover(polymer, polymer_alt1))
-    from pprint import pprint
-    pprint([[bb.name for bb in p.building_blocks] for p in cohort2])
-    assert len(cohort2) == 8
+
+    assert len(cohort2) == 10
     for mol1 in cohort2:
         assert len(mol1.building_blocks) == 2
         for mol2 in cohort2:
@@ -46,7 +45,7 @@ def test_jumble(polymer, polymer_alt1, polymer_alt2):
         jumble.crossover(polymer, polymer_alt1, polymer_alt2)
     )
 
-    assert len(cohort3) == 19
+    assert len(cohort3) == 15
     for mol1 in cohort3:
         assert len(mol1.building_blocks) == 2
         for mol2 in cohort3:
