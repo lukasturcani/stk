@@ -331,7 +331,7 @@ if __name__ == '__main__':
                         help='The number times the GA should be run.')
 
     args = parser.parse_args()
-    loader = SourceFileLoader(abspath(args.input_file))
+    loader = SourceFileLoader('input_file', abspath(args.input_file))
     input_file = loader.load_module()
     rootlogger.setLevel(input_file.logging_level)
 
