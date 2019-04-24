@@ -83,6 +83,6 @@ def test_try_catch_optimizer(tmp_amine2):
                                     catch_optimizer=None)
     try_catch = stk.TryCatchOptimizer(try_optimizer=always_raiser,
                                       catch_optimizer=success)
-    tmp_amine2.write('try_catch_optimizer_before.mol', 1)
+    tmp_amine2.write(join(odir, 'try_catch_optimizer_before.mol'), 1)
     try_catch.optimize(tmp_amine2, 1)
-    tmp_amine2.write('try_catch_optimizer_after.mol', 1)
+    tmp_amine2.write(join(odir, 'try_catch_optimizer_after.mol'), 1)
