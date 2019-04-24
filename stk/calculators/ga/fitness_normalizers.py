@@ -121,6 +121,54 @@ class FitnessNormalizer:
         raise NotImplementedError()
 
 
+class NormalizerSequence(FitnessNormalizer):
+    """
+    Applies a sequence of normalizers in sequence.
+
+    Attributes
+    ----------
+    normalizers : :class:`tuple` of :class:`FitnessNormalizer`
+        The normalizers which get applied in sequence by
+        :meth:`normalize`.
+
+    """
+
+    def __init__(self, *normalizers):
+        """
+        Initializes a :class:`NormalizerSequence` instance.
+
+        Parameters
+        ----------
+        normalizers : :class:`tuple` of :class:`FitnessNormalizer`
+            The normalizers which get applied in sequence by
+            :meth:`normalize`.
+
+        """
+
+        self.normalizers = normalizers
+
+    def normalize(self, population):
+        """
+        Normalizes the fitness values in `population`.
+
+        Parameters
+        ----------
+        population : :class:`.Population`
+            A :class:`.Population` of molecules whose fitness values
+            should be normalized.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+            The :attr:`fitness` attributes of the molecules in
+            `population` are modified in place.
+        """
+
+        for normalizer in self.normalizers:
+            logger.info(f'Using {normalizer.__clas__.__name__}.')
+            normalizer.normalize(population)
+
+
 class Power(FitnessNormalizer):
     """
     Raises fitness values to some power.

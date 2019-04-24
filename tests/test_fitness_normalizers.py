@@ -124,3 +124,7 @@ def test_shift_up(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
     assert tmp_amine2.fitness.tolist() == [1, 6, 5]
     assert tmp_amine2_alt1.fitness.tolist() == [3, 1, 2]
     assert tmp_amine2_alt2.fitness.tolist() == [2, 31, 1]
+
+
+def test_normalizer_sequence():
+    assert False
