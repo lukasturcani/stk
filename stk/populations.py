@@ -14,7 +14,6 @@ import psutil
 from functools import wraps
 import logging
 from threading import Thread
-from collections import Counter
 
 from .utilities import dedupe, OPTIONS, daemon_logger, logged_call
 
