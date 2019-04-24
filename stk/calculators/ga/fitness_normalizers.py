@@ -194,7 +194,7 @@ class NormalizerSequence(FitnessNormalizer):
         """
 
         for normalizer in self.normalizers:
-            logger.info(f'Using {normalizer.__clas__.__name__}.')
+            logger.info(f'Using {normalizer.__class__.__name__}.')
             normalizer.normalize(population)
 
 
