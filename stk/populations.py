@@ -166,6 +166,31 @@ class Population:
         return p
 
     @classmethod
+    def init_copy(cls, population):
+        """
+        Makes a copy of `population`
+
+        Molecules in `population` are not copied.
+
+        Parameters
+        ----------
+        population : :class:`Population`
+            The population to copy.
+
+        Returns
+        -------
+        :class:`Population`
+            A copy of `population`.
+
+        """
+
+        copy = cls(*population.members)
+        copy.populations = [
+            cls.init_copy(pop) for pop in population.populations
+        ]
+        return copy
+
+    @classmethod
     def init_diverse(cls,
                      macromol_class,
                      building_blocks,
