@@ -3,13 +3,7 @@
 # #####################################################################
 
 import stk
-import rdkit.Chem.AllCehm as rdkit
-
-# #####################################################################
-# Run the GA serially.
-# #####################################################################
-
-processes = 1
+import rdkit.Chem.AllChem as rdkit
 
 # #####################################################################
 # Initial population.
@@ -76,7 +70,7 @@ mutator = stk.RandomMutation(
 # Optimizer.
 # #####################################################################
 
-optimizer = stk.OptimzerSequence(
+optimizer = stk.OptimizerSequence(
     stk.RDKitEmbedder(rdkit.ETKDG()),
     stk.MMFF()
 )

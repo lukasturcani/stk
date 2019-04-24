@@ -121,6 +121,32 @@ class FitnessNormalizer:
         raise NotImplementedError()
 
 
+class NullFitnessNormalizer(FitnessNormalizer):
+    """
+    Does nothing.
+
+    """
+
+    def normalize(self, population):
+        """
+        Does not normalize the fitness values in `population`.
+
+        Parameters
+        ----------
+        population : :class:`.Population`
+            A :class:`.Population` of molecules whose fitness values
+            are not normalized.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+            This method does nothing.
+
+        """
+
+        return
+
+
 class NormalizerSequence(FitnessNormalizer):
     """
     Applies a sequence of normalizers in sequence.
@@ -175,6 +201,7 @@ class NormalizerSequence(FitnessNormalizer):
         """
 
         self.normalizers = normalizers
+        super().__init__()
 
     def normalize(self, population):
         """

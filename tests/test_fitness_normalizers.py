@@ -133,6 +133,8 @@ def test_normalizer_sequence(tmp_amine2,
         stk.Power(2),
         stk.Sum()
     )
+    for norm in sequence.normalizers:
+        norm.handle_failed = False
 
     tmp_amine2.fitness = [1, 2, 3]
     tmp_amine2_alt1.fitness = [4, 5, 6]
@@ -142,5 +144,5 @@ def test_normalizer_sequence(tmp_amine2,
     sequence.normalize(pop)
 
     assert tmp_amine2.fitness == 14
-    assert tmp_amine2_alt1 == 77
-    assert tmp_amine2_alt2 == 194
+    assert tmp_amine2_alt1.fitness == 77
+    assert tmp_amine2_alt2.fitness == 194
