@@ -126,5 +126,21 @@ def test_shift_up(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
     assert tmp_amine2_alt2.fitness.tolist() == [2, 31, 1]
 
 
-def test_normalizer_sequence():
-    assert False
+def test_normalizer_sequence(tmp_amine2,
+                             tmp_amine2_alt1,
+                             tmp_amine2_alt2):
+    sequence = stk.NormalizerSequence(
+        stk.Power(2),
+        stk.Sum()
+    )
+
+    tmp_amine2.fitness = [1, 2, 3]
+    tmp_amine2_alt1.fitness = [4, 5, 6]
+    tmp_amine2_alt2.fitness = [7, 8, 9]
+    pop = stk.Population(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2)
+
+    sequence.normalize(pop)
+
+    assert tmp_amine2.fitness == 14
+    assert tmp_amine2_alt1 == 77
+    assert tmp_amine2_alt2 == 194

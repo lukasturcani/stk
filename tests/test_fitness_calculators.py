@@ -1,5 +1,6 @@
 import stk
 import numpy as np
+import pytest
 
 
 def test_property_vector(test_mol1):
@@ -66,3 +67,12 @@ def test_attribute_creation(tmp_amine2):
     assert not hasattr(tmp_amine2, 'fitness')
     calc.fitness(tmp_amine2)
     assert tmp_amine2.fitness == [2]
+
+
+def test_raising_fitness_calculator(fitness_calculator, tmp_amine2):
+    never_raiser = stk.RaisingFitnessCalculator(fitness_calculator, 0)
+    never_raiser.fitness(tmp_amine2)
+
+    always_raiser = stk.RaisingFitnessCalculator(fitness_calculator, 1)
+    with pytest.raises(stk.RaisingFitnessCalculatorError):
+        always_raiser.fitness(tmp_amine2)

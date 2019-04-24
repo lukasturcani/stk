@@ -1272,6 +1272,14 @@ class GAPopulation(Population):
                                      ((logq, fitness_fn, mol) for
                                       mol in self))
 
+        logq.put(None)
+        log_thread.join()
+
+        # If anything returned an exception, raise it.
+        for result in evaluated:
+            if isinstance(result, Exception):
+                raise result
+
         # Update the molecules in the population.
         sorted_new = sorted(evaluated, key=lambda m: m.key)
         sorted_old = sorted(self, key=lambda m: m.key)
@@ -1282,9 +1290,6 @@ class GAPopulation(Population):
         if OPTIONS['cache']:
             for member in evaluated:
                 member.update_cache()
-
-        logq.put(None)
-        log_thread.join()
 
     def gen_mutants(self):
         """

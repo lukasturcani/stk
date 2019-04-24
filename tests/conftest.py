@@ -66,6 +66,11 @@ class TestMol(stk.Cage):
         return 4
 
 
+class TestFitnessCalculator(stk.FitnessCalculator):
+    def fitness(self, mol, conformer=-1):
+        return 12
+
+
 def pytest_addoption(parser):
     parser.addoption('--macromodel_path', default='')
     parser.addoption('--mopac_path', default='')
@@ -79,6 +84,11 @@ def pytest_generate_tests(metafunc):
     if 'mopac_path' in metafunc.fixturenames:
         mopac_path = metafunc.config.getoption('mopac_path')
         metafunc.parametrize('mopac_path', [mopac_path])
+
+
+@pytest.fixture(scope='session')
+def fitness_calculator():
+    return TestFitnessCalculator(use_cache=False)
 
 
 @pytest.fixture(scope='session')

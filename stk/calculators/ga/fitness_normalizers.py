@@ -131,6 +131,35 @@ class NormalizerSequence(FitnessNormalizer):
         The normalizers which get applied in sequence by
         :meth:`normalize`.
 
+    Examples
+    --------
+    .. code-block:: python
+
+        # Make the normalizer.
+        sequence = stk.NormalizerSequence(
+            stk.Power(2),
+            stk.Sum()
+        )
+
+        # Make a population of molecules.
+        mol1 = StructUnit(...)
+        mol2 = Cage(...)
+        mol3 = Polymer(...)
+        pop = stk.Population(mol1, mol2, mol3)
+
+        # Set the fitness values.
+        mol1.fitness = [1, 2, 3]
+        mol2.fitness = [4, 5, 6]
+        mol3.fitness = [7, 8, 9]
+
+        # Apply the normalizer.
+        sequence.normalize(pop)
+
+        # mol1.fitness is now 14.
+        # mol2.fitness is now 77.
+        # mol3.fitness is now 194.
+
+
     """
 
     def __init__(self, *normalizers):

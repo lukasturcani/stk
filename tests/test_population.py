@@ -455,3 +455,24 @@ def test_contains(generate_population):
     subpop_cages = generate_population(cache=True, offset=True)
     pop.add_subpopulation(subpop_cages)
     assert subpop_cages[2] in pop
+
+
+def test_calculate_member_fitness(fitness_calculator,
+                                  tmp_polymer_pop):
+
+    pop = stk.GAPopulation(*tmp_polymer_pop)
+    for mol in pop:
+        assert not hasattr(mol, 'fitness')
+
+    pop.fitness_calculator = fitness_calculator
+    pop.calculate_member_fitness()
+
+    for mol in pop:
+        assert mol.fitness == 12
+
+    with pytest.raises(stk.RaisingFitnessCalculatorError):
+        pop.fitness_calculator = stk.RaisingFitnessCalculator(
+                    fitness_calculator=fitness_calculator,
+                    fail_chance=1
+        )
+        pop.calculate_member_fitness()

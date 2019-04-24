@@ -50,6 +50,7 @@ the conformer id of the conformer used for calculating the fitness.
 
 from functools import wraps
 import logging
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -195,6 +196,78 @@ class FitnessCalculator:
         """
 
         raise NotImplementedError()
+
+
+class RaisingFitnessCalculatorError(Exception):
+    ...
+
+
+class RaisingFitnessCalculator(FitnessCalculator):
+    """
+    Raises and calculates fitness at random.
+
+    This fitness calculator is used for debugging to simulate
+    cases where the fitness calculation raises an error.
+
+    Attributes
+    ----------
+    fitness_calculator : :class:`FitnessCalculator`
+        When the fitness calculator does not fail, it uses this
+        :class:`FitnessCalculator` to calculate fitness of molecules.
+
+    fail_chance : :class:`float`
+        The probability that the fitness calculator will raise an error
+        each time :meth:`fitness` is used.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        calc = PropertyVector(lambda mol, conformer: mol.GetNumAtoms())
+        partial_raiser = RaisingFitnessCalculator(calc,
+                                                  fail_chance=0.75)
+        # 75 % chance an error will be raised by calling fitness.
+        partial_raiser.fitness(mol)
+
+    """
+
+    def __init__(self, fitness_calculator, fail_chance=0.5):
+        self.fitness_calculator = fitness_calculator
+        self.fail_chance = fail_chance
+        # "fitness_calculator" should toggle use_cache for itself.
+        super().__init__(use_cache=False)
+
+    def fitness(self, mol, conformer=-1):
+        """
+        Calculates the fitness of `conformer` of `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule whose fitness should be calculated.
+
+        conformer : :class:`int`, optional
+            The conformer of `mol` to use.
+
+        Returns
+        -------
+        :class:`object`
+            Whatever the :meth:`fitness` method of
+            :attr:`fitness_calculator` returns.
+
+        Raises
+        ------
+        :class:`RaisingFitnessCalculatorError`
+            This error is raised at random.
+
+        """
+
+        if np.random.rand() < self.fail_chance:
+            raise RaisingFitnessCalculatorError(
+                    'Used RaisingFitnessCalculator'
+            )
+        return self.fitness_calculator.fitness(mol, conformer)
 
 
 class PropertyVector(FitnessCalculator):
