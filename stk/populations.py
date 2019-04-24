@@ -750,6 +750,9 @@ class Population:
                                      ((logq, opt_fn, mem) for
                                       mem in self))
 
+        logq.put(None)
+        log_thread.join()
+
         # If anything failed, raise an error.
         for result in optimized:
             if isinstance(result, Exception):
@@ -767,9 +770,6 @@ class Population:
         if OPTIONS['cache']:
             for member in optimized:
                 member.update_cache()
-
-        logq.put(None)
-        log_thread.join()
 
     def _optimize_serial(self, optimizer):
         for member in self:
