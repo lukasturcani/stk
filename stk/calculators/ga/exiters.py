@@ -6,8 +6,8 @@ been fulfilled.
 
 .. _`adding selectors`:
 
-Extending stk: Adding exiters.
-------------------------------
+Extending stk: Making new exiters.
+----------------------------------
 
 A new :class:`Exiter` class should inherit :class:`Exiter` and
 define an :meth:`~Exiter.exit` method, which takes progress population
@@ -224,7 +224,7 @@ class MolPresent(Exiter):
         # Check for the presence of the molecule, starting with the
         # newest generation first.
         for pop in progress.populations:
-            if self.mol in pop:
+            if any(mol.same(self.mol) for mol in pop):
                 return True
         return False
 
@@ -266,7 +266,7 @@ class FitnessPlateau(Exiter):
 
     def exit(self, progress):
         """
-        Checks if the fittest molecules changed between generations,
+        Checks if the fittest molecules changed between generations.
 
         Parameters
         ----------
@@ -282,12 +282,17 @@ class FitnessPlateau(Exiter):
         """
 
         # Check that the GA has run for more than num_gens generations.
-        if len(progress.populations) > self.num_generations:
+        if len(progress.populations) >= self.num_generations:
             gens = set()
             for i in range(self.num_generations):
-                gen = sorted(progress.populations[-i-1], reverse=True)
+                gen = sorted(progress.populations[-i-1],
+                             reverse=True,
+                             key=lambda mol: mol.fitness)
                 # Get the top members of the generation.
-                gens.add(frozenset(gen[:self.top_members]))
+                keys = frozenset(
+                    mol.key for mol in gen[:self.top_members]
+                )
+                gens.add(keys)
             unique_gens = len(gens)
             if unique_gens == 1:
                 return True
