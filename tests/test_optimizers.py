@@ -55,12 +55,15 @@ def test_optimizer_sequence(tmp_polymer):
 
 
 def test_cache_use(tmp_polymer):
-    etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
-    skipper = stk.RDKitEmbedder(rdkit.ETKDG(), use_cache=True)
+    opt1 = stk.NullOptimizer()
+    assert not opt1.cache
+    opt1.optimize(tmp_polymer)
+    assert not opt1.cache
 
-    etkdg.optimize(tmp_polymer)
-    etkdg.optimize(tmp_polymer)
-    skipper.optimize(tmp_polymer)
+    opt2 = stk.NullOptimizer(use_cache=True)
+    assert not opt2.cache
+    opt2.optimize(tmp_polymer)
+    assert (tmp_polymer.key, -1) in opt2.cache
 
 
 def test_cage_optimizer_sequence(tmp_cc3, tmp_cage):
