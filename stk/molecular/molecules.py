@@ -2435,7 +2435,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             key=lambda info: info.name
         ))
 
-        Molecule.__init__(obj, note, name)
+        Molecule.__init__(obj, name, note)
 
         cls.cache[key] = obj
         return obj
