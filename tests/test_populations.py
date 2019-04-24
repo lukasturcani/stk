@@ -468,15 +468,14 @@ def test_calculate_member_fitness(fitness_calculator,
     for mol in pop:
         assert not hasattr(mol, 'fitness')
 
-    pop.fitness_calculator = fitness_calculator
-    pop.calculate_member_fitness()
+    pop.calculate_member_fitness(fitness_calculator)
 
     for mol in pop:
         assert mol.fitness == 12
 
     with pytest.raises(stk.RaisingFitnessCalculatorError):
-        pop.fitness_calculator = stk.RaisingFitnessCalculator(
+        calc = stk.RaisingFitnessCalculator(
                     fitness_calculator=fitness_calculator,
                     fail_chance=1
         )
-        pop.calculate_member_fitness()
+        pop.calculate_member_fitness(calc)

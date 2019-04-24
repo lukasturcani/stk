@@ -1192,9 +1192,7 @@ class GAPopulation(Population):
                      mutation_selector,
                      crossover_selector,
                      mutator,
-                     crosser,
-                     fitness_calculator,
-                     fitness_normalizer):
+                     crosser):
         """
         Sets the GA calculators.
 
@@ -1216,12 +1214,6 @@ class GAPopulation(Population):
         crosser : :class:`.Crosser`
             Carries out the crossover of molecules.
 
-        fitness_calculator : :class:`.FitnessCalculator`
-            Calculates the fitness values of molecules.
-
-        fitness_normalizer : :class:`.FitnessNormalizer`
-            Normalizes fitness values of molecules.
-
         """
 
         self.generation_selector = generation_selector
@@ -1229,10 +1221,10 @@ class GAPopulation(Population):
         self.crossover_selector = crossover_selector
         self.mutator = mutator
         self.crosser = crosser
-        self.fitness_calculator = fitness_calculator
-        self.fitness_normalizer = fitness_normalizer
 
-    def calculate_member_fitness(self, processes=psutil.cpu_count()):
+    def calculate_member_fitness(self,
+                                 fitness_calculator,
+                                 processes=psutil.cpu_count()):
         """
         Calculates the fitness values of molecules.
 
@@ -1242,6 +1234,10 @@ class GAPopulation(Population):
             The number of processes to create. If ``1`` then fitness
             values are calculated serially.
 
+        fitness_calculator : :class:`.FitnessCalculator`
+            The :class:`.FitnessCalculator` used to calculate the
+            fitness.
+
         Returns
         -------
         None : :class:`NoneType`
@@ -1249,21 +1245,24 @@ class GAPopulation(Population):
         """
 
         if processes == 1:
-            self._calculate_fitness_serial()
+            self._calculate_fitness_serial(fitness_calculator)
         else:
-            self._calculate_fitness_parallel(processes)
+            self._calculate_fitness_parallel(fitness_calculator,
+                                             processes)
 
-    def _calculate_fitness_serial(self):
+    def _calculate_fitness_serial(self, fitness_calculator):
         for mol in self:
-            self.fitness_calculator.fitness(mol)
+            fitness_calculator.fitness(mol)
 
-    def _calculate_fitness_parallel(self, processes):
+    def _calculate_fitness_parallel(self,
+                                    fitness_calculator,
+                                    processes):
         manager = mp.Manager()
         logq = manager.Queue()
         log_thread = Thread(target=daemon_logger, args=(logq, ))
         log_thread.start()
 
-        fitness_fn = _Guard(self.fitness_calculator.fitness)
+        fitness_fn = _Guard(fitness_calculator.fitness)
 
         # Apply the function to every member of the population, in
         # parallel.
