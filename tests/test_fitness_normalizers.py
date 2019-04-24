@@ -6,60 +6,116 @@ Tests for normalization functions.
 import stk
 
 
-def test_cage(pop):
-    for i, mem in enumerate(pop):
-        mem.fitness = [i, i, i, i]
+def test_power(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
+    normalizer = stk.Power(2)
 
-    stk.Normalization.cage(None, pop, 2, 3)
+    tmp_amine2.fitness = 1
+    tmp_amine2_alt1.fitness = 2
+    tmp_amine2_alt2.fitness = 3
 
-    for i, mem in enumerate(pop):
-        assert mem.fitness == [abs(i-2), abs(i-3), i, i]
+    pop = stk.Population(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2)
+    normalizer.normalize(pop)
 
+    assert tmp_amine2.fitness == 1
+    assert tmp_amine2_alt1.fitness == 4
+    assert tmp_amine2_alt2.fitness == 9
 
-def test_combine(pop):
+    tmp_amine2.fitness = [1, 2, 3]
+    tmp_amine2_alt1.fitness = [4, 5, 6]
+    tmp_amine2_alt2.fitness = [7, 8, 9]
 
-    # Each member will have a fitness value of form:
-    #   [1,1,1,1] or [2,2,2,2]
-    # Where the number represnts the index in the population.
-    # After combination, the fitness value should be 4*rank.
-    for i, mem in enumerate(pop, 1):
-        mem.fitness = [i for _ in range(4)]
+    normalizer.normalize(pop)
 
-    stk.Normalization.combine(None, pop, [1, 1, 1, 1], [1, 1, 1, 1])
-
-    for i, mem in enumerate(pop, 1):
-        assert mem.fitness == i*4
-
-
-def test_magnitudes(pop):
-
-    for mem in pop:
-        mem.fitness = [1, 10, 100, -100]
-
-    stk.Normalization.magnitudes(None, pop)
-
-    for mem in pop:
-        assert all(x == 1 for x in mem.fitness)
+    assert tmp_amine2.fitness.tolist() == [2, 4, 9]
+    assert tmp_amine2_alt1.fitness.tolist() == [16, 25, 36]
+    assert tmp_amine2_alt2.fitness.tolist() == [49, 64, 81]
 
 
-def test_shift_elements(pop):
+def test_multiply(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
+    normalizer = stk.Multiply(2)
 
-    for i, mem in enumerate(pop):
-        mem.fitness = [i, 10*i, -i, -1000*i]
+    tmp_amine2.fitness = 1
+    tmp_amine2_alt1.fitness = 2
+    tmp_amine2_alt2.fitness = 3
 
-    stk.Normalization.shift_elements(None, pop, indices=[2, 3])
+    pop = stk.Population(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2)
+    normalizer.normalize(pop)
 
-    for mem in pop:
-        assert mem.fitness[2] > 0
-        assert mem.fitness[3] > 0
+    assert tmp_amine2.fitness == 2
+    assert tmp_amine2_alt1.fitness == 4
+    assert tmp_amine2_alt2.fitness == 6
+
+    tmp_amine2.fitness = [1, 2, 3]
+    tmp_amine2_alt1.fitness = [4, 5, 6]
+    tmp_amine2_alt2.fitness = [7, 8, 9]
+
+    normalizer.normalize(pop)
+
+    assert tmp_amine2.fitness.tolist() == [2, 4, 6]
+    assert tmp_amine2_alt1.fitness.tolist() == [8, 10, 12]
+    assert tmp_amine2_alt2.fitness.tolist() == [14, 16, 18]
 
 
-def test_invert(pop):
+def test_sum(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
+    normalizer = stk.Sum()
 
-    for i, mem in enumerate(pop, 1):
-        mem.fitness = i
+    tmp_amine2.fitness = [1, 2, 3]
+    tmp_amine2_alt1.fitness = [4, 5, 6]
+    tmp_amine2_alt2.fitness = [7, 8, 9]
 
-    stk.Normalization.invert(None, pop)
+    pop = stk.Population(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2)
+    normalizer.normalize(pop)
 
-    for i, mem in enumerate(pop, 1):
-        assert mem.fitness == 1/i
+    assert tmp_amine2.fitness == 6
+    assert tmp_amine2_alt1.fitness == 15
+    assert tmp_amine2_alt2.fitness == 24
+
+
+def test_scale_by_mean(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
+    normalizer = stk.ScaleByMean()
+
+    tmp_amine2.fitness = 1
+    tmp_amine2_alt1.fitness = 2
+    tmp_amine2_alt2.fitness = 3
+
+    pop = stk.Population(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2)
+    normalizer.normalize(pop)
+
+    assert tmp_amine2.fitness == 0.5
+    assert tmp_amine2_alt1.fitness == 1
+    assert tmp_amine2_alt2.fitness == 1.5
+
+    tmp_amine2.fitness = [1, 2, 3]
+    tmp_amine2_alt1.fitness = [10, 20, 30]
+    tmp_amine2_alt2.fitness = [100, 200, 300]
+
+    normalizer.normalize(pop)
+
+    assert tmp_amine2.fitness.tolist() == [0.5, 0.5, 0.5]
+    assert tmp_amine2_alt1.fitness.tolist() == [1, 1, 1]
+    assert tmp_amine2_alt2.fitness.tolist() == [1.5, 1.5, 1.5]
+
+
+def test_shift_up(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2):
+    normalizer = stk.ShiftUp()
+
+    tmp_amine2.fitness = 1
+    tmp_amine2_alt1.fitness = -2
+    tmp_amine2_alt2.fitness = 3
+
+    pop = stk.Population(tmp_amine2, tmp_amine2_alt1, tmp_amine2_alt2)
+    normalizer.normalize(pop)
+
+    assert tmp_amine2.fitness == 4
+    assert tmp_amine2_alt1.fitness == 1
+    assert tmp_amine2_alt2.fitness == 6
+
+    tmp_amine2.fitness = [1, -5, 5]
+    tmp_amine2_alt1.fitness = [3, -10, 2]
+    tmp_amine2_alt2.fitness = [2, 20, 1]
+
+    normalizer.normalize(pop)
+
+    assert tmp_amine2.fitness.tolist() == [1, 6, 5]
+    assert tmp_amine2_alt1.fitness.tolist() == [3, 1, 2]
+    assert tmp_amine2_alt2.fitness.tolist() == [2, 31, 1]

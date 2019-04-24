@@ -109,11 +109,25 @@ def tmp_amine2():
     return amine2
 
 
+@pytest.fixture
+def tmp_amine2_alt1():
+    return stk.StructUnit2.smiles_init(smiles='NCNCN',
+                                       functional_groups=['amine'],
+                                       name='tmp_amine2_alt1')
+
+
 @pytest.fixture(scope='session')
 def amine2_alt1():
     return stk.StructUnit2.smiles_init(smiles='NCNCN',
                                        functional_groups=['amine'],
                                        name='amine2_alt1')
+
+
+@pytest.fixture
+def tmp_amine2_alt2():
+    return stk.StructUnit2.smiles_init(smiles='NC[Si]CN',
+                                       functional_groups=['amine'],
+                                       name='tmp_amine2_alt2')
 
 
 @pytest.fixture(scope='session')

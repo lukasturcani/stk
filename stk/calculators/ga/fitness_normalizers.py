@@ -9,7 +9,7 @@ After :meth:`~FitnessNormalizer.normalize` is run, every
 :class:`float` in its :attr:`fitness` attribute. However, before
 :meth:`~FitnessNormalizer.normalize` the values in the :attr:`fitness`
 attribute can be any Python object. It is the job of the
-:class:`FitnessNormalizer` to convert these to positive, non-zero
+:class:`FitnessNormalizer` to convert these into positive, non-zero
 :class:`float`s.
 
 To see how :class:`FitnessNormalizer`s can be used, look at the
@@ -20,16 +20,13 @@ multiple :class:`FitnessNormalizer`s can be chained using
 
 .. _`adding fitness normalizers`:
 
-Extending stk: Adding fitness normalizers.
-------------------------------------------
+Extending stk: Making new fitness normalizers.
+----------------------------------------------
 
-A new class inheriting :class:`FitnessCalculator` must be added.
-The class must define a :meth:`~FitnessCalculator.fitness` method,
-which takes two arguments. The first is `mol` which takes a
-:class:`.Molecule` object and is the molecule whose fitness is to be
-calculated. The second is `conformer` and it is an :class:`int` holding
-the conformer id of the conformer used for calculating the fitness.
-`conformer` is should be an optional argument, defaulting to ``-1``.
+A new class inheriting :class:`FitnessNormalizer` must be made.
+The class must define a :meth:`~FitnessNormalizer.normalize` method,
+which takes one argument, which is a :class:`.Population` of
+:class:`.Molecule`.
 
 
 """
@@ -432,7 +429,7 @@ class Sum(FitnessNormalizer):
         pop = Population(mol1, mol2, mol3)
 
         # Create the normalizer.
-        sum_normalizer = Sum([1, 2, 3])
+        sum_normalizer = Sum()
 
         # Normalize the fitness values.
         sum_normalizer.normalize(pop)
