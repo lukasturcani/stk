@@ -12,8 +12,8 @@ or :class:`RandomMutation`.
 
 .. _`adding mutators`:
 
-Extending stk: Adding mutators.
--------------------------------
+Extending stk: Making new mutators.
+-----------------------------------
 
 Mutators must simple inherit the :class:`Mutator` class and define a
 method called :meth:`~Mutatator.mutate`, which take a single molecule
@@ -415,12 +415,12 @@ class SimilarBuildingBlock(Mutator):
 
         """
 
-        if mol not in self._similar_bb:
+        if mol not in self._similar_bbs:
             # Maps the macro_mol to a dict. The dict maps each
             # building block of the macro mol to an iterator.
             # The iterators yield the next most similar molecules in
             # `mols` to the building block.
-            self._similar_bb[mol] = {}
+            self._similar_bbs[mol] = {}
 
         # Choose the building block which undergoes mutation.
         valid_bbs = [bb for bb in mol.building_blocks if self.key(bb)]
@@ -434,20 +434,20 @@ class SimilarBuildingBlock(Mutator):
 
         # If the building block has not been chosen before, create an
         # iterator yielding similar molecules from `mols` for it.
-        if chosen_bb not in self._similar_bb[mol]:
+        if chosen_bb not in self._similar_bbs[mol]:
             rdkit_mols = (m.mol for m in self.building_blocks)
-            self._similar_bb[mol][chosen_bb] = iter(
+            self._similar_bbs[mol][chosen_bb] = iter(
                       chosen_bb.similar_molecules(rdkit_mols)
             )
 
         try:
-            _, sim_mol = next(self._similar_bb[mol][chosen_bb])
+            _, sim_mol = next(self._similar_bbs[mol][chosen_bb])
         except StopIteration:
             rdkit_mols = (m.mol for m in self.building_blocks)
-            self._similar_bb[mol][chosen_bb] = iter(
+            self._similar_bbs[mol][chosen_bb] = iter(
                 chosen_bb.similar_molecules(rdkit_mols)
             )
-            _, sim_mol = next(self._similar_bb[mol][chosen_bb])
+            _, sim_mol = next(self._similar_bbs[mol][chosen_bb])
 
         sim_mol_inchi = rdkit.MolToInchi(sim_mol)
         sim_struct_unit = mol_map[sim_mol_inchi]
@@ -455,7 +455,7 @@ class SimilarBuildingBlock(Mutator):
         # If the most similar molecule in `mols` is itself, then take
         # the next most similar one.
         if sim_struct_unit is chosen_bb:
-            _, sim_mol = next(self._similar_bb[mol][chosen_bb])
+            _, sim_mol = next(self._similar_bbs[mol][chosen_bb])
             sim_mol_inchi = rdkit.MolToInchi(sim_mol)
             sim_struct_unit = mol_map[sim_mol_inchi]
 

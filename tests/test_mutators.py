@@ -1,49 +1,82 @@
 import stk
 
 
-def test_random_bb(test_mol1, struct_units3):
-    mutant = stk.Mutation(None, None).random_bb(
-                            test_mol1,
-                            struct_units3,
-                            lambda x: x.__class__ is stk.StructUnit3)
+def test_random_building_block(polymer,
+                               amine2,
+                               aldehyde2,
+                               aldehyde2_alt1):
 
-    assert mutant.__class__ == test_mol1.__class__
-    assert mutant.topology.__class__ == test_mol1.topology.__class__
-    mol_struct_unit2 = next(bb for bb in test_mol1.building_blocks if
-                            isinstance(bb, stk.StructUnit2))
-    mol_struct_unit3 = next(bb for bb in test_mol1.building_blocks if
-                            isinstance(bb, stk.StructUnit3))
+    mutator = stk.RandomBuildingBlock(
+            building_blocks=[aldehyde2_alt1],
+            key=lambda mol: mol.func_group_infos[0].name == 'aldehyde'
+    )
+    mutant = mutator.mutate(polymer)
 
-    mutant_struct_unit2 = next(bb for bb in mutant.building_blocks if
-                               isinstance(bb, stk.StructUnit2))
-    mutant_struct_unit3 = next(bb for bb in mutant.building_blocks if
-                               isinstance(bb, stk.StructUnit3))
-
-    assert mol_struct_unit2 == mutant_struct_unit2
-    assert mol_struct_unit3 != mutant_struct_unit3
-
-
-def test_similar_bb(test_mol1, struct_units3):
-    mutant = stk.Mutation(None, None).similar_bb(
-                            test_mol1,
-                            struct_units3,
-                            lambda x: x.__class__ is stk.StructUnit3)
-
-    rdkit_mols = (m.mol for m in struct_units3)
-    bb3 = next(bb for bb in test_mol1.building_blocks if
-               isinstance(bb, stk.StructUnit3))
-    mutant_bb3 = next(bb for bb in mutant.building_blocks if
-                      isinstance(bb, stk.StructUnit3))
-    most_sim = bb3.similar_molecules(rdkit_mols)[0][1]
-    mol_map = {m.mol: m for m in struct_units3}
-    assert mol_map[most_sim] is mutant_bb3
-    assert mutant.topology.__class__ == test_mol1.topology.__class__
+    assert mutant.__class__ == polymer.__class__
+    assert mutant.topology.__class__ == polymer.topology.__class__
+    assert any(
+        bb.same(aldehyde2_alt1) for bb in mutant.building_blocks
+    )
+    assert all(
+        not bb.same(aldehyde2) for bb in mutant.building_blocks
+    )
 
 
-def test_random_topology(test_mol1):
+def test_similar_bb(polymer,
+                    amine2,
+                    aldehyde2,
+                    aldehyde2_alt1,
+                    aldehyde2_alt2):
+
+    mutator = stk.SimilarBuildingBlock(
+            building_blocks=[aldehyde2_alt1, aldehyde2_alt2],
+            duplicate_building_blocks=False,
+            key=lambda mol: mol.func_group_infos[0].name == 'aldehyde'
+    )
+    mutant = mutator.mutate(polymer)
+
+    assert mutant.__class__ == polymer.__class__
+    assert mutant.topology.__class__ == polymer.topology.__class__
+    assert any(
+        bb.same(aldehyde2_alt1) for bb in mutant.building_blocks
+    )
+    assert all(
+        not bb.same(aldehyde2) for bb in mutant.building_blocks
+    )
+
+    mutant = mutator.mutate(polymer)
+
+    assert mutant.__class__ == polymer.__class__
+    assert mutant.topology.__class__ == polymer.topology.__class__
+    assert any(
+        bb.same(aldehyde2_alt2) for bb in mutant.building_blocks
+    )
+    assert all(
+        not bb.same(aldehyde2) for bb in mutant.building_blocks
+    )
+
+
+def test_random_topology(cage):
     topologies = [stk.EightPlusTwelve(), stk.FourPlusSix()]
-    mutant = stk.Mutation.random_topology(None, test_mol1, topologies)
+    mutator = stk.RandomTopology(topologies)
+    mutant = mutator.mutate(cage)
 
-    assert type(mutant) == type(test_mol1)
-    assert mutant.topology.__class__ != test_mol1.topology.__class__
-    assert mutant.building_blocks == test_mol1.building_blocks
+    assert type(mutant) == type(cage)
+    assert mutant.topology.__class__ != cage.topology.__class__
+    assert all(
+        any(m.same(c) for c in cage.building_blocks)
+        for m in mutant.building_blocks
+    )
+    assert mutant.building_blocks == cage.building_blocks
+
+
+def test_random_mutation(cage):
+    t1 = stk.RandomTopology([stk.EightPlusTwelve()])
+    t2 = stk.RandomTopology([stk.FourPlusSix2()])
+    mutator1 = stk.RandomMutation(t1, t2, weights=[1, 0])
+    mutator2 = stk.RandomMutation(t1, t2, weights=[0, 1])
+
+    mutant1 = mutator1.mutate(cage)
+    assert isinstance(mutant1.topology, stk.EightPlusTwelve)
+    mutant2 = mutator2.mutate(cage)
+    assert isinstance(mutant2.topology, stk.FourPlusSix2)

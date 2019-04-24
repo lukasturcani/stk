@@ -320,6 +320,11 @@ def difluorene_dibromine():
                     name='difluorene_dibromine')
 
 
+@pytest.fixture(scope='session')
+def cage(amine2, aldehyde3):
+    return stk.Cage([amine2, aldehyde3], stk.FourPlusSix(), 'cage')
+
+
 @pytest.fixture
 def tmp_cage(amine2, aldehyde3):
     return stk.Cage([amine2, aldehyde3], stk.FourPlusSix(), 'tmp_cage')
