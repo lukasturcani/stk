@@ -9,13 +9,13 @@ for example :class:`GeneticRecombination`,
 
 .. _`adding crossers`:
 
-Extending stk: Adding crossers.
--------------------------------
+Extending stk: Making new crossers.
+-----------------------------------
 
-Crossers are simple classes which inherit :class:`Crosser` and
-define a method called :meth:`~Crosser.crossover`. The method is a
-generator, which can take any number of molecules and yields
-the offspring molecules.
+To add a new :class:`Crosser`, make a new class which inherits
+:class:`Crosser` and defines a method called
+:meth:`~Crosser.crossover`. The method is a generator, which can take
+any number of molecules and yields the offspring molecules.
 
 """
 
@@ -24,7 +24,7 @@ import numpy as np
 import itertools as it
 from collections import defaultdict
 
-from ..utilities import dedupe
+from ...utilities import dedupe
 
 
 logger = logging.getLogger(__name__)
@@ -329,12 +329,13 @@ class GeneticRecombination(Crosser):
         genes = {gene: np.random.permutation(list(alleles))
                  for gene, alleles in genes.items()}
 
-        tops = (mol.topology for mol in mols)
+        tops = dedupe((mol.topology for mol in mols), key=repr)
 
         product = it.product(*genes.values(), tops)
 
         if self.random_yield_order:
-            product = np.random.shuffle(list(product))
+            product = list(product)
+            np.random.shuffle(product)
 
         for *building_blocks, top in product:
             yield cls(building_blocks, top)
@@ -453,11 +454,12 @@ class Jumble(Crosser):
         building_block_groups = combinations(
                                   iterable=building_blocks,
                                   r=self.num_offspring_building_blocks)
-        topologies = dedupe(mol.topology for mol in mols)
+        topologies = dedupe((mol.topology for mol in mols), key=repr)
         product = it.product(building_block_groups, topologies)
 
         if self.random_yield_order:
-            product = np.random.shuffle(list(product))
+            product = list(product)
+            np.random.shuffle(product)
 
         for bbs, top in product:
             yield cls(bbs, top)

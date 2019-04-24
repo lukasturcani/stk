@@ -132,10 +132,23 @@ def amine2_alt3():
 
 @pytest.fixture(scope='session')
 def aldehyde2():
-
     return stk.StructUnit2.smiles_init(smiles='O=CCC=O',
                                        functional_groups=['aldehyde'],
                                        name='aldehyde2')
+
+
+@pytest.fixture(scope='session')
+def aldehyde2_alt1():
+    return stk.StructUnit2.smiles_init(smiles='O=CNC=O',
+                                       functional_groups=['aldehyde'],
+                                       name='aldehyde2_alt1')
+
+
+@pytest.fixture(scope='session')
+def aldehyde2_alt2():
+    return stk.StructUnit2.smiles_init(smiles='O=CNNC=O',
+                                       functional_groups=['aldehyde'],
+                                       name='aldehyde2_alt2')
 
 
 @pytest.fixture(scope='session')
@@ -146,11 +159,25 @@ def boronic_acid2():
                                 name='boronic_acid2')
 
 
+@pytest.fixture(scope='session')
+def bromine2():
+    return stk.StructUnit2.smiles_init(smiles='[Br]CCC[Br]',
+                                       functional_groups=['bromine'],
+                                       name='bromine2')
+
+
 @pytest.fixture
 def tmp_bromine2():
     return stk.StructUnit2.smiles_init(smiles='[Br]CCC[Br]',
                                        functional_groups=['bromine'],
                                        name='tmp_bromine2')
+
+
+@pytest.fixture(scope='session')
+def bromine2_alt1():
+    return stk.StructUnit2.smiles_init(smiles='[Br]CNC[Br]',
+                                       functional_groups=['bromine'],
+                                       name='bromine2_alt1')
 
 
 @pytest.fixture
@@ -299,6 +326,20 @@ def polymer(amine2, aldehyde2):
                        'polymer')
 
 
+@pytest.fixture(scope='session')
+def polymer_alt1(amine2_alt1, aldehyde2_alt1):
+    return stk.Polymer([amine2_alt1, aldehyde2_alt1],
+                       stk.Linear('AB', [0, 0], 3),
+                       'polymer_alt1')
+
+
+@pytest.fixture(scope='session')
+def polymer_alt2(amine2_alt2, aldehyde2_alt2):
+    return stk.Polymer([amine2_alt2, aldehyde2_alt2],
+                       stk.Linear('AB', [0, 0], 3),
+                       'polymer_alt2')
+
+
 @pytest.fixture
 def tmp_polymer(amine2, aldehyde2):
     return stk.Polymer([amine2, aldehyde2],
@@ -433,17 +474,17 @@ def pop(generate_population):
 
 
 @pytest.fixture
-def tmp_polymer_pop(tmp_bromine2, tmp_bromine2_alt1):
-    p1 = stk.Polymer([tmp_bromine2, tmp_bromine2_alt1],
+def tmp_polymer_pop(bromine2, bromine2_alt1):
+    p1 = stk.Polymer([bromine2, bromine2_alt1],
                      stk.Linear('AB', [0, 0], 1),
                      'p1')
-    p2 = stk.Polymer([tmp_bromine2, tmp_bromine2_alt1],
+    p2 = stk.Polymer([bromine2, bromine2_alt1],
                      stk.Linear('ABBA', [0, 0], 1),
                      'p2')
-    p3 = stk.Polymer([tmp_bromine2, tmp_bromine2_alt1],
+    p3 = stk.Polymer([bromine2, bromine2_alt1],
                      stk.Linear('ABA', [0, 0], 1),
                      'p3')
-    p4 = stk.Polymer([tmp_bromine2, tmp_bromine2_alt1],
+    p4 = stk.Polymer([bromine2, bromine2_alt1],
                      stk.Linear('AAB', [0, 0], 1),
                      'p4')
 
