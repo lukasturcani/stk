@@ -6,7 +6,7 @@ Fitness calculators are classes which inherit
 :meth:`~FitnessCalculator.fitness` method. This method is used to
 calculate the fitness of molecules. A :class:`FitnessCalculator` will
 hold calculated fitness values in
-:attr:`FitnessCalculator.fitness_values`. The method will also
+:attr:`FitnessCalculator.cache`. The method will also
 create a :attr:`fitness` attribute on the molecules it evaluates,
 which holds the fitness value. The values calculated by
 :meth:`~FitnessCalculator.fitness` can be any Python object, as long as
@@ -34,10 +34,10 @@ by the mean fitness across the population.
 
 .. _`adding fitness calculators`:
 
-Extending stk: Adding fitness calculators.
-------------------------------------------
+Extending stk: Making new fitness calculators.
+----------------------------------------------
 
-A new class inheriting :class:`FitnessCalculator` must be added.
+A new class inheriting :class:`FitnessCalculator` must be created.
 The class must define a :meth:`~FitnessCalculator.fitness` method,
 which takes two arguments. The first is `mol` which takes a
 :class:`.Molecule` object and is the molecule whose fitness is to be
@@ -84,7 +84,7 @@ def _add_fitness_attribute_creation(fitness):
     return inner
 
 
-def _add_fitness_caching(fitness):
+def _add_cache_use(fitness):
     """
     Gives fitness functions the option skip re-calculatations.
 
@@ -104,17 +104,18 @@ def _add_fitness_caching(fitness):
 
     @wraps(fitness)
     def inner(self, mol, conformer=-1):
-        key = (mol, conformer)
-        if self.use_cache and key in self.fitness_values:
+        key = (mol.key, conformer)
+        if self.use_cache and key in self.cache:
             logger.info(
                 'Using cached fitness value '
                 f'for "{mol.name}" conformer {conformer}.'
             )
-            return self.fitness_values[(mol, conformer)]
-
-        r = fitness(self, mol, conformer)
-        self.fitness_values[key] = r
-        return r
+            return self.cache[(mol, conformer)]
+        else:
+            r = fitness(self, mol, conformer)
+            if self.use_cache:
+                self.cache[key] = r
+            return r
 
     return inner
 
@@ -132,15 +133,15 @@ class FitnessCalculator:
     ----------
     use_cache : :class:`bool`
         If ``True`` then fitness values for molecules and conformers
-        already held in :attr:`fitness_values` are not re-calculated
+        already held in :attr:`cache` are not re-calculated
         and the value already stored is used.
 
-    fitness_values : :class:`dict`
+    cache : :class:`dict`
         Stores fitness values of molecules in the form:
 
         .. code-block:: python
 
-            fitness_values = {
+            cache = {
                 (mol1, conf1): 12.2,
                 (mol1, conf3): 124.31,
                 (mol2, conf1): 0.2
@@ -160,17 +161,17 @@ class FitnessCalculator:
         ----------
         use_cache : :class:`bool`
             If ``True`` then fitness values for molecules and
-            conformers already held in :attr:`fitness_values` are not
+            conformers already held in :attr:`cache` are not
             re-calculated and the value already stored is used.
 
         """
 
         self.use_cache = use_cache
-        self.fitness_values = {}
+        self.cache = {}
 
     def __init_subclass__(cls, **kwargs):
         cls.fitness = _add_fitness_attribute_creation(cls.fitness)
-        cls.fitness = _add_fitness_caching(cls.fitness)
+        cls.fitness = _add_cache_use(cls.fitness)
         return super().__init_subclass__(**kwargs)
 
     def fitness(self, mol, conformer=-1):
@@ -196,13 +197,6 @@ class FitnessCalculator:
         raise NotImplementedError()
 
 
-# Provides labels for the progress plotter.
-# @_param_labels('Cavity Difference',
-#                'Window Difference',
-#                'Asymmetry',
-#                'Energy per Bond',
-#                'Precursors Strain',
-#                'Dihedral Strain')
 class PropertyVector(FitnessCalculator):
     """
     Calculates the a set of properties of a molecule.
@@ -285,8 +279,8 @@ class PropertyVector(FitnessCalculator):
             print('Fitness attribute added.')
 
         # The fitness calculate will have all the results saved in
-        # its fitness_values attribute.
-        print(fitness_calculator.fitness_values)
+        # its cache attribute.
+        print(fitness_calculator.cache)
 
 
     Use on :class:`.MacroMolecule` objects, :class:`.Polymer`
@@ -335,8 +329,8 @@ class PropertyVector(FitnessCalculator):
             print('Fitness attribute added.')
 
         # The fitness calculate will have all the results saved in
-        # its fitness_values attribute.
-        print(fitness_calculator.fitness_values)
+        # its cache attribute.
+        print(fitness_calculator.cache)
 
     Use on :class:`.MacroMolecule` objects, :class:`.Cage`
 
@@ -381,8 +375,8 @@ class PropertyVector(FitnessCalculator):
             print('Fitness attribute added.')
 
         # The fitness calculate will have all the results saved in
-        # its fitness_values attribute.
-        print(fitness_calculator.fitness_values)
+        # its cache attribute.
+        print(fitness_calculator.cache)
 
 
     """
@@ -403,13 +397,13 @@ class PropertyVector(FitnessCalculator):
 
         use_cache : :class:`bool`
             If ``True`` then fitness values for molecules and
-            conformers already held in :attr:`fitness_values` are not
+            conformers already held in :attr:`cache` are not
             re-calculated and the value stored is used.
 
         """
 
         self.property_fns = property_fns
-        super.__init__(use_cache=use_cache)
+        super().__init__(use_cache=use_cache)
 
     def fitness(self, mol, conformer=-1):
         """
