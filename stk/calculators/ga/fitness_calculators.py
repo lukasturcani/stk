@@ -170,8 +170,8 @@ class FitnessCalculator:
         self.cache = {}
 
     def __init_subclass__(cls, **kwargs):
-        cls.fitness = _add_fitness_attribute_creation(cls.fitness)
         cls.fitness = _add_cache_use(cls.fitness)
+        cls.fitness = _add_fitness_attribute_creation(cls.fitness)
         return super().__init_subclass__(**kwargs)
 
     def fitness(self, mol, conformer=-1):

@@ -8,16 +8,16 @@ documentation, for example :class:`Fittest`, :class:`Roulette` or
 :class:`AboveAverage`.
 
 :class:`Selector`s can be combined to generate more complex selection
-processes, such as stochastic sampling, using :class:`.Pipeline` or
-:class:`SelectorFunnel`. Examples of how this can happen are given in
-the documentation of these two classes.
+processes, such as stochastic sampling, using
+:class:`.SelectorSequence` or :class:`SelectorFunnel`. Examples of how
+this can happen are given in the documentation of these two classes.
 
 .. _`adding selectors`:
 
-Extending stk: Adding selectors.
---------------------------------
+Extending stk: Making new selectors.
+------------------------------------
 
-When a new :class:`Selector` is to be added it must inherit
+When a new :class:`Selector` class is made it must inherit
 :class:`Selector` and define a :meth:`~Selection.select` method.
 :meth:`~Selection.select` must take a single argument, which is the
 :class:`Population` from which molecules are selected.
@@ -84,6 +84,9 @@ class Selector:
             The number of molecules yielded at once.
 
         """
+
+        if num is None:
+            num = float('inf')
 
         self.num = num
         self.duplicates = duplicates
@@ -229,8 +232,78 @@ class SelectorFunnel(Selector):
 
         """
 
-        for selector in self.selectors:
+        *head, tail = self.selectors
+        for selector in head:
             population = [mol for mol, in selector.select(population)]
+
+        yield from tail.select(population)
+
+
+class SelectorSequence(Selector):
+    """
+    Yields from selectors in order.
+
+    Attributes
+    ----------
+    selectors : :class:`tuple` of :class:`Selector`
+        The :class:`Selector`s used to select molecules.
+
+    Examples
+    --------
+    First use :class:`Fittest` to select the 10 fittest batches and
+    then use :class:`Roulette` to select batches in proportion to their
+    fitness.
+
+    .. code-block:: python
+
+        # Make a population.
+        pop = Population(...)
+
+        # Create a Selector which yields 10 batches of molecules and
+        # then uses roulette selection indefinitely.
+        fittest = Fittest(batch_size=3)
+        roulette = Roulette(batch_size=3)
+        elitist_roulette = SelectorSequence(fittest, roulette)
+
+        # Use the selector to yield molecules.
+        for selected_mol in elitist_roulette.select(pop):
+            # Do something with the selected molecules.
+            ...
+
+    """
+
+    def __init__(self, *selectors):
+        """
+        Initializes a :class:`SelectorSequence` instance.
+
+        Parameters
+        ----------
+        *selectors : :class:`Selector`
+            The :class:`Selector`s used to select molecules.
+
+        """
+
+        self.selectors = selectors
+
+    def select(self, population):
+        """
+        Yields batches of molecules.
+
+        Parameters
+        ----------
+        population : :class:`.Population`
+            A :class:`.Population` from which batches of molecules are
+            selected.
+
+        Yields
+        ------
+        :class:`tuple` of :class:`.Molecule`
+            A batch of selected molecules.
+
+        """
+
+        for selector in self.selectors:
+            yield from selector.select(population)
 
 
 class Fittest(Selector):

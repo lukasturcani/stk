@@ -333,8 +333,7 @@ class SelectionPlotter(Plotter):
             label = f'{mol.name} - {mol.fitness}'
             data = {
                 'Molecule: name - fitness value': label,
-                # Add 0.5 and then use bottom=-0.5 in sns.bar().
-                'Number of times selected': selection_count+0.5,
+                'Number of times selected': selection_count,
                 'Fitness': mol.fitness
             }
             df = df.append(data, ignore_index=True)
@@ -345,14 +344,13 @@ class SelectionPlotter(Plotter):
         sm = plt.cm.ScalarMappable(cmap='magma_r', norm=norm)
         sm.set_array([])
 
-        ax = sns.barplot(
+        ax = sns.scatterplot(
                     x='Molecule: name - fitness value',
                     y='Number of times selected',
                     hue='Fitness',
                     palette='magma_r',
-                    dodge=False,
                     data=df,
-                    bottom=-0.5)
+                    s=[200 for i in range(len(counter.keys()))])
         ax.get_legend().remove()
         ax.figure.colorbar(sm).set_label('Fitness')
         plt.xticks(rotation=90)

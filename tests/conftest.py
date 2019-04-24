@@ -529,3 +529,8 @@ def progress():
         mol.cavity_size = -i
 
     return pop
+
+
+@pytest.fixture(scope='session')
+def flat_pop(progress):
+    return progress.populations[0]
