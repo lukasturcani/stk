@@ -298,10 +298,12 @@ class Fittest(Selector):
 
         """
 
-        super(num=num,
-              duplicates=duplicates,
-              use_rank=False,
-              batch_size=batch_size)
+        super().__init__(
+            num=num,
+            duplicates=duplicates,
+            use_rank=False,
+            batch_size=batch_size
+        )
 
     def select(self, population):
         """
@@ -420,10 +422,12 @@ class Roulette(Selector):
 
         """
 
-        super(num=num,
-              duplicates=duplicates,
-              use_rank=use_rank,
-              batch_size=batch_size)
+        super().__init__(
+            num=num,
+            duplicates=duplicates,
+            use_rank=use_rank,
+            batch_size=batch_size
+        )
 
     def select(self, population):
         """
@@ -566,10 +570,12 @@ class AboveAverage(Selector):
         """
 
         self.duplicate_batches = duplicate_batches
-        super(num=num,
-              duplicates=duplicates,
-              use_rank=use_rank,
-              batch_size=batch_size)
+        super().__init__(
+            num=num,
+            duplicates=duplicates,
+            use_rank=use_rank,
+            batch_size=batch_size
+        )
 
     def select(self, population):
         """

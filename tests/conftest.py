@@ -513,3 +513,19 @@ def tmp_polymer_pop(bromine2, bromine2_alt1):
 @pytest.fixture(scope='session')
 def ga_input():
     return stk.GAInput(join('..', 'data', 'inputfile.py'))
+
+
+@pytest.fixture(scope='session')
+def progress():
+    pop = stk.Population(*(
+        stk.Population(*(
+            stk.Molecule(f'{i}') for i in range(20)
+        ))
+        for i in range(25)
+    ))
+
+    for i, mol in enumerate(pop):
+        mol.fitness = i
+        mol.cavity_size = -i
+
+    return pop

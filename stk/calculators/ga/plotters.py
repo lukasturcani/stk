@@ -64,6 +64,10 @@ class ProgressPlotter(Plotter):
 
     Attributes
     ----------
+    filename : :class:`str`
+        The basename of the files. This means it should exclude
+        file extensions.
+
     attr : :class:`str`
         The name of the attribute which is plotted. It must be an
         attribute on the :class:`.Molecule` objects made by the GA.
@@ -87,7 +91,8 @@ class ProgressPlotter(Plotter):
 
         # Make the plotter which plots the fitness change across
         # generations.
-        plotter = ProgressPlotter(attr='fitness',
+        plotter = ProgressPlotter(filename='fitness_plot',
+                                  attr='fitness',
                                   y_label='Fitness',
                                   default=1e-4)
         plotter.plot(progress)
@@ -104,19 +109,24 @@ class ProgressPlotter(Plotter):
         # generations. Note that the GA must create the num_atoms
         # attribute on the molecules. This can be done in the fitness
         # function, for example.
-        plotter = ProgressPlotter(attr='num_atoms',
+        plotter = ProgressPlotter(filename='atom_plot',
+                                  attr='num_atoms',
                                   y_label='Number of Atoms',
                                   default=0)
         plotter.plot(progress)
 
     """
 
-    def __init__(self, attr, y_label, default):
+    def __init__(self, filename, attr, y_label, default):
         """
         Initializes a :class:`ProgressPlotter` instance.
 
         Parameters
         ----------
+        filename : :class:`str`
+            The basename of the files. This means it should not include
+            file extensions.
+
         attr : :class:`str`
             The name of the attribute which is plotted. It must be an
             attribute on the :class:`.Molecule` objects made by the GA.
@@ -130,6 +140,7 @@ class ProgressPlotter(Plotter):
 
         """
 
+        self.filename = filename
         self.attr = attr
         self.y_label = y_label
         self.default = default
@@ -190,7 +201,7 @@ class ProgressPlotter(Plotter):
 
         plt.legend(bbox_to_anchor=(1.15, 1), prop={'size': 9})
         plt.tight_layout()
-        fig.savefig(f'{self.attr}_progress.png', dpi=500)
+        fig.savefig(f'{self.filename}.png', dpi=500)
         plt.close('all')
 
 
@@ -201,7 +212,7 @@ class SelectionPlotter(Plotter):
     Attributes
     ----------
     filename : :class:`str`
-        The basename of the files. This means it should exclude
+        The basename of the files. This means it should not include
         file extensions.
 
     selector : :class:`.Selector`
@@ -253,7 +264,7 @@ class SelectionPlotter(Plotter):
         Parameters
         ----------
         filename : :class:`str`
-            The basename of the files. This means it should exclude
+            The basename of the files. This means it should not include
             file extensions.
 
         selector : :class:`.Selector`
@@ -287,19 +298,13 @@ class SelectionPlotter(Plotter):
         """
 
         @wraps(select)
-        def inner(*args, **kwargs):
-            selected = select(*args, **kwargs)
-            counter = Counter()
+        def inner(population):
 
-            while True:
-                try:
-                    yielded = next(selected)
-                except StopIteration:
-                    self._plot(counter)
-                    raise
-
-                counter.update(yielded)
-                yield yielded
+            counter = Counter({mol: 0 for mol in population})
+            for selected in select(population):
+                counter.update(selected)
+                yield selected
+            self._plot(counter)
 
         return inner
 
@@ -328,7 +333,8 @@ class SelectionPlotter(Plotter):
             label = f'{mol.name} - {mol.fitness}'
             data = {
                 'Molecule: name - fitness value': label,
-                'Number of times selected': selection_count,
+                # Add 0.5 and then use bottom=-0.5 in sns.bar().
+                'Number of times selected': selection_count+0.5,
                 'Fitness': mol.fitness
             }
             df = df.append(data, ignore_index=True)
@@ -345,7 +351,8 @@ class SelectionPlotter(Plotter):
                     hue='Fitness',
                     palette='magma_r',
                     dodge=False,
-                    data=df)
+                    data=df,
+                    bottom=-0.5)
         ax.get_legend().remove()
         ax.figure.colorbar(sm).set_label('Fitness')
         plt.xticks(rotation=90)
