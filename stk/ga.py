@@ -253,7 +253,7 @@ def ga_run(input_file):
     history.db(pop)
 
     gen = 0
-    while exiter.exit(progress):
+    while not exiter.exit(progress):
         gen += 1
         logger.info(f'Starting generation {gen}.')
 
