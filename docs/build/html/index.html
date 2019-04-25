@@ -98,9 +98,9 @@
 </li>
 <li><a class="reference internal" href="#dealing-with-multiple-conformers">Dealing with Multiple Conformers</a><ul>
 <li><a class="reference internal" href="#dealing-with-multiple-molecules">Dealing with Multiple Molecules</a></li>
-<li><a class="reference internal" href="#automated-molecular-design-with-genetic-algorithms">Automated Molecular Design with Genetic Algorithms</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#automated-molecular-design-with-genetic-algorithms">Automated Molecular Design with Genetic Algorithms</a></li>
 <li><a class="reference internal" href="#extending-stk">Extending <code class="docutils literal notranslate"><span class="pre">stk</span></code></a></li>
 <li><a class="reference internal" href="#further-reading">Further Reading</a></li>
 </ul>
@@ -411,7 +411,7 @@ energy of the molecule</p>
 </div>
 <p>All genetic algorithm operations are also implemented through
 calculators, take for example a <a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> such as
-<code class="xref py py-class docutils literal notranslate"><span class="pre">RandomTopology</span></code></p>
+<a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.RandomTopology" title="stk.calculators.ga.mutators.RandomTopology"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomTopology</span></code></a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">topologies</span> <span class="o">=</span> <span class="p">[</span><span class="n">EightPlusTwelve</span><span class="p">(),</span> <span class="n">FourPlusSix</span><span class="p">(),</span> <span class="n">Dodecahedron</span><span class="p">()]</span>
 <span class="n">random_top</span> <span class="o">=</span> <span class="n">RandomTopology</span><span class="p">(</span><span class="n">topologies</span><span class="p">)</span>
 
@@ -430,7 +430,7 @@ the topology of a molecule with a new one, in order to generate the mutant.
 In this case, the new topologies would be one of <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.EightPlusTwelve" title="stk.molecular.topologies.cage.two_plus_three.EightPlusTwelve"><code class="xref py py-class docutils literal notranslate"><span class="pre">EightPlusTwelve</span></code></a>,
 <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.FourPlusSix" title="stk.molecular.topologies.cage.two_plus_three.FourPlusSix"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourPlusSix</span></code></a> or <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.Dodecahedron" title="stk.molecular.topologies.cage.two_plus_three.Dodecahedron"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dodecahedron</span></code></a>.</p>
 <p>Calculators often support additional options to modify their behaviour.
-For example, calculator of type <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> or
+For example, calculators of type <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> or
 <a class="reference internal" href="stk.calculators.energy.energy_calculators.html#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a> support caching. This means that if the
 same molecule and conformer is supplied to the calculator, it will not
 run the optimization or energy calculation again, it will return the
@@ -452,8 +452,8 @@ previously calculated value</p>
 <span class="n">cached_mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
 
 <span class="c1"># Make a non-caching and a caching uff energy calculator.</span>
-<span class="n">uff_energy</span> <span class="o">=</span> <span class="n">UFF</span><span class="p">()</span>
-<span class="n">caching_uff_energy</span> <span class="o">=</span> <span class="n">UFF</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">uff_energy</span> <span class="o">=</span> <span class="n">UFFEnergy</span><span class="p">()</span>
+<span class="n">caching_uff_energy</span> <span class="o">=</span> <span class="n">UFFEnergy</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
 <span class="c1"># Calculate the energy twice.</span>
 <span class="n">uff_energy</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
@@ -670,8 +670,9 @@ all the molecules to a folder</p>
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="automated-molecular-design-with-genetic-algorithms">
-<h3>Automated Molecular Design with Genetic Algorithms<a class="headerlink" href="#automated-molecular-design-with-genetic-algorithms" title="Permalink to this headline">¶</a></h3>
+<h2>Automated Molecular Design with Genetic Algorithms<a class="headerlink" href="#automated-molecular-design-with-genetic-algorithms" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">stk</span></code> includes a genetic algorithm which
 can be used to evolve molecules that fulfil user defined design criteria.
 The genetic algorithm can be run from the command line using:</p>
@@ -833,7 +834,7 @@ and selects building blocks which have the most atoms.</p>
 <span class="c1"># Fitness normalizer.</span>
 <span class="c1"># #####################################################################</span>
 
-<span class="c1"># This is an optional argument, will default to NullOptimizer.</span>
+<span class="c1"># This is an optional argument, will default to NullFitnessNormalizer.</span>
 
 <span class="c1"># The PropertyVector fitness calculator will set the fitness as</span>
 <span class="c1"># [n_atoms] use the Sum() fitness normalizer to convert the fitness to</span>
@@ -1015,8 +1016,7 @@ mutation counter</p>
 <img alt="_images/counter_example.png" src="_images/counter_example.png" />
 <p>It shows that molecule <code class="docutils literal notranslate"><span class="pre">8</span></code> was selected three times for mutation, while molecules
 <code class="docutils literal notranslate"><span class="pre">40</span></code>, <code class="docutils literal notranslate"><span class="pre">23`</span></code> were selected once. The
-remaining molecules did not participate in crossover operations
-in that generation.</p>
+remaining molecules were not mutated in that generation.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">final_pop</span></code> directory holds the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> files holding the
 structures of the last generation of molecules.
 The file <code class="docutils literal notranslate"><span class="pre">big_monomers.py</span></code> is a copy of the input file. The <code class="docutils literal notranslate"><span class="pre">database.json</span></code>
@@ -1045,7 +1045,6 @@ stderr. The message should be relatively straightforward, such as</p>
 <p>which shows the time, the level of the message which can be, in order of
 priority DEBUG, INFO, WARNING, ERROR or CRITICAL, the module where
 the message originated and finally the message itself.</p>
-</div>
 </div>
 <div class="section" id="extending-stk">
 <span id="id1"></span><h2>Extending <code class="docutils literal notranslate"><span class="pre">stk</span></code><a class="headerlink" href="#extending-stk" title="Permalink to this headline">¶</a></h2>
