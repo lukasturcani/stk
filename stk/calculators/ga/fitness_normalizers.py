@@ -98,7 +98,8 @@ def _dedupe(normalize):
 
     @wraps(normalize)
     def inner(self, population):
-        return normalize(self, dedupe(population))
+        cls = population.__class__
+        return normalize(self, cls(*dedupe(population)))
 
     return inner
 
