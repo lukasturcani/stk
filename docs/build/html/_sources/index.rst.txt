@@ -390,7 +390,18 @@ previously calculated value
     caching_uff_energy.energy(mol)
 
 More information on each type of calculator can be seen by visiting the
-module dedicated to that calculator, :mod:`.calculators`.
+following modules:
+
+    * :mod:`.optimizers`
+    * :mod:`.energy_calculators`
+    * :mod:`.electronic_property_calculators`
+    * :mod:`.mutators`
+    * :mod:`.crossers`
+    * :mod:`.fitness_calculators`
+    * :mod:`.fitness_normalizers`
+    * :mod:`.selectors`
+    * :mod:`.exiters`
+    * :mod:`.plotters`
 
 Combining Calculators
 .....................
