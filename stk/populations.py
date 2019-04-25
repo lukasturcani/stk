@@ -741,7 +741,7 @@ class Population:
         log_thread = Thread(target=daemon_logger, args=(logq, ))
         log_thread.start()
 
-        opt_fn = _Guard(optimizer.optimize)
+        opt_fn = _Guard(optimizer, optimizer.optimize)
 
         # Apply the function to every member of the population, in
         # parallel.
@@ -1388,10 +1388,11 @@ class _Guard:
 
     """
 
-    def __init__(self, func):
-        wraps(func)(self)
+    def __init__(self, calculator, fn):
+        self.calc_name = calculator.__class__.__name__
+        wraps(fn)(self)
 
-    def __call__(self, mol, conformer=-1):
+    def __call__(self, mol):
         """
         Decorates and calls the function.
 
@@ -1408,18 +1409,15 @@ class _Guard:
         """
 
         fn = self.__wrapped__.__name__
+        cls = self.calc_name
         try:
-            logger.info(
-                f'Running "{fn}()" on '
-                f'"{mol.name}" conformer {conformer}.'
-            )
-            self.__wrapped__(mol, conformer)
+            logger.info(f'Running "{cls}.{fn}()" on "{mol.name}"')
+            self.__wrapped__(mol)
             return mol
 
         except Exception as ex:
             errormsg = (
-                f'"{fn}()" failed on molecule '
-                f'"{mol.name}" conformer {conformer}.'
+                f'"{cls}.{fn}()" failed on molecule "{mol.name}"'
             )
             logger.error(errormsg, exc_info=True)
             return ex
