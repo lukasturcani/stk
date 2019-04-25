@@ -352,7 +352,7 @@ In this case, the new topologies would be one of :class:`.EightPlusTwelve`,
 :class:`.FourPlusSix` or :class:`.Dodecahedron`.
 
 Calculators often support additional options to modify their behaviour.
-For example, calculator of type :class:`.Optimizer` or
+For example, calculators of type :class:`.Optimizer` or
 :class:`.EnergyCalculator` support caching. This means that if the
 same molecule and conformer is supplied to the calculator, it will not
 run the optimization or energy calculation again, it will return the
