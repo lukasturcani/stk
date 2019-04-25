@@ -108,9 +108,9 @@ def test_both_md(tmp_cc3, macromodel_path):
 
 @macromodel
 def test_energy(amine2, macromodel_path):
-    a = amine2.energy.macromodel(forcefield=16,
-                                 macromodel_path=macromodel_path,
-                                 output_dir='energy_calc')
+
+    mm = stk.MacroModelEnergy(macromodel_path, 'energy_calc')
+    a = mm.energy(amine2)
     assert np.allclose(a=a,
                        b=49.0655,
                        atol=1e-2)
