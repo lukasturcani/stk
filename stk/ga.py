@@ -237,6 +237,9 @@ def ga_run(input_file):
                      mutator=mutator,
                      crosser=crosser)
 
+    # GA optimizer should always use its cache.
+    optimizer.use_cache = True
+
     # 2. Set up the directory structure.
 
     launch_dir = os.getcwd()
