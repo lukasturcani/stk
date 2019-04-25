@@ -30,7 +30,8 @@ class MacroModelEnergy(EnergyCalculator):
     def __init__(self,
                  macromodel_path,
                  output_dir=None,
-                 force_field=16):
+                 force_field=16,
+                 use_cache=False):
         """
 
         Parameters
@@ -48,11 +49,17 @@ class MacroModelEnergy(EnergyCalculator):
         force_field : :class:`int`, optional
             The number of the force field to be used.
 
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`energy` will not run twice on the same
+            molecule and conformer, but will instead return the previously
+            calculated value.
+
         """
 
         self.macromodel_path = macromodel_path
         self.output_dir = output_dir
         self.force_field = force_field
+        super().__init__(use_cache=use_cache)
 
     def energy(self, mol, conformer=-1):
         """
