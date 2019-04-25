@@ -377,8 +377,8 @@ previously calculated value
     cached_mmff.optimize(mol)
 
     # Make a non-caching and a caching uff energy calculator.
-    uff_energy = UFF()
-    caching_uff_energy = UFF(use_cache=True)
+    uff_energy = UFFEnergy()
+    caching_uff_energy = UFFEnergy(use_cache=True)
 
     # Calculate the energy twice.
     uff_energy.energy(mol)
