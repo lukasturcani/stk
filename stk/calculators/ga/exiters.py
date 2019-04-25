@@ -4,7 +4,7 @@ Defines :class:`Exiter` classes.
 :class:`Exiter` objects check to see if an exit condition for the GA
 has been fulfilled.
 
-.. _`adding selectors`:
+.. _`adding exiters`:
 
 Extending stk: Making new exiters.
 ----------------------------------

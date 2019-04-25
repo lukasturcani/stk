@@ -476,12 +476,12 @@ class RandomTopology(Mutator):
     Parameters
     ----------
     topologies : :class:`list` of :class:`.Topology`
-        This lists holds the topology instances from which one is
-        selected at random to form a mutant.
+        This :class:`list` holds the topology instances from which one
+        is selected at random to form a mutant.
 
     Examples
     --------
-    ..code-block:: python
+    .. code-block:: python
 
         # Create a molecule which is to be mutated.
         bb1 = StructUnit2.smiles_init('NCCN', ['amine'])
