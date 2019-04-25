@@ -210,6 +210,26 @@ class FormationEnergy(EnergyCalculator):
 
     Examples
     --------
+    .. code-block:: python
+
+        # Make the molecules needed to calculate formation energy.
+        water = StructUnit.smiles_init('[H]O[H]')
+        bb1 = StructUnit2(...)
+        bb2 = StructUnit3(...)
+        cage = Cage([bb1, bb2], FourPlusSix())
+
+        # Make the energy calculator used to calculate energies.
+        uff_energy = UFFEnergy()
+
+        # Make the formation energy calculator.
+        formation = FormationEnergy(
+            energy_calculator=uff_energy,
+            reactants=[bb1]*6 + [bb2]*4,
+            products=[water]*cage.topology.bonds_made
+        )
+
+        # Calculate the formation energy.
+        formation_energy = formation.energy(cage)
 
     """
 
@@ -219,7 +239,7 @@ class FormationEnergy(EnergyCalculator):
                  products,
                  reactant_conformers=None,
                  product_conformers=None,
-                 use_cache=True):
+                 use_cache=False):
         """
         Initializes a :class:`FormationEnergy` instance.
 
