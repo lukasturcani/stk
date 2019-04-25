@@ -1074,7 +1074,7 @@ Further Reading
     * :ref:`cof assembly`
     * :doc:`advanced_cage_building`
     * :doc:`caching`
-    * :doc:`modifying calculators`
+    * :doc:`modifying_calculators`
 
 Indices and tables
 ==================

@@ -121,6 +121,8 @@ class Optimizer:
     cache : :class:`set`
         A :class:`set` of the form
 
+        .. code-block:: python
+
             cache = {
                 (mol1, conformer1),
                 (mol1, conformer2),
@@ -597,7 +599,7 @@ class RDKitEmbedder(Optimizer):
 
     Examples
     --------
-    Use ETKDG[#] to generate an optimized structure.
+    Use ETKDG [#]_ to generate an optimized structure.
 
     .. code-block:: python
 
