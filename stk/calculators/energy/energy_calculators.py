@@ -119,6 +119,8 @@ class EnergyCalculator:
     cache : :class:`dict`
         A :class:`dict` hodling calculated energy values of the form
 
+        .. code-block:: python
+
             cache = {
                 (mol1, conformer1): 12.2,
                 (mol1, conformer2): 2.0,

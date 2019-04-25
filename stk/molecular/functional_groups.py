@@ -316,8 +316,8 @@ class FunctionalGroup:
         atom id is decreased by 1. If the atom id is equal to a
         `deleters` atom id, it is removed.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         deleters : :class:`list` of :class:`int`
             Ids of atoms which are being removed from the molecule.
             Must be sorted in ascending order.
