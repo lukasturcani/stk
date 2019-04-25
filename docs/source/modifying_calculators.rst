@@ -50,7 +50,7 @@ Create a decorator which wraps a function and times it.
 
     # Add timing info to the calculators.
     mmff.optimize = timed_fn(mmff.optimize)
-    energy_calculator = timed_fn(energy_calculator.energy)
+    energy_calculator.energy = timed_fn(energy_calculator.energy)
 
     mol = stk.StructUnit(...)
     # These calls will print how long the function execution took.
