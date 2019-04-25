@@ -10,12 +10,12 @@ After :meth:`~FitnessNormalizer.normalize` is run, every
 :meth:`~FitnessNormalizer.normalize` the values in the :attr:`fitness`
 attribute can be any Python object. It is the job of the
 :class:`FitnessNormalizer` to convert these into positive, non-zero
-:class:`float`s.
+:class:`float`.
 
-To see how :class:`FitnessNormalizer`s can be used, look at the
+To see how :class:`FitnessNormalizer` can be used, look at the
 documention of the classes which inherit it, for example
 :class:`Power`, :class:`Sum` :class:`ScaleByMean`. In addition,
-multiple :class:`FitnessNormalizer`s can be chained using
+multiple :class:`FitnessNormalizer` can be chained using
 :meth:`.Sequence.normalize`.
 
 .. _`adding fitness normalizers`:
@@ -257,7 +257,7 @@ class Power(FitnessNormalizer):
     Raises fitness values to some power.
 
     This works for cases where the :attr:`fitness` is single
-    :class:`float` and where it is :class:`list` of :class:`float`s.
+    :class:`float` and where it is :class:`list` of :class:`float`.
 
     Attributes
     ----------

@@ -62,7 +62,8 @@ class RandomCrossover(Crosser):
     Attributes
     ----------
     crossers : :class:`tuple` of :class:`Crosser`
-        :class:`Crosser`s which are used to carry out the crossovers.
+        :class:`Crosser` objects which are used to carry out the
+        crossovers.
 
     weights : :class:`list` of :class:`float`
         The probability that each :class:`Crosser` will be selected to
@@ -123,7 +124,7 @@ class RandomCrossover(Crosser):
         Parameters
         ----------
         crossers : :class:`tuple` of :class:`Crosser`
-            :class:`Crosser`s which are used to carry out the
+            :class:`Crosser` objects which are used to carry out the
             crossovers.
 
         weights : :class:`list` of :class:`float`, optional

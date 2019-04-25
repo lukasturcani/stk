@@ -275,12 +275,12 @@ class PropertyVector(FitnessCalculator):
     Calculates the a set of properties of a molecule.
 
     This :class:`FitnessCalculator` applies a series of
-    :class:`function`s to a :class:`.Molecule` and appends each result
+    :class:`function` to a :class:`.Molecule` and appends each result
     to a :class:`list`. The :class:`list` forms the property vector of
     the molecule and it is returned as the fitness value of the
     molecule.
 
-    If any of the :class:`function`s returns ``None``, then instead of
+    If any of the :class:`function` returns ``None``, then instead of
     a :class:`list` the fitness value will be ``None``. In essence,
     :class:`PropertyVector` requires that all properties were
     successfully calculated.
@@ -288,7 +288,7 @@ class PropertyVector(FitnessCalculator):
     Attributes
     ----------
     property_fns : :class:`tuple` of :class:`function`
-        A group of :class:`function`s, each of which is used to
+        A group of :class:`function`, each of which is used to
         calculate a single property of the molecule. Each function must
         take 2 arguments, `mol` and `conformer`. `mol` accepts a
         :class:`.Molecule` object and `conformer` accepts an
@@ -461,7 +461,7 @@ class PropertyVector(FitnessCalculator):
         Parameters
         ----------
         *property_fns : :class:`tuple` of :class:`function`
-            A group of :class:`function`s, each of which is used to
+            A group of :class:`function`, each of which is used to
             calculate a single property of the molecule. Each function
             must take 2 arguments, `mol` and `conformer`. `mol` accepts
             a :class:`.Molecule` object and `conformer` accepts an

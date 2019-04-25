@@ -1,13 +1,13 @@
 """
 Defines :class:`Selector` classes.
 
-:class:`Selector`s are classes which define the :meth:`Selector.select`
+Selectors are objects with a :meth:`~Selector.select`
 method, which is used to select molecules from a :class:`.Population`.
 Examples of how :class:`Selector` classes can be used is given their
 documentation, for example :class:`Fittest`, :class:`Roulette` or
 :class:`AboveAverage`.
 
-:class:`Selector`s can be combined to generate more complex selection
+:class:`Selector` can be combined to generate more complex selection
 processes, such as stochastic sampling, using
 :class:`.SelectorSequence` or :class:`SelectorFunnel`. Examples of how
 this can happen are given in the documentation of these two classes.
@@ -202,7 +202,7 @@ class Selector:
 
 class SelectorFunnel(Selector):
     """
-    Applies :class:`Selector`s in order.
+    Applies :class:`Selector` objects in order.
 
     Each :class:`Selector` in :attr:`selectors` is used until
     exhaustion. The molecules selected by each :class:`Selector`
@@ -212,7 +212,7 @@ class SelectorFunnel(Selector):
     Attributes
     ----------
     selectors : :class:`tuple` of :class:`Selector`
-        The :class:`Selector`s used to select molecules. For all
+        The :class:`Selector` objects used to select molecules. For all
         except the last :attr:`num` must be ``1``.
 
     Examples
@@ -245,8 +245,8 @@ class SelectorFunnel(Selector):
         Parameters
         ----------
         *selectors : :class:`Selector`
-            The :class:`Selector`s used to select molecules. For all
-            except the last :attr:`num` must be ``1``.
+            The :class:`Selector` objects used to select molecules. For
+            all except the last :attr:`num` must be ``1``.
 
         """
 
@@ -290,7 +290,7 @@ class SelectorSequence(Selector):
     Attributes
     ----------
     selectors : :class:`tuple` of :class:`Selector`
-        The :class:`Selector`s used to select molecules.
+        The :class:`Selector` objects used to select molecules.
 
     Examples
     --------
@@ -323,7 +323,7 @@ class SelectorSequence(Selector):
         Parameters
         ----------
         *selectors : :class:`Selector`
-            The :class:`Selector`s used to select molecules.
+            The :class:`Selector` objects used to select molecules.
 
         """
 

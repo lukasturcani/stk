@@ -70,7 +70,8 @@ class RandomMutation(Mutator):
     Attributes
     ----------
     mutators : :class:`tuple` of :class:`Mutator`
-        :class:`Mutator`s which are used to carry out the mutations.
+        :class:`Mutator` objects which are used to carry out the
+        mutations.
 
     weights : :class:`list` of :class:`float`
         The probability that each :class:`Mutator` will be selected
@@ -137,7 +138,8 @@ class RandomMutation(Mutator):
         Parameters
         ----------
         *mutators : :class:`Mutator`
-            :class:`Mutator`s which are used to carry out the mutations.
+            :class:`Mutator` objects which are used to carry out the
+            mutations.
 
         weights : :class:`list` of :class:`float`, optional
             The probability that each :class:`Mutator` will be selected
@@ -329,9 +331,9 @@ class SimilarBuildingBlock(Mutator):
         mutant must all be unique.
 
     _similar_bbs : :class:`dict`
-        Maps a :class:`.MacroMolecule` to :class:`iterator`s which
-        yield the most similar molecules in :attr:`building_blocks`,
-        in order.
+        Maps a :class:`.MacroMolecule` to multiple :class:`iterator`,
+        each of which yields the most similar molecules in
+        :attr:`building_blocks`, in order.
 
     Examples
     --------

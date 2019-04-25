@@ -1,8 +1,8 @@
 """
 Defines :class:`Exiter` classes.
 
-:class:`Exiter`s check to see if an exit condition for the GA has
-been fulfilled.
+:class:`Exiter` objects check to see if an exit condition for the GA
+has been fulfilled.
 
 .. _`adding selectors`:
 
@@ -52,7 +52,7 @@ class AnyExiter(Exiter):
     Attributes
     ----------
     exiters : :class:`tuple` of :class:`Exiter`
-        :class:`Exiter`s which are checked to see if their exit
+        :class:`Exiter` objects which are checked to see if their exit
         conditions have been satisfied.
 
     """
@@ -64,8 +64,8 @@ class AnyExiter(Exiter):
         Parameters
         ----------
         *exiters : :class:`Exiter`
-            :class:`Exiter`s which are checked to see if their exit
-            conditions have been satisfied.
+            :class:`Exiter` objects which are checked to see if their
+            exit conditions have been satisfied.
 
         """
 
@@ -93,12 +93,12 @@ class AnyExiter(Exiter):
 
 class AllExiters(Exiter):
     """
-    Checks if all :class:`Exiter`s have satisfied their conditions.
+    Checks if all :class:`Exiter` objects return ``True``.
 
     Attributes
     ----------
     exiters : :class:`tuple` of :class:`Exiter`
-        :class:`Exiter`s which are checked to see if their exit
+        :class:`Exiter` objects which are checked to see if their exit
         conditions have been satisfied.
 
     """
@@ -110,8 +110,8 @@ class AllExiters(Exiter):
         Parameters
         ----------
         *exiters : :class:`Exiter`
-            :class:`Exiter`s which are checked to see if their exit
-            conditions have been satisfied.
+            :class:`Exiter` objects which are checked to see if their
+            exit conditions have been satisfied.
 
         """
 
@@ -129,8 +129,8 @@ class AllExiters(Exiter):
         Returns
         -------
         :class:`bool`
-            ``True`` if all :class:`Exiter`s in :attr:`exiters` have
-            satisfied its exit condition.
+            ``True`` if all :class:`Exiter` objects in :attr:`exiters`
+            have satisfied its exit condition.
 
         """
 
