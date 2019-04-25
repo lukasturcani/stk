@@ -83,6 +83,9 @@ class Selector:
         batch_size : :class:`int`
             The number of molecules yielded at once.
 
+        yielded : :class:`set` of :class:`.Molecule`
+            The previously yielded molecules.
+
         """
 
         if num is None:
@@ -92,6 +95,7 @@ class Selector:
         self.duplicates = duplicates
         self.use_rank = use_rank
         self.batch_size = batch_size
+        self.yielded = set()
 
     def _batch(self, population):
         """
@@ -116,8 +120,7 @@ class Selector:
         for batch in it.combinations(population, self.batch_size):
             yield batch, sum(m.fitness for m in batch)
 
-    @staticmethod
-    def _no_duplicates(batches):
+    def _no_duplicates(self, batches):
         """
         Makes sure that no molecule is yielded in more than one batch.
 
@@ -137,10 +140,9 @@ class Selector:
 
         """
 
-        seen = set()
         for batch, fitness in batches:
-            if all(mol not in seen for mol in batch):
-                seen.update(batch)
+            if all(mol not in self.yielded for mol in batch):
+                self.yielded.update(batch)
                 yield batch, fitness
 
     def select(self, population):
@@ -214,6 +216,10 @@ class SelectorFunnel(Selector):
         """
 
         self.selectors = selectors
+        self.yielded = set()
+        # Make all the selectors share the same yielded set.
+        for selector in self.selectors:
+            selector.yielded = self.yielded
 
     def select(self, population):
         """
@@ -284,6 +290,10 @@ class SelectorSequence(Selector):
         """
 
         self.selectors = selectors
+        self.yielded = set()
+        # Make all the selectors share the yielded set.
+        for selector in self.selectors:
+            selector.yielded = self.yielded
 
     def select(self, population):
         """
@@ -519,9 +529,12 @@ class Roulette(Selector):
 
         """
 
-        yielded = set()
-
-        valid_pop = list(population)
+        if not self.duplicates:
+            valid_pop = [
+                mol for mol in population if mol not in self.yielded
+            ]
+        else:
+            valid_pop = list(population)
         yields = 0
         while len(valid_pop) >= self.batch_size and yields < self.num:
 
@@ -545,9 +558,10 @@ class Roulette(Selector):
             yield selected
             yields += 1
             if not self.duplicates:
-                yielded.update(selected)
+                self.yielded.update(selected)
                 valid_pop = [
-                    ind for ind in population if ind not in yielded
+                    mol for mol in population
+                    if mol not in self.yielded
                 ]
 
 
