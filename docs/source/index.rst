@@ -73,12 +73,14 @@ and will look like this.
 
 Notice that the functional group has disappeared and been replaced by
 new bonds between the monomers. The new bonds seem a little stretched,
-so we can optimize the structure using an optimization function defined in
-:mod:`~.optimization.optimization`, in this case :func:`.rdkit_ETKDG`
+so we can optimize the structure using an :class:`.Optimizer`
+defined in :mod:`~.calculator.optimization`, in this case
+:class:`.MMFF`
 
 .. code-block:: python
 
-    rdkit_ETKDG(polymer)
+    mmff = MMFF()
+    mmff.optimize(polymer)
 
 Again, the polymer can be written to a file
 
@@ -177,20 +179,24 @@ Here is a third example:
 .. image:: figures/cage3.png
 
 While we assembled some cages, the constructed structures are not
-particularly realistic. We can optimize the geometry using an optimization
-function:
+particularly realistic. We can optimize the geometry using an
+:class:`.Optimizer`:
 
 .. code-block:: python
 
-    macromodel_opt(cage, '/opt/schrodinger2017-4')
-    macromodel_opt(cage2, '/opt/schrodinger2017-4')
-    macromodel_opt(cage3, '/opt/schrodinger2017-4')
+    macromodel = MacroModelForceField(
+        macromodel_path='/opt/schrodinger2017-4'
+    )
+    macromodel.optimize(cage)
+    macromodel.optimize(cage2)
+    macromodel.optimize(cage3)
 
 .. image:: figures/cages_opt.png
 
-In this case the function :func:`.macromodel_opt` was used. We could have
-used :func:`.rdkit_ETKDG` again but chances are the structures would
-have been optimized quite poorly. The :func:`.macromodel_opt` function
+In this case the optimizer :class:`.MacroModelForceField` was used.
+We could have used :class:`.MMFF` again but chances are the structures
+would have been optimized quite poorly. The
+:class:`.MacroModelForceField` optimizer
 requires a valid ``MacroModel`` installation with a working license.
 The argument ``'/opt/schrodinger2017-4'`` is the path to the installation.
 
@@ -276,34 +282,215 @@ of each COF. This is done analogously to the organic cage case so reading
 Other Materials
 ...............
 
-``stk`` is a work in progress and currently supports only the above classes
-of materials out of the box. However, ``stk`` was designed to be easy
-extend to other classes of molecules.
-For a guide on how this can be done
-see, :ref:`extending stk`.
+Other materials defined by ``stk`` can be found in
+:mod:`.molecular.topologies`. In addition to this, ``stk`` was designed
+to be easy extend to other classes of molecules. For a guide on how this
+can be done see, :ref:`extending stk`.
 
 
-Other Features
---------------
+Calculators
+-----------
+
+``stk`` makes extensive use of calculator objects. Calculators are a
+very general pattern for performing operations on molecules. All
+calculators are objects with a special method, used to perform the
+calculation. You have already been introduced to one type of calculator,
+the :class:`.Optimizer`. An optimizer has a special method called
+:meth:`~.Optimizer.optimize`, which optimizes a molecule. Here is
+another example
+
+.. code-block:: python
+
+    mol = StructUnit(...)
+    polymer = Polymer(...)
+
+    optimizer1 = MMFF()
+
+    # Optimize mol with mmff.
+    optimizer1.optimize(mol)
+    # Optimize polymer conformer 2 with mmff.
+    optimizer2.optimize(polymer, conformer=2)
+
+Other types of calculators will have different special methods used to
+perform calculations on molecules. For example, an
+:class:`.EnergyCalculator` will define an
+:meth:`~.EnergyCalculator.energy` method. This method calculates the
+energy of the molecule
+
+.. code-block:: python
+
+    mmff_energy = MMFFEnergy()
+    uff_energy = UFFEnergy()
+
+    # Calculate the energy of mol conformer 1 with the mmff force field.
+    mol_mmff_energy = mmff_energy.energy(mol, conformer=1)
+
+    # Calculate the energy of polymer conformer 10 with the uff force field.
+    polymer_uff_energy = uff_energy.energy(polymer, conformer=10)
+
+All genetic algorithm operations are also implemented through
+calculators, take for example a :class:`.Mutator` such as
+:class:`RandomTopology`
+
+.. code-block:: python
+
+    topologies = [EightPlusTwelve(), FourPlusSix(), Dodecahedron()]
+    random_top = RandomTopology(topologies)
+
+    # Assume bb1 and bb2 are StructUnit2 and StructUnit3 objects.
+    cage = Cage([bb1, bb2], SixPlusNine())
+
+    # Perform a mutation.
+    mutant = random_top.mutate(cage)
+
+A :class:`.Mutator` is a calculator which implements a
+:meth:`~.Mutator.mutate` method. This method takes a molecule and
+returns a mutant, *i.e.* a modified version, of that molecule.
+In this example, the ``random_top`` is a :class:`.Mutator`, which replaces
+the topology of a molecule with a new one, in order to generate the mutant.
+In this case, the new topologies would be one of :class:`.EightPlusTwelve`,
+:class:`.FourPlusSix` or :class:`.Dodecahedron`.
+
+Calculators often support additional options to modify their behaviour.
+For example, calculator of type :class:`.Optimizer` or
+:class:`.EnergyCalculator` support caching. This means that if the
+same molecule and conformer is supplied to the calculator, it will not
+run the optimization or energy calculation again, it will return the
+previously calculated value
+
+.. code-block:: python
+
+    # Example of caching with optimizers.
+    mmff = MMFF()
+    caching_mmff = MMFF(use_cache=True)
+
+    mol = StructUnit(...)
+
+    # Performs an optimization on mol.
+    mmff.optimize(mol)
+    # Performs a second optimization on mol.
+    mmff.optimize(mol)
+
+    # Performs an optimization on mol.
+    cached_mmff.optimize(mol)
+    # Does not peform an optimization on mol.
+    cached_mmff.optimize(mol)
+
+    # Make a non-caching and a caching uff energy calculator.
+    uff_energy = UFF()
+    caching_uff_energy = UFF(use_cache=True)
+
+    # Calculate the energy twice.
+    uff_energy.energy(mol)
+    uff_energy.energy(mol)
+
+    # Calculate the energy.
+    caching_uff_energy.energy(mol)
+    # Does not calculate the energy again, returns the previous value.
+    caching_uff_energy.energy(mol)
+
+More information on each type of calculator can be seen by visiting the
+module dedicated to that calculator, :mod:`.calculators`.
+
+Combining Calculators
+.....................
+
+Calculators can be combined to create complex behaviour on the fly.
+For example, we may wish to make a 2 step optimization process. First,
+we perform an optimization using the MMFF force field and the run
+a MacroModel molecular dynamics conformer search with
+:class:`.MacroModelMD`. The obvious way to do
+this is to run the two optimizers in sequence
+
+.. code-block:: python
+
+    mmff = MMFF()
+    macromodel = MacroModelMD(macromodel_path='/opt/schrodinger2017-4')
+
+    mmff.optimize(mol)
+    macromodel.optimize(mol)
+
+However, there is a better way! We can use an optimizer called
+:class:`.OptimizerSequence`. The :meth:`~OptimizerSequence.optimize`
+method of this optimizer calls the :class:`~Optimizer.optimize` methods
+of the optimizers it was initialized with
+
+.. code-block:: python
+
+    opt_sequence = OptimizerSequence(mmff, macromodel)
+    # Optimize with mmff and then with macromodel.
+    opt_sequence.optimize(mol)
+
+This pattern is quite common and powerful. For example, we can take
+three different :class:`.Mutator` objects. Each of these defines
+a different :meth:`~.Mutator.mutate` method. We want to apply one of
+these mutations at random. We can simply use :class:`.RandomMutation`
+
+.. code-block:: python
+
+    random_bb = RandomBuildingBlock(...)
+    similar_bb = SimilarBulidingBlock(...)
+    random_topology = RandomTopology(...)
+
+    random_mutation = RandomMutation(
+        random_bb,
+        similar_bb,
+        random_topology
+    )
+
+    # Use one of the mutate() methods of random_bb, similar_bb and
+    # random_topology at random.
+    mutant1 = random_mutation.mutate(mol)
+    # The next call use a different mutation to the call above.
+    mutant2 = random_mutation.mutate(mol)
+
+The :meth:`.RandomMutation.mutate` method randomly selects a
+:class:`.Mutator` it was initialized with to carry out the mutation
+on its behalf.
+
+Making New Calculators
+......................
+
+New calculators can be added very simply and they can be defined in
+user code. Specific guidelines are defined in the module
+dedicated to each type of calculator in :mod:`.calculators`.
+
+A simple example of adding a new calculator in user code.
+
+.. code-block:: python
+
+    class NewEnergyCalculator(EnergyCalculator):
+        def energy(self, mol, conformer=-1):
+            return 15
+
+    energy_calc = NewEnergyCalculator()
+    # Calculate the energy with the new calculator.
+    energy_calc.energy(mol)
+
+
+Note that you can also modify the behaviour of existing calculators in
+your code, some common patterns are described in
+:doc:`modifying_calculators`.
+
+Saving Calculator Results
+.........................
+
+If you want to save the results which your calculator found you should
+set ``use_cache=True`` and then you can simply use :module:`pickle`
+to dump and load the calculator object. You can inspect the saved
+values by looking at the :attr:`cache` attribute.
 
 Calculating Molecular Properties
 ................................
 
 ``stk`` provides a variety of methods to calculate molecular properties.
 What methods can be used depends on what kind of molecule object is created.
-All molecules can use methods defined in :class:`.Molecule`. All
-building blocks can use methods in :class:`.StructUnit` in addition to this.
-Assembled molecules can use additional methods provided by :class:`.MacroMolecule`.
+Note that all molecules can use methods defined in :class:`.Molecule`.
 
 Here are some examples:
 
 .. code-block:: python
 
-    # Calculate the energy of a molecule using rdkit and the UFF force field.
-    mol.energy.rdkit('uff')
-    # Calculate the energy of a molecule using MacroModel. Using force field
-    # number 16 (OPLS3).
-    mol.energy.marcomodel(16, '/opt/schrodinger2017-4')
     # Calculate the maximum diameter of of a molecule.
     mol.max_diameter()
     # Calculate the cavity size of a cage molecule.
@@ -315,23 +502,6 @@ Here are some examples:
     mol.center_of_mass()
     # Get the atomic symbol of atom with id of 13.
     mol.atom_symbol(13)
-
-Something to note about energy calculations, is that each time you run
-the method, the result gets saved. For example,
-
-
-.. code-block:: python
-
-    mol.energy.values # {}
-    mol.energy.rdkit('uff') # Returns 16.05
-    mol.energy.values # {FunctionData('rdkit', forcefield='uff'): 16.501}
-    mol.energy.macromodel(forcefield=16,
-                          macromodel_path='path/to/macromodel/dir') # Returns 200
-    mol.energy.values # {FunctionData('rdkit', forcefield='uff'): 16.501,
-                      #  FunctionData('macromodel', forcefield=16): 200}
-
-This can come in handy if you do not want to repeat expensive calculations.
-
 
 Geometric Manipulations
 .......................
@@ -414,10 +584,8 @@ Most methods and functions in ``stk`` also support conformers.
 
     # And so on ...
 
-
 Dealing with Multiple Molecules
 ...............................
-
 
 When batches of molecules are created, it is often desirable to optimize
 them all at once. By placing the molecules in a :class:`.Population`
@@ -425,8 +593,9 @@ instance, all molecules can be optimized in parallel.
 
 .. code-block:: python
 
+    mmff = MMFF()
     pop = Population(cage, cage2, cage3)
-    pop.optimize(FunctionData('macromodel_opt', macromodel_path='/opt/schrodinger2017-4'))
+    pop.optimize(mmff)
 
 
 In addition to this, the :class:`.Population` class provides some handy
@@ -479,21 +648,18 @@ and recover the ``stk`` objects later
 Automated Molecular Design with Genetic Algorithms
 ..................................................
 
-Via the :mod:`.ga` module, ``stk`` includes a genetic algorithm which
+``stk`` includes a genetic algorithm which
 can be used to evolve molecules that fulfil user defined design criteria.
 The genetic algorithm can be run from the command line using::
 
     $ python -m stk.ga input_file.py
 
-The input file is a simple python script which defines the mutation,
-crossover, selection and other functions the genetic algorithm
-should use. For details on how to build an input file see :class:`.GAInput`
-and :doc:`ga_input_file_examples`.
+The input file is a simple python script which defines the
+calculators the genetic algorithm should use, as well as some optional
+parameters.
 
 The genetic algorithm automatically works with any molecules that ``stk``
-can construct, just make sure you define an appropriate fitness function.
-It will also work with :class:`StructUnit` if you do not wish to use
-``stk``'s construction capabilities.
+uses, both :class:`.StructUnit` and :class:`.MacroMolecule` objects.
 
 Take for example the following input file which runs the GA on polymers
 and selects building blocks which have the most atoms.
