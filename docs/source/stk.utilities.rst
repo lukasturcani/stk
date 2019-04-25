@@ -1,5 +1,10 @@
-stk\.utilities package
-======================
+stk.utilities package
+=====================
+
+.. automodule:: stk.utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Submodules
 ----------
@@ -9,10 +14,3 @@ Submodules
    stk.utilities.mplogging
    stk.utilities.utilities
 
-Module contents
----------------
-
-.. automodule:: stk.utilities
-    :members:
-    :undoc-members:
-    :show-inheritance:

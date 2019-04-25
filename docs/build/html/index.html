@@ -88,7 +88,10 @@
 <li><a class="reference internal" href="#other-materials">Other Materials</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#other-features">Other Features</a><ul>
+<li><a class="reference internal" href="#calculators">Calculators</a><ul>
+<li><a class="reference internal" href="#combining-calculators">Combining Calculators</a></li>
+<li><a class="reference internal" href="#making-new-calculators">Making New Calculators</a></li>
+<li><a class="reference internal" href="#saving-calculator-results">Saving Calculator Results</a></li>
 <li><a class="reference internal" href="#calculating-molecular-properties">Calculating Molecular Properties</a></li>
 <li><a class="reference internal" href="#geometric-manipulations">Geometric Manipulations</a></li>
 </ul>
@@ -216,9 +219,11 @@ the number of repeating units is <code class="docutils literal notranslate"><spa
 <img alt="_images/polymer.png" src="_images/polymer.png" />
 <p>Notice that the functional group has disappeared and been replaced by
 new bonds between the monomers. The new bonds seem a little stretched,
-so we can optimize the structure using an optimization function defined in
-<a class="reference internal" href="stk.optimization.optimization.html#module-stk.optimization.optimization" title="stk.optimization.optimization"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optimization</span></code></a>, in this case <a class="reference internal" href="stk.optimization.optimization.html#stk.optimization.optimization.rdkit_ETKDG" title="stk.optimization.optimization.rdkit_ETKDG"><code class="xref py py-func docutils literal notranslate"><span class="pre">rdkit_ETKDG()</span></code></a></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rdkit_ETKDG</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+so we can optimize the structure using an <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>
+defined in <code class="xref py py-mod docutils literal notranslate"><span class="pre">optimization</span></code>, in this case
+<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.MMFF" title="stk.calculators.optimization.optimizers.MMFF"><code class="xref py py-class docutils literal notranslate"><span class="pre">MMFF</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
+<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Again, the polymer can be written to a file</p>
@@ -290,17 +295,21 @@ This is because a different topology instance was provided during initialization
 </div>
 <img alt="_images/cage3.png" src="_images/cage3.png" />
 <p>While we assembled some cages, the constructed structures are not
-particularly realistic. We can optimize the geometry using an optimization
-function:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
-<span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage2</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
-<span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage3</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+particularly realistic. We can optimize the geometry using an
+<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macromodel</span> <span class="o">=</span> <span class="n">MacroModelForceField</span><span class="p">(</span>
+    <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;/opt/schrodinger2017-4&#39;</span>
+<span class="p">)</span>
+<span class="n">macromodel</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">cage</span><span class="p">)</span>
+<span class="n">macromodel</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">cage2</span><span class="p">)</span>
+<span class="n">macromodel</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">cage3</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="_images/cages_opt.png" src="_images/cages_opt.png" />
-<p>In this case the function <a class="reference internal" href="stk.optimization.macromodel.html#stk.optimization.macromodel.macromodel_opt" title="stk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal notranslate"><span class="pre">macromodel_opt()</span></code></a> was used. We could have
-used <a class="reference internal" href="stk.optimization.optimization.html#stk.optimization.optimization.rdkit_ETKDG" title="stk.optimization.optimization.rdkit_ETKDG"><code class="xref py py-func docutils literal notranslate"><span class="pre">rdkit_ETKDG()</span></code></a> again but chances are the structures would
-have been optimized quite poorly. The <a class="reference internal" href="stk.optimization.macromodel.html#stk.optimization.macromodel.macromodel_opt" title="stk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal notranslate"><span class="pre">macromodel_opt()</span></code></a> function
+<p>In this case the optimizer <a class="reference internal" href="stk.calculators.optimization.macromodel.html#stk.calculators.optimization.macromodel.MacroModelForceField" title="stk.calculators.optimization.macromodel.MacroModelForceField"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelForceField</span></code></a> was used.
+We could have used <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.MMFF" title="stk.calculators.optimization.optimizers.MMFF"><code class="xref py py-class docutils literal notranslate"><span class="pre">MMFF</span></code></a> again but chances are the structures
+would have been optimized quite poorly. The
+<a class="reference internal" href="stk.calculators.optimization.macromodel.html#stk.calculators.optimization.macromodel.MacroModelForceField" title="stk.calculators.optimization.macromodel.MacroModelForceField"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelForceField</span></code></a> optimizer
 requires a valid <code class="docutils literal notranslate"><span class="pre">MacroModel</span></code> installation with a working license.
 The argument <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-4'</span></code> is the path to the installation.</p>
 <p>Note that there are many more cage topologies available (14+), which
@@ -359,29 +368,187 @@ of each COF. This is done analogously to the organic cage case so reading
 </div>
 <div class="section" id="other-materials">
 <h3>Other Materials<a class="headerlink" href="#other-materials" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">stk</span></code> is a work in progress and currently supports only the above classes
-of materials out of the box. However, <code class="docutils literal notranslate"><span class="pre">stk</span></code> was designed to be easy
-extend to other classes of molecules.
-For a guide on how this can be done
-see, <a class="reference internal" href="#extending-stk"><span class="std std-ref">Extending stk</span></a>.</p>
+<p>Other materials defined by <code class="docutils literal notranslate"><span class="pre">stk</span></code> can be found in
+<a class="reference internal" href="stk.molecular.topologies.html#module-stk.molecular.topologies" title="stk.molecular.topologies"><code class="xref py py-mod docutils literal notranslate"><span class="pre">molecular.topologies</span></code></a>. In addition to this, <code class="docutils literal notranslate"><span class="pre">stk</span></code> was designed
+to be easy extend to other classes of molecules. For a guide on how this
+can be done see, <a class="reference internal" href="#extending-stk"><span class="std std-ref">Extending stk</span></a>.</p>
 </div>
 </div>
-<div class="section" id="other-features">
-<h2>Other Features<a class="headerlink" href="#other-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="calculators">
+<h2>Calculators<a class="headerlink" href="#calculators" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">stk</span></code> makes extensive use of calculator objects. Calculators are a
+very general pattern for performing operations on molecules. All
+calculators are objects with a special method, used to perform the
+calculation. You have already been introduced to one type of calculator,
+the <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>. An optimizer has a special method called
+<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a>, which optimizes a molecule. Here is
+another example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">polymer</span> <span class="o">=</span> <span class="n">Polymer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="n">optimizer1</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
+
+<span class="c1"># Optimize mol with mmff.</span>
+<span class="n">optimizer1</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="c1"># Optimize polymer conformer 2 with mmff.</span>
+<span class="n">optimizer2</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Other types of calculators will have different special methods used to
+perform calculations on molecules. For example, an
+<a class="reference internal" href="stk.calculators.energy.energy_calculators.html#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a> will define an
+<a class="reference internal" href="stk.calculators.energy.energy_calculators.html#stk.calculators.energy.energy_calculators.EnergyCalculator.energy" title="stk.calculators.energy.energy_calculators.EnergyCalculator.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a> method. This method calculates the
+energy of the molecule</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mmff_energy</span> <span class="o">=</span> <span class="n">MMFFEnergy</span><span class="p">()</span>
+<span class="n">uff_energy</span> <span class="o">=</span> <span class="n">UFFEnergy</span><span class="p">()</span>
+
+<span class="c1"># Calculate the energy of mol conformer 1 with the mmff force field.</span>
+<span class="n">mol_mmff_energy</span> <span class="o">=</span> <span class="n">mmff_energy</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Calculate the energy of polymer conformer 10 with the uff force field.</span>
+<span class="n">polymer_uff_energy</span> <span class="o">=</span> <span class="n">uff_energy</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>All genetic algorithm operations are also implemented through
+calculators, take for example a <a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> such as
+<code class="xref py py-class docutils literal notranslate"><span class="pre">RandomTopology</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">topologies</span> <span class="o">=</span> <span class="p">[</span><span class="n">EightPlusTwelve</span><span class="p">(),</span> <span class="n">FourPlusSix</span><span class="p">(),</span> <span class="n">Dodecahedron</span><span class="p">()]</span>
+<span class="n">random_top</span> <span class="o">=</span> <span class="n">RandomTopology</span><span class="p">(</span><span class="n">topologies</span><span class="p">)</span>
+
+<span class="c1"># Assume bb1 and bb2 are StructUnit2 and StructUnit3 objects.</span>
+<span class="n">cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">SixPlusNine</span><span class="p">())</span>
+
+<span class="c1"># Perform a mutation.</span>
+<span class="n">mutant</span> <span class="o">=</span> <span class="n">random_top</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">cage</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A <a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> is a calculator which implements a
+<a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.Mutator.mutate" title="stk.calculators.ga.mutators.Mutator.mutate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mutate()</span></code></a> method. This method takes a molecule and
+returns a mutant, <em>i.e.</em> a modified version, of that molecule.
+In this example, the <code class="docutils literal notranslate"><span class="pre">random_top</span></code> is a <a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a>, which replaces
+the topology of a molecule with a new one, in order to generate the mutant.
+In this case, the new topologies would be one of <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.EightPlusTwelve" title="stk.molecular.topologies.cage.two_plus_three.EightPlusTwelve"><code class="xref py py-class docutils literal notranslate"><span class="pre">EightPlusTwelve</span></code></a>,
+<a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.FourPlusSix" title="stk.molecular.topologies.cage.two_plus_three.FourPlusSix"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourPlusSix</span></code></a> or <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.Dodecahedron" title="stk.molecular.topologies.cage.two_plus_three.Dodecahedron"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dodecahedron</span></code></a>.</p>
+<p>Calculators often support additional options to modify their behaviour.
+For example, calculator of type <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> or
+<a class="reference internal" href="stk.calculators.energy.energy_calculators.html#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a> support caching. This means that if the
+same molecule and conformer is supplied to the calculator, it will not
+run the optimization or energy calculation again, it will return the
+previously calculated value</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example of caching with optimizers.</span>
+<span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
+<span class="n">caching_mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Performs an optimization on mol.</span>
+<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="c1"># Performs a second optimization on mol.</span>
+<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+<span class="c1"># Performs an optimization on mol.</span>
+<span class="n">cached_mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="c1"># Does not peform an optimization on mol.</span>
+<span class="n">cached_mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+<span class="c1"># Make a non-caching and a caching uff energy calculator.</span>
+<span class="n">uff_energy</span> <span class="o">=</span> <span class="n">UFF</span><span class="p">()</span>
+<span class="n">caching_uff_energy</span> <span class="o">=</span> <span class="n">UFF</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Calculate the energy twice.</span>
+<span class="n">uff_energy</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="n">uff_energy</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+<span class="c1"># Calculate the energy.</span>
+<span class="n">caching_uff_energy</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="c1"># Does not calculate the energy again, returns the previous value.</span>
+<span class="n">caching_uff_energy</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>More information on each type of calculator can be seen by visiting the
+module dedicated to that calculator, <a class="reference internal" href="stk.calculators.html#module-stk.calculators" title="stk.calculators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calculators</span></code></a>.</p>
+<div class="section" id="combining-calculators">
+<h3>Combining Calculators<a class="headerlink" href="#combining-calculators" title="Permalink to this headline">¶</a></h3>
+<p>Calculators can be combined to create complex behaviour on the fly.
+For example, we may wish to make a 2 step optimization process. First,
+we perform an optimization using the MMFF force field and the run
+a MacroModel molecular dynamics conformer search with
+<a class="reference internal" href="stk.calculators.optimization.macromodel.html#stk.calculators.optimization.macromodel.MacroModelMD" title="stk.calculators.optimization.macromodel.MacroModelMD"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelMD</span></code></a>. The obvious way to do
+this is to run the two optimizers in sequence</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
+<span class="n">macromodel</span> <span class="o">=</span> <span class="n">MacroModelMD</span><span class="p">(</span><span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+
+<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="n">macromodel</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, there is a better way! We can use an optimizer called
+<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.OptimizerSequence" title="stk.calculators.optimization.optimizers.OptimizerSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizerSequence</span></code></a>. The <code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code>
+method of this optimizer calls the <code class="xref py py-class docutils literal notranslate"><span class="pre">optimize</span></code> methods
+of the optimizers it was initialized with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">opt_sequence</span> <span class="o">=</span> <span class="n">OptimizerSequence</span><span class="p">(</span><span class="n">mmff</span><span class="p">,</span> <span class="n">macromodel</span><span class="p">)</span>
+<span class="c1"># Optimize with mmff and then with macromodel.</span>
+<span class="n">opt_sequence</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This pattern is quite common and powerful. For example, we can take
+three different <a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> objects. Each of these defines
+a different <a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.Mutator.mutate" title="stk.calculators.ga.mutators.Mutator.mutate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mutate()</span></code></a> method. We want to apply one of
+these mutations at random. We can simply use <a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.RandomMutation" title="stk.calculators.ga.mutators.RandomMutation"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomMutation</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">random_bb</span> <span class="o">=</span> <span class="n">RandomBuildingBlock</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">similar_bb</span> <span class="o">=</span> <span class="n">SimilarBulidingBlock</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">random_topology</span> <span class="o">=</span> <span class="n">RandomTopology</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="n">random_mutation</span> <span class="o">=</span> <span class="n">RandomMutation</span><span class="p">(</span>
+    <span class="n">random_bb</span><span class="p">,</span>
+    <span class="n">similar_bb</span><span class="p">,</span>
+    <span class="n">random_topology</span>
+<span class="p">)</span>
+
+<span class="c1"># Use one of the mutate() methods of random_bb, similar_bb and</span>
+<span class="c1"># random_topology at random.</span>
+<span class="n">mutant1</span> <span class="o">=</span> <span class="n">random_mutation</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="c1"># The next call use a different mutation to the call above.</span>
+<span class="n">mutant2</span> <span class="o">=</span> <span class="n">random_mutation</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.RandomMutation.mutate" title="stk.calculators.ga.mutators.RandomMutation.mutate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RandomMutation.mutate()</span></code></a> method randomly selects a
+<a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> it was initialized with to carry out the mutation
+on its behalf.</p>
+</div>
+<div class="section" id="making-new-calculators">
+<h3>Making New Calculators<a class="headerlink" href="#making-new-calculators" title="Permalink to this headline">¶</a></h3>
+<p>New calculators can be added very simply and they can be defined in
+user code. Specific guidelines are defined in the module
+dedicated to each type of calculator in <a class="reference internal" href="stk.calculators.html#module-stk.calculators" title="stk.calculators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calculators</span></code></a>.</p>
+<p>A simple example of adding a new calculator in user code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">NewEnergyCalculator</span><span class="p">(</span><span class="n">EnergyCalculator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">15</span>
+
+<span class="n">energy_calc</span> <span class="o">=</span> <span class="n">NewEnergyCalculator</span><span class="p">()</span>
+<span class="c1"># Calculate the energy with the new calculator.</span>
+<span class="n">energy_calc</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that you can also modify the behaviour of existing calculators in
+your code, some common patterns are described in
+<a class="reference internal" href="modifying_calculators.html"><span class="doc">Modifying stk Calculators</span></a>.</p>
+</div>
+<div class="section" id="saving-calculator-results">
+<h3>Saving Calculator Results<a class="headerlink" href="#saving-calculator-results" title="Permalink to this headline">¶</a></h3>
+<p>If you want to save the results which your calculator found you should
+set <code class="docutils literal notranslate"><span class="pre">use_cache=True</span></code> and then you can simply use <code class="xref py py-mod docutils literal notranslate"><span class="pre">pickle</span></code>
+to dump and load the calculator object. You can inspect the saved
+values by looking at the <code class="xref py py-attr docutils literal notranslate"><span class="pre">cache</span></code> attribute.</p>
+</div>
 <div class="section" id="calculating-molecular-properties">
 <h3>Calculating Molecular Properties<a class="headerlink" href="#calculating-molecular-properties" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">stk</span></code> provides a variety of methods to calculate molecular properties.
 What methods can be used depends on what kind of molecule object is created.
-All molecules can use methods defined in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>. All
-building blocks can use methods in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> in addition to this.
-Assembled molecules can use additional methods provided by <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</p>
+Note that all molecules can use methods defined in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p>
 <p>Here are some examples:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate the energy of a molecule using rdkit and the UFF force field.</span>
-<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span>
-<span class="c1"># Calculate the energy of a molecule using MacroModel. Using force field</span>
-<span class="c1"># number 16 (OPLS3).</span>
-<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">marcomodel</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
-<span class="c1"># Calculate the maximum diameter of of a molecule.</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate the maximum diameter of of a molecule.</span>
 <span class="n">mol</span><span class="o">.</span><span class="n">max_diameter</span><span class="p">()</span>
 <span class="c1"># Calculate the cavity size of a cage molecule.</span>
 <span class="n">cage</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">()</span>
@@ -394,18 +561,6 @@ Assembled molecules can use additional methods provided by <a class="reference i
 <span class="n">mol</span><span class="o">.</span><span class="n">atom_symbol</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Something to note about energy calculations, is that each time you run
-the method, the result gets saved. For example,</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span> <span class="c1"># {}</span>
-<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span> <span class="c1"># Returns 16.05</span>
-<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span> <span class="c1"># {FunctionData(&#39;rdkit&#39;, forcefield=&#39;uff&#39;): 16.501}</span>
-<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">macromodel</span><span class="p">(</span><span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-                      <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;path/to/macromodel/dir&#39;</span><span class="p">)</span> <span class="c1"># Returns 200</span>
-<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span> <span class="c1"># {FunctionData(&#39;rdkit&#39;, forcefield=&#39;uff&#39;): 16.501,</span>
-                  <span class="c1">#  FunctionData(&#39;macromodel&#39;, forcefield=16): 200}</span>
-</pre></div>
-</div>
-<p>This can come in handy if you do not want to repeat expensive calculations.</p>
 </div>
 <div class="section" id="geometric-manipulations">
 <h3>Geometric Manipulations<a class="headerlink" href="#geometric-manipulations" title="Permalink to this headline">¶</a></h3>
@@ -472,13 +627,14 @@ constructing conformers of the <a class="reference internal" href="stk.molecular
 <div class="section" id="dealing-with-multiple-molecules">
 <h3>Dealing with Multiple Molecules<a class="headerlink" href="#dealing-with-multiple-molecules" title="Permalink to this headline">¶</a></h3>
 <p>When batches of molecules are created, it is often desirable to optimize
-them all at once. By placing the molecules in a <a class="reference internal" href="stk.population.html#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>
+them all at once. By placing the molecules in a <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>
 instance, all molecules can be optimized in parallel.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">cage</span><span class="p">,</span> <span class="n">cage2</span><span class="p">,</span> <span class="n">cage3</span><span class="p">)</span>
-<span class="n">pop</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;macromodel_opt&#39;</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
+<span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">cage</span><span class="p">,</span> <span class="n">cage2</span><span class="p">,</span> <span class="n">cage3</span><span class="p">)</span>
+<span class="n">pop</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mmff</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In addition to this, the <a class="reference internal" href="stk.population.html#stk.population.Population" title="stk.population.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> class provides some handy
+<p>In addition to this, the <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> class provides some handy
 tools to assemble large amounts of molecules at a time. For example if
 we want to create every possible cage from a set of building blocks and
 topologies:</p>
@@ -516,207 +672,206 @@ all the molecules to a folder</p>
 </div>
 <div class="section" id="automated-molecular-design-with-genetic-algorithms">
 <h3>Automated Molecular Design with Genetic Algorithms<a class="headerlink" href="#automated-molecular-design-with-genetic-algorithms" title="Permalink to this headline">¶</a></h3>
-<p>Via the <a class="reference internal" href="stk.ga.html#module-stk.ga" title="stk.ga"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ga</span></code></a> module, <code class="docutils literal notranslate"><span class="pre">stk</span></code> includes a genetic algorithm which
+<p><code class="docutils literal notranslate"><span class="pre">stk</span></code> includes a genetic algorithm which
 can be used to evolve molecules that fulfil user defined design criteria.
 The genetic algorithm can be run from the command line using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m stk.ga input_file.py
 </pre></div>
 </div>
-<p>The input file is a simple python script which defines the mutation,
-crossover, selection and other functions the genetic algorithm
-should use. For details on how to build an input file see <a class="reference internal" href="stk.ga.input.html#stk.ga.input.GAInput" title="stk.ga.input.GAInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAInput</span></code></a>
-and <a class="reference internal" href="ga_input_file_examples.html"><span class="doc">&lt;no title&gt;</span></a>.</p>
+<p>The input file is a simple python script which defines the
+calculators the genetic algorithm should use, as well as some optional
+parameters.</p>
 <p>The genetic algorithm automatically works with any molecules that <code class="docutils literal notranslate"><span class="pre">stk</span></code>
-can construct, just make sure you define an appropriate fitness function.
-It will also work with <code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code> if you do not wish to use
-<code class="docutils literal notranslate"><span class="pre">stk</span></code>’s construction capabilities.</p>
+uses, both <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> and <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects.</p>
 <p>Take for example the following input file which runs the GA on polymers
 and selects building blocks which have the most atoms.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># big_monomers.py</span>
-
-<span class="c1"># ################################################################</span>
-<span class="c1"># Import stuff.</span>
-<span class="c1"># ################################################################</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># #####################################################################</span>
+<span class="c1"># Imports.</span>
+<span class="c1"># #####################################################################</span>
 
 <span class="kn">import</span> <span class="nn">stk</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Number of CPU cores to use.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Set the number of cores to use.</span>
+<span class="c1"># #####################################################################</span>
 
+<span class="c1"># This argument is optional, will default to use all CPU cores on</span>
+<span class="c1"># your PC.</span>
 <span class="n">processes</span> <span class="o">=</span> <span class="mi">1</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Disable debug population dumps.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Set logging level.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="n">pop_dumps</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c1"># This argument is optional, will default to logging.INFO</span>
+<span class="n">logging_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Population size.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Toggle the writing of a log file.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="n">pop_size</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="c1"># This argument is optional, will default to True.</span>
+<span class="n">log_file</span> <span class="o">=</span> <span class="bp">True</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Number of generations to create.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Toggle the dumping of generated molecules.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="n">num_generations</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="c1"># This argument is optional, will default to True.</span>
+<span class="n">database_dump</span> <span class="o">=</span> <span class="bp">True</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Number of mutation operations to perform each generation.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Toggle the dumping of GA generations.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="n">num_mutations</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># This argument is optional, will default to True.</span>
+<span class="n">progress_dump</span> <span class="o">=</span> <span class="bp">True</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Number of crossover operations to perform each generation.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Toggle the dumping of molecules at every generation.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="n">num_crossovers</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="c1"># This argument is optional, will default to False.</span>
+<span class="n">debug_dumps</span> <span class="o">=</span> <span class="bp">False</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Population initialization function.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Make a tar archive of the output.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="c1"># First create the StructUnit objects of the monomers. In</span>
-<span class="c1"># this simple example, they are simple hydro-carbon chains terminated</span>
-<span class="c1"># with either two amine or two aldehyde functional groups.</span>
-<span class="n">amines</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">aldehydes</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">):</span>
-    <span class="c1"># There are 2 different backbones, alkane, alkene.</span>
-    <span class="n">backbones</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="o">*</span><span class="n">i</span><span class="p">)]</span>
+<span class="c1"># This argument is optional, will default to False.</span>
+<span class="n">tar_output</span> <span class="o">=</span> <span class="bp">True</span>
 
-    <span class="k">for</span> <span class="n">backbone</span> <span class="ow">in</span> <span class="n">backbones</span><span class="p">:</span>
-        <span class="n">amine_smiles</span> <span class="o">=</span> <span class="s1">&#39;N&#39;</span> <span class="o">+</span> <span class="n">backbone</span> <span class="o">+</span> <span class="s1">&#39;N&#39;</span>
-        <span class="n">amine_monomer</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span>
-                                         <span class="n">smiles</span><span class="o">=</span><span class="n">amine_smiles</span><span class="p">,</span>
-                                         <span class="n">functional_groups</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
-        <span class="n">amines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amine_monomer</span><span class="p">)</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Initial population.</span>
+<span class="c1"># #####################################################################</span>
 
-        <span class="n">aldehyde_smiles</span> <span class="o">=</span> <span class="s1">&#39;O=C&#39;</span> <span class="o">+</span> <span class="n">backbone</span> <span class="o">+</span> <span class="s1">&#39;C=O&#39;</span>
-        <span class="n">aldehyde_monomer</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span>
-                                        <span class="n">smiles</span><span class="o">=</span><span class="n">aldehyde_smiles</span><span class="p">,</span>
-                                        <span class="n">functional_groups</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
-        <span class="n">aldehydes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aldehyde_monomer</span><span class="p">)</span>
+<span class="c1"># Only the &quot;population&quot; variable must be defined in the input file.</span>
+<span class="c1"># The other variables defined in this section are to make the code</span>
+<span class="c1"># more readable.</span>
 
-<span class="c1"># List of the possible topologies the polymers can have. In this</span>
-<span class="c1"># simple example a single topology will suffice.</span>
-<span class="n">polymer_topologies</span> <span class="o">=</span> <span class="p">[</span><span class="n">stk</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">repeating_unit</span><span class="o">=</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span>
-                                 <span class="n">orientation</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                                 <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">carbon</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span>
+<span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;[Br]{carbon*i}[Br]&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bromine&#39;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">27</span><span class="p">)</span>
+<span class="p">]</span>
 
-<span class="c1"># Finally, define the function which is called to create the</span>
-<span class="c1"># initial GA population. The &quot;NAME&quot; key holds the name of an</span>
-<span class="c1"># initialization function of the GAPopulation class. The remaining</span>
-<span class="c1"># key-value pairs are additional parameters for that function.</span>
-<span class="c1"># Default parameters can be specified if desired.</span>
-<span class="n">init_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;init_random&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;macromol_class&#39;</span><span class="p">:</span> <span class="n">stk</span><span class="o">.</span><span class="n">Polymer</span><span class="p">,</span>
-             <span class="s1">&#39;building_blocks&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">amines</span><span class="p">,</span> <span class="n">aldehydes</span><span class="p">],</span>
-             <span class="s1">&#39;topologies&#39;</span><span class="p">:</span> <span class="n">polymer_topologies</span><span class="p">}</span>
+<span class="n">topologies</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">12</span><span class="p">)</span>
+<span class="p">]</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Selection function for selecting the next generation.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># population holds the initial population of the GA.</span>
+<span class="n">population</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">GAPopulation</span><span class="o">.</span><span class="n">init_random</span><span class="p">(</span><span class="n">stk</span><span class="o">.</span><span class="n">Polymer</span><span class="p">,</span>
+                                          <span class="p">[</span><span class="n">building_blocks</span><span class="p">],</span>
+                                          <span class="n">topologies</span><span class="p">,</span>
+                                          <span class="mi">25</span><span class="p">)</span>
 
-<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Selection class.</span>
-<span class="c1"># The remaining key-value pairs are additional parameters for that</span>
-<span class="c1"># method. The &quot;population&quot; parameter is not specified and any</span>
-<span class="c1"># default parameters can be specified if desired.</span>
-<span class="n">generational_select_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;stochastic_sampling&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;use_rank&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Selector for selecting the next generation.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Selection function for selecting parents.</span>
-<span class="c1"># ################################################################</span>
+<span class="n">generation_selector</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">SelectorSequence</span><span class="p">(</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">Fittest</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">Roulette</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="p">)</span>
 
-<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Selection class.</span>
-<span class="c1"># The remaining key-value pairs are additional parameters for that</span>
-<span class="c1"># method. The &quot;population&quot; parameter is not specified and any</span>
-<span class="c1"># default parameters can be specified if desired.</span>
-<span class="n">crossover_select_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;crossover_roulette&#39;</span><span class="p">,</span>
-                         <span class="s1">&#39;truncation&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Selector for selecting parents.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Selection function for selecting molecules for mutation.</span>
-<span class="c1"># ################################################################</span>
+<span class="n">crossover_selector</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">AboveAverage</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Selection class.</span>
-<span class="c1"># The remaining key-value pairs are additional parameters for that</span>
-<span class="c1"># method. The &quot;population&quot; parameter is not specified and any</span>
-<span class="c1"># default parameters can be specified if desired.</span>
-<span class="n">mutation_select_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;stochastic_sampling&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;truncation&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-                        <span class="s1">&#39;duplicates&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Selector for selecting molecules for mutation.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Crossover functions.</span>
-<span class="c1"># ################################################################</span>
+<span class="n">mutation_selector</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">SelectorFunnel</span><span class="p">(</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">AboveAverage</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">Roulette</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="p">)</span>
 
-<span class="c1"># In this example there only one crossover function will be used,</span>
-<span class="c1"># but can use multiple if we add them into the list.</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Crosser.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Crossover class.</span>
-<span class="c1"># The &quot;macro_mol&quot; parameters are not specified and any default</span>
-<span class="c1"># parameters can be specified optionally. All other parameters</span>
-<span class="c1"># must be specified as key-value pairs.</span>
-<span class="n">crossover_funcs</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;genetic_recombination&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">func_group_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">}]</span>
+<span class="n">crosser</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">Jumble</span><span class="p">(</span><span class="n">num_offspring_building_blocks</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Mutation functions.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Mutator.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="c1"># The &quot;NAME&quot; key holds the name of a method in the Mutation class.</span>
-<span class="c1"># The &quot;macro_mol&quot; parameter is not specified and any default</span>
-<span class="c1"># parameters can be specified optionally. All other parameters</span>
-<span class="c1"># must be specified as key-value pairs.</span>
+<span class="n">mutator</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">RandomMutation</span><span class="p">(</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">RandomTopology</span><span class="p">(</span><span class="n">topologies</span><span class="p">),</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">RandomBuildingBlock</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">mol</span><span class="p">:</span> <span class="bp">True</span><span class="p">),</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">SimilarBuildingBlock</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">mol</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+<span class="p">)</span>
 
-<span class="c1"># mutation_func1 substitutes the amine building block in the</span>
-<span class="c1"># molecule with one from the list &quot;amines&quot;, defined earlier.</span>
-<span class="n">mutation_func1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;random_bb&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;mols&#39;</span><span class="p">:</span> <span class="n">amines</span><span class="p">,</span>
-                  <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">func_group_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;amine&#39;</span><span class="p">}</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Optimizer.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="c1"># mutation_func2 substitutes the aldehyde building block in the</span>
-<span class="c1"># molecule with one from the list &quot;aldehydes&quot;, defined earlier.</span>
-<span class="n">mutation_func2</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;random_bb&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;mols&#39;</span><span class="p">:</span> <span class="n">aldehydes</span><span class="p">,</span>
-                  <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">func_group_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">}</span>
+<span class="c1"># Remember to set use_cache to True for the GA.</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">MMFF</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
-<span class="c1"># Here we tell the GA which mutation functions we want to use.</span>
-<span class="n">mutation_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">mutation_func1</span><span class="p">,</span> <span class="n">mutation_func2</span><span class="p">]</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Fitness calculator.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Optimization function.</span>
-<span class="c1"># ################################################################</span>
 
-<span class="c1"># In this example, for the sake of speed, we will not optimize</span>
-<span class="c1"># constructed polymers.</span>
+<span class="k">def</span> <span class="nf">num_atoms</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+    <span class="n">n_atoms</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+    <span class="c1"># Save the number of atoms in an attribute for later plotting.</span>
+    <span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">=</span> <span class="n">n_atoms</span>
+    <span class="k">return</span> <span class="n">n_atoms</span>
 
-<span class="c1"># The &quot;NAME&quot; key holds the name of a function</span>
-<span class="c1"># defined in the optimization.py module. The &quot;mol&quot; parameter is</span>
-<span class="c1"># not specified and any default parameters can be specified</span>
-<span class="c1"># optionally. All other parameters must be specified as key-value</span>
-<span class="c1"># pairs.</span>
 
-<span class="c1"># Note that &quot;do_not_optimize&quot; is the name of a function</span>
-<span class="c1"># in this module. It simply returns immediately and as a result does</span>
-<span class="c1"># no work.</span>
-<span class="n">opt_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;do_not_optimize&#39;</span><span class="p">}</span>
+<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">PropertyVector</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">)</span>
 
-<span class="c1"># ################################################################</span>
-<span class="c1"># Fitness function.</span>
-<span class="c1"># ################################################################</span>
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Fitness normalizer.</span>
+<span class="c1"># #####################################################################</span>
 
-<span class="c1"># The &quot;NAME&quot; key holds the name of a function defined in the</span>
-<span class="c1"># &quot;fitness.py&quot; module. The &quot;macro_mol&quot; parameter is not</span>
-<span class="c1"># specified and any default parameters can be specified if desired.</span>
-<span class="c1"># The remaining parameters must be specified as key-value pairs.</span>
-<span class="n">fitness_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;building_block_atoms&#39;</span><span class="p">}</span>
+<span class="c1"># This is an optional argument, will default to NullOptimizer.</span>
+
+<span class="c1"># The PropertyVector fitness calculator will set the fitness as</span>
+<span class="c1"># [n_atoms] use the Sum() fitness normalizer to convert the fitness to</span>
+<span class="c1"># just n_atoms^0.5. The sqrt is because we use the Power normalizer.</span>
+<span class="n">fitness_normalizer</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">NormalizerSequence</span><span class="p">(</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">Power</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">Sum</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Exit condition.</span>
+<span class="c1"># #####################################################################</span>
+
+<span class="n">exiter</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">NumGenerations</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+
+<span class="c1"># #####################################################################</span>
+<span class="c1"># Make plotters.</span>
+<span class="c1"># #####################################################################</span>
+
+<span class="c1"># This is an optional argument, no plotting will be made by default.</span>
+
+<span class="n">plotters</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">ProgressPlotter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;fitness_plot&#39;</span><span class="p">,</span>
+                        <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;fitness&#39;</span><span class="p">,</span>
+                        <span class="n">y_label</span><span class="o">=</span><span class="s1">&#39;Fitness&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">),</span>
+    <span class="n">stk</span><span class="o">.</span><span class="n">ProgressPlotter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;atom_number_plot&#39;</span><span class="p">,</span>
+                        <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;num_atoms&#39;</span><span class="p">,</span>
+                        <span class="n">y_label</span><span class="o">=</span><span class="s1">&#39;Number of Atoms&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="n">stk</span><span class="o">.</span><span class="n">SelectionPlotter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;generational_selection&#39;</span><span class="p">,</span>
+                     <span class="n">selector</span><span class="o">=</span><span class="n">generation_selector</span><span class="p">)</span>
+<span class="n">stk</span><span class="o">.</span><span class="n">SelectionPlotter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;crossover_selection&#39;</span><span class="p">,</span>
+                     <span class="n">selector</span><span class="o">=</span><span class="n">crossover_selector</span><span class="p">)</span>
+<span class="n">stk</span><span class="o">.</span><span class="n">SelectionPlotter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;mutation_selection&#39;</span><span class="p">,</span>
+                     <span class="n">selector</span><span class="o">=</span><span class="n">mutation_selector</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Running the genetic algorithm with this input file:</p>
@@ -726,10 +881,15 @@ and selects building blocks which have the most atoms.</p>
 <p>will produce the following directory structure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|--</span> <span class="n">stk_ga_runs</span>
 <span class="o">|</span>   <span class="o">|--</span> <span class="mi">0</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">counters</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_crossover_counter</span><span class="o">.</span><span class="n">png</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_mutation_counter</span><span class="o">.</span><span class="n">png</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selection_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">scratch</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">atom_number_plot</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">atom_number_plot</span><span class="o">.</span><span class="n">csv</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">fitness_plot</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">fitness_plot</span><span class="o">.</span><span class="n">csv</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">generational_selection_1</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">crossover_selection_1</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">mutation_selection_1</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">final_pop</span>
@@ -742,14 +902,11 @@ and selects building blocks which have the most atoms.</p>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">database</span><span class="o">.</span><span class="n">json</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">json</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">errors</span><span class="o">.</span><span class="n">log</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">png</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">csv</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">output</span><span class="o">.</span><span class="n">tgz</span>
 </pre></div>
 </div>
-<p>A glance at the evolutionary progress plot in <code class="docutils literal notranslate"><span class="pre">epp.png</span></code> will show us
-how well our GA did.</p>
+<p>A glance at the evolutionary progress plot in
+<code class="docutils literal notranslate"><span class="pre">scratch/fitness_plot.png</span></code> will show us how well our GA did.</p>
 <img alt="_images/epp.png" src="_images/epp.png" />
 <p>Running the genetic algorithm again:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m stk.ga big_monomers.py
@@ -780,25 +937,27 @@ how well our GA did.</p>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">output</span><span class="o">.</span><span class="n">tgz</span>
 <span class="o">|</span>
 <span class="o">|</span>   <span class="o">|--</span> <span class="mi">1</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">counters</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_crossover_counter</span><span class="o">.</span><span class="n">png</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_mutation_counter</span><span class="o">.</span><span class="n">png</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">gen_1_selection_counter</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">scratch</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">atom_number_plot</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">atom_number_plot</span><span class="o">.</span><span class="n">csv</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">fitness_plot</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">fitness_plot</span><span class="o">.</span><span class="n">csv</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">generational_selection_1</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">crossover_selection_1</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">mutation_selection_1</span><span class="o">.</span><span class="n">png</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">final_pop</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">41.</span><span class="n">mol</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">221.</span><span class="n">mol</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">1391.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">150.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">2160.</span><span class="n">mol</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="mf">9471.</span><span class="n">mol</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="o">...</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">big_monomers</span><span class="o">.</span><span class="n">py</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">database</span><span class="o">.</span><span class="n">json</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">json</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">errors</span><span class="o">.</span><span class="n">log</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">progress</span><span class="o">.</span><span class="n">log</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">png</span>
-<span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">epp</span><span class="o">.</span><span class="n">csv</span>
 <span class="o">|</span>   <span class="o">|</span>   <span class="o">|--</span> <span class="n">output</span><span class="o">.</span><span class="n">tgz</span>
 </pre></div>
 </div>
@@ -838,76 +997,44 @@ not need to be re-constructed, re-optimized or have fitness value
 re-calculated in any of the subsequent runs. The cached version
 of the molecule will be used.</p>
 <p>However, the molecular cache be pre-loaded even when the <code class="docutils literal notranslate"><span class="pre">-l</span></code> option is
-not used. The input file allows the definition of a variable
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">databases</span></code>, for example</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_inputfile.py</span>
+not used, simply load the molecules in the input file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some input_file.py</span>
 
-<span class="n">databases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;path/to/some/population1.json&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;path/to/some/other/population2.json&#39;</span><span class="p">]</span>
+<span class="c1"># There is no need to save this population into a variable.</span>
+<span class="c1"># It is enough to load the molecules to place them into the cache.</span>
+<span class="n">stk</span><span class="o">.</span><span class="n">Population</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;dumped_molecules.json&#39;</span><span class="p">,</span>
+                    <span class="n">stk</span><span class="o">.</span><span class="n">Molecule</span><span class="o">.</span><span class="n">from_dict</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If this variable is defined in the input file, any molecules present
-in the population dump files will be loaded into the cache before the
-GA starts. This means that any molecules found in these populations
-will not be re-optimized, or have their fitness value re-calculated
-if discovered by the GA.</p>
 <p>The output of a single GA consists of a number of files and
-directories. The <code class="docutils literal notranslate"><span class="pre">counter</span></code> directory holds <code class="docutils literal notranslate"><span class="pre">.png</span></code> files showing
+directories. The <code class="docutils literal notranslate"><span class="pre">scratch</span></code> directory holds any files created during
+the GA run. For example, the <code class="docutils literal notranslate"><span class="pre">.png</span></code> files showing
 how frequently a member of the population was selected for mutation,
 crossover and generational selection. For example, this is a
-crossover counter</p>
+mutation counter</p>
 <img alt="_images/counter_example.png" src="_images/counter_example.png" />
-<p>It shows that molecule <code class="docutils literal notranslate"><span class="pre">168</span></code> was selected twice for crossover, while molecules
-<code class="docutils literal notranslate"><span class="pre">60</span></code>, <code class="docutils literal notranslate"><span class="pre">170</span></code>, <code class="docutils literal notranslate"><span class="pre">167</span></code>, <code class="docutils literal notranslate"><span class="pre">63</span></code> and <code class="docutils literal notranslate"><span class="pre">153</span></code> were selected once. The
+<p>It shows that molecule <code class="docutils literal notranslate"><span class="pre">8</span></code> was selected three times for mutation, while molecules
+<code class="docutils literal notranslate"><span class="pre">40</span></code>, <code class="docutils literal notranslate"><span class="pre">23`</span></code> were selected once. The
 remaining molecules did not participate in crossover operations
 in that generation.</p>
-<p>If you do want want the GA to produce these files, simply tell the
-GA in the input file</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.py</span>
-
-<span class="n">counters</span> <span class="o">=</span> <span class="bp">False</span>
-</pre></div>
-</div>
 <p>The <code class="docutils literal notranslate"><span class="pre">final_pop</span></code> directory holds the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> files holding the
 structures of the last generation of molecules.
 The file <code class="docutils literal notranslate"><span class="pre">big_monomers.py</span></code> is a copy of the input file. The <code class="docutils literal notranslate"><span class="pre">database.json</span></code>
 file is a population dump file which holds every molecule produced by
-the GA during the run. This can be turned off with</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.py</span>
-
-<span class="n">database_dump</span> <span class="o">=</span> <span class="bp">False</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">progress.json</span></code> is also a population dump file. This population holds
+the GA during the run. <code class="docutils literal notranslate"><span class="pre">progress.json</span></code> is also a population dump file.
+This population holds
 every generation of the GA as a subpopulation. This is quite useful
-if you want to analyse the output of the GA generation-wise. It
-can be turned off with</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.py</span>
-
-<span class="n">progress_dump</span> <span class="o">=</span> <span class="bp">False</span>
-</pre></div>
-</div>
+if you want to analyse the output of the GA generation-wise.</p>
 <p><code class="docutils literal notranslate"><span class="pre">errors.log</span></code> is a file which contains every exception and its
 traceback encountered by the GA during its run.</p>
 <p><code class="docutils literal notranslate"><span class="pre">progress.log</span></code> is a file which lists which molecules make up each
 generation, and their respective fitness values.</p>
-<p><code class="docutils literal notranslate"><span class="pre">epp.csv</span></code> is a dumped <code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> which holds the data used
-make <code class="docutils literal notranslate"><span class="pre">epp.png</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">output.tgz</span></code> is a tarred and compressed copy of the output folder for
 the run.
 This means if you want to share you entire run output you can just
-share this file. It can be turned off with</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># some_input_file.png</span>
-
-<span class="n">tar_output</span> <span class="o">=</span> <span class="bp">False</span>
-</pre></div>
-</div>
+share this file.</p>
 <p>Finally, when running the GA the progress will be printed into
-stderr. The message should be relatively straightforward. One thing
-to note though is that during optimizations and fitness function
-calculation, any molecule that has already been optimized and had its
-fitness value calculated will be skipped, so that duplicate work is
-avoided. Briefly an example message</p>
+stderr. The message should be relatively straightforward, such as</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">======================================================================</span>
 
 <span class="mi">17</span><span class="p">:</span><span class="mi">42</span><span class="p">:</span><span class="mi">20</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">stk</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">mutation</span> <span class="o">-</span> <span class="n">Using</span> <span class="n">random_bb</span><span class="o">.</span>
@@ -915,7 +1042,7 @@ avoided. Briefly an example message</p>
 <span class="o">======================================================================</span>
 </pre></div>
 </div>
-<p>show the time, the level of the message which can be, in order of
+<p>which shows the time, the level of the message which can be, in order of
 priority DEBUG, INFO, WARNING, ERROR or CRITICAL, the module where
 the message originated and finally the message itself.</p>
 </div>
@@ -924,21 +1051,22 @@ the message originated and finally the message itself.</p>
 <span id="id1"></span><h2>Extending <code class="docutils literal notranslate"><span class="pre">stk</span></code><a class="headerlink" href="#extending-stk" title="Permalink to this headline">¶</a></h2>
 <p>Each module of <code class="docutils literal notranslate"><span class="pre">stk</span></code> has its own guidelines for adding new functionality.
 However, in almost all cases adding new features to <code class="docutils literal notranslate"><span class="pre">stk</span></code> only involves
-defining a simple function in the appropriate module or a method in the
-appropriate class.</p>
+defining a simple class in the appropriate module. All of the extensions
+can be done in user code so stk source code does not need to be
+modified directly in order to be extended.</p>
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference internal" href="stk.molecular.molecules.html#adding-macromolecules"><span class="std std-ref">Extending stk: Adding new macromolecules.</span></a></li>
 <li><a class="reference internal" href="stk.molecular.topologies.base.html#adding-topologies"><span class="std std-ref">Extending stk: Adding new topologies.</span></a></li>
 <li><a class="reference internal" href="stk.molecular.functional_groups.html#adding-functional-groups"><span class="std std-ref">Extending stk: Adding  more functional groups.</span></a></li>
-<li><a class="reference internal" href="stk.optimization.optimization.html#adding-optimization-functions"><span class="std std-ref">Extending stk: Adding optimization functions.</span></a></li>
-<li><a class="reference internal" href="stk.molecular.energy.html#adding-energy-functions"><span class="std std-ref">Extending stk: Adding more energy functions.</span></a></li>
-<li><a class="reference internal" href="stk.ga.mutation.html#adding-mutation-functions"><span class="std std-ref">Extending stk: Adding mutation functions.</span></a></li>
-<li><a class="reference internal" href="stk.ga.crossover.html#adding-crossover-functions"><span class="std std-ref">Extending stk: Adding crossover functions.</span></a></li>
-<li><a class="reference internal" href="stk.ga.fitness.html#adding-fitness-functions"><span class="std std-ref">Extending stk: Adding fitness functions.</span></a></li>
-<li><a class="reference internal" href="stk.ga.normalization.html#adding-normalization-functions"><span class="std std-ref">Extending stk: Adding normalization functions.</span></a></li>
-<li><a class="reference internal" href="stk.ga.selection.html#adding-selection-functions"><span class="std std-ref">Extending stk: Adding selection functions.</span></a></li>
-<li><a class="reference internal" href="stk.ga.ga_exit.html#adding-exit-functions"><span class="std std-ref">Extending stk: Adding exit functions.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.optimization.optimizers.html#adding-optimizers"><span class="std std-ref">Extending stk: Making new optimizers.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.energy.energy_calculators.html#adding-energy-calculators"><span class="std std-ref">Extending stk: Making new energy calculators.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.ga.mutators.html#adding-mutators"><span class="std std-ref">Extending stk: Making new mutators.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.ga.crossers.html#adding-crossers"><span class="std std-ref">Extending stk: Making new crossers.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.ga.fitness_calculators.html#adding-fitness-calculators"><span class="std std-ref">Extending stk: Making new fitness calculators.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.ga.fitness_normalizers.html#adding-fitness-normalizers"><span class="std std-ref">Extending stk: Making new fitness normalizers.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.ga.selectors.html#adding-selectors"><span class="std std-ref">Extending stk: Making new selectors.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.ga.exiters.html#adding-exiters"><span class="std std-ref">Extending stk: Making new exiters.</span></a></li>
 </ul>
 </div></blockquote>
 </div>
@@ -950,7 +1078,7 @@ appropriate class.</p>
 <li><a class="reference internal" href="stk.molecular.topologies.cof.html#cof-assembly"><span class="std std-ref">How the assembly process works for 2D COF topologies.</span></a></li>
 <li><a class="reference internal" href="advanced_cage_building.html"><span class="doc">Advanced Cage Building</span></a></li>
 <li><a class="reference internal" href="caching.html"><span class="doc">Caching</span></a></li>
-<li><a class="reference external" href="https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826">https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826</a></li>
+<li><a class="reference internal" href="modifying_calculators.html"><span class="doc">Modifying stk Calculators</span></a></li>
 </ul>
 </div></blockquote>
 </div>

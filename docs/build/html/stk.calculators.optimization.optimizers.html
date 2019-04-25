@@ -1,0 +1,781 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.calculators.optimization.optimizers module &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">stk.calculators.optimization.optimizers module</a><ul>
+<li><a class="reference internal" href="#extending-stk-making-new-optimizers">Extending stk: Making new optimizers.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">stk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>stk.calculators.optimization.optimizers module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stk.calculators.optimization.optimizers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-stk.calculators.optimization.optimizers">
+<span id="stk-calculators-optimization-optimizers-module"></span><h1>stk.calculators.optimization.optimizers module<a class="headerlink" href="#module-stk.calculators.optimization.optimizers" title="Permalink to this headline">¶</a></h1>
+<p>Defines optimizers.</p>
+<p>Optimizers are objects used to optimize molecules. Each optimizer is
+initialized with some settings and used to optimize a molecule
+with <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="kn">as</span> <span class="nn">rdkit</span>
+<span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
+<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+<span class="c1"># Optionally, a conformer can be provided.</span>
+<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Optimizers also work with MacroMolecule objects.</span>
+<span class="n">polymer</span> <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">mol</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">etkdg</span> <span class="o">=</span> <span class="n">RDKitEmbedder</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
+<span class="n">etkdg</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Sometimes it is desirable to chain multiple optimizations, one after
+another. For example, before running an optimization, it may be
+desirable to embed a molecule first, to generate an initial structure.
+<a class="reference internal" href="#stk.calculators.optimization.optimizers.OptimizerSequence" title="stk.calculators.optimization.optimizers.OptimizerSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizerSequence</span></code></a> may be used for this.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new optimizer which chains the previously defined</span>
+<span class="c1"># mmff and etkdg optimizers.</span>
+<span class="n">optimizer_sequence</span> <span class="o">=</span> <span class="n">OptimizerSequence</span><span class="p">(</span><span class="n">etkdg</span><span class="p">,</span> <span class="n">mmff</span><span class="p">)</span>
+
+<span class="c1"># Run each optimizer in sequence.</span>
+<span class="n">optimizer_sequence</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By default, running <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Optimizer.optimize()</span></code></a> twice in a row will
+perform an optimization a second time on a molecule. If we want to
+skip optimizations on molecules which have already been optimized
+we can use the <code class="xref py py-attr docutils literal notranslate"><span class="pre">use_cache</span></code> flag.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">caching_etkdg</span> <span class="o">=</span> <span class="n">RDKitEmbedder</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">(),</span> <span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1"># First optimize call runs an optimization.</span>
+<span class="n">caching_etkdg</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+<span class="c1"># Second call does nothing.</span>
+<span class="n">caching_etkdg</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Caching is done on a per <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> basis. Just because the
+molecule has been cached by one <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> instance does not
+mean that a different <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> instance will no longer
+optimize the molecule.</p>
+<div class="section" id="extending-stk-making-new-optimizers">
+<span id="adding-optimizers"></span><h2>Extending stk: Making new optimizers.<a class="headerlink" href="#extending-stk-making-new-optimizers" title="Permalink to this headline">¶</a></h2>
+<p>New optimizers can be made by simply making a class which inherits the
+<a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> class. In addition to this, the new class must
+define a <code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code> method. The method must take 2
+arguments a mandatory <cite>mol</cite> argument and an optional <cite>conformer</cite>
+argument. <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a> will take a molecule and change
+its structure however it likes. Beyond this there are no requirements.</p>
+<dl class="class">
+<dt id="stk.calculators.optimization.optimizers.CageOptimizerSequence">
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">CageOptimizerSequence</code><span class="sig-paren">(</span><em>*optimizers</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.CageOptimizerSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
+<p>Applies <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> objects to a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>.</p>
+<p>Before each <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> in the sequence is applied to the
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>, it is checked to see if it is collapsed. If it is
+collapsed, the optiimzation sequence ends immediately.</p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.CageOptimizerSequence.optimizers">
+<code class="descname">optimizers</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.CageOptimizerSequence.optimizers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> objects which are used to optimize a
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a> molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.CageOptimizerSequence.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.CageOptimizerSequence.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes a molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>) – The cage to be optimized.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.optimization.optimizers.MMFF">
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">MMFF</code><span class="sig-paren">(</span><em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.MMFF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
+<p>Use the MMFF force field to optimize molecules.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCNCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
+<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.MMFF.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.MMFF.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes a molecule with the MMFF force field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.optimization.optimizers.NullOptimizer">
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">NullOptimizer</code><span class="sig-paren">(</span><em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.NullOptimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
+<p>Does not perform optimizations.</p>
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.NullOptimizer.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.NullOptimizer.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does not optimize a molecule.</p>
+<p>This function just returns immediately without changing the
+molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – A molecule.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – A conformer.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.optimization.optimizers.Optimizer">
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">Optimizer</code><span class="sig-paren">(</span><em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.Optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A base class for optimizers.</p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.Optimizer.cache">
+<code class="descname">cache</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.Optimizer.cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cache</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="n">mol1</span><span class="p">,</span> <span class="n">conformer1</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">mol1</span><span class="p">,</span> <span class="n">conformer2</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">mol2</span><span class="p">,</span> <span class="n">conformer2</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>which holds every <code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code> and conformer optimized
+by the <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>. Here <code class="docutils literal notranslate"><span class="pre">mol1</span></code> and <code class="docutils literal notranslate"><span class="pre">mol2</span></code> are
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects and <code class="docutils literal notranslate"><span class="pre">conformer1</span></code> and
+<code class="docutils literal notranslate"><span class="pre">conformer2</span></code> are <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, which are the ids of the
+optimized conformers of the molecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.Optimizer.use_cache">
+<code class="descname">use_cache</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.Optimizer.use_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a> will not run twice on the same
+molecule and conformer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.Optimizer.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.Optimizer.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes a molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.optimization.optimizers.OptimizerSequence">
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">OptimizerSequence</code><span class="sig-paren">(</span><em>*optimizers</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.OptimizerSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
+<p>Applies optimizers in sequence.</p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.OptimizerSequence.optimizers">
+<code class="descname">optimizers</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.OptimizerSequence.optimizers" title="Permalink to this definition">¶</a></dt>
+<dd><p>A number of optimizers, each of which gets applied to a
+molecule, based on the order in this <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<p>Let’s say we want to embed a molecule with ETKDG first and then
+minimize it with the MMFF force field.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="kn">as</span> <span class="nn">rdkit</span>
+<span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCNCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">etkdg</span> <span class="o">=</span> <span class="n">RDKitEmbedder</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
+<span class="n">mmff</span> <span class="o">=</span> <span class="n">RDKitForceField</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFOptimizeMolecule</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">OptimizerPipeline</span><span class="p">(</span><span class="n">etkdg</span><span class="p">,</span> <span class="n">mmff</span><span class="p">)</span>
+<span class="n">optimizer</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.OptimizerSequence.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.OptimizerSequence.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Chains multiple <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> instances together.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.optimization.optimizers.RDKitEmbedder">
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">RDKitEmbedder</code><span class="sig-paren">(</span><em>params</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.RDKitEmbedder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
+<p>Uses <code class="xref py py-func docutils literal notranslate"><span class="pre">rdkit.EmbedMolecule()</span></code> to find an optimized structure.</p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.RDKitEmbedder.params">
+<code class="descname">params</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.RDKitEmbedder.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>The parameters used for the embedding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.EmbedParameters</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<p>Use ETKDG <a class="footnote-reference" href="#id2" id="id1">[1]</a> to generate an optimized structure.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="kn">as</span> <span class="nn">rdkit</span>
+<span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCNCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">embedder</span> <span class="o">=</span> <span class="n">RDKitEmbedder</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
+<span class="n">embedder</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654">http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</a></td></tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.RDKitEmbedder.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.RDKitEmbedder.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes a molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.optimization.optimizers.RaisingOptimizer">
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">RaisingOptimizer</code><span class="sig-paren">(</span><em>optimizer</em>, <em>fail_chance=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
+<p>Raises and optimizes at random.</p>
+<p>This optimizer is used for debugging to simulate optimization
+functions which sometimes completes successfully and sometimes
+randomly fails.</p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.RaisingOptimizer.optimizer">
+<code class="descname">optimizer</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizer.optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>When the optimizer does not fail, it uses this
+<a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> to optimize molecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.RaisingOptimizer.fail_chance">
+<code class="descname">fail_chance</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizer.fail_chance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The probability that the optimizer will raise an error each
+time <a class="reference internal" href="#stk.calculators.optimization.optimizers.RaisingOptimizer.optimize" title="stk.calculators.optimization.optimizers.RaisingOptimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a> is used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCNCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">etkdg</span> <span class="o">=</span> <span class="n">RDKitEmbedder</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
+<span class="n">partial_raiser</span> <span class="o">=</span> <span class="n">RaisingOptimizer</span><span class="p">(</span><span class="n">etkdg</span><span class="p">,</span> <span class="n">fail_chance</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c1"># 75 % chance an error will be raised by calling optimize.</span>
+<span class="n">partial_raiser</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.RaisingOptimizer.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizer.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes a molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#stk.calculators.optimization.optimizers.RaisingOptimizerError" title="stk.calculators.optimization.optimizers.RaisingOptimizerError"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaisingOptimizerError</span></code></a> – This error is raised at random.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="stk.calculators.optimization.optimizers.RaisingOptimizerError">
+<em class="property">exception </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">RaisingOptimizerError</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizerError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.optimization.optimizers.TryCatchOptimizer">
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">TryCatchOptimizer</code><span class="sig-paren">(</span><em>try_optimizer</em>, <em>catch_optimizer</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.TryCatchOptimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
+<p>Try to optimize with a <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>, use another on failure.</p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.TryCatchOptimizer.try_optimizer">
+<code class="descname">try_optimizer</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.TryCatchOptimizer.try_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The optimizer which is used initially to try and optimize a
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.TryCatchOptimizer.catch_optimizer">
+<code class="descname">catch_optimizer</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.TryCatchOptimizer.catch_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <a class="reference internal" href="#stk.calculators.optimization.optimizers.TryCatchOptimizer.try_optimizer" title="stk.calculators.optimization.optimizers.TryCatchOptimizer.try_optimizer"><code class="xref py py-attr docutils literal notranslate"><span class="pre">try_optimizer</span></code></a> raises an error, this optimizer is
+run on the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instead.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create some molecules to optimize.</span>
+<span class="n">mol1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCN&#39;</span><span class="p">,</span> <span class="p">[]</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">mol2</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;CCCCC&#39;</span><span class="p">)</span>
+<span class="n">mol3</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=CCCN&#39;</span><span class="p">)</span>
+
+<span class="c1"># Create an optimizer which may fail.</span>
+<span class="n">uff</span> <span class="o">=</span> <span class="n">UFF</span><span class="p">()</span>
+
+<span class="c1"># Create a backup optimizer.</span>
+<span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
+
+<span class="c1"># Make an optimizer which tries to run raiser and if that</span>
+<span class="c1"># raises an error, will run mmff on the molecule instead.</span>
+<span class="n">try_catch</span> <span class="o">=</span> <span class="n">TryCatchOptimizer</span><span class="p">(</span><span class="n">try_optimizer</span><span class="o">=</span><span class="n">uff</span><span class="p">,</span>
+                              <span class="n">catch_optimizer</span><span class="o">=</span><span class="n">mmff</span><span class="p">)</span>
+
+<span class="c1"># Optimize the molecules. In each case if the optimization with</span>
+<span class="c1"># UFF fails, MMFF is used to optimize the molecule instead.</span>
+<span class="n">try_catch</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol1</span><span class="p">)</span>
+<span class="n">try_catch</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol2</span><span class="p">)</span>
+<span class="n">try_catch</span><span class="o">.</span><span class="n">optimzie</span><span class="p">(</span><span class="n">mol3</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.TryCatchOptimizer.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.TryCatchOptimizer.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes a molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.optimization.optimizers.UFF">
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">UFF</code><span class="sig-paren">(</span><em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.UFF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
+<p>Use the UFF force field to optimize molecules.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCNCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">uff</span> <span class="o">=</span> <span class="n">UFF</span><span class="p">()</span>
+<span class="n">uff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.UFF.optimize">
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.UFF.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes a molecule with the UFF force field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="stk.calculators.optimization.optimizers._add_cache_use">
+<code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">_add_cache_use</code><span class="sig-paren">(</span><em>optimize</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers._add_cache_use" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a> use the <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.cache" title="stk.calculators.optimization.optimizers.Optimizer.cache"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cache</span></code></a>.</p>
+<p>Decorates <cite>optimize</cite> so that before running it checks if the
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and conformer have already been optimized by the
+optimizer. If so, and <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.use_cache" title="stk.calculators.optimization.optimizers.Optimizer.use_cache"><code class="xref py py-attr docutils literal notranslate"><span class="pre">use_cache</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+then the molecule is skipped and no optimization is performed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>optimize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which is to have skipping added to it.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The decorated function.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

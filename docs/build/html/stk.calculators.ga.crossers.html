@@ -1,0 +1,579 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.calculators.ga.crossers module &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">stk.calculators.ga.crossers module</a><ul>
+<li><a class="reference internal" href="#extending-stk-making-new-crossers">Extending stk: Making new crossers.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">stk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>stk.calculators.ga.crossers module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stk.calculators.ga.crossers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-stk.calculators.ga.crossers">
+<span id="stk-calculators-ga-crossers-module"></span><h1>stk.calculators.ga.crossers module<a class="headerlink" href="#module-stk.calculators.ga.crossers" title="Permalink to this headline">¶</a></h1>
+<p>Defines crossers.</p>
+<p>Crossers are objects which take a group of molecules and recombine
+them to produce offspring molecules. How crossers are used can be
+seen in the documentation of the various <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> classes,
+for example <a class="reference internal" href="#stk.calculators.ga.crossers.GeneticRecombination" title="stk.calculators.ga.crossers.GeneticRecombination"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticRecombination</span></code></a>,
+<a class="reference internal" href="#stk.calculators.ga.crossers.Jumble" title="stk.calculators.ga.crossers.Jumble"><code class="xref py py-class docutils literal notranslate"><span class="pre">Jumble</span></code></a> or <a class="reference internal" href="#stk.calculators.ga.crossers.RandomCrossover" title="stk.calculators.ga.crossers.RandomCrossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomCrossover</span></code></a>.</p>
+<div class="section" id="extending-stk-making-new-crossers">
+<span id="adding-crossers"></span><h2>Extending stk: Making new crossers.<a class="headerlink" href="#extending-stk-making-new-crossers" title="Permalink to this headline">¶</a></h2>
+<p>To add a new <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a>, make a new class which inherits
+<a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> and defines a method called
+<a class="reference internal" href="#stk.calculators.ga.crossers.Crosser.crossover" title="stk.calculators.ga.crossers.Crosser.crossover"><code class="xref py py-meth docutils literal notranslate"><span class="pre">crossover()</span></code></a>. The method is a generator, which can take
+any number of molecules and yields the offspring molecules.</p>
+<dl class="class">
+<dt id="stk.calculators.ga.crossers.Crosser">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.crossers.</code><code class="descname">Crosser</code><a class="headerlink" href="#stk.calculators.ga.crossers.Crosser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Carries out crossover on molecules.</p>
+<dl class="method">
+<dt id="stk.calculators.ga.crossers.Crosser.crossover">
+<code class="descname">crossover</code><span class="sig-paren">(</span><em>*mols</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.Crosser.crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a crossover operation on some molecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*mols</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecules on which a crossover operation is performed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The generated offspring.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.ga.crossers.GeneticRecombination">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.crossers.</code><code class="descname">GeneticRecombination</code><span class="sig-paren">(</span><em>key</em>, <em>random_yield_order=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.GeneticRecombination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.crossers.Crosser</span></code></a></p>
+<p>Recombine building blocks using biological systems as a model.</p>
+<p>Overall, this crosser mimics how animals and plants inherit
+DNA from their parents, except generalized to work with any
+number of parents. First it is worth discussing some
+terminology. A gene is a the smallest packet of genetic
+information. In animals, each gene can have multiple alleles.
+For example, there is a gene for hair color, and individual
+alleles for black, red, brown, etc. hair. This means that every
+person has a gene for hair color, but a person with black hair
+will have the black hair allele and a person with red hair will
+have the red hair allele. When two parents produce an
+offspring, the offspring will have a hair color gene and will
+inherit the allele of one of the parents at random. Therefore,
+if you have two parents, one with black hair and one with red
+hair, the offspring will either have black or red hair,
+depending on which allele they inherit.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">stk</span></code> molecules, each building block represents an allele.
+The question is, which gene is each building block an allele
+of? To answer that, let’s first construct a couple of
+building block molecules</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;filename1.mol&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;filename2.mol&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">bb3</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;filename3.mol&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">bb4</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;filename4.mol&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>We can define a function which analyzes a building block
+molecule and returns the gene it belongs to, for example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">determine_gene</span><span class="p">(</span><span class="n">building_block</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">building_block</span><span class="o">.</span><span class="n">func_group_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+<p>Here, we can see that the gene to which each building block
+molecule belongs is given by the functional group name.
+Therefore there is an <code class="docutils literal notranslate"><span class="pre">'amine'</span></code> gene which has two alleles
+<code class="docutils literal notranslate"><span class="pre">bb1</span></code> and <code class="docutils literal notranslate"><span class="pre">bb4</span></code> and there is an <code class="docutils literal notranslate"><span class="pre">'aldehyde'</span></code> gene which
+has two alleles <code class="docutils literal notranslate"><span class="pre">bb2</span></code> and <code class="docutils literal notranslate"><span class="pre">bb3</span></code>.</p>
+<p>Alternatively, we could have defined a function such as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">determine_gene</span><span class="p">(</span><span class="n">building_block</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">building_block</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+</pre></div>
+</div>
+<p>Now we can see that we end up with the gene called
+<code class="docutils literal notranslate"><span class="pre">'StructUnit2'</span></code> which has two alleles <code class="docutils literal notranslate"><span class="pre">bb1</span></code> and <code class="docutils literal notranslate"><span class="pre">bb3</span></code>
+and a second gene called <code class="docutils literal notranslate"><span class="pre">'StructUnit3'</span></code> which has the
+alleles <code class="docutils literal notranslate"><span class="pre">bb2</span></code> and <code class="docutils literal notranslate"><span class="pre">bb4</span></code>.</p>
+<p>To produce offspring molecules, this class categorizes
+each building block of the parent molecules into genes using
+the <cite>key</cite> parameter. Then, to generate a single offspring, it
+picks a random building block for every gene. The picked
+building blocks are used to construct the offspring. The
+topoogy of the offspring is one of the parent’s topologies.
+For obvious reasons, this approach works with any number of
+parents.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.crossers.GeneticRecombination.key">
+<code class="descname">key</code><a class="headerlink" href="#stk.calculators.ga.crossers.GeneticRecombination.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function, which takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> object
+and returns its gene or category. To produce an offspring,
+one of the building blocks from each category is picked
+at random.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.crossers.GeneticRecombination.random_yield_order">
+<code class="descname">random_yield_order</code><a class="headerlink" href="#stk.calculators.ga.crossers.GeneticRecombination.random_yield_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles if the order in which the building blocks are made
+should be random.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<p>Note that any number of parents can be used for the crossover.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the molecules which will be crossed.</span>
+<span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=CCCCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">polymer1</span>  <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">bb3</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb4</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=C[Si]CCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">polymer2</span>  <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb3</span><span class="p">,</span> <span class="n">bb4</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">bb5</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NC[Si]CN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb6</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=CCNNCCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">polymer3</span>  <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb5</span><span class="p">,</span> <span class="n">bb6</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Create the crosser.</span>
+<span class="n">recombination</span> <span class="o">=</span> <span class="n">GeneticRecombination</span><span class="p">(</span>
+                 <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">mol</span><span class="p">:</span> <span class="n">mol</span><span class="o">.</span><span class="n">func_group_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># Get the offspring molecules.</span>
+<span class="n">cohort1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+    <span class="n">recombination</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">polymer1</span><span class="p">,</span> <span class="n">polymer2</span><span class="p">,</span> <span class="n">polymer3</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Get a second set of offspring molecules.</span>
+<span class="n">cohort2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+    <span class="n">recombination</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">polymer1</span><span class="p">,</span> <span class="n">polymer2</span><span class="p">,</span> <span class="n">polymer3</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Make a third set of offspring molecules by crossing two of</span>
+<span class="c1"># the offspring molecules.</span>
+<span class="n">offspring1</span><span class="p">,</span> <span class="n">offspring2</span><span class="p">,</span> <span class="o">*</span><span class="n">rest</span> <span class="o">=</span> <span class="n">cohort1</span>
+<span class="n">cohort3</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+    <span class="n">recombination</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">offspring1</span><span class="p">,</span> <span class="n">offspring2</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.ga.crossers.GeneticRecombination.crossover">
+<code class="descname">crossover</code><span class="sig-paren">(</span><em>*mols</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.GeneticRecombination.crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a crossover operation on some molecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*mols</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecules to be crossed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The generated offspring.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.ga.crossers.Jumble">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.crossers.</code><code class="descname">Jumble</code><span class="sig-paren">(</span><em>num_offspring_building_blocks</em>, <em>duplicate_building_blocks=False</em>, <em>random_yield_order=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.Jumble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.crossers.Crosser</span></code></a></p>
+<p>Distributes all building blocks among offspring.</p>
+<p>Puts all the building blocks from each parent into one big pot
+and building blocks are drawn from the pot to generate the
+offspring. The offspring inherit the topology of one of the
+parents.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.crossers.Jumble.num_offspring_building_blocks">
+<code class="descname">num_offspring_building_blocks</code><a class="headerlink" href="#stk.calculators.ga.crossers.Jumble.num_offspring_building_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of building blocks each offspring is made from.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.crossers.Jumble.duplicate_building_blocks">
+<code class="descname">duplicate_building_blocks</code><a class="headerlink" href="#stk.calculators.ga.crossers.Jumble.duplicate_building_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether the building blocks used to construct the
+offspring must all be unique.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.crossers.Jumble.random_yield_order">
+<code class="descname">random_yield_order</code><a class="headerlink" href="#stk.calculators.ga.crossers.Jumble.random_yield_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles if the order in which the building blocks are made
+should be random.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<p>Note that any number of parents can be used for the crossover.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the molecules which will be crossed.</span>
+<span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=CCCCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">polymer1</span>  <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">bb3</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb4</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=C[Si]CCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">polymer2</span>  <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb3</span><span class="p">,</span> <span class="n">bb4</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">bb5</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NC[Si]CN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb6</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=CCNNCCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">polymer3</span>  <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb5</span><span class="p">,</span> <span class="n">bb6</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Create the crosser.</span>
+<span class="n">jumble</span> <span class="o">=</span> <span class="n">Jumble</span><span class="p">(</span><span class="n">num_offspring_building_blocks</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Get the offspring molecules.</span>
+<span class="n">cohort1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">jumble</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">polymer1</span><span class="p">,</span> <span class="n">polymer2</span><span class="p">,</span> <span class="n">polymer3</span><span class="p">))</span>
+
+<span class="c1"># Get a second set of offspring molecules.</span>
+<span class="n">cohort2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">jumble</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">polymer1</span><span class="p">,</span> <span class="n">polymer2</span><span class="p">,</span> <span class="n">polymer3</span><span class="p">))</span>
+
+<span class="c1"># Make a third set of offspring molecules by crossing two of</span>
+<span class="c1"># the offspring molecules.</span>
+<span class="n">offspring1</span><span class="p">,</span> <span class="n">offspring2</span><span class="p">,</span> <span class="o">*</span><span class="n">rest</span> <span class="o">=</span> <span class="n">cohort1</span>
+<span class="n">cohort3</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">jumble</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">offspring1</span><span class="p">,</span> <span class="n">offspring2</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.ga.crossers.Jumble.crossover">
+<code class="descname">crossover</code><span class="sig-paren">(</span><em>*mols</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.Jumble.crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Carries out crossover on some molecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*mols</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The parent molecules.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The offspring molecule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.ga.crossers.RandomCrossover">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.crossers.</code><code class="descname">RandomCrossover</code><span class="sig-paren">(</span><em>*crossers</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.RandomCrossover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.crossers.Crosser</span></code></a></p>
+<p>Uses a random <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> to carry out crossovers.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.crossers.RandomCrossover.crossers">
+<code class="descname">crossers</code><a class="headerlink" href="#stk.calculators.ga.crossers.RandomCrossover.crossers" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> objects which are used to carry out the
+crossovers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.crossers.RandomCrossover.weights">
+<code class="descname">weights</code><a class="headerlink" href="#stk.calculators.ga.crossers.RandomCrossover.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>The probability that each <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> will be selected to
+carry out a crossover.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<p>Note that the crossover operations used in this example accept
+any number of parents.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the molecules which will be crossed.</span>
+<span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=CCCCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">polymer1</span>  <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">bb3</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb4</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=C[Si]CCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">polymer2</span>  <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb3</span><span class="p">,</span> <span class="n">bb4</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">bb5</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NC[Si]CN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb6</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=CCNNCCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+<span class="n">polymer3</span>  <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb5</span><span class="p">,</span> <span class="n">bb6</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Create the crossers.</span>
+<span class="n">recombination</span> <span class="o">=</span> <span class="n">GeneticRecombination</span><span class="p">(</span>
+                 <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">mol</span><span class="p">:</span> <span class="n">mol</span><span class="o">.</span><span class="n">func_group_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">jumble</span> <span class="o">=</span> <span class="n">Jumble</span><span class="p">(</span><span class="n">num_offspring_building_blocks</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">random_crossover</span> <span class="o">=</span> <span class="n">RandomCrossover</span><span class="p">(</span><span class="n">recombination</span><span class="p">,</span> <span class="n">jumble</span><span class="p">)</span>
+
+<span class="c1"># Get the offspring molecules, either recombination or jumble</span>
+<span class="c1"># will be used to make them.</span>
+<span class="n">cohort1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+    <span class="n">random_crossover</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">polymer1</span><span class="p">,</span> <span class="n">polymer2</span><span class="p">,</span> <span class="n">polymer3</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Get a second set of offspring molecules, either recombination</span>
+<span class="c1"># or jumble will be used to make them.</span>
+<span class="n">cohort2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+    <span class="n">random_crossover</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">polymer1</span><span class="p">,</span> <span class="n">polymer2</span><span class="p">,</span> <span class="n">polymer3</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Make a third set of offspring molecules by crossing two of</span>
+<span class="c1"># the offspring molecules. Either recombination or jumble will</span>
+<span class="c1"># be used to make them.</span>
+<span class="n">offspring1</span><span class="p">,</span> <span class="n">offspring2</span><span class="p">,</span> <span class="o">*</span><span class="n">rest</span> <span class="o">=</span> <span class="n">cohort1</span>
+<span class="n">cohort3</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+    <span class="n">random_crossover</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">offspring1</span><span class="p">,</span> <span class="n">offspring2</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.ga.crossers.RandomCrossover.crossover">
+<code class="descname">crossover</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.RandomCrossover.crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create offspring with a <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> in <a class="reference internal" href="#stk.calculators.ga.crossers.RandomCrossover.crossers" title="stk.calculators.ga.crossers.RandomCrossover.crossers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">crossers</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>*args</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>) – Arguments passed to the chosen <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a>’s
+<a class="reference internal" href="#stk.calculators.ga.crossers.Crosser.crossover" title="stk.calculators.ga.crossers.Crosser.crossover"><code class="xref py py-meth docutils literal notranslate"><span class="pre">crossover()</span></code></a> method.</li>
+<li><strong>**kwargs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>) – Keyword arguments passed to the chosen <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a>’s
+<a class="reference internal" href="#stk.calculators.ga.crossers.Crosser.crossover" title="stk.calculators.ga.crossers.Crosser.crossover"><code class="xref py py-meth docutils literal notranslate"><span class="pre">crossover()</span></code></a> method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The generated offspring</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

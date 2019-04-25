@@ -1,5 +1,5 @@
-stk\.utilities\.utilities module
-================================
+stk.utilities.utilities module
+==============================
 
 .. automodule:: stk.utilities.utilities
     :members:

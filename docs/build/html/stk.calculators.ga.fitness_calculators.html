@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.calculators.ga.fitness_calculators module &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">stk.calculators.ga.fitness_calculators module</a><ul>
+<li><a class="reference internal" href="#extending-stk-making-new-fitness-calculators">Extending stk: Making new fitness calculators.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">stk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>stk.calculators.ga.fitness_calculators module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stk.calculators.ga.fitness_calculators.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-stk.calculators.ga.fitness_calculators">
+<span id="stk-calculators-ga-fitness-calculators-module"></span><h1>stk.calculators.ga.fitness_calculators module<a class="headerlink" href="#module-stk.calculators.ga.fitness_calculators" title="Permalink to this headline">¶</a></h1>
+<p>Module for defining fitness calculators.</p>
+<p>Fitness calculators are classes which inherit
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> and define a
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> method. This method is used to
+calculate the fitness of molecules. A <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> will
+hold calculated fitness values in
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.cache" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.cache"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FitnessCalculator.cache</span></code></a>. The method will also
+create a <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> attribute on the molecules it evaluates,
+which holds the fitness value. The values calculated by
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> can be any Python object, as long as
+the <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> value after <code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer.normalize</span></code> is
+applied is set to a positive, non-zero <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>. The calculated
+fitness may also be <code class="docutils literal notranslate"><span class="pre">None</span></code> to indicate a failed calculation.</p>
+<p>The <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> can be pickled if the calculated values
+are to be saved.</p>
+<p>For examples of how a <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> may be used, look
+at the documentation of classes which inherit it, for example
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.PropertyVector" title="stk.calculators.ga.fitness_calculators.PropertyVector"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyVector</span></code></a>.</p>
+<p>During the GA, fitness values are initially calculated by a
+fitness calculator, which is an instance of a
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a>. After this, fitness normalization takes
+place through an instance of a <a class="reference internal" href="stk.calculators.ga.fitness_normalizers.html#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a>. The
+difference between fitness calculation and normalization is that
+a fitness calculation always returns the same fitness value for a
+given molecule and conformer, while fitness normalization updates
+existing fitness values based on all the fitness values in a
+population, for example by dividing the fitness value of all molecules
+by the mean fitness across the population.</p>
+<div class="section" id="extending-stk-making-new-fitness-calculators">
+<span id="adding-fitness-calculators"></span><h2>Extending stk: Making new fitness calculators.<a class="headerlink" href="#extending-stk-making-new-fitness-calculators" title="Permalink to this headline">¶</a></h2>
+<p>A new class inheriting <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> must be created.
+The class must define a <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> method,
+which takes two arguments. The first is <cite>mol</cite> which takes a
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> object and is the molecule whose fitness is to be
+calculated. The second is <cite>conformer</cite> and it is an <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> holding
+the conformer id of the conformer used for calculating the fitness.
+<cite>conformer</cite> is should be an optional argument, defaulting to <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+<dl class="class">
+<dt id="stk.calculators.ga.fitness_calculators.FitnessCalculator">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">FitnessCalculator</code><span class="sig-paren">(</span><em>use_cache</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Calculates and stores fitness values of molecules.</p>
+<p>A <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> will automatically add a
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code></a> attribute to any <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects
+it calculates a fitness value for. The attribute will hold the
+calculated fitness value</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.fitness_calculators.FitnessCalculator.use_cache">
+<code class="descname">use_cache</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.use_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> then fitness values for molecules and conformers
+already held in <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.cache" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.cache"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cache</span></code></a> are not re-calculated
+and the value already stored is used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.fitness_calculators.FitnessCalculator.cache">
+<code class="descname">cache</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores fitness values of molecules in the form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cache</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="n">mol1</span><span class="p">,</span> <span class="n">conf1</span><span class="p">):</span> <span class="mf">12.2</span><span class="p">,</span>
+    <span class="p">(</span><span class="n">mol1</span><span class="p">,</span> <span class="n">conf3</span><span class="p">):</span> <span class="mf">124.31</span><span class="p">,</span>
+    <span class="p">(</span><span class="n">mol2</span><span class="p">,</span> <span class="n">conf1</span><span class="p">):</span> <span class="mf">0.2</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">mol1</span></code> and <code class="docutils literal notranslate"><span class="pre">mol2</span></code> are <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects
+and <code class="docutils literal notranslate"><span class="pre">conf1</span></code> and <code class="docutils literal notranslate"><span class="pre">conf3</span></code> are <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> which are the
+conformers used to calculate the fitness values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness">
+<code class="descname">fitness</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the fitness value of a molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule whose fitness should be calculated.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer of <cite>mol</cite> to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The fitness value of a <cite>conformer</cite> of <cite>mol</cite>. Can be
+<code class="docutils literal notranslate"><span class="pre">None</span></code> to indicate a failed calculation.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.ga.fitness_calculators.PropertyVector">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">PropertyVector</code><span class="sig-paren">(</span><em>*property_fns</em>, <em>use_cache=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.PropertyVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.fitness_calculators.FitnessCalculator</span></code></a></p>
+<p>Calculates the a set of properties of a molecule.</p>
+<p>This <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> applies a series of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code> to a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and appends each result
+to a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>. The <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> forms the property vector of
+the molecule and it is returned as the fitness value of the
+molecule.</p>
+<p>If any of the <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code> returns <code class="docutils literal notranslate"><span class="pre">None</span></code>, then instead of
+a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> the fitness value will be <code class="docutils literal notranslate"><span class="pre">None</span></code>. In essence,
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.PropertyVector" title="stk.calculators.ga.fitness_calculators.PropertyVector"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyVector</span></code></a> requires that all properties were
+successfully calculated.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.fitness_calculators.PropertyVector.property_fns">
+<code class="descname">property_fns</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.PropertyVector.property_fns" title="Permalink to this definition">¶</a></dt>
+<dd><p>A group of <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>, each of which is used to
+calculate a single property of the molecule. Each function must
+take 2 arguments, <cite>mol</cite> and <cite>conformer</cite>. <cite>mol</cite> accepts a
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> object and <cite>conformer</cite> accepts an
+<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. These are the molecule and the conformer id used
+to calculate the property.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<p>Use on <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> objects.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the molecules which are to have fitness values</span>
+<span class="c1"># evaluated.</span>
+<span class="n">mol1</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">mol2</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NC[Si]CCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">mol3</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=CCC(C=O)CCC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+
+<span class="c1"># Create the functions which calculate the molecule properties.</span>
+<span class="k">def</span> <span class="nf">atom_number</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">diameter</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mol</span><span class="o">.</span><span class="n">max_diamater</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+    <span class="n">energy_calculator</span> <span class="o">=</span> <span class="n">MMFFEnergy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">energy_calculator</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+
+<span class="c1"># Create the fitness calculator.</span>
+<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span><span class="n">atom_number</span><span class="p">,</span>
+                                    <span class="n">diameter</span><span class="p">,</span>
+                                    <span class="n">energy</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fitness vector of mol1. It will be a list</span>
+<span class="c1"># holding the number of atoms, diameter and energy of mol1,</span>
+<span class="c1"># respectively.</span>
+<span class="n">mol1_fitness</span> <span class="o">=</span> <span class="n">fitness_calculator</span><span class="o">.</span><span class="n">fitness</span><span class="p">(</span><span class="n">mol1</span><span class="p">)</span>
+<span class="c1"># The molecule will also have a fitness attribute holding the</span>
+<span class="c1"># result.</span>
+<span class="k">if</span> <span class="n">mol1</span><span class="o">.</span><span class="n">fitness</span> <span class="o">==</span> <span class="n">mol1_fitness</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Fitness attribute added.&#39;</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fitness vector of mol2. It will be a list</span>
+<span class="c1"># holding the number of atoms, diameter and energy of mol2,</span>
+<span class="c1"># respectively.</span>
+<span class="n">mol2_fitness</span> <span class="o">=</span> <span class="n">fitness_calculator</span><span class="o">.</span><span class="n">fitness</span><span class="p">(</span><span class="n">mol2</span><span class="p">)</span>
+<span class="c1"># The molecule will also have a fitness attribute holding the</span>
+<span class="c1"># result.</span>
+<span class="k">if</span> <span class="n">mol2</span><span class="o">.</span><span class="n">fitness</span> <span class="o">==</span> <span class="n">mol2_fitness</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Fitness attribute added.&#39;</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fitness vector of mol3. It will be a list</span>
+<span class="c1"># holding the number of atoms, diameter and energy of mol3,</span>
+<span class="c1"># respectively.</span>
+<span class="n">mol3_fitness</span> <span class="o">=</span> <span class="n">fitness_calculator</span><span class="o">.</span><span class="n">fitness</span><span class="p">(</span><span class="n">mol3</span><span class="p">)</span>
+<span class="c1"># The molecule will also have a fitness attribute holding the</span>
+<span class="c1"># result.</span>
+<span class="k">if</span> <span class="n">mol3</span><span class="o">.</span><span class="n">fitness</span> <span class="o">==</span> <span class="n">mol3_fitness</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Fitness attribute added.&#39;</span><span class="p">)</span>
+
+<span class="c1"># The fitness calculate will have all the results saved in</span>
+<span class="c1"># its cache attribute.</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fitness_calculator</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Use on <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects, <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Polymer" title="stk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polymer</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># First create molecules whose fitness value we wish to</span>
+<span class="c1"># caclculate.</span>
+<span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;[Br]CC[Br]&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bromine&#39;</span><span class="p">])</span>
+<span class="n">polymer1</span> <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb1</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;[Br]CCNNCC[Br]&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bromine&#39;</span><span class="p">])</span>
+<span class="n">polymer2</span> <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Create the functions which calculate the molecule properties.</span>
+<span class="k">def</span> <span class="nf">atom_number</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">diameter</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mol</span><span class="o">.</span><span class="n">max_diamater</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">monomer_number</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mol</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">repeating_unit</span><span class="p">)</span>
+
+<span class="c1"># Create the fitness calculator.</span>
+<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span><span class="n">atom_number</span><span class="p">,</span>
+                                    <span class="n">diameter</span><span class="p">,</span>
+                                    <span class="n">monomer_number</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fitness vector of polymer1. It will be a list</span>
+<span class="c1"># holding the number of atoms, diameter and the number of</span>
+<span class="c1"># monomers in polymer1, espectively.</span>
+<span class="n">polymer1_fitness</span> <span class="o">=</span> <span class="n">fitness_calculator</span><span class="o">.</span><span class="n">fitness</span><span class="p">(</span><span class="n">polymer1</span><span class="p">)</span>
+<span class="c1"># The molecule will also have a fitness attribute holding the</span>
+<span class="c1"># result.</span>
+<span class="k">if</span> <span class="n">polymer1</span><span class="o">.</span><span class="n">fitness</span> <span class="o">==</span> <span class="n">polymer1_fitness</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Fitness attribute added.&#39;</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fitness vector of polymer2. It will be a list</span>
+<span class="c1"># holding the number of atoms, diameter and the number of</span>
+<span class="c1"># monomers in polymer2, espectively.</span>
+<span class="n">polymer2_fitness</span> <span class="o">=</span> <span class="n">fitness_calculator</span><span class="o">.</span><span class="n">fitness</span><span class="p">(</span><span class="n">polymer2</span><span class="p">)</span>
+<span class="c1"># The molecule will also have a fitness attribute holding the</span>
+<span class="c1"># result.</span>
+<span class="k">if</span> <span class="n">polymer2</span><span class="o">.</span><span class="n">fitness</span> <span class="o">==</span> <span class="n">polymer2_fitness</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Fitness attribute added.&#39;</span><span class="p">)</span>
+
+<span class="c1"># The fitness calculate will have all the results saved in</span>
+<span class="c1"># its cache attribute.</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fitness_calculator</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Use on <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects, <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># First create molecules whose fitness value we wish to</span>
+<span class="c1"># caclculate.</span>
+<span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;O=CCCC(C=O)CC=O&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">])</span>
+
+<span class="n">cage1</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">())</span>
+<span class="n">cage2</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">EightPlusTwelve</span><span class="p">())</span>
+
+<span class="c1"># Create the functions which calculate the molecule properties.</span>
+<span class="k">def</span> <span class="nf">cavity_difference</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+    <span class="c1"># Calculate the difference from a cavity size of 5.</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">window_variance</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mol</span><span class="o">.</span><span class="n">window_variance</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+
+<span class="c1"># Create the fitness calculator.</span>
+<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span><span class="n">cavity_difference</span><span class="p">,</span>
+                                    <span class="n">window_variance</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fitness vector of cage1. It will be a list</span>
+<span class="c1"># holding how different the cavity size is from 5 Angstrom and</span>
+<span class="c1"># window variance, respectively.</span>
+<span class="n">cage1_fitness</span> <span class="o">=</span> <span class="n">fitness_calculator</span><span class="o">.</span><span class="n">fitness</span><span class="p">(</span><span class="n">cage1</span><span class="p">)</span>
+<span class="c1"># The molecule will also have a fitness attribute holding the</span>
+<span class="c1"># result.</span>
+<span class="k">if</span> <span class="n">cage1</span><span class="o">.</span><span class="n">fitness</span> <span class="o">==</span> <span class="n">cage1_fitness</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Fitness attribute added.&#39;</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fitness vector of cage2. It will be a list</span>
+<span class="c1"># holding how different the cavity size is from 5 Angstrom and</span>
+<span class="c1"># window variance, respectively.</span>
+<span class="n">cage2_fitness</span> <span class="o">=</span> <span class="n">fitness_calculator</span><span class="o">.</span><span class="n">fitness</span><span class="p">(</span><span class="n">cage2</span><span class="p">)</span>
+<span class="c1"># The molecule will also have a fitness attribute holding the</span>
+<span class="c1"># result.</span>
+<span class="k">if</span> <span class="n">cage2</span><span class="o">.</span><span class="n">fitness</span> <span class="o">==</span> <span class="n">cage2_fitness</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Fitness attribute added.&#39;</span><span class="p">)</span>
+
+<span class="c1"># The fitness calculate will have all the results saved in</span>
+<span class="c1"># its cache attribute.</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fitness_calculator</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.ga.fitness_calculators.PropertyVector.fitness">
+<code class="descname">fitness</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.PropertyVector.fitness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the property vector of a molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule whose property vector should be calculated.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer of <cite>mol</cite> to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of properties of the <cite>mol</cite>. Will be
+<code class="docutils literal notranslate"><span class="pre">None</span></code> if any of the</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">RaisingFitnessCalculator</code><span class="sig-paren">(</span><em>fitness_calculator</em>, <em>fail_chance=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.fitness_calculators.FitnessCalculator</span></code></a></p>
+<p>Raises and calculates fitness at random.</p>
+<p>This fitness calculator is used for debugging to simulate
+cases where the fitness calculation raises an error.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness_calculator">
+<code class="descname">fitness_calculator</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness_calculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>When the fitness calculator does not fail, it uses this
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> to calculate fitness of molecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fail_chance">
+<code class="descname">fail_chance</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fail_chance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The probability that the fitness calculator will raise an error
+each time <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> is used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCNCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">calc</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span><span class="k">lambda</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">:</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">())</span>
+<span class="n">partial_raiser</span> <span class="o">=</span> <span class="n">RaisingFitnessCalculator</span><span class="p">(</span><span class="n">calc</span><span class="p">,</span>
+                                          <span class="n">fail_chance</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c1"># 75 % chance an error will be raised by calling fitness.</span>
+<span class="n">partial_raiser</span><span class="o">.</span><span class="n">fitness</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness">
+<code class="descname">fitness</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the fitness of <cite>conformer</cite> of <cite>mol</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule whose fitness should be calculated.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer of <cite>mol</cite> to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Whatever the <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> method of
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness_calculator" title="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness_calculator"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness_calculator</span></code></a> returns.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError" title="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaisingFitnessCalculatorError</span></code></a> – This error is raised at random.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError">
+<em class="property">exception </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">RaisingFitnessCalculatorError</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stk.calculators.ga.fitness_calculators._add_cache_use">
+<code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">_add_cache_use</code><span class="sig-paren">(</span><em>fitness</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators._add_cache_use" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives fitness functions the option skip re-calculatations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fitness</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A fitness function, which is a
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> method of a
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The decorated fitness function.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="stk.calculators.ga.fitness_calculators._add_fitness_attribute_creation">
+<code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">_add_fitness_attribute_creation</code><span class="sig-paren">(</span><em>fitness</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators._add_fitness_attribute_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes fitness functions add a <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> attribute.</p>
+<p>The attribute is added to the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects evaluated
+by the <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fitness</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A fitness function, which is a
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> method of a
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The decorated fitness function.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,5 +1,5 @@
-stk\.molecular\.functional\_groups module
-=========================================
+stk.molecular.functional\_groups module
+=======================================
 
 .. automodule:: stk.molecular.functional_groups
     :members:

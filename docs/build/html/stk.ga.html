@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>stk.ga package &mdash; stk  documentation</title>
+  <title>stk.ga module &mdash; stk  documentation</title>
   
 
   
@@ -79,11 +79,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">stk.ga package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-stk.ga">Module contents</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">stk.ga module</a></li>
 </ul>
 </div>
             
@@ -129,7 +125,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>stk.ga package</li>
+      <li>stk.ga module</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -148,48 +144,167 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="stk-ga-package">
-<h1>stk.ga package<a class="headerlink" href="#stk-ga-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.crossover.html">stk.ga.crossover module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="stk.ga.crossover.html#extending-stk-adding-crossover-functions">Extending stk: Adding crossover functions.</a></li>
+  <div class="section" id="module-stk.ga">
+<span id="stk-ga-module"></span><h1>stk.ga module<a class="headerlink" href="#module-stk.ga" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="stk.ga.GAHistory">
+<em class="property">class </em><code class="descclassname">stk.ga.</code><code class="descname">GAHistory</code><span class="sig-paren">(</span><em>fitness_calculator</em>, <em>log_file</em>, <em>progress_dump</em>, <em>database_dump</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.GAHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Deals with logging the GA’s history.</p>
+<dl class="attribute">
+<dt id="stk.ga.GAHistory.fitness_calculator">
+<code class="descname">fitness_calculator</code><a class="headerlink" href="#stk.ga.GAHistory.fitness_calculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="stk.calculators.ga.fitness_calculators.html#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> used to calculate fitness
+values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.calculators.ga.fitness_calculators.html#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.ga.GAHistory.progress_dump">
+<code class="descname">progress_dump</code><a class="headerlink" href="#stk.ga.GAHistory.progress_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles dumping of <a class="reference internal" href="#stk.ga.GAHistory.progress" title="stk.ga.GAHistory.progress"><code class="xref py py-attr docutils literal notranslate"><span class="pre">progress</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.ga.GAHistory.database_dump">
+<code class="descname">database_dump</code><a class="headerlink" href="#stk.ga.GAHistory.database_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles dumping of <code class="xref py py-attr docutils literal notranslate"><span class="pre">dp_pop</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.ga.GAHistory.progress">
+<code class="descname">progress</code><a class="headerlink" href="#stk.ga.GAHistory.progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>A population where each subpopulation is a generation of the
+GA.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.populations.html#stk.populations.GAPopulation" title="stk.populations.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.ga.GAHistory.db_pop">
+<code class="descname">db_pop</code><a class="headerlink" href="#stk.ga.GAHistory.db_pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>A population which holds every molecule made by the GA.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.populations.html#stk.populations.GAPopulation" title="stk.populations.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a> or <code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.GAHistory.db">
+<code class="descname">db</code><span class="sig-paren">(</span><em>mols</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.GAHistory.db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds <cite>mols</cite> to <a class="reference internal" href="#stk.ga.GAHistory.db_pop" title="stk.ga.GAHistory.db_pop"><code class="xref py py-attr docutils literal notranslate"><span class="pre">db_pop</span></code></a>.</p>
+<p>Only molecules not already present are added.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mols</strong> (<a class="reference internal" href="stk.populations.html#stk.populations.GAPopulation" title="stk.populations.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – A group of molecules made by the GA.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.GAHistory.dump">
+<code class="descname">dump</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.GAHistory.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates output files for the GA run.</p>
+<p>The following files are created:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>progress.log</dt>
+<dd>This file holds the progress of the GA in text form.
+Each generation is reprented by the names of the
+molecules and their key and fitness.</dd>
+<dt>progress.json</dt>
+<dd>A population dump file holding <cite>progress</cite>. Only made if
+<a class="reference internal" href="#stk.ga.GAHistory.progress_dump" title="stk.ga.GAHistory.progress_dump"><code class="xref py py-attr docutils literal notranslate"><span class="pre">progress_dump</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</dd>
+<dt>database.json</dt>
+<dd>A population dump file holding every molecule made by
+the GA. Only made if <a class="reference internal" href="#stk.ga.GAHistory.db_pop" title="stk.ga.GAHistory.db_pop"><code class="xref py py-attr docutils literal notranslate"><span class="pre">db_pop</span></code></a> is not <code class="docutils literal notranslate"><span class="pre">None</span></code>.</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="stk.ga.GAHistory.log_file_content">
+<em class="property">static </em><code class="descname">log_file_content</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.GAHistory.log_file_content" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.GAHistory.log_pop">
+<code class="descname">log_pop</code><span class="sig-paren">(</span><em>logger</em>, <em>pop</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.GAHistory.log_pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes <cite>pop</cite> to <cite>logger</cite> at level <code class="docutils literal notranslate"><span class="pre">INFO</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>logger</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code>) – The logger object recording the GA.</li>
+<li><strong>pop</strong> (<a class="reference internal" href="stk.populations.html#stk.populations.GAPopulation" title="stk.populations.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a>) – A population which is to be added to the log.</li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.fitness.html">stk.ga.fitness module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="stk.ga.fitness.html#how-fitness-values-are-calculated">How fitness values are calculated.</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stk.ga.fitness.html#extending-stk-adding-fitness-functions">Extending stk: Adding fitness functions.</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stk.ga.fitness.html#a-note-on-plotting">A note on plotting.</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.ga_exit.html">stk.ga.ga_exit module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="stk.ga.ga_exit.html#extending-stk-adding-exit-functions">Extending stk: Adding exit functions.</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.ga_population.html">stk.ga.ga_population module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.ga_tools.html">stk.ga.ga_tools module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.input.html">stk.ga.input module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.mutation.html">stk.ga.mutation module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="stk.ga.mutation.html#extending-stk-adding-mutation-functions">Extending stk: Adding mutation functions.</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.normalization.html">stk.ga.normalization module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="stk.ga.normalization.html#extending-stk-adding-normalization-functions">Extending stk: Adding normalization functions.</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.plotting.html">stk.ga.plotting module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="stk.ga.selection.html">stk.ga.selection module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="stk.ga.selection.html#extending-stk-adding-selection-functions">Extending stk: Adding selection functions.</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="module-stk.ga">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-stk.ga" title="Permalink to this headline">¶</a></h2>
-</div>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.GAHistory.pop_log_content">
+<code class="descname">pop_log_content</code><span class="sig-paren">(</span><em>pop</em>, <em>underline</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.GAHistory.pop_log_content" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="stk.ga.ga_run">
+<code class="descclassname">stk.ga.</code><code class="descname">ga_run</code><span class="sig-paren">(</span><em>input_file</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.ga.ga_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the GA.</p>
+</dd></dl>
+
 </div>
 
 
