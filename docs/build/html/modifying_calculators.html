@@ -200,7 +200,7 @@ different molecules.</p>
 
 <span class="c1"># Add timing info to the calculators.</span>
 <span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span> <span class="o">=</span> <span class="n">timed_fn</span><span class="p">(</span><span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">)</span>
-<span class="n">energy_calculator</span> <span class="o">=</span> <span class="n">timed_fn</span><span class="p">(</span><span class="n">energy_calculator</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+<span class="n">energy_calculator</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">timed_fn</span><span class="p">(</span><span class="n">energy_calculator</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
 
 <span class="n">mol</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">StructUnit</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="c1"># These calls will print how long the function execution took.</span>
