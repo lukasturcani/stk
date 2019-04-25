@@ -128,8 +128,8 @@ class EnergyCalculator:
         which holds every :class:`Molecule` and conformer whose energy
         was calculated by the :class:`EnergyCalculator`. Here ``mol1``
         and ``mol2`` are :class:`.Molecule` objects and ``conformer1``
-        and ``conformer2`` are :class:`int`s, which are the ids of the
-        conformers passed to :meth:`energy`.
+        and ``conformer2`` are of type :class:`int`, and are the ids
+        of the conformers passed to :meth:`energy`.
 
     use_cache : :class:`bool`
         If ``True`` :meth:`energy` will not run twice on the same

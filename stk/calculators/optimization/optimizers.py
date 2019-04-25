@@ -248,7 +248,7 @@ class OptimizerSequence(Optimizer):
 
 class CageOptimizerSequence(Optimizer):
     """
-    Applies a sequence of :class:`Optimizer`s to a :class:`.Cage`.
+    Applies :class:`Optimizer` objects to a :class:`.Cage`.
 
     Before each :class:`Optimizer` in the sequence is applied to the
     :class:`.Cage`, it is checked to see if it is collapsed. If it is
@@ -257,7 +257,7 @@ class CageOptimizerSequence(Optimizer):
     Attributes
     ----------
     optimizers : :class:`tuple` of :class:`Optimizer`
-        The :class:`Optimizer`s which are used to optimize a
+        The :class:`Optimizer` objects which are used to optimize a
         :class:`.Cage` molecule.
 
     """
@@ -597,7 +597,7 @@ class RDKitEmbedder(Optimizer):
 
     Examples
     --------
-    Use ETKDG to generate an optimized structure.
+    Use ETKDG[#] to generate an optimized structure.
 
     .. code-block:: python
 

@@ -476,7 +476,7 @@ Saving Calculator Results
 .........................
 
 If you want to save the results which your calculator found you should
-set ``use_cache=True`` and then you can simply use :module:`pickle`
+set ``use_cache=True`` and then you can simply use :mod:`pickle`
 to dump and load the calculator object. You can inspect the saved
 values by looking at the :attr:`cache` attribute.
 
