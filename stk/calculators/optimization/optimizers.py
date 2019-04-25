@@ -207,7 +207,7 @@ class OptimizerSequence(Optimizer):
 
     """
 
-    def __init__(self, *optimizers):
+    def __init__(self, *optimizers, use_cache=False):
         """
         Initializes a :class:`OptimizerSequence` instance.
 
@@ -217,12 +217,14 @@ class OptimizerSequence(Optimizer):
             A number of optimizers, each of which gets applied to a
             molecule, based on the order given.
 
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
+
         """
 
         self.optimizers = optimizers
-        # skip_optimized is False because it is the job of the
-        # optimizers in calculators to toggle skipping for themselves.
-        super().__init__(use_cache=False)
+        super().__init__(use_cache=use_cache)
 
     def optimize(self, mol, conformer=-1):
         """
