@@ -1262,7 +1262,8 @@ class GAPopulation(Population):
         log_thread = Thread(target=daemon_logger, args=(logq, ))
         log_thread.start()
 
-        fitness_fn = _Guard(fitness_calculator.fitness)
+        fitness_fn = _Guard(fitness_calculator,
+                            fitness_calculator.fitness)
 
         # Apply the function to every member of the population, in
         # parallel.
