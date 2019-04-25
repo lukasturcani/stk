@@ -1005,8 +1005,7 @@ mutation counter
 
 It shows that molecule ``8`` was selected three times for mutation, while molecules
 ``40``, ``23``` were selected once. The
-remaining molecules did not participate in crossover operations
-in that generation.
+remaining molecules were not mutated in that generation.
 
 The ``final_pop`` directory holds the ``.mol`` files holding the
 structures of the last generation of molecules.
