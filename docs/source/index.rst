@@ -330,7 +330,7 @@ energy of the molecule
 
 All genetic algorithm operations are also implemented through
 calculators, take for example a :class:`.Mutator` such as
-:class:`RandomTopology`
+:class:`.RandomTopology`
 
 .. code-block:: python
 
