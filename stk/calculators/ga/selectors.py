@@ -27,9 +27,35 @@ When a new :class:`Selector` class is made it must inherit
 import itertools as it
 import numpy as np
 import logging
+from functools import wraps
 
 
 logger = logging.getLogger(__name__)
+
+
+def _add_yielded_reset(select):
+    """
+    Makes every :meth:`~Selector.select` call empty :attr:`yielded`.
+
+    Parameters
+    ----------
+    select : :class:`function`
+        The :meth:`~Selector.select` method to decorate.
+
+    Returns
+    -------
+    :class:`function`
+        The decorated :meth:`~Selector.select` method.
+
+    """
+
+    @wraps(select)
+    def inner(self, population):
+        if self.reset_yielded:
+            self.yielded &= set()
+        return select(self, population)
+
+    return inner
 
 
 class Selector:
@@ -59,6 +85,13 @@ class Selector:
     batch_size : :class:`int`
         The number of molecules yielded at once.
 
+    yielded : :class:`set` of :class:`.Molecule`
+        The previously yielded molecules.
+
+    reset_yielded : :class:`bool`
+        If ``True`` :attr:`yielded` is emptied before each
+        :meth:`select`.
+
     """
 
     def __init__(self, num, duplicates, use_rank, batch_size):
@@ -83,9 +116,6 @@ class Selector:
         batch_size : :class:`int`
             The number of molecules yielded at once.
 
-        yielded : :class:`set` of :class:`.Molecule`
-            The previously yielded molecules.
-
         """
 
         if num is None:
@@ -96,6 +126,11 @@ class Selector:
         self.use_rank = use_rank
         self.batch_size = batch_size
         self.yielded = set()
+        self.reset_yielded = True
+
+    def __init_subclass__(cls, **kwargs):
+        cls.select = _add_yielded_reset(cls.select)
+        return super().__init_subclass__(**kwargs)
 
     def _batch(self, population):
         """
@@ -218,8 +253,11 @@ class SelectorFunnel(Selector):
         self.selectors = selectors
         self.num = selectors[-1].num
         self.yielded = set()
+        self.reset_yielded = True
         # Make all the selectors share the same yielded set.
         for selector in self.selectors:
+            # Only the funnel will reset yielded.
+            selector.reset_yielded = False
             selector.yielded = self.yielded
 
     def select(self, population):
@@ -239,14 +277,9 @@ class SelectorFunnel(Selector):
 
         """
 
-        # Reset the yielded attribute. Use &= here because the yielded
-        # attributes of all Selectors in self.selectors are pointing to
-        # this set.
-        self.yielded &= set()
         *head, tail = self.selectors
         for selector in head:
             population = [mol for mol, in selector.select(population)]
-
         yield from tail.select(population)
 
 
@@ -297,8 +330,11 @@ class SelectorSequence(Selector):
         self.selectors = selectors
         self.num = sum(selector.num for selector in self.selectors)
         self.yielded = set()
+        self.reset_yielded = True
         # Make all the selectors share the yielded set.
         for selector in self.selectors:
+            # Only the sequence will reset yielded.
+            selector.reset_yielded = False
             selector.yielded = self.yielded
 
     def select(self, population):
@@ -318,10 +354,6 @@ class SelectorSequence(Selector):
 
         """
 
-        # Reset the yielded attribute. Use &= here because the yielded
-        # attributes of all Selectors in self.selectors are pointing to
-        # this set.
-        self.yielded &= set()
         for selector in self.selectors:
             yield from selector.select(population)
 
@@ -709,11 +741,10 @@ class AboveAverage(Selector):
 
         yielded = 0
         for batch, fitness in batches:
-
             if fitness >= mean:
                 n = fitness // mean if self.duplicate_batches else 1
                 for i in range(int(n)):
                     yield batch
                     yielded += 1
                     if yielded >= self.num:
-                        break
+                        return
