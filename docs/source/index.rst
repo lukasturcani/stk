@@ -999,12 +999,12 @@ directories. The ``scratch`` directory holds any files created during
 the GA run. For example, the ``.png`` files showing
 how frequently a member of the population was selected for mutation,
 crossover and generational selection. For example, this is a
-crossover counter
+mutation counter
 
 .. image:: figures/counter_example.png
 
-It shows that molecule ``168`` was selected twice for crossover, while molecules
-``60``, ``170``, ``167``, ``63`` and ``153`` were selected once. The
+It shows that molecule ``8`` was selected three times for mutation, while molecules
+``40``, ``23``` were selected once. The
 remaining molecules did not participate in crossover operations
 in that generation.
 
