@@ -343,7 +343,6 @@ def ga_run(input_file):
     stk.kill_macromodel()
 
     history.dump()
-    progress.remove_duplicates()
     progress.calculate_member_fitness(fitness_calculator, processes)
     # Keep the fitness of failed molecules as None. Plotters can ignore
     # these values to make better graphs.

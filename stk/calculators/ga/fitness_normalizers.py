@@ -35,6 +35,8 @@ import numpy as np
 import logging
 from functools import wraps
 
+from ...utilities import dedupe
+
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +80,29 @@ def _handle_failed_molecules(normalize):
     return inner
 
 
+def _dedupe(normalize):
+    """
+    Makes sure that duplicates are removed before normalization.
+
+    Parameters
+    ----------
+    normalize : class:`function`
+        The :meth:`~FitnessNormalizer.normalize` method to decorate.
+
+    Returns
+    -------
+    :class:`function`
+        The decorated :meth:`~FitnessNormalizer.normalize` method.
+
+    """
+
+    @wraps(normalize)
+    def inner(self, population):
+        return normalize(self, dedupe(population))
+
+    return inner
+
+
 class FitnessNormalizer:
     """
     Normalizes fitness values across a :class:`.Population`.
@@ -97,6 +122,7 @@ class FitnessNormalizer:
         self.handle_failed = True
 
     def __init_subclass__(cls, **kwargs):
+        cls.normalize = _dedupe(cls.normalize)
         cls.normalize = _handle_failed_molecules(cls.normalize)
         return super().__init_subclass__(**kwargs)
 
