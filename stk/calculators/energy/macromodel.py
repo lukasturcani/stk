@@ -96,6 +96,8 @@ class MacroModelEnergy(EnergyCalculator):
         basename = str(uuid4().int)
         if self.output_dir is None:
             output_dir = basename
+        else:
+            output_dir = self.output_dir
 
         tmp_file = f'{basename}.mol'
         mol.write(tmp_file, conformer)

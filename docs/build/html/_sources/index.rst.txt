@@ -330,7 +330,7 @@ energy of the molecule
 
 All genetic algorithm operations are also implemented through
 calculators, take for example a :class:`.Mutator` such as
-:class:`RandomTopology`
+:class:`.RandomTopology`
 
 .. code-block:: python
 
@@ -352,7 +352,7 @@ In this case, the new topologies would be one of :class:`.EightPlusTwelve`,
 :class:`.FourPlusSix` or :class:`.Dodecahedron`.
 
 Calculators often support additional options to modify their behaviour.
-For example, calculator of type :class:`.Optimizer` or
+For example, calculators of type :class:`.Optimizer` or
 :class:`.EnergyCalculator` support caching. This means that if the
 same molecule and conformer is supplied to the calculator, it will not
 run the optimization or energy calculation again, it will return the
@@ -377,8 +377,8 @@ previously calculated value
     cached_mmff.optimize(mol)
 
     # Make a non-caching and a caching uff energy calculator.
-    uff_energy = UFF()
-    caching_uff_energy = UFF(use_cache=True)
+    uff_energy = UFFEnergy()
+    caching_uff_energy = UFFEnergy(use_cache=True)
 
     # Calculate the energy twice.
     uff_energy.energy(mol)
@@ -646,7 +646,7 @@ and recover the ``stk`` objects later
     pop[1] # <Periodic at 0x12498>
 
 Automated Molecular Design with Genetic Algorithms
-..................................................
+--------------------------------------------------
 
 ``stk`` includes a genetic algorithm which
 can be used to evolve molecules that fulfil user defined design criteria.
@@ -814,7 +814,7 @@ and selects building blocks which have the most atoms.
     # Fitness normalizer.
     # #####################################################################
 
-    # This is an optional argument, will default to NullOptimizer.
+    # This is an optional argument, will default to NullFitnessNormalizer.
 
     # The PropertyVector fitness calculator will set the fitness as
     # [n_atoms] use the Sum() fitness normalizer to convert the fitness to
@@ -1005,8 +1005,7 @@ mutation counter
 
 It shows that molecule ``8`` was selected three times for mutation, while molecules
 ``40``, ``23``` were selected once. The
-remaining molecules did not participate in crossover operations
-in that generation.
+remaining molecules were not mutated in that generation.
 
 The ``final_pop`` directory holds the ``.mol`` files holding the
 structures of the last generation of molecules.
