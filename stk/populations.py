@@ -1307,16 +1307,37 @@ class GAPopulation(Population):
 
         mutants = []
         parents = self.mutation_selector.select(self)
-        for i, parent in enumerate(parents, 1):
-            logger.info(
-                f'Mutation number {i}. '
-                f'Finish when {self.mutation_selector.num}.'
-            )
+        for i, (parent, ) in enumerate(parents, 1):
+            logger.info(f'Mutation number {i}.')
             mutant = self.mutator.mutate(parent)
             if mutant not in self:
                 mutants.append(mutant)
 
         return mutants
+
+    def gen_next_gen(self):
+        """
+        Returns the next GA generation.
+
+        Returns
+        -------
+        :class:`.GAPopulation`
+            The next generation.
+
+        """
+
+        cls = self.__class__
+        next_gen = cls(*(
+            mol for mol, in self.generation_selector.select(self)
+        ))
+        next_gen.set_ga_tools(
+                 generation_selector=self.generation_selector,
+                 mutation_selector=self.mutation_selector,
+                 crossover_selector=self.crossover_selector,
+                 mutator=self.mutator,
+                 crosser=self.crosser
+        )
+        return next_gen
 
     def gen_offspring(self):
         """
@@ -1336,13 +1357,10 @@ class GAPopulation(Population):
         offspring = []
         parent_batches = self.crossover_selector.select(self)
         for i, parents in enumerate(parent_batches, 1):
-            logger.info(
-                f'Crossover number {i}. '
-                f'Finish when {self.crossover_selector.num}.'
-            )
-            child = self.crosser.crossover(*parents)
-            if child not in self:
-                offspring.append(child)
+            logger.info(f'Crossover number {i}.')
+            for child in self.crosser.crossover(*parents):
+                if child not in self:
+                    offspring.append(child)
 
         return offspring
 

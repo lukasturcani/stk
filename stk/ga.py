@@ -27,6 +27,10 @@ class GAHistory:
 
     Attributes
     ----------
+    fitness_calculator : :class:`.FitnessCalculator`
+        The :class:`.FitnessCalculator` used to calculate fitness
+        values.
+
     progress_dump : :class:`bool`
         Toggles dumping of :attr:`progress`.
 
@@ -42,7 +46,11 @@ class GAHistory:
 
     """
 
-    def __init__(self, progress_dump, database_dump):
+    def __init__(self,
+                 fitness_calculator,
+                 progress_dump,
+                 database_dump):
+        self.fitness_calculator = fitness_calculator
         self.progress_dump = progress_dump
         self.database_dump = database_dump
         self.progress = stk.GAPopulation()
@@ -136,15 +144,30 @@ class GAHistory:
 
         molecule = 'molecule'
         fitness = 'fitness'
+        normalized_fitness = 'normalized_fitness'
+        rank = 'rank'
 
         sorted_pop = sorted(pop, reverse=True, key=lambda m: m.fitness)
-        mols = '\n'.join(
-            f'\n{mol.name:<10}\t{mol.fitness:<40}\n{u}'
-            for mol in sorted_pop
+
+        mols = '\n'.join(self.pop_log_content(sorted_pop, u))
+        s = (
+            f'Population log:\n\n'
+            f'{u}\n'
+            f'{rank:<10}\t{molecule:<10}\t'
+            f'{fitness:<40}\t{normalized_fitness}\n'
+            f'{u}\n'
+            f'{mols}'
         )
-        s = (f'Population log:\n{u}\n{molecule:<10}\t'
-             f'{fitness:<40}\n{u}\n{mols}\n')
         logger.info(s)
+
+    def pop_log_content(self, pop, underline):
+        for i, mol in enumerate(pop, 1):
+            key = (mol.key, -1)
+            fitness = self.fitness_calculator.cache[key]
+            yield (
+                f'{i:<10}\t{mol.name:<10}\t{fitness!r:<40}\t'
+                f'{mol.fitness}\n{underline}'
+            )
 
 
 def ga_run(input_file):
@@ -232,7 +255,9 @@ def ga_run(input_file):
     os.chdir('scratch')
     open('errors.log', 'w').close()
 
-    history = GAHistory(database_dump, progress_dump)
+    history = GAHistory(fitness_calculator,
+                        database_dump,
+                        progress_dump)
     progress = history.progress
 
     # 3. Run the GA.
@@ -266,7 +291,8 @@ def ga_run(input_file):
         logger.debug(f'Population size is {len(pop)}.')
 
         logger.info('Adding offsping and mutants to population.')
-        pop += offspring + mutants
+        pop.members.extend(offspring)
+        pop.members.extend(mutants)
 
         logger.debug(f'Population size is {len(pop)}.')
 
@@ -306,6 +332,8 @@ def ga_run(input_file):
 
     stk.kill_macromodel()
 
+    history.dump()
+    progress.remove_duplicates()
     progress.calculate_member_fitness(fitness_calculator, processes)
     # Keep the fitness of failed molecules as None. Plotters can ignore
     # these values to make better graphs.
@@ -316,7 +344,6 @@ def ga_run(input_file):
 
     os.chdir(root_dir)
     os.rename('scratch/errors.log', 'errors.log')
-    history.dump()
 
     pop.write('final_pop', True)
     os.chdir(launch_dir)
@@ -324,6 +351,7 @@ def ga_run(input_file):
         logger.info('Compressing output.')
         stk.tar_output()
     stk.archive_output()
+    logger.info('Successful exit.')
 
 
 if __name__ == '__main__':
