@@ -3,12 +3,19 @@
 # #####################################################################
 
 import stk
+import logging
 
 # #####################################################################
 # Run GA serially.
 # #####################################################################
 
 processes = 1
+
+# #####################################################################
+# Set logging level.
+# #####################################################################
+
+logging_level = logging.DEBUG
 
 # #####################################################################
 # Initial population.
@@ -75,7 +82,7 @@ mutator = stk.RandomMutation(
 # Optimizer.
 # #####################################################################
 
-optimizer = stk.NullOptimizer()
+optimizer = stk.NullOptimizer(use_cache=True)
 
 # #####################################################################
 # Fitness calculator.
@@ -97,9 +104,9 @@ fitness_calculator = stk.PropertyVector(num_atoms)
 
 # The PropertyVector fitness calculator will set the fitness as
 # [n_atoms] use the Sum() fitness normalizer to convert the fitness to
-# just n_atoms^2. The squre is because we use the Power normalizer.
+# just n_atoms^0.5. The sqrt is because we use the Power normalizer.
 fitness_normalizer = stk.NormalizerSequence(
-    stk.Power(2),
+    stk.Power(0.5),
     stk.Sum()
 )
 

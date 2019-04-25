@@ -51,7 +51,6 @@ def test_cache_use(tmp_amine2):
     # Test that the cache is being used by putting a random object into
     # it and making sure it gets returned.
     calc.cache[(tmp_amine2.key, 1)] = obj
-    print(calc.cache)
     assert calc.fitness(tmp_amine2, 1) is obj
 
 

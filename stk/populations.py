@@ -1308,8 +1308,9 @@ class GAPopulation(Population):
 
         mutants = []
         parents = self.mutation_selector.select(self)
+        num = self.mutation_selector.num
         for i, (parent, ) in enumerate(parents, 1):
-            logger.info(f'Mutation number {i}.')
+            logger.info(f'Mutation number {i}. Finish when {num}.')
             mutant = self.mutator.mutate(parent)
             if mutant not in self:
                 mutants.append(mutant)
@@ -1357,8 +1358,9 @@ class GAPopulation(Population):
 
         offspring = []
         parent_batches = self.crossover_selector.select(self)
+        num = self.crossover_selector.num
         for i, parents in enumerate(parent_batches, 1):
-            logger.info(f'Crossover number {i}.')
+            logger.info(f'Crossover number {i}. Finish when {num}.')
             for child in self.crosser.crossover(*parents):
                 if child not in self:
                     offspring.append(child)

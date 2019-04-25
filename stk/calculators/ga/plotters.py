@@ -184,7 +184,7 @@ class ProgressPlotter(Plotter):
             df = df.append(data, ignore_index=True)
 
         # Save the plot data.
-        df.to_csv(f'{self.attr}_progress.csv')
+        df.to_csv(f'{self.filename}.csv')
 
         fig = plt.figure(figsize=[8, 4.5])
 

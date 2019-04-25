@@ -48,9 +48,11 @@ class GAHistory:
 
     def __init__(self,
                  fitness_calculator,
+                 log_file,
                  progress_dump,
                  database_dump):
         self.fitness_calculator = fitness_calculator
+        self.log_file = log_file
         self.progress_dump = progress_dump
         self.database_dump = database_dump
         self.progress = stk.GAPopulation()
@@ -97,10 +99,11 @@ class GAHistory:
 
         """
 
-        with open('progress.log', 'w') as logfile:
-            logfile.write(
-                '\n'.join(self.log_file_content(self.progress))
-            )
+        if self.log_file:
+            with open('progress.log', 'w') as logfile:
+                logfile.write(
+                    '\n'.join(self.log_file_content(self.progress))
+                )
 
         if self.progress_dump:
             self.progress.dump('progress.json')
@@ -144,7 +147,7 @@ class GAHistory:
 
         molecule = 'molecule'
         fitness = 'fitness'
-        normalized_fitness = 'normalized_fitness'
+        normalized_fitness = 'normalized fitness'
         rank = 'rank'
 
         sorted_pop = sorted(pop, reverse=True, key=lambda m: m.fitness)
@@ -153,7 +156,7 @@ class GAHistory:
         s = (
             f'Population log:\n\n'
             f'{u}\n'
-            f'{rank:<10}\t{molecule:<10}\t'
+            f'{rank:<10}\t{molecule:<10}\t\t'
             f'{fitness:<40}\t{normalized_fitness}\n'
             f'{u}\n'
             f'{mols}'
@@ -165,7 +168,7 @@ class GAHistory:
             key = (mol.key, -1)
             fitness = self.fitness_calculator.cache[key]
             yield (
-                f'{i:<10}\t{mol.name:<10}\t{fitness!r:<40}\t'
+                f'{i:<10}\t{mol.name:<10}\t\t{fitness!r:<40}\t'
                 f'{mol.fitness}\n{underline}'
             )
 
@@ -202,6 +205,10 @@ def ga_run(input_file):
     plotters = []
     if hasattr(input_file, 'plotters'):
         plotters = input_file.plotters
+
+    log_file = True
+    if hasattr(input_file, 'log_file'):
+        log_file = input_file.log_file
 
     database_dump = True
     if hasattr(input_file, 'database_dump'):
@@ -255,9 +262,10 @@ def ga_run(input_file):
     os.chdir('scratch')
     open('errors.log', 'w').close()
 
-    history = GAHistory(fitness_calculator,
-                        database_dump,
-                        progress_dump)
+    history = GAHistory(fitness_calculator=fitness_calculator,
+                        log_file=log_file,
+                        database_dump=database_dump,
+                        progress_dump=progress_dump)
     progress = history.progress
 
     # 3. Run the GA.
@@ -322,6 +330,8 @@ def ga_run(input_file):
 
         logger.info('Selecting members of the next generation.')
         pop = pop.gen_next_gen()
+
+        history.log_pop(logger, pop)
 
         logger.info('Recording progress.')
         progress.add_subpopulation(pop)

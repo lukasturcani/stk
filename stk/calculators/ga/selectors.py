@@ -216,6 +216,7 @@ class SelectorFunnel(Selector):
         """
 
         self.selectors = selectors
+        self.num = selectors[-1].num
         self.yielded = set()
         # Make all the selectors share the same yielded set.
         for selector in self.selectors:
@@ -238,6 +239,10 @@ class SelectorFunnel(Selector):
 
         """
 
+        # Reset the yielded attribute. Use &= here because the yielded
+        # attributes of all Selectors in self.selectors are pointing to
+        # this set.
+        self.yielded &= set()
         *head, tail = self.selectors
         for selector in head:
             population = [mol for mol, in selector.select(population)]
@@ -290,6 +295,7 @@ class SelectorSequence(Selector):
         """
 
         self.selectors = selectors
+        self.num = sum(selector.num for selector in self.selectors)
         self.yielded = set()
         # Make all the selectors share the yielded set.
         for selector in self.selectors:
@@ -312,6 +318,10 @@ class SelectorSequence(Selector):
 
         """
 
+        # Reset the yielded attribute. Use &= here because the yielded
+        # attributes of all Selectors in self.selectors are pointing to
+        # this set.
+        self.yielded &= set()
         for selector in self.selectors:
             yield from selector.select(population)
 
@@ -697,11 +707,13 @@ class AboveAverage(Selector):
         if self.duplicates:
             batches = self._no_duplicates(batches)
 
-        for i, (batch, fitness) in enumerate(batches):
-            if i >= self.num:
-                break
+        yielded = 0
+        for batch, fitness in batches:
 
             if fitness >= mean:
                 n = fitness // mean if self.duplicate_batches else 1
                 for i in range(int(n)):
                     yield batch
+                    yielded += 1
+                    if yielded >= self.num:
+                        break
