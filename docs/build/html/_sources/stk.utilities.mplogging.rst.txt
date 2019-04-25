@@ -1,5 +1,5 @@
-stk\.utilities\.mplogging module
-================================
+stk.utilities.mplogging module
+==============================
 
 .. automodule:: stk.utilities.mplogging
     :members:

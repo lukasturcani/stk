@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.calculators.ga.plotters module &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">stk.calculators.ga.plotters module</a><ul>
+<li><a class="reference internal" href="#extending-stk-making-new-plotters">Extending stk: Making new plotters.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">stk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>stk.calculators.ga.plotters module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stk.calculators.ga.plotters.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-stk.calculators.ga.plotters">
+<span id="stk-calculators-ga-plotters-module"></span><h1>stk.calculators.ga.plotters module<a class="headerlink" href="#module-stk.calculators.ga.plotters" title="Permalink to this headline">¶</a></h1>
+<p>Defines plotters.</p>
+<p>Plotters are calculators which produce graphs. They generally do this
+by decorating other calculators to hook into them, collect data from
+them and then plot the results. To see examples of how to use plotters
+look at the documentation of the individual plotters. For example
+<a class="reference internal" href="#stk.calculators.ga.plotters.SelectionPlotter" title="stk.calculators.ga.plotters.SelectionPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">SelectionPlotter</span></code></a> and <a class="reference internal" href="#stk.calculators.ga.plotters.ProgressPlotter" title="stk.calculators.ga.plotters.ProgressPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressPlotter</span></code></a>.</p>
+<div class="section" id="extending-stk-making-new-plotters">
+<span id="adding-plotters"></span><h2>Extending stk: Making new plotters.<a class="headerlink" href="#extending-stk-making-new-plotters" title="Permalink to this headline">¶</a></h2>
+<p>New plotters should inherit <a class="reference internal" href="#stk.calculators.ga.plotters.Plotter" title="stk.calculators.ga.plotters.Plotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plotter</span></code></a> and define a
+<a class="reference internal" href="#stk.calculators.ga.plotters.Plotter.plot" title="stk.calculators.ga.plotters.Plotter.plot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">plot()</span></code></a> method. Note that plotters do no necessarily have
+to make a plot when <a class="reference internal" href="#stk.calculators.ga.plotters.Plotter.plot" title="stk.calculators.ga.plotters.Plotter.plot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">plot()</span></code></a> is made. For example,
+<a class="reference internal" href="#stk.calculators.ga.plotters.SelectionPlotter" title="stk.calculators.ga.plotters.SelectionPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">SelectionPlotter</span></code></a> plots every time the
+<a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> it is used with becomes exhausted and it’s
+<a class="reference internal" href="#stk.calculators.ga.plotters.SelectionPlotter.plot" title="stk.calculators.ga.plotters.SelectionPlotter.plot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">plot()</span></code></a> does nothing..</p>
+<dl class="class">
+<dt id="stk.calculators.ga.plotters.Plotter">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.plotters.</code><code class="descname">Plotter</code><a class="headerlink" href="#stk.calculators.ga.plotters.Plotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A base class for plotters.</p>
+<dl class="method">
+<dt id="stk.calculators.ga.plotters.Plotter.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.Plotter.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>progress</strong> (<a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>) – A <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> where each generation of the GA is
+a subpopulation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.ga.plotters.ProgressPlotter">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.plotters.</code><code class="descname">ProgressPlotter</code><span class="sig-paren">(</span><em>filename</em>, <em>attr</em>, <em>y_label</em>, <em>default</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.ProgressPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.plotters.Plotter" title="stk.calculators.ga.plotters.Plotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.plotters.Plotter</span></code></a></p>
+<p>Plots how an attribute changes during a GA.</p>
+<p>The produced plot will show the GA generations on the x axis and
+the min, mean and max values of an attribute on the y axis.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.plotters.ProgressPlotter.filename">
+<code class="descname">filename</code><a class="headerlink" href="#stk.calculators.ga.plotters.ProgressPlotter.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The basename of the files. This means it should exclude
+file extensions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.plotters.ProgressPlotter.attr">
+<code class="descname">attr</code><a class="headerlink" href="#stk.calculators.ga.plotters.ProgressPlotter.attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the attribute which is plotted. It must be an
+attribute on the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects made by the GA.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.plotters.ProgressPlotter.y_label">
+<code class="descname">y_label</code><a class="headerlink" href="#stk.calculators.ga.plotters.ProgressPlotter.y_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>The y label for the produced graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.plotters.ProgressPlotter.default">
+<code class="descname">default</code><a class="headerlink" href="#stk.calculators.ga.plotters.ProgressPlotter.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>When a molecule in the population does not have attribute
+<a class="reference internal" href="#stk.calculators.ga.plotters.ProgressPlotter.attr" title="stk.calculators.ga.plotters.ProgressPlotter.attr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">attr</span></code></a>, this is the default value to use for it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<p>Plot how fitness value changes with GA generations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># progress has subpopulations where each subpopulation is a</span>
+<span class="c1"># generation of a GA.</span>
+<span class="n">progress</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Make the plotter which plots the fitness change across</span>
+<span class="c1"># generations.</span>
+<span class="n">plotter</span> <span class="o">=</span> <span class="n">ProgressPlotter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;fitness_plot&#39;</span><span class="p">,</span>
+                          <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;fitness&#39;</span><span class="p">,</span>
+                          <span class="n">y_label</span><span class="o">=</span><span class="s1">&#39;Fitness&#39;</span><span class="p">,</span>
+                          <span class="n">default</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+<span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Plot how the number of atoms changes with GA generations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># progress has subpopulations where each subpopulation is a</span>
+<span class="c1"># generation of a GA.</span>
+<span class="n">progress</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Make the plotter which plots the number of atoms across</span>
+<span class="c1"># generations. Note that the GA must create the num_atoms</span>
+<span class="c1"># attribute on the molecules. This can be done in the fitness</span>
+<span class="c1"># function, for example.</span>
+<span class="n">plotter</span> <span class="o">=</span> <span class="n">ProgressPlotter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;atom_plot&#39;</span><span class="p">,</span>
+                          <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;num_atoms&#39;</span><span class="p">,</span>
+                          <span class="n">y_label</span><span class="o">=</span><span class="s1">&#39;Number of Atoms&#39;</span><span class="p">,</span>
+                          <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.ga.plotters.ProgressPlotter.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.ProgressPlotter.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a progress plot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>progress</strong> (<a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>) – A <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> where each generation of the GA is
+a subpopulation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stk.calculators.ga.plotters.SelectionPlotter">
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.plotters.</code><code class="descname">SelectionPlotter</code><span class="sig-paren">(</span><em>filename</em>, <em>selector</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.SelectionPlotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.plotters.Plotter" title="stk.calculators.ga.plotters.Plotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.plotters.Plotter</span></code></a></p>
+<p>Plots which molecules a <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> selects.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.plotters.SelectionPlotter.filename">
+<code class="descname">filename</code><a class="headerlink" href="#stk.calculators.ga.plotters.SelectionPlotter.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The basename of the files. This means it should not include
+file extensions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.ga.plotters.SelectionPlotter.selector">
+<code class="descname">selector</code><a class="headerlink" href="#stk.calculators.ga.plotters.SelectionPlotter.selector" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> whose selection of molecules is
+plotted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make a population of molecules.</span>
+<span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Make a selector.</span>
+<span class="n">roulette</span> <span class="o">=</span> <span class="n">Roulette</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Make a plotter.</span>
+<span class="n">SelectionPlotter</span><span class="p">(</span><span class="s1">&#39;roulette_counter&#39;</span><span class="p">,</span> <span class="n">roulette</span><span class="p">)</span>
+
+<span class="c1"># Select the molecules.</span>
+<span class="n">selected</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">roulette</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pop</span><span class="p">))</span>
+
+<span class="c1"># There should now be a file called &quot;roulette_counter_1.png&quot;</span>
+<span class="c1"># which shows a graph of all the selected molecules.</span>
+
+<span class="c1"># Make another population.</span>
+<span class="n">pop2</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Select molecules from this other population.</span>
+<span class="n">selected2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">roulette</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pop2</span><span class="p">))</span>
+
+<span class="c1"># There should now be a file called &quot;roulette_counter_2.png&quot;</span>
+<span class="c1"># which shows a graph of all the selected molecules.</span>
+
+<span class="c1"># Select from the original population again.</span>
+<span class="n">selected3</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">roulette</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pop</span><span class="p">))</span>
+
+<span class="c1"># There should now be a file called &quot;roulette_counter_3.png&quot;</span>
+<span class="c1"># which shows a graph of all the selected molecules.</span>
+
+<span class="c1"># And so on every time you use &quot;roulette.select()&quot;.</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="stk.calculators.ga.plotters.SelectionPlotter._plot">
+<code class="descname">_plot</code><span class="sig-paren">(</span><em>counter</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.SelectionPlotter._plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a selection counter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>counter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Counter</span></code>) – A counter specifying which molecules were selected and how
+many times.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.ga.plotters.SelectionPlotter.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.SelectionPlotter.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does nothing.</p>
+<p>This <a class="reference internal" href="#stk.calculators.ga.plotters.Plotter" title="stk.calculators.ga.plotters.Plotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plotter</span></code></a> creates a plot each time <a class="reference internal" href="#stk.calculators.ga.plotters.SelectionPlotter.selector" title="stk.calculators.ga.plotters.SelectionPlotter.selector"><code class="xref py py-attr docutils literal notranslate"><span class="pre">selector</span></code></a>
+is finished selecting molecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>progress</strong> (<a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>) – A <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> where each generation of the GA is
+a subpopulation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.ga.plotters.SelectionPlotter.update_counter">
+<code class="descname">update_counter</code><span class="sig-paren">(</span><em>select</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.SelectionPlotter.update_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorates <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector.select" title="stk.calculators.ga.selectors.Selector.select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Selector.select()</span></code></a>.</p>
+<p>This is a decorator which makes sure that every time
+<a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector.select" title="stk.calculators.ga.selectors.Selector.select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Selector.select()</span></code></a> selects a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> a
+counter keeping track of selected molecules is updated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>select</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – The <code class="xref py py-meth docutils literal notranslate"><span class="pre">Selector.select()</span></code> method to decorate.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The decorated <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector.select" title="stk.calculators.ga.selectors.Selector.select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Selector.select()</span></code></a> method.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

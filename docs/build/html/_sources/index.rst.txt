@@ -73,12 +73,14 @@ and will look like this.
 
 Notice that the functional group has disappeared and been replaced by
 new bonds between the monomers. The new bonds seem a little stretched,
-so we can optimize the structure using an optimization function defined in
-:mod:`~.optimization.optimization`, in this case :func:`.rdkit_ETKDG`
+so we can optimize the structure using an :class:`.Optimizer`
+defined in :mod:`~.calculator.optimization`, in this case
+:class:`.MMFF`
 
 .. code-block:: python
 
-    rdkit_ETKDG(polymer)
+    mmff = MMFF()
+    mmff.optimize(polymer)
 
 Again, the polymer can be written to a file
 
@@ -177,20 +179,24 @@ Here is a third example:
 .. image:: figures/cage3.png
 
 While we assembled some cages, the constructed structures are not
-particularly realistic. We can optimize the geometry using an optimization
-function:
+particularly realistic. We can optimize the geometry using an
+:class:`.Optimizer`:
 
 .. code-block:: python
 
-    macromodel_opt(cage, '/opt/schrodinger2017-4')
-    macromodel_opt(cage2, '/opt/schrodinger2017-4')
-    macromodel_opt(cage3, '/opt/schrodinger2017-4')
+    macromodel = MacroModelForceField(
+        macromodel_path='/opt/schrodinger2017-4'
+    )
+    macromodel.optimize(cage)
+    macromodel.optimize(cage2)
+    macromodel.optimize(cage3)
 
 .. image:: figures/cages_opt.png
 
-In this case the function :func:`.macromodel_opt` was used. We could have
-used :func:`.rdkit_ETKDG` again but chances are the structures would
-have been optimized quite poorly. The :func:`.macromodel_opt` function
+In this case the optimizer :class:`.MacroModelForceField` was used.
+We could have used :class:`.MMFF` again but chances are the structures
+would have been optimized quite poorly. The
+:class:`.MacroModelForceField` optimizer
 requires a valid ``MacroModel`` installation with a working license.
 The argument ``'/opt/schrodinger2017-4'`` is the path to the installation.
 
@@ -276,34 +282,215 @@ of each COF. This is done analogously to the organic cage case so reading
 Other Materials
 ...............
 
-``stk`` is a work in progress and currently supports only the above classes
-of materials out of the box. However, ``stk`` was designed to be easy
-extend to other classes of molecules.
-For a guide on how this can be done
-see, :ref:`extending stk`.
+Other materials defined by ``stk`` can be found in
+:mod:`.molecular.topologies`. In addition to this, ``stk`` was designed
+to be easy extend to other classes of molecules. For a guide on how this
+can be done see, :ref:`extending stk`.
 
 
-Other Features
---------------
+Calculators
+-----------
+
+``stk`` makes extensive use of calculator objects. Calculators are a
+very general pattern for performing operations on molecules. All
+calculators are objects with a special method, used to perform the
+calculation. You have already been introduced to one type of calculator,
+the :class:`.Optimizer`. An optimizer has a special method called
+:meth:`~.Optimizer.optimize`, which optimizes a molecule. Here is
+another example
+
+.. code-block:: python
+
+    mol = StructUnit(...)
+    polymer = Polymer(...)
+
+    optimizer1 = MMFF()
+
+    # Optimize mol with mmff.
+    optimizer1.optimize(mol)
+    # Optimize polymer conformer 2 with mmff.
+    optimizer2.optimize(polymer, conformer=2)
+
+Other types of calculators will have different special methods used to
+perform calculations on molecules. For example, an
+:class:`.EnergyCalculator` will define an
+:meth:`~.EnergyCalculator.energy` method. This method calculates the
+energy of the molecule
+
+.. code-block:: python
+
+    mmff_energy = MMFFEnergy()
+    uff_energy = UFFEnergy()
+
+    # Calculate the energy of mol conformer 1 with the mmff force field.
+    mol_mmff_energy = mmff_energy.energy(mol, conformer=1)
+
+    # Calculate the energy of polymer conformer 10 with the uff force field.
+    polymer_uff_energy = uff_energy.energy(polymer, conformer=10)
+
+All genetic algorithm operations are also implemented through
+calculators, take for example a :class:`.Mutator` such as
+:class:`RandomTopology`
+
+.. code-block:: python
+
+    topologies = [EightPlusTwelve(), FourPlusSix(), Dodecahedron()]
+    random_top = RandomTopology(topologies)
+
+    # Assume bb1 and bb2 are StructUnit2 and StructUnit3 objects.
+    cage = Cage([bb1, bb2], SixPlusNine())
+
+    # Perform a mutation.
+    mutant = random_top.mutate(cage)
+
+A :class:`.Mutator` is a calculator which implements a
+:meth:`~.Mutator.mutate` method. This method takes a molecule and
+returns a mutant, *i.e.* a modified version, of that molecule.
+In this example, the ``random_top`` is a :class:`.Mutator`, which replaces
+the topology of a molecule with a new one, in order to generate the mutant.
+In this case, the new topologies would be one of :class:`.EightPlusTwelve`,
+:class:`.FourPlusSix` or :class:`.Dodecahedron`.
+
+Calculators often support additional options to modify their behaviour.
+For example, calculator of type :class:`.Optimizer` or
+:class:`.EnergyCalculator` support caching. This means that if the
+same molecule and conformer is supplied to the calculator, it will not
+run the optimization or energy calculation again, it will return the
+previously calculated value
+
+.. code-block:: python
+
+    # Example of caching with optimizers.
+    mmff = MMFF()
+    caching_mmff = MMFF(use_cache=True)
+
+    mol = StructUnit(...)
+
+    # Performs an optimization on mol.
+    mmff.optimize(mol)
+    # Performs a second optimization on mol.
+    mmff.optimize(mol)
+
+    # Performs an optimization on mol.
+    cached_mmff.optimize(mol)
+    # Does not peform an optimization on mol.
+    cached_mmff.optimize(mol)
+
+    # Make a non-caching and a caching uff energy calculator.
+    uff_energy = UFF()
+    caching_uff_energy = UFF(use_cache=True)
+
+    # Calculate the energy twice.
+    uff_energy.energy(mol)
+    uff_energy.energy(mol)
+
+    # Calculate the energy.
+    caching_uff_energy.energy(mol)
+    # Does not calculate the energy again, returns the previous value.
+    caching_uff_energy.energy(mol)
+
+More information on each type of calculator can be seen by visiting the
+module dedicated to that calculator, :mod:`.calculators`.
+
+Combining Calculators
+.....................
+
+Calculators can be combined to create complex behaviour on the fly.
+For example, we may wish to make a 2 step optimization process. First,
+we perform an optimization using the MMFF force field and the run
+a MacroModel molecular dynamics conformer search with
+:class:`.MacroModelMD`. The obvious way to do
+this is to run the two optimizers in sequence
+
+.. code-block:: python
+
+    mmff = MMFF()
+    macromodel = MacroModelMD(macromodel_path='/opt/schrodinger2017-4')
+
+    mmff.optimize(mol)
+    macromodel.optimize(mol)
+
+However, there is a better way! We can use an optimizer called
+:class:`.OptimizerSequence`. The :meth:`~OptimizerSequence.optimize`
+method of this optimizer calls the :class:`~Optimizer.optimize` methods
+of the optimizers it was initialized with
+
+.. code-block:: python
+
+    opt_sequence = OptimizerSequence(mmff, macromodel)
+    # Optimize with mmff and then with macromodel.
+    opt_sequence.optimize(mol)
+
+This pattern is quite common and powerful. For example, we can take
+three different :class:`.Mutator` objects. Each of these defines
+a different :meth:`~.Mutator.mutate` method. We want to apply one of
+these mutations at random. We can simply use :class:`.RandomMutation`
+
+.. code-block:: python
+
+    random_bb = RandomBuildingBlock(...)
+    similar_bb = SimilarBulidingBlock(...)
+    random_topology = RandomTopology(...)
+
+    random_mutation = RandomMutation(
+        random_bb,
+        similar_bb,
+        random_topology
+    )
+
+    # Use one of the mutate() methods of random_bb, similar_bb and
+    # random_topology at random.
+    mutant1 = random_mutation.mutate(mol)
+    # The next call use a different mutation to the call above.
+    mutant2 = random_mutation.mutate(mol)
+
+The :meth:`.RandomMutation.mutate` method randomly selects a
+:class:`.Mutator` it was initialized with to carry out the mutation
+on its behalf.
+
+Making New Calculators
+......................
+
+New calculators can be added very simply and they can be defined in
+user code. Specific guidelines are defined in the module
+dedicated to each type of calculator in :mod:`.calculators`.
+
+A simple example of adding a new calculator in user code.
+
+.. code-block:: python
+
+    class NewEnergyCalculator(EnergyCalculator):
+        def energy(self, mol, conformer=-1):
+            return 15
+
+    energy_calc = NewEnergyCalculator()
+    # Calculate the energy with the new calculator.
+    energy_calc.energy(mol)
+
+
+Note that you can also modify the behaviour of existing calculators in
+your code, some common patterns are described in
+:doc:`modifying_calculators`.
+
+Saving Calculator Results
+.........................
+
+If you want to save the results which your calculator found you should
+set ``use_cache=True`` and then you can simply use :mod:`pickle`
+to dump and load the calculator object. You can inspect the saved
+values by looking at the :attr:`cache` attribute.
 
 Calculating Molecular Properties
 ................................
 
 ``stk`` provides a variety of methods to calculate molecular properties.
 What methods can be used depends on what kind of molecule object is created.
-All molecules can use methods defined in :class:`.Molecule`. All
-building blocks can use methods in :class:`.StructUnit` in addition to this.
-Assembled molecules can use additional methods provided by :class:`.MacroMolecule`.
+Note that all molecules can use methods defined in :class:`.Molecule`.
 
 Here are some examples:
 
 .. code-block:: python
 
-    # Calculate the energy of a molecule using rdkit and the UFF force field.
-    mol.energy.rdkit('uff')
-    # Calculate the energy of a molecule using MacroModel. Using force field
-    # number 16 (OPLS3).
-    mol.energy.marcomodel(16, '/opt/schrodinger2017-4')
     # Calculate the maximum diameter of of a molecule.
     mol.max_diameter()
     # Calculate the cavity size of a cage molecule.
@@ -315,23 +502,6 @@ Here are some examples:
     mol.center_of_mass()
     # Get the atomic symbol of atom with id of 13.
     mol.atom_symbol(13)
-
-Something to note about energy calculations, is that each time you run
-the method, the result gets saved. For example,
-
-
-.. code-block:: python
-
-    mol.energy.values # {}
-    mol.energy.rdkit('uff') # Returns 16.05
-    mol.energy.values # {FunctionData('rdkit', forcefield='uff'): 16.501}
-    mol.energy.macromodel(forcefield=16,
-                          macromodel_path='path/to/macromodel/dir') # Returns 200
-    mol.energy.values # {FunctionData('rdkit', forcefield='uff'): 16.501,
-                      #  FunctionData('macromodel', forcefield=16): 200}
-
-This can come in handy if you do not want to repeat expensive calculations.
-
 
 Geometric Manipulations
 .......................
@@ -414,10 +584,8 @@ Most methods and functions in ``stk`` also support conformers.
 
     # And so on ...
 
-
 Dealing with Multiple Molecules
 ...............................
-
 
 When batches of molecules are created, it is often desirable to optimize
 them all at once. By placing the molecules in a :class:`.Population`
@@ -425,8 +593,9 @@ instance, all molecules can be optimized in parallel.
 
 .. code-block:: python
 
+    mmff = MMFF()
     pop = Population(cage, cage2, cage3)
-    pop.optimize(FunctionData('macromodel_opt', macromodel_path='/opt/schrodinger2017-4'))
+    pop.optimize(mmff)
 
 
 In addition to this, the :class:`.Population` class provides some handy
@@ -479,212 +648,212 @@ and recover the ``stk`` objects later
 Automated Molecular Design with Genetic Algorithms
 ..................................................
 
-Via the :mod:`.ga` module, ``stk`` includes a genetic algorithm which
+``stk`` includes a genetic algorithm which
 can be used to evolve molecules that fulfil user defined design criteria.
 The genetic algorithm can be run from the command line using::
 
     $ python -m stk.ga input_file.py
 
-The input file is a simple python script which defines the mutation,
-crossover, selection and other functions the genetic algorithm
-should use. For details on how to build an input file see :class:`.GAInput`
-and :doc:`ga_input_file_examples`.
+The input file is a simple python script which defines the
+calculators the genetic algorithm should use, as well as some optional
+parameters.
 
 The genetic algorithm automatically works with any molecules that ``stk``
-can construct, just make sure you define an appropriate fitness function.
-It will also work with :class:`StructUnit` if you do not wish to use
-``stk``'s construction capabilities.
+uses, both :class:`.StructUnit` and :class:`.MacroMolecule` objects.
 
 Take for example the following input file which runs the GA on polymers
 and selects building blocks which have the most atoms.
 
 .. code-block:: python
 
-    # big_monomers.py
-
-    # ################################################################
-    # Import stuff.
-    # ################################################################
+    # #####################################################################
+    # Imports.
+    # #####################################################################
 
     import stk
+    import logging
 
-    # ################################################################
-    # Number of CPU cores to use.
-    # ################################################################
+    # #####################################################################
+    # Set the number of cores to use.
+    # #####################################################################
 
+    # This argument is optional, will default to use all CPU cores on
+    # your PC.
     processes = 1
 
-    # ################################################################
-    # Disable debug population dumps.
-    # ################################################################
+    # #####################################################################
+    # Set logging level.
+    # #####################################################################
 
-    pop_dumps = False
+    # This argument is optional, will default to logging.INFO
+    logging_level = logging.DEBUG
 
-    # ################################################################
-    # Population size.
-    # ################################################################
+    # #####################################################################
+    # Toggle the writing of a log file.
+    # #####################################################################
 
-    pop_size = 20
+    # This argument is optional, will default to True.
+    log_file = True
 
-    # ################################################################
-    # Number of generations to create.
-    # ################################################################
+    # #####################################################################
+    # Toggle the dumping of generated molecules.
+    # #####################################################################
 
-    num_generations = 50
+    # This argument is optional, will default to True.
+    database_dump = True
 
-    # ################################################################
-    # Number of mutation operations to perform each generation.
-    # ################################################################
+    # #####################################################################
+    # Toggle the dumping of GA generations.
+    # #####################################################################
 
-    num_mutations = 5
+    # This argument is optional, will default to True.
+    progress_dump = True
 
-    # ################################################################
-    # Number of crossover operations to perform each generation.
-    # ################################################################
+    # #####################################################################
+    # Toggle the dumping of molecules at every generation.
+    # #####################################################################
 
-    num_crossovers = 3
+    # This argument is optional, will default to False.
+    debug_dumps = False
 
-    # ################################################################
-    # Population initialization function.
-    # ################################################################
+    # #####################################################################
+    # Make a tar archive of the output.
+    # #####################################################################
 
-    # First create the StructUnit objects of the monomers. In
-    # this simple example, they are simple hydro-carbon chains terminated
-    # with either two amine or two aldehyde functional groups.
-    amines = []
-    aldehydes = []
-    for i in range(1, 50):
-        # There are 2 different backbones, alkane, alkene.
-        backbones = ['C'*i, '='.join('C'*i)]
+    # This argument is optional, will default to False.
+    tar_output = True
 
-        for backbone in backbones:
-            amine_smiles = 'N' + backbone + 'N'
-            amine_monomer = stk.StructUnit2.smiles_init(
-                                             smiles=amine_smiles,
-                                             functional_groups=['amine'])
-            amines.append(amine_monomer)
+    # #####################################################################
+    # Initial population.
+    # #####################################################################
 
-            aldehyde_smiles = 'O=C' + backbone + 'C=O'
-            aldehyde_monomer = stk.StructUnit2.smiles_init(
-                                            smiles=aldehyde_smiles,
-                                            functional_groups=['aldehyde'])
-            aldehydes.append(aldehyde_monomer)
+    # Only the "population" variable must be defined in the input file.
+    # The other variables defined in this section are to make the code
+    # more readable.
 
-    # List of the possible topologies the polymers can have. In this
-    # simple example a single topology will suffice.
-    polymer_topologies = [stk.Linear(repeating_unit='AB',
-                                     orientation=[0, 0],
-                                     n=1)]
+    carbon = 'C'
+    building_blocks = [
+        stk.StructUnit2.smiles_init(f'[Br]{carbon*i}[Br]', ['bromine'])
+        for i in range(2, 27)
+    ]
 
-    # Finally, define the function which is called to create the
-    # initial GA population. The "NAME" key holds the name of an
-    # initialization function of the GAPopulation class. The remaining
-    # key-value pairs are additional parameters for that function.
-    # Default parameters can be specified if desired.
-    init_func = {'NAME': 'init_random',
-                 'macromol_class': stk.Polymer,
-                 'building_blocks': [amines, aldehydes],
-                 'topologies': polymer_topologies}
+    topologies = [
+        stk.Linear('A', [0], 3),
+        stk.Linear('A', [0], 6),
+        stk.Linear('A', [0], 12)
+    ]
 
-    # ################################################################
-    # Selection function for selecting the next generation.
-    # ################################################################
+    # population holds the initial population of the GA.
+    population = stk.GAPopulation.init_random(stk.Polymer,
+                                              [building_blocks],
+                                              topologies,
+                                              25)
 
-    # The "NAME" key holds the name of a method in the Selection class.
-    # The remaining key-value pairs are additional parameters for that
-    # method. The "population" parameter is not specified and any
-    # default parameters can be specified if desired.
-    generational_select_func = {'NAME': 'stochastic_sampling',
-                                'use_rank': True}
+    # #####################################################################
+    # Selector for selecting the next generation.
+    # #####################################################################
 
-    # ################################################################
-    # Selection function for selecting parents.
-    # ################################################################
+    generation_selector = stk.SelectorSequence(
+        stk.Fittest(num=3, duplicates=False),
+        stk.Roulette(num=22, duplicates=False)
+    )
 
-    # The "NAME" key holds the name of a method in the Selection class.
-    # The remaining key-value pairs are additional parameters for that
-    # method. The "population" parameter is not specified and any
-    # default parameters can be specified if desired.
-    crossover_select_func = {'NAME': 'crossover_roulette',
-                             'truncation': 5}
+    # #####################################################################
+    # Selector for selecting parents.
+    # #####################################################################
 
-    # ################################################################
-    # Selection function for selecting molecules for mutation.
-    # ################################################################
+    crossover_selector = stk.AboveAverage(num=5, batch_size=2)
 
-    # The "NAME" key holds the name of a method in the Selection class.
-    # The remaining key-value pairs are additional parameters for that
-    # method. The "population" parameter is not specified and any
-    # default parameters can be specified if desired.
-    mutation_select_func = {'NAME': 'stochastic_sampling',
-                            'truncation': 3,
-                            'duplicates': True}
+    # #####################################################################
+    # Selector for selecting molecules for mutation.
+    # #####################################################################
 
-    # ################################################################
-    # Crossover functions.
-    # ################################################################
+    mutation_selector = stk.SelectorFunnel(
+        stk.AboveAverage(num=10, duplicates=False),
+        stk.Roulette(num=5)
+    )
 
-    # In this example there only one crossover function will be used,
-    # but can use multiple if we add them into the list.
+    # #####################################################################
+    # Crosser.
+    # #####################################################################
 
-    # The "NAME" key holds the name of a method in the Crossover class.
-    # The "macro_mol" parameters are not specified and any default
-    # parameters can be specified optionally. All other parameters
-    # must be specified as key-value pairs.
-    crossover_funcs = [{'NAME': 'genetic_recombination',
-                        'key': lambda x: x.func_group_infos[0].name}]
+    crosser = stk.Jumble(num_offspring_building_blocks=3)
 
-    # ################################################################
-    # Mutation functions.
-    # ################################################################
+    # #####################################################################
+    # Mutator.
+    # #####################################################################
 
-    # The "NAME" key holds the name of a method in the Mutation class.
-    # The "macro_mol" parameter is not specified and any default
-    # parameters can be specified optionally. All other parameters
-    # must be specified as key-value pairs.
+    mutator = stk.RandomMutation(
+        stk.RandomTopology(topologies),
+        stk.RandomBuildingBlock(building_blocks, lambda mol: True),
+        stk.SimilarBuildingBlock(building_blocks, lambda mol: True, False)
+    )
 
-    # mutation_func1 substitutes the amine building block in the
-    # molecule with one from the list "amines", defined earlier.
-    mutation_func1 = {'NAME': 'random_bb',
-                      'mols': amines,
-                      'key': lambda x: x.func_group_infos[0].name == 'amine'}
+    # #####################################################################
+    # Optimizer.
+    # #####################################################################
 
-    # mutation_func2 substitutes the aldehyde building block in the
-    # molecule with one from the list "aldehydes", defined earlier.
-    mutation_func2 = {'NAME': 'random_bb',
-                      'mols': aldehydes,
-                      'key': lambda x: x.func_group_infos[0].name == 'aldehyde'}
+    # Remember to set use_cache to True for the GA.
+    optimizer = stk.MMFF(use_cache=True)
 
-    # Here we tell the GA which mutation functions we want to use.
-    mutation_funcs = [mutation_func1, mutation_func2]
+    # #####################################################################
+    # Fitness calculator.
+    # #####################################################################
 
-    # ################################################################
-    # Optimization function.
-    # ################################################################
 
-    # In this example, for the sake of speed, we will not optimize
-    # constructed polymers.
+    def num_atoms(mol, conformer):
+        n_atoms = mol.mol.GetNumAtoms()
+        # Save the number of atoms in an attribute for later plotting.
+        mol.num_atoms = n_atoms
+        return n_atoms
 
-    # The "NAME" key holds the name of a function
-    # defined in the optimization.py module. The "mol" parameter is
-    # not specified and any default parameters can be specified
-    # optionally. All other parameters must be specified as key-value
-    # pairs.
 
-    # Note that "do_not_optimize" is the name of a function
-    # in this module. It simply returns immediately and as a result does
-    # no work.
-    opt_func = {'NAME': 'do_not_optimize'}
+    fitness_calculator = stk.PropertyVector(num_atoms)
 
-    # ################################################################
-    # Fitness function.
-    # ################################################################
+    # #####################################################################
+    # Fitness normalizer.
+    # #####################################################################
 
-    # The "NAME" key holds the name of a function defined in the
-    # "fitness.py" module. The "macro_mol" parameter is not
-    # specified and any default parameters can be specified if desired.
-    # The remaining parameters must be specified as key-value pairs.
-    fitness_func = {'NAME': 'building_block_atoms'}
+    # This is an optional argument, will default to NullOptimizer.
+
+    # The PropertyVector fitness calculator will set the fitness as
+    # [n_atoms] use the Sum() fitness normalizer to convert the fitness to
+    # just n_atoms^0.5. The sqrt is because we use the Power normalizer.
+    fitness_normalizer = stk.NormalizerSequence(
+        stk.Power(0.5),
+        stk.Sum()
+    )
+
+    # #####################################################################
+    # Exit condition.
+    # #####################################################################
+
+    exiter = stk.NumGenerations(25)
+
+    # #####################################################################
+    # Make plotters.
+    # #####################################################################
+
+    # This is an optional argument, no plotting will be made by default.
+
+    plotters = [
+        stk.ProgressPlotter(filename='fitness_plot',
+                            attr='fitness',
+                            y_label='Fitness',
+                            default=1e-4),
+        stk.ProgressPlotter(filename='atom_number_plot',
+                            attr='num_atoms',
+                            y_label='Number of Atoms',
+                            default=0)
+    ]
+
+    stk.SelectionPlotter(filename='generational_selection',
+                         selector=generation_selector)
+    stk.SelectionPlotter(filename='crossover_selection',
+                         selector=crossover_selector)
+    stk.SelectionPlotter(filename='mutation_selection',
+                         selector=mutation_selector)
+
 
 
 Running the genetic algorithm with this input file::
@@ -695,10 +864,15 @@ will produce the following directory structure::
 
     |-- stk_ga_runs
     |   |-- 0
-    |   |   |-- counters
-    |   |   |   |-- gen_1_crossover_counter.png
-    |   |   |   |-- gen_1_mutation_counter.png
-    |   |   |   |-- gen_1_selection_counter.png
+    |   |   |-- scratch
+    |   |   |   |-- atom_number_plot.png
+    |   |   |   |-- atom_number_plot.csv
+    |   |   |   |-- fitness_plot.png
+    |   |   |   |-- fitness_plot.csv
+    |   |   |   |-- generational_selection_1.png
+    |   |   |   |-- crossover_selection_1.png
+    |   |   |   |-- mutation_selection_1.png
+    |   |   |   |-- progress.log
     |   |   |   |-- ...
     |   |   |
     |   |   |-- final_pop
@@ -711,13 +885,10 @@ will produce the following directory structure::
     |   |   |-- database.json
     |   |   |-- progress.json
     |   |   |-- errors.log
-    |   |   |-- progress.log
-    |   |   |-- epp.png
-    |   |   |-- epp.csv
     |   |   |-- output.tgz
 
-A glance at the evolutionary progress plot in ``epp.png`` will show us
-how well our GA did.
+A glance at the evolutionary progress plot in
+``scratch/fitness_plot.png`` will show us how well our GA did.
 
 .. image:: figures/epp.png
 
@@ -752,25 +923,27 @@ will add a second subfolder with the same structure::
     |   |   |-- output.tgz
     |
     |   |-- 1
-    |   |   |-- counters
-    |   |   |   |-- gen_1_crossover_counter.png
-    |   |   |   |-- gen_1_mutation_counter.png
-    |   |   |   |-- gen_1_selection_counter.png
+    |   |   |-- scratch
+    |   |   |   |-- atom_number_plot.png
+    |   |   |   |-- atom_number_plot.csv
+    |   |   |   |-- fitness_plot.png
+    |   |   |   |-- fitness_plot.csv
+    |   |   |   |-- generational_selection_1.png
+    |   |   |   |-- crossover_selection_1.png
+    |   |   |   |-- mutation_selection_1.png
+    |   |   |   |-- progress.log
     |   |   |   |-- ...
     |   |   |
     |   |   |-- final_pop
-    |   |   |   |-- 41.mol
-    |   |   |   |-- 221.mol
-    |   |   |   |-- 1391.mol
+    |   |   |   |-- 150.mol
+    |   |   |   |-- 2160.mol
+    |   |   |   |-- 9471.mol
     |   |   |   |-- ...
     |   |   |
     |   |   |-- big_monomers.py
     |   |   |-- database.json
     |   |   |-- progress.json
     |   |   |-- errors.log
-    |   |   |-- progress.log
-    |   |   |-- epp.png
-    |   |   |-- epp.csv
     |   |   |-- output.tgz
 
 The genetic algorithm can also be run multiple times in a row::
@@ -810,66 +983,39 @@ re-calculated in any of the subsequent runs. The cached version
 of the molecule will be used.
 
 However, the molecular cache be pre-loaded even when the ``-l`` option is
-not used. The input file allows the definition of a variable
-:attr:`~.GAInput.databases`, for example
+not used, simply load the molecules in the input file.
 
 .. code-block:: python
 
-    # some_inputfile.py
+    # some input_file.py
 
-    databases = ['path/to/some/population1.json',
-                 'path/to/some/other/population2.json']
-
-If this variable is defined in the input file, any molecules present
-in the population dump files will be loaded into the cache before the
-GA starts. This means that any molecules found in these populations
-will not be re-optimized, or have their fitness value re-calculated
-if discovered by the GA.
+    # There is no need to save this population into a variable.
+    # It is enough to load the molecules to place them into the cache.
+    stk.Population.load('dumped_molecules.json',
+                        stk.Molecule.from_dict)
 
 The output of a single GA consists of a number of files and
-directories. The ``counter`` directory holds ``.png`` files showing
+directories. The ``scratch`` directory holds any files created during
+the GA run. For example, the ``.png`` files showing
 how frequently a member of the population was selected for mutation,
 crossover and generational selection. For example, this is a
-crossover counter
+mutation counter
 
 .. image:: figures/counter_example.png
 
-It shows that molecule ``168`` was selected twice for crossover, while molecules
-``60``, ``170``, ``167``, ``63`` and ``153`` were selected once. The
+It shows that molecule ``8`` was selected three times for mutation, while molecules
+``40``, ``23``` were selected once. The
 remaining molecules did not participate in crossover operations
 in that generation.
-
-If you do want want the GA to produce these files, simply tell the
-GA in the input file
-
-.. code-block:: python
-
-    # some_input_file.py
-
-    counters = False
 
 The ``final_pop`` directory holds the ``.mol`` files holding the
 structures of the last generation of molecules.
 The file ``big_monomers.py`` is a copy of the input file. The ``database.json``
 file is a population dump file which holds every molecule produced by
-the GA during the run. This can be turned off with
-
-.. code-block:: python
-
-    # some_input_file.py
-
-    database_dump = False
-
-``progress.json`` is also a population dump file. This population holds
+the GA during the run. ``progress.json`` is also a population dump file.
+This population holds
 every generation of the GA as a subpopulation. This is quite useful
-if you want to analyse the output of the GA generation-wise. It
-can be turned off with
-
-.. code-block:: python
-
-    # some_input_file.py
-
-    progress_dump = False
+if you want to analyse the output of the GA generation-wise.
 
 ``errors.log`` is a file which contains every exception and its
 traceback encountered by the GA during its run.
@@ -877,26 +1023,13 @@ traceback encountered by the GA during its run.
 ``progress.log`` is a file which lists which molecules make up each
 generation, and their respective fitness values.
 
-``epp.csv`` is a dumped :class:`pandas.DataFrame` which holds the data used
-make ``epp.png``.
-
 ``output.tgz`` is a tarred and compressed copy of the output folder for
 the run.
 This means if you want to share you entire run output you can just
-share this file. It can be turned off with
-
-.. code-block:: python
-
-    # some_input_file.png
-
-    tar_output = False
+share this file.
 
 Finally, when running the GA the progress will be printed into
-stderr. The message should be relatively straightforward. One thing
-to note though is that during optimizations and fitness function
-calculation, any molecule that has already been optimized and had its
-fitness value calculated will be skipped, so that duplicate work is
-avoided. Briefly an example message
+stderr. The message should be relatively straightforward, such as
 
 ::
 
@@ -906,7 +1039,7 @@ avoided. Briefly an example message
 
     ======================================================================
 
-show the time, the level of the message which can be, in order of
+which shows the time, the level of the message which can be, in order of
 priority DEBUG, INFO, WARNING, ERROR or CRITICAL, the module where
 the message originated and finally the message itself.
 
@@ -917,20 +1050,21 @@ Extending ``stk``
 
 Each module of ``stk`` has its own guidelines for adding new functionality.
 However, in almost all cases adding new features to ``stk`` only involves
-defining a simple function in the appropriate module or a method in the
-appropriate class.
+defining a simple class in the appropriate module. All of the extensions
+can be done in user code so stk source code does not need to be
+modified directly in order to be extended.
 
     * :ref:`adding macromolecules`
     * :ref:`adding topologies`
     * :ref:`adding functional groups`
-    * :ref:`adding optimization functions`
-    * :ref:`adding energy functions`
-    * :ref:`adding mutation functions`
-    * :ref:`adding crossover functions`
-    * :ref:`adding fitness functions`
-    * :ref:`adding normalization functions`
-    * :ref:`adding selection functions`
-    * :ref:`adding exit functions`
+    * :ref:`adding optimizers`
+    * :ref:`adding energy calculators`
+    * :ref:`adding mutators`
+    * :ref:`adding crossers`
+    * :ref:`adding fitness calculators`
+    * :ref:`adding fitness normalizers`
+    * :ref:`adding selectors`
+    * :ref:`adding exiters`
 
 
 Further Reading
@@ -940,7 +1074,7 @@ Further Reading
     * :ref:`cof assembly`
     * :doc:`advanced_cage_building`
     * :doc:`caching`
-    * https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826
+    * :doc:`modifying_calculators`
 
 Indices and tables
 ==================

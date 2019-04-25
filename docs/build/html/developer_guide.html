@@ -1,0 +1,206 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Developer’s guide. &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Developer’s guide.</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">stk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Developer’s guide.</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/developer_guide.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="developer-s-guide">
+<h1>Developer’s guide.<a class="headerlink" href="#developer-s-guide" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">stk</span></code> is a fairly simple library. The key design principle is
+modularity and atomicity. The basic dependency structure is that
+any module can depend on things defined in the <a class="reference internal" href="stk.utilities.html#module-stk.utilities" title="stk.utilities"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utilities</span></code></a>
+module but all other top-level modules, such as <a class="reference internal" href="stk.calculators.html#module-stk.calculators" title="stk.calculators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calculators</span></code></a>
+and <a class="reference internal" href="stk.molecular.html#module-stk.molecular" title="stk.molecular"><code class="xref py py-mod docutils literal notranslate"><span class="pre">molecular</span></code></a> should be completely independent of one another.</p>
+<p>Within these top level modules, sub-modules should still be defined in
+as dependency free way as possible, though exceptions can be made in
+rare and extreme circumstances where it makes sense. For example
+<a class="reference internal" href="stk.molecular.molecules.html#module-stk.molecular.molecules" title="stk.molecular.molecules"><code class="xref py py-mod docutils literal notranslate"><span class="pre">molecules</span></code></a> imports a couple of tools from
+<a class="reference internal" href="stk.molecular.functional_groups.html#module-stk.molecular.functional_groups" title="stk.molecular.functional_groups"><code class="xref py py-mod docutils literal notranslate"><span class="pre">functional_groups</span></code></a></p>
+<p><a class="reference internal" href="stk.utilities.html#module-stk.utilities" title="stk.utilities"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utilities</span></code></a> defines general purpose tools, <a class="reference internal" href="stk.molecular.html#module-stk.molecular" title="stk.molecular"><code class="xref py py-mod docutils literal notranslate"><span class="pre">molecular</span></code></a>
+defines tools dealing with molecules and <a class="reference internal" href="stk.calculators.html#module-stk.calculators" title="stk.calculators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calculators</span></code></a> defines
+calculator objects. Each calculator type should be defined in its
+own sub-module with additional sub-folders to make everything as tidy
+and logically cohesive as possible.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

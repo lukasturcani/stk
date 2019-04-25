@@ -1,5 +1,10 @@
-stk\.molecular\.topologies package
-==================================
+stk.molecular.topologies package
+================================
+
+.. automodule:: stk.molecular.topologies
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Subpackages
 -----------
@@ -15,11 +20,5 @@ Submodules
 
    stk.molecular.topologies.base
    stk.molecular.topologies.cof
+   stk.molecular.topologies.multimers
 
-Module contents
----------------
-
-.. automodule:: stk.molecular.topologies
-    :members:
-    :undoc-members:
-    :show-inheritance:
