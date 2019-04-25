@@ -646,7 +646,7 @@ and recover the ``stk`` objects later
     pop[1] # <Periodic at 0x12498>
 
 Automated Molecular Design with Genetic Algorithms
-..................................................
+--------------------------------------------------
 
 ``stk`` includes a genetic algorithm which
 can be used to evolve molecules that fulfil user defined design criteria.
@@ -814,7 +814,7 @@ and selects building blocks which have the most atoms.
     # Fitness normalizer.
     # #####################################################################
 
-    # This is an optional argument, will default to NullOptimizer.
+    # This is an optional argument, will default to NullFitnessNormalizer.
 
     # The PropertyVector fitness calculator will set the fitness as
     # [n_atoms] use the Sum() fitness normalizer to convert the fitness to
