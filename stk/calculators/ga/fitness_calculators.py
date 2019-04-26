@@ -232,11 +232,34 @@ class RaisingFitnessCalculator(FitnessCalculator):
 
     """
 
-    def __init__(self, fitness_calculator, fail_chance=0.5):
+    def __init__(self,
+                 fitness_calculator,
+                 fail_chance=0.5,
+                 use_cache=False):
+        """
+        Initializes a :class:`RaisingFitnessCalculator` instance.
+
+        Parameters
+        ----------
+        fitness_calculator : :class:`FitnessCalculator`
+            When the fitness calculator does not fail, it uses this
+            :class:`FitnessCalculator` to calculate fitness of
+            molecules.
+
+        fail_chance : :class:`float`, optional
+            The probability that the fitness calculator will raise an
+            error each time :meth:`fitness` is used.
+
+        use_cache : :class:`bool`, optional
+            If ``True`` then fitness values for molecules and
+            conformers already held in :attr:`cache` are not
+            re-calculated and the value already stored is used.
+
+        """
+
         self.fitness_calculator = fitness_calculator
         self.fail_chance = fail_chance
-        # "fitness_calculator" should toggle use_cache for itself.
-        super().__init__(use_cache=False)
+        super().__init__(use_cache=use_cache)
 
     def fitness(self, mol, conformer=-1):
         """
@@ -451,10 +474,9 @@ class PropertyVector(FitnessCalculator):
         # its cache attribute.
         print(fitness_calculator.cache)
 
-
     """
 
-    def __init__(self, *property_fns, use_cache=True):
+    def __init__(self, *property_fns, use_cache=False):
         """
         Initializes a :class:`CageFitness` instance.
 
@@ -468,7 +490,7 @@ class PropertyVector(FitnessCalculator):
             :class:`int`. These are the molecule and the conformer id
             used to calculate the property.
 
-        use_cache : :class:`bool`
+        use_cache : :class:`bool`, optional
             If ``True`` then fitness values for molecules and
             conformers already held in :attr:`cache` are not
             re-calculated and the value stored is used.
