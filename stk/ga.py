@@ -237,8 +237,9 @@ def ga_run(input_file):
                      mutator=mutator,
                      crosser=crosser)
 
-    # GA optimizer should always use its cache.
+    # GA optimizer and fitness calculator should always use the cache.
     optimizer.use_cache = True
+    fitness_calculator.use_cache = True
 
     # 2. Set up the directory structure.
 
