@@ -266,7 +266,7 @@ class CageOptimizerSequence(Optimizer):
 
     """
 
-    def __init__(self, *optimizers):
+    def __init__(self, *optimizers, use_cache=False):
         """
         Initializes a :class:`CageOptimizerSequence` instance.
 
@@ -276,10 +276,13 @@ class CageOptimizerSequence(Optimizer):
             The :class:`Optimizers` used in sequence to optimize
             :class:`.Cage` molecules.
 
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
+
         """
 
         self.optimizers = optimizers
-        # "optimizers" should toggle use_cache for themselves.
         super().__init__(use_cache=False)
 
     def optimize(self, mol, conformer=-1):
