@@ -283,7 +283,7 @@ class CageOptimizerSequence(Optimizer):
         """
 
         self.optimizers = optimizers
-        super().__init__(use_cache=False)
+        super().__init__(use_cache=use_cache)
 
     def optimize(self, mol, conformer=-1):
         """
@@ -391,14 +391,34 @@ class TryCatchOptimizer(Optimizer):
         try_catch.optimize(mol2)
         try_catch.optimzie(mol3)
 
-
     """
 
-    def __init__(self, try_optimizer, catch_optimizer):
+    def __init__(self,
+                 try_optimizer,
+                 catch_optimizer,
+                 use_cache=False):
+        """
+        Initializes a :class:`TryCatchOptimizer` instance.
+
+        Parameters
+        ----------
+        try_optimizer : :class:`Optimizer`
+            The optimizer which is used initially to try and optimize a
+            :class:`.Molecule`.
+
+        catch_optimizer : :class:`Optimizer`
+            If :attr:`try_optimizer` raises an error, this optimizer is
+            run on the :class:`.Molecule` instead.
+
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
+
+        """
+
         self.try_optimizer = try_optimizer
         self.catch_optimizer = catch_optimizer
-        # try and catch optimizers should toggle use_cache themselves.
-        super().__init__(use_cache=False)
+        super().__init__(use_cache=use_cache)
 
     def optimize(self, mol, conformer=-1):
         """
@@ -464,7 +484,7 @@ class RaisingOptimizer(Optimizer):
 
     """
 
-    def __init__(self, optimizer, fail_chance=0.5):
+    def __init__(self, optimizer, fail_chance=0.5, use_cache=False):
         """
         Initializes :class:`PartialRaiser`.
 
@@ -478,12 +498,15 @@ class RaisingOptimizer(Optimizer):
             The probability that the optimizer will raise an error each
             time :meth:`optimize` is used.
 
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
+
         """
 
         self.optimizer = optimizer
         self.fail_chance = fail_chance
-        # "optmizer" should toggle use_cache for itself.
-        super().__init__(use_cache=False)
+        super().__init__(use_cache=use_cache)
 
     def optimize(self, mol, conformer=-1):
         """
