@@ -202,7 +202,7 @@ class OptimizerSequence(Optimizer):
         mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
         etkdg = RDKitEmbedder(rdkit.ETKDG())
         mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
-        optimizer = OptimizerPipeline(etkdg, mmff)
+        optimizer = OptimizerSequence(etkdg, mmff)
         optimizer.optimize(mol)
 
     """
