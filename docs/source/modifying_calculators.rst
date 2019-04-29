@@ -1,9 +1,9 @@
 Modifying ``stk`` Calculators
 =============================
 
-This guide takes the form a cookbook to give examples of how ``stk``
-calculators can be extended in user code to add functionality. The
-basic principle is the use of decorators to extend functionality.
+This guide takes the form a cookbook. Common problems are presented
+followed by a suggested solution. A typical pattern is the use of
+decorators to extend calculator methods.
 
 Adding timing information to calculator calls.
 ==============================================
