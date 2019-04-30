@@ -876,7 +876,7 @@ class MacroModelMD(_MacroModel):
     simulation_time : :class:`float`
         The simulation time in ``ps`` of the MD.
 
-    restricted_bonds : class:`set`
+    restricted_bonds : :class:`set`
         A :class:`set` of the form
 
         .. code-block:: python
@@ -890,7 +890,7 @@ class MacroModelMD(_MacroModel):
         Where each :class:`frozenset` defines which bonds should have
         a fixed length via the atom ids of atoms in the bond.
 
-    restricted_bond_angles : class:`set`
+    restricted_bond_angles : :class:`set`
         A :class:`set` of the form
 
         .. code-block:: python
@@ -905,7 +905,7 @@ class MacroModelMD(_MacroModel):
         have a fixed size via the atom ids of atoms in the bond
         angle.
 
-    restricted_torsional_angles : class:`set`
+    restricted_torsional_angles : :class:`set`
         A :class:`set` of the form
 
         .. code-block:: python
@@ -982,7 +982,7 @@ class MacroModelMD(_MacroModel):
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
 
-        restricted_bonds : class:`set`
+        restricted_bonds : :class:`set`, optional
             A :class:`set` of the form
 
             .. code-block:: python
@@ -993,10 +993,10 @@ class MacroModelMD(_MacroModel):
                     frozenset((5, 6))
                 }
 
-            Where each :class:`frozenset` defines which bonds should have
-            a fixed length via the atom ids of atoms in the bond.
+            Where each :class:`frozenset` defines which bonds should
+            have a fixed length via the atom ids of atoms in the bond.
 
-        restricted_bond_angles : class:`set`
+        restricted_bond_angles : :class:`set`, optional
             A :class:`set` of the form
 
             .. code-block:: python
@@ -1007,11 +1007,11 @@ class MacroModelMD(_MacroModel):
                     frozenset((5, 8, 2))
                 }
 
-            Where each :class:`frozenset` defines which bond angles should
-            have a fixed size via the atom ids of atoms in the bond
-            angle.
+            Where each :class:`frozenset` defines which bond angles
+            should have a fixed size via the atom ids of atoms in the
+            bond angle.
 
-        restricted_torsional_angles : class:`set`
+        restricted_torsional_angles : :class:`set`, optional
             A :class:`set` of the form
 
             .. code-block:: python
@@ -1022,9 +1022,9 @@ class MacroModelMD(_MacroModel):
                     frozenset((5, 8, 2, 9))
                 }
 
-            Where each :class:`frozenset` defines which torsional angles
-            should have a fixed size via the atom ids of atoms in the
-            torsional angle.
+            Where each :class:`frozenset` defines which torsional
+            angles should have a fixed size via the atom ids of atoms
+            in the torsional angle.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
