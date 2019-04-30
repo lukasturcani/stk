@@ -214,7 +214,7 @@ def ga_run(input_file):
     if hasattr(input_file, 'database_dump'):
         database_dump = input_file.database_dump
 
-    progress_dump = False
+    progress_dump = True
     if hasattr(input_file, 'progress_dump'):
         progress_dump = input_file.progress_dump
 
