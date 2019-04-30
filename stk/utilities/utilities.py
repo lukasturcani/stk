@@ -846,7 +846,10 @@ def move_generated_macromodel_files(basename, output_dir):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
 
-    for filename in iglob(f'{basename}/*'):
+    for filename in iglob(f'{basename}*'):
+        # Do not move the output_dir.
+        if filename == output_dir:
+            continue
         os.rename(filename, f'{output_dir}/{filename}')
 
 
