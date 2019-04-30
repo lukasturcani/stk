@@ -98,7 +98,7 @@ def test_both_md(tmp_cc3, macromodel_path):
     # Freeze one of the bonders.
     bonder = tmp_cc3.func_groups[0].bonder_ids[0]
     restricted_bonds = []
-    for neighbor in tmp_cc3.mol.GetAtom(bonder).GetNeighbors():
+    for neighbor in tmp_cc3.mol.GetAtomWithIdx(bonder).GetNeighbors():
         restricted_bonds.append(frozenset((bonder, neighbor.GetIdx())))
 
     mm = stk.MacroModelMD(macromodel_path=macromodel_path,
