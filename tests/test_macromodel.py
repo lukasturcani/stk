@@ -98,7 +98,6 @@ def test_unrestricted_md(tmp_cc3, macromodel_path):
 
 @macromodel
 def test_energy(amine2, macromodel_path):
-
     mm = stk.MacroModelEnergy(macromodel_path, 'energy_calc')
     a = mm.energy(amine2)
     assert np.allclose(a=a,
