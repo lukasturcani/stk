@@ -95,10 +95,16 @@ def test_unrestricted_md(tmp_cc3, macromodel_path):
 def test_both_md(tmp_cc3, macromodel_path):
     tmp_cc3.write(join(outdir, 'bmm_md_before.mol'), conformer=0)
 
+    # Freeze one of the bonders.
+    bonder = tmp_cc3.functional_groups[0].bonder_ids[0]
+    restricted_bonds = []
+    for neighbor in tmp_cc3.mol.GetAtom(bonder).GetNeighbors():
+        restricted_bonds.append(frozenset((bonder, neighbor.GetIdx())))
+
     mm = stk.MacroModelMD(macromodel_path=macromodel_path,
                           output_dir='bmm_md',
                           minimum_gradient=1,
-                          restricted='both',
+                          restricted_bonds=restricted_bonds,
                           simulation_time=20,
                           eq_time=2,
                           conformers=2)
