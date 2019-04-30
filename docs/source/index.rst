@@ -1053,6 +1053,63 @@ which shows the time, the level of the message which can be, in order of
 priority DEBUG, INFO, WARNING, ERROR or CRITICAL, the module where
 the message originated and finally the message itself.
 
+Genetic algorithm input file variables.
+.......................................
+
+This section lists the variables that need to be defined in the GA
+input file, along with a description of each variable.
+
+* :data:`population` - :class:`.GAPopulation` - **mandatory** -
+  The initial population of the GA.
+* :data:`optimizer` - :class:`.Optimizer` - **mandatory** - The
+  optimizer used to optimize the molecules created by the GA.
+* :data:`fitness_calculator` - :class:`.FitnessCalculator` -
+  **mandatory** - The fitness calculator used to calculate fitness of
+  molecules.
+* :data:`crosser` - :class:`.Crosser` - **mandatory** - The crosser
+  used to carry out crossover operations.
+* :data:`mutator` - :class:`.Mutator` - **mandatory** - The mutator
+  used to carry out mutation operations.
+* :data:`generation_selector` - :class:`.Selector` - **mandatory** -
+  The selector used to select the next generation.
+  :attr:`~.Selector.batch_size` must be ``1``.
+* :data:`mutation_selector` - :class:`.Selector` - **mandatory** - The
+  selector used to select molecules to mutate.
+  :attr:`~.Selector.batch_size` must be ``1``.
+* :data:`crossover_selector` - :class:`.Selector` - **mandatory** -
+  The selector used to select molecules for crossover.
+* :data:`exiter` - :class:`.Exiter` - The exiter which determines if
+  the GA has satisfied its exit condition.
+* :data:`fitness_normalizer` - :class:`.FitnessNormalizer` -
+  *optional, default = NullFitnessOptimizer()* - The fitness normalizer
+  which normalizes fitness values each generation.
+* :data:`processes` - :class:`int` -
+  *optional, default = psutil.cpu_count()* - The number of CPU cores
+  the GA should use.
+* :data:`plotters` - :class:`list` of :class:`.Plotter` -
+  *optional, default = []* - Plotters which are used to plot graphs at
+  the end of the GA.
+* :data:`log_file` - :class:`bool` -
+  *optional, default = True* - Toggles whether a log file which lists
+  which molecules are present in each generation should be made.
+* :data:`database_dump` - :class:`bool` -
+  *optional, default = True* - Toggles whether a :class:`.Population`
+  JSON file should be made at the end of the GA run. It will hold every
+  molecule made by the GA.
+* :data:`progress_dump` - :class:`bool` -
+  *optional, default = True* - Toggles whether a :class:`.Population`
+  JSON file should be made at the end of the GA run. It will hold every
+  generation of the GA as a separate subpopulation.
+* :data:`debug_dumps` - :class:`bool` -
+  *optional, default = False* - If ``True`` a database and progress dump
+  is made after every generation rather than just the end. This is nice
+  for debugging but can seriously slow down the GA.
+* :data:`tar_output` - :class:`bool` -
+  *optional, default = False* - If ``True`` then a compressed tar
+  archive of the output folder will be made.
+* :data:`logging_level` - :class:`int` -
+  *optional, default = logging.INFO* - Sets the logging level in the GA.
+
 .. _`extending stk`:
 
 Extending ``stk``
