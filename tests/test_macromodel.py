@@ -64,6 +64,7 @@ def test_restricted_md(tmp_cc3, macromodel_path):
                           simulation_time=20,
                           eq_time=2,
                           conformers=2,
+                          time_step=0.1,
                           restricted_bonds=restricted_bonds)
     mm.optimize(tmp_cc3, conformer=0)
     tmp_cc3.write(join(outdir, 'rmm_md_after.mol'), conformer=0)
@@ -71,7 +72,7 @@ def test_restricted_md(tmp_cc3, macromodel_path):
 
 @macromodel
 def test_unrestricted_md(tmp_cc3, macromodel_path):
-    tmp_cc3.write(join(outdir, 'umm_md_before.mol'), conformer=0)
+    tmp_cc3.write(join(outdir, 'umm_md_before.mol'), conformer=1)
 
     mm = stk.MacroModelMD(macromodel_path=macromodel_path,
                           output_dir='umm_md',
@@ -79,8 +80,8 @@ def test_unrestricted_md(tmp_cc3, macromodel_path):
                           simulation_time=20,
                           eq_time=2,
                           conformers=2)
-    mm.optimize(tmp_cc3, conformer=0)
-    tmp_cc3.write(join(outdir, 'umm_md_after.mol'), conformer=0)
+    mm.optimize(tmp_cc3, conformer=1)
+    tmp_cc3.write(join(outdir, 'umm_md_after.mol'), conformer=1)
 
 
 @macromodel

@@ -929,7 +929,7 @@ class MacroModelMD(_MacroModel):
                  force_field=16,
                  temperature=300,
                  conformers=50,
-                 time_step=0.1,
+                 time_step=1,
                  eq_time=10,
                  simulation_time=200,
                  maximum_iterations=2500,
