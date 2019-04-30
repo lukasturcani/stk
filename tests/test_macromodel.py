@@ -49,19 +49,6 @@ def test_unrestricted_force_field(tmp_cc3, macromodel_path):
 
 
 @macromodel
-def test_both_force_field(tmp_cc3, macromodel_path):
-    tmp_cc3.write(join(outdir, 'bmm_ff_before.mol'),
-                  conformer=0)
-
-    mm = stk.MacroModelForceField(macromodel_path=macromodel_path,
-                                  output_dir='bmm_ff',
-                                  restricted='both',
-                                  minimum_gradient=1)
-    mm.optimize(tmp_cc3, conformer=0)
-    tmp_cc3.write(join(outdir, 'bmm_ff_after.mol'), conformer=0)
-
-
-@macromodel
 def test_restricted_md(tmp_cc3, macromodel_path):
     tmp_cc3.write(join(outdir, 'rmm_md_before.mol'), conformer=0)
 

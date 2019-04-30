@@ -544,16 +544,14 @@ class MacroModelForceField(_MacroModel):
         If ``False`` then all bonds are optimized, not just the ones
         created during macromolecular assembly. If ``True`` then an
         optimization is performed only on the bonds added during
-        molecular assembly. If ``'both'`` then a restricted
-        optimization is performed first, followed by a regular
-        optimization.
+        molecular assembly.
 
     """
 
     def __init__(self,
                  macromodel_path,
                  output_dir=None,
-                 restricted='both',
+                 restricted=False,
                  timeout=None,
                  force_field=16,
                  maximum_iterations=2500,
@@ -578,9 +576,7 @@ class MacroModelForceField(_MacroModel):
             If ``False`` then all bonds are optimized, not just the
             ones created during macromolecular assembly. If ``True``
             then an optimization is performed only on the bonds added
-            during molecular assembly. If ``'both'`` then a restricted
-            optimization is performed first, followed by a regular
-            optimization.
+            during molecular assembly.
 
         timeout : :class:`float`, optional
             The amount in seconds the optimization is allowed to run
@@ -722,11 +718,6 @@ class MacroModelForceField(_MacroModel):
         # Get the ``.maegz`` optimization output to a ``.mae``.
         self.convert_maegz_to_mae(mol)
         mol.update_from_mae(f'{basename}.mae', conformer)
-
-        if self.restricted == 'both':
-            self.restricted = False
-            self.optimize(mol, conformer)
-            self.restricted = 'both'
 
         move_generated_macromodel_files(basename, output_dir)
 
@@ -1178,11 +1169,6 @@ class MacroModelMD(_MacroModel):
         # Extract the lowest energy conformer into its own .mae file.
         conformer_mae = MAEExtractor(mol._file).path
         mol.update_from_mae(conformer_mae, conformer)
-
-        if self.restricted == 'both':
-            self.restricted = False
-            self.optimize(mol, conformer)
-            self.restricted = 'both'
 
         move_generated_macromodel_files(basename, output_dir)
 
