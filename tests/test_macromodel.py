@@ -83,7 +83,6 @@ def test_unrestricted_md(tmp_cc3, macromodel_path):
     mm = stk.MacroModelMD(macromodel_path=macromodel_path,
                           output_dir='umm_md',
                           minimum_gradient=1,
-                          restricted=False,
                           simulation_time=20,
                           eq_time=2,
                           conformers=2)
