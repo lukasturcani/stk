@@ -18,7 +18,7 @@ macromodel = pytest.mark.skipif(
     reason="Only run when explicitly asked.")
 
 
-outdir = join('tests_output', 'macromodel_tests_output')
+outdir = 'macromodel_tests_output'
 if not os.path.exists(outdir):
     os.mkdir(outdir)
 
