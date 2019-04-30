@@ -100,7 +100,10 @@
 <li><a class="reference internal" href="#dealing-with-multiple-molecules">Dealing with Multiple Molecules</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#automated-molecular-design-with-genetic-algorithms">Automated Molecular Design with Genetic Algorithms</a></li>
+<li><a class="reference internal" href="#automated-molecular-design-with-genetic-algorithms">Automated Molecular Design with Genetic Algorithms</a><ul>
+<li><a class="reference internal" href="#genetic-algorithm-input-file-variables">Genetic algorithm input file variables.</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#extending-stk">Extending <code class="docutils literal notranslate"><span class="pre">stk</span></code></a></li>
 <li><a class="reference internal" href="#further-reading">Further Reading</a></li>
 </ul>
@@ -1059,6 +1062,63 @@ stderr. The message should be relatively straightforward, such as</p>
 <p>which shows the time, the level of the message which can be, in order of
 priority DEBUG, INFO, WARNING, ERROR or CRITICAL, the module where
 the message originated and finally the message itself.</p>
+<div class="section" id="genetic-algorithm-input-file-variables">
+<h3>Genetic algorithm input file variables.<a class="headerlink" href="#genetic-algorithm-input-file-variables" title="Permalink to this headline">¶</a></h3>
+<p>This section lists the variables that need to be defined in the GA
+input file, along with a description of each variable.</p>
+<ul class="simple">
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">population</span></code> - <a class="reference internal" href="stk.populations.html#stk.populations.GAPopulation" title="stk.populations.GAPopulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GAPopulation</span></code></a> - <strong>mandatory</strong> -
+The initial population of the GA.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">optimizer</span></code> - <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> - <strong>mandatory</strong> - The
+optimizer used to optimize the molecules created by the GA.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">fitness_calculator</span></code> - <a class="reference internal" href="stk.calculators.ga.fitness_calculators.html#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> -
+<strong>mandatory</strong> - The fitness calculator used to calculate fitness of
+molecules.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">crosser</span></code> - <a class="reference internal" href="stk.calculators.ga.crossers.html#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> - <strong>mandatory</strong> - The crosser
+used to carry out crossover operations.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">mutator</span></code> - <a class="reference internal" href="stk.calculators.ga.mutators.html#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> - <strong>mandatory</strong> - The mutator
+used to carry out mutation operations.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">generation_selector</span></code> - <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> - <strong>mandatory</strong> -
+The selector used to select the next generation.
+<a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector.batch_size" title="stk.calculators.ga.selectors.Selector.batch_size"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_size</span></code></a> must be <code class="docutils literal notranslate"><span class="pre">1</span></code>.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">mutation_selector</span></code> - <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> - <strong>mandatory</strong> - The
+selector used to select molecules to mutate.
+<a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector.batch_size" title="stk.calculators.ga.selectors.Selector.batch_size"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_size</span></code></a> must be <code class="docutils literal notranslate"><span class="pre">1</span></code>.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">crossover_selector</span></code> - <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> - <strong>mandatory</strong> -
+The selector used to select molecules for crossover.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">exiter</span></code> - <a class="reference internal" href="stk.calculators.ga.exiters.html#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a> - The exiter which determines if
+the GA has satisfied its exit condition.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">fitness_normalizer</span></code> - <a class="reference internal" href="stk.calculators.ga.fitness_normalizers.html#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a> -
+<em>optional, default = NullFitnessOptimizer()</em> - The fitness normalizer
+which normalizes fitness values each generation.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">processes</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> -
+<em>optional, default = psutil.cpu_count()</em> - The number of CPU cores
+the GA should use.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">plotters</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.calculators.ga.plotters.html#stk.calculators.ga.plotters.Plotter" title="stk.calculators.ga.plotters.Plotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plotter</span></code></a> -
+<em>optional, default = []</em> - Plotters which are used to plot graphs at
+the end of the GA.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">log_file</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
+<em>optional, default = True</em> - Toggles whether a log file which lists
+which molecules are present in each generation should be made.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">database_dump</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
+<em>optional, default = True</em> - Toggles whether a <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>
+JSON file should be made at the end of the GA run. It will hold every
+molecule made by the GA.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">progress_dump</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
+<em>optional, default = True</em> - Toggles whether a <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>
+JSON file should be made at the end of the GA run. It will hold every
+generation of the GA as a separate subpopulation.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">debug_dumps</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
+<em>optional, default = False</em> - If <code class="docutils literal notranslate"><span class="pre">True</span></code> a database and progress dump
+is made after every generation rather than just the end. This is nice
+for debugging but can seriously slow down the GA.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">tar_output</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
+<em>optional, default = False</em> - If <code class="docutils literal notranslate"><span class="pre">True</span></code> then a compressed tar
+archive of the output folder will be made.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">logging_level</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> -
+<em>optional, default = logging.INFO</em> - Sets the logging level in the GA.</li>
+</ul>
+</div>
 </div>
 <div class="section" id="extending-stk">
 <span id="id1"></span><h2>Extending <code class="docutils literal notranslate"><span class="pre">stk</span></code><a class="headerlink" href="#extending-stk" title="Permalink to this headline">¶</a></h2>

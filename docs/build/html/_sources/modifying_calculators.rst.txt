@@ -1,9 +1,8 @@
 Modifying ``stk`` Calculators
 =============================
 
-This guide takes the form a cookbook to give examples of how ``stk``
-calculators can be extended in user code to add functionality. The
-basic principle is the use of decorators to extend functionality.
+This guide takes the form a cookbook. Common problems are presented
+followed by a suggested solution.
 
 Adding timing information to calculator calls.
 ==============================================
@@ -14,49 +13,66 @@ Problem
 You want to see how long different optimization settings take on
 different molecules.
 
-
 Solution
 ........
 
-Create a decorator which wraps a function and times it.
+Create a new optimizer class. The optimizers of this class will take
+take the optimizer you want to time as an initialization parameter.
 
 .. code-block:: python
 
     import stk
     import time
-    from functools import wraps
 
-    def timed_fn(fn):
-        """
-        Adds timing info to functions.
 
-        """
+    class TimedOptimizer(stk.Optimizer):
+        def __init__(self, optimizer, use_cache=False):
+            self.optimizer = optimizer
+            super().__init__(use_cache=use_cache)
 
-        @wraps(fn)
-        def inner(self, mol, conformer=-1):
+        def optimize(self, mol, conformer=-1):
             start = time.time()
-            r = fn(*args, **kwargs)
+            r = self.optimizer.optimize(mol, conformer)
+            opt_name = self.optimizer.__class__.__name__
             print(
-                f'{fn.__name__} takes {time.time()-start} '
+                f'{opt_name} takes {time.time()-start} '
                 f'seconds on {mol.name}.'
             )
             return r
 
-        return inner
 
-    # Create some calculators.
+    class TimedEnergyCalculator(stk.EnergyCalculator):
+        def __init__(self, energy_calculator, use_cache=False):
+            self.energy_calculator = energy_calculator
+            super().__init__(use_cache=use_cache)
+
+        def energy(self, mol, conformer=-1):
+            start = time.time()
+            energy = self.energy_calculator.energy(mol, conformer)
+            calc_name = self.energy_calculator.__class__.__name__
+            print(
+                f'{calc_name} takes {time.time()-start} '
+                f'seconds on {mol.name}.'
+            )
+            return energy
+
+    # Create some timed calculators.
     mmff = stk.MMFF()
-    energy_calculator = stk.UFFEnergy()
+    timed_mmff = TimedOptimizer(mmff)
 
-    # Add timing info to the calculators.
-    mmff.optimize = timed_fn(mmff.optimize)
-    energy_calculator.energy = timed_fn(energy_calculator.energy)
+    uff_energy = stk.UFFEnergy()
+    timed_uff_energy = TimedEnergyCalculator(uff_energy)
 
     mol = stk.StructUnit(...)
     # These calls will print how long the function execution took.
-    mmff.optimize(mol)
-    energy_calculator.energy(mol)
+    timed_mmff.optimize(mol)
+    timed_uff_energy.energy(mol)
 
+
+The initial instinct may be to use a decorator to decorate
+:meth:`optimize` and :meth:`energy`. However, this approach is not
+not compatible with multiprocessing as the resulting calculators
+cannot be pickled.
 
 Specifying a conformer with :meth:`.Population.optimize`.
 =========================================================
@@ -72,31 +88,38 @@ to ``-1``.
 Solution
 --------
 
-Change the default argument with a decorator.
+Create a new optimizer class which allows you to set which conformer
+to use on initialization.
 
 .. code-block:: python
 
     import stk
-    from functools import wraps
 
-    def set_default_conformer(optimize, conformer):
-        """
-        Sets default conformer of `optimize` to `conformer`.
 
-        """
+    class ConformerOptimizer(stk.Optimizer):
+        def __init__(self, optimizer, conformer, use_cache=False):
+            self.optimizer = optimizer
+            self.conformer = conformer
+            super().__init__(use_cache=use_cache)
 
-        @wraps(fn)
-        def inner(self, mol):
-            return optimize(self, mol, conformer)
+        def optimize(self, mol, conformer=-1):
+            return self.optimizer.optimize(mol, self.conformer)
 
-        return inner
 
     mmff = MMFF()
     # The conformer optimized by this optimizer will be 10.
-    mmff.optimize = set_default_conformer(mmff.optimize, 10)
+    mmff_conf_10 = ConformerOptimizer(mmff, 10)
 
     # Make a population of molecules.
     pop = stk.Population(...)
 
     # Optimize conformer 10 of all the molecules.
-    pop.optimize(mmff)
+    pop.optimize(mmff_conf_10)
+
+
+Once again, a decorator cannot be used because it is incompatible with
+pickle and multiprocessing. Here a new optimizer class is defined.
+Notice that the signature of :meth:`optimize` is unchanged, however
+the value passed to the conformer argument will be ignored. Instead
+the conformer set during initialization of :class:`ConformerOptimizer`
+will be used.

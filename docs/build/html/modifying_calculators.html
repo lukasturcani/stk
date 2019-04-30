@@ -158,9 +158,8 @@
             
   <div class="section" id="modifying-stk-calculators">
 <h1>Modifying <code class="docutils literal notranslate"><span class="pre">stk</span></code> Calculators<a class="headerlink" href="#modifying-stk-calculators" title="Permalink to this headline">¶</a></h1>
-<p>This guide takes the form a cookbook to give examples of how <code class="docutils literal notranslate"><span class="pre">stk</span></code>
-calculators can be extended in user code to add functionality. The
-basic principle is the use of decorators to extend functionality.</p>
+<p>This guide takes the form a cookbook. Common problems are presented
+followed by a suggested solution.</p>
 </div>
 <div class="section" id="adding-timing-information-to-calculator-calls">
 <h1>Adding timing information to calculator calls.<a class="headerlink" href="#adding-timing-information-to-calculator-calls" title="Permalink to this headline">¶</a></h1>
@@ -171,43 +170,60 @@ different molecules.</p>
 </div>
 <div class="section" id="solution">
 <h2>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h2>
-<p>Create a decorator which wraps a function and times it.</p>
+<p>Create a new optimizer class. The optimizers of this class will take
+take the optimizer you want to time as an initialization parameter.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">stk</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 
-<span class="k">def</span> <span class="nf">timed_fn</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Adds timing info to functions.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">TimedOptimizer</span><span class="p">(</span><span class="n">stk</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
 
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+        <span class="n">opt_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">print</span><span class="p">(</span>
-            <span class="n">f</span><span class="s1">&#39;{fn.__name__} takes {time.time()-start} &#39;</span>
+            <span class="n">f</span><span class="s1">&#39;{opt_name} takes {time.time()-start} &#39;</span>
             <span class="n">f</span><span class="s1">&#39;seconds on {mol.name}.&#39;</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span>
 
-    <span class="k">return</span> <span class="n">inner</span>
 
-<span class="c1"># Create some calculators.</span>
+<span class="k">class</span> <span class="nc">TimedEnergyCalculator</span><span class="p">(</span><span class="n">stk</span><span class="o">.</span><span class="n">EnergyCalculator</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_calculator</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_calculator</span> <span class="o">=</span> <span class="n">energy_calculator</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_calculator</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+        <span class="n">calc_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_calculator</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">print</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;{calc_name} takes {time.time()-start} &#39;</span>
+            <span class="n">f</span><span class="s1">&#39;seconds on {mol.name}.&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">energy</span>
+
+<span class="c1"># Create some timed calculators.</span>
 <span class="n">mmff</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">MMFF</span><span class="p">()</span>
-<span class="n">energy_calculator</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">UFFEnergy</span><span class="p">()</span>
+<span class="n">timed_mmff</span> <span class="o">=</span> <span class="n">TimedOptimizer</span><span class="p">(</span><span class="n">mmff</span><span class="p">)</span>
 
-<span class="c1"># Add timing info to the calculators.</span>
-<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span> <span class="o">=</span> <span class="n">timed_fn</span><span class="p">(</span><span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">)</span>
-<span class="n">energy_calculator</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">timed_fn</span><span class="p">(</span><span class="n">energy_calculator</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+<span class="n">uff_energy</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">UFFEnergy</span><span class="p">()</span>
+<span class="n">timed_uff_energy</span> <span class="o">=</span> <span class="n">TimedEnergyCalculator</span><span class="p">(</span><span class="n">uff_energy</span><span class="p">)</span>
 
 <span class="n">mol</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">StructUnit</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="c1"># These calls will print how long the function execution took.</span>
-<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
-<span class="n">energy_calculator</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="n">timed_mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="n">timed_uff_energy</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The initial instinct may be to use a decorator to decorate
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code>. However, this approach is not
+not compatible with multiprocessing as the resulting calculators
+cannot be pickled.</p>
 </div>
 </div>
 <div class="section" id="specifying-a-conformer-with-population-optimize">
@@ -220,33 +236,38 @@ in the <cite>conformer</cite> argument of <a class="reference internal" href="st
 to <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
 <div class="section" id="id2">
 <h3>Solution<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>Change the default argument with a decorator.</p>
+<p>Create a new optimizer class which allows you to set which conformer
+to use on initialization.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">stk</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 
-<span class="k">def</span> <span class="nf">set_default_conformer</span><span class="p">(</span><span class="n">optimize</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Sets default conformer of `optimize` to `conformer`.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">ConformerOptimizer</span><span class="p">(</span><span class="n">stk</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">conformer</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conformer</span> <span class="o">=</span> <span class="n">conformer</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
 
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conformer</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">inner</span>
 
 <span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
 <span class="c1"># The conformer optimized by this optimizer will be 10.</span>
-<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span> <span class="o">=</span> <span class="n">set_default_conformer</span><span class="p">(</span><span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">mmff_conf_10</span> <span class="o">=</span> <span class="n">ConformerOptimizer</span><span class="p">(</span><span class="n">mmff</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
 <span class="c1"># Make a population of molecules.</span>
 <span class="n">pop</span> <span class="o">=</span> <span class="n">stk</span><span class="o">.</span><span class="n">Population</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 
 <span class="c1"># Optimize conformer 10 of all the molecules.</span>
-<span class="n">pop</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mmff</span><span class="p">)</span>
+<span class="n">pop</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mmff_conf_10</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Once again, a decorator cannot be used because it is incompatible with
+pickle and multiprocessing. Here a new optimizer class is defined.
+Notice that the signature of <code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code> is unchanged, however
+the value passed to the conformer argument will be ignored. Instead
+the conformer set during initialization of <code class="xref py py-class docutils literal notranslate"><span class="pre">ConformerOptimizer</span></code>
+will be used.</p>
 </div>
 </div>
 </div>
