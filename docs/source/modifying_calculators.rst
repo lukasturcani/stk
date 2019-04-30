@@ -35,7 +35,7 @@ Create a decorator which wraps a function and times it.
         @wraps(fn)
         def inner(self, mol, conformer=-1):
             start = time.time()
-            r = fn(*args, **kwargs)
+            r = fn(self, mol, conformer)
             print(
                 f'{fn.__name__} takes {time.time()-start} '
                 f'seconds on {mol.name}.'
