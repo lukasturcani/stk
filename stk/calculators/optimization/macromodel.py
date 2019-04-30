@@ -64,14 +64,6 @@ class _MacroModel(Optimizer):
     minimum_gradient : :class:`float`
         The gradient at which optimization is stopped.
 
-    restricted : :class:`bool`
-        If ``False`` then all bonds are optimized, not just the ones
-        created during macromolecular assembly. If ``True`` then an
-        optimization is performed only on the bonds added during
-        molecular assembly. If ``'both'`` then a restricted
-        optimization is performed first, followed by a regular
-        optimization.
-
     timeout : :class:`float`
         The amount in seconds the MD is allowed to run before
         being terminated. ``None`` means there is no timeout.
@@ -81,7 +73,6 @@ class _MacroModel(Optimizer):
     def __init__(self,
                  macromodel_path,
                  output_dir,
-                 restricted,
                  timeout,
                  force_field,
                  maximum_iterations,
@@ -101,14 +92,6 @@ class _MacroModel(Optimizer):
             The name of the directory into which files generated during
             the optimization are written, if ``None`` then
             :func:`uuid.uuid4` is used.
-
-        restricted : :class:`bool`, optional
-            If ``False`` then all bonds are optimized, not just the
-            ones created during macromolecular assembly. If ``True``
-            then an optimization is performed only on the bonds added
-            during molecular assembly. If ``'both'`` then a restricted
-            optimization is performed first, followed by a regular
-            optimization.
 
         timeout : :class:`float`, optional
             The amount in seconds the optimization is allowed to run
@@ -133,7 +116,6 @@ class _MacroModel(Optimizer):
 
         self.macromodel_path = macromodel_path
         self.output_dir = output_dir
-        self.restricted = restricted
         self.timeout = timeout
         self.force_field = force_field
         self.maximum_iterations = maximum_iterations
@@ -538,15 +520,7 @@ class _MacroModel(Optimizer):
 
         """
 
-        # Make a string to hold all of the ``FX`` lines.
         fix_block = ''
-
-        # If `restricted` is ``False`` do not add a fix block.
-        if not self.restricted:
-            return com.replace(
-                "!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!\n",
-                fix_block
-            )
         # Add lines that fix the bond distance.
         fix_block = self.fix_distances(mol, fix_block)
         # Add lines that fix the bond angles.
@@ -558,6 +532,194 @@ class _MacroModel(Optimizer):
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!\n',
             fix_block
         )
+
+
+class MacroModelForceField(_MacroModel):
+    """
+    Uses MacroModel force fields to optimize molecules.
+
+    Attributes
+    ----------
+    restricted : :class:`bool`
+        If ``False`` then all bonds are optimized, not just the ones
+        created during macromolecular assembly. If ``True`` then an
+        optimization is performed only on the bonds added during
+        molecular assembly.
+
+    """
+
+    def __init__(self,
+                 macromodel_path,
+                 output_dir=None,
+                 restricted=False,
+                 timeout=None,
+                 force_field=16,
+                 maximum_iterations=2500,
+                 minimum_gradient=0.05,
+                 use_cache=False):
+        """
+        Initializes a :class:`MacroModelForceField` object.
+
+        Parameters
+        ----------
+        macromodel_path : :class:`str`
+            The full path of the Schrodinger suite within the user's
+            machine. For example, on a Linux machine this may be
+            something like ``'/opt/schrodinger2017-2'``.
+
+        output_dir : :class:`str`, optional
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
+
+        restricted : :class:`bool`, optional
+            If ``False`` then all bonds are optimized, not just the
+            ones created during macromolecular assembly. If ``True``
+            then an optimization is performed only on the bonds added
+            during molecular assembly.
+
+        timeout : :class:`float`, optional
+            The amount in seconds the optimization is allowed to run
+            before being terminated. ``None`` means there is no
+            timeout.
+
+        force_field : :class:`int`, optional
+            The number of the force field to be used.
+
+        maximum_iterations : :class:`int`, optional
+            The maximum number of iterations done during the
+            optimization.
+
+        minimum_gradient : :class:`float`, optional
+            The gradient at which optimization is stopped.
+
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
+
+        """
+
+        self.restricted = restricted
+        super().__init__(macromodel_path=macromodel_path,
+                         output_dir=output_dir,
+                         force_field=force_field,
+                         maximum_iterations=maximum_iterations,
+                         minimum_gradient=minimum_gradient,
+                         timeout=timeout,
+                         use_cache=use_cache)
+
+    def generate_com(self, mol):
+        """
+        Create a ``.com`` file for a MacroModel optimization.
+
+        The created ``.com`` file fixes all bond parameters which were
+        not added during assembly. This means all bond distances, bond
+        angles and torsional angles are fixed, except for cases where
+        it involves a bond added during assembly of the macromolecule.
+
+        This fixing is implemented by creating a ``.com`` file with
+        various "FX" commands written within its body.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule which is to be optimized.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        logger.debug('Creating .com file for "{}".'.format(mol.name))
+
+        # This is the body of the ``.com`` file. The line that begins
+        # and ends with exclamation lines is replaced with the various
+        # commands that fix bond distances and angles.
+        line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
+        line2 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
+        line3 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
+        line4 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
+        line5 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
+        line6 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
+        line7 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
+
+        com_block = "\n".join([
+            self.com_line(*line1),
+            self.com_line(*line2),
+            self.com_line(*line3),
+            self.com_line(*line4),
+            '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
+            self.com_line(*line5),
+            self.com_line(*line6),
+            self.com_line(*line7)
+        ])
+
+        # Create a path for the ``.com`` file. It is the same as that
+        # of the structure file but with a ``.com`` extension.
+        name, ext = os.path.splitext(mol._file)
+
+        # If `restricted` is ``False`` do not add a fix block.
+        if not self.restricted:
+            com_block = com_block.replace(
+                "!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!\n",
+                ''
+            )
+        else:
+            # This function adds all the lines which fix bond distances
+            # and angles into com_block.
+            com_block = self.fix_params(mol, com_block)
+
+        # Writes the .com file.
+        with open(f'{name}.com', 'w') as com:
+            # The first line holds the .mae file containing the
+            # molecule to be optimized.
+            com.write(f'{name}.mae\n')
+            # The second line holds the name of the output file of the
+            # optimization.
+            com.write(f'{name}-out.maegz\n')
+            # Next is the body of the .com file.
+            com.write(com_block)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        basename = str(uuid4().int)
+        if self.output_dir is None:
+            output_dir = basename
+        else:
+            output_dir = self.output_dir
+
+        mol._file = f'{basename}.mol'
+
+        # First write a .mol file of the molecule.
+        mol.write(mol._file, conformer)
+        # MacroModel requires a ``.mae`` file as input.
+        self.create_mae(mol)
+        # generate the ``.com`` file for the MacroModel run.
+        self.generate_com(mol)
+        # Run the optimization.
+        self.run_bmin(mol)
+        # Get the ``.maegz`` optimization output to a ``.mae``.
+        self.convert_maegz_to_mae(mol)
+        mol.update_from_mae(f'{basename}.mae', conformer)
+
+        move_generated_macromodel_files(basename, output_dir)
 
     def fix_distances(self, mol, fix_block):
         """
@@ -586,10 +748,11 @@ class _MacroModel(Optimizer):
         )
 
         # Go through all the bonds in the rdkit molecule. If the bond
-        # is not between bonder atoms add a fix line to the ``fix_block``.
-        # If the bond does invovle two bonder atoms go to the next bond.
-        # This is because a bond between 2 bonder atoms was added during
-        # assembly and should therefore not be fixed.
+        # is not between bonder atoms add a fix line to the
+        # ``fix_block``. If the bond does invovle two bonder atoms go
+        # to the next bond. This is because a bond between 2 bonder
+        # atoms was added during assembly and should therefore not be
+        # fixed.
         for bond in mol.mol.GetBonds():
             atom1 = bond.GetBeginAtom()
             atom2 = bond.GetEndAtom()
@@ -692,186 +855,6 @@ class _MacroModel(Optimizer):
         return fix_block
 
 
-class MacroModelForceField(_MacroModel):
-    """
-    Uses MacroModel force fields to optimize molecules.
-
-    """
-
-    def __init__(self,
-                 macromodel_path,
-                 output_dir=None,
-                 restricted='both',
-                 timeout=None,
-                 force_field=16,
-                 maximum_iterations=2500,
-                 minimum_gradient=0.05,
-                 use_cache=False):
-        """
-        Initializes a :class:`MacroModelForceField` object.
-
-        Parameters
-        ----------
-        macromodel_path : :class:`str`
-            The full path of the Schrodinger suite within the user's
-            machine. For example, on a Linux machine this may be
-            something like ``'/opt/schrodinger2017-2'``.
-
-        output_dir : :class:`str`, optional
-            The name of the directory into which files generated during
-            the optimization are written, if ``None`` then
-            :func:`uuid.uuid4` is used.
-
-        restricted : :class:`bool`, optional
-            If ``False`` then all bonds are optimized, not just the
-            ones created during macromolecular assembly. If ``True``
-            then an optimization is performed only on the bonds added
-            during molecular assembly. If ``'both'`` then a restricted
-            optimization is performed first, followed by a regular
-            optimization.
-
-        timeout : :class:`float`, optional
-            The amount in seconds the optimization is allowed to run
-            before being terminated. ``None`` means there is no
-            timeout.
-
-        force_field : :class:`int`, optional
-            The number of the force field to be used.
-
-        maximum_iterations : :class:`int`, optional
-            The maximum number of iterations done during the
-            optimization.
-
-        minimum_gradient : :class:`float`, optional
-            The gradient at which optimization is stopped.
-
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
-
-        """
-
-        super().__init__(macromodel_path=macromodel_path,
-                         output_dir=output_dir,
-                         force_field=force_field,
-                         maximum_iterations=maximum_iterations,
-                         minimum_gradient=minimum_gradient,
-                         restricted=restricted,
-                         timeout=timeout,
-                         use_cache=use_cache)
-
-    def generate_com(self, mol):
-        """
-        Create a ``.com`` file for a MacroModel optimization.
-
-        The created ``.com`` file fixes all bond parameters which were
-        not added during assembly. This means all bond distances, bond
-        angles and torsional angles are fixed, except for cases where
-        it involves a bond added during assembly of the macromolecule.
-
-        This fixing is implemented by creating a ``.com`` file with
-        various "FX" commands written within its body.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule which is to be optimized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        logger.debug('Creating .com file for "{}".'.format(mol.name))
-
-        # This is the body of the ``.com`` file. The line that begins
-        # and ends with exclamation lines is replaced with the various
-        # commands that fix bond distances and angles.
-        line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
-        line2 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
-        line3 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
-        line4 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
-        line5 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
-        line6 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
-        line7 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
-
-        com_block = "\n".join([
-            self.com_line(*line1),
-            self.com_line(*line2),
-            self.com_line(*line3),
-            self.com_line(*line4),
-            '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
-            self.com_line(*line5),
-            self.com_line(*line6),
-            self.com_line(*line7)
-        ])
-
-        # Create a path for the ``.com`` file. It is the same as that
-        # of the structure file but with a ``.com`` extension.
-        name, ext = os.path.splitext(mol._file)
-
-        # This function adds all the lines which fix bond distances and
-        # angles into com_block.
-        com_block = self.fix_params(mol, com_block)
-
-        # Writes the .com file.
-        with open(f'{name}.com', 'w') as com:
-            # The first line holds the .mae file containing the
-            # molecule to be optimized.
-            com.write(f'{name}.mae\n')
-            # The second line holds the name of the output file of the
-            # optimization.
-            com.write(f'{name}-out.maegz\n')
-            # Next is the body of the .com file.
-            com.write(com_block)
-
-    def optimize(self, mol, conformer=-1):
-        """
-        Optimizes a molecule.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        basename = str(uuid4().int)
-        if self.output_dir is None:
-            output_dir = basename
-        else:
-            output_dir = self.output_dir
-
-        mol._file = f'{basename}.mol'
-
-        # First write a .mol file of the molecule.
-        mol.write(mol._file, conformer)
-        # MacroModel requires a ``.mae`` file as input.
-        self.create_mae(mol)
-        # generate the ``.com`` file for the MacroModel run.
-        self.generate_com(mol)
-        # Run the optimization.
-        self.run_bmin(mol)
-        # Get the ``.maegz`` optimization output to a ``.mae``.
-        self.convert_maegz_to_mae(mol)
-        mol.update_from_mae(f'{basename}.mae', conformer)
-
-        if self.restricted == 'both':
-            self.restricted = False
-            self.optimize(mol, conformer)
-            self.restricted = 'both'
-
-        move_generated_macromodel_files(basename, output_dir)
-
-
 class MacroModelMD(_MacroModel):
     """
     Runs a MD conformer search using MacroModel.
@@ -893,6 +876,50 @@ class MacroModelMD(_MacroModel):
     simulation_time : :class:`float`
         The simulation time in ``ps`` of the MD.
 
+    restricted_bonds : class:`set`
+        A :class:`set` of the form
+
+        .. code-block:: python
+
+            restricted_bonds = {
+                frozenset((0, 10)),
+                frozenset((3, 14)),
+                frozenset((5, 6))
+            }
+
+        Where each :class:`frozenset` defines which bonds should have
+        a fixed length via the atom ids of atoms in the bond.
+
+    restricted_bond_angles : class:`set`
+        A :class:`set` of the form
+
+        .. code-block:: python
+
+            restricted_bonds = {
+                frozenset((0, 10, 12)),
+                frozenset((3, 14, 7)),
+                frozenset((5, 8, 2))
+            }
+
+        Where each :class:`frozenset` defines which bond angles should
+        have a fixed size via the atom ids of atoms in the bond
+        angle.
+
+    restricted_torsional_angles : class:`set`
+        A :class:`set` of the form
+
+        .. code-block:: python
+
+            restricted_bonds = {
+                frozenset((0, 10, 12, 3)),
+                frozenset((3, 14, 7, 4)),
+                frozenset((5, 8, 2, 9))
+            }
+
+        Where each :class:`frozenset` defines which torsional angles
+        should have a fixed size via the atom ids of atoms in the
+        torsional angle.
+
     """
 
     def __init__(self,
@@ -900,14 +927,16 @@ class MacroModelMD(_MacroModel):
                  output_dir=None,
                  timeout=None,
                  force_field=16,
-                 restricted='both',
                  temperature=300,
                  conformers=50,
-                 time_step=0.1,
+                 time_step=1,
                  eq_time=10,
                  simulation_time=200,
                  maximum_iterations=2500,
                  minimum_gradient=0.05,
+                 restricted_bonds=None,
+                 restricted_bond_angles=None,
+                 restricted_torsional_angles=None,
                  use_cache=False):
         """
         Runs a MD conformer search on `mol`.
@@ -931,14 +960,6 @@ class MacroModelMD(_MacroModel):
         force_field : :class:`int`, optional
             The number of the force field to be used.
 
-        restricted : :class:`bool`, optional
-            If ``False`` then all bonds are optimized, not just the
-            ones created during macromolecular assembly. If ``True``
-            then an optimization is performed only on the bonds added
-            during molecular assembly. If ``'both'`` then a restricted
-            optimization is performed first, followed by a regular
-            optimization.
-
         temperature : :class:`float`, optional
             The temperature in Kelvin at which the MD is run.
 
@@ -961,22 +982,75 @@ class MacroModelMD(_MacroModel):
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
 
+        restricted_bonds : class:`set`
+            A :class:`set` of the form
+
+            .. code-block:: python
+
+                restricted_bonds = {
+                    frozenset((0, 10)),
+                    frozenset((3, 14)),
+                    frozenset((5, 6))
+                }
+
+            Where each :class:`frozenset` defines which bonds should have
+            a fixed length via the atom ids of atoms in the bond.
+
+        restricted_bond_angles : class:`set`
+            A :class:`set` of the form
+
+            .. code-block:: python
+
+                restricted_bonds = {
+                    frozenset((0, 10, 12)),
+                    frozenset((3, 14, 7)),
+                    frozenset((5, 8, 2))
+                }
+
+            Where each :class:`frozenset` defines which bond angles should
+            have a fixed size via the atom ids of atoms in the bond
+            angle.
+
+        restricted_torsional_angles : class:`set`
+            A :class:`set` of the form
+
+            .. code-block:: python
+
+                restricted_bonds = {
+                    frozenset((0, 10, 12, 3)),
+                    frozenset((3, 14, 7, 4)),
+                    frozenset((5, 8, 2, 9))
+                }
+
+            Where each :class:`frozenset` defines which torsional angles
+            should have a fixed size via the atom ids of atoms in the
+            torsional angle.
+
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
             molecule and conformer.
 
         """
 
+        if restricted_bonds is None:
+            restricted_bonds = set()
+        if restricted_bond_angles is None:
+            restricted_bond_angles = set()
+        if restricted_torsional_angles is None:
+            restricted_torsional_angles = set()
+
         self.temperature = temperature
         self.conformers = conformers
         self.time_step = time_step
         self.eq_time = eq_time
         self.simulation_time = simulation_time
+        self.restricted_bonds = restricted_bonds
+        self.restricted_bond_angles = restricted_bond_angles
+        self.restricted_torsional_angles = restricted_torsional_angles
         super().__init__(macromodel_path=macromodel_path,
                          output_dir=output_dir,
                          timeout=timeout,
                          force_field=force_field,
-                         restricted=restricted,
                          maximum_iterations=maximum_iterations,
                          minimum_gradient=minimum_gradient,
                          use_cache=use_cache)
@@ -1096,9 +1170,127 @@ class MacroModelMD(_MacroModel):
         conformer_mae = MAEExtractor(mol._file).path
         mol.update_from_mae(conformer_mae, conformer)
 
-        if self.restricted == 'both':
-            self.restricted = False
-            self.optimize(mol, conformer)
-            self.restricted = 'both'
-
         move_generated_macromodel_files(basename, output_dir)
+
+    def fix_distances(self, mol, fix_block):
+        """
+        Adds lines fixing bond distances to ``.com`` body.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        fix_block : :class:`str`
+            A string holding fix commands in the ``.com`` file.
+
+        Returns
+        -------
+        :class:`str`
+            A string holding fix commands in the ``.com`` file.
+
+        """
+
+        # Go through all the bonds in the rdkit molecule. If the bond
+        # is not between bonder atoms add a fix line to the
+        # ``fix_block``. If the bond does invovle two bonder atoms go
+        # to the next bond. This is because a bond between 2 bonder
+        # atoms was added during assembly and should therefore not be
+        # fixed.
+        for bond in mol.mol.GetBonds():
+            atom1 = bond.GetBeginAtom()
+            atom2 = bond.GetEndAtom()
+            bond_key = frozenset((atom1.GetIdx(), atom2.GetIdx()))
+            if (bond_key not in self.restricted_bonds):
+                continue
+
+            # Make sure that the indices are increased by 1 in the .mae
+            # file.
+            atom1_id = atom1.GetIdx() + 1
+            atom2_id = atom2.GetIdx() + 1
+            args = ('FXDI', atom1_id, atom2_id, 0, 0, 99999, 0, 0, 0)
+            fix_block += self.com_line(*args)
+            fix_block += '\n'
+
+        return fix_block
+
+    def fix_bond_angles(self, mol, fix_block):
+        """
+        Adds lines fixing bond angles to the ``.com`` body.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        fix_block : :class:`str`
+            A string holding fix commands in the ``.com`` file.
+
+        Returns
+        -------
+        :class:`str`
+            A string holding fix commands in the ``.com`` file.
+
+        """
+
+        # Create a substructure consisting of 3 dummy atoms bonded with
+        # 3 dummy bonds. This substructure will match with any 3 atoms
+        # which are bonded together with any combination of bonds.
+        # These 3 atoms will therefore have a bond angle.
+        ba_mol = rdkit.MolFromSmarts('[*]~[*]~[*]')
+
+        # Get the indices of all atoms which have a bond angle.
+        # ``ba_atoms`` is a tuple of tuples of the form ((1,2,3),
+        # (4,5,6), (7,8,9), ...). Each inner tuple holds the indicies
+        # of the atoms which form a bond angle.
+        ba_atoms = mol.mol.GetSubstructMatches(ba_mol)
+
+        for atom_ids in ba_atoms:
+            if frozenset(atom_ids) in self.restricted_bond_angles:
+                atom_ids = [i+1 for i in atom_ids]
+                args = ('FXBA', *atom_ids, 99999, 0, 0, 0, 0)
+                fix_block += self.com_line(*args)
+                fix_block += '\n'
+
+        return fix_block
+
+    def fix_torsional_angles(self, mol, fix_block):
+        """
+        Adds lines fixing torsional bond angles to the ``.com`` body.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        fix_block : :class:`str`
+            A string holding fix commands in the ``.com`` file.
+
+        Returns
+        -------
+        :class:`str`
+            A string holding fix commands in the ``.com`` file.
+
+        """
+
+        # Create a substructure consisting of 4 dummy atoms bonded with
+        # 4 dummy bonds. This substructure will match with any 4 atoms
+        # which are bonded together with any combination of bonds.
+        # These 4 atoms will therefore have a torsinal angle.
+        ta_mol = rdkit.MolFromSmarts('[*]~[*]~[*]~[*]')
+
+        # Get the indices of all atoms which have a torsional angle.
+        # ``ta_atoms`` as a tuple of tuples of the form ((1,2,3,4),
+        # (4,5,6,7), ...). Each inner tuple holds the indicies of the
+        # atoms which have a torsional angle.
+        ta_atoms = mol.mol.GetSubstructMatches(ta_mol)
+
+        # Apply the fix.
+        for atom_ids in ta_atoms:
+            if frozenset(atom_ids) in self.restricted_torsional_angles:
+                atom_ids = [i+1 for i in atom_ids]
+                args = ('FXTA', *atom_ids, 99999, 361, 0, 0)
+                fix_block += self.com_line(*args)
+                fix_block += '\n'
+
+        return fix_block

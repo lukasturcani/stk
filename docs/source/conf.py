@@ -35,7 +35,12 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon']
 
-autodoc_default_flags = ['private-members']
+autodoc_default_flags = [
+    'private-members',
+    'special_members',
+    'inherited-members',
+    'show-inheritance'
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
