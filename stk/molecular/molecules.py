@@ -2302,8 +2302,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Yields
         ------
         :class:`.FunctionalGroup`
-            A functional group from :attr:`.func_groups` with atomic
-            ids shifted by `shift`.
+            A functional group from :attr:`~StructUnit.func_groups`
+            with atomic ids shifted by `shift`.
 
         """
 
