@@ -204,7 +204,7 @@ argument. <a class="reference internal" href="#stk.calculators.optimization.opti
 its structure however it likes. Beyond this there are no requirements.</p>
 <dl class="class">
 <dt id="stk.calculators.optimization.optimizers.CageOptimizerSequence">
-<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">CageOptimizerSequence</code><span class="sig-paren">(</span><em>*optimizers</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.CageOptimizerSequence" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">CageOptimizerSequence</code><span class="sig-paren">(</span><em>*optimizers</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.CageOptimizerSequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
 <p>Applies <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> objects to a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>.</p>
 <p>Before each <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> in the sequence is applied to the
@@ -420,7 +420,7 @@ minimize it with the MMFF force field.</p>
 <span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCNCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
 <span class="n">etkdg</span> <span class="o">=</span> <span class="n">RDKitEmbedder</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
 <span class="n">mmff</span> <span class="o">=</span> <span class="n">RDKitForceField</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFOptimizeMolecule</span><span class="p">)</span>
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">OptimizerPipeline</span><span class="p">(</span><span class="n">etkdg</span><span class="p">,</span> <span class="n">mmff</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">OptimizerSequence</span><span class="p">(</span><span class="n">etkdg</span><span class="p">,</span> <span class="n">mmff</span><span class="p">)</span>
 <span class="n">optimizer</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -512,7 +512,7 @@ minimize it with the MMFF force field.</p>
 
 <dl class="class">
 <dt id="stk.calculators.optimization.optimizers.RaisingOptimizer">
-<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">RaisingOptimizer</code><span class="sig-paren">(</span><em>optimizer</em>, <em>fail_chance=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">RaisingOptimizer</code><span class="sig-paren">(</span><em>optimizer</em>, <em>fail_chance=0.5</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
 <p>Raises and optimizes at random.</p>
 <p>This optimizer is used for debugging to simulate optimization
@@ -589,11 +589,23 @@ time <a class="reference internal" href="#stk.calculators.optimization.optimizer
 <dt id="stk.calculators.optimization.optimizers.RaisingOptimizerError">
 <em class="property">exception </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">RaisingOptimizerError</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizerError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.optimizers.RaisingOptimizerError.args">
+<code class="descname">args</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizerError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.RaisingOptimizerError.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.RaisingOptimizerError.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.calculators.optimization.optimizers.TryCatchOptimizer">
-<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">TryCatchOptimizer</code><span class="sig-paren">(</span><em>try_optimizer</em>, <em>catch_optimizer</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.TryCatchOptimizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">TryCatchOptimizer</code><span class="sig-paren">(</span><em>try_optimizer</em>, <em>catch_optimizer</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.TryCatchOptimizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
 <p>Try to optimize with a <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>, use another on failure.</p>
 <dl class="attribute">

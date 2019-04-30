@@ -151,13 +151,194 @@
 <dt id="stk.calculators.optimization.macromodel.MacroModelConversionError">
 <em class="property">exception </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">MacroModelConversionError</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelConversionError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.macromodel.MacroModelConversionError.args">
+<code class="descname">args</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelConversionError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelConversionError.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelConversionError.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.calculators.optimization.macromodel.MacroModelForceField">
-<em class="property">class </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">MacroModelForceField</code><span class="sig-paren">(</span><em>macromodel_path</em>, <em>output_dir=None</em>, <em>restricted='both'</em>, <em>timeout=None</em>, <em>force_field=16</em>, <em>maximum_iterations=2500</em>, <em>minimum_gradient=0.05</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">MacroModelForceField</code><span class="sig-paren">(</span><em>macromodel_path</em>, <em>output_dir=None</em>, <em>restricted=False</em>, <em>timeout=None</em>, <em>force_field=16</em>, <em>maximum_iterations=2500</em>, <em>minimum_gradient=0.05</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.macromodel._MacroModel" title="stk.calculators.optimization.macromodel._MacroModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.macromodel._MacroModel</span></code></a></p>
 <p>Uses MacroModel force fields to optimize molecules.</p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.restricted">
+<code class="descname">restricted</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.restricted" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> then all bonds are optimized, not just the ones
+created during macromolecular assembly. If <code class="docutils literal notranslate"><span class="pre">True</span></code> then an
+optimization is performed only on the bonds added during
+molecular assembly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.com_line">
+<em class="property">static </em><code class="descname">com_line</code><span class="sig-paren">(</span><em>arg1</em>, <em>arg2</em>, <em>arg3</em>, <em>arg4</em>, <em>arg5</em>, <em>arg6</em>, <em>arg7</em>, <em>arg8</em>, <em>arg9</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.com_line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.convert_maegz_to_mae">
+<code class="descname">convert_maegz_to_mae</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.convert_maegz_to_mae" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a <code class="docutils literal notranslate"><span class="pre">.maegz</span></code> file to a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized. The <code class="docutils literal notranslate"><span class="pre">.maegz</span></code> file holding
+its optimized structure is converted to a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.
+Both versions are kept.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.create_mae">
+<code class="descname">create_mae</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.create_mae" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file holding the molecule to be optimized.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
+structure file is converted to a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file. The
+original file is also kept.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The full path of the newly created <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.fix_bond_angles">
+<code class="descname">fix_bond_angles</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.fix_bond_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds lines fixing bond angles to the <code class="docutils literal notranslate"><span class="pre">.com</span></code> body.</p>
+<p>All bond angles of the molecule are fixed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.fix_distances">
+<code class="descname">fix_distances</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.fix_distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds lines fixing bond distances to <code class="docutils literal notranslate"><span class="pre">.com</span></code> body.</p>
+<p>Only bond distances which do not involve bonds created during
+assembly are fixed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.fix_params">
+<code class="descname">fix_params</code><span class="sig-paren">(</span><em>mol</em>, <em>com</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.fix_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fix bond distances and angles in <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+<p>For each bond distance, bond angle and torisional angle that
+does not involve a bond created during assembly a “FX” command
+is added to the body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+<p>These lines replace the filler line in the main string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized.</li>
+<li><strong>com</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file which is to have fix commands
+added.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding the body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file with
+instructions to fix the various bond distances and angles
+as described in the docstring.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.fix_torsional_angles">
+<code class="descname">fix_torsional_angles</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.fix_torsional_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds lines fixing torsional bond angles to the <code class="docutils literal notranslate"><span class="pre">.com</span></code> body.</p>
+<p>All torsional angles of the molecule are fixed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.optimization.macromodel.MacroModelForceField.generate_com">
 <code class="descname">generate_com</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.generate_com" title="Permalink to this definition">¶</a></dt>
@@ -177,6 +358,56 @@ various “FX” commands written within its body.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.kill_bmin">
+<code class="descname">kill_bmin</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.kill_bmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kills bmin.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.license_found">
+<code class="descname">license_found</code><span class="sig-paren">(</span><em>output</em>, <em>mol=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.license_found" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks to see if minimization failed due to a missing license.</p>
+<p>The user can be notified of this in one of two ways. Sometimes
+the output of the submission contains the message informing
+that the license was not found and in other cases it will be
+the log file. This function checks both of these sources for
+this message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The output from submitting the minimization of the
+structure to bmin.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>, optional) – The molecule being optimized. If the <code class="docutils literal notranslate"><span class="pre">.log</span></code> file is not
+to be checked, the default <code class="docutils literal notranslate"><span class="pre">None</span></code> should be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal notranslate"><span class="pre">True</span></code> if the license was found. <code class="docutils literal notranslate"><span class="pre">False</span></code> if the
+minimization did not occur due to a missing license.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -206,23 +437,125 @@ various “FX” commands written within its body.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.run_bmin">
+<code class="descname">run_bmin</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.run_bmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs an optimization using bmin.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#stk.calculators.optimization.macromodel.MacroModelOptimizationError" title="stk.calculators.optimization.macromodel.MacroModelOptimizationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelOptimizationError</span></code></a> – If the optimization failed for some unspecified.</li>
+<li><a class="reference internal" href="#stk.calculators.optimization.macromodel.MacroModelForceFieldError" title="stk.calculators.optimization.macromodel.MacroModelForceFieldError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelForceFieldError</span></code></a> – If the force field could not be used with the molecule.</li>
+<li><a class="reference internal" href="#stk.calculators.optimization.macromodel.MacroModelLewisStructureError" title="stk.calculators.optimization.macromodel.MacroModelLewisStructureError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelLewisStructureError</span></code></a> – If Lewis structure of the molecule had issues.</li>
+<li><a class="reference internal" href="#stk.calculators.optimization.macromodel.MacroModelPathError" title="stk.calculators.optimization.macromodel.MacroModelPathError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelPathError</span></code></a> – If an invalid MacroModel path is being used.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.structconvert">
+<code class="descname">structconvert</code><span class="sig-paren">(</span><em>iname</em>, <em>oname</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.structconvert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses structconvert to change file type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>iname</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the input file.</li>
+<li><strong>oname</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the output file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceField.wait_for_file">
+<code class="descname">wait_for_file</code><span class="sig-paren">(</span><em>filename</em>, <em>timeout=10</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceField.wait_for_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stalls until a given file exists or <cite>timeout</cite> expires.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the file which should be waited for.</li>
+<li><strong>timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The number of seconds before the function stops waiting and
+returns.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="exception">
 <dt id="stk.calculators.optimization.macromodel.MacroModelForceFieldError">
 <em class="property">exception </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">MacroModelForceFieldError</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceFieldError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceFieldError.args">
+<code class="descname">args</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceFieldError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelForceFieldError.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelForceFieldError.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="exception">
 <dt id="stk.calculators.optimization.macromodel.MacroModelLewisStructureError">
 <em class="property">exception </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">MacroModelLewisStructureError</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelLewisStructureError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.macromodel.MacroModelLewisStructureError.args">
+<code class="descname">args</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelLewisStructureError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelLewisStructureError.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelLewisStructureError.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.calculators.optimization.macromodel.MacroModelMD">
-<em class="property">class </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">MacroModelMD</code><span class="sig-paren">(</span><em>macromodel_path</em>, <em>output_dir=None</em>, <em>timeout=None</em>, <em>force_field=16</em>, <em>restricted='both'</em>, <em>temperature=300</em>, <em>conformers=50</em>, <em>time_step=0.1</em>, <em>eq_time=10</em>, <em>simulation_time=200</em>, <em>maximum_iterations=2500</em>, <em>minimum_gradient=0.05</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">MacroModelMD</code><span class="sig-paren">(</span><em>macromodel_path</em>, <em>output_dir=None</em>, <em>timeout=None</em>, <em>force_field=16</em>, <em>temperature=300</em>, <em>conformers=50</em>, <em>time_step=1</em>, <em>eq_time=10</em>, <em>simulation_time=200</em>, <em>maximum_iterations=2500</em>, <em>minimum_gradient=0.05</em>, <em>restricted_bonds=None</em>, <em>restricted_bond_angles=None</em>, <em>restricted_torsional_angles=None</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.optimization.macromodel._MacroModel" title="stk.calculators.optimization.macromodel._MacroModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.macromodel._MacroModel</span></code></a></p>
 <p>Runs a MD conformer search using MacroModel.</p>
 <dl class="attribute">
@@ -295,6 +628,225 @@ various “FX” commands written within its body.</p>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.restricted_bonds">
+<code class="descname">restricted_bonds</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.restricted_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">restricted_bonds</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nb">frozenset</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span>
+    <span class="nb">frozenset</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">)),</span>
+    <span class="nb">frozenset</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Where each <code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code> defines which bonds should have
+a fixed length via the atom ids of atoms in the bond.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class:<cite>set</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.restricted_bond_angles">
+<code class="descname">restricted_bond_angles</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.restricted_bond_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">restricted_bonds</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nb">frozenset</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">)),</span>
+    <span class="nb">frozenset</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">7</span><span class="p">)),</span>
+    <span class="nb">frozenset</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Where each <code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code> defines which bond angles should
+have a fixed size via the atom ids of atoms in the bond
+angle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class:<cite>set</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.restricted_torsional_angles">
+<code class="descname">restricted_torsional_angles</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.restricted_torsional_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">restricted_bonds</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nb">frozenset</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
+    <span class="nb">frozenset</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span>
+    <span class="nb">frozenset</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Where each <code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code> defines which torsional angles
+should have a fixed size via the atom ids of atoms in the
+torsional angle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class:<cite>set</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.com_line">
+<em class="property">static </em><code class="descname">com_line</code><span class="sig-paren">(</span><em>arg1</em>, <em>arg2</em>, <em>arg3</em>, <em>arg4</em>, <em>arg5</em>, <em>arg6</em>, <em>arg7</em>, <em>arg8</em>, <em>arg9</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.com_line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.convert_maegz_to_mae">
+<code class="descname">convert_maegz_to_mae</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.convert_maegz_to_mae" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a <code class="docutils literal notranslate"><span class="pre">.maegz</span></code> file to a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized. The <code class="docutils literal notranslate"><span class="pre">.maegz</span></code> file holding
+its optimized structure is converted to a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.
+Both versions are kept.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.create_mae">
+<code class="descname">create_mae</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.create_mae" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file holding the molecule to be optimized.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
+structure file is converted to a <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file. The
+original file is also kept.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The full path of the newly created <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.fix_bond_angles">
+<code class="descname">fix_bond_angles</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.fix_bond_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds lines fixing bond angles to the <code class="docutils literal notranslate"><span class="pre">.com</span></code> body.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.fix_distances">
+<code class="descname">fix_distances</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.fix_distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds lines fixing bond distances to <code class="docutils literal notranslate"><span class="pre">.com</span></code> body.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.fix_params">
+<code class="descname">fix_params</code><span class="sig-paren">(</span><em>mol</em>, <em>com</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.fix_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fix bond distances and angles in <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+<p>For each bond distance, bond angle and torisional angle that
+does not involve a bond created during assembly a “FX” command
+is added to the body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+<p>These lines replace the filler line in the main string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized.</li>
+<li><strong>com</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file which is to have fix commands
+added.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding the body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file with
+instructions to fix the various bond distances and angles
+as described in the docstring.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.fix_torsional_angles">
+<code class="descname">fix_torsional_angles</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.fix_torsional_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds lines fixing torsional bond angles to the <code class="docutils literal notranslate"><span class="pre">.com</span></code> body.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.optimization.macromodel.MacroModelMD.generate_com">
 <code class="descname">generate_com</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.generate_com" title="Permalink to this definition">¶</a></dt>
@@ -314,6 +866,56 @@ various “FX” commands written within its body.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.kill_bmin">
+<code class="descname">kill_bmin</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.kill_bmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kills bmin.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.license_found">
+<code class="descname">license_found</code><span class="sig-paren">(</span><em>output</em>, <em>mol=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.license_found" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks to see if minimization failed due to a missing license.</p>
+<p>The user can be notified of this in one of two ways. Sometimes
+the output of the submission contains the message informing
+that the license was not found and in other cases it will be
+the log file. This function checks both of these sources for
+this message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The output from submitting the minimization of the
+structure to bmin.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>, optional) – The molecule being optimized. If the <code class="docutils literal notranslate"><span class="pre">.log</span></code> file is not
+to be checked, the default <code class="docutils literal notranslate"><span class="pre">None</span></code> should be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal notranslate"><span class="pre">True</span></code> if the license was found. <code class="docutils literal notranslate"><span class="pre">False</span></code> if the
+minimization did not occur due to a missing license.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -343,23 +945,125 @@ various “FX” commands written within its body.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.run_bmin">
+<code class="descname">run_bmin</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.run_bmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs an optimization using bmin.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#stk.calculators.optimization.macromodel.MacroModelOptimizationError" title="stk.calculators.optimization.macromodel.MacroModelOptimizationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelOptimizationError</span></code></a> – If the optimization failed for some unspecified.</li>
+<li><a class="reference internal" href="#stk.calculators.optimization.macromodel.MacroModelForceFieldError" title="stk.calculators.optimization.macromodel.MacroModelForceFieldError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelForceFieldError</span></code></a> – If the force field could not be used with the molecule.</li>
+<li><a class="reference internal" href="#stk.calculators.optimization.macromodel.MacroModelLewisStructureError" title="stk.calculators.optimization.macromodel.MacroModelLewisStructureError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelLewisStructureError</span></code></a> – If Lewis structure of the molecule had issues.</li>
+<li><a class="reference internal" href="#stk.calculators.optimization.macromodel.MacroModelPathError" title="stk.calculators.optimization.macromodel.MacroModelPathError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroModelPathError</span></code></a> – If an invalid MacroModel path is being used.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.structconvert">
+<code class="descname">structconvert</code><span class="sig-paren">(</span><em>iname</em>, <em>oname</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.structconvert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses structconvert to change file type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>iname</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the input file.</li>
+<li><strong>oname</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the output file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelMD.wait_for_file">
+<code class="descname">wait_for_file</code><span class="sig-paren">(</span><em>filename</em>, <em>timeout=10</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelMD.wait_for_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stalls until a given file exists or <cite>timeout</cite> expires.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the file which should be waited for.</li>
+<li><strong>timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The number of seconds before the function stops waiting and
+returns.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="exception">
 <dt id="stk.calculators.optimization.macromodel.MacroModelOptimizationError">
 <em class="property">exception </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">MacroModelOptimizationError</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelOptimizationError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.macromodel.MacroModelOptimizationError.args">
+<code class="descname">args</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelOptimizationError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelOptimizationError.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelOptimizationError.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="exception">
 <dt id="stk.calculators.optimization.macromodel.MacroModelPathError">
 <em class="property">exception </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">MacroModelPathError</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelPathError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="stk.calculators.optimization.macromodel.MacroModelPathError.args">
+<code class="descname">args</code><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelPathError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.macromodel.MacroModelPathError.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel.MacroModelPathError.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="stk.calculators.optimization.macromodel._MacroModel">
-<em class="property">class </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">_MacroModel</code><span class="sig-paren">(</span><em>macromodel_path</em>, <em>output_dir</em>, <em>restricted</em>, <em>timeout</em>, <em>force_field</em>, <em>maximum_iterations</em>, <em>minimum_gradient</em>, <em>use_cache</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel._MacroModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.calculators.optimization.macromodel.</code><code class="descname">_MacroModel</code><span class="sig-paren">(</span><em>macromodel_path</em>, <em>output_dir</em>, <em>timeout</em>, <em>force_field</em>, <em>maximum_iterations</em>, <em>minimum_gradient</em>, <em>use_cache</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel._MacroModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.optimization.optimizers.Optimizer</span></code></a></p>
 <p>Base class for MacroModel optimzers.</p>
 <dl class="attribute">
@@ -437,25 +1141,6 @@ the optimization are written, if <code class="docutils literal notranslate"><spa
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.calculators.optimization.macromodel._MacroModel.restricted">
-<code class="descname">restricted</code><a class="headerlink" href="#stk.calculators.optimization.macromodel._MacroModel.restricted" title="Permalink to this definition">¶</a></dt>
-<dd><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code> then all bonds are optimized, not just the ones
-created during macromolecular assembly. If <code class="docutils literal notranslate"><span class="pre">True</span></code> then an
-optimization is performed only on the bonds added during
-molecular assembly. If <code class="docutils literal notranslate"><span class="pre">'both'</span></code> then a restricted
-optimization is performed first, followed by a regular
-optimization.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="stk.calculators.optimization.macromodel._MacroModel.timeout">
 <code class="descname">timeout</code><a class="headerlink" href="#stk.calculators.optimization.macromodel._MacroModel.timeout" title="Permalink to this definition">¶</a></dt>
 <dd><p>The amount in seconds the MD is allowed to run before
@@ -516,57 +1201,6 @@ original file is also kept.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.calculators.optimization.macromodel._MacroModel.fix_bond_angles">
-<code class="descname">fix_bond_angles</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel._MacroModel.fix_bond_angles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds lines fixing bond angles to the <code class="docutils literal notranslate"><span class="pre">.com</span></code> body.</p>
-<p>All bond angles of the molecule are fixed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
-<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.calculators.optimization.macromodel._MacroModel.fix_distances">
-<code class="descname">fix_distances</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel._MacroModel.fix_distances" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds lines fixing bond distances to <code class="docutils literal notranslate"><span class="pre">.com</span></code> body.</p>
-<p>Only bond distances which do not involve bonds created during
-assembly are fixed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
-<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="stk.calculators.optimization.macromodel._MacroModel.fix_params">
 <code class="descname">fix_params</code><span class="sig-paren">(</span><em>mol</em>, <em>com</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel._MacroModel.fix_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fix bond distances and angles in <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
@@ -588,31 +1222,6 @@ added.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding the body of the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file with
 instructions to fix the various bond distances and angles
 as described in the docstring.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.calculators.optimization.macromodel._MacroModel.fix_torsional_angles">
-<code class="descname">fix_torsional_angles</code><span class="sig-paren">(</span><em>mol</em>, <em>fix_block</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.macromodel._MacroModel.fix_torsional_angles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds lines fixing torsional bond angles to the <code class="docutils literal notranslate"><span class="pre">.com</span></code> body.</p>
-<p>All torsional angles of the molecule are fixed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
-<li><strong>fix_block</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A string holding fix commands in the <code class="docutils literal notranslate"><span class="pre">.com</span></code> file.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>

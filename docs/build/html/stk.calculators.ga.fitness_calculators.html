@@ -264,7 +264,7 @@ conformers used to calculate the fitness values.</p>
 
 <dl class="class">
 <dt id="stk.calculators.ga.fitness_calculators.PropertyVector">
-<em class="property">class </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">PropertyVector</code><span class="sig-paren">(</span><em>*property_fns</em>, <em>use_cache=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.PropertyVector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">PropertyVector</code><span class="sig-paren">(</span><em>*property_fns</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.PropertyVector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.fitness_calculators.FitnessCalculator</span></code></a></p>
 <p>Calculates the a set of properties of a molecule.</p>
 <p>This <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> applies a series of
@@ -471,7 +471,7 @@ to calculate the property.</p>
 
 <dl class="class">
 <dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator">
-<em class="property">class </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">RaisingFitnessCalculator</code><span class="sig-paren">(</span><em>fitness_calculator</em>, <em>fail_chance=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">RaisingFitnessCalculator</code><span class="sig-paren">(</span><em>fitness_calculator</em>, <em>fail_chance=0.5</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.fitness_calculators.FitnessCalculator</span></code></a></p>
 <p>Raises and calculates fitness at random.</p>
 <p>This fitness calculator is used for debugging to simulate
@@ -549,6 +549,18 @@ each time <a class="reference internal" href="#stk.calculators.ga.fitness_calcul
 <dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError">
 <em class="property">exception </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">RaisingFitnessCalculatorError</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError.args">
+<code class="descname">args</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="function">

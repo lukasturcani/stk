@@ -153,9 +153,140 @@
 <em class="property">class </em><code class="descclassname">stk.utilities.mplogging.</code><code class="descname">MPLogger</code><span class="sig-paren">(</span><em>name</em>, <em>level=0</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">logging.Logger</span></code></p>
 <dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger._log">
+<code class="descname">_log</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>args</em>, <em>exc_info=None</em>, <em>extra=None</em>, <em>stack_info=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger._log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Low-level logging routine which creates a LogRecord and then calls
+all the handlers of this logger to handle the record.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.addFilter">
+<code class="descname">addFilter</code><span class="sig-paren">(</span><em>filter</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.addFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified filter to this handler.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.addHandler">
+<code class="descname">addHandler</code><span class="sig-paren">(</span><em>hdlr</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.addHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified handler to this logger.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.callHandlers">
+<code class="descname">callHandlers</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.callHandlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pass a record to all relevant handlers.</p>
+<p>Loop through all handlers for this logger and its parents in the
+logger hierarchy. If no handler was found, output a one-off error
+message to sys.stderr. Stop searching up the hierarchy whenever a
+logger with the “propagate” attribute set to zero is found - that
+will be the last logger whose handlers are called.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.critical">
+<code class="descname">critical</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.critical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log ‘msg % args’ with severity ‘CRITICAL’.</p>
+<p>To pass exception information, use the keyword argument exc_info with
+a true value, e.g.</p>
+<p>logger.critical(“Houston, we have a %s”, “major disaster”, exc_info=1)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.debug">
+<code class="descname">debug</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log ‘msg % args’ with severity ‘DEBUG’.</p>
+<p>To pass exception information, use the keyword argument exc_info with
+a true value, e.g.</p>
+<p>logger.debug(“Houston, we have a %s”, “thorny problem”, exc_info=1)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.error">
+<code class="descname">error</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log ‘msg % args’ with severity ‘ERROR’.</p>
+<p>To pass exception information, use the keyword argument exc_info with
+a true value, e.g.</p>
+<p>logger.error(“Houston, we have a %s”, “major problem”, exc_info=1)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.exception">
+<code class="descname">exception</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>exc_info=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method for logging an ERROR with exception information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.fatal">
+<code class="descname">fatal</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.fatal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log ‘msg % args’ with severity ‘CRITICAL’.</p>
+<p>To pass exception information, use the keyword argument exc_info with
+a true value, e.g.</p>
+<p>logger.critical(“Houston, we have a %s”, “major disaster”, exc_info=1)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a record is loggable by consulting all the filters.</p>
+<p>The default is to allow the record to be logged; any filter can veto
+this and the record is then dropped. Returns a zero value if a record
+is to be dropped, else non-zero.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 3.2: </span>Allow filters to be just callables.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.findCaller">
+<code class="descname">findCaller</code><span class="sig-paren">(</span><em>stack_info=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.findCaller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the stack frame of the caller so that we can note the source
+file name, line number and function name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.getChild">
+<code class="descname">getChild</code><span class="sig-paren">(</span><em>suffix</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.getChild" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a logger which is a descendant to this one.</p>
+<p>This is a convenience method, such that</p>
+<p>logging.getLogger(‘abc’).getChild(‘def.ghi’)</p>
+<p>is the same as</p>
+<p>logging.getLogger(‘abc.def.ghi’)</p>
+<p>It’s useful, for example, when the parent logger is named using
+__name__ rather than a literal string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.getEffectiveLevel">
+<code class="descname">getEffectiveLevel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.getEffectiveLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the effective level for this logger.</p>
+<p>Loop through this logger and its parents in the logger hierarchy,
+looking for a non-zero logging level. Return the first one found.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.utilities.mplogging.MPLogger.handle">
 <code class="descname">handle</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.handle" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.hasHandlers">
+<code class="descname">hasHandlers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.hasHandlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>See if this logger has any handlers configured.</p>
+<p>Loop through all handlers for this logger and its parents in the
+logger hierarchy. Return True if a handler was found, else False.
+Stop searching up the hierarchy whenever a logger with the “propagate”
+attribute set to zero is found - that will be the last logger which
+is checked for the existence of handlers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.info">
+<code class="descname">info</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log ‘msg % args’ with severity ‘INFO’.</p>
+<p>To pass exception information, use the keyword argument exc_info with
+a true value, e.g.</p>
+<p>logger.info(“Houston, we have a %s”, “interesting problem”, exc_info=1)</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="stk.utilities.mplogging.MPLogger.isEnabledFor">
@@ -163,10 +294,68 @@
 <dd><p>Is this logger enabled for level ‘level’?</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.log">
+<code class="descname">log</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log ‘msg % args’ with the integer severity ‘level’.</p>
+<p>To pass exception information, use the keyword argument exc_info with
+a true value, e.g.</p>
+<p>logger.log(level, “We have a %s”, “mysterious problem”, exc_info=1)</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="stk.utilities.mplogging.MPLogger.log_queue">
 <code class="descname">log_queue</code><em class="property"> = None</em><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.log_queue" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.makeRecord">
+<code class="descname">makeRecord</code><span class="sig-paren">(</span><em>name</em>, <em>level</em>, <em>fn</em>, <em>lno</em>, <em>msg</em>, <em>args</em>, <em>exc_info</em>, <em>func=None</em>, <em>extra=None</em>, <em>sinfo=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.makeRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>A factory method which can be overridden in subclasses to create
+specialized LogRecords.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.utilities.mplogging.MPLogger.manager">
+<code class="descname">manager</code><em class="property"> = &lt;logging.Manager object&gt;</em><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.manager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.removeFilter">
+<code class="descname">removeFilter</code><span class="sig-paren">(</span><em>filter</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.removeFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified filter from this handler.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.removeHandler">
+<code class="descname">removeHandler</code><span class="sig-paren">(</span><em>hdlr</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.removeHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified handler from this logger.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.utilities.mplogging.MPLogger.root">
+<code class="descname">root</code><em class="property"> = &lt;RootLogger root (WARNING)&gt;</em><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.root" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.setLevel">
+<code class="descname">setLevel</code><span class="sig-paren">(</span><em>level</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.setLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the logging level of this logger.  level must be an int or a str.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.warn">
+<code class="descname">warn</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.warn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.utilities.mplogging.MPLogger.warning">
+<code class="descname">warning</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.utilities.mplogging.MPLogger.warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log ‘msg % args’ with severity ‘WARNING’.</p>
+<p>To pass exception information, use the keyword argument exc_info with
+a true value, e.g.</p>
+<p>logger.warning(“Houston, we have a %s”, “bit of a problem”, exc_info=1)</p>
+</dd></dl>
 
 </dd></dl>
 
