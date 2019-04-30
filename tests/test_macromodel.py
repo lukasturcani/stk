@@ -96,7 +96,7 @@ def test_both_md(tmp_cc3, macromodel_path):
     tmp_cc3.write(join(outdir, 'bmm_md_before.mol'), conformer=0)
 
     # Freeze one of the bonders.
-    bonder = tmp_cc3.functional_groups[0].bonder_ids[0]
+    bonder = tmp_cc3.func_groups[0].bonder_ids[0]
     restricted_bonds = []
     for neighbor in tmp_cc3.mol.GetAtom(bonder).GetNeighbors():
         restricted_bonds.append(frozenset((bonder, neighbor.GetIdx())))
