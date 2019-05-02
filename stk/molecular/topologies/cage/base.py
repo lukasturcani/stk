@@ -977,6 +977,10 @@ class NoLinkerCageTopology(CageTopology):
 
             mol = position.place_mol(scale, bb, int(orientation))
 
+            add_fragment_props(mol,
+                               macro_mol.building_blocks.index(bb),
+                               bb_index)
+
             first_id = len(self._func_groups)
             ids = range(first_id, first_id+n_bb)
             self._func_groups.extend(bb.shift_fgs(ids, num_atoms))
