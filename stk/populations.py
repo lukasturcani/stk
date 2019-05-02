@@ -9,7 +9,8 @@ from os.path import join
 import numpy as np
 import json
 from glob import iglob
-import multiprocessing as mp
+from pathos.helpers import mp
+import pathos
 import psutil
 from functools import wraps
 import logging
@@ -745,10 +746,11 @@ class Population:
 
         # Apply the function to every member of the population, in
         # parallel.
-        with mp.get_context('spawn').Pool(processes) as pool:
-            optimized = pool.starmap(logged_call,
-                                     ((logq, opt_fn, mem) for
-                                      mem in self))
+        with pathos.pools.ProcessPool(processes) as pool:
+            optimized = pool.map(logged_call,
+                                 [logq]*len(self),
+                                 [opt_fn]*len(self),
+                                 self)
 
         logq.put(None)
         log_thread.join()
@@ -1267,10 +1269,11 @@ class GAPopulation(Population):
 
         # Apply the function to every member of the population, in
         # parallel.
-        with mp.get_context('spawn').Pool(processes) as pool:
-            evaluated = pool.starmap(logged_call,
-                                     ((logq, fitness_fn, mol) for
-                                      mol in self))
+        with pathos.pools.ProcessPool(processes) as pool:
+            evaluated = pool.map(logged_call,
+                                 [logq]*len(self),
+                                 [fitness_fn]*len(self),
+                                 self)
 
         logq.put(None)
         log_thread.join()
