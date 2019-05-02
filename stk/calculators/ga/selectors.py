@@ -587,7 +587,9 @@ class Roulette(Selector):
                 ranks = range(1, len(valid_pop)+1)
                 weights = [1/(rank*total) for rank in ranks]
 
-                valid_pop = sorted(valid_pop, reverse=True)
+                valid_pop = sorted(valid_pop,
+                                   key=lambda m: m.fitness,
+                                   reverse=True)
 
             else:
                 total = sum(mol.fitness for mol in valid_pop)
