@@ -392,7 +392,7 @@ class Power(FitnessNormalizer):
         """
 
         for mol in population:
-            mol.fitness = np.power(mol.fitness, self.power)
+            mol.fitness = np.float_power(mol.fitness, self.power)
 
 
 class Multiply(FitnessNormalizer):
