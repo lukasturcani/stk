@@ -14,9 +14,9 @@ import pathos
 import psutil
 from functools import wraps
 import logging
-from threading import Thread
+import pathos
 
-from .utilities import dedupe, OPTIONS, daemon_logger, logged_call
+from .utilities import dedupe, OPTIONS
 
 
 logger = logging.getLogger(__name__)
