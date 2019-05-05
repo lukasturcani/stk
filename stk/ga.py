@@ -14,10 +14,31 @@ warnings.filterwarnings("ignore")
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
 
 
+# Define the formatter for logging messages.
+try:
+    f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
+except OSError:
+    # When testing os.get_terminal_size() will fail because stdout is
+    # not connceted to a terminal.
+    f = '\n' + '='*100 + '\n\n'
+formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
+                                     '%(name)s - %(message)s'),
+                              datefmt='%H:%M:%S')
+
+# Define logging handlers.
+errorhandler = logging.FileHandler('output/scratch/errors.log',
+                                   delay=True)
+errorhandler.setLevel(logging.ERROR)
+
+streamhandler = logging.StreamHandler()
+
+errorhandler.setFormatter(formatter)
+streamhandler.setFormatter(formatter)
+
 # Get the loggers.
 rootlogger = logging.getLogger()
-rootlogger.addHandler(stk.errorhandler)
-rootlogger.addHandler(stk.streamhandler)
+rootlogger.addHandler(errorhandler)
+rootlogger.addHandler(streamhandler)
 
 logger = logging.getLogger(__name__)
 
