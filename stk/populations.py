@@ -13,9 +13,9 @@ import multiprocessing as mp
 import psutil
 from functools import wraps
 import logging
-from threading import Thread
+import pathos
 
-from .utilities import dedupe, OPTIONS, daemon_logger, logged_call
+from .utilities import dedupe, OPTIONS
 
 
 logger = logging.getLogger(__name__)
@@ -736,22 +736,12 @@ class Population:
         return np.min([key(member) for member in self], axis=0)
 
     def _optimize_parallel(self, optimizer, processes):
-        manager = mp.Manager()
-        logq = manager.Queue()
-        log_thread = Thread(target=daemon_logger, args=(logq, ))
-        log_thread.start()
-
         opt_fn = _Guard(optimizer, optimizer.optimize)
 
         # Apply the function to every member of the population, in
         # parallel.
-        with mp.get_context('spawn').Pool(processes) as pool:
-            optimized = pool.starmap(logged_call,
-                                     ((logq, opt_fn, mem) for
-                                      mem in self))
-
-        logq.put(None)
-        log_thread.join()
+        with pathos.pools.ProcessPool(processes) as pool:
+            optimized = pool.map(opt_fn, self)
 
         # If anything failed, raise an error.
         for result in optimized:
