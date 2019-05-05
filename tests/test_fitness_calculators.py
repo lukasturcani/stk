@@ -43,7 +43,7 @@ def test_cache_use(tmp_amine2):
     assert calc.fitness(tmp_amine2, 1) is not obj
 
     # Test that the cache is being filled when use_cache is True.
-    calc = stk.PropertyVector(lambda mol, conformer: 1)
+    calc = stk.PropertyVector(lambda mol, conformer: 1, use_cache=True)
     assert not calc.cache
     calc.fitness(tmp_amine2)
     assert calc.cache
