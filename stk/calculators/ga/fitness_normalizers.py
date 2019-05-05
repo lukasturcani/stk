@@ -65,7 +65,7 @@ def _handle_failed_molecules(normalize):
     @wraps(normalize)
     def inner(self, population):
         valid_pop = population.init_copy(population)
-        population.remove_members(
+        valid_pop.remove_members(
             lambda m: m.fitness is None
         )
         r = normalize(self, valid_pop)
