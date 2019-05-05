@@ -14,7 +14,6 @@ import pathos
 import psutil
 from functools import wraps
 import logging
-import pathos
 
 from .utilities import dedupe, OPTIONS
 
