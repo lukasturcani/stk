@@ -348,6 +348,8 @@ class NullOptimizer(Optimizer):
 
         """
 
+        logger.debug('Message 1.')
+        logger.debug('Message 2.')
         return
 
 

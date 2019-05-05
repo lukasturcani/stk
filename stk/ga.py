@@ -1,13 +1,14 @@
 import warnings
 import os
-import shutil
 import logging
 import argparse
 from rdkit import RDLogger
-from os.path import join, basename, abspath
+from os.path import join, basename
 import stk
-from importlib.machinery import SourceFileLoader
 import psutil
+from types import SimpleNamespace
+import shutil
+
 
 warnings.filterwarnings("ignore")
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
@@ -173,7 +174,7 @@ class GAHistory:
             )
 
 
-def ga_run(input_file):
+def ga_run(filename, input_file):
     """
     Runs the GA.
 
@@ -258,8 +259,7 @@ def ga_run(input_file):
         os.mkdir('pop_dumps')
 
     # Copy the input script into the ``output`` folder.
-    shutil.copyfile(input_file.__file__,
-                    basename(input_file.__file__))
+    shutil.copyfile(filename, basename(filename))
     # Make the ``scratch`` directory which acts as the working
     # directory during the GA run.
     os.mkdir('scratch')
@@ -375,8 +375,10 @@ if __name__ == '__main__':
                         help='The number times the GA should be run.')
 
     args = parser.parse_args()
-    loader = SourceFileLoader('input_file', abspath(args.input_file))
-    input_file = loader.load_module()
+    n = {}
+    with open(args.input_file, 'r') as f:
+        exec(f.read(), n)
+    input_file = SimpleNamespace(**n)
 
     for x in range(args.loops):
-        ga_run(input_file)
+        ga_run(args.input_file, input_file)

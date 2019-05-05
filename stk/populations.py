@@ -737,23 +737,12 @@ class Population:
         return np.min([key(member) for member in self], axis=0)
 
     def _optimize_parallel(self, optimizer, processes):
-        manager = mp.Manager()
-        logq = manager.Queue()
-        log_thread = Thread(target=daemon_logger, args=(logq, ))
-        log_thread.start()
-
         opt_fn = _Guard(optimizer, optimizer.optimize)
 
         # Apply the function to every member of the population, in
         # parallel.
         with pathos.pools.ProcessPool(processes) as pool:
-            optimized = pool.map(logged_call,
-                                 [logq]*len(self),
-                                 [opt_fn]*len(self),
-                                 self)
-
-        logq.put(None)
-        log_thread.join()
+            optimized = pool.map(opt_fn, self)
 
         # If anything failed, raise an error.
         for result in optimized:
@@ -1259,10 +1248,6 @@ class GAPopulation(Population):
     def _calculate_fitness_parallel(self,
                                     fitness_calculator,
                                     processes):
-        manager = mp.Manager()
-        logq = manager.Queue()
-        log_thread = Thread(target=daemon_logger, args=(logq, ))
-        log_thread.start()
 
         fitness_fn = _Guard(fitness_calculator,
                             fitness_calculator.fitness)
@@ -1270,13 +1255,7 @@ class GAPopulation(Population):
         # Apply the function to every member of the population, in
         # parallel.
         with pathos.pools.ProcessPool(processes) as pool:
-            evaluated = pool.map(logged_call,
-                                 [logq]*len(self),
-                                 [fitness_fn]*len(self),
-                                 self)
-
-        logq.put(None)
-        log_thread.join()
+            evaluated = pool.map(fitness_fn, self)
 
         # If anything returned an exception, raise it.
         for result in evaluated:
@@ -1288,6 +1267,8 @@ class GAPopulation(Population):
         sorted_old = sorted(self, key=lambda m: m.key)
         for old, new in zip(sorted_old, sorted_new):
             old.__dict__ = dict(vars(new))
+            if fitness_calculator.use_cache:
+                fitness_calculator.cache[(old.key, -1)] = new.fitness
 
         # Make sure the cache is updated.
         if OPTIONS['cache']:
