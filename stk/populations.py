@@ -29,7 +29,7 @@ class Population:
 
     In addtion to holding :class:`.Molecule` objects, the
     :class:`Population` class can be used to create large numbers of
-    these instances through the :meth:`init\_` class methods.
+    these instances through the class methods beggining with "init_".
 
     :class:`.Molecule` instances held by a :class:`Population` can have
     their structures optimized in parallel through the
