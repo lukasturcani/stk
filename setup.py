@@ -35,6 +35,7 @@ setup(name='stk',
           'psutil',
           'pywindowx',
           'pandas',
+          'pathos',
           'seaborn'
        ],
       python_requires='>=3.6')
