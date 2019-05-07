@@ -1350,18 +1350,6 @@ class GAPopulation(Population):
 
         return offspring
 
-    def normalize_fitness_values(self):
-        """
-        Uses :attr:`fitness_normalizer` to normalize fitness values.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self.fitness_normalizer.normalize(self)
-
 
 class _Guard:
     """
