@@ -71,7 +71,7 @@ def _handle_failed_molecules(normalize):
         r = normalize(self, valid_pop)
 
         if self.handle_failed:
-            minimum_fitness = min(m.fitness for m in valid_pop)
+            minimum_fitness = min((m.fitness for m in valid_pop), default=1)
             for member in population:
                 if member.fitness is None:
                     member.fitness = minimum_fitness/2
@@ -248,8 +248,11 @@ class NormalizerSequence(FitnessNormalizer):
         """
 
         for normalizer in self.normalizers:
+            handle_failed = normalizer.handle_failed
+            normalizer.handle_failed = False
             logger.info(f'Using {normalizer.__class__.__name__}.')
             normalizer.normalize(population)
+            normalizer.handle_failed = handle_failed
 
 
 class Power(FitnessNormalizer):
