@@ -3299,6 +3299,15 @@ class Cage(MacroMolecule):
         return valid_windows[:self.topology.n_windows]
 
 
+class CageComplex(MacroMolecule):
+    """
+    Represents a cage-guest system.
+
+    """
+
+    pass
+
+
 class Polymer(MacroMolecule):
     """
     Used to represent polymers.
