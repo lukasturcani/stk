@@ -1,4 +1,5 @@
 from .cage import *
 from .base import *
 from .cof import *
-from .multimers import *
+from .multimer import *
+from .polymer import *
