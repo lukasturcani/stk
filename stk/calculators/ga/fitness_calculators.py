@@ -516,7 +516,7 @@ class PropertyVector(FitnessCalculator):
         -------
         :class:`list`
             A :class:`list` of properties of the `mol`. Will be
-            ``None`` if any of the
+            ``None`` if any of the properties fail.
 
         """
 
@@ -531,7 +531,8 @@ class PropertyVector(FitnessCalculator):
                     f'Using '
                     f'{property_fn.__name__} on "{mol.name}" failed.'
                 )
-                return None
-            else:
-                property_vector.append(r)
-        return property_vector
+                property_vector.append(None)
+        if None in property_vector:
+            return None    
+        else:
+            return property_vector
