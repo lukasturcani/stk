@@ -8,6 +8,7 @@ import stk
 import psutil
 from types import SimpleNamespace
 import shutil
+from importlib.machinery import SourceFileLoader
 
 
 warnings.filterwarnings("ignore")
@@ -396,10 +397,8 @@ if __name__ == '__main__':
                         help='The number times the GA should be run.')
 
     args = parser.parse_args()
-    n = {}
-    with open(args.input_file, 'r') as f:
-        exec(f.read(), n)
-    input_file = SimpleNamespace(**n)
+    loader = SourceFileLoader('input_file', args.input_file)
+    input_file = loader.load_module()
 
     for x in range(args.loops):
         ga_run(args.input_file, input_file)
