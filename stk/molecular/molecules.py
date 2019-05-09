@@ -3803,3 +3803,15 @@ class Periodic(MacroMolecule):
                 a2 = bond.atom2(mol.mol) + 1
                 dx, dy, dz = bond.direction
                 f.write(f'connect {a1} {a2} {dx:+} {dy:+} {dz:+}\n')
+
+
+class Rotaxane(MacroMolecule):
+    """
+    Used to represent rotaxanes.
+
+    Rotaxanes are mechanically-interlocked molecules with a macrocyclic
+    ring threaded around a polymeric axle.
+
+    """
+
+    pass
