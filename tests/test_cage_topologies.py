@@ -1,6 +1,7 @@
 import stk
 import os
 from os.path import join
+import numpy as np
 
 
 test_dir = 'cage_topology_tests_output'
@@ -539,3 +540,20 @@ def test_multiconformer(tmp_amine2, tmp_aldehyde3):
     assert c.topology == top
     assert c.bb_counter[tmp_amine2] == amine_count
     assert c.bb_counter[tmp_aldehyde3] == aldehyde_count
+
+
+def test_cage_complex(amine2, amine2_alt1, aldehyde3, chained_c60):
+    c = stk.Cage([amine2, amine2_alt1, aldehyde3],
+                 stk.FourPlusSix(bb_positions={
+                     amine2: [5],
+                     amine2_alt1: [0, 1, 2, 3, 4],
+                     aldehyde3: [0, 1, 2, 3]
+                 }))
+
+    n = 3
+    for i in range(n):
+        cage_complex = stk.CageComplex(
+            [c, chained_c60],
+            stk.CageGuest(axis=[1, 0, 0], angle=2*np.pi*i/n)
+        )
+        cage_complex.write(join(test_dir, f'cage_guest_{i}.mol'))

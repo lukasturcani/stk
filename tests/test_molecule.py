@@ -76,10 +76,6 @@ def test_atom_symbol(amine2):
         assert atom_sym == amine2.atom_symbol(atom_id)
 
 
-def test_cavity_size(cc3):
-    assert abs(cc3.cavity_size(conformer=1)-5.622072210870494) < 1e-4
-
-
 def test_center_of_mass(amine2):
     """
     Tests `center_of_mass`.

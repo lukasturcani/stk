@@ -330,6 +330,12 @@ def c60():
 
 
 @pytest.fixture(scope='session')
+def chained_c60():
+    path = join('..', 'data', 'chained_c60.mol')
+    return stk.StructUnit(path, name='c60')
+
+
+@pytest.fixture(scope='session')
 def fg():
     return stk.FunctionalGroup(id_=0,
                                atom_ids=[10, 3, 1, 4, 43, 5, 32, 55],
