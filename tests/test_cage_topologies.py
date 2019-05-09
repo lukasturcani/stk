@@ -554,8 +554,8 @@ def test_cage_complex(amine2, amine2_alt1, aldehyde3, chained_c60):
     for i in range(n):
         cage_complex = stk.CageComplex(
             [c, chained_c60],
-            stk.CageGuest(axis=[1, 0, 0],
-                          angle=2*np.pi*i/n,
-                          displacement=[2*i, 0, 0])
+            stk.CageWithGuest(axis=[1, 0, 0],
+                              angle=2*np.pi*i/n,
+                              displacement=[2*i, 0, 0])
         )
-        cage_complex.write(join(test_dir, f'cage_guest_{i}.mol'))
+        cage_complex.write(join(test_dir, f'cage_with_guest_{i}.mol'))

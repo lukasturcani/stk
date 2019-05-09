@@ -5,7 +5,7 @@ from ....utilities import (rotation_matrix_arbitrary_axis,
                            add_fragment_props)
 
 
-class CageGuest(Topology):
+class CageWithGuest(Topology):
     """
     A topology representing a cage with a guest.
 
@@ -26,7 +26,7 @@ class CageGuest(Topology):
 
     def __init__(self, axis=None, angle=0, displacement=None):
         """
-        Initializes an instance of :class:`CageGuest`.
+        Initializes an instance of :class:`CageWithGuest`.
 
         Parameters
         ----------
