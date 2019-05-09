@@ -1,8 +1,8 @@
 from ..base import Topology
-from ....utilities import 
+from ....utilities import rotation_matrix_arbitrary_axis
 
 
-class CageGuest(Topoology):
+class CageGuest(Topology):
     """
 
     """
@@ -18,6 +18,7 @@ class CageGuest(Topoology):
         
         self.displacement = None
         if displacement is not None:
+            # Nested list so that it can be added to a [3, n] array.
             self.displacement = [[i] for i in displacement]
 
     def place_mols(self, macro_mol):
@@ -26,6 +27,12 @@ class CageGuest(Topoology):
         for i, bb in enumerate(macro_mol.building_blocks):
             pos = bb.position_matrix()
             bb.set_position(origin)
+            
+            # Make sure that the building blocks are always positioned
+            # consistently, regardless of initial position.
+            _, a1, a2 = bb.max_diameter()
+            mol_axis = bb.atom_coords(a1) - bb.atom_coords(a2)
+            bb.set_orientation(mol_axis, [1, 0, 0])
 
             # Apply the rotation and displacement to the guest.
             if i == 1:
