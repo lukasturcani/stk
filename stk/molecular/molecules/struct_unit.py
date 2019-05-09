@@ -38,18 +38,18 @@ from collections import defaultdict
 from inspect import signature
 
 from .molecule import Molecule
-from .functional_groups import FunctionalGroup
-from .functional_groups import functional_group_infos as fg_infos
-from .functional_groups import functional_groups as fgs
-from ..utilities import (flatten,
-                         normalize_vector,
-                         rotation_matrix,
-                         vector_theta,
-                         mol_from_mae_file,
-                         rotation_matrix_arbitrary_axis,
-                         remake,
-                         dedupe,
-                         OPTIONS)
+from ..functional_groups import FunctionalGroup
+from ..functional_groups import functional_group_infos as fg_infos
+from ..functional_groups import functional_groups as fgs
+from ...utilities import (flatten,
+                          normalize_vector,
+                          rotation_matrix,
+                          vector_theta,
+                          mol_from_mae_file,
+                          rotation_matrix_arbitrary_axis,
+                          remake,
+                          dedupe,
+                          OPTIONS)
 
 
 logger = logging.getLogger(__name__)

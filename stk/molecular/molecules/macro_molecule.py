@@ -149,8 +149,9 @@ from collections import Counter, defaultdict
 from inspect import signature
 
 from .molecule import Molecule
-from . import topologies
-from ..utilities import OPTIONS
+from .. import topologies
+from ..functional_groups import FunctionalGroup
+from ...utilities import OPTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -528,7 +529,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.building_blocks = bbs
         obj.atom_props = {int(key): value for key, value in
                           d.pop('atom_props').items()}
-        obj.func_groups = tuple(eval(d.pop('func_groups')))
+        # Globals for eval.
+        g = {'FunctionalGroup': FunctionalGroup}
+        obj.func_groups = tuple(eval(d.pop('func_groups'), g))
         if OPTIONS['cache']:
             cls.cache[key] = obj
 

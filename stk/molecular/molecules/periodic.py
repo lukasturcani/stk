@@ -5,7 +5,7 @@ import math
 
 from .struct_unit import StructUnit
 from .macro_molecule import MacroMolecule
-from .functional_groups import Reactor
+from ..functional_groups import Reactor
 from ...utilities import flatten, vector_theta, Cell
 
 
