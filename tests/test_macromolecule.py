@@ -1,5 +1,6 @@
 import os
 import stk
+import pickle
 
 if not os.path.exists('macromolecule_tests_output'):
     os.mkdir('macromolecule_tests_output')
@@ -20,29 +21,6 @@ def test_building_block_cores(polymer):
 
 def test_bb_distortion(polymer):
     assert isinstance(polymer.bb_distortion(), float)
-
-
-def test_comparison():
-    """
-    Checks ``==``, ``>``, ``>=``, etc. operators.
-
-    """
-
-    a = stk.MacroMolecule.__new__(stk.MacroMolecule)
-    a.fitness = 1
-
-    b = stk.MacroMolecule.__new__(stk.MacroMolecule)
-    b.fitness = 1
-
-    c = stk.MacroMolecule.__new__(stk.MacroMolecule)
-    c.fitness = 2
-
-    # Comparison operators should compare their fitness.
-    assert not a < b
-    assert a <= b
-    assert a == b
-    assert c > b
-    assert c >= a
 
 
 def test_caching(amine2, aldehyde2):
@@ -85,20 +63,43 @@ def test_save_rdkit_atom_props(tmp_amine2):
     assert tmp_amine2.atom_props[2]['str_test'] == 'value'
 
 
-def test_json_init(polymer):
+def test_json_init(tmp_polymer):
+
     path = os.path.join('macromolecule_tests_output', 'mol.json')
-    polymer.dump(path)
+
+    tmp_polymer.test_attr1 = 'something'
+    tmp_polymer.test_attr2 = 12
+    tmp_polymer.test_attr3 = ['12', 'something', 21]
+    include_attrs = ['test_attr1', 'test_attr2', 'test_attr3']
+
+    tmp_polymer.dump(path, include_attrs=include_attrs)
     mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
 
-    assert polymer is not mol2
-    assert polymer.func_groups == mol2.func_groups
-    assert polymer.atom_props == mol2.atom_props
-    assert polymer.bb_counter == mol2.bb_counter
-    assert polymer.topology == mol2.topology
-    assert polymer.bonds_made == mol2.bonds_made
-    assert polymer.unscaled_fitness == mol2.unscaled_fitness
-    assert polymer.progress_params == mol2.progress_params
+    assert tmp_polymer.__class__ is mol2.__class__
+    assert tmp_polymer is not mol2
+    assert tmp_polymer.func_groups == mol2.func_groups
+    assert tmp_polymer.atom_props == mol2.atom_props
+
+    matches = 0
+    for key1, value1 in tmp_polymer.bb_counter.items():
+        for key2, value2 in mol2.bb_counter.items():
+            if key1.same(key2):
+                assert value1 == value2
+                matches += 1
+    assert len(tmp_polymer.bb_counter) == len(mol2.bb_counter)
+    assert len(mol2.bb_counter) == matches
+
+    assert tmp_polymer.topology == mol2.topology
+    assert tmp_polymer.bonds_made == mol2.bonds_made
     assert all(bb1.same(bb2) and
                bb1.func_groups == bb2.func_groups
                for bb1, bb2 in
-               zip(polymer.building_blocks, mol2.building_blocks))
+               zip(tmp_polymer.building_blocks, mol2.building_blocks))
+    assert tmp_polymer.test_attr1 == mol2.test_attr1
+    assert tmp_polymer.test_attr2 == mol2.test_attr2
+    assert tmp_polymer.test_attr3 == mol2.test_attr3
+
+
+def test_pickle(polymer):
+    result = pickle.loads(pickle.dumps(polymer))
+    assert result.same(polymer)

@@ -82,8 +82,6 @@
         }
     ],
     "topology": "FourPlusSix(A_alignments=None, B_alignments=None, bb_positions=None, edge_alignments=None)",
-    "unscaled_fitness": "{}",
-    "progress_params": {},
     "note": "",
     "name": "",
     "atom_props": {

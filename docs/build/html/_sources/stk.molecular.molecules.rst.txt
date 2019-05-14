@@ -1,5 +1,5 @@
-stk\.molecular\.molecules module
-================================
+stk.molecular.molecules module
+==============================
 
 .. automodule:: stk.molecular.molecules
     :members:

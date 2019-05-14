@@ -936,12 +936,6 @@ class NoLinkerCageTopology(CageTopology):
     alignments : :class:`list` of :class:`int`
         See :attr:`CageTopology.A_alignments`
 
-    bb_positions : :class:`list` of :class:`int`
-        For each vertex, the :class:`int` is the index of a
-        building block in :attr:`.MacroMolecule.building_blocks`.
-        It is the building block to be placed on that vertex. Can be
-        ``None`` if a random building block should be placed.
-
     """
 
     def __init__(self, alignments=None, bb_positions=None):
@@ -965,8 +959,12 @@ class NoLinkerCageTopology(CageTopology):
             for i in range(len(self.positions_A)):
                 bb_map[i] = np.random.choice(macro_mol.building_blocks)
         else:
-            for bb_index, positions in self.bb_positions.items():
-                bb = macro_mol.building_blocks[bb_index]
+            for bb, positions in self.bb_positions.items():
+                # bb_positions can hold the StructUnits directly or
+                # refer to them by index.
+                if isinstance(bb, int):
+                    bb = macro_mol.building_blocks[bb]
+
                 for position in positions:
                     bb_map[position] = bb
 
@@ -978,6 +976,10 @@ class NoLinkerCageTopology(CageTopology):
             n_bb = len(bb.func_groups)
 
             mol = position.place_mol(scale, bb, int(orientation))
+
+            add_fragment_props(mol,
+                               macro_mol.building_blocks.index(bb),
+                               bb_index)
 
             first_id = len(self._func_groups)
             ids = range(first_id, first_id+n_bb)

@@ -24,33 +24,70 @@ if not os.path.exists(outdir):
 
 
 @macromodel
-def test_macromodel_opt(tmp_cc3, macromodel_path):
-    tmp_cc3.write(join(outdir, 'mm_opt_before.mol'))
+def test_restricted_force_field(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'rmm_ff_before.mol'), conformer=0)
 
-    stk.macromodel_opt(
-        tmp_cc3,
-        macromodel_path,
-        {'md': True, 'gradient': 1, 'restricted': 'both'},
-        {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2})
-
-    tmp_cc3.write(join(outdir, 'mm_opt_after.mol'))
-
-
-@macromodel
-def test_macromodel_cage_opt(tmp_cc3, macromodel_path):
-    tmp_cc3.write(join(outdir, 'mm_cage_opt_before.mol'))
-
-    stk.macromodel_cage_opt(
-        tmp_cc3,
-        macromodel_path,
-        {'md': True, 'gradient': 1, 'restricted': False},
-        {'gradient': 1, 'sim_time': 20, 'eq_time': 2, 'confs': 2})
-
-    tmp_cc3.write(join(outdir, 'mm_cage_opt_after.mol'))
+    mm = stk.MacroModelForceField(macromodel_path=macromodel_path,
+                                  output_dir='rmm_ff',
+                                  restricted=True,
+                                  minimum_gradient=1)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'rmm_ff_after.mol'), conformer=0)
 
 
 @macromodel
-def test_macromodel_eng(amine2, macromodel_path):
-    assert np.allclose(a=amine2.energy.macromodel(16, macromodel_path),
+def test_unrestricted_force_field(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'umm_ff_before.mol'),
+                  conformer=0)
+
+    mm = stk.MacroModelForceField(macromodel_path=macromodel_path,
+                                  output_dir='umm_ff',
+                                  restricted=False,
+                                  minimum_gradient=1)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'umm_ff_after.mol'), conformer=0)
+
+
+@macromodel
+def test_restricted_md(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'rmm_md_before.mol'), conformer=0)
+
+    # Freeze one of the bonders.
+    bonder = tmp_cc3.func_groups[0].bonder_ids[0]
+    restricted_bonds = []
+    for neighbor in tmp_cc3.mol.GetAtomWithIdx(bonder).GetNeighbors():
+        restricted_bonds.append(frozenset((bonder, neighbor.GetIdx())))
+
+    mm = stk.MacroModelMD(macromodel_path=macromodel_path,
+                          output_dir='rmm_md',
+                          minimum_gradient=1,
+                          simulation_time=20,
+                          eq_time=2,
+                          conformers=2,
+                          time_step=0.1,
+                          restricted_bonds=restricted_bonds)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'rmm_md_after.mol'), conformer=0)
+
+
+@macromodel
+def test_unrestricted_md(tmp_cc3, macromodel_path):
+    tmp_cc3.write(join(outdir, 'umm_md_before.mol'), conformer=0)
+
+    mm = stk.MacroModelMD(macromodel_path=macromodel_path,
+                          output_dir='umm_md',
+                          minimum_gradient=1,
+                          simulation_time=20,
+                          eq_time=2,
+                          conformers=2)
+    mm.optimize(tmp_cc3, conformer=0)
+    tmp_cc3.write(join(outdir, 'umm_md_after.mol'), conformer=0)
+
+
+@macromodel
+def test_energy(amine2, macromodel_path):
+    mm = stk.MacroModelEnergy(macromodel_path, 'energy_calc')
+    a = mm.energy(amine2)
+    assert np.allclose(a=a,
                        b=49.0655,
                        atol=1e-2)

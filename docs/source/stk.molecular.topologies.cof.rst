@@ -1,5 +1,5 @@
-stk\.molecular\.topologies\.cof module
-======================================
+stk.molecular.topologies.cof module
+===================================
 
 .. automodule:: stk.molecular.topologies.cof
     :members:

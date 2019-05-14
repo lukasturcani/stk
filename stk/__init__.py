@@ -1,4 +1,6 @@
 from .utilities import *
 from .molecular import *
-from .optimization import *
-from .population import *
+from .calculators import *
+from .populations import *
+
+__version__ = '2019.05.09.2'

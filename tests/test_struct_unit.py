@@ -2,6 +2,7 @@ import os
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import stk
+import pickle
 
 if not os.path.exists('struct_unit_tests_output'):
     os.mkdir('struct_unit_tests_output')
@@ -10,6 +11,16 @@ if not os.path.exists('struct_unit_tests_output'):
 def test_init(amine2):
     assert len(amine2.func_groups) == 2
     assert amine2.func_groups[0].info.name == 'amine'
+
+    amine2_1 = stk.StructUnit(amine2.mol, ['amine'])
+    assert amine2_1.same(amine2)
+
+    mol_block = rdkit.MolToMolBlock(amine2.mol, forceV3000=True)
+    amine2_2 = stk.StructUnit(mol_block, ['amine'])
+    assert amine2_2.same(amine2)
+
+    amine2_3 = stk.StructUnit(amine2.mol)
+    assert amine2.same(amine2_3)
 
 
 def test_all_bonder_distances(tmp_aldehyde3):
@@ -75,17 +86,25 @@ def test_functional_groups(amine2):
         assert any(ids == fg.atom_ids for ids in fg_atoms)
 
 
-def test_json_init(amine2):
+def test_json_init(tmp_amine2):
     path = os.path.join('struct_unit_tests_output', 'mol.json')
-    amine2.dump(path)
-    mol2 = stk.Molecule.load(path, stk.Molecule.from_dict)
 
-    assert isinstance(amine2.file, str)
-    assert mol2.optimized
-    assert mol2.energy.__class__.__name__ == 'Energy'
-    assert amine2 is not mol2
-    assert amine2.atom_props == amine2.atom_props
-    assert mol2.func_groups == amine2.func_groups
+    tmp_amine2.test_attr1 = 'something'
+    tmp_amine2.test_attr2 = 12
+    tmp_amine2.test_attr3 = ['12', 'something', 21]
+    include_attrs = ['test_attr1', 'test_attr2', 'test_attr3']
+
+    tmp_amine2.dump(path, include_attrs)
+    mol2 = stk.Molecule.load(path)
+
+    assert isinstance(tmp_amine2.file, str)
+    assert tmp_amine2 is not mol2
+    assert tmp_amine2.atom_props == tmp_amine2.atom_props
+    assert mol2.func_groups == tmp_amine2.func_groups
+
+    assert tmp_amine2.test_attr1 == mol2.test_attr1
+    assert tmp_amine2.test_attr2 == mol2.test_attr2
+    assert tmp_amine2.test_attr3 == mol2.test_attr3
 
 
 def test_caching():
@@ -115,8 +134,8 @@ def test_caching():
 
 
 def test_set_bonder_centroid(tmp_amine2):
-    tmp_amine2.set_bonder_centroid([1, 2, 3])
-    assert np.allclose(tmp_amine2.bonder_centroid(),
+    tmp_amine2.set_bonder_centroid([1, 2, 3], 0)
+    assert np.allclose(tmp_amine2.bonder_centroid(0),
                        [1, 2, 3],
                        atol=1e-8)
 
@@ -137,3 +156,8 @@ def test_shift_fgs(amine4):
 
         for a1, a2 in zip(fg1.deleter_ids, fg2.deleter_ids):
             assert a1 + 32 == a2
+
+
+def test_pickle(amine2):
+    result = pickle.loads(pickle.dumps(amine2))
+    assert result.same(amine2)

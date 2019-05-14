@@ -316,8 +316,8 @@ class FunctionalGroup:
         atom id is decreased by 1. If the atom id is equal to a
         `deleters` atom id, it is removed.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         deleters : :class:`list` of :class:`int`
             Ids of atoms which are being removed from the molecule.
             Must be sorted in ascending order.
@@ -603,8 +603,8 @@ class Reactor:
                 partial(self.diol_with_dihalogen,
                         dihalogen='dibromine'),
 
-            ReactionKey('phenyl_amine', 'phenyl_amine'):
-                self.phenyl_amine_with_phenyl_amine
+            ReactionKey('ring_amine', 'ring_amine'):
+                self.ring_amine_with_ring_amine
 
         }
 
@@ -859,7 +859,7 @@ class Reactor:
         self.emol.AddBond(boron_atom, diol.bonder_ids[1], bond)
         self.bonds_made += 2
 
-    def phenyl_amine_with_phenyl_amine(self, fg1, fg2):
+    def ring_amine_with_ring_amine(self, fg1, fg2):
         """
         Creates bonds between functional groups.
 
@@ -1062,25 +1062,25 @@ functional_groups = (
            del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1),
                        Match(smarts='[$([C](#[C])[H])]', n=1)]),
 
-    FGInfo(name='phenyl_amine',
-           fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6]([H])',
+    FGInfo(name='ring_amine',
+           fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
            bonder_smarts=[
                Match(
-                   smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6]([H]))]',
+                   smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6R1])]',
                    n=1
                ),
                Match(
-                   smarts='[$([#6]([H])(~[#6]([H]))~[#6][N]([H])[H])]',
+                   smarts='[$([#6]([H])(~[#6R1])~[#6][N]([H])[H])]',
                    n=1
                ),
             ],
            del_smarts=[
                Match(
-                   smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6]([H]))]',
+                   smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6R1])]',
                    n=2
                ),
                Match(
-                   smarts='[$([H][#6](~[#6]([H]))~[#6][N]([H])[H])]',
+                   smarts='[$([H][#6](~[#6R1])~[#6][N]([H])[H])]',
                    n=1
                )
            ])

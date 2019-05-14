@@ -47,6 +47,6 @@ def test_boronic_acid_with_diol(boronic_acid2, diol2):
     p.write(join(test_dir, 'boronic_acid_diol.mol'))
 
 
-def test_phenyl_with_phenyl_amine(phenyl_amine):
-    p = stk.Polymer([phenyl_amine], stk.Linear('A', [1], 8))
-    p.write(join(test_dir, 'phenyl_amine_phenyl_amine.mol'))
+def test_phenyl_with_ring_amine(ring_amine):
+    p = stk.Polymer([ring_amine], stk.Linear('A', [1], 8))
+    p.write(join(test_dir, 'ring_amine_ring_amine.mol'))

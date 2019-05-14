@@ -6,3 +6,4 @@ psutil
 pywindowx
 pandas
 seaborn
+pathos
