@@ -422,3 +422,30 @@ class UFFEnergy(EnergyCalculator):
         mol.mol.UpdatePropertyCache()
         ff = rdkit.UFFGetMoleculeForceField(mol.mol, confId=conformer)
         return ff.CalcEnergy()
+
+
+class GFNXTB(EnergyCalculator):
+    """
+    Uses GFN-xTB to calculate energies.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        # Create a molecules whose energy we want to know.
+        mol1 = StructUnit.smiles_init('CCCNCCCN')
+        mol2 = Polymer(...)
+        mol3 = Cage(...)
+
+        # Create the energy calculator.
+        uff = UFFEnergy()
+
+        # Calculate the energies.
+        energy1 = uff.energy(mol1)
+        energy2 = uff.energy(mol2)
+        energy3 = uff.energy(mol3)
+
+    """
+
+    def energy(self, mol, conformer=-1):
+        ' get from optimizer code once implemented'
