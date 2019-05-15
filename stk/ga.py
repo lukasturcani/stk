@@ -6,7 +6,6 @@ from rdkit import RDLogger
 from os.path import join, basename
 import stk
 import psutil
-from types import SimpleNamespace
 import shutil
 from importlib.machinery import SourceFileLoader
 
@@ -372,7 +371,7 @@ def ga_run(filename, input_file):
     progress.calculate_member_fitness(fitness_calculator, processes)
     # Keep the fitness of failed molecules as None. Plotters can ignore
     # these values to make better graphs.
-    handle_failed = fitness_normalizer.handle_failed 
+    handle_failed = fitness_normalizer.handle_failed
     fitness_normalizer.handle_failed = False
     fitness_normalizer.normalize(progress)
     for plotter in plotters:

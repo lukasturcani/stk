@@ -533,6 +533,6 @@ class PropertyVector(FitnessCalculator):
                 )
             property_vector.append(r)
         if None in property_vector:
-            return None    
+            return None
         else:
             return property_vector
