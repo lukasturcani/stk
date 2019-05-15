@@ -747,6 +747,15 @@ class GFNXTB(Optimizer):
             self.valid_solvent()
 
     def optimize(self, mol, conformer=-1):
+    def valid_solvent(self):
+        '''Check if solvent is valid.
+
+        '''
+        valid_solvents = ['ch2cl2']
+        if self.solvent in valid_solvents:
+            return True
+        else:
+            raise(f'{self.solvent} is an invalid solvent!')
         """
         Optimizes a molecule.
 
