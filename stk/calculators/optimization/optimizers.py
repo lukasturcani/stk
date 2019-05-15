@@ -71,6 +71,9 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import warnings
 from functools import wraps
+import subprocess as sp
+import os
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -687,3 +690,17 @@ class RDKitEmbedder(Optimizer):
         mol.mol.RemoveConformer(conformer)
         new_conf.SetId(conformer)
         mol.mol.AddConformer(new_conf)
+
+class GFNXTB(Optimizer):
+    def __init__(self, gfnxtb_path, processes=1, use_cache=False):
+        self.gfnxtb_path = gfnxtb_path
+        self.processes = processes
+        super().__init__(use_cache=use_cache)
+
+    def optimize(self, mol, conformer=-1):
+        opt_comm = os.path.join(self.gfnxtb_path, 'xtb')
+        xyz = f'{uuid.uuid4().int}.xyz'
+        mol.write(xyz)
+        cmd = [opt_comm, xyz, '-opt', '--parallel', str(self.processes)]
+        proc = sp.Popen(cmd, stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
+        output, err = proc.communicate()
