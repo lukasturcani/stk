@@ -74,6 +74,7 @@ class TestFitnessCalculator(stk.FitnessCalculator):
 def pytest_addoption(parser):
     parser.addoption('--macromodel_path', default='')
     parser.addoption('--mopac_path', default='')
+    parser.addoption('--gfnxtb_path', default='')
 
 
 def pytest_generate_tests(metafunc):
@@ -84,6 +85,10 @@ def pytest_generate_tests(metafunc):
     if 'mopac_path' in metafunc.fixturenames:
         mopac_path = metafunc.config.getoption('mopac_path')
         metafunc.parametrize('mopac_path', [mopac_path])
+
+    if 'gfnxtb_path' in metafunc.fixturenames:
+        gfnxtb_path = metafunc.config.getoption('gfnxtb_path')
+        metafunc.parametrize('gfnxtb_path', [gfnxtb_path])
 
 
 @pytest.fixture(scope='session')
