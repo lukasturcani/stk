@@ -1122,6 +1122,5 @@ class Molecule:
             xyz.write("\n")
             for i in range(len(x)):
                 xyz.write('{} {:f} {:f} {:f}\n'.format(
-                    self.atom_symbol(i),x[i],y[i],z[i]
+                    self.atom_symbol(i), x[i], y[i], z[i]
                 ))
-

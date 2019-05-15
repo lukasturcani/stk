@@ -691,6 +691,7 @@ class RDKitEmbedder(Optimizer):
         new_conf.SetId(conformer)
         mol.mol.AddConformer(new_conf)
 
+
 class GFNXTB(Optimizer):
     def __init__(self, gfnxtb_path, processes=1, use_cache=False):
         self.gfnxtb_path = gfnxtb_path
