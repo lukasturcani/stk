@@ -1014,9 +1014,12 @@ class Molecule:
 
         """
 
-        write_funcs = {'.mol': self._write_mdl_mol_file,
-                       '.sdf': self._write_mdl_mol_file,
-                       '.pdb': self._write_pdb_file}
+        write_funcs = {
+            '.mol': self._write_mdl_mol_file,
+            '.sdf': self._write_mdl_mol_file,
+            '.pdb': self._write_pdb_file,
+            '.xyz': self._write_xyz_file
+        }
 
         _, ext = os.path.splitext(path)
         write_func = write_funcs[ext]
@@ -1085,3 +1088,39 @@ class Molecule:
 
         with open(path, 'w') as pdb:
             pdb.write(new_content)
+
+    def _write_xyz_file(self, path, conformer=-1):
+        """
+        Writes a ``.xyz`` file of the molecule
+
+        This function should not be used directly, only via
+        :meth:`write`.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path to the file being written.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
+
+        x, y, z = self.position_matrix(conformer)
+        number_atoms = str(len(x))
+
+        with open(path, "w") as xyz:
+            xyz.write(number_atoms)
+            xyz.write("\n")
+            xyz.write("\n")
+            for i in range(len(x)):
+                xyz.write('{} {:f} {:f} {:f}\n'.format(
+                    self.atom_symbol(i), x[i], y[i], z[i]
+                ))
