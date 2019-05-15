@@ -713,14 +713,19 @@ class GFNXTB(Optimizer):
 
     """
 
-    def __init__(self, gfnxtb_path, num_cores=1, use_cache=False):
+    def __init__(self, gfnxtb_path, opt_level=1, num_cores=1, solvent=None,
+                 use_cache=False):
         """
         Initializes a :class:`GFNXTB` instance.
 
         Parameters
         ----------
         gfnxtb_path : :class:`str`
-            The path to the GFN-xTB executable.
+            The path to the GFN-xTB or GFN2-xTB executable.
+
+        opt_level : :class:`int`, optional
+            Optimization level to use.
+            -2 =  , -1 = , 0 = , 1 = , 2 = .
 
         num_cores : :class:`int`
             The number of cores for GFN-xTB to use.
@@ -729,11 +734,17 @@ class GFNXTB(Optimizer):
             If ``True`` :meth:`optimize` will not run twice on the same
             molecule and conformer.
 
+        solvent : :class:`str`, optional
+            XXXX
         """
 
         self.gfnxtb_path = gfnxtb_path
+        self.opt_level = opt_level
         self.num_cores = str(num_cores)
         super().__init__(use_cache=use_cache)
+        self.solvent = solvent
+        if self.solvent is not None:
+            self.valid_solvent()
 
     def optimize(self, mol, conformer=-1):
         """
@@ -755,6 +766,15 @@ class GFNXTB(Optimizer):
 
         xyz = f'{uuid.uuid4().int}.xyz'
         mol.write(xyz)
+
+        # write solvent section of cmd
+        if self.solvent is None:
+            solvent_part = ''
+        else:
+            solvent_part = '--gbsa ' + self.solvent
+
+        # set optimization level
+        opt_level_part = ''
         cmd = [
             self.gfnxtb_path, xyz, '-opt', '--parallel', self.num_cores
         ]
