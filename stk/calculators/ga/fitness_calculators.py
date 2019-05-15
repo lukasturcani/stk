@@ -531,7 +531,7 @@ class PropertyVector(FitnessCalculator):
                     f'Using '
                     f'{property_fn.__name__} on "{mol.name}" failed.'
                 )
-                property_vector.append(None)
+            property_vector.append(r)
         if None in property_vector:
             return None    
         else:
