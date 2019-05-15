@@ -3,6 +3,7 @@ from os.path import join
 import os
 import rdkit.Chem.AllChem as rdkit
 import pytest
+import sys
 
 
 odir = 'optimizer_tests_output'
@@ -33,8 +34,8 @@ def test_mmff(tmp_polymer):
 
 def test_uff(tmp_polymer):
     tmp_polymer.write(join(odir, 'uff_before.mol'))
-    mmff = stk.UFF()
-    mmff.optimize(tmp_polymer)
+    uff = stk.UFF()
+    uff.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'uff_after.mol'))
 
 
@@ -86,3 +87,16 @@ def test_try_catch_optimizer(tmp_amine2):
     tmp_amine2.write(join(odir, 'try_catch_optimizer_before.mol'), 1)
     try_catch.optimize(tmp_amine2, 1)
     tmp_amine2.write(join(odir, 'try_catch_optimizer_after.mol'), 1)
+
+
+gfnxtb = pytest.mark.skipif(
+    all('gfnxtb' not in x for x in sys.argv),
+    reason="Only run when explicitly asked.")
+
+
+@gfnxtb
+def test_gfnxtb(tmp_polymer, gfnxtb_path):
+    tmp_polymer.write(join(odir, 'gfnxtb_before.mol'))
+    gfnxtb = stk.GFNXTB(gfnxtb_path)
+    gfnxtb.optimize(tmp_polymer)
+    tmp_polymer.write(join(odir, 'gfnxtb_after.mol'))
