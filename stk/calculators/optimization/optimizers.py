@@ -800,12 +800,17 @@ class GFNXTB(Optimizer):
             shell = False
 
         cmd = [
-            self.gfnxtb_path, xyz, '-opt', '--parallel', self.num_cores
+            mem_ulimt_cmd,
+            self.gfnxtb_path, xyz, '-opt', opt_level_part,
+            '--parallel', self.num_cores,
+            solvent_part
         ]
+
         proc = sp.Popen(
             cmd,
             stdin=sp.PIPE,
             stdout=sp.PIPE,
-            stderr=sp.PIPE
+            stderr=sp.PIPE,
+            shell=shell,
         )
         output, err = proc.communicate()
