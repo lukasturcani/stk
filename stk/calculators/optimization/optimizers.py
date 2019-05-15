@@ -746,7 +746,6 @@ class GFNXTB(Optimizer):
         if self.solvent is not None:
             self.valid_solvent()
 
-    def optimize(self, mol, conformer=-1):
     def valid_solvent(self):
         '''Check if solvent is valid.
 
@@ -756,6 +755,8 @@ class GFNXTB(Optimizer):
             return True
         else:
             raise(f'{self.solvent} is an invalid solvent!')
+
+    def optimize(self, mol, conformer=-1, mem_ulimit=False):
         """
         Optimizes a molecule.
 
@@ -766,6 +767,10 @@ class GFNXTB(Optimizer):
 
         conformer : :class:`int`, optional
             The conformer to use.
+
+        mem_ulimit : :class: `bool`, optional
+            If ``True`` :meth:`optimize` will be run without constraints on
+            the stacksize. May be useful for large molecules on workstations.
 
         Returns
         -------
@@ -784,6 +789,16 @@ class GFNXTB(Optimizer):
 
         # set optimization level
         opt_level_part = ''
+
+        # modify memory limit
+        if mem_ulimit:
+            mem_ulimt_cmd = 'ulimit -s unlimited'+' ;'
+            # allow multiple shell commands to be run in one subprocess
+            shell = True
+        else:
+            mem_ulimt_cmd = ''
+            shell = False
+
         cmd = [
             self.gfnxtb_path, xyz, '-opt', '--parallel', self.num_cores
         ]
