@@ -122,3 +122,11 @@ class Macrocycle(MacrocycleBase, MacroMolecule):
 
     """
     pass
+
+
+class Rotaxane(MacroMolecule:
+    """
+    Used to represent rotaxanes.
+
+    """
+    pass
