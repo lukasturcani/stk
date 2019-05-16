@@ -41,6 +41,7 @@ of the macrocycle relative to the axle caps.
 
 from .macro_molecule import MacroMolecule
 from .struct_unit import StructUnit
+import rdkit.Chem.AllChem as rdkit
 
 
 class MacrocycleBase:
