@@ -1,13 +1,12 @@
 """
-Defines classes that describe macrocycles and rotaxanes.
+Defines classes that describe macrocycles.
 
 There is a family of classes dealing with macrocycles, a cyclic
-oligomer topology used to construct macrocycles, and classes related
-to rotaxanes.
+oligomer topology used to construct macrocycles.
 
 A base class :class:`MacrocycleBase` contains the methods used by all
 macrocycles, no matter whether loaded or constructed using ``stk``.
-A daugter :class:`MacrocycleStructUnit` also inherits
+A child class :class:`MacrocycleStructUnit` also inherits
 :class:`StructUnit` and is used to load macrocycles that were not
 constructed in ``stk``, while:class:`Macrocycle` inherits
 :class:`MacroMolecule` and is a result of construction within the
@@ -27,15 +26,6 @@ are placed on a circumference of a large circle and the two terminal
 monomers are joined together to close the macrocycle. Otherwise it has
 attributes akin to :class:`Linear`, i.e. :attr:`Cyclic.repeating_unit`,
 :attr:`Cyclic.orientation`, and :attr:`Cyclic.n`.
-
-A new :class:`MacroMolecule` called :class:`Rotaxane` is defined. This
-class stores constructed rotaxanes, normally originating from
-:class:`NRotaxane` topology. The :class:`NRotaxane` takes the axle and
-a :class:`list` of :class:`MacrocycleBase` objects to be threaded.
-The macrocycles are spaced evenly along the axle in a direction
-specified analogously to polymers in :attr:`NRotaxane.orientation`.
-This allows to construct mechanical isomers, with opposite orientations
-of the macrocycle relative to the axle caps.
 
 """
 
@@ -120,14 +110,6 @@ class MacrocycleStructUnit(MacrocycleBase, StructUnit):
 class Macrocycle(MacrocycleBase, MacroMolecule):
     """
     Used to represent macrocycles constructed by ``stk``.
-
-    """
-    pass
-
-
-class Rotaxane(MacroMolecule):
-    """
-    Used to represent rotaxanes.
 
     """
     pass

@@ -6,7 +6,8 @@ from .molecule import *
 from .periodic import *
 from .polymer import *
 from .struct_unit import *
-from .macrocycles_rotaxanes import *
+from .macrocycles import *
+from .rotaxanes import *
 
 # Toggle the caching of molecules.
 OPTIONS['cache'] = True

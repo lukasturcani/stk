@@ -642,13 +642,11 @@ class Molecule:
         xyz = np.array(list(conf.GetAtomPosition(atom)
                        for atom in ring_ids))
 
-        A = np.c_[xyz[:, 0], xyz[:, 1], np.ones(xyz.shape[0])]
-        C, *_ = np.linalg.lstsq(A, xyz[:, 2], rcond=None)
+        G = xyz.sum(axis=0) / xyz.shape[0]
 
-        ortho = np.array([C[0], C[1], -1])
-        normal = normalize_vector(ortho)
+        *_, vh = np.linalg.svd(xyz - G)
 
-        return normal
+        return vh[2, :]
 
     def position_matrix(self, conformer=-1):
         """
