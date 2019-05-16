@@ -126,7 +126,8 @@ class NRotaxane(Topology):
             # Rotate the macrocycle towards the x or -x direction
             # as given by the probability in `mdir`.
             mdir = np.random.choice([1, -1], p=[mdir, 1-mdir])
-            cycle.set_orientation(normal, [mdir, 0, 0])
+            cycle.set_orientation(normal, [1, 0, 0])
+            cycle.rotate(np.pi, [0, 0, 1]) if mdir < 0 else None
 
             # Position the macrocycle along the axle.
             cycle_x = min_x + (i + 1) * spacing
