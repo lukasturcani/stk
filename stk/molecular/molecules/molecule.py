@@ -472,7 +472,7 @@ class Molecule:
 
         """
 
-        conf = self.mol.GetConformer()
+        conf = self.mol.GetConformer(conformer)
         xyz = np.array(conf.GetPositions())
 
         if exclude_ids is not None:
