@@ -329,36 +329,6 @@ class Molecule:
 
         return diff
 
-    def direction(self, exclude_ids=None, conformer=-1):
-        """
-        Find the linear direction of the molecule or a group of its atoms.
-
-        Parameters
-        ----------
-        excluded_ids : :class:`list` of :class:`int`
-            The ids of atoms exluded from the direction calculation.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            Direction vector of the molecule (excluding `exclude_ids`).
-
-        """
-        conf = self.mol.GetConformer()
-        xyz = np.array(conf.GetPositions())
-
-        if exclude_ids is not None:
-            xyz = np.delete(xyz, exclude_ids, axis=0)
-
-        xyzmean = xyz.mean(axis=0)
-
-        *_, vh = np.linalg.svd(xyz - xyzmean)
-
-        return vh[0]
-
     def dump(self, path, include_attrs=None):
         """
         Writes a JSON :class:`dict` of the molecule to a file.
@@ -478,6 +448,41 @@ class Molecule:
         return all(
             atom_id not in fg.atom_ids for fg in self.func_groups
         )
+
+    def linear_direction(self, exclude_ids=None, conformer=-1):
+        """
+        Find the linear direction of the molecule or its atoms.
+
+        The method uses singular value decomposition to find the best
+        fit line to the atomic coordinates. Returned is the vector
+        in the direction of the molecule.
+
+        Parameters
+        ----------
+        excluded_ids : :class:`list` of :class:`int`
+            The ids of atoms exluded from the direction calculation.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Direction vector of the molecule (excluding `exclude_ids`).
+
+        """
+
+        conf = self.mol.GetConformer()
+        xyz = np.array(conf.GetPositions())
+
+        if exclude_ids is not None:
+            xyz = np.delete(xyz, exclude_ids, axis=0)
+
+        xyzmean = xyz.mean(axis=0)
+
+        *_, vh = np.linalg.svd(xyz - xyzmean)
+
+        return vh[0]
 
     @classmethod
     def load(cls, path, load_names=True):
@@ -615,13 +620,17 @@ class Molecule:
                 "\n"
                 "$$$$\n")
 
-    def plane_normal(self, ring_ids=None, conformer=-1):
+    def plane_normal(self, atom_ids=None, conformer=-1):
         """
-        Find the plane of the molecule of a group if its atoms lie.
+        Find the best fit plane of the molecule or its atoms.
+
+        The method uses singular value decomposition to find the best
+        fit line to the atomic coordinates. Returned is the vector
+        orthonormal to the best fit plane.
 
         Parameters
         ----------
-        ring_ids : :class:`list` of :class:`int`, optional
+        atom_ids : :class:`list` of :class:`int`, optional
             The ids of the atoms that are assumed to be on the plane.
             Only their coordinates will be used for fitting.
 
@@ -634,13 +643,14 @@ class Molecule:
             Vector orthonormal to the plane of the molecule.
 
         """
-        if ring_ids is None:
-            _, ring_ids = self.macro_atoms(conformer=conformer)
+
+        if atom_ids is None:
+            _, atom_ids = self.macro_atoms(conformer=conformer)
 
         conf = self.mol.GetConformer(conformer)
 
         xyz = np.array(list(conf.GetAtomPosition(atom)
-                       for atom in ring_ids))
+                       for atom in atom_ids))
 
         G = xyz.sum(axis=0) / xyz.shape[0]
 

@@ -1,8 +1,14 @@
+"""
+Defines rotaxane topologies.
+
+"""
+
+
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
 from .base import Topology
-from ...utilities import dedupe, add_fragment_props, remake
+from ...utilities import dedupe, add_fragment_props
 
 
 class NRotaxane(Topology):
@@ -21,9 +27,10 @@ class NRotaxane(Topology):
     Attributes
     ----------
     repeating_unit : :class:`str`
-        A string showing the repeating unit of the macrocycle within
-        :class:`.Rotaxane`. For example, ``"AB"`` or ``"ABB"``. The
-        building block with index ``0`` in
+        A string showing the repeating unit of the macrocycles within
+        :class:`.Rotaxane`. For example, ``"AB"`` or ``"ABB"``, would
+        implied two or three macrocycles threaded, respectively.
+        The building block with index ``0`` in
         :attr:`.MacroMolecule.building_blocks` is labelled as ``"A"``
         while index ``1`` as ``"B"`` and so on.
 
@@ -44,6 +51,14 @@ class NRotaxane(Topology):
 
         Parameters
         ----------
+        repeating_unit : :class:`str`
+            A string showing the repeating unit of the macrocycles within
+            :class:`.Rotaxane`. For example, ``"AB"`` or ``"ABB"``, would
+            implied two or three macrocycles threaded, respectively.
+            The building block with index ``0`` in
+            :attr:`.MacroMolecule.building_blocks` is labelled as ``"A"``
+            while index ``1`` as ``"B"`` and so on.
+
         orientation : :class:`tuple` of :class:`float`
             For each character in the repeating unit, a value between
             ``0`` (inclusive) and ``1`` (inclusive) must be given.
@@ -58,6 +73,7 @@ class NRotaxane(Topology):
             make rotaxane. Constructs [n*len(repeat_unit)+1]rotaxane.
 
         """
+
         self.repeating_unit = repeating_unit
         self.orientation = tuple(orientation)
         self.n = n
@@ -81,9 +97,10 @@ class NRotaxane(Topology):
         None : :class:`NoneType`
 
         """
+
         # Identify the axle and the macrocycles in the building_blocks.
         bbs = macro_mol.building_blocks
-        axle = next(m for m in bbs if not hasattr(m, 'macro_atoms'))
+        axle = next(m for m in bbs if not hasattr(m, 'cycle_atoms'))
 
         cycles = [m for m in bbs if m is not axle]
 
@@ -93,8 +110,8 @@ class NRotaxane(Topology):
         for l, monomer in zip(dedupe(self.repeating_unit), cycles):
             mapping[l] = monomer
 
-        # Make string representing the entire polymer, not just the
-        # repeating unit.
+        # Make string representing the entire set of macrocycles,
+        # not just the repeating unit.
         polycycle = self.repeating_unit*self.n
 
         # Get the direction for each macrocycle along the axle,
@@ -119,7 +136,7 @@ class NRotaxane(Topology):
         for i, (label, mdir) in enumerate(zip(polycycle, dirs)):
             cycle = mapping[label]
             macro_mol.bb_counter.update([cycle])
-            _, ring_ids = cycle.macro_atoms()
+            _, ring_ids = cycle.cycle_atoms()
             normal = cycle.plane_normal(ring_ids=ring_ids)
             org_pos = cycle.mol.GetConformer().GetPositions().T
 
@@ -155,6 +172,7 @@ class NRotaxane(Topology):
             Holds the ids of the functional groups set to react.
 
         """
+
         return iter(())
 
     def _minmax_x(self, axle, exclude_ids=None):
@@ -178,6 +196,7 @@ class NRotaxane(Topology):
             The minium x coordinate along the axle.
 
         """
+
         conf = axle.mol.GetConformer()
         xyz = np.array(conf.GetPositions())
 

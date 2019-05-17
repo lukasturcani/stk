@@ -3,4 +3,5 @@ from .base import *
 from .cof import *
 from .multimer import *
 from .polymer import *
-from .rotaxanes import *
+from .rotaxane import *
+from .macrocycle import *
