@@ -119,7 +119,7 @@ class NRotaxane(Topology):
         dirs = self.orientation*self.n
 
         # Place the axle along the x axis with the centroid at origin.
-        axle_dir = axle.direction()
+        axle_dir = axle.linear_direction()
         axle.set_orientation(axle_dir, [1, 0, 0])
         axle.set_position([0, 0, 0])
 
@@ -136,8 +136,8 @@ class NRotaxane(Topology):
         for i, (label, mdir) in enumerate(zip(polycycle, dirs)):
             cycle = mapping[label]
             macro_mol.bb_counter.update([cycle])
-            _, ring_ids = cycle.cycle_atoms()
-            normal = cycle.plane_normal(ring_ids=ring_ids)
+            ring_ids = cycle.cycle_atoms()
+            normal = cycle.plane_normal(atom_ids=ring_ids)
             org_pos = cycle.mol.GetConformer().GetPositions().T
 
             # Rotate the macrocycle towards the x or -x direction

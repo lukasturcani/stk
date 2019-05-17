@@ -645,7 +645,7 @@ class Molecule:
         """
 
         if atom_ids is None:
-            _, atom_ids = self.macro_atoms(conformer=conformer)
+            atom_ids = self.cycle_atoms(conformer=conformer)
 
         conf = self.mol.GetConformer(conformer)
 
