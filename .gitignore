@@ -2,7 +2,7 @@
 
 **/.cache
 *.ipynb_checkpoints
-**/.vscode
+# **/.vscode
 
 # Some folders get created by tests.
 **/*tests_output
