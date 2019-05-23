@@ -71,6 +71,8 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import warnings
 from functools import wraps
+import subprocess as sp
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -687,3 +689,79 @@ class RDKitEmbedder(Optimizer):
         mol.mol.RemoveConformer(conformer)
         new_conf.SetId(conformer)
         mol.mol.AddConformer(new_conf)
+
+
+class GFNXTB(Optimizer):
+    """
+    Uses GFN-xTB to optimize molecules.
+
+    Attributes
+    ----------
+    gfnxtb_path : :class:`str`
+        The path to the GFN-xTB executable.
+
+    num_cores : :class:`str`
+        The number of cores for GFN-xTB to use.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        gfnxtb = GFNXTB('/opt/gfnxtb/xtb')
+        gfnxtb.optimize(mol)
+
+    """
+
+    def __init__(self, gfnxtb_path, num_cores=1, use_cache=False):
+        """
+        Initializes a :class:`GFNXTB` instance.
+
+        Parameters
+        ----------
+        gfnxtb_path : :class:`str`
+            The path to the GFN-xTB executable.
+
+        num_cores : :class:`int`
+            The number of cores for GFN-xTB to use.
+
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
+
+        """
+
+        self.gfnxtb_path = gfnxtb_path
+        self.num_cores = str(num_cores)
+        super().__init__(use_cache=use_cache)
+
+    def optimize(self, mol, conformer=-1):
+        """
+        Optimizes a molecule.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        xyz = f'{uuid.uuid4().int}.xyz'
+        mol.write(xyz)
+        cmd = [
+            self.gfnxtb_path, xyz, '-opt', '--parallel', self.num_cores
+        ]
+        proc = sp.Popen(
+            cmd,
+            stdin=sp.PIPE,
+            stdout=sp.PIPE,
+            stderr=sp.PIPE
+        )
+        output, err = proc.communicate()

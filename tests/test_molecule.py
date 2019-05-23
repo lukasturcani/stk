@@ -137,6 +137,20 @@ def test_is_core_atom(amine2):
         assert core is amine2.is_core_atom(atom_id)
 
 
+def test_linear_direction(tmp_amine2):
+    direction = tmp_amine2.linear_direction(conformer=1)
+    tmp_amine2.set_orientation(direction, [0, 1, 0], conformer=1)
+    direction = tmp_amine2.linear_direction(conformer=1)
+    assert np.allclose(direction, np.array([0, 1, 0]), atol=1e-4)
+
+
+def test_linear_direction(tmp_amine2):
+    direction = tmp_amine2.linear_direction(conformer=1)
+    tmp_amine2.set_orientation(direction, [0, 1, 0], conformer=1)
+    direction = tmp_amine2.linear_direction(conformer=1)
+    assert np.allclose(direction, np.array([0, 1, 0]), atol=1e-4)
+
+
 def test_position_matrix(amine2):
     position_matrix = amine2.position_matrix()
     for atom_id, atom_coords in amine2.all_atom_coords():
