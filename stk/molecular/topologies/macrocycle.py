@@ -12,7 +12,7 @@ from ...utilities import dedupe, add_fragment_props
 
 class Cyclic(Topology):
     """
-    A class representing cyclic polymers forming a macrocycle.
+    Represents cyclic polymers forming a macrocycle.
 
     Attributes
     ----------
@@ -26,7 +26,12 @@ class Cyclic(Topology):
         For each character in the repeating unit, a value between ``0``
         and ``1`` (both inclusive) must be given in a :class:`list`. It
         indicates the probability that each monomer will have its
-        orientation along the chain flipped.
+        orientation along the chain flipped. If
+        ``0`` then the monomer is guaranteed to not flip. If ``1``
+        it is guaranteed to flip. This allows the user to create
+        head-to-head or head-to-tail chains, as well as chain with
+        a preference for head-to-head or head-to-tail if a number
+        between ``0`` and ``1`` is chosen.
 
     n : :class:`int`
         The number of repeating units which in the macrocycle.
@@ -128,7 +133,6 @@ class Cyclic(Topology):
 
             bb.set_orientation2([1, 0, 0])
 
-            n_fgs = len(bb.func_groups)
             c1, c2 = list(bb.bonder_centroids())
             front = 1 if c1[0] < c2[0] else 0
 

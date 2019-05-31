@@ -449,13 +449,9 @@ class Molecule:
             atom_id not in fg.atom_ids for fg in self.func_groups
         )
 
-    def linear_direction(self, exclude_ids=None, conformer=-1):
+    def direction(self, exclude_ids=None, conformer=-1):
         """
-        Find the linear direction of the molecule or its atoms.
-
-        The method uses singular value decomposition to find the best
-        fit line to the atomic coordinates. Returned is the vector
-        in the direction of the molecule.
+        Find the direction of the molecule or its atoms.
 
         Parameters
         ----------
@@ -624,15 +620,13 @@ class Molecule:
         """
         Find the best fit plane of the molecule or its atoms.
 
-        The method uses singular value decomposition to find the best
-        fit line to the atomic coordinates. Returned is the vector
-        orthonormal to the best fit plane.
-
         Parameters
         ----------
         atom_ids : :class:`list` of :class:`int`, optional
             The ids of the atoms that are assumed to be on the plane.
             Only their coordinates will be used for fitting.
+            If ``None`` then atoms forming the largest cycle are found
+            prior to fitting the plane.
 
         conformer : :class:`int`, optional
             The id of the conformer to be used.
