@@ -298,10 +298,28 @@ def aldehyde6():
 
 
 @pytest.fixture(scope='session')
+def cycle_su():
+    cycle = rdkit.MolFromSmiles('CCCC1CCCCCCCCC1')
+    cycle = rdkit.AddHs(cycle)
+    rdkit.EmbedMolecule(cycle)
+
+    cycle_su = stk.MacrocycleStructUnit(cycle, [])
+    return cycle_su
+
+
+@pytest.fixture(scope='session')
+def cycle(amine2, aldehyde2):
+    cycle = stk.Macrocycle([amine2, aldehyde2],
+                           stk.Cyclic('AB', [0, 0], 3))
+    return cycle
+
+
+@pytest.fixture(scope='session')
 def polymer(amine2, aldehyde2):
     return stk.Polymer([amine2, aldehyde2],
                        stk.Linear('AB', [0, 0], 3),
                        'polymer')
+
 
 
 @pytest.fixture
