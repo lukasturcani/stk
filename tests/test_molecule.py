@@ -4,19 +4,21 @@ from scipy.spatial.distance import euclidean
 import stk
 
 
-def test_all_atom_coords(amine2):
+def test_all_atom_coords(tmp_amine2):
     """
     Test `all_atom_coords`.
 
     """
 
-    natoms = amine2.mol.GetNumAtoms()
-    for i, (atom, coord) in enumerate(amine2.all_atom_coords(), 1):
-        assert atom < natoms
-        assert type(atom) == int
-        assert type(coord) == np.ndarray
-        assert len(coord) == 3
-    assert natoms == i
+    n_atoms = tmp_amine2.mol.GetNumAtoms()
+    new_coords = np.stack([np.arange(n_atoms) for _ in range(3)])
+    tmp_amine2.set_position_from_matrix(new_coords)
+
+    for i, (atom, coords) in enumerate(tmp_amine2.all_atom_coords()):
+        assert atom == i
+        assert all(coords == [i, i, i])
+
+    assert n_atoms == i+1
 
 
 def test_atom_centroid(amine2):
@@ -32,18 +34,19 @@ def test_atom_centroid(amine2):
                        atol=1e-6)
 
 
-def test_atom_coords(amine2):
+def test_atom_coords(tmp_amine2):
     """
     Tests `atom_coords`.
 
     """
 
-    conf = amine2.mol.GetConformer()
-    for atom in amine2.mol.GetAtoms():
-        atom_id = atom.GetIdx()
-        coords = amine2.atom_coords(atom_id)
-        conf_coords = conf.GetAtomPosition(atom_id)
-        assert np.allclose(coords, conf_coords, atol=1e-8)
+    n_atoms = tmp_amine2.mol.GetNumAtoms()
+    new_coords = np.stack([np.arange(n_atoms) for _ in range(3)])
+    tmp_amine2.set_position_from_matrix(new_coords)
+
+    for i in range(n_atoms):
+        coords = tmp_amine2.atom_coords(i)
+        assert all(coords == [i, i, i])
 
 
 def test_atom_distance(amine2):
@@ -55,13 +58,11 @@ def test_atom_distance(amine2):
     # Go through all combinations of atoms in the molecule. Calculate
     # the distance and compare it the distance calculated by the
     # method.
-    conf = amine2.mol.GetConformer()
-    for atom1, atom2 in it.combinations(amine2.mol.GetAtoms(), 2):
-        atom1_id = atom1.GetIdx()
-        atom2_id = atom2.GetIdx()
+    n_atoms = amine2.mol.GetNumAtoms()
+    for atom1_id, atom2_id in it.combinations(range(n_atoms), 2):
         assert (amine2.atom_distance(atom1_id, atom2_id) ==
-                euclidean(conf.GetAtomPosition(atom1_id),
-                          conf.GetAtomPosition(atom2_id)))
+                euclidean(amine2.atom_coords(atom1_id),
+                          amine2.atom_coords(atom2_id)))
 
 
 def test_atom_symbol(amine2):
@@ -177,9 +178,8 @@ def test_same(amine2,
 
 def test_set_position_from_matrix(tmp_amine2):
     # The new position matrix just sets all atomic positions to origin.
-    new_pos_mat = np.array([[0 for x in range(3)] for y in
-                            range(tmp_amine2.mol.GetNumAtoms())])
-    tmp_amine2.set_position_from_matrix(new_pos_mat.T, 0)
+    new_pos_mat = np.zeros((3, tmp_amine2.mol.GetNumAtoms()))
+    tmp_amine2.set_position_from_matrix(new_pos_mat, 0)
     for _, atom_coord in tmp_amine2.all_atom_coords(0):
         assert np.allclose(atom_coord, [0, 0, 0], atol=1e-8)
 
