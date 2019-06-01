@@ -18,8 +18,8 @@ def test_cycle_coords(tmp_cycle):
 
     for i, coords in enumerate(tmp_cycle.cycle_coords(conformer=0), 1):
         assert coords[0] in catoms
-        assert np.allclose(coords[1], np.array([0, 0, 0]), atol=1e-5)
-        assert np.allclose(coords[2], np.array([0, 0, 0]), atol=1e-5)
-        assert np.allclose(coords[3], np.array([0, 0, 0]), atol=1e-5)
+        assert np.isclose(coords[1], 0.0, atol=1e-5)
+        assert np.isclose(coords[2], 0.0, atol=1e-5)
+        assert np.isclose(coords[3], 0.0, atol=1e-5)
         assert len(coords) == 4
     assert len(catoms) == i
