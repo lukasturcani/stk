@@ -303,15 +303,19 @@ def cycle_su():
     cycle = rdkit.AddHs(cycle)
     rdkit.EmbedMolecule(cycle)
 
-    cycle_su = stk.MacrocycleStructUnit(cycle, [])
-    return cycle_su
+    return stk.MacrocycleStructUnit(cycle, [])
 
 
 @pytest.fixture(scope='session')
 def cycle(amine2, aldehyde2):
-    cycle = stk.Macrocycle([amine2, aldehyde2],
-                           stk.Cyclic('AB', [0, 0], 3))
-    return cycle
+    return stk.Macrocycle([amine2, aldehyde2],
+                          stk.Cyclic('AB', [0, 0], 3))
+
+
+@pytest.fixture
+def tmp_cycle(amine2, aldehyde2):
+    return stk.Macrocycle([amine2, aldehyde2],
+                          stk.Cyclic('AB', [0, 0], 3))
 
 
 @pytest.fixture(scope='session')
@@ -319,7 +323,6 @@ def polymer(amine2, aldehyde2):
     return stk.Polymer([amine2, aldehyde2],
                        stk.Linear('AB', [0, 0], 3),
                        'polymer')
-
 
 
 @pytest.fixture

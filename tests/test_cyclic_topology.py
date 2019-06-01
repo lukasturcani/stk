@@ -30,7 +30,7 @@ def test_assembly(amine2, aldehyde2, boronic_acid2, diol2):
     assert (c1.mol.GetNumAtoms() ==
             monomer_atom_count*repeat_units - 3*monomer_joins)
 
-    # c2 loses 2 atoms because OH groups are replaced with H.
+    # c2 loses 2 atoms because two OH groups are replaced with H atoms.
     monomer_atom_count = (boronic_acid2.mol.GetNumAtoms() +
                           diol2.mol.GetNumAtoms())
 
