@@ -72,7 +72,7 @@ class MacrocycleBase:
         -------
         :class:`list` of :class:`list` of :class:`float`
             Coordinates of the atoms in the largest ring in the format
-            ``[atomic_number, x, y, z]``.
+            ``[atom_index, x, y, z]``.
 
         """
 
@@ -80,7 +80,7 @@ class MacrocycleBase:
         conf = self.mol.GetConformer(conformer)
         macrocycle = (self.mol.GetAtomWithIdx(i)
                       for i in max(ssr, key=len))
-        macro_coords = [[atom.GetAtomicNum(),
+        macro_coords = [[atom.GetIdx(),
                          *conf.GetAtomPosition(atom.GetIdx())]
                         for atom in macrocycle]
 
