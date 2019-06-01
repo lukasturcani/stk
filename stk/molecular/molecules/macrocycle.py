@@ -28,11 +28,6 @@ class MacrocycleBase:
         """
         Find the macrocyclic atoms in the molecule.
 
-        Returns
-        -------
-        :class:`.list` of :class:`.int`
-            Atom ids of the atoms comprising the largest ring.
-
         Notes
         -----
         The approach identifies the Smallest Set of Symmetric Rings
@@ -40,6 +35,10 @@ class MacrocycleBase:
         chose arbitrarily, making the results not unique. This should
         not be a problem in most applications.
 
+        Returns
+        -------
+        :class:`.list` of :class:`.int`
+            Atom ids of the atoms comprising the largest ring.
 
         """
 
@@ -56,6 +55,13 @@ class MacrocycleBase:
         macrocycle are found and the xyz coordinates file containing
         only those atoms can be saved.
 
+        Notes
+        -----
+        The approach identifies the Smallest Set of Symmetric Rings
+        and as a result one of multiple rings of the same size can be
+        chose arbitrarily, making the results not unique. This should
+        not be a problem in most applications.
+
         Parameters
         ----------
         path : :class:`.str`
@@ -67,13 +73,6 @@ class MacrocycleBase:
         :class:`list` of :class:`list` of :class:`float`
             Coordinates of the atoms in the largest ring in the format
             ``[atomic_number, x, y, z]``.
-
-        Notes
-        -----
-        The approach identifies the Smallest Set of Symmetric Rings
-        and as a result one of multiple rings of the same size can be
-        chose arbitrarily, making the results not unique. This should
-        not be a problem in most applications.
 
         """
 
