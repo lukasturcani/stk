@@ -8,9 +8,7 @@ def test_cycle_atoms(cycle_su):
 
 def test_cycle_coords(tmp_cycle):
     catoms = tmp_cycle.cycle_atoms()
-
-    conf = tmp_cycle.mol.GetConformer(0)
-    new_pos_mat = np.array(conf.GetPositions())
+    new_pos_mat = tmp_cycle.position_matrix(0).T
 
     # Place cycle atoms at the origin
     for atom in catoms:
