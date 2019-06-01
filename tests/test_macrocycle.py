@@ -1,25 +1,44 @@
+from os.path import join
+import os
 import numpy as np
 
 
+test_dir = 'macorcycle_tests_output'
+if not os.path.exists(test_dir):
+    os.mkdir(test_dir)
+
+
 def test_cycle_atoms(cycle_su):
-    assert set(cycle_su.cycle_atoms()) == {3, 4, 5, 6, 7, 8,
-                                           9, 10, 11, 12}
+    assert sorted(cycle_su.cycle_atoms()) == list(range(3, 13))
 
 
-def test_cycle_coords(tmp_cycle):
-    catoms = tmp_cycle.cycle_atoms()
-    new_pos_mat = tmp_cycle.position_matrix(0).T
+def test_write_cycle_coords(cycle_su):
+    path = join(f'{test_dir}', 'cycle_coords.xyz')
+    cycle_su.write_cycle_coords(path)
 
-    # Place cycle atoms at the origin
-    for atom in catoms:
-        new_pos_mat[atom] = [0 for x in range(3)]
+    with open(path, 'r') as f:
+        atom_count, _, *content = f.read().split('\n')
 
-    tmp_cycle.set_position_from_matrix(new_pos_mat.T, 0)
+    cycle_atoms = cycle_su.cycle_atoms()
 
-    for i, coords in enumerate(tmp_cycle.cycle_coords(conformer=0), 1):
-        assert coords[0] in catoms
-        assert np.isclose(coords[1], 0.0, atol=1e-5)
-        assert np.isclose(coords[2], 0.0, atol=1e-5)
-        assert np.isclose(coords[3], 0.0, atol=1e-5)
-        assert len(coords) == 4
-    assert len(catoms) == i
+    # Make sure the atom count was written correctly.
+    assert int(atom_count) == len(cycle_atoms)
+
+    # Make sure the correct number of atoms was written to the file.
+    assert len(content) == len(cycle_atoms)
+
+    # Make sure the coordinates were written correctly.
+    cycle_atoms = set(cycle_atoms)
+    for line in content:
+        atom_id, *coord = line.split()
+        atom_id = int(atom_id)
+        coord = [float(i) for i in coord]
+        assert atom_id in cycle_atoms
+        # Make sure there are no duplicates.
+        cycle_atoms.remove(atom_id)
+
+        assert np.allclose(
+            a=cycle_su.atom_coords(atom_id),
+            b=coord,
+            atol=1e-8
+        )
