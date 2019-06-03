@@ -49,46 +49,6 @@ class MacrocycleBase:
         ssr = rdkit.GetSymmSSSR(self.mol)
         return list(max(ssr, key=len))
 
-    def write_cycle_coords(self, path, conformer=-1):
-        """
-        Write the coords of the macrocyclic atoms to a file.
-
-        The coords are written in an ``.xyz`` format. For example::
-
-            atom_count
-
-            atom1_id x y z
-            atom2_id x y z
-            atom3_id x y z
-
-        Parameters
-        ----------
-        path : :class:`str`
-            A path to the file.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        cycle_atoms = self.cycle_atoms(conformer)
-        atom_coords = (
-            (atom_id, *self.atom_coords(atom_id))
-            for atom_id in cycle_atoms
-        )
-        file_content = [f'{len(cycle_atoms)}\n']
-        file_content.extend(
-            f'{atom_id} {x} {y} {z}'
-            for atom_id, x, y, z in atom_coords
-        )
-
-        with open(path, 'w') as f:
-            f.write('\n'.join(file_content))
-
 
 class MacrocycleStructUnit(MacrocycleBase, StructUnit):
     """

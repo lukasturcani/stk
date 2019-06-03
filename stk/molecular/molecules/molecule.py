@@ -541,12 +541,16 @@ class Molecule:
         maxid1, maxid2 = np.unravel_index(dist.argmax(), dist.shape)
         return dist[maxid1, maxid2], int(maxid1), int(maxid2)
 
-    def mdl_mol_block(self, conformer=-1):
+    def mdl_mol_block(self, atoms=None, conformer=-1):
         """
         Returns a V3000 mol block of the molecule.
 
         Parameters
-        ---------
+        ----------
+        atoms : :class:`set` of :class:`int`, optional
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
+
         conformer : :class:`int`, optional
             The id of the conformer to use.
 
@@ -566,19 +570,10 @@ class Molecule:
         except ValueError:
             pass
 
-        n_atoms = self.mol.GetNumAtoms()
-        n_bonds = self.mol.GetNumBonds()
+        if atoms is None:
+            atoms = range(self.mol.GetNumAtoms())
 
-        dtype = np.dtype(object)
-
-        atom_ids = np.array([np.arange(1, n_atoms+1)],
-                            dtype=dtype).T
-
-        atom_symbols = np.array([[self.atom_symbol(i)]
-                                 for i in range(n_atoms)],
-                                dtype=dtype)
-
-        pos_mat = self.mol.GetConformer(conformer).GetPositions()
+        n_atoms = len(atoms)
 
         charges = np.array([[f' CHG={a.GetFormalCharge()}' if
                              a.GetFormalCharge() else '']
@@ -1059,11 +1054,11 @@ class Molecule:
         rdkit.AssignAtomChiralTagsFromStructure(self.mol, conformer)
         rdkit.AssignStereochemistry(self.mol, True, True, True)
 
-    def write(self, path, conformer=-1):
+    def write(self, path, atoms=None, conformer=-1):
         """
         Writes a molecular structure file of the molecule.
 
-        This bypasses the need to the writining functions in ``rdkit``.
+        This bypasses the need for writing functions in ``rdkit``.
         These have issues with macromolecules due to poor ring finding
         and sanitization issues.
 
@@ -1071,6 +1066,10 @@ class Molecule:
         ----------
         path : :class:`str`
             The `path` to which the molecule should be written.
+
+        atoms : :class:`list` of :class:`int`, optional
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
 
         conformer : :class:`int`, optional
             The conformer to use.
@@ -1084,15 +1083,14 @@ class Molecule:
         write_funcs = {
             '.mol': self._write_mdl_mol_file,
             '.sdf': self._write_mdl_mol_file,
-            '.pdb': self._write_pdb_file,
             '.xyz': self._write_xyz_file
         }
 
         _, ext = os.path.splitext(path)
         write_func = write_funcs[ext]
-        write_func(path, conformer)
+        write_func(path, atoms, conformer)
 
-    def _write_mdl_mol_file(self, path, conformer=-1):
+    def _write_mdl_mol_file(self, path, atoms, conformer):
         """
         Writes a V3000 ``.mol`` file of the molecule
 
@@ -1104,7 +1102,11 @@ class Molecule:
         path : :class:`str`
             The full path to the file being written.
 
-        conformer : :class:`int`, optional
+        atoms : :class:`list` of :class:`int`
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
+
+        conformer : :class:`int`
             The conformer to use.
 
         Returns
@@ -1114,49 +1116,9 @@ class Molecule:
         """
 
         with open(path, 'w') as f:
-            f.write(self.mdl_mol_block(conformer))
+            f.write(self.mdl_mol_block(atoms, conformer))
 
-    def _write_pdb_file(self, path, conformer=-1):
-        """
-        Writes a ``.pdb`` file of the molecule
-
-        This function should not be used directly, only via
-        :meth:`write`.
-
-        Parameters
-        ----------
-        path : :class:`str`
-            The full path to the file being written.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # First write the file using rdkit.
-        rdkit.MolToPDBFile(self.mol, path, conformer)
-
-        # Edit the file because rkdit does poor atom labelling.
-        new_content = ''
-        with open(path, 'r') as pdb:
-            for line in pdb:
-                if 'HETATM' in line:
-                    words = line.split()
-                    lbl_word = words[2]
-                    rpl_word = words[-1]
-                    rpl_word += " "*(len(lbl_word)-len(rpl_word))
-                    line = line.replace(lbl_word, rpl_word)
-
-                new_content += line
-
-        with open(path, 'w') as pdb:
-            pdb.write(new_content)
-
-    def _write_xyz_file(self, path, conformer=-1):
+    def _write_xyz_file(self, path, atoms, conformer):
         """
         Writes a ``.xyz`` file of the molecule
 
@@ -1168,7 +1130,11 @@ class Molecule:
         path : :class:`str`
             The full path to the file being written.
 
-        conformer : :class:`int`, optional
+        atoms : :class:`list` of :class:`int`
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
+
+        conformer : :class:`int`
             The conformer to use.
 
         Returns
@@ -1179,15 +1145,16 @@ class Molecule:
 
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
+        if atoms is None:
+            atoms = range(self.mol.GetNumAtoms())
 
-        x, y, z = self.position_matrix(conformer)
-        number_atoms = str(len(x))
+        num_atoms = str(len(atoms))
+
+        content = [f'{num_atoms}\n\n']
+        for atom_id in atoms:
+            x, y, z = self.atom_coords(atom_id, conformer)
+            symbol = self.atom_symbol(atom_id)
+            content.append(f'{symbol} {x:f} {y:f} {z:f}\n')
 
         with open(path, "w") as xyz:
-            xyz.write(number_atoms)
-            xyz.write("\n")
-            xyz.write("\n")
-            for i in range(len(x)):
-                xyz.write('{} {:f} {:f} {:f}\n'.format(
-                    self.atom_symbol(i), x[i], y[i], z[i]
-                ))
+            xyz.write(''.join(content))
