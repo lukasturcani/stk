@@ -51,3 +51,11 @@ def test_formation(polymer, amine2):
     product_energy = mmff.energy(water)*3 + mmff.energy(polymer)
     formation_energy = product_energy - reactant_energy
     assert formation.energy(polymer) - formation_energy < 1e-4
+
+
+def test_gfnxtb(tmp_polymer, gfnxtb_path):
+    # tmp_polymer.write(join(odir, 'gfnxtb_before.mol'))
+    # gfnxtb = stk.GFNXTB(gfnxtb_path)
+    # gfnxtb.optimize(tmp_polymer)
+    # tmp_polymer.write(join(odir, 'gfnxtb_after.mol'))
+    pass
