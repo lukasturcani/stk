@@ -723,6 +723,11 @@ class GFNXTB(Optimizer):
         gfnxtb_path : :class:`str`
             The path to the GFN-xTB or GFN2-xTB executable.
 
+
+        free : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will perform a numerical hessian
+            calculation on the optimized structure to give Free energy also.
+
         opt_level : :class:`int`, optional
             Optimization level to use.
             -2 =  , -1 = , 0 = , 1 = , 2 = .
@@ -739,6 +744,7 @@ class GFNXTB(Optimizer):
         """
 
         self.gfnxtb_path = gfnxtb_path
+        self.free = free
         self.opt_level = opt_level
         self.num_cores = str(num_cores)
         super().__init__(use_cache=use_cache)
@@ -834,7 +840,10 @@ class GFNXTB(Optimizer):
             solvent_part = '--gbsa ' + self.solvent
 
         # set optimization level
-        opt_level_part = ''
+        if self.free is False:
+            opt_level_part = '-opt ' + self.opt_level
+        elif self.free is True:
+            opt_level_part = '-ohess ' + self.opt_level
 
         # modify memory limit
         if mem_ulimit:
@@ -847,7 +856,7 @@ class GFNXTB(Optimizer):
 
         cmd = [
             mem_ulimt_cmd,
-            self.gfnxtb_path, xyz, '-opt', opt_level_part,
+            self.gfnxtb_path, xyz, opt_level_part,
             '--parallel', self.num_cores,
             solvent_part
         ]
