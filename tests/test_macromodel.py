@@ -79,7 +79,8 @@ def test_unrestricted_md(tmp_cc3, macromodel_path):
                           minimum_gradient=1,
                           simulation_time=20,
                           eq_time=2,
-                          conformers=2)
+                          conformers=2,
+                          time_step=0.1)
     mm.optimize(tmp_cc3, conformer=0)
     tmp_cc3.write(join(outdir, 'umm_md_after.mol'), conformer=0)
 
