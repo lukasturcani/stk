@@ -70,6 +70,8 @@ import logging
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import warnings
+from glob import iglob
+import os
 from functools import wraps
 import subprocess as sp
 import uuid
@@ -713,8 +715,8 @@ class GFNXTB(Optimizer):
 
     """
 
-    def __init__(self, gfnxtb_path, opt_level=1, num_cores=1, solvent=None,
-                 use_cache=False):
+    def __init__(self, gfnxtb_path, output_dir=None, free=False, opt_level=1,
+                 num_cores=1, solvent=None, charge=None, use_cache=False):
         """
         Initializes a :class:`GFNXTB` instance.
 
@@ -723,6 +725,10 @@ class GFNXTB(Optimizer):
         gfnxtb_path : :class:`str`
             The path to the GFN-xTB or GFN2-xTB executable.
 
+        output_dir : :class:`str`, optional
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
 
         free : :class:`bool`, optional
             If ``True`` :meth:`optimize` will perform a numerical hessian
@@ -741,16 +747,20 @@ class GFNXTB(Optimizer):
 
         solvent : :class:`str`, optional
             XXXX
+
+        charge : :class:`str`, optional
+            XXXX
         """
 
         self.gfnxtb_path = gfnxtb_path
         self.free = free
         self.opt_level = opt_level
         self.num_cores = str(num_cores)
-        super().__init__(use_cache=use_cache)
         self.solvent = solvent
         if self.solvent is not None:
             self.valid_solvent()
+        self.charge = charge
+        super().__init__(use_cache=use_cache)
 
     def valid_solvent(self):
         '''Check if solvent is valid.
@@ -814,11 +824,13 @@ class GFNXTB(Optimizer):
 
         mem_ulimit : :class: `bool`, optional
             If ``True`` :meth:`optimize` will be run without constraints on
-            the stacksize. May be useful for large molecules on workstations.
+            the stacksize. Generally should be ``True``, however this may raise
+            issues on clusters.
 
         Returns
         -------
-        None : :class:`NoneType`
+        self.check_complete() : :class:`bool`
+            Output from process. True if optimization is successful.
 
         """
 
@@ -839,6 +851,12 @@ class GFNXTB(Optimizer):
         else:
             solvent_part = '--gbsa ' + self.solvent
 
+        # write charge section of cmd
+        if self.charge is None:
+            charge_part = ''
+        else:
+            charge_part = '--chrg ' + self.solvent
+
         # set optimization level
         if self.free is False:
             opt_level_part = '-opt ' + self.opt_level
@@ -858,7 +876,7 @@ class GFNXTB(Optimizer):
             mem_ulimt_cmd,
             self.gfnxtb_path, xyz, opt_level_part,
             '--parallel', self.num_cores,
-            solvent_part
+            solvent_part, charge_part, f'> {out_file}'
         ]
 
         proc = sp.Popen(
