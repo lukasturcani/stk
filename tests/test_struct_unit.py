@@ -24,10 +24,11 @@ def test_init(amine2):
 
 
 def test_all_bonder_distances(tmp_aldehyde3):
-    shape = (3, tmp_aldehyde3.mol.GetNumAtoms())
-    tmp_aldehyde3.set_position_from_matrix(np.zeros(shape))
+    coords = np.zeros((3, tmp_aldehyde3.mol.GetNumAtoms()))
+    tmp_aldehyde3.set_position_from_matrix(coords)
     bonder_distances = tmp_aldehyde3.all_bonder_distances()
     for i, (id1, id2, d) in enumerate(bonder_distances):
+        assert id1 != id2
         assert type(id1) is int
         assert type(id2) is int
         assert abs(d) < 1e-5
@@ -52,12 +53,19 @@ def test_bonder_centroid(tmp_aldehyde3):
     assert sum(centroid) < 1e-5
 
 
-def test_bonder_direction_vectors(aldehyde3):
-    dir_vectors = aldehyde3.bonder_direction_vectors()
+def test_bonder_direction_vectors(tmp_aldehyde3):
+    pos_mat = tmp_aldehyde3.position_matrix()
+    # Set the coordinate of each bonder to the id of the fg.
+    for fg in tmp_aldehyde3.func_groups:
+        for bonder in fg.bonder_ids:
+            pos_mat[:, bonder] = [fg.id, fg.id, fg.id]
+    tmp_aldehyde3.set_position_from_matrix(pos_mat)
+
+    dir_vectors = tmp_aldehyde3.bonder_direction_vectors()
     for i, (id1, id2, v) in enumerate(dir_vectors):
-        assert type(id1) == int
-        assert type(id2) == int
-        assert type(v) == np.ndarray
+        # Calculate the expected direction vector based on ids.
+        d = stk.normalize_vector(np.array([id2]*3) - np.array([id1]*3))
+        assert np.allclose(d, v, atol=1e-8)
     assert i == 2
 
 
