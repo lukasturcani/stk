@@ -792,19 +792,13 @@ class MacroModelForceField(_MacroModel):
 
         """
 
-        # Create a substructure consisting of 3 dummy atoms bonded with
-        # 3 dummy bonds. This substructure will match with any 3 atoms
-        # which are bonded together with any combination of bonds.
-        # These 3 atoms will therefore have a bond angle.
-        ba_mol = rdkit.MolFromSmarts('[*]~[*]~[*]')
-
-        # Get the indices of all atoms which have a bond angle.
-        # ``ba_atoms`` is a tuple of tuples of the form ((1,2,3),
-        # (4,5,6), (7,8,9), ...). Each inner tuple holds the indicies
-        # of the atoms which form a bond angle.
-        ba_atoms = mol.mol.GetSubstructMatches(ba_mol)
-
-        for atom_ids in ba_atoms:
+        paths = rdkit.FindAllPathsOfLengthN(
+            mol=mol.mol,
+            length=3,
+            useBonds=False,
+            useHs=True
+        )
+        for atom_ids in paths:
             atom_ids = [i+1 for i in atom_ids]
             args = ('FXBA', *atom_ids, 99999, 0, 0, 0, 0)
             fix_block += self.com_line(*args)
@@ -833,20 +827,13 @@ class MacroModelForceField(_MacroModel):
 
         """
 
-        # Create a substructure consisting of 4 dummy atoms bonded with
-        # 4 dummy bonds. This substructure will match with any 4 atoms
-        # which are bonded together with any combination of bonds.
-        # These 4 atoms will therefore have a torsinal angle.
-        ta_mol = rdkit.MolFromSmarts('[*]~[*]~[*]~[*]')
-
-        # Get the indices of all atoms which have a torsional angle.
-        # ``ta_atoms`` as a tuple of tuples of the form ((1,2,3,4),
-        # (4,5,6,7), ...). Each inner tuple holds the indicies of the
-        # atoms which have a torsional angle.
-        ta_atoms = mol.mol.GetSubstructMatches(ta_mol)
-
-        # Apply the fix.
-        for atom_ids in ta_atoms:
+        paths = rdkit.FindAllPathsOfLengthN(
+            mol=mol.mol,
+            length=4,
+            useBonds=False,
+            useHs=True
+        )
+        for atom_ids in paths:
             atom_ids = [i+1 for i in atom_ids]
             args = ('FXTA', *atom_ids, 99999, 361, 0, 0)
             fix_block += self.com_line(*args)
