@@ -816,8 +816,16 @@ class GFNXTB(Optimizer):
 
         """
 
-        xyz = f'{uuid.uuid4().int}.xyz'
-        mol.write(xyz)
+        basename = uuid.uuid4().int
+
+        if self.output_dir is None:
+            output_dir = basename
+        else:
+            output_dir = self.output_dir
+
+        xyz = f'{basename}.xyz'
+        out_file = f'{basename}.output'
+        mol.write(xyz, conformer=conformer)
 
         # write solvent section of cmd
         if self.solvent is None:
