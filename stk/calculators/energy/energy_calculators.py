@@ -447,5 +447,53 @@ class GFNXTB(EnergyCalculator):
 
     """
 
+    def __init__(self, gfnxtb_path, output_dir=None, free=False, num_cores=1,
+                 energy_type='total', solvent=None, charge=None
+                 ):
+        """
+        Initializes a :class:`GFNXTB` instance.
+
+        Parameters
+        ----------
+        gfnxtb_path : :class:`str`
+            The path to the GFN-xTB or GFN2-xTB executable.
+
+        output_dir : :class:`str`, optional
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
+
+        free : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will perform a numerical hessian
+            calculation on the optimized structure to give Free energy also.
+
+        opt_level : :class:`int`, optional
+            Optimization level to use.
+            -2 =  , -1 = , 0 = , 1 = , 2 = .
+
+        num_cores : :class:`int`
+            The number of cores for GFN-xTB to use.
+
+        energy_type : :class:`str`, optional
+            Type of energy to extract.
+            `total` : total energy of system
+            `free` : total free energy of system. Reqiures free=True
+
+        solvent : :class:`str`, optional
+            XXXX
+
+        charge : :class:`str`, optional
+            XXXX
+        """
+        self.gfnxtb_path = gfnxtb_path
+        self.output_dir = output_dir
+        self.free = free
+        self.num_cores = str(num_cores)
+        self.energy_type = energy_type
+        self.solvent = solvent
+        if self.solvent is not None:
+            self.valid_solvent()
+        self.charge = charge
+
     def energy(self, mol, conformer=-1):
         ' get from optimizer code once implemented'
