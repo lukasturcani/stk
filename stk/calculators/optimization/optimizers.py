@@ -754,6 +754,7 @@ class GFNXTB(Optimizer):
 
         self.gfnxtb_path = gfnxtb_path
         self.free = free
+        self.output_dir = output_dir
         self.opt_level = opt_level
         self.num_cores = str(num_cores)
         self.solvent = solvent
