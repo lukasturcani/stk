@@ -55,6 +55,7 @@ go about calculating the energy.
 
 import rdkit.Chem.AllChem as rdkit
 import logging
+import re
 from functools import wraps
 
 
@@ -494,6 +495,44 @@ class GFNXTB(EnergyCalculator):
         if self.solvent is not None:
             self.valid_solvent()
         self.charge = charge
+
+    def extract_energy(self, output_file):
+        """
+        Extract desired energy from GFN2-xTB output file.
+
+        Format depends on version. Works with version 190418.
+
+
+        Obtained results (in a.u.):
+            - free energies (FE)
+            - absolute energy (TE)
+            - SCC energy (SCE)
+            - G (GT)
+            - H (HT)
+
+        """
+        print('CHECK OTHER ENERGY TYPES')
+        if self.free is False:
+            if self.energy_type in ['total']:
+                raise(f'{self.energy_type} requires hessian calculation - free=True')
+
+        for line in open(output_file, 'r'):
+            # regex:
+            nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+            # free energy in a.u.
+            if '| TOTAL FREE ENERGY' in line and self.energy_type == 'total':
+                FE_au = nums.search(line.rstrip()).group(0)
+                energy_au = FE_au
+                break
+            if '| TOTAL ENERGY' in line and self.energy_type == 'free':
+                TE_au = nums.search(line.rstrip()).group(0)
+                energy_au = TE_au
+                break
+            if '| TOTAL ENTHALPY' in line and self.energy_type == 'enthalpy':
+                HT_au = nums.search(line.rstrip()).group(0)
+                energy_au = HT_au
+                break
+        return energy_au
 
     def energy(self, mol, conformer=-1):
         ' get from optimizer code once implemented'
