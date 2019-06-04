@@ -574,42 +574,54 @@ class Molecule:
             atoms = range(self.mol.GetNumAtoms())
 
         n_atoms = len(atoms)
+        atom_lines = []
+        for atom_id in atoms:
+            x, y, z = self.atom_coords(atom_id, conformer)
+            symbol = self.atom_symbol(atom_id)
+            charge = self.mol.GetAtomWithIdx(atom_id).GetFormalCharge()
+            charge = f' CHG={charge}' if charge else ''
+            atom_lines.append(
+                'M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n'.format(
+                    atom_id+1, symbol, x, y, z, charge
+                )
+            )
+        atom_block = ''.join(atom_lines)
 
-        charges = np.array([[f' CHG={a.GetFormalCharge()}' if
-                             a.GetFormalCharge() else '']
-                            for a in self.mol.GetAtoms()],
-                           dtype=dtype)
+        # Convert to set because membership is going to be checked by
+        # bonds.
+        atoms = set(atoms)
+        bond_lines = []
+        for bond in self.mol.GetBonds():
+            a1 = bond.GetBeginAtomIdx()
+            a2 = bond.GetEndAtomIdx()
+            if a1 in atoms and a2 in atoms:
+                bond_id = len(bond_lines)
+                bond_type = bond.GetBondTypeAsDouble()
+                bond_lines.append(
+                    f'M  V30 {bond_id} {bond_type} {a1+1} {a2+1}\n'
+                )
 
-        atom_data = np.concatenate(
-                        [atom_ids, atom_symbols, pos_mat, charges],
-                        axis=1).reshape((-1, ))
-        atom_block = "M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n"*n_atoms
-        atom_block = atom_block.format(*atom_data)
+        n_bonds = len(bond_lines)
+        bond_block = ''.join(bond_lines)
 
-        bond_data = [prop for bond in self.mol.GetBonds() for prop in
-                     (bond.GetIdx(),
-                      int(bond.GetBondTypeAsDouble()),
-                      bond.GetBeginAtomIdx()+1,
-                      bond.GetEndAtomIdx()+1)]
-        bond_block = "M  V30 {} {} {} {}\n"*n_bonds
-        bond_block = bond_block.format(*bond_data)
-
-        return ("\n"
-                "     RDKit          3D\n"
-                "\n"
-                "  0  0  0  0  0  0  0  0  0  0999 V3000\n"
-                "M  V30 BEGIN CTAB\n"
-                f"M  V30 COUNTS {n_atoms} {n_bonds} 0 0 0\n"
-                "M  V30 BEGIN ATOM\n"
-                f"{atom_block}"
-                "M  V30 END ATOM\n"
-                "M  V30 BEGIN BOND\n"
-                f"{bond_block}"
-                "M  V30 END BOND\n"
-                "M  V30 END CTAB\n"
-                "M  END\n"
-                "\n"
-                "$$$$\n")
+        return (
+            '\n'
+            '     RDKit          3D\n'
+            '\n'
+            '  0  0  0  0  0  0  0  0  0  0999 V3000\n'
+            'M  V30 BEGIN CTAB\n'
+            f'M  V30 COUNTS {n_atoms} {n_bonds} 0 0 0\n'
+            'M  V30 BEGIN ATOM\n'
+            f'{atom_block}'
+            'M  V30 END ATOM\n'
+            'M  V30 BEGIN BOND\n'
+            f'{bond_block}'
+            'M  V30 END BOND\n'
+            'M  V30 END CTAB\n'
+            'M  END\n'
+            '\n'
+            '$$$$\n'
+        )
 
     def plane_normal(self, atom_ids=None, conformer=-1):
         """
