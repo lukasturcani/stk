@@ -268,6 +268,7 @@ def test_xyz_write(cycle_su):
     with open(join(test_dir, 'cycle.xyz'), 'r') as f:
         xyz_content = f.read()
 
+    # Check that every atom in the molecule has a line in the file.
     xyz_lines = set(xyz_content.split('\n'))
     for atom_id in range(cycle_su.mol.GetNumAtoms()):
         x, y, z = cycle_su.atom_coords(atom_id)
@@ -281,10 +282,12 @@ def test_xyz_write(cycle_su):
     with open(join(test_dir, 'cycle_atoms.xyz'), 'r') as f:
         xyz_content = f.read()
 
+    # Check that every cycle atom has a line in the file.
     xyz_lines = set(xyz_content.split('\n'))
     for atom_id in atoms:
         x, y, z = cycle_su.atom_coords(atom_id)
         symbol = cycle_su.atom_symbol(atom_id)
         assert f'{symbol} {x:f} {y:f} {z:f}' in xyz_lines
 
+    # Check that only cycle atoms were written.
     assert len(xyz_content.split('\n'))-3 == len(atoms)
