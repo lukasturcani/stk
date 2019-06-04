@@ -1095,7 +1095,8 @@ class Molecule:
         write_funcs = {
             '.mol': self._write_mdl_mol_file,
             '.sdf': self._write_mdl_mol_file,
-            '.xyz': self._write_xyz_file
+            '.xyz': self._write_xyz_file,
+            '.pdb': self._write_pdb_file
         }
 
         _, ext = os.path.splitext(path)
@@ -1170,3 +1171,82 @@ class Molecule:
 
         with open(path, "w") as xyz:
             xyz.write(''.join(content))
+
+    def _write_pdb_file(self, path, atoms, conformer):
+        """
+        Writes a ``.pdb`` file of the molecule
+
+        This function should not be used directly, only via
+        :meth:`write`.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path to the file being written.
+
+        atoms : :class:`list` of :class:`int`
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
+
+        conformer : :class:`int`
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if atoms is None:
+            atoms = range(self.mol.GetNumAtoms())
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
+
+        lines = []
+        atom_counts = {}
+        hetatm = 'HETATM'
+        alt_loc = ''
+        res_name = 'UNL'
+        chain_id = ''
+        res_seq = '1'
+        i_code = ''
+        occupancy = '1.00'
+        temp_factor = '0.00'
+        for atom in atoms:
+
+            # If all atoms are getting written, keep the atom ids. If
+            # a subset of atoms is being written make new atom ids.
+            if len(atoms) == self.mol.GetNumAtoms():
+                serial = atom+1
+            else:
+                serial = len(lines)
+
+            element = self.atom_symbol(atom)
+            atom_counts[element] = atom_counts.get(element, 0) + 1
+            name = f'{element}{atom_counts[element]}'
+            x, y, z = self.atom_coords(atom, conformer)
+            charge = self.mol.GetAtomWithIdx(atom).GetFormalCharge()
+            lines.append(
+                f'{hetatm:<6}{serial:>5} {name:<4}'
+                f'{alt_loc:<1}{res_name:<3}  {chain_id:<1}'
+                f'{res_seq:>4}{i_code:<1}   {x:>8}{y:>8}{z:>8}'
+                f'{occupancy:>6}{temp_factor:>6}          '
+                f'{element:>2}{charge:<2}\n'
+            )
+
+        # Convert to set because membership is going to be checked by
+        # bonds.
+        atoms = set(atoms)
+        conect = 'CONECT'
+        for bond in self.mol.GetBonds():
+            a1 = bond.GetBeginAtomIdx()
+            a2 = bond.GetEndAtomIdx()
+            if a1 in atoms and a2 in atoms:
+                lines.append(
+                    f'{conect:<6}{a1:>5}{a2:>5}               \n'
+                )
+
+        lines.append('END\n\n')
+        with open(path, 'w') as f:
+            f.write(''.join(lines))
