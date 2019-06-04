@@ -2,6 +2,13 @@ import itertools as it
 import numpy as np
 from scipy.spatial.distance import euclidean
 import stk
+import os
+from os.path import join
+
+
+test_dir = 'molecule_tests_output'
+if not os.path.exists(test_dir):
+    os.mkdir(test_dir)
 
 
 def test_all_atom_coords(amine2):
@@ -207,3 +214,15 @@ def test_update_from_mae(tmp_amine2, mae_path):
     tmp_amine2.update_from_mae(mae_path, 1)
     assert abs(tmp_amine2.max_diameter(0)[0] -
                tmp_amine2.max_diameter(1)[0]) > 1
+
+
+def test_write(cycle_su):
+    atoms = cycle_su.cycle_atoms()
+
+    # Test .mol writing.
+    cycle_su.write(join(test_dir, 'cycle.mol'))
+    cycle_su.write(join(test_dir, 'cycle_atoms.mol'), atoms)
+
+    # Test .xyz writing.
+    cycle_su.write(join(test_dir, 'cycle.xyz'))
+    cycle_su.write(join(test_dir, 'cycle_atoms.xyz'), atoms)
