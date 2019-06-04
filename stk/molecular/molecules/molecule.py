@@ -1230,9 +1230,10 @@ class Molecule:
             lines.append(
                 f'{hetatm:<6}{serial:>5} {name:<4}'
                 f'{alt_loc:<1}{res_name:<3}  {chain_id:<1}'
-                f'{res_seq:>4}{i_code:<1}   {x:>8}{y:>8}{z:>8}'
+                f'{res_seq:>4}{i_code:<1}   '
+                f'{x:>8.5f}{y:>8.5f}{z:>8.5f}'
                 f'{occupancy:>6}{temp_factor:>6}          '
-                f'{element:>2}{charge:<2}\n'
+                f'{element:>2}{charge:>2}\n'
             )
 
         # Convert to set because membership is going to be checked by
