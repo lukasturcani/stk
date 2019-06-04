@@ -216,13 +216,75 @@ def test_update_from_mae(tmp_amine2, mae_path):
                tmp_amine2.max_diameter(1)[0]) > 1
 
 
-def test_write(cycle_su):
+def test_mol_write(cycle_su):
     atoms = cycle_su.cycle_atoms()
 
-    # Test .mol writing.
     cycle_su.write(join(test_dir, 'cycle.mol'))
-    cycle_su.write(join(test_dir, 'cycle_atoms.mol'), atoms)
+    cycle = stk.StructUnit(join(test_dir, 'cycle.mol'))
+    for i in range(cycle.mol.GetNumAtoms()):
+        assert np.allclose(
+            a=cycle_su.atom_coords(i),
+            b=cycle.atom_coords(i),
+            atol=1e-3
+        )
+    for b1 in cycle.mol.GetBonds():
+        b2 = cycle_su.mol.GetBondWithIdx(b1.GetIdx())
+        assert b1.GetBondType() == b2.GetBondType()
+        assert b1.GetBeginAtomIdx() == b2.GetBeginAtomIdx()
+        assert b1.GetEndAtomIdx() == b2.GetEndAtomIdx()
 
-    # Test .xyz writing.
+    # Write the cycle atoms to a file and create a string for each
+    # cycle atom written into valid_lines. Then load the written cycle
+    # and for every atom create a string and place it into cycle_lines.
+    # Sorted valid and cycle lines should match.
+    cycle_su.write(join(test_dir, 'cycle_atoms.mol'), atoms)
+    # Note down all atoms written to the file.
+    valid_lines = []
+    for atom_id in atoms:
+        symbol = cycle_su.atom_symbol(atom_id)
+        x, y, z = cycle_su.atom_coords(atom_id)
+        valid_lines.append(
+            f'{symbol} {x:.4f} {y:.4f} {z:.4f}'
+        )
+
+    cycle = stk.StructUnit(join(test_dir, 'cycle_atoms.mol'))
+    # Note down all atoms read from the file.
+    cycle_lines = []
+    for atom_id in range(cycle.mol.GetNumAtoms()):
+        symbol = cycle.atom_symbol(atom_id)
+        x, y, z = cycle.atom_coords(atom_id)
+        cycle_lines.append(
+            f'{symbol} {x:.4f} {y:.4f} {z:.4f}'
+        )
+
+    # Written and read atoms should match.
+    assert sorted(valid_lines) == sorted(cycle_lines)
+
+
+def test_xyz_write(cycle_su):
+    atoms = cycle_su.cycle_atoms()
     cycle_su.write(join(test_dir, 'cycle.xyz'))
+
+    with open(join(test_dir, 'cycle.xyz'), 'r') as f:
+        xyz_content = f.read()
+
+    xyz_lines = set(xyz_content.split('\n'))
+    for atom_id in range(cycle_su.mol.GetNumAtoms()):
+        x, y, z = cycle_su.atom_coords(atom_id)
+        symbol = cycle_su.atom_symbol(atom_id)
+        assert f'{symbol} {x:f} {y:f} {z:f}' in xyz_lines
+
+    assert len(xyz_content.split('\n'))-3 == cycle_su.mol.GetNumAtoms()
+
+    # Test writing of specific atoms.
     cycle_su.write(join(test_dir, 'cycle_atoms.xyz'), atoms)
+    with open(join(test_dir, 'cycle_atoms.xyz'), 'r') as f:
+        xyz_content = f.read()
+
+    xyz_lines = set(xyz_content.split('\n'))
+    for atom_id in atoms:
+        x, y, z = cycle_su.atom_coords(atom_id)
+        symbol = cycle_su.atom_symbol(atom_id)
+        assert f'{symbol} {x:f} {y:f} {z:f}' in xyz_lines
+
+    assert len(xyz_content.split('\n'))-3 == len(atoms)
