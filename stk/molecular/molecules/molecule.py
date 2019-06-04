@@ -595,7 +595,11 @@ class Molecule:
             a1 = bond.GetBeginAtomIdx()
             a2 = bond.GetEndAtomIdx()
             if a1 in atoms and a2 in atoms:
-                bond_id = len(bond_lines)
+                # Keep bond ids if all bonds are getting written.
+                if n_atoms == self.mol.GetNumAtoms():
+                    bond_id = bond.GetIdx()
+                else:
+                    bond_id = len(bond_lines)
                 bond_type = bond.GetBondTypeAsDouble()
                 bond_lines.append(
                     f'M  V30 {bond_id} {bond_type} {a1+1} {a2+1}\n'
@@ -1214,14 +1218,7 @@ class Molecule:
         occupancy = '1.00'
         temp_factor = '0.00'
         for atom in atoms:
-
-            # If all atoms are getting written, keep the atom ids. If
-            # a subset of atoms is being written make new atom ids.
-            if len(atoms) == self.mol.GetNumAtoms():
-                serial = atom+1
-            else:
-                serial = len(lines)
-
+            serial = atom+1
             element = self.atom_symbol(atom)
             atom_counts[element] = atom_counts.get(element, 0) + 1
             name = f'{element}{atom_counts[element]}'
@@ -1229,7 +1226,7 @@ class Molecule:
             charge = self.mol.GetAtomWithIdx(atom).GetFormalCharge()
             lines.append(
                 f'{hetatm:<6}{serial:>5} {name:<4}'
-                f'{alt_loc:<1}{res_name:<3}  {chain_id:<1}'
+                f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'
                 f'{res_seq:>4}{i_code:<1}   '
                 f'{x:>8.5f}{y:>8.5f}{z:>8.5f}'
                 f'{occupancy:>6}{temp_factor:>6}          '
@@ -1245,9 +1242,9 @@ class Molecule:
             a2 = bond.GetEndAtomIdx()
             if a1 in atoms and a2 in atoms:
                 lines.append(
-                    f'{conect:<6}{a1:>5}{a2:>5}               \n'
+                    f'{conect:<6}{a1+1:>5}{a2+1:>5}               \n'
                 )
 
-        lines.append('END\n\n')
+        lines.append('END\n')
         with open(path, 'w') as f:
             f.write(''.join(lines))

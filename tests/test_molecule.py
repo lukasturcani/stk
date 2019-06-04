@@ -291,3 +291,67 @@ def test_xyz_write(cycle_su):
 
     # Check that only cycle atoms were written.
     assert len(xyz_content.split('\n'))-3 == len(atoms)
+
+
+def test_pdb_write(cycle_su):
+    cycle_su.write(join(test_dir, 'cycle.pdb'))
+    cycle = stk.StructUnit(join(test_dir, 'cycle.pdb'))
+
+    # Make sure the position matrices are basically the same.
+    assert np.allclose(
+        a=cycle_su.position_matrix(),
+        b=cycle.position_matrix(),
+        atol=1e-5
+    )
+
+    # Make sure the connectivity is the same.
+    bonds1 = sorted(
+        sorted((b.GetBeginAtomIdx(), b.GetEndAtomIdx()))
+        for b in cycle_su.mol.GetBonds()
+    )
+
+    bonds2 = sorted(
+        sorted((b.GetBeginAtomIdx(), b.GetEndAtomIdx()))
+        for b in cycle.mol.GetBonds()
+    )
+    assert bonds1 == bonds2
+
+    # Test writing of specific atoms only.
+    atoms = cycle_su.cycle_atoms()
+    cycle_su.write(join(test_dir, 'cycle_atoms.pdb'), atoms)
+    cycle = stk.StructUnit(join(test_dir, 'cycle_atoms.pdb'))
+
+    # Make sure the position matrices are basically the same.
+    assert np.allclose(
+        a=cycle_su.position_matrix()[:, atoms],
+        b=cycle.position_matrix(),
+        atol=1e-5
+    )
+
+    # Make sure the bonds which need to exist exist.
+    # Atom ids will change, so compare positions.
+    atoms = set(atoms)
+    bonds1 = []
+    for bond in cycle_su.mol.GetBonds():
+        a1, a2 = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
+        if a1 in atoms and a2 in atoms:
+            bonds1.append(sorted([
+                *cycle_su.atom_coords(a1),
+                *cycle_su.atom_coords(a2)
+            ]))
+    bonds1 = np.array(bonds1)
+
+    bonds2 = []
+    for bond in cycle.mol.GetBonds():
+        a1, a2 = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
+        bonds2.append(sorted([
+            *cycle.atom_coords(a1),
+            *cycle.atom_coords(a2)
+        ]))
+    bonds2 = np.array(bonds2)
+
+    assert np.allclose(
+        a=bonds1,
+        b=bonds2,
+        atol=1e-5
+    )
