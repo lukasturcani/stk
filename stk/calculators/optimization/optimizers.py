@@ -698,6 +698,21 @@ class GFNXTB(Optimizer):
     """
     Uses GFN-xTB to optimize molecules.
 
+    Notes
+    -----
+    When running :meth:`optimize`, this calculator changes the
+    present working directory with :func:`os.chdir`. The original
+    working directory will be restored even if an error is raised so
+    unless a multi-threading is being used this implementation detail
+    should not matter.
+
+    If multi-threading is being used an error could occur if two
+    different threads need to know about the current working directory
+    as this :class:`.Optimizer` can change it from under them.
+
+    Note that this does not have any impact on multi-processing,
+    which should always be safe.
+
     Attributes
     ----------
     gfnxtb_path : :class:`str`
@@ -718,6 +733,25 @@ class GFNXTB(Optimizer):
         mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
         gfnxtb = GFNXTB('/opt/gfnxtb/xtb')
         gfnxtb.optimize(mol)
+
+    Note that for :class:`.MacroMolecule` objects assembled by ``stk``
+    :class:`GFNXTB` should usually be used in a
+    :class:`OptimizerSequence`. This is because GFN-xTB uses only
+    xyz coordinates as input and so will not register the long bonds
+    created during assembly as bonds. An optimizer which can minimize
+    these bonds first should be used before it.
+
+    .. code-block:: python
+
+        bb1 = StructUnit2.smiles_init('NCCNCCN', ['amine'])
+        bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
+        polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
+
+        gfnxtb = OptimizerSequence(
+            UFF(),
+            GFNXTB('/opt/gfnxtb/xtb')
+        )
+        gfnxtb.optimize(polymer)
 
     """
 
