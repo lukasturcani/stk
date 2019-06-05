@@ -1118,7 +1118,7 @@ class Molecule:
 
         # Update the structure.
         new_coords = np.array(new_coords).T
-        self.set_position_from_matrix(new_coords)
+        self.set_position_from_matrix(new_coords, conformer=conformer)
 
     def update_stereochemistry(self, conformer=-1):
         """
