@@ -1087,8 +1087,9 @@ class Molecule:
         num_atoms = self.mol.GetNumAtoms()
         if int(atom_count) != num_atoms:
             raise RuntimeError(
-                'The number of atoms in the xyz file does '
-                'not match the number of atoms in the molecule.'
+                f'The number of atoms in the xyz file, {atom_count}, '
+                'does not match the number of atoms in the '
+                f'molecule, {num_atoms}.'
             )
 
         # Save all the coords in the file.
@@ -1109,8 +1110,9 @@ class Molecule:
         # lines was present in the file.
         if i+1 != num_atoms:
             raise RuntimeError(
-                'The number of atoms in the xyz file does '
-                'not match the number of atoms in the molecule.'
+                f'The number of atom lines in the xyz file, {i+1}, '
+                'does not match the number of atoms in the '
+                f'molecule, {num_atoms}.'
             )
 
         # Update the structure.
