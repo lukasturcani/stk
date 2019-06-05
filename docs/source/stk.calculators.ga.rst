@@ -1,11 +1,6 @@
 stk.calculators.ga package
 ==========================
 
-.. automodule:: stk.calculators.ga
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Submodules
 ----------
 
@@ -19,3 +14,10 @@ Submodules
    stk.calculators.ga.plotters
    stk.calculators.ga.selectors
 
+Module contents
+---------------
+
+.. automodule:: stk.calculators.ga
+    :members:
+    :undoc-members:
+    :show-inheritance:

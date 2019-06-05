@@ -1,11 +1,6 @@
 stk.calculators.electronic\_property package
 ============================================
 
-.. automodule:: stk.calculators.electronic_property
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Submodules
 ----------
 
@@ -14,3 +9,10 @@ Submodules
    stk.calculators.electronic_property.electronic_property_calculators
    stk.calculators.electronic_property.mopac
 
+Module contents
+---------------
+
+.. automodule:: stk.calculators.electronic_property
+    :members:
+    :undoc-members:
+    :show-inheritance:

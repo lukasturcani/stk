@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.molecular.topologies.macrocycle module &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">stk.molecular.topologies.macrocycle module</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">stk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>stk.molecular.topologies.macrocycle module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stk.molecular.topologies.macrocycle.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-stk.molecular.topologies.macrocycle">
+<span id="stk-molecular-topologies-macrocycle-module"></span><h1>stk.molecular.topologies.macrocycle module<a class="headerlink" href="#module-stk.molecular.topologies.macrocycle" title="Permalink to this headline">¶</a></h1>
+<p>Defines macrocycle topologies.</p>
+<dl class="class">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic">
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.macrocycle.</code><code class="descname">Cyclic</code><span class="sig-paren">(</span><em>repeating_unit</em>, <em>orientation</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.molecular.topologies.base.Topology</span></code></a></p>
+<p>Represents cyclic polymers forming a macrocycle.</p>
+<dl class="attribute">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic.repeating_unit">
+<code class="descname">repeating_unit</code><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic.repeating_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string showing the repeating unit of the <a class="reference internal" href="#stk.molecular.topologies.macrocycle.Cyclic" title="stk.molecular.topologies.macrocycle.Cyclic"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cyclic</span></code></a>.
+For example, <code class="docutils literal notranslate"><span class="pre">&quot;AB&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ABB&quot;</span></code>. The building block with
+index <code class="docutils literal notranslate"><span class="pre">0</span></code> in <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule.building_blocks" title="stk.molecular.molecules.macro_molecule.MacroMolecule.building_blocks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.building_blocks</span></code></a> is
+labelled as <code class="docutils literal notranslate"><span class="pre">&quot;A&quot;</span></code> while index <code class="docutils literal notranslate"><span class="pre">1</span></code> as <code class="docutils literal notranslate"><span class="pre">&quot;B&quot;</span></code> and so on.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic.orientation">
+<code class="descname">orientation</code><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic.orientation" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each character in the repeating unit, a value between <code class="docutils literal notranslate"><span class="pre">0</span></code>
+and <code class="docutils literal notranslate"><span class="pre">1</span></code> (both inclusive) must be given in a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>. It
+indicates the probability that each monomer will have its
+orientation along the chain flipped. If
+<code class="docutils literal notranslate"><span class="pre">0</span></code> then the monomer is guaranteed to not flip. If <code class="docutils literal notranslate"><span class="pre">1</span></code>
+it is guaranteed to flip. This allows the user to create
+head-to-head or head-to-tail chains, as well as chain with
+a preference for head-to-head or head-to-tail if a number
+between <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> is chosen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic.n">
+<code class="descname">n</code><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic.n" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of repeating units which in the macrocycle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>repeating_unit</em>, <em>orientation</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a <a class="reference internal" href="#stk.molecular.topologies.macrocycle.Cyclic" title="stk.molecular.topologies.macrocycle.Cyclic"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cyclic</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>repeating_unit</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string showing the repeating unit of the
+<a class="reference internal" href="#stk.molecular.topologies.macrocycle.Cyclic" title="stk.molecular.topologies.macrocycle.Cyclic"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cyclic</span></code></a>. For example, <code class="docutils literal notranslate"><span class="pre">&quot;AB&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ABB&quot;</span></code>. The
+building block with index <code class="docutils literal notranslate"><span class="pre">0</span></code> in
+<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule.building_blocks" title="stk.molecular.molecules.macro_molecule.MacroMolecule.building_blocks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.building_blocks</span></code></a> is labelled as
+<code class="docutils literal notranslate"><span class="pre">&quot;A&quot;</span></code> while index <code class="docutils literal notranslate"><span class="pre">1</span></code> as <code class="docutils literal notranslate"><span class="pre">&quot;B&quot;</span></code> and so on.</li>
+<li><strong>orientation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – For each character in the repeating unit, a value between
+<code class="docutils literal notranslate"><span class="pre">0</span></code> (inclusive) and <code class="docutils literal notranslate"><span class="pre">1</span></code> (inclusive) must be given.
+The values give the probability that each monomer is
+flipped by 180 degrees when being added to the chain. If
+<code class="docutils literal notranslate"><span class="pre">0</span></code> then the monomer is guaranteed to not flip. If <code class="docutils literal notranslate"><span class="pre">1</span></code>
+it is guaranteed to flip. This allows the user to create
+head-to-head or head-to-tail chains, as well as chain with
+a preference for head-to-head or head-to-tail if a number
+between <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> is chosen.</li>
+<li><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of repeating units which are used to make the
+macrocycle.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic.bonded_fgs">
+<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic.bonded_fgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield functional groups to react.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.macrocycle.html#stk.molecular.molecules.macrocycle.Macrocycle" title="stk.molecular.molecules.macrocycle.Macrocycle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Macrocycle</span></code></a>) – The polymer being assembled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> – Holds the ids of the functional groups set to react.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic.build">
+<code class="descname">build</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assembles <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> instances of macromolecules.</p>
+<p>This method places an <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule of the assembled
+macromolecule into the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.mol" title="stk.molecular.molecules.molecule.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">mol</span></code></a> attribute of
+<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>. It also creates the
+<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule.bb_counter" title="stk.molecular.molecules.macro_molecule.MacroMolecule.bb_counter"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.bb_counter</span></code></a> and
+<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule.bonds_made" title="stk.molecular.molecules.macro_molecule.MacroMolecule.bonds_made"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.bonds_made</span></code></a> attributes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instance which needs to be
+built.</li>
+<li><strong>bb_conformers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The ids of the building block conformers to be used. Must
+be equal in length to <cite>building_blocks</cite> and orders must
+correspond. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then <code class="docutils literal notranslate"><span class="pre">-1</span></code> is used for all
+building blocks.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs final clean up actions on an assembled molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule being assembled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic.place_mols">
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic.place_mols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Place monomers on a large circle.</p>
+<p>The monomers are placed around a large circle centred at the
+origin, so that the vector running between the functional
+groups is placed in a direction tangent to the circle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.macrocycle.html#stk.molecular.molecules.macrocycle.Macrocycle" title="stk.molecular.molecules.macrocycle.Macrocycle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Macrocycle</span></code></a>) – The macrocycle being assembled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.macrocycle.Cyclic.prepare">
+<code class="descname">prepare</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.topologies.macrocycle.Cyclic.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs ops between placing and reacting building blocks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule being assembled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

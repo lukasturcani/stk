@@ -168,6 +168,12 @@ and returns a mutant molecule. There are no requirements besides this.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Used for errors which occuring during mutation operations.</p>
 <dl class="attribute">
+<dt id="stk.calculators.ga.mutators.MutationError.__init__">
+<code class="descname">__init__</code><a class="headerlink" href="#stk.calculators.ga.mutators.MutationError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="stk.calculators.ga.mutators.MutationError.args">
 <code class="descname">args</code><a class="headerlink" href="#stk.calculators.ga.mutators.MutationError.args" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -186,6 +192,12 @@ set self.__traceback__ to tb and return self.</p>
 <em class="property">class </em><code class="descclassname">stk.calculators.ga.mutators.</code><code class="descname">Mutator</code><a class="headerlink" href="#stk.calculators.ga.mutators.Mutator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Creates mutants.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.mutators.Mutator.__init__">
+<code class="descname">__init__</code><a class="headerlink" href="#stk.calculators.ga.mutators.Mutator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.ga.mutators.Mutator.mutate">
 <code class="descname">mutate</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.Mutator.mutate" title="Permalink to this definition">¶</a></dt>
@@ -194,11 +206,11 @@ set self.__traceback__ to tb and return self.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be mutated.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be mutated.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>mol</strong> – The mutant molecule.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -211,7 +223,7 @@ set self.__traceback__ to tb and return self.</p>
 <em class="property">class </em><code class="descclassname">stk.calculators.ga.mutators.</code><code class="descname">RandomBuildingBlock</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>key</em>, <em>duplicate_building_blocks=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.RandomBuildingBlock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.mutators.Mutator</span></code></a></p>
 <p>Substitutes random building blocks.</p>
-<p>This mutator takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> and substitutes the
+<p>This mutator takes a <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> and substitutes the
 building blocks with one chosen at random from a given set.</p>
 <dl class="attribute">
 <dt id="stk.calculators.ga.mutators.RandomBuildingBlock.building_blocks">
@@ -222,7 +234,7 @@ in molecules being mutated.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -231,7 +243,7 @@ in molecules being mutated.</p>
 <dl class="attribute">
 <dt id="stk.calculators.ga.mutators.RandomBuildingBlock.key">
 <code class="descname">key</code><a class="headerlink" href="#stk.calculators.ga.mutators.RandomBuildingBlock.key" title="Permalink to this definition">¶</a></dt>
-<dd><p>A function which takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> and returns
+<dd><p>A function which takes a <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> and returns
 <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>. This function is applied to every
 building block of the molecule being mutated. Building blocks
 which returned <code class="docutils literal notranslate"><span class="pre">True</span></code> are liable for substition by one of the
@@ -291,6 +303,31 @@ mutant must all be unique.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.mutators.RandomBuildingBlock.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>key</em>, <em>duplicate_building_blocks=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.RandomBuildingBlock.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.mutators.RandomBuildingBlock" title="stk.calculators.ga.mutators.RandomBuildingBlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomBuildingBlock</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A group of molecules which are used to replace building
+blocks in molecules being mutated.</li>
+<li><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which takes a <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> and returns
+<code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>. This function is applied to every
+building block of the molecule being mutated. Building
+blocks which returned <code class="docutils literal notranslate"><span class="pre">True</span></code> are liable for substition by
+one of the molecules in <a class="reference internal" href="#stk.calculators.ga.mutators.RandomBuildingBlock.building_blocks" title="stk.calculators.ga.mutators.RandomBuildingBlock.building_blocks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">building_blocks</span></code></a>.</li>
+<li><strong>duplicate_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Indicates whether the building blocks used to construct the
+mutant must all be unique.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.mutators.RandomBuildingBlock.mutate">
 <code class="descname">mutate</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.RandomBuildingBlock.mutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Substitute a building block at random.</p>
@@ -298,12 +335,12 @@ mutant must all be unique.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule which is to have its building block
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule which is to have its building block
 substituted.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The produced mutant.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -396,6 +433,26 @@ to carry out a mutation.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.mutators.RandomMutation.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*mutators</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.RandomMutation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.mutators.RandomMutation" title="stk.calculators.ga.mutators.RandomMutation"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomMutation</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>*mutators</strong> (<a class="reference internal" href="#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a>) – <a class="reference internal" href="#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> objects which are used to carry out the
+mutations.</li>
+<li><strong>weights</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The probability that each <a class="reference internal" href="#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> will be selected
+to carry out a mutation.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.mutators.RandomMutation.mutate">
 <code class="descname">mutate</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.RandomMutation.mutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a mutant with a <a class="reference internal" href="#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> in <a class="reference internal" href="#stk.calculators.ga.mutators.RandomMutation.mutators" title="stk.calculators.ga.mutators.RandomMutation.mutators"><code class="xref py py-attr docutils literal notranslate"><span class="pre">mutators</span></code></a>.</p>
@@ -403,11 +460,11 @@ to carry out a mutation.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be mutated.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be mutated.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The produced mutant.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -456,6 +513,21 @@ is selected at random to form a mutant.</td>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.mutators.RandomTopology.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>topologies</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.RandomTopology.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.mutators.RandomTopology" title="stk.calculators.ga.mutators.RandomTopology"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomTopology</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>topologies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>) – This lists holds the topology instances from which one is
+selected at random to form a new molecule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.mutators.RandomTopology.mutate">
 <code class="descname">mutate</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.RandomTopology.mutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Substitute a random topology.</p>
@@ -463,11 +535,11 @@ is selected at random to form a mutant.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule which is to have its topology substituted.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule which is to have its topology substituted.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The produced mutant.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -480,7 +552,7 @@ is selected at random to form a mutant.</td>
 <em class="property">class </em><code class="descclassname">stk.calculators.ga.mutators.</code><code class="descname">SimilarBuildingBlock</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>key</em>, <em>duplicate_building_blocks</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.SimilarBuildingBlock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.mutators.Mutator</span></code></a></p>
 <p>Substitutes similar building blocks.</p>
-<p>This mutator takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> and substitutes the
+<p>This mutator takes a <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> and substitutes the
 building blocks with the most similar one from a given set.</p>
 <dl class="attribute">
 <dt id="stk.calculators.ga.mutators.SimilarBuildingBlock.building_blocks">
@@ -491,7 +563,7 @@ in molecules being mutated.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -500,7 +572,7 @@ in molecules being mutated.</p>
 <dl class="attribute">
 <dt id="stk.calculators.ga.mutators.SimilarBuildingBlock.key">
 <code class="descname">key</code><a class="headerlink" href="#stk.calculators.ga.mutators.SimilarBuildingBlock.key" title="Permalink to this definition">¶</a></dt>
-<dd><p>A function which takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> and returns
+<dd><p>A function which takes a <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> and returns
 <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>. This function is applied to every
 building block of the molecule being mutated. Building blocks
 which returned <code class="docutils literal notranslate"><span class="pre">True</span></code> are liable for substition by one of the
@@ -533,7 +605,7 @@ mutant must all be unique.</p>
 <dl class="attribute">
 <dt id="stk.calculators.ga.mutators.SimilarBuildingBlock._similar_bbs">
 <code class="descname">_similar_bbs</code><a class="headerlink" href="#stk.calculators.ga.mutators.SimilarBuildingBlock._similar_bbs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Maps a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to multiple <code class="xref py py-class docutils literal notranslate"><span class="pre">iterator</span></code>,
+<dd><p>Maps a <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to multiple <code class="xref py py-class docutils literal notranslate"><span class="pre">iterator</span></code>,
 each of which yields the most similar molecules in
 <a class="reference internal" href="#stk.calculators.ga.mutators.SimilarBuildingBlock.building_blocks" title="stk.calculators.ga.mutators.SimilarBuildingBlock.building_blocks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">building_blocks</span></code></a>, in order.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -576,6 +648,31 @@ each of which yields the most similar molecules in
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.mutators.SimilarBuildingBlock.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>key</em>, <em>duplicate_building_blocks</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.SimilarBuildingBlock.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.mutators.RandomBuildingBlock" title="stk.calculators.ga.mutators.RandomBuildingBlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomBuildingBlock</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>) – A group of molecules which are used to replace building
+blocks in molecules being mutated.</li>
+<li><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which takes a <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> and returns
+<code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>. This function is applied to every
+building block of the molecule being mutated. Building
+blocks which returned <code class="docutils literal notranslate"><span class="pre">True</span></code> are liable for substition by
+one of the molecules in <a class="reference internal" href="#stk.calculators.ga.mutators.SimilarBuildingBlock.building_blocks" title="stk.calculators.ga.mutators.SimilarBuildingBlock.building_blocks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">building_blocks</span></code></a>.</li>
+<li><strong>duplicate_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Indicates whether the building blocks used to construct the
+mutant must all be unique.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.mutators.SimilarBuildingBlock.mutate">
 <code class="descname">mutate</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.mutators.SimilarBuildingBlock.mutate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Substitute a similar building block.</p>
@@ -583,12 +680,12 @@ each of which yields the most similar molecules in
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule which is to have its building block
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecule which is to have its building block
 substituted.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The produced mutant.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
