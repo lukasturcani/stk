@@ -1106,7 +1106,7 @@ class Molecule:
                     f'Atom {i} element does not match file.'
                 )
 
-            new_coords.append(coords)
+            new_coords.append([float(i) for i in coords])
 
         # Check that the correct number of atom
         # lines was present in the file.
