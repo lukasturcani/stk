@@ -14,7 +14,8 @@ from ...utilities import (normalize_vector,
                           mol_from_mae_file,
                           rotation_matrix_arbitrary_axis,
                           atom_vdw_radii,
-                          remake)
+                          remake,
+                          periodic_table)
 
 
 class MoleculeSubclassError(Exception):
@@ -1049,6 +1050,75 @@ class Molecule:
         conf.SetId(conformer)
         self.mol.RemoveConformer(conformer)
         self.mol.AddConformer(conf)
+
+    def update_from_xyz(self, path, conformer=-1):
+        """
+        Updates molecular structure to match a ``.xyz`` file.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.mol`` file from which the structure
+            should be updated.
+
+        conformer : :class:`int`, optional
+            The conformer to be updated.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If the number of atoms in the file does not match the
+            number of atoms in the molecule or if atom elements in the
+            file do not agree with the atom elements in the molecule.
+
+        """
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
+
+        with open(path, 'r') as f:
+            atom_count, *content = f.read().split('\n')
+
+        # Remove null lines.
+        content = filter(lambda line: line, content)
+
+        # Check the atom count is correct.
+        num_atoms = self.mol.GetNumAtoms()
+        if int(atom_count) != num_atoms:
+            raise RuntimeError(
+                'The number of atoms in the xyz file does '
+                'not match the number of atoms in the molecule.'
+            )
+
+        # Save all the coords in the file.
+        new_coords = []
+        for i, line in enumerate(content):
+            element, *coords = line.split()
+            if element.isnumeric():
+                element = periodic_table[int(element)]
+
+            if element != self.atom_symbol(i):
+                raise RuntimeError(
+                    f'Atom {i} element does not match file.'
+                )
+
+            new_coords.append(coords)
+
+        # Check that the correct number of atom
+        # lines was present in the file.
+        if i+1 != num_atoms:
+            raise RuntimeError(
+                'The number of atoms in the xyz file does '
+                'not match the number of atoms in the molecule.'
+            )
+
+        # Update the structure.
+        new_coords = np.array(new_coords).T
+        self.set_position_from_matrix(new_coords)
 
     def update_stereochemistry(self, conformer=-1):
         """
