@@ -708,7 +708,7 @@ class MacroModelForceField(_MacroModel):
         mol._file = f'{basename}.mol'
 
         # First write a .mol file of the molecule.
-        mol.write(mol._file, conformer)
+        mol.write(mol._file, conformer=conformer)
         # MacroModel requires a ``.mae`` file as input.
         self.create_mae(mol)
         # generate the ``.com`` file for the MacroModel run.
@@ -1146,7 +1146,7 @@ class MacroModelMD(_MacroModel):
         mol._file = f'{basename}.mol'
 
         # First write a .mol file of the molecule.
-        mol.write(mol._file, conformer)
+        mol.write(mol._file, conformer=conformer)
         # MacroModel requires a ``.mae`` file as input.
         self.create_mae(mol)
         # Generate the ``.com`` file for the MacroModel MD run.
