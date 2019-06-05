@@ -210,7 +210,7 @@ go about calculating the energy.</p>
 </div>
 <p>which holds every <code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code> and conformer whose energy
 was calculated by the <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a>. Here <code class="docutils literal notranslate"><span class="pre">mol1</span></code>
-and <code class="docutils literal notranslate"><span class="pre">mol2</span></code> are <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects and <code class="docutils literal notranslate"><span class="pre">conformer1</span></code>
+and <code class="docutils literal notranslate"><span class="pre">mol2</span></code> are <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects and <code class="docutils literal notranslate"><span class="pre">conformer1</span></code>
 and <code class="docutils literal notranslate"><span class="pre">conformer2</span></code> are of type <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, and are the ids
 of the conformers passed to <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.energy" title="stk.calculators.energy.energy_calculators.EnergyCalculator.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -240,6 +240,22 @@ calculated value.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="stk.calculators.energy.energy_calculators.EnergyCalculator.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>use_cache</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.energy" title="stk.calculators.energy.energy_calculators.EnergyCalculator.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a> will not run twice on the same
+molecule and conformer, but will instead return the previously
+calculated value.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.energy.energy_calculators.EnergyCalculator.energy">
 <code class="descname">energy</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the energy of <cite>mol</cite>.</p>
@@ -248,7 +264,7 @@ calculated value.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose energy is to be calculated.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose energy is to be calculated.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optinal) – The conformer of <cite>mol</cite> to use.</li>
 </ul>
 </td>
@@ -270,6 +286,12 @@ calculated value.</p>
 <em class="property">exception </em><code class="descclassname">stk.calculators.energy.energy_calculators.</code><code class="descname">EnergyError</code><a class="headerlink" href="#stk.calculators.energy.energy_calculators.EnergyError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Indicates a failed energy calculation.</p>
+<dl class="attribute">
+<dt id="stk.calculators.energy.energy_calculators.EnergyError.__init__">
+<code class="descname">__init__</code><a class="headerlink" href="#stk.calculators.energy.energy_calculators.EnergyError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="stk.calculators.energy.energy_calculators.EnergyError.args">
 <code class="descname">args</code><a class="headerlink" href="#stk.calculators.energy.energy_calculators.EnergyError.args" title="Permalink to this definition">¶</a></dt>
@@ -313,7 +335,7 @@ then it must appear multiple times in this <code class="xref py py-class docutil
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -323,14 +345,14 @@ then it must appear multiple times in this <code class="xref py py-class docutil
 <dt id="stk.calculators.energy.energy_calculators.FormationEnergy.products">
 <code class="descname">products</code><a class="headerlink" href="#stk.calculators.energy.energy_calculators.FormationEnergy.products" title="Permalink to this definition">¶</a></dt>
 <dd><p>The molecules which are produced as a result of the formation
-reaction. This <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> must omit the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>
+reaction. This <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> must omit the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>
 passed to <a class="reference internal" href="#stk.calculators.energy.energy_calculators.FormationEnergy.energy" title="stk.calculators.energy.energy_calculators.FormationEnergy.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a>. If there are multiples of the same
 product, it must appear multiple times in this <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -386,6 +408,38 @@ product, it must appear multiple times in this <code class="xref py py-class doc
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.energy.energy_calculators.FormationEnergy.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>energy_calculator</em>, <em>reactants</em>, <em>products</em>, <em>reactant_conformers=None</em>, <em>product_conformers=None</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators.FormationEnergy.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.energy.energy_calculators.FormationEnergy" title="stk.calculators.energy.energy_calculators.FormationEnergy"><code class="xref py py-class docutils literal notranslate"><span class="pre">FormationEnergy</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>energy_calculator</strong> (<a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a>) – The <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a> used to calculate the energy
+of all reactant and product molecules.</li>
+<li><strong>reactants</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The reactants. If there are multiples of the same reactant
+then it must appear multiple times in this <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>.</li>
+<li><strong>products</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecules which are produced as a result of the
+formation reaction. This <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> must omit the
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> passed to <a class="reference internal" href="#stk.calculators.energy.energy_calculators.FormationEnergy.energy" title="stk.calculators.energy.energy_calculators.FormationEnergy.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a>. If there are
+multiples of the same product, it must appear multiple
+times in this <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>.</li>
+<li><strong>reactant_conformers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer ids of the molecules in <a class="reference internal" href="#stk.calculators.energy.energy_calculators.FormationEnergy.reactants" title="stk.calculators.energy.energy_calculators.FormationEnergy.reactants"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reactants</span></code></a> to
+use.</li>
+<li><strong>product_conformers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer ids of the molecules in <a class="reference internal" href="#stk.calculators.energy.energy_calculators.FormationEnergy.products" title="stk.calculators.energy.energy_calculators.FormationEnergy.products"><code class="xref py py-attr docutils literal notranslate"><span class="pre">products</span></code></a> to
+use.</li>
+<li><strong>use_cache</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> <a class="reference internal" href="#stk.calculators.energy.energy_calculators.FormationEnergy.energy" title="stk.calculators.energy.energy_calculators.FormationEnergy.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a> will not run twice on the same
+molecule and conformer, but will instead return the
+previously calculated value.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.energy.energy_calculators.FormationEnergy.energy">
 <code class="descname">energy</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators.FormationEnergy.energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the formation energy of <cite>mol</cite>.</p>
@@ -394,7 +448,7 @@ product, it must appear multiple times in this <code class="xref py py-class doc
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose formation energy is to be
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose formation energy is to be
 calculated.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optinal) – The conformer of <cite>mol</cite> to use.</li>
 </ul>
@@ -433,6 +487,22 @@ calculated.</li>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.energy.energy_calculators.MMFFEnergy.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators.MMFFEnergy.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>use_cache</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> <a class="reference internal" href="#stk.calculators.energy.energy_calculators.MMFFEnergy.energy" title="stk.calculators.energy.energy_calculators.MMFFEnergy.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a> will not run twice on the same
+molecule and conformer, but will instead return the previously
+calculated value.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.energy.energy_calculators.MMFFEnergy.energy">
 <code class="descname">energy</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators.MMFFEnergy.energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the energy of <cite>mol</cite>.</p>
@@ -441,7 +511,7 @@ calculated.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose energy is to be calculated.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose energy is to be calculated.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optinal) – The conformer of <cite>mol</cite> to use.</li>
 </ul>
 </td>
@@ -479,6 +549,22 @@ calculated.</li>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.energy.energy_calculators.UFFEnergy.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators.UFFEnergy.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>use_cache</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> <a class="reference internal" href="#stk.calculators.energy.energy_calculators.UFFEnergy.energy" title="stk.calculators.energy.energy_calculators.UFFEnergy.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a> will not run twice on the same
+molecule and conformer, but will instead return the previously
+calculated value.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.energy.energy_calculators.UFFEnergy.energy">
 <code class="descname">energy</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators.UFFEnergy.energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the energy of <cite>mol</cite>.</p>
@@ -487,7 +573,7 @@ calculated.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose energy is to be calculated.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose energy is to be calculated.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optinal) – The conformer of <cite>mol</cite> to use.</li>
 </ul>
 </td>
@@ -509,7 +595,7 @@ calculated.</li>
 <code class="descclassname">stk.calculators.energy.energy_calculators.</code><code class="descname">_add_cache_use</code><span class="sig-paren">(</span><em>energy</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators._add_cache_use" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.energy" title="stk.calculators.energy.energy_calculators.EnergyCalculator.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a> use the cache.</p>
 <p>Decorates <cite>energy</cite> so that before running it checks if the
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and conformer have already had their energy
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and conformer have already had their energy
 calculated. If so, and <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.use_cache" title="stk.calculators.energy.energy_calculators.EnergyCalculator.use_cache"><code class="xref py py-attr docutils literal notranslate"><span class="pre">use_cache</span></code></a> is
 <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the energy value in the
 <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.cache" title="stk.calculators.energy.energy_calculators.EnergyCalculator.cache"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cache</span></code></a> is returned.</p>

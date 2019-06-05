@@ -172,8 +172,8 @@ building blocks were used to build it.</p>
 <span class="n">cage</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="n">bb2</span> <span class="c1"># True</span>
 </pre></div>
 </div>
-<p>The attribute <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.building_blocks" title="stk.molecular.molecules.MacroMolecule.building_blocks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.building_blocks</span></code></a> is a list of
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances. The exact ones used to build it in the
+<p>The attribute <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule.building_blocks" title="stk.molecular.molecules.macro_molecule.MacroMolecule.building_blocks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MacroMolecule.building_blocks</span></code></a> is a list of
+<a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances. The exact ones used to build it in the
 first place. Note that this is true for all assembled molecules, not
 just cages. This will be important later.</p>
 <img alt="_images/cage.png" src="_images/cage.png" />
@@ -248,7 +248,7 @@ The vertices a labelled <code class="docutils literal notranslate"><span class="
 <p>For the purposes of drawing, we can simplify the representation of
 our molecule.
 Recall, that each building block is
-represented within <code class="docutils literal notranslate"><span class="pre">stk</span></code> as a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit3</span></code></a> instance.</p>
+represented within <code class="docutils literal notranslate"><span class="pre">stk</span></code> as a <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit3" title="stk.molecular.molecules.struct_unit.StructUnit3"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit3</span></code></a> instance.</p>
 </div></blockquote>
 </li>
 <li><p class="first">Place the building block on each vertex of the topology.</p>
@@ -257,10 +257,10 @@ represented within <code class="docutils literal notranslate"><span class="pre">
 <p>Notice that because we duplicate the building block to make the
 macromolecule, the atom ids changed. The atom id of <code class="docutils literal notranslate"><span class="pre">bonder</span></code> atom
 within the macromolecule is shown next to the atoms while the
-original atom id in the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is shown in brackets.
+original atom id in the <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is shown in brackets.
 Note that the macromolecule is represented
-in <code class="docutils literal notranslate"><span class="pre">stk</span></code> by a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instance, in this case a
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>.</p>
+in <code class="docutils literal notranslate"><span class="pre">stk</span></code> by a <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instance, in this case a
+<a class="reference internal" href="stk.molecular.molecules.cage.html#stk.molecular.molecules.cage.Cage" title="stk.molecular.molecules.cage.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>.</p>
 </div></blockquote>
 </li>
 <li><p class="first">Rotate each building block while keeping it on the vertex to minimize
@@ -270,8 +270,8 @@ topology. Let’s take a birds eye view of each vertex.</p>
 <p>At each vertex, pick any arbitrary edge and select a
 <code class="docutils literal notranslate"><span class="pre">bonder</span></code> atom. We then rotate the building block until the selected
 edge and <code class="docutils literal notranslate"><span class="pre">bonder</span></code> atom are perfectly aligned. The bonder atom is
-identified by the id in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit3</span></code></a>, not by the id
-in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>. Once rotation is done, create the bonds
+identified by the id in <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit3" title="stk.molecular.molecules.struct_unit.StructUnit3"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit3</span></code></a>, not by the id
+in <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>. Once rotation is done, create the bonds
 between all the building blocks in the macromolecule and we have one
 structural isomer. We can define which <code class="docutils literal notranslate"><span class="pre">bonder</span></code> atom we picked for
 alignment at each

@@ -182,7 +182,7 @@ by the mean fitness across the population.</p>
 <p>A new class inheriting <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> must be created.
 The class must define a <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> method,
 which takes two arguments. The first is <cite>mol</cite> which takes a
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> object and is the molecule whose fitness is to be
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> object and is the molecule whose fitness is to be
 calculated. The second is <cite>conformer</cite> and it is an <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> holding
 the conformer id of the conformer used for calculating the fitness.
 <cite>conformer</cite> is should be an optional argument, defaulting to <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
@@ -192,7 +192,7 @@ the conformer id of the conformer used for calculating the fitness.
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Calculates and stores fitness values of molecules.</p>
 <p>A <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> will automatically add a
-<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code></a> attribute to any <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code></a> attribute to any <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects
 it calculates a fitness value for. The attribute will hold the
 calculated fitness value</p>
 <dl class="attribute">
@@ -222,7 +222,7 @@ and the value already stored is used.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal notranslate"><span class="pre">mol1</span></code> and <code class="docutils literal notranslate"><span class="pre">mol2</span></code> are <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects
+<p>where <code class="docutils literal notranslate"><span class="pre">mol1</span></code> and <code class="docutils literal notranslate"><span class="pre">mol2</span></code> are <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects
 and <code class="docutils literal notranslate"><span class="pre">conf1</span></code> and <code class="docutils literal notranslate"><span class="pre">conf3</span></code> are <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> which are the
 conformers used to calculate the fitness values.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -230,6 +230,22 @@ conformers used to calculate the fitness values.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.ga.fitness_calculators.FitnessCalculator.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>use_cache</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>use_cache</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then fitness values for molecules and
+conformers already held in <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.cache" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.cache"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cache</span></code></a> are not
+re-calculated and the value already stored is used.</td>
 </tr>
 </tbody>
 </table>
@@ -244,7 +260,7 @@ conformers used to calculate the fitness values.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule whose fitness should be calculated.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule whose fitness should be calculated.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer of <cite>mol</cite> to use.</li>
 </ul>
 </td>
@@ -268,7 +284,7 @@ conformers used to calculate the fitness values.</p>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.fitness_calculators.FitnessCalculator</span></code></a></p>
 <p>Calculates the a set of properties of a molecule.</p>
 <p>This <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> applies a series of
-<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code> to a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and appends each result
+<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code> to a <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and appends each result
 to a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>. The <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> forms the property vector of
 the molecule and it is returned as the fitness value of the
 molecule.</p>
@@ -282,7 +298,7 @@ successfully calculated.</p>
 <dd><p>A group of <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>, each of which is used to
 calculate a single property of the molecule. Each function must
 take 2 arguments, <cite>mol</cite> and <cite>conformer</cite>. <cite>mol</cite> accepts a
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> object and <cite>conformer</cite> accepts an
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> object and <cite>conformer</cite> accepts an
 <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. These are the molecule and the conformer id used
 to calculate the property.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -296,7 +312,7 @@ to calculate the property.</p>
 </dd></dl>
 
 <p class="rubric">Examples</p>
-<p>Use on <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> objects.</p>
+<p>Use on <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> objects.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the molecules which are to have fitness values</span>
 <span class="c1"># evaluated.</span>
 <span class="n">mol1</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
@@ -351,7 +367,7 @@ to calculate the property.</p>
 <span class="k">print</span><span class="p">(</span><span class="n">fitness_calculator</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Use on <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects, <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Polymer" title="stk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polymer</span></code></a></p>
+<p>Use on <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects, <a class="reference internal" href="stk.molecular.molecules.polymer.html#stk.molecular.molecules.polymer.Polymer" title="stk.molecular.molecules.polymer.Polymer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polymer</span></code></a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># First create molecules whose fitness value we wish to</span>
 <span class="c1"># caclculate.</span>
 <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;[Br]CC[Br]&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bromine&#39;</span><span class="p">])</span>
@@ -398,7 +414,7 @@ to calculate the property.</p>
 <span class="k">print</span><span class="p">(</span><span class="n">fitness_calculator</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Use on <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects, <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Cage" title="stk.molecular.molecules.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a></p>
+<p>Use on <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects, <a class="reference internal" href="stk.molecular.molecules.cage.html#stk.molecular.molecules.cage.Cage" title="stk.molecular.molecules.cage.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># First create molecules whose fitness value we wish to</span>
 <span class="c1"># caclculate.</span>
 <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
@@ -443,6 +459,31 @@ to calculate the property.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.fitness_calculators.PropertyVector.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*property_fns</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.PropertyVector.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <code class="xref py py-class docutils literal notranslate"><span class="pre">CageFitness</span></code> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>*property_fns</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A group of <code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>, each of which is used to
+calculate a single property of the molecule. Each function
+must take 2 arguments, <cite>mol</cite> and <cite>conformer</cite>. <cite>mol</cite> accepts
+a <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> object and <cite>conformer</cite> accepts an
+<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. These are the molecule and the conformer id
+used to calculate the property.</li>
+<li><strong>use_cache</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then fitness values for molecules and
+conformers already held in <code class="xref py py-attr docutils literal notranslate"><span class="pre">cache</span></code> are not
+re-calculated and the value stored is used.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.fitness_calculators.PropertyVector.fitness">
 <code class="descname">fitness</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.PropertyVector.fitness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the property vector of a molecule.</p>
@@ -451,13 +492,13 @@ to calculate the property.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule whose property vector should be calculated.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule whose property vector should be calculated.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer of <cite>mol</cite> to use.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of properties of the <cite>mol</cite>. Will be
-<code class="docutils literal notranslate"><span class="pre">None</span></code> if any of the</p>
+<code class="docutils literal notranslate"><span class="pre">None</span></code> if any of the properties fail.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
@@ -516,6 +557,30 @@ each time <a class="reference internal" href="#stk.calculators.ga.fitness_calcul
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>fitness_calculator</em>, <em>fail_chance=0.5</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator" title="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaisingFitnessCalculator</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fitness_calculator</strong> (<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a>) – When the fitness calculator does not fail, it uses this
+<a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> to calculate fitness of
+molecules.</li>
+<li><strong>fail_chance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The probability that the fitness calculator will raise an
+error each time <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> is used.</li>
+<li><strong>use_cache</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then fitness values for molecules and
+conformers already held in <code class="xref py py-attr docutils literal notranslate"><span class="pre">cache</span></code> are not
+re-calculated and the value already stored is used.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness">
 <code class="descname">fitness</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator.fitness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the fitness of <cite>conformer</cite> of <cite>mol</cite>.</p>
@@ -524,7 +589,7 @@ each time <a class="reference internal" href="#stk.calculators.ga.fitness_calcul
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule whose fitness should be calculated.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule whose fitness should be calculated.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer of <cite>mol</cite> to use.</li>
 </ul>
 </td>
@@ -549,6 +614,12 @@ each time <a class="reference internal" href="#stk.calculators.ga.fitness_calcul
 <dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError">
 <em class="property">exception </em><code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">RaisingFitnessCalculatorError</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError.__init__">
+<code class="descname">__init__</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError.args">
 <code class="descname">args</code><a class="headerlink" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculatorError.args" title="Permalink to this definition">¶</a></dt>
@@ -587,7 +658,7 @@ set self.__traceback__ to tb and return self.</p>
 <dt id="stk.calculators.ga.fitness_calculators._add_fitness_attribute_creation">
 <code class="descclassname">stk.calculators.ga.fitness_calculators.</code><code class="descname">_add_fitness_attribute_creation</code><span class="sig-paren">(</span><em>fitness</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_calculators._add_fitness_attribute_creation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes fitness functions add a <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> attribute.</p>
-<p>The attribute is added to the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects evaluated
+<p>The attribute is added to the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects evaluated
 by the <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness" title="stk.calculators.ga.fitness_calculators.FitnessCalculator.fitness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitness()</span></code></a> method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

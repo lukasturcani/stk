@@ -168,6 +168,12 @@ to make a plot when <a class="reference internal" href="#stk.calculators.ga.plot
 <em class="property">class </em><code class="descclassname">stk.calculators.ga.plotters.</code><code class="descname">Plotter</code><a class="headerlink" href="#stk.calculators.ga.plotters.Plotter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A base class for plotters.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.plotters.Plotter.__init__">
+<code class="descname">__init__</code><a class="headerlink" href="#stk.calculators.ga.plotters.Plotter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.ga.plotters.Plotter.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.Plotter.plot" title="Permalink to this definition">¶</a></dt>
@@ -215,7 +221,7 @@ file extensions.</p>
 <dt id="stk.calculators.ga.plotters.ProgressPlotter.attr">
 <code class="descname">attr</code><a class="headerlink" href="#stk.calculators.ga.plotters.ProgressPlotter.attr" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the attribute which is plotted. It must be an
-attribute on the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects made by the GA.</p>
+attribute on the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects made by the GA.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -286,6 +292,29 @@ attribute on the <a class="reference internal" href="stk.molecular.molecules.htm
 <span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
 </pre></div>
 </div>
+<dl class="method">
+<dt id="stk.calculators.ga.plotters.ProgressPlotter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>filename</em>, <em>attr</em>, <em>y_label</em>, <em>default</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.ProgressPlotter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.plotters.ProgressPlotter" title="stk.calculators.ga.plotters.ProgressPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressPlotter</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The basename of the files. This means it should not include
+file extensions.</li>
+<li><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the attribute which is plotted. It must be an
+attribute on the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects made by the GA.</li>
+<li><strong>y_label</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The y label for the produced graph.</li>
+<li><strong>default</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – When a molecule in the population does not have attribute
+<a class="reference internal" href="#stk.calculators.ga.plotters.ProgressPlotter.attr" title="stk.calculators.ga.plotters.ProgressPlotter.attr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">attr</span></code></a>, this is the default value to use for it.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.ga.plotters.ProgressPlotter.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.ProgressPlotter.plot" title="Permalink to this definition">¶</a></dt>
@@ -377,6 +406,26 @@ plotted.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.plotters.SelectionPlotter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>filename</em>, <em>selector</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.SelectionPlotter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.plotters.SelectionPlotter" title="stk.calculators.ga.plotters.SelectionPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">SelectionPlotter</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The basename of the files. This means it should not include
+file extensions.</li>
+<li><strong>selector</strong> (<a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a>) – The <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> whose selection of molecules is
+plotted.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.plotters.SelectionPlotter._plot">
 <code class="descname">_plot</code><span class="sig-paren">(</span><em>counter</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.SelectionPlotter._plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots a selection counter.</p>
@@ -421,7 +470,7 @@ a subpopulation.</td>
 <code class="descname">update_counter</code><span class="sig-paren">(</span><em>select</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.plotters.SelectionPlotter.update_counter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorates <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector.select" title="stk.calculators.ga.selectors.Selector.select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Selector.select()</span></code></a>.</p>
 <p>This is a decorator which makes sure that every time
-<a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector.select" title="stk.calculators.ga.selectors.Selector.select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Selector.select()</span></code></a> selects a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> a
+<a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector.select" title="stk.calculators.ga.selectors.Selector.select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Selector.select()</span></code></a> selects a <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> a
 counter keeping track of selected molecules is updated.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

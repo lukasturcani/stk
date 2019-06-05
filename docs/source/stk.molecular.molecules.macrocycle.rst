@@ -1,7 +1,7 @@
-stk.molecular.topologies.multimers module
+stk.molecular.molecules.macrocycle module
 =========================================
 
-.. automodule:: stk.molecular.topologies.multimers
+.. automodule:: stk.molecular.molecules.macrocycle
     :members:
     :undoc-members:
     :show-inheritance:
