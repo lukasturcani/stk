@@ -26,33 +26,57 @@ def test_raising_optimizer(tmp_polymer):
 
 
 def test_mmff(tmp_polymer):
+    # If the optimization was successful the energy should be lowered.
+    energy_calculator = stk.MMFFEnergy()
+    init_energy = energy_calculator.energy(tmp_polymer)
+
     tmp_polymer.write(join(odir, 'mmff_before.mol'))
     mmff = stk.MMFF()
     mmff.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'mmff_after.mol'))
 
+    assert energy_calculator.energy(tmp_polymer) < init_energy
+
 
 def test_uff(tmp_polymer):
+    # If the optimization was successful the energy should be lowered.
+    energy_calculator = stk.UFFEnergy()
+    init_energy = energy_calculator.energy(tmp_polymer)
+
     tmp_polymer.write(join(odir, 'uff_before.mol'))
     uff = stk.UFF()
     uff.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'uff_after.mol'))
 
+    assert energy_calculator.energy(tmp_polymer) < init_energy
+
 
 def test_rdkit_embedder(tmp_polymer):
+    # If the optimization was successful the energy should be lowered.
+    energy_calculator = stk.UFFEnergy()
+    init_energy = energy_calculator.energy(tmp_polymer)
+
     tmp_polymer.write(join(odir, 'rdkit_embed_before.mol'))
     etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
     etkdg.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'rdkit_embed_after.mol'))
 
+    assert energy_calculator.energy(tmp_polymer) < init_energy
+
 
 def test_optimizer_sequence(tmp_polymer):
+    # If the optimization was successful the energy should be lowered.
+    energy_calculator = stk.MMFFEnergy()
+    init_energy = energy_calculator.energy(tmp_polymer)
+
     tmp_polymer.write(join(odir, 'optimize_sequence_before.mol'))
     etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
     mmff = stk.MMFF()
     sequence = stk.OptimizerSequence(etkdg, mmff)
     sequence.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'optimize_sequence_after.mol'))
+
+    assert energy_calculator.energy(tmp_polymer) < init_energy
 
 
 def test_cache_use(tmp_polymer):
@@ -69,11 +93,26 @@ def test_cache_use(tmp_polymer):
 
 
 def test_cage_optimizer_sequence(tmp_cc3, tmp_cage):
+    energy_calculator = stk.MMFFEnergy()
+    init_cc3 = energy_calculator.energy(tmp_cc3)
+    init_cage = energy_calculator.energy(tmp_cage)
+
     mmff = stk.MMFF()
     etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
-    sequence = stk.CageOptimizerSequence(etkdg, mmff)
-    sequence.optimize(tmp_cage)
-    sequence.optimize(tmp_cc3)
+
+    # CC3 needs an optimizer with mmff only, because using etkdg will
+    # increase its energy.
+    sequence1 = stk.CageOptimizerSequence(mmff)
+    sequence1.optimize(tmp_cc3)
+    sequence2 = stk.CageOptimizerSequence(etkdg, mmff)
+    sequence2.optimize(tmp_cage)
+
+    # CC3 should have found all windows so energy should be lowered due
+    # to optimization.
+    assert energy_calculator.energy(tmp_cc3) < init_cc3
+    # Cage should have not found all windows so energy should be the
+    # same as no optimization happened.
+    assert energy_calculator.energy(tmp_cage) == init_cage
 
 
 def test_try_catch_optimizer(tmp_amine2):
