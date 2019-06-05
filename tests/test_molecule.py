@@ -2,6 +2,13 @@ import itertools as it
 import numpy as np
 from scipy.spatial.distance import euclidean
 import stk
+import os
+from os.path import join
+
+
+test_dir = 'molecule_tests_output'
+if not os.path.exists(test_dir):
+    os.mkdir(test_dir)
 
 
 def test_all_atom_coords(tmp_amine2):
@@ -207,3 +214,144 @@ def test_update_from_mae(tmp_amine2, mae_path):
     tmp_amine2.update_from_mae(mae_path, 1)
     assert abs(tmp_amine2.max_diameter(0)[0] -
                tmp_amine2.max_diameter(1)[0]) > 1
+
+
+def test_mol_write(cycle_su):
+    atoms = cycle_su.cycle_atoms()
+
+    cycle_su.write(join(test_dir, 'cycle.mol'))
+    cycle = stk.StructUnit(join(test_dir, 'cycle.mol'))
+    for i in range(cycle.mol.GetNumAtoms()):
+        assert np.allclose(
+            a=cycle_su.atom_coords(i),
+            b=cycle.atom_coords(i),
+            atol=1e-3
+        )
+    for b1 in cycle.mol.GetBonds():
+        b2 = cycle_su.mol.GetBondWithIdx(b1.GetIdx())
+        assert b1.GetBondType() == b2.GetBondType()
+        assert b1.GetBeginAtomIdx() == b2.GetBeginAtomIdx()
+        assert b1.GetEndAtomIdx() == b2.GetEndAtomIdx()
+
+    # Write the cycle atoms to a file and create a string for each
+    # cycle atom written into valid_lines. Then load the written cycle
+    # and for every atom create a string and place it into cycle_lines.
+    # Sorted valid and cycle lines should match.
+    cycle_su.write(join(test_dir, 'cycle_atoms.mol'), atoms)
+    # Note down all atoms written to the file.
+    valid_lines = []
+    for atom_id in atoms:
+        symbol = cycle_su.atom_symbol(atom_id)
+        x, y, z = cycle_su.atom_coords(atom_id)
+        valid_lines.append(
+            f'{symbol} {x:.4f} {y:.4f} {z:.4f}'
+        )
+
+    cycle = stk.StructUnit(join(test_dir, 'cycle_atoms.mol'))
+    # Note down all atoms read from the file.
+    cycle_lines = []
+    for atom_id in range(cycle.mol.GetNumAtoms()):
+        symbol = cycle.atom_symbol(atom_id)
+        x, y, z = cycle.atom_coords(atom_id)
+        cycle_lines.append(
+            f'{symbol} {x:.4f} {y:.4f} {z:.4f}'
+        )
+
+    # Written and read atoms should match.
+    assert sorted(valid_lines) == sorted(cycle_lines)
+
+
+def test_xyz_write(cycle_su):
+    atoms = cycle_su.cycle_atoms()
+    cycle_su.write(join(test_dir, 'cycle.xyz'))
+
+    with open(join(test_dir, 'cycle.xyz'), 'r') as f:
+        xyz_content = f.read()
+
+    # Check that every atom in the molecule has a line in the file.
+    xyz_lines = set(xyz_content.split('\n'))
+    for atom_id in range(cycle_su.mol.GetNumAtoms()):
+        x, y, z = cycle_su.atom_coords(atom_id)
+        symbol = cycle_su.atom_symbol(atom_id)
+        assert f'{symbol} {x:f} {y:f} {z:f}' in xyz_lines
+
+    assert len(xyz_content.split('\n'))-3 == cycle_su.mol.GetNumAtoms()
+
+    # Test writing of specific atoms.
+    cycle_su.write(join(test_dir, 'cycle_atoms.xyz'), atoms)
+    with open(join(test_dir, 'cycle_atoms.xyz'), 'r') as f:
+        xyz_content = f.read()
+
+    # Check that every cycle atom has a line in the file.
+    xyz_lines = set(xyz_content.split('\n'))
+    for atom_id in atoms:
+        x, y, z = cycle_su.atom_coords(atom_id)
+        symbol = cycle_su.atom_symbol(atom_id)
+        assert f'{symbol} {x:f} {y:f} {z:f}' in xyz_lines
+
+    # Check that only cycle atoms were written.
+    assert len(xyz_content.split('\n'))-3 == len(atoms)
+
+
+def test_pdb_write(cycle_su):
+    cycle_su.write(join(test_dir, 'cycle.pdb'))
+    cycle = stk.StructUnit(join(test_dir, 'cycle.pdb'))
+
+    # Make sure the position matrices are basically the same.
+    assert np.allclose(
+        a=cycle_su.position_matrix(),
+        b=cycle.position_matrix(),
+        atol=1e-5
+    )
+
+    # Make sure the connectivity is the same.
+    bonds1 = sorted(
+        sorted((b.GetBeginAtomIdx(), b.GetEndAtomIdx()))
+        for b in cycle_su.mol.GetBonds()
+    )
+
+    bonds2 = sorted(
+        sorted((b.GetBeginAtomIdx(), b.GetEndAtomIdx()))
+        for b in cycle.mol.GetBonds()
+    )
+    assert bonds1 == bonds2
+
+    # Test writing of specific atoms only.
+    atoms = cycle_su.cycle_atoms()
+    cycle_su.write(join(test_dir, 'cycle_atoms.pdb'), atoms)
+    cycle = stk.StructUnit(join(test_dir, 'cycle_atoms.pdb'))
+
+    # Make sure the position matrices are basically the same.
+    assert np.allclose(
+        a=cycle_su.position_matrix()[:, atoms],
+        b=cycle.position_matrix(),
+        atol=1e-5
+    )
+
+    # Make sure the bonds which need to exist exist.
+    # Atom ids will change, so compare positions.
+    atoms = set(atoms)
+    bonds1 = []
+    for bond in cycle_su.mol.GetBonds():
+        a1, a2 = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
+        if a1 in atoms and a2 in atoms:
+            bonds1.append(sorted([
+                *cycle_su.atom_coords(a1),
+                *cycle_su.atom_coords(a2)
+            ]))
+    bonds1 = np.array(bonds1)
+
+    bonds2 = []
+    for bond in cycle.mol.GetBonds():
+        a1, a2 = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
+        bonds2.append(sorted([
+            *cycle.atom_coords(a1),
+            *cycle.atom_coords(a2)
+        ]))
+    bonds2 = np.array(bonds2)
+
+    assert np.allclose(
+        a=bonds1,
+        b=bonds2,
+        atol=1e-5
+    )
