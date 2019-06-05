@@ -29,7 +29,7 @@ class Population:
 
     In addtion to holding :class:`.Molecule` objects, the
     :class:`Population` class can be used to create large numbers of
-    these instances through the class methods beggining with "init_".
+    these instances through the class methods beginning with "init".
 
     :class:`.Molecule` instances held by a :class:`Population` can have
     their structures optimized in parallel through the
