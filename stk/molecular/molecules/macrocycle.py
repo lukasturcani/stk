@@ -52,7 +52,7 @@ class MacrocycleBase:
 
 class MacrocycleStructUnit(MacrocycleBase, StructUnit):
     """
-    Used to represent macrocyles loaded as :class:`.StructUnit`s.
+    Used to represent macrocyles loaded as :class:`.StructUnit`.
 
     """
     pass
