@@ -1081,10 +1081,7 @@ class Molecule:
             conformer = self.mol.GetConformer(conformer).GetId()
 
         with open(path, 'r') as f:
-            atom_count, *content = f.read().split('\n')
-
-        # Remove null lines.
-        content = filter(lambda line: line, content)
+            atom_count, _, *content = f.readlines()
 
         # Check the atom count is correct.
         num_atoms = self.mol.GetNumAtoms()
