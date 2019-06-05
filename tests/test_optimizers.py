@@ -102,7 +102,11 @@ gfnxtb = pytest.mark.skipif(
 
 @gfnxtb
 def test_gfnxtb(tmp_polymer, gfnxtb_path):
+    # GFNXTB  requires an embedding before working.
+    etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
+    etkdg.optimize(tmp_polymer)
+
     tmp_polymer.write(join(odir, 'gfnxtb_before.mol'))
-    gfnxtb = stk.GFNXTB(gfnxtb_path)
+    gfnxtb = stk.GFNXTB(gfnxtb_path, output_dir=join(odir, 'gfnxtb'))
     gfnxtb.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'gfnxtb_after.mol'))

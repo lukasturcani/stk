@@ -73,6 +73,9 @@ import warnings
 from functools import wraps
 import subprocess as sp
 import uuid
+import os
+from os.path import join
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -700,6 +703,11 @@ class GFNXTB(Optimizer):
     gfnxtb_path : :class:`str`
         The path to the GFN-xTB executable.
 
+    output_dir : :class:`str`
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
+
     num_cores : :class:`str`
         The number of cores for GFN-xTB to use.
 
@@ -713,7 +721,11 @@ class GFNXTB(Optimizer):
 
     """
 
-    def __init__(self, gfnxtb_path, num_cores=1, use_cache=False):
+    def __init__(self,
+                 gfnxtb_path,
+                 output_dir=None,
+                 num_cores=1,
+                 use_cache=False):
         """
         Initializes a :class:`GFNXTB` instance.
 
@@ -721,6 +733,11 @@ class GFNXTB(Optimizer):
         ----------
         gfnxtb_path : :class:`str`
             The path to the GFN-xTB executable.
+
+        output_dir : :class:`str`, optional
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
 
         num_cores : :class:`int`
             The number of cores for GFN-xTB to use.
@@ -732,6 +749,7 @@ class GFNXTB(Optimizer):
         """
 
         self.gfnxtb_path = gfnxtb_path
+        self.output_dir = os.path.abspath(output_dir)
         self.num_cores = str(num_cores)
         super().__init__(use_cache=use_cache)
 
@@ -753,15 +771,26 @@ class GFNXTB(Optimizer):
 
         """
 
-        xyz = f'{uuid.uuid4().int}.xyz'
-        mol.write(xyz)
-        cmd = [
-            self.gfnxtb_path, xyz, '-opt', '--parallel', self.num_cores
-        ]
-        proc = sp.Popen(
-            cmd,
-            stdin=sp.PIPE,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE
-        )
-        output, err = proc.communicate()
+        if conformer == -1:
+            conformer = mol.mol.GetConformer(conformer).GetId()
+
+        if os.path.exists(self.output_dir):
+            shutil.rmtree(self.output_dir)
+        os.mkdir(self.output_dir)
+        init_dir = os.getcwd()
+        try:
+            os.chdir(self.output_dir)
+            xyz = join(self.output_dir, f'{uuid.uuid4().int}.xyz')
+            mol.write(xyz, conformer=conformer)
+            cmd = [
+                self.gfnxtb_path,
+                xyz,
+                '-opt',
+                '--parallel',
+                self.num_cores
+            ]
+            sp.run(cmd, stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
+            output_xyz = join(self.output_dir, 'xtbopt.xyz')
+            mol.update_from_xyz(path=output_xyz, conformer=conformer)
+        finally:
+            os.chdir(init_dir)
