@@ -523,10 +523,10 @@ def test_multiconformer(tmp_amine2, tmp_aldehyde3):
     c.add_conformer([0, 1])
     c.add_conformer([1, 1])
 
-    c.write(join(test_dir, 'FourPlusSix_conf1.mol'), 0)
-    c.write(join(test_dir, 'FourPlusSix_conf2.mol'), 1)
-    c.write(join(test_dir, 'FourPlusSix_conf3.mol'), 2)
-    c.write(join(test_dir, 'FourPlusSix_conf4.mol'), 3)
+    c.write(join(test_dir, 'FourPlusSix_conf1.mol'), conformer=0)
+    c.write(join(test_dir, 'FourPlusSix_conf2.mol'), conformer=1)
+    c.write(join(test_dir, 'FourPlusSix_conf3.mol'), conformer=2)
+    c.write(join(test_dir, 'FourPlusSix_conf4.mol'), conformer=3)
 
     assert c.bonds_made == amine_fg_count*amine_count
     assert (c.mol.GetNumAtoms() ==

@@ -37,8 +37,10 @@ def test_restricted_force_field(tmp_cc3, macromodel_path):
 
 @macromodel
 def test_unrestricted_force_field(tmp_cc3, macromodel_path):
-    tmp_cc3.write(join(outdir, 'umm_ff_before.mol'),
-                  conformer=0)
+    tmp_cc3.write(
+        path=join(outdir, 'umm_ff_before.mol'),
+        conformer=0
+    )
 
     mm = stk.MacroModelForceField(macromodel_path=macromodel_path,
                                   output_dir='umm_ff',
