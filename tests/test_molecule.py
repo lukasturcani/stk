@@ -216,6 +216,68 @@ def test_update_from_mae(tmp_amine2, mae_path):
                tmp_amine2.max_diameter(1)[0]) > 1
 
 
+def test_update_from_mol(tmp_amine2):
+    initial_coords = tmp_amine2.position_matrix()
+    new_coords = 4*initial_coords
+    # Make a new conformer with new coords.
+    tmp_amine2.set_position_from_matrix(new_coords, conformer=1)
+
+    # Write the new conformer to a file.
+    path = join(test_dir, 'update_from_mol.mol')
+    tmp_amine2.write(
+        path=path,
+        conformer=1
+    )
+    # Update the initial conformer with the conformer in the file.
+    tmp_amine2.update_from_mol(
+        path=path,
+        conformer=0
+    )
+
+    # The initial conformer should now have the new coords.
+    assert np.allclose(
+        a=tmp_amine2.position_matrix(conformer=0),
+        b=new_coords,
+        atol=1e-4
+    )
+    assert not np.allclose(
+        a=tmp_amine2.position_matrix(conformer=0),
+        b=initial_coords,
+        atol=1e-4
+    )
+
+
+def test_update_from_xyz(tmp_amine2):
+    initial_coords = tmp_amine2.position_matrix()
+    new_coords = 4*initial_coords
+    # Make a new conformer with new coords.
+    tmp_amine2.set_position_from_matrix(new_coords, conformer=1)
+
+    # Write the new conformer to a file.
+    path = join(test_dir, 'update_from_mol.xyz')
+    tmp_amine2.write(
+        path=path,
+        conformer=1
+    )
+    # Update the initial conformer with the conformer in the file.
+    tmp_amine2.update_from_xyz(
+        path=path,
+        conformer=0
+    )
+
+    # The initial conformer should now have the new coords.
+    assert np.allclose(
+        a=tmp_amine2.position_matrix(conformer=0),
+        b=new_coords,
+        atol=1e-4
+    )
+    assert not np.allclose(
+        a=tmp_amine2.position_matrix(conformer=0),
+        b=initial_coords,
+        atol=1e-4
+    )
+
+
 def test_mol_write(cycle_su):
     atoms = cycle_su.cycle_atoms()
 
