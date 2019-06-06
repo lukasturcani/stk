@@ -1078,8 +1078,9 @@ input file, along with a description of each variable.
   :attr:`~.Selector.batch_size` must be ``1``.
 * :data:`crossover_selector` - :class:`.Selector` - **mandatory** -
   The selector used to select molecules for crossover.
-* :data:`exiter` - :class:`.Exiter` - The exiter which determines if
-  the GA has satisfied its exit condition.
+* :data:`exiter` - :class:`.Exiter` - **mandatory** -
+  The exiter which determines if the GA has satisfied its exit
+  condition.
 * :data:`fitness_normalizer` - :class:`.FitnessNormalizer` -
   *optional, default = NullFitnessOptimizer()* - The fitness normalizer
   which normalizes fitness values each generation.
