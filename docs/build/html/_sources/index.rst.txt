@@ -1082,8 +1082,8 @@ input file, along with a description of each variable.
   The exiter which determines if the GA has satisfied its exit
   condition.
 * :data:`fitness_normalizer` - :class:`.FitnessNormalizer` -
-  *optional, default = NullFitnessOptimizer()* - The fitness normalizer
-  which normalizes fitness values each generation.
+  *optional, default = :class:`.NullFitnessNormalizer`* - The fitness
+  normalizer which normalizes fitness values each generation.
 * :data:`processes` - :class:`int` -
   *optional, default = psutil.cpu_count()* - The number of CPU cores
   the GA should use.
