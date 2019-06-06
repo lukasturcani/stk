@@ -738,10 +738,10 @@ class GFNXTB(Optimizer):
 
     Note that for :class:`.MacroMolecule` objects assembled by ``stk``
     :class:`GFNXTB` should usually be used in a
-    :class:`OptimizerSequence`. This is because GFN-xTB uses only
-    xyz coordinates as input and so will not register the long bonds
-    created during assembly as bonds. An optimizer which can minimize
-    these bonds first should be used before it.
+    :class:`OptimizerSequence`. This is because GFN-xTB only uses
+    xyz coordinates as input and so will not recognize the long bonds
+    created during assembly. An optimizer which can minimize
+    these bonds should be used before :class:`GFNXTB`.
 
     .. code-block:: python
 
