@@ -280,7 +280,7 @@ molecule and conformer.</li>
 <p>When running <a class="reference internal" href="#stk.calculators.optimization.optimizers.GFNXTB.optimize" title="stk.calculators.optimization.optimizers.GFNXTB.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a>, this calculator changes the
 present working directory with <code class="xref py py-func docutils literal notranslate"><span class="pre">os.chdir()</span></code>. The original
 working directory will be restored even if an error is raised so
-unless a multi-threading is being used this implementation detail
+unless multi-threading is being used this implementation detail
 should not matter.</p>
 <p>If multi-threading is being used an error could occur if two
 different threads need to know about the current working directory
