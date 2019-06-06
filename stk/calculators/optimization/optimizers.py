@@ -261,13 +261,27 @@ class CageOptimizerSequence(Optimizer):
 
     Before each :class:`Optimizer` in the sequence is applied to the
     :class:`.Cage`, it is checked to see if it is collapsed. If it is
-    collapsed, the optiimzation sequence ends immediately.
+    collapsed, the optimization sequence ends immediately.
 
     Attributes
     ----------
     optimizers : :class:`tuple` of :class:`Optimizer`
         The :class:`Optimizer` objects which are used to optimize a
         :class:`.Cage` molecule.
+
+    Examples
+    --------
+    Let's say we want to embed a cage with ETKDG first and then
+    minimize it with the MMFF force field.
+
+    .. code-block:: python
+
+        import rdkit.Chem.AllChem as rdkit
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        etkdg = RDKitEmbedder(rdkit.ETKDG())
+        mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
+        optimizer = CageOptimizerSequence(etkdg, mmff)
+        optimizer.optimize(mol)
 
     """
 
