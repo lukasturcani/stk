@@ -857,21 +857,16 @@ class Molecule:
 
         """
 
-        conf_id = self.mol.GetConformer(conformer).GetId()
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
 
         # Get the original centroid.
-        centroid = self.centroid(conf_id)
+        centroid = self.centroid(conformer)
         # Find out how much it needs to shift to reach `position`.
-        shift = position - centroid
-        # Apply the shift and get the resulting rdkit conformer object.
-        new_conf = self.shift(shift, conf_id).GetConformer()
-        new_conf.SetId(conf_id)
-
-        # Replace the old rkdit conformer with one where the centroid
-        # is at `position`.
-        self.mol.RemoveConformer(conf_id)
-        self.mol.AddConformer(new_conf)
-
+        shift = np.expand_dims(position - centroid, axis=1)
+        # Apply the shift.
+        positions = self.position_matrix(conformer)
+        self.set_position_from_matrix(positions+shift, conformer)
         return self.mol
 
     def set_position_from_matrix(self, pos_mat, conformer=-1):
@@ -1015,11 +1010,9 @@ class Molecule:
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
 
-        mol = mol_from_mae_file(path)
-        conf = rdkit.Conformer(mol.GetConformer())
-        conf.SetId(conformer)
-        self.mol.RemoveConformer(conformer)
-        self.mol.AddConformer(conf)
+        mol = Molecule()
+        mol.mol = mol_from_mae_file(path)
+        self.set_position_from_matrix(mol.position_matrix(), conformer)
 
     def update_from_mol(self, path, conformer=-1):
         """
@@ -1043,13 +1036,15 @@ class Molecule:
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
 
-        mol = remake(rdkit.MolFromMolFile(molFileName=path,
-                                          sanitize=False,
-                                          removeHs=False))
-        conf = rdkit.Conformer(mol.GetConformer())
-        conf.SetId(conformer)
-        self.mol.RemoveConformer(conformer)
-        self.mol.AddConformer(conf)
+        mol = Molecule()
+        mol.mol = remake(
+            rdkit.MolFromMolFile(
+                molFileName=path,
+                sanitize=False,
+                removeHs=False
+            )
+        )
+        self.set_position_from_matrix(mol.position_matrix(), conformer)
 
     def update_from_xyz(self, path, conformer=-1):
         """
