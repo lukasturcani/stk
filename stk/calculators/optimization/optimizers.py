@@ -705,7 +705,7 @@ class GFNXTB(Optimizer):
     When running :meth:`optimize`, this calculator changes the
     present working directory with :func:`os.chdir`. The original
     working directory will be restored even if an error is raised so
-    unless a multi-threading is being used this implementation detail
+    unless multi-threading is being used this implementation detail
     should not matter.
 
     If multi-threading is being used an error could occur if two
