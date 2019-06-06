@@ -1086,8 +1086,9 @@ selector used to select molecules to mutate.
 <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector.batch_size" title="stk.calculators.ga.selectors.Selector.batch_size"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_size</span></code></a> must be <code class="docutils literal notranslate"><span class="pre">1</span></code>.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">crossover_selector</span></code> - <a class="reference internal" href="stk.calculators.ga.selectors.html#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> - <strong>mandatory</strong> -
 The selector used to select molecules for crossover.</li>
-<li><code class="xref py py-data docutils literal notranslate"><span class="pre">exiter</span></code> - <a class="reference internal" href="stk.calculators.ga.exiters.html#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a> - The exiter which determines if
-the GA has satisfied its exit condition.</li>
+<li><code class="xref py py-data docutils literal notranslate"><span class="pre">exiter</span></code> - <a class="reference internal" href="stk.calculators.ga.exiters.html#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a> - <strong>mandatory</strong> -
+The exiter which determines if the GA has satisfied its exit
+condition.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">fitness_normalizer</span></code> - <a class="reference internal" href="stk.calculators.ga.fitness_normalizers.html#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a> -
 <em>optional, default = NullFitnessOptimizer()</em> - The fitness normalizer
 which normalizes fitness values each generation.</li>
