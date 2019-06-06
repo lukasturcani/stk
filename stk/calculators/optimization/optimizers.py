@@ -796,6 +796,9 @@ class GFNXTB(Optimizer):
 
         """
 
+        if output_dir is None:
+            output_dir = f'{uuid.uuid4().int}'
+
         self.gfnxtb_path = gfnxtb_path
         self.output_dir = os.path.abspath(output_dir)
         self.num_cores = str(num_cores)
@@ -828,7 +831,7 @@ class GFNXTB(Optimizer):
         init_dir = os.getcwd()
         try:
             os.chdir(self.output_dir)
-            xyz = join(self.output_dir, f'{uuid.uuid4().int}.xyz')
+            xyz = join(self.output_dir, f'input_structure.xyz')
             mol.write(xyz, conformer=conformer)
             cmd = [
                 self.gfnxtb_path,
