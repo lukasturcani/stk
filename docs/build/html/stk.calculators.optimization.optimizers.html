@@ -209,7 +209,7 @@ its structure however it likes. Beyond this there are no requirements.</p>
 <p>Applies <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> objects to a <a class="reference internal" href="stk.molecular.molecules.cage.html#stk.molecular.molecules.cage.Cage" title="stk.molecular.molecules.cage.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>.</p>
 <p>Before each <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> in the sequence is applied to the
 <a class="reference internal" href="stk.molecular.molecules.cage.html#stk.molecular.molecules.cage.Cage" title="stk.molecular.molecules.cage.Cage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cage</span></code></a>, it is checked to see if it is collapsed. If it is
-collapsed, the optiimzation sequence ends immediately.</p>
+collapsed, the optimization sequence ends immediately.</p>
 <dl class="attribute">
 <dt id="stk.calculators.optimization.optimizers.CageOptimizerSequence.optimizers">
 <code class="descname">optimizers</code><a class="headerlink" href="#stk.calculators.optimization.optimizers.CageOptimizerSequence.optimizers" title="Permalink to this definition">¶</a></dt>
@@ -225,6 +225,17 @@ collapsed, the optiimzation sequence ends immediately.</p>
 </table>
 </dd></dl>
 
+<p class="rubric">Examples</p>
+<p>Let’s say we want to embed a cage with ETKDG first and then
+minimize it with the MMFF force field.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="kn">as</span> <span class="nn">rdkit</span>
+<span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCNCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
+<span class="n">etkdg</span> <span class="o">=</span> <span class="n">RDKitEmbedder</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
+<span class="n">mmff</span> <span class="o">=</span> <span class="n">RDKitForceField</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFOptimizeMolecule</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">CageOptimizerSequence</span><span class="p">(</span><span class="n">etkdg</span><span class="p">,</span> <span class="n">mmff</span><span class="p">)</span>
+<span class="n">optimizer</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="method">
 <dt id="stk.calculators.optimization.optimizers.CageOptimizerSequence.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>*optimizers</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.CageOptimizerSequence.__init__" title="Permalink to this definition">¶</a></dt>
