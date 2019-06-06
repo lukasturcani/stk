@@ -1090,34 +1090,36 @@ The selector used to select molecules for crossover.</li>
 The exiter which determines if the GA has satisfied its exit
 condition.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">fitness_normalizer</span></code> - <a class="reference internal" href="stk.calculators.ga.fitness_normalizers.html#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a> -
-<em>optional, default = :class:`.NullFitnessNormalizer`</em> - The fitness
+<em>optional, default =</em> <a class="reference internal" href="stk.calculators.ga.fitness_normalizers.html#stk.calculators.ga.fitness_normalizers.NullFitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.NullFitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NullFitnessNormalizer</span></code></a> - The fitness
 normalizer which normalizes fitness values each generation.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">processes</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> -
-<em>optional, default = psutil.cpu_count()</em> - The number of CPU cores
-the GA should use.</li>
+<em>optional, default =</em> <code class="xref py py-func docutils literal notranslate"><span class="pre">psutil.cpu_count()</span></code> - The number of CPU
+cores the GA should use.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">plotters</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.calculators.ga.plotters.html#stk.calculators.ga.plotters.Plotter" title="stk.calculators.ga.plotters.Plotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plotter</span></code></a> -
-<em>optional, default = []</em> - Plotters which are used to plot graphs at
-the end of the GA.</li>
+<em>optional, default =</em> <code class="docutils literal notranslate"><span class="pre">[]</span></code> - Plotters which are used to plot graphs
+at the end of the GA.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">log_file</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
-<em>optional, default = True</em> - Toggles whether a log file which lists
-which molecules are present in each generation should be made.</li>
+<em>optional, default =</em> <code class="docutils literal notranslate"><span class="pre">True</span></code> - Toggles whether a log file which
+lists which molecules are present in each generation should be made.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">database_dump</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
-<em>optional, default = True</em> - Toggles whether a <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>
-JSON file should be made at the end of the GA run. It will hold every
-molecule made by the GA.</li>
+<em>optional, default =</em> <code class="docutils literal notranslate"><span class="pre">True</span></code> - Toggles whether a
+<a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> JSON file should be made at the end of the GA
+run. It will hold every molecule made by the GA.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">progress_dump</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
-<em>optional, default = True</em> - Toggles whether a <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>
-JSON file should be made at the end of the GA run. It will hold every
-generation of the GA as a separate subpopulation.</li>
+<em>optional, default =</em> <code class="docutils literal notranslate"><span class="pre">True</span></code> - Toggles whether a
+<a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> JSON file should be made at the end of the GA
+run. It will hold every generation of the GA as a separate
+subpopulation.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">debug_dumps</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
-<em>optional, default = False</em> - If <code class="docutils literal notranslate"><span class="pre">True</span></code> a database and progress dump
-is made after every generation rather than just the end. This is nice
-for debugging but can seriously slow down the GA.</li>
+<em>optional, default =</em> <code class="docutils literal notranslate"><span class="pre">False</span></code> - If <code class="docutils literal notranslate"><span class="pre">True</span></code> a database and progress
+dump is made after every generation rather than just the end. This is
+nice for debugging but can seriously slow down the GA.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">tar_output</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> -
-<em>optional, default = False</em> - If <code class="docutils literal notranslate"><span class="pre">True</span></code> then a compressed tar
+<em>optional, default =</em> <code class="docutils literal notranslate"><span class="pre">False</span></code> - If <code class="docutils literal notranslate"><span class="pre">True</span></code> then a compressed tar
 archive of the output folder will be made.</li>
 <li><code class="xref py py-data docutils literal notranslate"><span class="pre">logging_level</span></code> - <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> -
-<em>optional, default = logging.INFO</em> - Sets the logging level in the GA.</li>
+<em>optional, default =</em> <code class="docutils literal notranslate"><span class="pre">logging.INFO</span></code> - Sets the logging level in
+the GA.</li>
 </ul>
 </div>
 </div>
