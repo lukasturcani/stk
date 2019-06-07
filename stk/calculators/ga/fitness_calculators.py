@@ -343,9 +343,11 @@ class PropertyVector(FitnessCalculator):
             return energy_calculator.energy(mol, conformer)
 
         # Create the fitness calculator.
-        fitness_calculator = PropertyVector(atom_number,
-                                            diameter,
-                                            energy)
+        fitness_calculator = PropertyVector(
+            atom_number,
+            diameter,
+            energy
+        )
 
         # Calculate the fitness vector of mol1. It will be a list
         # holding the number of atoms, diameter and energy of mol1,
@@ -402,9 +404,11 @@ class PropertyVector(FitnessCalculator):
             return mol.topology.n * len(mol.topology.repeating_unit)
 
         # Create the fitness calculator.
-        fitness_calculator = PropertyVector(atom_number,
-                                            diameter,
-                                            monomer_number)
+        fitness_calculator = PropertyVector(
+            atom_number,
+            diameter,
+            monomer_number
+        )
 
         # Calculate the fitness vector of polymer1. It will be a list
         # holding the number of atoms, diameter and the number of
@@ -449,8 +453,10 @@ class PropertyVector(FitnessCalculator):
             return mol.window_variance(conformer)
 
         # Create the fitness calculator.
-        fitness_calculator = PropertyVector(cavity_difference,
-                                            window_variance)
+        fitness_calculator = PropertyVector(
+            cavity_difference,
+            window_variance
+        )
 
         # Calculate the fitness vector of cage1. It will be a list
         # holding how different the cavity size is from 5 Angstrom and

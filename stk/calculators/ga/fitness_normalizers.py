@@ -2,21 +2,16 @@
 Module for defining fitness normalizers.
 
 Fitness normalizers are classes which are responsible for normalizing
-the fitness values in a :class:`Population`. They analyze the
+the fitness values in a :class:`.Population`. They analyze the
 :attr:`fitness` values across the entire population and update them.
-After :meth:`~FitnessNormalizer.normalize` is run, every
-:class:`.Molecule` in the population must hold a positive, non-zero
-:class:`float` in its :attr:`fitness` attribute. However, before
-:meth:`~FitnessNormalizer.normalize` the values in the :attr:`fitness`
-attribute can be any Python object. It is the job of the
-:class:`FitnessNormalizer` to convert these into positive, non-zero
-:class:`float`.
+Calling :meth:`~FitnessNormalizer.normalize` directly modifies the
+:attr:`fitness` attribute of :class:`.Molecule` objects.
 
 To see how :class:`FitnessNormalizer` can be used, look at the
 documention of the classes which inherit it, for example
 :class:`Power`, :class:`Sum` :class:`ScaleByMean`. In addition,
 multiple :class:`FitnessNormalizer` can be chained using
-:meth:`.Sequence.normalize`.
+:meth:`.NormalizerSequence`.
 
 .. _`adding fitness normalizers`:
 
