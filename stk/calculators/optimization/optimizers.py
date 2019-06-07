@@ -796,11 +796,8 @@ class GFNXTB(Optimizer):
 
         """
 
-        if output_dir is None:
-            output_dir = f'{uuid.uuid4().int}'
-
         self.gfnxtb_path = gfnxtb_path
-        self.output_dir = os.path.abspath(output_dir)
+        self.output_dir = output_dir
         self.num_cores = str(num_cores)
         super().__init__(use_cache=use_cache)
 
@@ -825,13 +822,20 @@ class GFNXTB(Optimizer):
         if conformer == -1:
             conformer = mol.mol.GetConformer(conformer).GetId()
 
-        if os.path.exists(self.output_dir):
-            shutil.rmtree(self.output_dir)
-        os.mkdir(self.output_dir)
+        if self.output_dir is None:
+            output_dir = str(uuid.uuid4().int)
+        else:
+            output_dir = self.output_dir
+        output_dir = os.path.abspath(output_dir)
+
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+
+        os.mkdir(output_dir)
         init_dir = os.getcwd()
         try:
-            os.chdir(self.output_dir)
-            xyz = join(self.output_dir, f'input_structure.xyz')
+            os.chdir(output_dir)
+            xyz = join(output_dir, f'input_structure.xyz')
             mol.write(xyz, conformer=conformer)
             cmd = [
                 self.gfnxtb_path,
@@ -841,7 +845,7 @@ class GFNXTB(Optimizer):
                 self.num_cores
             ]
             sp.run(cmd, stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
-            output_xyz = join(self.output_dir, 'xtbopt.xyz')
+            output_xyz = join(output_dir, 'xtbopt.xyz')
             mol.update_from_xyz(path=output_xyz, conformer=conformer)
         finally:
             os.chdir(init_dir)
