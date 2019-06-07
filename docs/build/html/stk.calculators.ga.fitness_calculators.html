@@ -331,9 +331,11 @@ to calculate the property.</p>
     <span class="k">return</span> <span class="n">energy_calculator</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
 
 <span class="c1"># Create the fitness calculator.</span>
-<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span><span class="n">atom_number</span><span class="p">,</span>
-                                    <span class="n">diameter</span><span class="p">,</span>
-                                    <span class="n">energy</span><span class="p">)</span>
+<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span>
+    <span class="n">atom_number</span><span class="p">,</span>
+    <span class="n">diameter</span><span class="p">,</span>
+    <span class="n">energy</span>
+<span class="p">)</span>
 
 <span class="c1"># Calculate the fitness vector of mol1. It will be a list</span>
 <span class="c1"># holding the number of atoms, diameter and energy of mol1,</span>
@@ -387,9 +389,11 @@ to calculate the property.</p>
     <span class="k">return</span> <span class="n">mol</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">repeating_unit</span><span class="p">)</span>
 
 <span class="c1"># Create the fitness calculator.</span>
-<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span><span class="n">atom_number</span><span class="p">,</span>
-                                    <span class="n">diameter</span><span class="p">,</span>
-                                    <span class="n">monomer_number</span><span class="p">)</span>
+<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span>
+    <span class="n">atom_number</span><span class="p">,</span>
+    <span class="n">diameter</span><span class="p">,</span>
+    <span class="n">monomer_number</span>
+<span class="p">)</span>
 
 <span class="c1"># Calculate the fitness vector of polymer1. It will be a list</span>
 <span class="c1"># holding the number of atoms, diameter and the number of</span>
@@ -432,8 +436,10 @@ to calculate the property.</p>
     <span class="k">return</span> <span class="n">mol</span><span class="o">.</span><span class="n">window_variance</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
 
 <span class="c1"># Create the fitness calculator.</span>
-<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span><span class="n">cavity_difference</span><span class="p">,</span>
-                                    <span class="n">window_variance</span><span class="p">)</span>
+<span class="n">fitness_calculator</span> <span class="o">=</span> <span class="n">PropertyVector</span><span class="p">(</span>
+    <span class="n">cavity_difference</span><span class="p">,</span>
+    <span class="n">window_variance</span>
+<span class="p">)</span>
 
 <span class="c1"># Calculate the fitness vector of cage1. It will be a list</span>
 <span class="c1"># holding how different the cavity size is from 5 Angstrom and</span>
