@@ -587,7 +587,8 @@ corresponds to the order of the sublists.</p>
 </li>
 <li><strong>topologies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>) – The topologies of macromolecules being made.</li>
 <li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of parallel processes to create when building
-the molecules.</li>
+the molecules. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, creates a process for each
+core on the computer.</li>
 <li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">False</span></code>, duplicate structures are removed from
 the population.</li>
 </ul>
@@ -863,7 +864,7 @@ when it is applied to all members of the population.</td>
 
 <dl class="method">
 <dt id="stk.populations.GAPopulation.optimize">
-<code class="descname">optimize</code><span class="sig-paren">(</span><em>optimizer</em>, <em>processes=8</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.optimize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>optimizer</em>, <em>processes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structures of molecules in the population.</p>
 <p>The molecules are optimized serially or in parallel depending
 if <cite>processes</cite> is <code class="docutils literal notranslate"><span class="pre">1</span></code> or more. The serial version may be
@@ -881,8 +882,9 @@ are modified.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>optimizer</strong> (<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>) – The optimizer used to carry out the optimizations.</li>
-<li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of parallel processes to create. Optimization
-will run serially if <code class="docutils literal notranslate"><span class="pre">1</span></code>.</li>
+<li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of parallel processes to create. Optimization
+will run serially if <code class="docutils literal notranslate"><span class="pre">1</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, creates a
+process for each core on the computer.</li>
 </ul>
 </td>
 </tr>
@@ -1333,7 +1335,8 @@ corresponds to the order of the sublists.</p>
 </li>
 <li><strong>topologies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>) – The topologies of macromolecules being made.</li>
 <li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of parallel processes to create when building
-the molecules.</li>
+the molecules. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, creates a process for each
+core on the computer.</li>
 <li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">False</span></code>, duplicate structures are removed from
 the population.</li>
 </ul>
@@ -1609,7 +1612,7 @@ when it is applied to all members of the population.</td>
 
 <dl class="method">
 <dt id="stk.populations.Population.optimize">
-<code class="descname">optimize</code><span class="sig-paren">(</span><em>optimizer</em>, <em>processes=8</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population.optimize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>optimizer</em>, <em>processes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structures of molecules in the population.</p>
 <p>The molecules are optimized serially or in parallel depending
 if <cite>processes</cite> is <code class="docutils literal notranslate"><span class="pre">1</span></code> or more. The serial version may be
@@ -1627,8 +1630,9 @@ are modified.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>optimizer</strong> (<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>) – The optimizer used to carry out the optimizations.</li>
-<li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of parallel processes to create. Optimization
-will run serially if <code class="docutils literal notranslate"><span class="pre">1</span></code>.</li>
+<li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of parallel processes to create. Optimization
+will run serially if <code class="docutils literal notranslate"><span class="pre">1</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, creates a
+process for each core on the computer.</li>
 </ul>
 </td>
 </tr>
