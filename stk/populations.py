@@ -127,7 +127,8 @@ class Population:
 
         processes : :class:`int`, optional
             The number of parallel processes to create when building
-            the molecules.
+            the molecules. If ``None``, creates a process for each
+            core on the computer.
 
         duplicates : :class:`bool`, optional
             If ``False``, duplicate structures are removed from
@@ -765,7 +766,7 @@ class Population:
         for member in self:
             optimizer.optimize(member)
 
-    def optimize(self, optimizer, processes=psutil.cpu_count()):
+    def optimize(self, optimizer, processes=None):
         """
         Optimizes the structures of molecules in the population.
 
@@ -787,15 +788,19 @@ class Population:
         optimizer : :class:`.Optimizer`
             The optimizer used to carry out the optimizations.
 
-        processes : :class:`int`
+        processes : :class:`int`, optional
             The number of parallel processes to create. Optimization
-            will run serially if ``1``.
+            will run serially if ``1``. If ``None``, creates a
+            process for each core on the computer.
 
         Returns
         -------
         None : :class:`NoneType`
 
         """
+
+        if processes is None:
+            processes = psutil.cpu_count()
 
         if processes == 1:
             self._optimize_serial(optimizer)
