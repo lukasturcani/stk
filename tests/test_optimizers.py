@@ -51,13 +51,13 @@ def test_uff(tmp_polymer):
     assert energy_calculator.energy(tmp_polymer) < init_energy
 
 
-def test_rdkit_embedder(tmp_polymer):
+def test_etkdg(tmp_polymer):
     # If the optimization was successful the energy should be lowered.
     energy_calculator = stk.UFFEnergy()
     init_energy = energy_calculator.energy(tmp_polymer)
 
     tmp_polymer.write(join(odir, 'rdkit_embed_before.mol'))
-    etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
+    etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'rdkit_embed_after.mol'))
 
