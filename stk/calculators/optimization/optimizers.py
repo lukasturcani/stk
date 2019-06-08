@@ -637,25 +637,23 @@ class UFF(Optimizer):
         rdkit.UFFOptimizeMolecule(mol.mol, confId=conformer)
 
 
-class RDKitEmbedder(Optimizer):
+class ETKDG(Optimizer):
     """
-    Uses :func:`rdkit.EmbedMolecule` to find an optimized structure.
+    Uses the ETKDG [#]_ v2 algorithm to find an optimized structure.
 
     Attributes
     ----------
-    params : :class:`rdkit.EmbedParameters`
-        The parameters used for the embedding.
+    random_seed : :class:`int`
+        The random seed to use.
 
     Examples
     --------
-    Use ETKDG [#]_ to generate an optimized structure.
-
     .. code-block:: python
 
         import rdkit.Chem.AllChem as rdkit
         mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        embedder = RDKitEmbedder(rdkit.ETKDG())
-        embedder.optimize(mol)
+        etkdg = ETKDG()
+        etkdg.optimize(mol)
 
     References
     ----------
@@ -663,14 +661,14 @@ class RDKitEmbedder(Optimizer):
 
     """
 
-    def __init__(self, params, use_cache=False):
+    def __init__(self, random_seed=12, use_cache=False):
         """
-        Initializes a :class:`RDKitEmbedder` instance.
+        Initializes a :class:`ETKDG` instance.
 
         Parameters
         ----------
-        params : :class:`rdkit.EmbedParameters`
-            The parameters used for the embedding.
+        random_seed : :class:`int`, optional
+            The random seed to use.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
@@ -678,7 +676,7 @@ class RDKitEmbedder(Optimizer):
 
         """
 
-        self.params = params
+        self.random_seed = random_seed
         super().__init__(use_cache=use_cache)
 
     def optimize(self, mol, conformer=-1):
@@ -702,12 +700,15 @@ class RDKitEmbedder(Optimizer):
         if conformer == -1:
             conformer = mol.mol.GetConformer(conformer).GetId()
 
-        conf_id = rdkit.EmbedMolecule(mol.mol, self.params)
-        new_conf = rdkit.Conformer(mol.mol.GetConformer(conf_id))
+        params = rdkit.ETKDGv2()
+        params.clearConfs = False
+        params.random_seed = self.random_seed
+
+        conf_id = rdkit.EmbedMolecule(mol.mol, params)
+        # Make sure that the conformer order is not re-arranged.
+        positions = mol.position_matrix(conformer=conf_id)
+        mol.set_position_from_matrix(positions, conformer=conformer)
         mol.mol.RemoveConformer(conf_id)
-        mol.mol.RemoveConformer(conformer)
-        new_conf.SetId(conformer)
-        mol.mol.AddConformer(new_conf)
 
 
 class GFNXTB(Optimizer):

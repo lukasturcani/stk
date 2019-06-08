@@ -1,7 +1,6 @@
 import stk
 from os.path import join
 import os
-import rdkit.Chem.AllChem as rdkit
 import pytest
 import sys
 
@@ -12,7 +11,7 @@ if not os.path.exists(odir):
 
 
 def test_raising_optimizer(tmp_polymer):
-    etkdg = stk.RDKitEmbedder(rdkit.ETKDGv2())
+    etkdg = stk.ETKDG()
     always_raiser = stk.RaisingOptimizer(optimizer=etkdg,
                                          fail_chance=1)
     with pytest.raises(stk.RaisingOptimizerError):
@@ -51,13 +50,13 @@ def test_uff(tmp_polymer):
     assert energy_calculator.energy(tmp_polymer) < init_energy
 
 
-def test_rdkit_embedder(tmp_polymer):
+def test_etkdg(tmp_polymer):
     # If the optimization was successful the energy should be lowered.
     energy_calculator = stk.UFFEnergy()
     init_energy = energy_calculator.energy(tmp_polymer)
 
     tmp_polymer.write(join(odir, 'rdkit_embed_before.mol'))
-    etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
+    etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'rdkit_embed_after.mol'))
 
@@ -70,7 +69,7 @@ def test_optimizer_sequence(tmp_polymer):
     init_energy = energy_calculator.energy(tmp_polymer)
 
     tmp_polymer.write(join(odir, 'optimize_sequence_before.mol'))
-    etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
+    etkdg = stk.ETKDG()
     mmff = stk.MMFF()
     sequence = stk.OptimizerSequence(etkdg, mmff)
     sequence.optimize(tmp_polymer)
@@ -98,7 +97,7 @@ def test_cage_optimizer_sequence(tmp_cc3, tmp_cage):
     init_cage = energy_calculator.energy(tmp_cage)
 
     mmff = stk.MMFF()
-    etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
+    etkdg = stk.ETKDG()
 
     # CC3 needs an optimizer with mmff only, because using etkdg will
     # increase its energy.
@@ -116,7 +115,7 @@ def test_cage_optimizer_sequence(tmp_cc3, tmp_cage):
 
 
 def test_try_catch_optimizer(tmp_amine2):
-    etkdg = stk.RDKitEmbedder(rdkit.ETKDGv2())
+    etkdg = stk.ETKDG()
     always_raiser = stk.RaisingOptimizer(optimizer=etkdg,
                                          fail_chance=1)
     success = stk.TryCatchOptimizer(try_optimizer=etkdg,
@@ -142,7 +141,7 @@ gfnxtb = pytest.mark.skipif(
 @gfnxtb
 def test_gfnxtb(tmp_polymer, gfnxtb_path):
     # GFNXTB  requires an embedding before working.
-    etkdg = stk.RDKitEmbedder(rdkit.ETKDG())
+    etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
 
     tmp_polymer.write(join(odir, 'gfnxtb_before.mol'))
