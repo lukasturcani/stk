@@ -61,7 +61,7 @@ import subprocess as sp
 import uuid
 import os
 import shutil
-from ...utilities import GFNXTBInvalidSolventError, valid_GFNXTB_solvent
+from ...utilities import valid_GFNXTB_solvent
 
 
 logger = logging.getLogger(__name__)
@@ -500,8 +500,7 @@ class GFNXTBEnergy(EnergyCalculator):
                  solvent_grid='normal',
                  charge=None,
                  use_cache=False,
-                 mem_ulimit=False,
-                 strict=True):
+                 mem_ulimit=False):
         """
         Initializes a :class:`GFNXTBEnergy` instance.
 
@@ -563,10 +562,6 @@ class GFNXTBEnergy(EnergyCalculator):
         charge : :class:`str`, optional
             Formal molecular charge. `-` should be used to indicate sign.
 
-        strict : :class:`bool`, optional
-            Whether to use the `--strict` during optimization, which turns all
-            internal GFN-xTB warnings into errors.
-
         """
         self.gfnxtb_path = gfnxtb_path
         self.gfn_version = gfn_version
@@ -578,11 +573,11 @@ class GFNXTBEnergy(EnergyCalculator):
         self.solvent = solvent
         if self.solvent is not None:
             self.solvent = solvent.lower()
-            valid_GFNXTB_solvent(self.gfn_version, self.solvent)
+            valid_GFNXTB_solvent(gfn_version=self.gfn_version,
+                                 solvent=self.solvent)
         self.solvent_grid = solvent_grid
         self.charge = charge
         self.mem_ulimit = mem_ulimit
-        self.strict = strict
         super().__init__(use_cache=use_cache)
 
     def get_properties(self):
@@ -641,7 +636,7 @@ class GFNXTBEnergy(EnergyCalculator):
         Parameters
         ----------
         mol : :class:`.Molecule`
-            The molecule to be optimized.
+            The molecule whose energy should be claculated.
 
         conformer : :class:`int`, optional
             The conformer to use.
@@ -689,7 +684,6 @@ class GFNXTBEnergy(EnergyCalculator):
             # turn on hessian calculation if free energy requested
             if self.free is True:
                 cmd.append('--hess')
-                cmd.append(self.opt_level)
             # set number of cores
             cmd.append('--parallel')
             cmd.append(self.num_cores)
@@ -707,11 +701,7 @@ class GFNXTBEnergy(EnergyCalculator):
             if self.charge is not None:
                 cmd.append('--chrg')
                 cmd.append(self.charge)
-            # add strict term
-            if self.strict is True:
-                cmd.append('--strict')
             cmd = ' '.join(cmd)
-            print(cmd)
             f = open(out_file, 'w')
             # uses the shell if mem_ulimit = True and waits until
             # subproces is complete. This is required to run the mem_ulimit_cmd

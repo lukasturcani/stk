@@ -76,7 +76,7 @@ import subprocess as sp
 import uuid
 from os.path import join
 import shutil
-from ...utilities import GFNXTBInvalidSolventError, valid_GFNXTB_solvent
+from ...utilities import valid_GFNXTB_solvent
 
 logger = logging.getLogger(__name__)
 
@@ -865,7 +865,8 @@ class GFNXTB(Optimizer):
         self.solvent = solvent
         if self.solvent is not None:
             self.solvent = solvent.lower()
-            valid_GFNXTB_solvent(self.gfn_version, self.solvent)
+            valid_GFNXTB_solvent(gfn_version=self.gfn_version,
+                                 solvent=self.solvent)
         self.solvent_grid = solvent_grid
         self.charge = charge
         self.mem_ulimit = mem_ulimit
