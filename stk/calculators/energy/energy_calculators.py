@@ -309,7 +309,7 @@ class FormationEnergy(EnergyCalculator):
 
         """
 
-        products = zip(self.products,  self.product_conformers)
+        products = zip(self.products, self.product_conformers)
         product_energy = sum(
             self.energy_calculator.energy(product, conformer)
             for product, conformer in products
