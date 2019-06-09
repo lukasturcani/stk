@@ -76,6 +76,7 @@ import subprocess as sp
 import uuid
 from os.path import join
 import shutil
+from ...utilities import GFNXTBInvalidSolventError, valid_GFNXTB_solvent
 
 logger = logging.getLogger(__name__)
 
@@ -713,10 +714,6 @@ class GFNXTBOptimizerFailedError(Exception):
     ...
 
 
-class GFNXTBInvalidSolventError(Exception):
-    ...
-
-
 class GFNXTB(Optimizer):
     """
     Uses GFN-xTB to optimize molecules.
@@ -868,44 +865,12 @@ class GFNXTB(Optimizer):
         self.solvent = solvent
         if self.solvent is not None:
             self.solvent = solvent.lower()
-            self.valid_solvent()
+            valid_GFNXTB_solvent(self.gfn_version, self.solvent)
         self.solvent_grid = solvent_grid
         self.charge = charge
         self.mem_ulimit = mem_ulimit
         self.strict = strict
         super().__init__(use_cache=use_cache)
-
-    def valid_solvent(self):
-        '''Check if solvent is valid for the given GFN version.
-
-        See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for discussion.
-        '''
-        if self.gfn_version == '0':
-            raise GFNXTBInvalidSolventError(
-                f'No solvent valid for version: {self.gfn_version}'
-            )
-        elif self.gfn_version == '1':
-            valid_solvents = ['acetone', 'acetonitrile', 'benzene',
-                              'CH2Cl2'.lower(), 'CHCl3'.lower(), 'CS2'.lower(),
-                              'DMF'.lower(), 'DMSO'.lower(), 'ether', 'H2O'.lower(),
-                              'methanol', 'THF'.lower(), 'toluene']
-            if self.solvent in valid_solvents:
-                return True
-            else:
-                raise GFNXTBInvalidSolventError(
-                    f'{self.solvent} is an invalid solvent for version {self.gfn_version}!'
-                )
-        elif self.gfn_version == '1':
-            valid_solvents = ['acetone', 'acetonitrile', 'CH2Cl2'.lower(),
-                              'CHCl3'.lower(), 'CS2'.lower(), 'DMF'.lower(),
-                              'DMSO'.lower(), 'ether', 'H2O'.lower(), 'methanol',
-                              'n-hexane'.lower(), 'THF'.lower(), 'toluene']
-            if self.solvent in valid_solvents:
-                return True
-            else:
-                raise GFNXTBInvalidSolventError(
-                    f'{self.solvent} is an invalid solvent for version {self.gfn_version}!'
-                )
 
     def check_complete(self):
         if os.path.isfile('.xtboptok'):

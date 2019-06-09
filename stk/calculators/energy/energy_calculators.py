@@ -61,6 +61,7 @@ import subprocess as sp
 import uuid
 import os
 import shutil
+from ...utilities import GFNXTBInvalidSolventError, valid_GFNXTB_solvent
 
 
 logger = logging.getLogger(__name__)
@@ -432,10 +433,6 @@ class UFFEnergy(EnergyCalculator):
         return ff.CalcEnergy()
 
 
-class GFNXTBEnergyInvalidSolventError(Exception):
-    ...
-
-
 class GFNXTBEnergy(EnergyCalculator):
     """
     Uses GFN-xTB to calculate energies.
@@ -581,51 +578,12 @@ class GFNXTBEnergy(EnergyCalculator):
         self.solvent = solvent
         if self.solvent is not None:
             self.solvent = solvent.lower()
-            self.valid_solvent()
+            valid_GFNXTB_solvent(self.gfn_version, self.solvent)
         self.solvent_grid = solvent_grid
         self.charge = charge
         self.mem_ulimit = mem_ulimit
         self.strict = strict
         super().__init__(use_cache=use_cache)
-
-    def valid_solvent(self,):
-        '''Check if solvent is valid for the given GFN version.
-
-        See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for discussion.
-
-generalized born (GB) model with solvent accessable surface (SASA) model,
-available solvents are acetone, acetonitrile, benzene (only GFN1-xTB),
-CH2Cl2, CHCl3, CS2, DMF (only GFN2-xTB), DMSO, ether, H2O, methanol,
-n-hexane (only GFN2-xTB), THF and toluene. The solvent input is not case-sensitive.
- The Gsolv reference state can be chosen as reference or bar1M (default).
-
-        '''
-        if self.gfn_version == '0':
-            raise GFNXTBEnergyInvalidSolventError(
-                f'No solvent valid for version: {self.gfn_version}'
-            )
-        elif self.gfn_version == '1':
-            valid_solvents = ['acetone', 'acetonitrile', 'benzene',
-                              'CH2Cl2'.lower(), 'CHCl3'.lower(), 'CS2'.lower(),
-                              'DMF'.lower(), 'DMSO'.lower(), 'ether', 'H2O'.lower(),
-                              'methanol', 'THF'.lower(), 'toluene']
-            if self.solvent in valid_solvents:
-                return True
-            else:
-                raise GFNXTBEnergyInvalidSolventError(
-                    f'{self.solvent} is an invalid solvent for version {self.gfn_version}!'
-                )
-        elif self.gfn_version == '1':
-            valid_solvents = ['acetone', 'acetonitrile', 'CH2Cl2'.lower(),
-                              'CHCl3'.lower(), 'CS2'.lower(), 'DMF'.lower(),
-                              'DMSO'.lower(), 'ether', 'H2O'.lower(), 'methanol',
-                              'n-hexane'.lower(), 'THF'.lower(), 'toluene']
-            if self.solvent in valid_solvents:
-                return True
-            else:
-                raise GFNXTBEnergyInvalidSolventError(
-                    f'{self.solvent} is an invalid solvent for version {self.gfn_version}!'
-                )
 
     def get_properties(self):
         """Extract desired properties from GFN-xTB single point energy calculation.

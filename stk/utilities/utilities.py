@@ -1150,3 +1150,40 @@ def vector_theta(vector1, vector2):
     if np.isclose(numerator, denominator, atol=1e-8):
         return 0.0
     return np.arccos(numerator/denominator)
+
+
+class GFNXTBInvalidSolventError(Exception):
+    ...
+
+
+def valid_GFNXTB_solvent(gfn_version, solvent):
+    '''Check if solvent is valid for the given GFN version.
+
+    See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for discussion.
+    '''
+    if gfn_version == '0':
+        raise GFNXTBInvalidSolventError(
+            f'No solvent valid for version: {gfn_version}'
+        )
+    elif gfn_version == '1':
+        valid_solvents = ['acetone', 'acetonitrile', 'benzene',
+                          'CH2Cl2'.lower(), 'CHCl3'.lower(), 'CS2'.lower(),
+                          'DMF'.lower(), 'DMSO'.lower(), 'ether', 'H2O'.lower(),
+                          'methanol', 'THF'.lower(), 'toluene']
+        if solvent in valid_solvents:
+            return True
+        else:
+            raise GFNXTBInvalidSolventError(
+                f'{solvent} is an invalid solvent for version {gfn_version}!'
+            )
+    elif gfn_version == '1':
+        valid_solvents = ['acetone', 'acetonitrile', 'CH2Cl2'.lower(),
+                          'CHCl3'.lower(), 'CS2'.lower(), 'DMF'.lower(),
+                          'DMSO'.lower(), 'ether', 'H2O'.lower(), 'methanol',
+                          'n-hexane'.lower(), 'THF'.lower(), 'toluene']
+        if solvent in valid_solvents:
+            return True
+        else:
+            raise GFNXTBInvalidSolventError(
+                f'{solvent} is an invalid solvent for version {gfn_version}!'
+            )
