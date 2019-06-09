@@ -580,8 +580,6 @@ class GFNXTBEnergy(EnergyCalculator):
         self.mem_ulimit = mem_ulimit
         super().__init__(use_cache=use_cache)
 
-    def get_properties(self):
-        """Extract desired properties from GFN-xTB single point energy calculation.
 
         """
         self.properties = {}
@@ -628,6 +626,31 @@ class GFNXTBEnergy(EnergyCalculator):
                 energy_au = HT_au
                 break
         return energy_au
+    def get_properties(self, output_file):
+        """
+        Extracts desired properties from GFN-xTB single point energy calculation.
+
+        """
+        self.properties = {}
+
+        # get output file in string
+        output_string = open(output_file, 'r').readlines()
+
+        # get properties from output string
+        self.properties['totalenergy'] = self.ext_total_energy(output_string)
+        if self.free is True:
+            self.properties['totalfreeenergy'] = self.ext_free_energy(output_string)
+            self.properties['frequencies'] = self.ext_frequencies(output_string)
+        self.properties['HLGap'] = self.ext_HLGap(output_string)
+        self.properties['FermiLevel'] = self.ext_FermiLevel(output_string)
+        self.properties['occupancies'] = self.ext_occupancies(output_string)
+        self.properties['Qdipole'] = self.ext_qdipolemom(output_string)
+        self.properties['fulldipole'] = self.ext_fulldipolemom(output_string)
+        self.properties['Qquadrupole'] = self.ext_qquadrupolemom(output_string)
+        self.properties['QDIPquadrupole'] = self.ext_qdipquadrupolemom(output_string)
+        self.properties['fullquadrupole'] = self.ext_fullquadrupolemom(output_string)
+
+        return self.properties
 
     def energy(self, mol, conformer=-1):
         """
@@ -710,7 +733,7 @@ class GFNXTBEnergy(EnergyCalculator):
             sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE,
                      shell=shell)
             f.close()
-            self.get_properties()
+            self.get_properties(output_file='output_info.output')
         finally:
             os.chdir(init_dir)
         return self.properties
