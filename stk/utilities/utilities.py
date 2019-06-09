@@ -1160,6 +1160,20 @@ def valid_GFNXTB_solvent(gfn_version, solvent):
     '''Check if solvent is valid for the given GFN version.
 
     See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for discussion.
+
+    Parameters
+    ----------
+    gfn_version : :class:`str`
+        GFN Parameterization version. `0`, `1` and `2` available.
+
+    solvent : :class:`str`
+        Solvent being tested.
+
+    Returns
+    -------
+    :class:`bool`
+        `True` if solvent is valid. Raises an error otherwise.
+
     '''
     if gfn_version == '0':
         raise GFNXTBInvalidSolventError(
