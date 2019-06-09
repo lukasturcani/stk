@@ -443,7 +443,7 @@ class GFNXTBEnergyNegativeFreqError(Exception):
 
 class GFNXTBEnergy(EnergyCalculator):
     """
-    Uses GFN-xTB to calculate energies.
+    Uses GFN-xTB to calculate energies and other properties of molecules.
 
     Notes
     -----
@@ -465,7 +465,59 @@ class GFNXTBEnergy(EnergyCalculator):
 
     Attributes
     ----------
-    TO BE FILLED IN FROM BELOW WHEN THAT IS DONE.
+    gfnxtb_path : :class:`str`
+        The path to the GFN-xTB executable.
+
+    gfn_version : :class:`str`
+        Parameterization of GFN-xTB to use.
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/basics.html
+
+    output_dir : :class:`str`, optional
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
+
+    free : :class:`bool`, optional
+        If ``True`` :meth:`energy` will perform a numerical hessian
+        calculation on the structure to give free energy also. Ideally,
+        this should only be applied to an already optimized structure.
+
+    output_dir : :class:`str`, optional
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
+
+    num_cores : :class:`int`
+        The number of cores for GFN-xTB to use. Requires appropriate setup
+        of GFN-xTB by user.
+
+    use_cache : :class:`bool`, optional
+        If ``True`` :meth:`energy` will not run twice on the same
+        molecule and conformer.
+
+    mem_ulimit : :class: `bool`, optional
+        If ``True`` :meth:`energy` will be run without constraints on
+        the stacksize. If memory issues are encountered, this should be ``True``,
+        however this may raise issues on clusters.
+
+    etemp : :class:`int`, optional
+        Electronic temperature to use (in K). Defaults to 300K.
+
+    solvent : :class:`str`, optional
+        Solvent to use in GBSA implicit solvation method.
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+    solvent_grid : :class:`str`, optional
+        Grid level to use in SASA calculations for GBSA implicit solvent.
+        Options:
+            normal, tight, verytight, extreme
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+    charge : :class:`str`, optional
+        Formal molecular charge. `-` should be used to indicate sign.
 
     Examples
     --------
@@ -490,11 +542,36 @@ class GFNXTBEnergy(EnergyCalculator):
 
         uff = UFF()
         uff.optimize(polymer)
-        gfnxtb = GFNXTBEnergy('/opt/gfnxtb/xtb')
+        gfnxtb = GFNXTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
+                              mem_ulimit=True)
         gfnxtb.energy(polymer)
 
-    ADD EXAMPLES OF DIFFERENT ENERGIES
+    Energies and other properties of optimized structures can be
+    extracted using :class:`GFNXTBEnergy`. For example vibrational frequencies,
+    the HOMO-LUMO gap and thermodynamic properties (such as the Total Free
+    Energy) can be calculated after an optimization with very tight contraints
+    with an implicit solvent (THF). Very tight criteria are required to ensure
+    that no negative vibrational frequencies are present.
 
+    .. code-block:: python
+
+        gfnxtb = OptimizerSequence(
+            UFF(),
+            GFNXTB(gfnxtb_path='/opt/gfnxtb/xtb',
+                   mem_ulimit=True,
+                   opt_level='verytight',
+                   solvent='THF')
+        )
+        gfnxtb.optimize(polymer)
+
+        gfnxtbenergy = GFNXTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
+                                    mem_ulimit=True,
+                                    free=True,
+                                    solvent='THF')
+        polymer_properties = gfnxtbenergy.energy(polymer)
+        polymer_free_energy = polymer_properties['totalfreeenergy']
+        polymer_freq = polymer_properties['frequencies']
+        polymer_gap = polymer_properties['HLGap']
     """
     def __init__(self,
                  gfnxtb_path,
@@ -518,8 +595,8 @@ class GFNXTBEnergy(EnergyCalculator):
 
         gfn_version : :class:`str`
             Parameterization of GFN-xTB to use.
-            See https://xtb-docs.readthedocs.io/en/latest/basics.html for a
-            discussion.
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/basics.html
 
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
@@ -537,7 +614,8 @@ class GFNXTBEnergy(EnergyCalculator):
             :func:`uuid.uuid4` is used.
 
         num_cores : :class:`int`
-            The number of cores for GFN-xTB to use.
+            The number of cores for GFN-xTB to use. Requires appropriate setup
+            of GFN-xTB by user.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`energy` will not run twice on the same
@@ -553,7 +631,8 @@ class GFNXTBEnergy(EnergyCalculator):
 
         solvent : :class:`str`, optional
             Solvent to use in GBSA implicit solvation method.
-            See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for options.
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
         solvent_grid : :class:`str`, optional
             Grid level to use in SASA calculations for GBSA implicit solvent.
@@ -920,8 +999,6 @@ class GFNXTBEnergy(EnergyCalculator):
         self.properties['QDIPquadrupole'] = self.ext_qdipquadrupolemom(output_string)
         self.properties['fullquadrupole'] = self.ext_fullquadrupolemom(output_string)
 
-        return self.properties
-
     def energy(self, mol, conformer=-1):
         """
         Calculates the energy of molecule `mol` using GFN-xTB.
@@ -938,7 +1015,6 @@ class GFNXTBEnergy(EnergyCalculator):
         -------
         self.properties : :class:`dict`
             Dictionary containing desired properties.
-
         """
 
         if conformer == -1:

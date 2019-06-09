@@ -733,7 +733,7 @@ class GFNXTB(Optimizer):
     Note that this does not have any impact on multi-processing,
     which should always be safe.
 
-    Documentation for GFN2-xTB available:
+    Documentation for GFN-xTB available:
     https://xtb-docs.readthedocs.io/en/latest/setup.html
 
     Attributes
@@ -741,13 +741,62 @@ class GFNXTB(Optimizer):
     gfnxtb_path : :class:`str`
         The path to the GFN-xTB executable.
 
-    output_dir : :class:`str`
+    gfn_version : :class:`str`
+        Parameterization of GFN-xTB to use.
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/basics.html
+
+    output_dir : :class:`str`, optional
         The name of the directory into which files generated during
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
 
-    num_cores : :class:`str`
-        The number of cores for GFN-xTB to use.
+    opt_level : :class:`str`, optional
+        Optimization level to use.
+        Options:
+            crude, sloppy, loose, lax, normal, tight, vtight, extreme
+        Definitions of levels:
+            https://xtb-docs.readthedocs.io/en/latest/optimization.html
+
+    output_dir : :class:`str`, optional
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
+
+    num_cores : :class:`int`
+        The number of cores for GFN-xTB to use. Requires appropriate setup
+        of GFN-xTB by user.
+
+    use_cache : :class:`bool`, optional
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule and conformer.
+
+    mem_ulimit : :class: `bool`, optional
+        If ``True`` :meth:`optimize` will be run without constraints on
+        the stacksize. If memory issues are encountered, this should be ``True``,
+        however this may raise issues on clusters.
+
+    etemp : :class:`int`, optional
+        Electronic temperature to use (in K). Defaults to 300K.
+
+    solvent : :class:`str`, optional
+        Solvent to use in GBSA implicit solvation method.
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+    solvent_grid : :class:`str`, optional
+        Grid level to use in SASA calculations for GBSA implicit solvent.
+        Options:
+            normal, tight, verytight, extreme
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+    charge : :class:`str`, optional
+        Formal molecular charge. `-` should be used to indicate sign.
+
+    strict : :class:`bool`, optional
+        Whether to use the `--strict` during optimization, which turns all
+        internal GFN-xTB warnings into errors.
 
     Examples
     --------
@@ -772,10 +821,37 @@ class GFNXTB(Optimizer):
 
         gfnxtb = OptimizerSequence(
             UFF(),
-            GFNXTB('/opt/gfnxtb/xtb')
+            GFNXTB(gfnxtb_path='/opt/gfnxtb/xtb',
+                   mem_ulimit=True)
         )
         gfnxtb.optimize(polymer)
 
+    Note that energies and other properties of optimized structures can be
+    extracted using :class:`GFNXTBEnergy`. For example vibrational frequencies,
+    the HOMO-LUMO gap and thermodynamic properties (such as the Total Free
+    Energy) can be calculated after an optimization with very tight contraints
+    with an implicit solvent (THF). Very tight criteria are required to ensure
+    that no negative vibrational frequencies are present.
+
+    .. code-block:: python
+
+        gfnxtb = OptimizerSequence(
+            UFF(),
+            GFNXTB(gfnxtb_path='/opt/gfnxtb/xtb',
+                   mem_ulimit=True,
+                   opt_level='verytight',
+                   solvent='THF')
+        )
+        gfnxtb.optimize(polymer)
+
+        gfnxtbenergy = GFNXTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
+                                    mem_ulimit=True,
+                                    free=True,
+                                    solvent='THF')
+        polymer_properties = gfnxtbenergy.energy(polymer)
+        polymer_free_energy = polymer_properties['totalfreeenergy']
+        polymer_freq = polymer_properties['frequencies']
+        polymer_gap = polymer_properties['HLGap']
     """
 
     def __init__(self,
@@ -801,8 +877,8 @@ class GFNXTB(Optimizer):
 
         gfn_version : :class:`str`
             Parameterization of GFN-xTB to use.
-            See https://xtb-docs.readthedocs.io/en/latest/basics.html for a
-            discussion.
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/basics.html
 
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
@@ -822,7 +898,8 @@ class GFNXTB(Optimizer):
             :func:`uuid.uuid4` is used.
 
         num_cores : :class:`int`
-            The number of cores for GFN-xTB to use.
+            The number of cores for GFN-xTB to use. Requires appropriate setup
+            of GFN-xTB by user.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
@@ -838,7 +915,8 @@ class GFNXTB(Optimizer):
 
         solvent : :class:`str`, optional
             Solvent to use in GBSA implicit solvation method.
-            See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for options.
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
         solvent_grid : :class:`str`, optional
             Grid level to use in SASA calculations for GBSA implicit solvent.
@@ -874,6 +952,10 @@ class GFNXTB(Optimizer):
         super().__init__(use_cache=use_cache)
 
     def check_complete(self):
+        """
+        Check if GFN-xTB optimization was converged.
+
+        """
         if os.path.isfile('.xtboptok'):
             return True
         elif os.path.isfile('NOT_CONVERGED'):
