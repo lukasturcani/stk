@@ -428,39 +428,91 @@ class UFFEnergy(EnergyCalculator):
         return ff.CalcEnergy()
 
 
-class GFNXTB(EnergyCalculator):
+class GFNXTBEnergyInvalidSolventError(Exception):
+    ...
+
+
+class GFNXTBEnergy(EnergyCalculator):
     """
     Uses GFN-xTB to calculate energies.
+
+    Notes
+    -----
+    When running :meth:`energy`, this calculator changes the
+    present working directory with :func:`os.chdir`. The original
+    working directory will be restored even if an error is raised so
+    unless multi-threading is being used this implementation detail
+    should not matter.
+
+    If multi-threading is being used an error could occur if two
+    different threads need to know about the current working directory
+    as this :class:`.EnergyCalculator` can change it from under them.
+
+    Note that this does not have any impact on multi-processing,
+    which should always be safe.
+
+    Documentation for GFN2-xTB available:
+    https://xtb-docs.readthedocs.io/en/latest/setup.html
+
+    Attributes
+    ----------
+    TO BE FILLED IN FROM BELOW WHEN THAT IS DONE.
 
     Examples
     --------
     .. code-block:: python
 
-        # Create a molecules whose energy we want to know.
-        mol1 = StructUnit.smiles_init('CCCNCCCN')
-        mol2 = Polymer(...)
-        mol3 = Cage(...)
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        gfnxtb = GFNXTBEnergy('/opt/gfnxtb/xtb')
+        gfnxtb.energy(mol)
 
-        # Create the energy calculator.
-        uff = UFFEnergy()
+    Note that for :class:`.MacroMolecule` objects assembled by ``stk``
+    :class:`GFNXTBEnergy` should usually be used after optimization with some
+    other method. This is because GFN-xTB only uses xyz coordinates as input
+    and so will not recognize the long bonds created during assembly.
+    An optimizer which can minimize these bonds should be used before
+    :class:`GFNXTBEnergy`.
 
-        # Calculate the energies.
-        energy1 = uff.energy(mol1)
-        energy2 = uff.energy(mol2)
-        energy3 = uff.energy(mol3)
+    .. code-block:: python
+
+        bb1 = StructUnit2.smiles_init('NCCNCCN', ['amine'])
+        bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
+        polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
+
+        uff = UFF()
+        uff.optimize(polymer)
+        gfnxtb = GFNXTBEnergy('/opt/gfnxtb/xtb')
+        gfnxtb.energy(polymer)
+
+    ADD EXAMPLES OF DIFFERENT ENERGIES
 
     """
-
-    def __init__(self, gfnxtb_path, output_dir=None, free=False, num_cores=1,
-                 energy_type='total', solvent=None, charge=None
-                 ):
+    def __init__(self,
+                 gfnxtb_path,
+                 gfn_version='2',
+                 output_dir=None,
+                 free=False,
+                 num_cores=1,
+                 energy_type='total',
+                 etemp=300,
+                 solvent=None,
+                 solvent_grid='normal',
+                 charge=None,
+                 use_cache=False,
+                 mem_ulimit=False,
+                 strict=True):
         """
-        Initializes a :class:`GFNXTB` instance.
+        Initializes a :class:`GFNXTBEnergy` instance.
 
         Parameters
         ----------
         gfnxtb_path : :class:`str`
             The path to the GFN-xTB or GFN2-xTB executable.
+
+        gfn_version : :class:`str`
+            Parameterization of GFN-xTB to use.
+            See https://xtb-docs.readthedocs.io/en/latest/basics.html for a
+            discussion.
 
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
@@ -471,9 +523,10 @@ class GFNXTB(EnergyCalculator):
             If ``True`` :meth:`optimize` will perform a numerical hessian
             calculation on the optimized structure to give Free energy also.
 
-        opt_level : :class:`int`, optional
-            Optimization level to use.
-            -2 =  , -1 = , 0 = , 1 = , 2 = .
+        output_dir : :class:`str`, optional
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
 
         num_cores : :class:`int`
             The number of cores for GFN-xTB to use.
@@ -483,21 +536,92 @@ class GFNXTB(EnergyCalculator):
             `total` : total energy of system
             `free` : total free energy of system. Reqiures free=True
 
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
+
+        mem_ulimit : :class: `bool`, optional
+            If ``True`` :meth:`optimize` will be run without constraints on
+            the stacksize. If memory issues are encountered, this should be ``True``,
+            however this may raise issues on clusters.
+
+        etemp : :class:`int`, optional
+            Electronic temperature to use (in K). Defaults to 300K.
+
         solvent : :class:`str`, optional
-            XXXX
+            Solvent to use in GBSA implicit solvation method.
+            See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for options.
+
+        solvent_grid : :class:`str`, optional
+            Grid level to use in SASA calculations for GBSA implicit solvent.
+            Options:
+                normal, tight, verytight, extreme
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
         charge : :class:`str`, optional
-            XXXX
+            Formal molecular charge. `-` should be used to indicate sign.
+
+        strict : :class:`bool`, optional
+            Whether to use the `--strict` during optimization, which turns all
+            internal GFN-xTB warnings into errors.
+
         """
         self.gfnxtb_path = gfnxtb_path
+        self.gfn_version = gfn_version
         self.output_dir = output_dir
         self.free = free
-        self.num_cores = str(num_cores)
         self.energy_type = energy_type
+        self.num_cores = str(num_cores)
+        self.etemp = str(etemp)
         self.solvent = solvent
         if self.solvent is not None:
+            self.solvent = solvent.lower()
             self.valid_solvent()
+        self.solvent_grid = solvent_grid
         self.charge = charge
+        self.mem_ulimit = mem_ulimit
+        self.strict = strict
+        super().__init__(use_cache=use_cache)
+
+    def valid_solvent(self,):
+        '''Check if solvent is valid for the given GFN version.
+
+        See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for discussion.
+
+generalized born (GB) model with solvent accessable surface (SASA) model,
+available solvents are acetone, acetonitrile, benzene (only GFN1-xTB),
+CH2Cl2, CHCl3, CS2, DMF (only GFN2-xTB), DMSO, ether, H2O, methanol,
+n-hexane (only GFN2-xTB), THF and toluene. The solvent input is not case-sensitive.
+ The Gsolv reference state can be chosen as reference or bar1M (default).
+
+        '''
+        if self.gfn_version == '0':
+            raise GFNXTBEnergyInvalidSolventError(
+                f'No solvent valid for version: {self.gfn_version}'
+            )
+        elif self.gfn_version == '1':
+            valid_solvents = ['acetone', 'acetonitrile', 'benzene',
+                              'CH2Cl2'.lower(), 'CHCl3'.lower(), 'CS2'.lower(),
+                              'DMF'.lower(), 'DMSO'.lower(), 'ether', 'H2O'.lower(),
+                              'methanol', 'THF'.lower(), 'toluene']
+            if self.solvent in valid_solvents:
+                return True
+            else:
+                raise GFNXTBEnergyInvalidSolventError(
+                    f'{self.solvent} is an invalid solvent for version {self.gfn_version}!'
+                )
+        elif self.gfn_version == '1':
+            valid_solvents = ['acetone', 'acetonitrile', 'CH2Cl2'.lower(),
+                              'CHCl3'.lower(), 'CS2'.lower(), 'DMF'.lower(),
+                              'DMSO'.lower(), 'ether', 'H2O'.lower(), 'methanol',
+                              'n-hexane'.lower(), 'THF'.lower(), 'toluene']
+            if self.solvent in valid_solvents:
+                return True
+            else:
+                raise GFNXTBEnergyInvalidSolventError(
+                    f'{self.solvent} is an invalid solvent for version {self.gfn_version}!'
+                )
 
     def extract_energy(self, output_file):
         """
