@@ -711,6 +711,10 @@ class ETKDG(Optimizer):
         mol.mol.RemoveConformer(conf_id)
 
 
+class GFNXTBOptimizerFailedError(Exception):
+    ...
+
+
 class GFNXTB(Optimizer):
     """
     Uses GFN-xTB to optimize molecules.
@@ -912,9 +916,11 @@ class GFNXTB(Optimizer):
             if os.path.isfile(file):
                 os.rename(file, f'{output_dir}/{file}')
 
-    def check_complete(self, basename, output_dir):
-        if os.path.isfile(f'{output_dir}/.xtboptok'):
+    def check_complete(self):
+        if os.path.isfile('.xtboptok'):
             return True
+        elif os.path.isfile('NOT_CONVERGED'):
+            raise GFNXTBOptimizerFailedError(f'Optimization not converged.')
         else:
             return False
 
