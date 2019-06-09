@@ -730,6 +730,9 @@ class GFNXTB(Optimizer):
     Note that this does not have any impact on multi-processing,
     which should always be safe.
 
+    Documentation for GFN2-xTB available:
+    https://xtb-docs.readthedocs.io/en/latest/setup.html
+
     Attributes
     ----------
     gfnxtb_path : :class:`str`
@@ -772,10 +775,19 @@ class GFNXTB(Optimizer):
 
     """
 
-    def __init__(self, gfnxtb_path, output_dir=None,
-                 free=False, opt_level=1,
-                 num_cores=1, solvent=None,
-                 charge=None, use_cache=False):
+    def __init__(self,
+                 gfnxtb_path,
+                 gfn_version='2',
+                 output_dir=None,
+                 opt_level='normal',
+                 num_cores=1,
+                 etemp=300,
+                 solvent=None,
+                 solvent_grid='normal',
+                 charge=None,
+                 use_cache=False,
+                 mem_ulimit=False,
+                 strict=True):
         """
         Initializes a :class:`GFNXTB` instance.
 
@@ -784,18 +796,22 @@ class GFNXTB(Optimizer):
         gfnxtb_path : :class:`str`
             The path to the GFN-xTB or GFN2-xTB executable.
 
+        gfn_version : :class:`str`
+            Parameterization of GFN-xTB to use.
+            See https://xtb-docs.readthedocs.io/en/latest/basics.html for a
+            discussion.
+
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
             the optimization are written, if ``None`` then
             :func:`uuid.uuid4` is used.
 
-        free : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will perform a numerical hessian
-            calculation on the optimized structure to give Free energy also.
-
-        opt_level : :class:`int`, optional
+        opt_level : :class:`str`, optional
             Optimization level to use.
-            -2 =  , -1 = , 0 = , 1 = , 2 = .
+            Options:
+                crude, sloppy, loose, lax, normal, tight, vtight, extreme
+            Definitions of levels:
+                https://xtb-docs.readthedocs.io/en/latest/optimization.html
 
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
@@ -809,22 +825,49 @@ class GFNXTB(Optimizer):
             If ``True`` :meth:`optimize` will not run twice on the same
             molecule and conformer.
 
+        mem_ulimit : :class: `bool`, optional
+            If ``True`` :meth:`optimize` will be run without constraints on
+            the stacksize. If memory issues are encountered, this should be ``True``,
+            however this may raise issues on clusters.
+
+        etemp : :class:`int`, optional
+            Electronic temperature to use (in K). Defaults to 300K.
+
         solvent : :class:`str`, optional
-            XXXX
+            Solvent to use in GBSA implicit solvation method.
+            See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for options.
+
+
+        solvent_grid : :class:`str`, optional
+            Grid level to use in SASA calculations for GBSA implicit solvent.
+            Options:
+                normal, tight, verytight, extreme
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
         charge : :class:`str`, optional
-            XXXX
+            Formal molecular charge. `-` should be used to indicate sign.
+
+        strict : :class:`bool`, optional
+            Whether to use the `--strict` during optimization, which turns all
+            internal GFN-xTB warnings into errors.
+
         """
 
         self.gfnxtb_path = gfnxtb_path
+        self.gfn_version = gfn_version
         self.output_dir = output_dir
-        self.free = free
         self.opt_level = opt_level
         self.num_cores = str(num_cores)
+        self.etemp = str(etemp)
         self.solvent = solvent
         if self.solvent is not None:
+            self.solvent = solvent.lower()
             self.valid_solvent()
+        self.solvent_grid = solvent_grid
         self.charge = charge
+        self.mem_ulimit = mem_ulimit
+        self.strict = strict
         super().__init__(use_cache=use_cache)
 
     def valid_solvent(self):
@@ -875,7 +918,7 @@ class GFNXTB(Optimizer):
         else:
             return False
 
-    def optimize(self, mol, conformer=-1, mem_ulimit=False):
+    def optimize(self, mol, conformer=-1):
         """
         Optimizes a molecule.
 
@@ -886,11 +929,6 @@ class GFNXTB(Optimizer):
 
         conformer : :class:`int`, optional
             The conformer to use.
-
-        mem_ulimit : :class: `bool`, optional
-            If ``True`` :meth:`optimize` will be run without constraints on
-            the stacksize. Generally should be ``True``, however this may raise
-            issues on clusters.
 
         Returns
         -------
@@ -915,75 +953,62 @@ class GFNXTB(Optimizer):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            xyz = join(output_dir, f'input_structure.xyz')
+            # when in output_dir -- use relative paths as GFN does not handle
+            # full path in command
+            xyz = 'input_structure.xyz'
+            out_file = 'output_info.output'
             mol.write(xyz, conformer=conformer)
-            cmd = [
-                self.gfnxtb_path,
-                xyz,
-                '-opt',
-                '--parallel',
-                self.num_cores
-            ]
-            sp.run(cmd, stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
-            output_xyz = join(output_dir, 'xtbopt.xyz')
-            mol.update_from_xyz(path=output_xyz, conformer=conformer)
+            # modify memory limit
+            if self.mem_ulimit:
+                cmd = ['ulimit -s unlimited ;']
+                # allow multiple shell commands to be run in one subprocess
+                shell = True
+            else:
+                cmd = []
+                shell = False
+            cmd.append(self.gfnxtb_path)
+            cmd.append(xyz)
+            # set GFN Parameterization
+            if self.gfn_version != '2':
+                cmd.append('--gfn')
+                cmd.append(self.gfn_version)
+            # set optimization level and type
+            cmd.append('--opt')
+            cmd.append(self.opt_level)
+            # set number of cores
+            cmd.append('--parallel')
+            cmd.append(self.num_cores)
+            # add eletronic temp term
+            if self.etemp != '300':
+                cmd.append('--etemp')
+                cmd.append(self.etemp)
+            # write solvent section of cmd
+            if self.solvent is not None:
+                cmd.append('--gbsa')
+                cmd.append(self.solvent)
+                if self.solvent_grid != 'normal':
+                    cmd.append(self.solvent_grid)
+            # write charge section of cmd
+            if self.charge is not None:
+                cmd.append('--chrg')
+                cmd.append(self.charge)
+            # add strict term
+            if self.strict is True:
+                cmd.append('--strict')
+            cmd = ' '.join(cmd)
+            print(cmd)
+            f = open(out_file, 'w')
+            # uses the shell if mem_ulimit = True and waits until
+            # subproces is complete. This is required to run the mem_ulimit_cmd
+            # and GFN calculation in one command, which is then closed, which
+            # minimizes the risk of unrestricting the memory limits.
+            sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE,
+                     shell=shell)
+            f.close()
+            if self.check_complete():
+                output_xyz = join(output_dir, 'xtbopt.xyz')
+                mol.update_from_xyz(path=output_xyz, conformer=conformer)
+            else:
+                raise GFNXTBOptimizerFailedError(f'Optimization failed incomplete')
         finally:
             os.chdir(init_dir)
-
-
-
-        basename = uuid.uuid4().int
-
-        if self.output_dir is None:
-            output_dir = basename
-        else:
-            output_dir = self.output_dir
-
-        xyz = f'{basename}.xyz'
-        out_file = f'{basename}.output'
-        mol.write(xyz, conformer=conformer)
-
-        # write solvent section of cmd
-        if self.solvent is None:
-            solvent_part = ''
-        else:
-            solvent_part = '--gbsa ' + self.solvent
-
-        # write charge section of cmd
-        if self.charge is None:
-            charge_part = ''
-        else:
-            charge_part = '--chrg ' + self.solvent
-
-        # set optimization level
-        if self.free is False:
-            opt_level_part = '-opt ' + self.opt_level
-        elif self.free is True:
-            opt_level_part = '-ohess ' + self.opt_level
-
-        # modify memory limit
-        if mem_ulimit:
-            mem_ulimt_cmd = 'ulimit -s unlimited'+' ;'
-            # allow multiple shell commands to be run in one subprocess
-            shell = True
-        else:
-            mem_ulimt_cmd = ''
-            shell = False
-
-        cmd = [
-            mem_ulimt_cmd,
-            self.gfnxtb_path, xyz, opt_level_part,
-            '--parallel', self.num_cores,
-            solvent_part, charge_part, f'> {out_file}'
-        ]
-
-        proc = sp.Popen(
-            cmd,
-            stdin=sp.PIPE,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE,
-            shell=shell,
-        )
-        output, err = proc.communicate()
-        self.move_generated_GFN_files(basename=basename, output_dir=output_dir)
-        return self.check_complete(basename=basename, output_dir=output_dir)
