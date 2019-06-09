@@ -54,13 +54,20 @@ def test_gfnxtb_optchrg(tmp_polymer, gfnxtb_path):
 
 
 def test_gfnxtb_opt(tmp_polymer, gfnxtb_path):
+    init_dir = os.getcwd()
+
     # GFNXTB  requires an embedding before working.
     etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
 
     # If the optimization was successful the energy should be lowered.
-    energy_calculator = stk.GFNXTBEnergy(gfnxtb_path=gfnxtb_path)
-    init_energy = energy_calculator.energy(tmp_polymer)
+    energy_calculator = stk.GFNXTBEnergy(gfnxtb_path=gfnxtb_path,
+                                         output_dir=join(odir, 'gfnxtb_ey'),
+                                         mem_ulimit=True)
+    init_prop = energy_calculator.energy(tmp_polymer)
+    init_energy = init_prop['totalenergy']
+
+    print('init', init_energy)
 
     print('doing GFN optimization')
 
@@ -69,9 +76,14 @@ def test_gfnxtb_opt(tmp_polymer, gfnxtb_path):
                         mem_ulimit=True)
     gfnxtb.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'gfnxtb_opt_after.mol'))
+    # check directory moving worked
+    assert os.getcwd() == init_dir
 
     print('done GFN optimization')
-    assert energy_calculator.energy(tmp_polymer) < init_energy
+    properties = energy_calculator.energy(tmp_polymer)
+    print('prop', properties)
+    print(init_energy, properties['totalenergy'])
+    assert properties['totalenergy'] < init_energy
 
 
 def main():
