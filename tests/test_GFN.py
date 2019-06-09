@@ -49,7 +49,7 @@ def test_gfnxtb_optsolv(tmp_polymer, gfnxtb_path):
     raise NotImplementedError
 
 
-def test_gfnxtb_ohess(tmp_polymer, gfnxtb_path):
+def test_gfnxtb_optchrg(tmp_polymer, gfnxtb_path):
     raise NotImplementedError
 
 
@@ -59,13 +59,14 @@ def test_gfnxtb_opt(tmp_polymer, gfnxtb_path):
     etkdg.optimize(tmp_polymer)
 
     # If the optimization was successful the energy should be lowered.
-    energy_calculator = stk.GFNXTBEnergy()
+    energy_calculator = stk.GFNXTBEnergy(gfnxtb_path=gfnxtb_path)
     init_energy = energy_calculator.energy(tmp_polymer)
 
     print('doing GFN optimization')
 
     tmp_polymer.write(join(odir, 'gfnxtb_opt_before.mol'))
-    gfnxtb = stk.GFNXTB(gfnxtb_path, output_dir=join(odir, 'gfnxtb'))
+    gfnxtb = stk.GFNXTB(gfnxtb_path, output_dir=join(odir, 'gfnxtb_opt'),
+                        mem_ulimit=True)
     gfnxtb.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'gfnxtb_opt_after.mol'))
 
@@ -104,9 +105,9 @@ def main():
         print('optsolv not implemented')
         pass
     try:
-        test_gfnxtb_ohess(tmp_polymer=poly, gfnxtb_path=gfnxtb_path)
+        test_gfnxtb_optchrg(tmp_polymer=poly, gfnxtb_path=gfnxtb_path)
     except NotImplementedError:
-        print('ohess not implemented')
+        print('ocharg not implemented')
         pass
 
 
