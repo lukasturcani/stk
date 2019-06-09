@@ -8,40 +8,12 @@ odir = 'optimizer_tests_output'
 if not os.path.exists(odir):
     os.mkdir(odir)
 
-
-def amine2():
-    amine2 = stk.StructUnit2.smiles_init(smiles='NCCCN',
-                                         functional_groups=['amine'],
-                                         name='amine2')
-    # Make a second conformer with a distinct geometry.
-    amine2.mol.AddConformer(amine2.mol.GetConformer(), True)
-    amine2.set_position_from_matrix(
-        pos_mat=amine2.mol.GetConformer().GetPositions().T*4,
-        conformer=1
-    )
-    return amine2
+gfnxtb = pytest.mark.skipif(
+    all('gfnxtb' not in x for x in sys.argv),
+    reason="Only run when explicitly asked.")
 
 
-def aldehyde2():
-
-    return stk.StructUnit2.smiles_init(smiles='O=CCC=O',
-                                       functional_groups=['aldehyde'],
-                                       name='aldehyde2')
-
-
-def polymer(amine2, aldehyde2):
-    return stk.Polymer([amine2, aldehyde2],
-                       stk.Linear('AB', [0, 0], 3),
-                       'polymer')
-
-# gfnxtb = pytest.mark.skipif(
-#     all('gfnxtb' not in x for x in sys.argv),
-#     reason="Only run when explicitly asked.")
-#
-#
-# @gfnxtb
-
-
+@gfnxtb
 def test_gfnxtb_properties(tmp_polymer, gfnxtb_path):
     init_dir = os.getcwd()
     # GFNXTB  requires an embedding before working.
@@ -163,25 +135,3 @@ def test_gfnxtb_opt(tmp_polymer, gfnxtb_path):
     # energy of structure in solvent differs from gas phase
     properties_solv = energy_calculator.energy(tmp_polymer)
     assert properties_solv['totalenergy'] != init_energy
-
-
-def main():
-    gfnxtb_path = '/home/atarzia/software/xtb_190418/bin/xtb'
-    amine2_ = amine2()
-    aldehyde2_ = aldehyde2()
-    poly = polymer(amine2_, aldehyde2_)
-    test_valid_solvent()
-    try:
-        test_gfnxtb_properties(tmp_polymer=poly, gfnxtb_path=gfnxtb_path)
-    except NotImplementedError:
-        print('properties not implemented')
-        pass
-    try:
-        test_gfnxtb_opt(tmp_polymer=poly, gfnxtb_path=gfnxtb_path)
-    except NotImplementedError:
-        print('opt not implemented')
-        pass
-
-
-if __name__ == '__main__':
-    main()
