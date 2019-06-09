@@ -627,6 +627,17 @@ n-hexane (only GFN2-xTB), THF and toluene. The solvent input is not case-sensiti
                     f'{self.solvent} is an invalid solvent for version {self.gfn_version}!'
                 )
 
+    def get_properties(self):
+        """Extract desired properties from GFN-xTB single point energy calculation.
+
+        """
+        self.properties = {}
+
+        # energy
+        self.properties['totalenergy'] = 0.0
+
+        return self.properties
+
     def extract_energy(self, output_file):
         """
         Extract desired energy from GFN2-xTB output file.
