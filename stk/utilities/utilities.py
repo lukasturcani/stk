@@ -1168,7 +1168,7 @@ def valid_GFNXTB_solvent(gfn_version, solvent):
     elif gfn_version == '1':
         valid_solvents = ['acetone', 'acetonitrile', 'benzene',
                           'CH2Cl2'.lower(), 'CHCl3'.lower(), 'CS2'.lower(),
-                          'DMF'.lower(), 'DMSO'.lower(), 'ether', 'H2O'.lower(),
+                          'DMSO'.lower(), 'ether', 'H2O'.lower(),
                           'methanol', 'THF'.lower(), 'toluene']
         if solvent in valid_solvents:
             return True
@@ -1176,7 +1176,7 @@ def valid_GFNXTB_solvent(gfn_version, solvent):
             raise GFNXTBInvalidSolventError(
                 f'{solvent} is an invalid solvent for version {gfn_version}!'
             )
-    elif gfn_version == '1':
+    elif gfn_version == '2':
         valid_solvents = ['acetone', 'acetonitrile', 'CH2Cl2'.lower(),
                           'CHCl3'.lower(), 'CS2'.lower(), 'DMF'.lower(),
                           'DMSO'.lower(), 'ether', 'H2O'.lower(), 'methanol',
