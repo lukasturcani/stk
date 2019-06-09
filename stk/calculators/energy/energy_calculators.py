@@ -527,8 +527,9 @@ class GFNXTBEnergy(EnergyCalculator):
             :func:`uuid.uuid4` is used.
 
         free : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will perform a numerical hessian
-            calculation on the optimized structure to give Free energy also.
+            If ``True`` :meth:`energy` will perform a numerical hessian
+            calculation on the structure to give free energy also. Ideally,
+            this should only be applied to an already optimized structure.
 
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
@@ -539,11 +540,11 @@ class GFNXTBEnergy(EnergyCalculator):
             The number of cores for GFN-xTB to use.
 
         use_cache : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will not run twice on the same
+            If ``True`` :meth:`energy` will not run twice on the same
             molecule and conformer.
 
         mem_ulimit : :class: `bool`, optional
-            If ``True`` :meth:`optimize` will be run without constraints on
+            If ``True`` :meth:`energy` will be run without constraints on
             the stacksize. If memory issues are encountered, this should be ``True``,
             however this may raise issues on clusters.
 
