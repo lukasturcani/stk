@@ -70,12 +70,10 @@ import logging
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import warnings
-from glob import iglob
 import os
 from functools import wraps
 import subprocess as sp
 import uuid
-import os
 from os.path import join
 import shutil
 
@@ -845,7 +843,6 @@ class GFNXTB(Optimizer):
             Solvent to use in GBSA implicit solvation method.
             See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for options.
 
-
         solvent_grid : :class:`str`, optional
             Grid level to use in SASA calculations for GBSA implicit solvent.
             Options:
@@ -920,7 +917,7 @@ class GFNXTB(Optimizer):
 
     def optimize(self, mol, conformer=-1):
         """
-        Optimizes a molecule.
+        Optimizes the molecule `mol` using GFN-xTB.
 
         Parameters
         ----------
@@ -932,8 +929,7 @@ class GFNXTB(Optimizer):
 
         Returns
         -------
-        self.check_complete() : :class:`bool`
-            Output from process. True if optimization is successful.
+        None : :class:`NoneType`
 
         """
 
@@ -996,7 +992,6 @@ class GFNXTB(Optimizer):
             if self.strict is True:
                 cmd.append('--strict')
             cmd = ' '.join(cmd)
-            print(cmd)
             f = open(out_file, 'w')
             # uses the shell if mem_ulimit = True and waits until
             # subproces is complete. This is required to run the mem_ulimit_cmd
