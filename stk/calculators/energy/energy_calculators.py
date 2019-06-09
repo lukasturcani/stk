@@ -57,6 +57,10 @@ import rdkit.Chem.AllChem as rdkit
 import logging
 import re
 from functools import wraps
+import subprocess as sp
+import uuid
+import os
+import shutil
 
 
 logger = logging.getLogger(__name__)
@@ -662,4 +666,92 @@ n-hexane (only GFN2-xTB), THF and toluene. The solvent input is not case-sensiti
         return energy_au
 
     def energy(self, mol, conformer=-1):
-        ' get from optimizer code once implemented'
+        """
+        Calculates the energy of molecule `mol` using GFN-xTB.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        self.properties : :class:`dict`
+            Dictionary containing desired properties.
+
+        """
+
+        if conformer == -1:
+            conformer = mol.mol.GetConformer(conformer).GetId()
+
+        if self.output_dir is None:
+            output_dir = str(uuid.uuid4().int)
+        else:
+            output_dir = self.output_dir
+        output_dir = os.path.abspath(output_dir)
+
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+
+        os.mkdir(output_dir)
+        init_dir = os.getcwd()
+        try:
+            os.chdir(output_dir)
+            xyz = 'input_structure.xyz'
+            out_file = 'output_info.output'
+            mol.write(xyz, conformer=conformer)
+            # modify memory limit
+            if self.mem_ulimit:
+                cmd = ['ulimit -s unlimited ;']
+                # allow multiple shell commands to be run in one subprocess
+                shell = True
+            else:
+                cmd = []
+                shell = False
+            cmd.append(self.gfnxtb_path)
+            cmd.append(xyz)
+            # set GFN Parameterization
+            if self.gfn_version != '2':
+                cmd.append('--gfn')
+                cmd.append(self.gfn_version)
+            # turn on hessian calculation if free energy requested
+            if self.free is True:
+                cmd.append('--hess')
+                cmd.append(self.opt_level)
+            # set number of cores
+            cmd.append('--parallel')
+            cmd.append(self.num_cores)
+            # add eletronic temp term
+            if self.etemp != '300':
+                cmd.append('--etemp')
+                cmd.append(self.etemp)
+            # write solvent section of cmd
+            if self.solvent is not None:
+                cmd.append('--gbsa')
+                cmd.append(self.solvent)
+                if self.solvent_grid != 'normal':
+                    cmd.append(self.solvent_grid)
+            # write charge section of cmd
+            if self.charge is not None:
+                cmd.append('--chrg')
+                cmd.append(self.charge)
+            # add strict term
+            if self.strict is True:
+                cmd.append('--strict')
+            cmd = ' '.join(cmd)
+            print(cmd)
+            f = open(out_file, 'w')
+            # uses the shell if mem_ulimit = True and waits until
+            # subproces is complete. This is required to run the mem_ulimit_cmd
+            # and GFN calculation in one command, which is then closed, which
+            # minimizes the risk of unrestricting the memory limits.
+            sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE,
+                     shell=shell)
+            f.close()
+            self.get_properties()
+        finally:
+            os.chdir(init_dir)
+        return self.properties
