@@ -421,6 +421,9 @@ class UFFEnergy(EnergyCalculator):
         """
 
         mol.mol.UpdatePropertyCache()
+        # RingInfo needs to be initialized, else rdkit may raise an
+        # error.
+        rdkit.GetSSSR(mol.mol)
         ff = rdkit.UFFGetMoleculeForceField(mol.mol, confId=conformer)
         return ff.CalcEnergy()
 

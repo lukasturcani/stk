@@ -1,0 +1,1192 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.molecular.molecules.molecule module &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">stk.molecular.molecules.molecule module</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">stk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>stk.molecular.molecules.molecule module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stk.molecular.molecules.molecule.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-stk.molecular.molecules.molecule">
+<span id="stk-molecular-molecules-molecule-module"></span><h1>stk.molecular.molecules.molecule module<a class="headerlink" href="#module-stk.molecular.molecules.molecule" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="stk.molecular.molecules.molecule.Molecule">
+<em class="property">class </em><code class="descclassname">stk.molecular.molecules.molecule.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The most basic class representing molecules.</p>
+<p>This class defines the operations which any class
+describing molecules should inherit or may find useful. Examples of
+such are <code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code>. This class
+should not be used directly.</p>
+<dl class="attribute">
+<dt id="stk.molecular.molecules.molecule.Molecule.mol">
+<code class="descname">mol</code><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>An <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule instance representing the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.molecules.molecule.Molecule.inchi">
+<code class="descname">inchi</code><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.inchi" title="Permalink to this definition">¶</a></dt>
+<dd><p>The InChI of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.molecules.molecule.Molecule.atom_props">
+<code class="descname">atom_props</code><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.atom_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps atom id to a <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> holding the properties of
+that atom. For example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">atom_props</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;prop1&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s1">&#39;prop2&#39;</span><span class="p">:</span> <span class="s1">&#39;value1&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;prop3&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">},</span>
+
+              <span class="mi">5</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;prop1&#39;</span><span class="p">:</span> <span class="s1">&#39;value2&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;prop5&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">}}</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.molecules.molecule.Molecule.name">
+<code class="descname">name</code><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A name which can be optionally given to the molecule for easy
+identification.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.molecules.molecule.Molecule.note">
+<code class="descname">note</code><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.note" title="Permalink to this definition">¶</a></dt>
+<dd><p>A note or comment about the molecule. Purely optional but can
+be useful for labelling and debugging.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule._write_mdl_mol_file">
+<code class="descname">_write_mdl_mol_file</code><span class="sig-paren">(</span><em>path</em>, <em>atoms</em>, <em>conformer</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule._write_mdl_mol_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a V3000 <code class="docutils literal notranslate"><span class="pre">.mol</span></code> file of the molecule</p>
+<p>This function should not be used directly, only via
+<a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule.write" title="stk.molecular.molecules.molecule.Molecule.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path to the file being written.</li>
+<li><strong>atoms</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The atom ids of atoms to write. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then all atoms
+are written.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule._write_pdb_file">
+<code class="descname">_write_pdb_file</code><span class="sig-paren">(</span><em>path</em>, <em>atoms</em>, <em>conformer</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule._write_pdb_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a <code class="docutils literal notranslate"><span class="pre">.pdb</span></code> file of the molecule</p>
+<p>This function should not be used directly, only via
+<a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule.write" title="stk.molecular.molecules.molecule.Molecule.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path to the file being written.</li>
+<li><strong>atoms</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The atom ids of atoms to write. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then all atoms
+are written.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule._write_xyz_file">
+<code class="descname">_write_xyz_file</code><span class="sig-paren">(</span><em>path</em>, <em>atoms</em>, <em>conformer</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule._write_xyz_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a <code class="docutils literal notranslate"><span class="pre">.xyz</span></code> file of the molecule</p>
+<p>This function should not be used directly, only via
+<a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule.write" title="stk.molecular.molecules.molecule.Molecule.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path to the file being written.</li>
+<li><strong>atoms</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The atom ids of atoms to write. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then all atoms
+are written.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.all_atom_coords">
+<code class="descname">all_atom_coords</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.all_atom_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields the coordinates of atoms in <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule.mol" title="stk.molecular.molecules.molecule.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">mol</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – The yielded <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> has the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">12</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p class="last">Where the first element is the atom id and the second
+element is an array holding the coordinates of the atom.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.atom_centroid">
+<code class="descname">atom_centroid</code><span class="sig-paren">(</span><em>atom_ids</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.atom_centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the centroid of a group of atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atom_ids</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The ids of atoms which which are used to calculate the
+centroid.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The centroid of atoms specified by <cite>atom_ids</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.atom_coords">
+<code class="descname">atom_coords</code><span class="sig-paren">(</span><em>atom_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.atom_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return coordinates of an atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atom_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the atom whose coordinates are desired.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An array holding the x, y and z coordinates of the atom.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.atom_distance">
+<code class="descname">atom_distance</code><span class="sig-paren">(</span><em>atom1_id</em>, <em>atom2_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.atom_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the distance between 2 atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atom1_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the first atom.</li>
+<li><strong>atom2_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the second atom.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The distance between the first and second atoms.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.double</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.atom_symbol">
+<code class="descname">atom_symbol</code><span class="sig-paren">(</span><em>atom_id</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.atom_symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the symbol of the atom with id <cite>atom_id</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atom_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id number of the atom.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The atomic symbol of the atom.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.center_of_mass">
+<code class="descname">center_of_mass</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.center_of_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the centre of mass of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An array holding the coordinates of the center of mass.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Center_of_mass">https://en.wikipedia.org/wiki/Center_of_mass</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.centroid">
+<code class="descname">centroid</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the centroid of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A numpy array holding the position of the centroid.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.core">
+<code class="descname">core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the molecule with no H or functional group atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The “core” of the molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.dihedral_strain">
+<code class="descname">dihedral_strain</code><span class="sig-paren">(</span><em>dihedral_SMARTS=''</em>, <em>target=180</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.dihedral_strain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the difference between the average dihedral and target.</p>
+<p>The differences is a returned as a percent.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The SMARTS code for the dihedral of interest.</li>
+<li><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Float representing the target value for the dihedral angle.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The percent difference between the average dihedral in the
+molecule and the target value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.direction">
+<code class="descname">direction</code><span class="sig-paren">(</span><em>exclude_ids=None</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the direction of the molecule or its atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>excluded_ids</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The ids of atoms exluded from the direction calculation.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Direction vector of the molecule (excluding <cite>exclude_ids</cite>).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.dump">
+<code class="descname">dump</code><span class="sig-paren">(</span><em>path</em>, <em>include_attrs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a JSON <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> of the molecule to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path to the file to which the JSON dict should be
+written.</li>
+<li><strong>include_attrs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The names of attributes of the molecule to be added to
+the JSON. Each attribute is saved as a string using
+<code class="xref py py-func docutils literal notranslate"><span class="pre">repr()</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="stk.molecular.molecules.molecule.Molecule.from_dict">
+<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>json_dict</em>, <em>load_names=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> from a JSON <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>.</p>
+<p>The <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> returned has the class specified in
+<cite>json_dict</cite>, not <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>json_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – A <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> holding the JSON representation of a
+molecule.</li>
+<li><strong>load_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the <code class="docutils literal notranslate"><span class="pre">name</span></code> key stored in <cite>json_dict</cite>
+is loaded.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The molecule represented by <cite>json_dict</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.graph">
+<code class="descname">graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a mathematical graph representing the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A graph where the nodes are the ids of the atoms and the
+edges are the bonds.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">networkx.Graph</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">inchi</code></dt>
+<dd><p>Returns the InChI of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The InChI of the molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.is_core_atom">
+<code class="descname">is_core_atom</code><span class="sig-paren">(</span><em>atom_id</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.is_core_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if atom is not H or part of a fg.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atom_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the atom being queried.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Indicates whether the atom with <cite>atom_id</cite> is part of the
+core.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="stk.molecular.molecules.molecule.Molecule.load">
+<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>path</em>, <em>load_names=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> from a JSON file.</p>
+<p>The returned <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> has the class specified in the
+JSON file, not <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path holding a JSON representation to a molecule.</li>
+<li><strong>load_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the <code class="docutils literal notranslate"><span class="pre">name</span></code> key stored in the JSON file
+is loaded.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The molecule held in <cite>path</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.max_diameter">
+<code class="descname">max_diameter</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.max_diameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the largest distance between 2 atoms in the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of the form<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">max_diameter</span> <span class="o">=</span> <span class="p">(</span><span class="mf">312.3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">54</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where the first element is the largest inter-atomic
+distance in the molecule. The next 2 elements are the ids
+of the involved atoms.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form (float, int, int)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.mdl_mol_block">
+<code class="descname">mdl_mol_block</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.mdl_mol_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a V3000 mol block of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atoms</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The atom ids of atoms to write. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then all atoms
+are written.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The V3000 mol block representing the molecule.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.plane_normal">
+<code class="descname">plane_normal</code><span class="sig-paren">(</span><em>atom_ids=None</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.plane_normal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the best fit plane of the molecule or its atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atom_ids</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The ids of the atoms that are assumed to be on the plane.
+Only their coordinates will be used for fitting.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> then atoms forming the largest cycle are found
+prior to fitting the plane.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Vector orthonormal to the plane of the molecule.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.position_matrix">
+<code class="descname">position_matrix</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.position_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a matrix holding the atomic positions of a conformer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The array has the shape <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">n]</span></code>. Each column holds the
+x, y and z coordinates of a bonder centroid. The index of
+the column corresponds to the atom id.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.rotate">
+<code class="descname">rotate</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates the molecule by <cite>theta</cite> about <cite>axis</cite>.</p>
+<p>The rotation occurs about the molecular centroid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>theta</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The size of the rotation in radians.</li>
+<li><strong>axis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The axis about which the rotation happens.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.same">
+<code class="descname">same</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.same" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if <cite>other</cite> has the same molecular structure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance you are checking has
+the same structure.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if the structures match.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.save_rdkit_atom_props">
+<code class="descname">save_rdkit_atom_props</code><span class="sig-paren">(</span><em>prop_names</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.save_rdkit_atom_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule.atom_props" title="stk.molecular.molecules.molecule.Molecule.atom_props"><code class="xref py py-attr docutils literal notranslate"><span class="pre">atom_props</span></code></a> with rdkit atom tags.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prop_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The names of atom properties which should be saved.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.set_orientation">
+<code class="descname">set_orientation</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.set_orientation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates the molecule by a rotation from <cite>start</cite> to <cite>end</cite>.</p>
+<p>Given two direction vectors, <cite>start</cite> and <cite>end</cite>, this method
+applies the rotation required transform <cite>start</cite> to <cite>end</cite> on
+the molecule. The rotation occurs about the centroid of the
+molecule.</p>
+<p>For example, if the <cite>start</cite> and <cite>end</cite> vectors
+are 45 degrees apart, a 45 degree rotation will be applied to
+the molecule. The rotation will be along the appropriate
+direction.</p>
+<p>The great thing about this method is that you as long as you
+can associate a geometric feature of the molecule with a
+vector, then the molecule can be rotated so that this vector is
+aligned with <cite>end</cite>. The defined vector can be virtually
+anything. This means that any geometric feature of the molecule
+can be easily aligned with any arbitrary axis.</p>
+<p class="rubric">Notes</p>
+<p>The difference between this method and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">StructUnit._set_orientation2()</span></code> is about which point the
+rotation occurs: centroid of the entire molecule versus
+centroid of the bonder atoms, respectively.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>start</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – A vector which is to be rotated so that it transforms to
+the <cite>end</cite> vector.</li>
+<li><strong>end</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – This array holds the vector, onto which <cite>start</cite> is rotated.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule in <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule.mol" title="stk.molecular.molecules.molecule.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">mol</span></code></a>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.set_position">
+<code class="descname">set_position</code><span class="sig-paren">(</span><em>position</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.set_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the centroid of the molecule to <cite>position</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>position</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – This array holds the position on which the centroid of the
+molecule should be placed.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The <code class="docutils literal notranslate"><span class="pre">rdkit</span></code> molecule with the centroid placed at
+<cite>position</cite>. This is the same instance as that in
+<a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule.mol" title="stk.molecular.molecules.molecule.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.mol</span></code></a>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.set_position_from_matrix">
+<code class="descname">set_position_from_matrix</code><span class="sig-paren">(</span><em>pos_mat</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.set_position_from_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set atomic positions of the molecule to those in <cite>pos_mat</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pos_mat</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – <p>The matrix holds the coordinates on which the atoms of the
+molecule should be placed.</p>
+<p>The shape of the matrix is <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">n]</span></code>. Each column of
+<cite>pos_mat</cite> represents the coordinates of a single atom. The
+1st column sets the coordinates of the atom with id of 0.
+The next column sets the coordinates of the atom with id 1,
+and so on.</p>
+</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.shift">
+<code class="descname">shift</code><span class="sig-paren">(</span><em>shift</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.shift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shifts the coordinates of all atoms.</p>
+<p>This does not modify the molecule. A modified copy is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shift</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – A numpy array holding the value of the shift along each
+axis.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A copy of the molecule where the coordinates have been
+shifted by <cite>shift</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">rdkit.Mol</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.molecules.molecule.Molecule.subclasses">
+<code class="descname">subclasses</code><em class="property"> = {'Cage': &lt;class 'stk.molecular.molecules.cage.Cage'&gt;, 'CageComplex': &lt;class 'stk.molecular.molecules.cage.CageComplex'&gt;, 'CageStructUnit': &lt;class 'stk.molecular.molecules.cage.CageStructUnit'&gt;, 'MacroMolecule': &lt;class 'stk.molecular.molecules.macro_molecule.MacroMolecule'&gt;, 'Macrocycle': &lt;class 'stk.molecular.molecules.macrocycle.Macrocycle'&gt;, 'MacrocycleStructUnit': &lt;class 'stk.molecular.molecules.macrocycle.MacrocycleStructUnit'&gt;, 'Periodic': &lt;class 'stk.molecular.molecules.periodic.Periodic'&gt;, 'Polymer': &lt;class 'stk.molecular.molecules.polymer.Polymer'&gt;, 'Rotaxane': &lt;class 'stk.molecular.molecules.rotaxane.Rotaxane'&gt;, 'StructUnit': &lt;class 'stk.molecular.molecules.struct_unit.StructUnit'&gt;, 'StructUnit2': &lt;class 'stk.molecular.molecules.struct_unit.StructUnit2'&gt;, 'StructUnit3': &lt;class 'stk.molecular.molecules.struct_unit.StructUnit3'&gt;}</em><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.subclasses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.update_cache">
+<code class="descname">update_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.update_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update attributes of cached molecule.</p>
+<p>Using <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> returns modified copies of molecules.
+In order to ensure that the cached molecules have
+their attributes updated to the values of the copies, this
+method must be run on the copies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.update_from_mae">
+<code class="descname">update_from_mae</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.update_from_mae" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates molecular structure to match an <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal notranslate"><span class="pre">.mae</span></code> file from which the structure
+should be updated.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to be updated.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.update_from_mol">
+<code class="descname">update_from_mol</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.update_from_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates molecular structure to match an <code class="docutils literal notranslate"><span class="pre">.mol</span></code> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> file from which the structure
+should be updated.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to be updated.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.update_from_xyz">
+<code class="descname">update_from_xyz</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.update_from_xyz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates molecular structure to match a <code class="docutils literal notranslate"><span class="pre">.xyz</span></code> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> file from which the structure
+should be updated.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to be updated.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeError</span></code> – If the number of atoms in the file does not match the
+number of atoms in the molecule or if atom elements in the
+file do not agree with the atom elements in the molecule.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.update_stereochemistry">
+<code class="descname">update_stereochemistry</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.update_stereochemistry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates stereochemistry tags in <a class="reference internal" href="#stk.molecular.molecules.molecule.Molecule.mol" title="stk.molecular.molecules.molecule.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.mol</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.Molecule.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>path</em>, <em>atoms=None</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.Molecule.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a molecular structure file of the molecule.</p>
+<p>This bypasses the need for writing functions in <code class="docutils literal notranslate"><span class="pre">rdkit</span></code>.
+These have issues with macromolecules due to poor ring finding
+and sanitization issues.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The <cite>path</cite> to which the molecule should be written.</li>
+<li><strong>atoms</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The atom ids of atoms to write. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then all atoms
+are written.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="stk.molecular.molecules.molecule.MoleculeSubclassError">
+<em class="property">exception </em><code class="descclassname">stk.molecular.molecules.molecule.</code><code class="descname">MoleculeSubclassError</code><a class="headerlink" href="#stk.molecular.molecules.molecule.MoleculeSubclassError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="attribute">
+<dt id="stk.molecular.molecules.molecule.MoleculeSubclassError.__init__">
+<code class="descname">__init__</code><a class="headerlink" href="#stk.molecular.molecules.molecule.MoleculeSubclassError.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.molecules.molecule.MoleculeSubclassError.args">
+<code class="descname">args</code><a class="headerlink" href="#stk.molecular.molecules.molecule.MoleculeSubclassError.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.molecules.molecule.MoleculeSubclassError.with_traceback">
+<code class="descname">with_traceback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.molecular.molecules.molecule.MoleculeSubclassError.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

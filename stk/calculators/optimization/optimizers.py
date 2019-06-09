@@ -75,6 +75,9 @@ import os
 from functools import wraps
 import subprocess as sp
 import uuid
+import os
+from os.path import join
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -260,13 +263,27 @@ class CageOptimizerSequence(Optimizer):
 
     Before each :class:`Optimizer` in the sequence is applied to the
     :class:`.Cage`, it is checked to see if it is collapsed. If it is
-    collapsed, the optiimzation sequence ends immediately.
+    collapsed, the optimization sequence ends immediately.
 
     Attributes
     ----------
     optimizers : :class:`tuple` of :class:`Optimizer`
         The :class:`Optimizer` objects which are used to optimize a
         :class:`.Cage` molecule.
+
+    Examples
+    --------
+    Let's say we want to embed a cage with ETKDG first and then
+    minimize it with the MMFF force field.
+
+    .. code-block:: python
+
+        import rdkit.Chem.AllChem as rdkit
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        etkdg = RDKitEmbedder(rdkit.ETKDG())
+        mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
+        optimizer = CageOptimizerSequence(etkdg, mmff)
+        optimizer.optimize(mol)
 
     """
 
@@ -620,25 +637,23 @@ class UFF(Optimizer):
         rdkit.UFFOptimizeMolecule(mol.mol, confId=conformer)
 
 
-class RDKitEmbedder(Optimizer):
+class ETKDG(Optimizer):
     """
-    Uses :func:`rdkit.EmbedMolecule` to find an optimized structure.
+    Uses the ETKDG [#]_ v2 algorithm to find an optimized structure.
 
     Attributes
     ----------
-    params : :class:`rdkit.EmbedParameters`
-        The parameters used for the embedding.
+    random_seed : :class:`int`
+        The random seed to use.
 
     Examples
     --------
-    Use ETKDG [#]_ to generate an optimized structure.
-
     .. code-block:: python
 
         import rdkit.Chem.AllChem as rdkit
         mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        embedder = RDKitEmbedder(rdkit.ETKDG())
-        embedder.optimize(mol)
+        etkdg = ETKDG()
+        etkdg.optimize(mol)
 
     References
     ----------
@@ -646,14 +661,14 @@ class RDKitEmbedder(Optimizer):
 
     """
 
-    def __init__(self, params, use_cache=False):
+    def __init__(self, random_seed=12, use_cache=False):
         """
-        Initializes a :class:`RDKitEmbedder` instance.
+        Initializes a :class:`ETKDG` instance.
 
         Parameters
         ----------
-        params : :class:`rdkit.EmbedParameters`
-            The parameters used for the embedding.
+        random_seed : :class:`int`, optional
+            The random seed to use.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
@@ -661,7 +676,7 @@ class RDKitEmbedder(Optimizer):
 
         """
 
-        self.params = params
+        self.random_seed = random_seed
         super().__init__(use_cache=use_cache)
 
     def optimize(self, mol, conformer=-1):
@@ -685,22 +700,45 @@ class RDKitEmbedder(Optimizer):
         if conformer == -1:
             conformer = mol.mol.GetConformer(conformer).GetId()
 
-        conf_id = rdkit.EmbedMolecule(mol.mol, self.params)
-        new_conf = rdkit.Conformer(mol.mol.GetConformer(conf_id))
+        params = rdkit.ETKDGv2()
+        params.clearConfs = False
+        params.random_seed = self.random_seed
+
+        conf_id = rdkit.EmbedMolecule(mol.mol, params)
+        # Make sure that the conformer order is not re-arranged.
+        positions = mol.position_matrix(conformer=conf_id)
+        mol.set_position_from_matrix(positions, conformer=conformer)
         mol.mol.RemoveConformer(conf_id)
-        mol.mol.RemoveConformer(conformer)
-        new_conf.SetId(conformer)
-        mol.mol.AddConformer(new_conf)
 
 
 class GFNXTB(Optimizer):
     """
     Uses GFN-xTB to optimize molecules.
 
+    Notes
+    -----
+    When running :meth:`optimize`, this calculator changes the
+    present working directory with :func:`os.chdir`. The original
+    working directory will be restored even if an error is raised so
+    unless multi-threading is being used this implementation detail
+    should not matter.
+
+    If multi-threading is being used an error could occur if two
+    different threads need to know about the current working directory
+    as this :class:`.Optimizer` can change it from under them.
+
+    Note that this does not have any impact on multi-processing,
+    which should always be safe.
+
     Attributes
     ----------
     gfnxtb_path : :class:`str`
         The path to the GFN-xTB executable.
+
+    output_dir : :class:`str`
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
 
     num_cores : :class:`str`
         The number of cores for GFN-xTB to use.
@@ -713,10 +751,31 @@ class GFNXTB(Optimizer):
         gfnxtb = GFNXTB('/opt/gfnxtb/xtb')
         gfnxtb.optimize(mol)
 
+    Note that for :class:`.MacroMolecule` objects assembled by ``stk``
+    :class:`GFNXTB` should usually be used in a
+    :class:`OptimizerSequence`. This is because GFN-xTB only uses
+    xyz coordinates as input and so will not recognize the long bonds
+    created during assembly. An optimizer which can minimize
+    these bonds should be used before :class:`GFNXTB`.
+
+    .. code-block:: python
+
+        bb1 = StructUnit2.smiles_init('NCCNCCN', ['amine'])
+        bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
+        polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
+
+        gfnxtb = OptimizerSequence(
+            UFF(),
+            GFNXTB('/opt/gfnxtb/xtb')
+        )
+        gfnxtb.optimize(polymer)
+
     """
 
-    def __init__(self, gfnxtb_path, output_dir=None, free=False, opt_level=1,
-                 num_cores=1, solvent=None, charge=None, use_cache=False):
+    def __init__(self, gfnxtb_path, output_dir=None,
+                 free=False, opt_level=1,
+                 num_cores=1, solvent=None,
+                 charge=None, use_cache=False):
         """
         Initializes a :class:`GFNXTB` instance.
 
@@ -738,6 +797,11 @@ class GFNXTB(Optimizer):
             Optimization level to use.
             -2 =  , -1 = , 0 = , 1 = , 2 = .
 
+        output_dir : :class:`str`, optional
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
+
         num_cores : :class:`int`
             The number of cores for GFN-xTB to use.
 
@@ -753,8 +817,8 @@ class GFNXTB(Optimizer):
         """
 
         self.gfnxtb_path = gfnxtb_path
-        self.free = free
         self.output_dir = output_dir
+        self.free = free
         self.opt_level = opt_level
         self.num_cores = str(num_cores)
         self.solvent = solvent
@@ -834,6 +898,39 @@ class GFNXTB(Optimizer):
             Output from process. True if optimization is successful.
 
         """
+
+        if conformer == -1:
+            conformer = mol.mol.GetConformer(conformer).GetId()
+
+        if self.output_dir is None:
+            output_dir = str(uuid.uuid4().int)
+        else:
+            output_dir = self.output_dir
+        output_dir = os.path.abspath(output_dir)
+
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+
+        os.mkdir(output_dir)
+        init_dir = os.getcwd()
+        try:
+            os.chdir(output_dir)
+            xyz = join(output_dir, f'input_structure.xyz')
+            mol.write(xyz, conformer=conformer)
+            cmd = [
+                self.gfnxtb_path,
+                xyz,
+                '-opt',
+                '--parallel',
+                self.num_cores
+            ]
+            sp.run(cmd, stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
+            output_xyz = join(output_dir, 'xtbopt.xyz')
+            mol.update_from_xyz(path=output_xyz, conformer=conformer)
+        finally:
+            os.chdir(init_dir)
+
+
 
         basename = uuid.uuid4().int
 

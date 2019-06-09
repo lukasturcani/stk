@@ -446,8 +446,10 @@ class MacroMolecule(Molecule, metaclass=Cached):
         if include_attrs is None:
             include_attrs = []
 
-        conformers = [(conf.GetId(), self.mdl_mol_block(conf.GetId()))
-                      for conf in self.mol.GetConformers()]
+        conformers = [
+            (conf.GetId(), self.mdl_mol_block(conformer=conf.GetId()))
+            for conf in self.mol.GetConformers()
+        ]
 
         json = {
             'bb_counter': [(key.json(), val) for key, val in

@@ -223,6 +223,35 @@ to be selected for crossover.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.selectors.AboveAverage.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>duplicate_batches=False</em>, <em>num=None</em>, <em>duplicates=True</em>, <em>use_rank=False</em>, <em>batch_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.AboveAverage.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.selectors.AboveAverage" title="stk.calculators.ga.selectors.AboveAverage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AboveAverage</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>duplicate_batches</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the same batch may be yielded more than
+once. For example, if the batch has a fitness twice above
+average it will be yielded twice, if it has a fitness
+three times above average, it will be yielded three times
+and so on.</li>
+<li><strong>num</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of batches to yield. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then yielding
+will continue forever or until the generator is exhausted,
+whichever comes first.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the same molecule can be yielded in more than
+one batch.</li>
+<li><strong>use_rank</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> the fitness value of an individual is
+calculated as <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">=</span> <span class="pre">1/rank</span></code>.</li>
+<li><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of molecules yielded at once.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.selectors.AboveAverage._batch">
 <code class="descname">_batch</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.AboveAverage._batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch molecules of <cite>population</cite> together.</p>
@@ -234,7 +263,7 @@ to be selected for crossover.</p>
 selected.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> which is the sum of all
 fitness values of the molecules in the batch.</td>
 </tr>
@@ -252,10 +281,10 @@ fitness values of the molecules in the batch.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batches</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code>) – An <code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> yielding <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form
 <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where <code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>
-of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
+of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>.</td>
 </tr>
 </tbody>
@@ -272,7 +301,7 @@ of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecula
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Populaion</span></code>) – The population from which individuals are to be selected.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The next selected batch of molecules.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The next selected batch of molecules.</td>
 </tr>
 </tbody>
 </table>
@@ -320,6 +349,27 @@ to be selected for crossover.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.selectors.Fittest.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>num=None</em>, <em>duplicates=True</em>, <em>batch_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.Fittest.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.selectors.Fittest" title="stk.calculators.ga.selectors.Fittest"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fittest</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>num</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of batches to yield. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then yielding
+will continue until the generator is exhausted.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the same molecule can be yielded in more than
+one batch.</li>
+<li><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of molecules yielded at once.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.selectors.Fittest._batch">
 <code class="descname">_batch</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.Fittest._batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch molecules of <cite>population</cite> together.</p>
@@ -331,7 +381,7 @@ to be selected for crossover.</p>
 selected.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> which is the sum of all
 fitness values of the molecules in the batch.</td>
 </tr>
@@ -349,10 +399,10 @@ fitness values of the molecules in the batch.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batches</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code>) – An <code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> yielding <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form
 <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where <code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>
-of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
+of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>.</td>
 </tr>
 </tbody>
@@ -370,7 +420,7 @@ of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecula
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>) – A <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> from which batches of molecules are
 selected.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
 </tr>
 </tbody>
 </table>
@@ -433,6 +483,30 @@ to be selected for crossover.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.selectors.Roulette.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>num=None</em>, <em>duplicates=True</em>, <em>use_rank=False</em>, <em>batch_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.Roulette.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.selectors.Roulette" title="stk.calculators.ga.selectors.Roulette"><code class="xref py py-class docutils literal notranslate"><span class="pre">Roulette</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>num</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of batches to yield. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then yielding
+will continue forever or until the generator is exhausted,
+whichever comes first.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> the same member can be yielded in more than
+one batch.</li>
+<li><strong>use_rank</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> the fitness value of an individual is
+calculated as <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">=</span> <span class="pre">1/rank</span></code>.</li>
+<li><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of molecules yielded at once.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.selectors.Roulette._batch">
 <code class="descname">_batch</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.Roulette._batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch molecules of <cite>population</cite> together.</p>
@@ -444,7 +518,7 @@ to be selected for crossover.</p>
 selected.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> which is the sum of all
 fitness values of the molecules in the batch.</td>
 </tr>
@@ -462,10 +536,10 @@ fitness values of the molecules in the batch.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batches</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code>) – An <code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> yielding <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form
 <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where <code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>
-of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
+of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>.</td>
 </tr>
 </tbody>
@@ -483,7 +557,7 @@ of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecula
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Populaion</span></code>) – A <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> from which batches of molecules are
 selected.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
 </tr>
 </tbody>
 </table>
@@ -568,7 +642,7 @@ batch.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -590,6 +664,30 @@ batch.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="stk.calculators.ga.selectors.Selector.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>num</em>, <em>duplicates</em>, <em>use_rank</em>, <em>batch_size</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.Selector.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>num</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of batches to yield. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then yielding
+will continue forever or until the generator is exhausted,
+whichever comes first.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> the same member can be yielded in more than one
+batch.</li>
+<li><strong>use_rank</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> the fitness value of a moleucle is calculated
+as <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">=</span> <span class="pre">1/rank</span></code>.</li>
+<li><strong>batch_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of molecules yielded at once.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.selectors.Selector._batch">
 <code class="descname">_batch</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.Selector._batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch molecules of <cite>population</cite> together.</p>
@@ -601,7 +699,7 @@ batch.</p>
 selected.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> which is the sum of all
 fitness values of the molecules in the batch.</td>
 </tr>
@@ -619,10 +717,10 @@ fitness values of the molecules in the batch.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batches</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code>) – An <code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> yielding <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form
 <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where <code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>
-of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
+of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>.</td>
 </tr>
 </tbody>
@@ -640,7 +738,7 @@ of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecula
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>) – A <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> from which batches of molecules are
 selected.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
 </tr>
 </tbody>
 </table>
@@ -691,6 +789,21 @@ fitness.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.selectors.SelectorFunnel.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*selectors</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.SelectorFunnel.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.selectors.SelectorFunnel" title="stk.calculators.ga.selectors.SelectorFunnel"><code class="xref py py-class docutils literal notranslate"><span class="pre">SelectorFunnel</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*selectors</strong> (<a class="reference internal" href="#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a>) – The <a class="reference internal" href="#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> objects used to select molecules. For
+all except the last <code class="xref py py-attr docutils literal notranslate"><span class="pre">num</span></code> must be <code class="docutils literal notranslate"><span class="pre">1</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.selectors.SelectorFunnel._batch">
 <code class="descname">_batch</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.SelectorFunnel._batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch molecules of <cite>population</cite> together.</p>
@@ -702,7 +815,7 @@ fitness.</p>
 selected.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> which is the sum of all
 fitness values of the molecules in the batch.</td>
 </tr>
@@ -720,10 +833,10 @@ fitness values of the molecules in the batch.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batches</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code>) – An <code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> yielding <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form
 <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where <code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>
-of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
+of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>.</td>
 </tr>
 </tbody>
@@ -741,7 +854,7 @@ of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecula
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>) – A <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> from which batches of molecules are
 selected.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
 </tr>
 </tbody>
 </table>
@@ -788,6 +901,20 @@ fitness.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.selectors.SelectorSequence.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*selectors</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.SelectorSequence.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.selectors.SelectorSequence" title="stk.calculators.ga.selectors.SelectorSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">SelectorSequence</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*selectors</strong> (<a class="reference internal" href="#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a>) – The <a class="reference internal" href="#stk.calculators.ga.selectors.Selector" title="stk.calculators.ga.selectors.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a> objects used to select molecules.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.selectors.SelectorSequence._batch">
 <code class="descname">_batch</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.selectors.SelectorSequence._batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch molecules of <cite>population</cite> together.</p>
@@ -799,7 +926,7 @@ fitness.</p>
 selected.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> which is the sum of all
 fitness values of the molecules in the batch.</td>
 </tr>
@@ -817,10 +944,10 @@ fitness values of the molecules in the batch.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batches</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code>) – An <code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> yielding <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form
 <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where <code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>
-of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
+of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of form <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">fitness)</span></code> where
-<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
 <code class="docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>.</td>
 </tr>
 </tbody>
@@ -838,7 +965,7 @@ of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecula
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>) – A <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> from which batches of molecules are
 selected.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – A batch of selected molecules.</td>
 </tr>
 </tbody>
 </table>

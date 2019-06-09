@@ -151,26 +151,21 @@
 <span id="stk-calculators-ga-fitness-normalizers-module"></span><h1>stk.calculators.ga.fitness_normalizers module<a class="headerlink" href="#module-stk.calculators.ga.fitness_normalizers" title="Permalink to this headline">¶</a></h1>
 <p>Module for defining fitness normalizers.</p>
 <p>Fitness normalizers are classes which are responsible for normalizing
-the fitness values in a <code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code>. They analyze the
+the fitness values in a <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>. They analyze the
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> values across the entire population and update them.
-After <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer.normalize" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize()</span></code></a> is run, every
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> in the population must hold a positive, non-zero
-<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> in its <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> attribute. However, before
-<a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer.normalize" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize()</span></code></a> the values in the <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code>
-attribute can be any Python object. It is the job of the
-<a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a> to convert these into positive, non-zero
-<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>.</p>
+Calling <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer.normalize" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize()</span></code></a> directly modifies the
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> attribute of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects.</p>
 <p>To see how <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a> can be used, look at the
 documention of the classes which inherit it, for example
 <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.Power" title="stk.calculators.ga.fitness_normalizers.Power"><code class="xref py py-class docutils literal notranslate"><span class="pre">Power</span></code></a>, <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.Sum" title="stk.calculators.ga.fitness_normalizers.Sum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sum</span></code></a> <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.ScaleByMean" title="stk.calculators.ga.fitness_normalizers.ScaleByMean"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScaleByMean</span></code></a>. In addition,
 multiple <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a> can be chained using
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">Sequence.normalize()</span></code>.</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">NormalizerSequence()</span></code>.</p>
 <div class="section" id="extending-stk-making-new-fitness-normalizers">
 <span id="adding-fitness-normalizers"></span><h2>Extending stk: Making new fitness normalizers.<a class="headerlink" href="#extending-stk-making-new-fitness-normalizers" title="Permalink to this headline">¶</a></h2>
 <p>A new class inheriting <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a> must be made.
 The class must define a <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer.normalize" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize()</span></code></a> method,
 which takes one argument, which is a <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> of
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p>
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p>
 <dl class="class">
 <dt id="stk.calculators.ga.fitness_normalizers.FitnessNormalizer">
 <em class="property">class </em><code class="descclassname">stk.calculators.ga.fitness_normalizers.</code><code class="descname">FitnessNormalizer</code><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="Permalink to this definition">¶</a></dt>
@@ -192,6 +187,12 @@ of molecules.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.ga.fitness_normalizers.FitnessNormalizer.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="method">
@@ -321,6 +322,21 @@ be a single number or multiple numbers.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.fitness_normalizers.Multiply.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>coefficient</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.Multiply.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.Multiply" title="stk.calculators.ga.fitness_normalizers.Multiply"><code class="xref py py-class docutils literal notranslate"><span class="pre">Multiply</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>coefficent</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The cofficients each <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> value by. Can be
+a single number or multiple numbers.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.fitness_normalizers.Multiply.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.Multiply.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the fitness values in <cite>population</cite>.</p>
@@ -389,6 +405,21 @@ should be normalized.</td>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.fitness_normalizers.NormalizerSequence.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*normalizers</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.NormalizerSequence.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.NormalizerSequence" title="stk.calculators.ga.fitness_normalizers.NormalizerSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">NormalizerSequence</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>normalizers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a>) – The normalizers which get applied in sequence by
+<a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.NormalizerSequence.normalize" title="stk.calculators.ga.fitness_normalizers.NormalizerSequence.normalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">normalize()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.fitness_normalizers.NormalizerSequence.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.NormalizerSequence.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the fitness values in <cite>population</cite>.</p>
@@ -415,6 +446,12 @@ should be normalized.</td>
 <em class="property">class </em><code class="descclassname">stk.calculators.ga.fitness_normalizers.</code><code class="descname">NullFitnessNormalizer</code><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.NullFitnessNormalizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.fitness_normalizers.FitnessNormalizer</span></code></a></p>
 <p>Does nothing.</p>
+<dl class="method">
+<dt id="stk.calculators.ga.fitness_normalizers.NullFitnessNormalizer.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.NullFitnessNormalizer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.ga.fitness_normalizers.NullFitnessNormalizer.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.NullFitnessNormalizer.normalize" title="Permalink to this definition">¶</a></dt>
@@ -543,6 +580,21 @@ a single number or multiple numbers.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.fitness_normalizers.Power.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>power</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.Power.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.Power" title="stk.calculators.ga.fitness_normalizers.Power"><code class="xref py py-class docutils literal notranslate"><span class="pre">Power</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>power</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The power to raise each <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> value to. Can be
+a single number or multiple numbers.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.fitness_normalizers.Power.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.Power.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the fitness values in <cite>population</cite>.</p>
@@ -570,7 +622,7 @@ should be normalized.</td>
 <dd><p>Bases: <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.ga.fitness_normalizers.FitnessNormalizer</span></code></a></p>
 <p>Divides fitness values by the population mean.</p>
 <p>While this function can be used if the <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> attribute
-of each <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> in the <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> is a single
+of each <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> in the <a class="reference internal" href="stk.populations.html#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> is a single
 number it is most useful when <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>
 of numbers. In this case, it is necessary to somehow combine the
 numbers so that a single <code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness</span></code> value is produced.
@@ -644,6 +696,12 @@ In essence we have removed the units from each parameter.</p>
 <span class="c1"># mol3.fitness is now [1.5, 1.5, 1.5].</span>
 </pre></div>
 </div>
+<dl class="method">
+<dt id="stk.calculators.ga.fitness_normalizers.ScaleByMean.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.ScaleByMean.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.ga.fitness_normalizers.ScaleByMean.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.ScaleByMean.normalize" title="Permalink to this definition">¶</a></dt>
@@ -739,6 +797,12 @@ shifted.</td>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.fitness_normalizers.ShiftUp.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.ShiftUp.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.fitness_normalizers.ShiftUp.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.ShiftUp.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the fitness values in <cite>population</cite>.</p>
@@ -793,6 +857,12 @@ should be normalized.</td>
 <span class="c1"># mol3.fitness is now 24.</span>
 </pre></div>
 </div>
+<dl class="method">
+<dt id="stk.calculators.ga.fitness_normalizers.Sum.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.Sum.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.ga.fitness_normalizers.Sum.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.fitness_normalizers.Sum.normalize" title="Permalink to this definition">¶</a></dt>

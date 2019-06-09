@@ -73,8 +73,8 @@ class ReactionKey:
         """
         Intializer.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         *fg_names : :class:`str`
             The names of functional groups involved in a reaction.
 

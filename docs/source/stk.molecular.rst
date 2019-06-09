@@ -1,16 +1,12 @@
 stk.molecular package
 =====================
 
-.. automodule:: stk.molecular
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
 .. toctree::
 
+    stk.molecular.molecules
     stk.molecular.topologies
 
 Submodules
@@ -19,5 +15,11 @@ Submodules
 .. toctree::
 
    stk.molecular.functional_groups
-   stk.molecular.molecules
 
+Module contents
+---------------
+
+.. automodule:: stk.molecular
+    :members:
+    :undoc-members:
+    :show-inheritance:

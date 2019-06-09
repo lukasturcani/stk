@@ -1078,37 +1078,40 @@ input file, along with a description of each variable.
   :attr:`~.Selector.batch_size` must be ``1``.
 * :data:`crossover_selector` - :class:`.Selector` - **mandatory** -
   The selector used to select molecules for crossover.
-* :data:`exiter` - :class:`.Exiter` - The exiter which determines if
-  the GA has satisfied its exit condition.
+* :data:`exiter` - :class:`.Exiter` - **mandatory** -
+  The exiter which determines if the GA has satisfied its exit
+  condition.
 * :data:`fitness_normalizer` - :class:`.FitnessNormalizer` -
-  *optional, default = NullFitnessOptimizer()* - The fitness normalizer
-  which normalizes fitness values each generation.
+  *optional, default =* :class:`.NullFitnessNormalizer()` - The fitness
+  normalizer which normalizes fitness values each generation.
 * :data:`processes` - :class:`int` -
-  *optional, default = psutil.cpu_count()* - The number of CPU cores
-  the GA should use.
+  *optional, default =* :func:`psutil.cpu_count` - The number of CPU
+  cores the GA should use.
 * :data:`plotters` - :class:`list` of :class:`.Plotter` -
-  *optional, default = []* - Plotters which are used to plot graphs at
-  the end of the GA.
+  *optional, default =* ``[]`` - Plotters which are used to plot graphs
+  at the end of the GA.
 * :data:`log_file` - :class:`bool` -
-  *optional, default = True* - Toggles whether a log file which lists
-  which molecules are present in each generation should be made.
+  *optional, default =* ``True`` - Toggles whether a log file which
+  lists which molecules are present in each generation should be made.
 * :data:`database_dump` - :class:`bool` -
-  *optional, default = True* - Toggles whether a :class:`.Population`
-  JSON file should be made at the end of the GA run. It will hold every
-  molecule made by the GA.
+  *optional, default =* ``True`` - Toggles whether a
+  :class:`.Population` JSON file should be made at the end of the GA
+  run. It will hold every molecule made by the GA.
 * :data:`progress_dump` - :class:`bool` -
-  *optional, default = True* - Toggles whether a :class:`.Population`
-  JSON file should be made at the end of the GA run. It will hold every
-  generation of the GA as a separate subpopulation.
+  *optional, default =* ``True`` - Toggles whether a
+  :class:`.Population` JSON file should be made at the end of the GA
+  run. It will hold every generation of the GA as a separate
+  subpopulation.
 * :data:`debug_dumps` - :class:`bool` -
-  *optional, default = False* - If ``True`` a database and progress dump
-  is made after every generation rather than just the end. This is nice
-  for debugging but can seriously slow down the GA.
+  *optional, default =* ``False`` - If ``True`` a database and progress
+  dump is made after every generation rather than just the end. This is
+  nice for debugging but can seriously slow down the GA.
 * :data:`tar_output` - :class:`bool` -
-  *optional, default = False* - If ``True`` then a compressed tar
+  *optional, default =* ``False`` - If ``True`` then a compressed tar
   archive of the output folder will be made.
 * :data:`logging_level` - :class:`int` -
-  *optional, default = logging.INFO* - Sets the logging level in the GA.
+  *optional, default =* ``logging.INFO`` - Sets the logging level in
+  the GA.
 
 .. _`extending stk`:
 

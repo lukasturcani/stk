@@ -252,6 +252,23 @@ generation.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="stk.populations.GAPopulation.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intializes a population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>, <a class="reference internal" href="#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>) – A population is initialized with the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<a class="reference internal" href="#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> instances it should hold. These are
+placed into the <code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code> or <code class="xref py py-attr docutils literal notranslate"><span class="pre">populations</span></code>
+attributes, respectively.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.populations.GAPopulation._calculate_fitness_parallel">
 <code class="descname">_calculate_fitness_parallel</code><span class="sig-paren">(</span><em>fitness_calculator</em>, <em>processes</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation._calculate_fitness_parallel" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -274,10 +291,10 @@ generation.</p>
 <dl class="method">
 <dt id="stk.populations.GAPopulation.add_members">
 <code class="descname">add_members</code><span class="sig-paren">(</span><em>population</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.add_members" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances into <code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code>.</p>
-<p>The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>  instances held within <cite>population</cite>, are
+<dd><p>Adds <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances into <code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code>.</p>
+<p>The <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>  instances held within <cite>population</cite>, are
 added into <code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code>. Any nesting is removed. This is
-because all <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>  instances are added into
+because all <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>  instances are added into
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code> directly, regardless of how nested they are
 within <cite>population</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -285,11 +302,11 @@ within <cite>population</cite>.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by this container are
+<li><strong>population</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by this container are
 added into <code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code>.</li>
 <li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – <p>Indicates whether multiple instances of the same molecule
 are allowed to be added. Note, the sameness of a molecule
-is judged by <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.same" title="stk.molecular.molecules.Molecule.same"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.same()</span></code></a>.</p>
+is judged by <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.same" title="stk.molecular.molecules.molecule.Molecule.same"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.same()</span></code></a>.</p>
 <p>When <code class="docutils literal notranslate"><span class="pre">False</span></code> only molecules which are not already
 held by the population will be added. <code class="docutils literal notranslate"><span class="pre">True</span></code> allows more
 than one instance of the same molecule to be added.</p>
@@ -335,7 +352,7 @@ molecules it holds are not copies.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The next <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance held within the
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The next <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance held within the
 population or its subpopulations.</td>
 </tr>
 </tbody>
@@ -347,8 +364,8 @@ population or its subpopulations.</td>
 <code class="descname">assign_names_from</code><span class="sig-paren">(</span><em>n</em>, <em>overwrite=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.assign_names_from" title="Permalink to this definition">¶</a></dt>
 <dd><p>Give each member of the population a name starting from <cite>n</cite>.</p>
 <p class="rubric">Notes</p>
-<p>This method modifies the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.name" title="stk.molecular.molecules.Molecule.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.name</span></code></a> attribute of
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by the population.</p>
+<p>This method modifies the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.name" title="stk.molecular.molecules.molecule.Molecule.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.name</span></code></a> attribute of
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by the population.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -479,7 +496,7 @@ and <a class="reference internal" href="#stk.populations.GAPopulation.mutator" t
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The generated mutants, minus those already in the
 population.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -514,7 +531,7 @@ molecules and <a class="reference internal" href="#stk.populations.GAPopulation.
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The generated offspring, minus those already in the
 population.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -528,7 +545,7 @@ population.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – A molecule whose structure is being evaluated for presence
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – A molecule whose structure is being evaluated for presence
 in the population.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> if a molecule with the same structure as <cite>mol</cite>
@@ -549,7 +566,7 @@ is held by the population.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects being
+<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of the <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects being
 built.</li>
 <li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – <p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
@@ -557,20 +574,21 @@ built.</li>
                    <span class="p">[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
-in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
+<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
+<a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
+in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
 instances are then supplied to the macromolecule:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macro_mol</span> <span class="o">=</span> <span class="n">MacroMolecule</span><span class="p">([</span><span class="n">pick1</span><span class="p">,</span> <span class="n">pick2</span><span class="p">,</span> <span class="n">pick3</span><span class="p">],</span>
                           <span class="n">Topology</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
+<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
 corresponds to the order of the sublists.</p>
 </li>
 <li><strong>topologies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>) – The topologies of macromolecules being made.</li>
 <li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of parallel processes to create when building
-the molecules.</li>
+the molecules. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, creates a process for each
+core on the computer.</li>
 <li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">False</span></code>, duplicate structures are removed from
 the population.</li>
 </ul>
@@ -609,40 +627,40 @@ assembled from <cite>databases</cite>.</p>
 <dl class="classmethod">
 <dt id="stk.populations.GAPopulation.init_diverse">
 <em class="property">classmethod </em><code class="descname">init_diverse</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.init_diverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</p>
+<dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</p>
 <p>All molecules are held in the <code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code>.</p>
 <p>From the supplied sublists of building blocks, a random
-molecule is selected to initialize a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>
+molecule is selected to initialize a <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>
 per sublist. The next molecule selected from the same sublist
 is the one most with the most different Morgan fingerprint. The
 next molecule is picked at random again and so on. This is done
-until <cite>size</cite> <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instances have been
+until <cite>size</cite> <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instances have been
 formed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to be assembled.</li>
+<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to be assembled.</li>
 <li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – <p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
                    <span class="p">[</span><span class="n">StructUnit3</span><span class="p">(),</span> <span class="n">StructUnit3</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
                    <span class="p">[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
-in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
+<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
+<a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
+in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
 instances are then supplied to the macromolecule:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macro_mol</span> <span class="o">=</span> <span class="n">MacroMolecule</span><span class="p">([</span><span class="n">pick1</span><span class="p">,</span> <span class="n">pick2</span><span class="p">,</span> <span class="n">pick3</span><span class="p">],</span>
                           <span class="n">Topology</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
+<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
 corresponds to the order of the sublists.</p>
 </li>
 <li><strong>topolgies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> of <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>) – An iterable holding topologies which should be randomly
-selected during initialization of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</li>
+selected during initialization of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</li>
 <li><strong>size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The size of the population to be initialized.</li>
 </ul>
 </td>
@@ -667,12 +685,12 @@ selected during initialization of <a class="reference internal" href="stk.molecu
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>folder</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The path to a folder holding molecular structure files
-used to initialize <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects held by
+used to initialize <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects held by
 the population.</li>
 <li><strong>moltype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – An initializer for the molecular structure files. For
-example, <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> or <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit2" title="stk.molecular.molecules.StructUnit2"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit2</span></code></a>.
+example, <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> or <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit2" title="stk.molecular.molecules.struct_unit.StructUnit2"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit2</span></code></a>.
 If <cite>folder</cite> contains <code class="docutils literal notranslate"><span class="pre">.json</span></code> dump files of
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> then <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.load" title="stk.molecular.molecules.Molecule.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.load()</span></code></a> could
+<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> then <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.load" title="stk.molecular.molecules.molecule.Molecule.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.load()</span></code></a> could
 also be used.</li>
 <li><strong>glob_pattern</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – A glob used for selecting specific files within <cite>folder</cite>.</li>
 </ul>
@@ -691,36 +709,36 @@ also be used.</li>
 <dl class="classmethod">
 <dt id="stk.populations.GAPopulation.init_random">
 <em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.init_random" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</p>
+<dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</p>
 <p>All molecules are held in <code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code>.</p>
 <p>From the supplied building blocks a random molecule is selected
-per sublist to for a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>. This is done
-until <cite>size</cite> <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> have been formed.</p>
+per sublist to for a <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>. This is done
+until <cite>size</cite> <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> have been formed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to be assembled.</li>
+<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to be assembled.</li>
 <li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – <p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
                    <span class="p">[</span><span class="n">StructUnit3</span><span class="p">(),</span> <span class="n">StructUnit3</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
                    <span class="p">[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
-in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
+<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
+<a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
+in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
 instances are then supplied to the macromolecule:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macro_mol</span> <span class="o">=</span> <span class="n">MacroMolecule</span><span class="p">([</span><span class="n">pick1</span><span class="p">,</span> <span class="n">pick2</span><span class="p">,</span> <span class="n">pick3</span><span class="p">],</span>
                           <span class="n">Topology</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
+<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
 corresponds to the order of the sublists.</p>
 </li>
 <li><strong>topolgies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> of <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>) – An iterable holding topologies which should be randomly
-selected during initialization of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</li>
+selected during initialization of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</li>
 <li><strong>size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The size of the population to be initialized.</li>
 </ul>
 </td>
@@ -747,8 +765,8 @@ selected during initialization of <a class="reference internal" href="stk.molecu
 <li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the file holding the dumped population.</li>
 <li><strong>member_init</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – The initialization function for the population’s members.
 It converts the member representations in the file to
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects. For example
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.from_dict" title="stk.molecular.molecules.Molecule.from_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.from_dict()</span></code></a> when loading <code class="docutils literal notranslate"><span class="pre">.json</span></code> files
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects. For example
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.from_dict" title="stk.molecular.molecules.molecule.Molecule.from_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.from_dict()</span></code></a> when loading <code class="docutils literal notranslate"><span class="pre">.json</span></code> files
 generated by <a class="reference internal" href="#stk.populations.GAPopulation.dump" title="stk.populations.GAPopulation.dump"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dump()</span></code></a>.</li>
 </ul>
 </td>
@@ -778,7 +796,7 @@ population is desired:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
 as its argument and returns a numerical value.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The maximum of the values returned by the function <cite>key</cite>
@@ -805,7 +823,7 @@ population is desired:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
 as its argument and returns a numerical value.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The mean of the values returned by the function <cite>key</cite> when
@@ -832,7 +850,7 @@ population is desired:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
 as its argument and returns a numerical value.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The minimum of the values returned by the function <cite>key</cite>
@@ -845,24 +863,8 @@ when it is applied to all members of the population.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.populations.GAPopulation.normalize_fitness_values">
-<code class="descname">normalize_fitness_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.normalize_fitness_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uses <a class="reference internal" href="#stk.populations.GAPopulation.fitness_normalizer" title="stk.populations.GAPopulation.fitness_normalizer"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fitness_normalizer</span></code></a> to normalize fitness values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="stk.populations.GAPopulation.optimize">
-<code class="descname">optimize</code><span class="sig-paren">(</span><em>optimizer</em>, <em>processes=8</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.optimize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>optimizer</em>, <em>processes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.GAPopulation.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structures of molecules in the population.</p>
 <p>The molecules are optimized serially or in parallel depending
 if <cite>processes</cite> is <code class="docutils literal notranslate"><span class="pre">1</span></code> or more. The serial version may be
@@ -872,7 +874,7 @@ In this case creating a parallel process pool creates
 unncessary overhead.</p>
 <p class="rubric">Notes</p>
 <p>This function modifies the structures of molecules held by the
-population. This means their <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.mol" title="stk.molecular.molecules.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.mol</span></code></a> attributes
+population. This means their <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.mol" title="stk.molecular.molecules.molecule.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.mol</span></code></a> attributes
 are modified.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -880,8 +882,9 @@ are modified.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>optimizer</strong> (<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>) – The optimizer used to carry out the optimizations.</li>
-<li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of parallel processes to create. Optimization
-will run serially if <code class="docutils literal notranslate"><span class="pre">1</span></code>.</li>
+<li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of parallel processes to create. Optimization
+will run serially if <code class="docutils literal notranslate"><span class="pre">1</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, creates a
+process for each core on the computer.</li>
 </ul>
 </td>
 </tr>
@@ -1012,7 +1015,7 @@ the JSON. Each attribute is saved as a string using
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dir_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the directory into which the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> file
 is written.</li>
-<li><strong>use_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.name" title="stk.molecular.molecules.Molecule.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.name</span></code></a> attribute of the
+<li><strong>use_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.name" title="stk.molecular.molecules.molecule.Molecule.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.name</span></code></a> attribute of the
 members is used to make the name of the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> file. If
 <code class="docutils literal notranslate"><span class="pre">False</span></code>, the files are just named after the member’s
 index in the population.</li>
@@ -1035,12 +1038,12 @@ index in the population.</li>
 <dt id="stk.populations.Population">
 <em class="property">class </em><code class="descclassname">stk.populations.</code><code class="descname">Population</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A container for  <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects.</p>
+<p>A container for  <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects.</p>
 <p><a class="reference internal" href="#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> instances can be nested.</p>
-<p>In addtion to holding <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects, the
+<p>In addtion to holding <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects, the
 <a class="reference internal" href="#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> class can be used to create large numbers of
-these instances through the <code class="xref py py-meth docutils literal notranslate"><span class="pre">init_()</span></code> class methods.</p>
-<p><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by a <a class="reference internal" href="#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> can have
+these instances through the class methods beginning with “init”.</p>
+<p><a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by a <a class="reference internal" href="#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> can have
 their structures optimized in parallel through the
 <a class="reference internal" href="#stk.populations.Population.optimize" title="stk.populations.Population.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a> method.</p>
 <p>The only operations directly implemented by this class are those
@@ -1080,7 +1083,24 @@ used.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.populations.Population.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intializes a population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>, <a class="reference internal" href="#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>) – A population is initialized with the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> and
+<a class="reference internal" href="#stk.populations.Population" title="stk.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a> instances it should hold. These are
+placed into the <a class="reference internal" href="#stk.populations.Population.members" title="stk.populations.Population.members"><code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code></a> or <a class="reference internal" href="#stk.populations.Population.populations" title="stk.populations.Population.populations"><code class="xref py py-attr docutils literal notranslate"><span class="pre">populations</span></code></a>
+attributes, respectively.</td>
 </tr>
 </tbody>
 </table>
@@ -1099,10 +1119,10 @@ used.</p>
 <dl class="method">
 <dt id="stk.populations.Population.add_members">
 <code class="descname">add_members</code><span class="sig-paren">(</span><em>population</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population.add_members" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances into <a class="reference internal" href="#stk.populations.Population.members" title="stk.populations.Population.members"><code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code></a>.</p>
-<p>The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>  instances held within <cite>population</cite>, are
+<dd><p>Adds <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances into <a class="reference internal" href="#stk.populations.Population.members" title="stk.populations.Population.members"><code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code></a>.</p>
+<p>The <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>  instances held within <cite>population</cite>, are
 added into <a class="reference internal" href="#stk.populations.Population.members" title="stk.populations.Population.members"><code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code></a>. Any nesting is removed. This is
-because all <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>  instances are added into
+because all <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>  instances are added into
 <a class="reference internal" href="#stk.populations.Population.members" title="stk.populations.Population.members"><code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code></a> directly, regardless of how nested they are
 within <cite>population</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1110,11 +1130,11 @@ within <cite>population</cite>.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by this container are
+<li><strong>population</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> of <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by this container are
 added into <a class="reference internal" href="#stk.populations.Population.members" title="stk.populations.Population.members"><code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code></a>.</li>
 <li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – <p>Indicates whether multiple instances of the same molecule
 are allowed to be added. Note, the sameness of a molecule
-is judged by <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.same" title="stk.molecular.molecules.Molecule.same"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.same()</span></code></a>.</p>
+is judged by <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.same" title="stk.molecular.molecules.molecule.Molecule.same"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.same()</span></code></a>.</p>
 <p>When <code class="docutils literal notranslate"><span class="pre">False</span></code> only molecules which are not already
 held by the population will be added. <code class="docutils literal notranslate"><span class="pre">True</span></code> allows more
 than one instance of the same molecule to be added.</p>
@@ -1160,7 +1180,7 @@ molecules it holds are not copies.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The next <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance held within the
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The next <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance held within the
 population or its subpopulations.</td>
 </tr>
 </tbody>
@@ -1172,8 +1192,8 @@ population or its subpopulations.</td>
 <code class="descname">assign_names_from</code><span class="sig-paren">(</span><em>n</em>, <em>overwrite=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population.assign_names_from" title="Permalink to this definition">¶</a></dt>
 <dd><p>Give each member of the population a name starting from <cite>n</cite>.</p>
 <p class="rubric">Notes</p>
-<p>This method modifies the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.name" title="stk.molecular.molecules.Molecule.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.name</span></code></a> attribute of
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by the population.</p>
+<p>This method modifies the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.name" title="stk.molecular.molecules.molecule.Molecule.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.name</span></code></a> attribute of
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instances held by the population.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1273,7 +1293,7 @@ desired objects.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – A molecule whose structure is being evaluated for presence
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – A molecule whose structure is being evaluated for presence
 in the population.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> if a molecule with the same structure as <cite>mol</cite>
@@ -1294,7 +1314,7 @@ is held by the population.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects being
+<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of the <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> objects being
 built.</li>
 <li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – <p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
@@ -1302,20 +1322,21 @@ built.</li>
                    <span class="p">[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
-in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
+<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
+<a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
+in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
 instances are then supplied to the macromolecule:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macro_mol</span> <span class="o">=</span> <span class="n">MacroMolecule</span><span class="p">([</span><span class="n">pick1</span><span class="p">,</span> <span class="n">pick2</span><span class="p">,</span> <span class="n">pick3</span><span class="p">],</span>
                           <span class="n">Topology</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
+<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
 corresponds to the order of the sublists.</p>
 </li>
 <li><strong>topologies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>) – The topologies of macromolecules being made.</li>
 <li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of parallel processes to create when building
-the molecules.</li>
+the molecules. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, creates a process for each
+core on the computer.</li>
 <li><strong>duplicates</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">False</span></code>, duplicate structures are removed from
 the population.</li>
 </ul>
@@ -1354,40 +1375,40 @@ assembled from <cite>databases</cite>.</p>
 <dl class="classmethod">
 <dt id="stk.populations.Population.init_diverse">
 <em class="property">classmethod </em><code class="descname">init_diverse</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population.init_diverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</p>
+<dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</p>
 <p>All molecules are held in the <a class="reference internal" href="#stk.populations.Population.members" title="stk.populations.Population.members"><code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code></a>.</p>
 <p>From the supplied sublists of building blocks, a random
-molecule is selected to initialize a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>
+molecule is selected to initialize a <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>
 per sublist. The next molecule selected from the same sublist
 is the one most with the most different Morgan fingerprint. The
 next molecule is picked at random again and so on. This is done
-until <cite>size</cite> <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instances have been
+until <cite>size</cite> <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> instances have been
 formed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to be assembled.</li>
+<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to be assembled.</li>
 <li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – <p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
                    <span class="p">[</span><span class="n">StructUnit3</span><span class="p">(),</span> <span class="n">StructUnit3</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
                    <span class="p">[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
-in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
+<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
+<a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
+in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
 instances are then supplied to the macromolecule:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macro_mol</span> <span class="o">=</span> <span class="n">MacroMolecule</span><span class="p">([</span><span class="n">pick1</span><span class="p">,</span> <span class="n">pick2</span><span class="p">,</span> <span class="n">pick3</span><span class="p">],</span>
                           <span class="n">Topology</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
+<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
 corresponds to the order of the sublists.</p>
 </li>
 <li><strong>topolgies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> of <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>) – An iterable holding topologies which should be randomly
-selected during initialization of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</li>
+selected during initialization of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</li>
 <li><strong>size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The size of the population to be initialized.</li>
 </ul>
 </td>
@@ -1412,12 +1433,12 @@ selected during initialization of <a class="reference internal" href="stk.molecu
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>folder</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The path to a folder holding molecular structure files
-used to initialize <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects held by
+used to initialize <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects held by
 the population.</li>
 <li><strong>moltype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – An initializer for the molecular structure files. For
-example, <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> or <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit2" title="stk.molecular.molecules.StructUnit2"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit2</span></code></a>.
+example, <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> or <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit2" title="stk.molecular.molecules.struct_unit.StructUnit2"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit2</span></code></a>.
 If <cite>folder</cite> contains <code class="docutils literal notranslate"><span class="pre">.json</span></code> dump files of
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> then <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.load" title="stk.molecular.molecules.Molecule.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.load()</span></code></a> could
+<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> then <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.load" title="stk.molecular.molecules.molecule.Molecule.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.load()</span></code></a> could
 also be used.</li>
 <li><strong>glob_pattern</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – A glob used for selecting specific files within <cite>folder</cite>.</li>
 </ul>
@@ -1436,36 +1457,36 @@ also be used.</li>
 <dl class="classmethod">
 <dt id="stk.populations.Population.init_random">
 <em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population.init_random" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</p>
+<dd><p>Assembles a population of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</p>
 <p>All molecules are held in <a class="reference internal" href="#stk.populations.Population.members" title="stk.populations.Population.members"><code class="xref py py-attr docutils literal notranslate"><span class="pre">members</span></code></a>.</p>
 <p>From the supplied building blocks a random molecule is selected
-per sublist to for a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>. This is done
-until <cite>size</cite> <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> have been formed.</p>
+per sublist to for a <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>. This is done
+until <cite>size</cite> <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> have been formed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to be assembled.</li>
+<li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The class of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> to be assembled.</li>
 <li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – <p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of the form</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
                    <span class="p">[</span><span class="n">StructUnit3</span><span class="p">(),</span> <span class="n">StructUnit3</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
                    <span class="p">[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">]]</span>
 </pre></div>
 </div>
-<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
-in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
+<p>To assemble a new <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>, a
+<a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
+in <cite>building_blocks</cite>. The picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a>
 instances are then supplied to the macromolecule:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">macro_mol</span> <span class="o">=</span> <span class="n">MacroMolecule</span><span class="p">([</span><span class="n">pick1</span><span class="p">,</span> <span class="n">pick2</span><span class="p">,</span> <span class="n">pick3</span><span class="p">],</span>
                           <span class="n">Topology</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
+<p>The order of picked <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> instances
 corresponds to the order of the sublists.</p>
 </li>
 <li><strong>topolgies</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">iterable</span></code> of <a class="reference internal" href="stk.molecular.topologies.base.html#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topology</span></code></a>) – An iterable holding topologies which should be randomly
-selected during initialization of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</li>
+selected during initialization of <a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>.</li>
 <li><strong>size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The size of the population to be initialized.</li>
 </ul>
 </td>
@@ -1492,8 +1513,8 @@ selected during initialization of <a class="reference internal" href="stk.molecu
 <li><strong>path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the file holding the dumped population.</li>
 <li><strong>member_init</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – The initialization function for the population’s members.
 It converts the member representations in the file to
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects. For example
-<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.from_dict" title="stk.molecular.molecules.Molecule.from_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.from_dict()</span></code></a> when loading <code class="docutils literal notranslate"><span class="pre">.json</span></code> files
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> objects. For example
+<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.from_dict" title="stk.molecular.molecules.molecule.Molecule.from_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Molecule.from_dict()</span></code></a> when loading <code class="docutils literal notranslate"><span class="pre">.json</span></code> files
 generated by <a class="reference internal" href="#stk.populations.Population.dump" title="stk.populations.Population.dump"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dump()</span></code></a>.</li>
 </ul>
 </td>
@@ -1523,7 +1544,7 @@ population is desired:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
 as its argument and returns a numerical value.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The maximum of the values returned by the function <cite>key</cite>
@@ -1550,7 +1571,7 @@ population is desired:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
 as its argument and returns a numerical value.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The mean of the values returned by the function <cite>key</cite> when
@@ -1577,7 +1598,7 @@ population is desired:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> instance
 as its argument and returns a numerical value.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The minimum of the values returned by the function <cite>key</cite>
@@ -1591,7 +1612,7 @@ when it is applied to all members of the population.</td>
 
 <dl class="method">
 <dt id="stk.populations.Population.optimize">
-<code class="descname">optimize</code><span class="sig-paren">(</span><em>optimizer</em>, <em>processes=8</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population.optimize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>optimizer</em>, <em>processes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations.Population.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structures of molecules in the population.</p>
 <p>The molecules are optimized serially or in parallel depending
 if <cite>processes</cite> is <code class="docutils literal notranslate"><span class="pre">1</span></code> or more. The serial version may be
@@ -1601,7 +1622,7 @@ In this case creating a parallel process pool creates
 unncessary overhead.</p>
 <p class="rubric">Notes</p>
 <p>This function modifies the structures of molecules held by the
-population. This means their <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.mol" title="stk.molecular.molecules.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.mol</span></code></a> attributes
+population. This means their <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.mol" title="stk.molecular.molecules.molecule.Molecule.mol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.mol</span></code></a> attributes
 are modified.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1609,8 +1630,9 @@ are modified.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>optimizer</strong> (<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a>) – The optimizer used to carry out the optimizations.</li>
-<li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of parallel processes to create. Optimization
-will run serially if <code class="docutils literal notranslate"><span class="pre">1</span></code>.</li>
+<li><strong>processes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of parallel processes to create. Optimization
+will run serially if <code class="docutils literal notranslate"><span class="pre">1</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, creates a
+process for each core on the computer.</li>
 </ul>
 </td>
 </tr>
@@ -1719,7 +1741,7 @@ the JSON. Each attribute is saved as a string using
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dir_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the directory into which the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> file
 is written.</li>
-<li><strong>use_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.name" title="stk.molecular.molecules.Molecule.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.name</span></code></a> attribute of the
+<li><strong>use_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> the <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule.name" title="stk.molecular.molecules.molecule.Molecule.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Molecule.name</span></code></a> attribute of the
 members is used to make the name of the <code class="docutils literal notranslate"><span class="pre">.mol</span></code> file. If
 <code class="docutils literal notranslate"><span class="pre">False</span></code>, the files are just named after the member’s
 index in the population.</li>
@@ -1747,6 +1769,12 @@ index in the population.</li>
 be used with <code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code>. It prevents functions from
 raising if they fail, which prevents the multiprocessing pool
 from hanging.</p>
+<dl class="method">
+<dt id="stk.populations._Guard.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>calculator</em>, <em>fn</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.populations._Guard.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>

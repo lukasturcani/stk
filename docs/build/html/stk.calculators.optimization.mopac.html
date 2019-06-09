@@ -297,6 +297,65 @@ is no timeout.</p>
 </tbody>
 </table>
 <dl class="method">
+<dt id="stk.calculators.optimization.mopac.MOPAC.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>hamiltonian='PM7'</em>, <em>method='OPT'</em>, <em>minimum_gradient=0.01</em>, <em>eps=80.1</em>, <em>charge=0</em>, <em>fileout='PDBOUT'</em>, <em>timeout=172800</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.mopac.MOPAC.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.optimization.mopac.MOPAC" title="stk.calculators.optimization.mopac.MOPAC"><code class="xref py py-class docutils literal notranslate"><span class="pre">MOPAC</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mopac_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path to the MOPAC suite on the user’s
+machine. For example, in a default MacOS installation the
+folder will probably be something like
+<code class="docutils literal notranslate"><span class="pre">/opt/mopac/MOPAC2016.exe</span></code>.</li>
+<li><strong>hamiltonian</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – <p>A series of different methods can be selected:
+<code class="docutils literal notranslate"><span class="pre">'PM7'</span></code>, <code class="docutils literal notranslate"><span class="pre">'PM6'</span></code>, <code class="docutils literal notranslate"><span class="pre">'AM1'</span></code>, <code class="docutils literal notranslate"><span class="pre">'CIS'</span></code>
+<code class="docutils literal notranslate"><span class="pre">'(CISD,</span> <span class="pre">CISDT)'</span></code>, <code class="docutils literal notranslate"><span class="pre">'MNDO'</span></code>, <code class="docutils literal notranslate"><span class="pre">'RM1'</span></code>, etc.</p>
+<p><code class="docutils literal notranslate"><span class="pre">'PM7'</span></code> is the latest version of the reparametrization of
+NDDO theory, where all the atomic and diatomic
+parameters were re-optimized / updated from PM6 <a class="footnote-reference" href="#id4" id="id3">[2]</a>.</p>
+</li>
+<li><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The default calculation consists of a geometry
+optimization. You can run single point calculations
+(SCF) or transition search algorithms (TS). Refer to
+the MOPAC website for specific keywords.</li>
+<li><strong>minimum_gradient</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The gradient at which the geometry optimization reaches
+the convergence criteria (<code class="docutils literal notranslate"><span class="pre">kcal</span></code> / <code class="docutils literal notranslate"><span class="pre">mol</span></code> /
+<code class="docutils literal notranslate"><span class="pre">Angstrom</span></code>). For small system and high precision
+work, <code class="docutils literal notranslate"><span class="pre">0.01</span></code> is recommended.</li>
+<li><strong>eps</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – Sets the dielectric constant for the solvent. Presence
+of this keyword will cause the COSMO (Conductor-like
+Screening Model) method to be used to approximate the
+effect of a solvent model surrounding the molecule.
+Solvents with a low dielectric constant are not likely
+to work well with this model. <code class="docutils literal notranslate"><span class="pre">0</span></code> means that the
+dielectric constant is not included in the calculation.
+<code class="docutils literal notranslate"><span class="pre">80.1</span></code> can be used to model a water environment at
+room temperature.</li>
+<li><strong>charge</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The charge of the system.</li>
+<li><strong>fileout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – Determines the output file type.</li>
+<li><strong>timeout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The amount in seconds the optimization is allowed to
+run before being terminated. The default value is <code class="docutils literal notranslate"><span class="pre">2</span></code>
+days or <code class="docutils literal notranslate"><span class="pre">172,800</span></code> seconds. <code class="docutils literal notranslate"><span class="pre">None</span></code> means there
+is no timeout.</li>
+<li><strong>use_cache</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> <a class="reference internal" href="#stk.calculators.optimization.mopac.MOPAC.optimize" title="stk.calculators.optimization.mopac.MOPAC.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a> will not run twice on the same
+molecule and conformer.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td><a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.optimization.mopac.MOPAC.generate_mop">
 <code class="descname">generate_mop</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.mopac.MOPAC.generate_mop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the <code class="docutils literal notranslate"><span class="pre">.mop</span></code> file for the optimization.</p>
@@ -305,7 +364,7 @@ is no timeout.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
 structure file is converted to a <code class="docutils literal notranslate"><span class="pre">.mop</span></code> file.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The conformer of the molecule to be used.</li>
 </ul>
@@ -331,7 +390,7 @@ structure file is converted to a <code class="docutils literal notranslate"><spa
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule being optimized.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
@@ -367,7 +426,7 @@ formatted for the input file.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
