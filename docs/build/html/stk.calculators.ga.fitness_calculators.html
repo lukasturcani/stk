@@ -80,6 +80,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">stk.calculators.ga.fitness_calculators module</a><ul>
+<li><a class="reference internal" href="#available-fitness-calculators">Available fitness calculators.</a></li>
 <li><a class="reference internal" href="#extending-stk-making-new-fitness-calculators">Extending stk: Making new fitness calculators.</a></li>
 </ul>
 </li>
@@ -177,6 +178,13 @@ given molecule and conformer, while fitness normalization updates
 existing fitness values based on all the fitness values in a
 population, for example by dividing the fitness value of all molecules
 by the mean fitness across the population.</p>
+<div class="section" id="available-fitness-calculators">
+<h2>Available fitness calculators.<a class="headerlink" href="#available-fitness-calculators" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#stk.calculators.ga.fitness_calculators.PropertyVector" title="stk.calculators.ga.fitness_calculators.PropertyVector"><code class="xref py py-class docutils literal notranslate"><span class="pre">PropertyVector</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator" title="stk.calculators.ga.fitness_calculators.RaisingFitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaisingFitnessCalculator</span></code></a></li>
+</ol>
+</div>
 <div class="section" id="extending-stk-making-new-fitness-calculators">
 <span id="adding-fitness-calculators"></span><h2>Extending stk: Making new fitness calculators.<a class="headerlink" href="#extending-stk-making-new-fitness-calculators" title="Permalink to this headline">¶</a></h2>
 <p>A new class inheriting <a class="reference internal" href="#stk.calculators.ga.fitness_calculators.FitnessCalculator" title="stk.calculators.ga.fitness_calculators.FitnessCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessCalculator</span></code></a> must be created.
