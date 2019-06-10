@@ -80,6 +80,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">stk.calculators.ga.mutators module</a><ul>
+<li><a class="reference internal" href="#available-mutators">Available mutators.</a></li>
 <li><a class="reference internal" href="#extending-stk-making-new-mutators">Extending stk: Making new mutators.</a></li>
 </ul>
 </li>
@@ -157,6 +158,15 @@ method must take a single molecule and return a mutant.</p>
 the various <a class="reference internal" href="#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> classes, for example
 <a class="reference internal" href="#stk.calculators.ga.mutators.RandomBuildingBlock" title="stk.calculators.ga.mutators.RandomBuildingBlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomBuildingBlock</span></code></a>, <a class="reference internal" href="#stk.calculators.ga.mutators.SimilarBuildingBlock" title="stk.calculators.ga.mutators.SimilarBuildingBlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimilarBuildingBlock</span></code></a>
 or <a class="reference internal" href="#stk.calculators.ga.mutators.RandomMutation" title="stk.calculators.ga.mutators.RandomMutation"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomMutation</span></code></a>.</p>
+<div class="section" id="available-mutators">
+<h2>Available mutators.<a class="headerlink" href="#available-mutators" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#stk.calculators.ga.mutators.RandomBuildingBlock" title="stk.calculators.ga.mutators.RandomBuildingBlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomBuildingBlock</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.mutators.SimilarBuildingBlock" title="stk.calculators.ga.mutators.SimilarBuildingBlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimilarBuildingBlock</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.mutators.RandomTopology" title="stk.calculators.ga.mutators.RandomTopology"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomTopology</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.mutators.RandomMutation" title="stk.calculators.ga.mutators.RandomMutation"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomMutation</span></code></a></li>
+</ol>
+</div>
 <div class="section" id="extending-stk-making-new-mutators">
 <span id="adding-mutators"></span><h2>Extending stk: Making new mutators.<a class="headerlink" href="#extending-stk-making-new-mutators" title="Permalink to this headline">¶</a></h2>
 <p>Mutators must simple inherit the <a class="reference internal" href="#stk.calculators.ga.mutators.Mutator" title="stk.calculators.ga.mutators.Mutator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mutator</span></code></a> class and define a
