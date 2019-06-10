@@ -80,6 +80,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">stk.calculators.ga.fitness_normalizers module</a><ul>
+<li><a class="reference internal" href="#available-fitness-normalizers">Available fitness normalizers.</a></li>
 <li><a class="reference internal" href="#extending-stk-making-new-fitness-normalizers">Extending stk: Making new fitness normalizers.</a></li>
 </ul>
 </li>
@@ -160,6 +161,18 @@ documention of the classes which inherit it, for example
 <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.Power" title="stk.calculators.ga.fitness_normalizers.Power"><code class="xref py py-class docutils literal notranslate"><span class="pre">Power</span></code></a>, <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.Sum" title="stk.calculators.ga.fitness_normalizers.Sum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sum</span></code></a> <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.ScaleByMean" title="stk.calculators.ga.fitness_normalizers.ScaleByMean"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScaleByMean</span></code></a>. In addition,
 multiple <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a> can be chained using
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">NormalizerSequence()</span></code>.</p>
+<div class="section" id="available-fitness-normalizers">
+<h2>Available fitness normalizers.<a class="headerlink" href="#available-fitness-normalizers" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.NullFitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.NullFitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NullFitnessNormalizer</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.Power" title="stk.calculators.ga.fitness_normalizers.Power"><code class="xref py py-class docutils literal notranslate"><span class="pre">Power</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.Multiply" title="stk.calculators.ga.fitness_normalizers.Multiply"><code class="xref py py-class docutils literal notranslate"><span class="pre">Multiply</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.Sum" title="stk.calculators.ga.fitness_normalizers.Sum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sum</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.ScaleByMean" title="stk.calculators.ga.fitness_normalizers.ScaleByMean"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScaleByMean</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.ShiftUp" title="stk.calculators.ga.fitness_normalizers.ShiftUp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShiftUp</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.NormalizerSequence" title="stk.calculators.ga.fitness_normalizers.NormalizerSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">NormalizerSequence</span></code></a></li>
+</ol>
+</div>
 <div class="section" id="extending-stk-making-new-fitness-normalizers">
 <span id="adding-fitness-normalizers"></span><h2>Extending stk: Making new fitness normalizers.<a class="headerlink" href="#extending-stk-making-new-fitness-normalizers" title="Permalink to this headline">¶</a></h2>
 <p>A new class inheriting <a class="reference internal" href="#stk.calculators.ga.fitness_normalizers.FitnessNormalizer" title="stk.calculators.ga.fitness_normalizers.FitnessNormalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessNormalizer</span></code></a> must be made.
