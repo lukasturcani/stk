@@ -79,10 +79,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">stk.calculators.optimization.optimizers module</a><ul>
-<li><a class="reference internal" href="#extending-stk-making-new-optimizers">Extending stk: Making new optimizers.</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">stk.calculators.optimization.optimizers module</a></li>
 </ul>
 </div>
             
@@ -150,58 +147,6 @@
   <div class="section" id="module-stk.calculators.optimization.optimizers">
 <span id="stk-calculators-optimization-optimizers-module"></span><h1>stk.calculators.optimization.optimizers module<a class="headerlink" href="#module-stk.calculators.optimization.optimizers" title="Permalink to this headline">¶</a></h1>
 <p>Defines optimizers.</p>
-<p>Optimizers are objects used to optimize molecules. Each optimizer is
-initialized with some settings and used to optimize a molecule
-with <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="kn">as</span> <span class="nn">rdkit</span>
-<span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="o">.</span><span class="n">smiles_init</span><span class="p">(</span><span class="s1">&#39;NCCCN&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amine&#39;</span><span class="p">])</span>
-<span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFF</span><span class="p">()</span>
-<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
-
-<span class="c1"># Optionally, a conformer can be provided.</span>
-<span class="n">mmff</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="c1"># Optimizers also work with MacroMolecule objects.</span>
-<span class="n">polymer</span> <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">mol</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
-<span class="n">etkdg</span> <span class="o">=</span> <span class="n">RDKitEmbedder</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
-<span class="n">etkdg</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Sometimes it is desirable to chain multiple optimizations, one after
-another. For example, before running an optimization, it may be
-desirable to embed a molecule first, to generate an initial structure.
-<a class="reference internal" href="#stk.calculators.optimization.optimizers.OptimizerSequence" title="stk.calculators.optimization.optimizers.OptimizerSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizerSequence</span></code></a> may be used for this.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new optimizer which chains the previously defined</span>
-<span class="c1"># mmff and etkdg optimizers.</span>
-<span class="n">optimizer_sequence</span> <span class="o">=</span> <span class="n">OptimizerSequence</span><span class="p">(</span><span class="n">etkdg</span><span class="p">,</span> <span class="n">mmff</span><span class="p">)</span>
-
-<span class="c1"># Run each optimizer in sequence.</span>
-<span class="n">optimizer_sequence</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>By default, running <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Optimizer.optimize()</span></code></a> twice in a row will
-perform an optimization a second time on a molecule. If we want to
-skip optimizations on molecules which have already been optimized
-we can use the <code class="xref py py-attr docutils literal notranslate"><span class="pre">use_cache</span></code> flag.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">caching_etkdg</span> <span class="o">=</span> <span class="n">RDKitEmbedder</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">(),</span> <span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="c1"># First optimize call runs an optimization.</span>
-<span class="n">caching_etkdg</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
-<span class="c1"># Second call does nothing.</span>
-<span class="n">caching_etkdg</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Caching is done on a per <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> basis. Just because the
-molecule has been cached by one <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> instance does not
-mean that a different <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> instance will no longer
-optimize the molecule.</p>
-<div class="section" id="extending-stk-making-new-optimizers">
-<span id="adding-optimizers"></span><h2>Extending stk: Making new optimizers.<a class="headerlink" href="#extending-stk-making-new-optimizers" title="Permalink to this headline">¶</a></h2>
-<p>New optimizers can be made by simply making a class which inherits the
-<a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer" title="stk.calculators.optimization.optimizers.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code></a> class. In addition to this, the new class must
-define a <code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code> method. The method must take 2
-arguments a mandatory <cite>mol</cite> argument and an optional <cite>conformer</cite>
-argument. <a class="reference internal" href="#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a> will take a molecule and change
-its structure however it likes. Beyond this there are no requirements.</p>
 <dl class="class">
 <dt id="stk.calculators.optimization.optimizers.CageOptimizerSequence">
 <em class="property">class </em><code class="descclassname">stk.calculators.optimization.optimizers.</code><code class="descname">CageOptimizerSequence</code><span class="sig-paren">(</span><em>*optimizers</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.CageOptimizerSequence" title="Permalink to this definition">¶</a></dt>
@@ -1058,7 +1003,6 @@ then the molecule is skipped and no optimization is performed.</p>
 </table>
 </dd></dl>
 
-</div>
 </div>
 
 
