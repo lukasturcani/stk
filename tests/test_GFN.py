@@ -64,7 +64,16 @@ def test_gfnxtb_properties(tmp_polymer, gfnxtb_path):
     assert len(prop['fullquadrupole']) == 6
     for i in prop['fullquadrupole']:
         assert isinstance(i, float)
-    assert prop['occupancies'] is None
+    assert isinstance(prop['occupancies'], dict)
+    assert isinstance(prop['occupancies']['HOMO'], list)
+    assert len(prop['occupancies']['HOMO']) == 3
+    for i in prop['occupancies']['HOMO']:
+        assert isinstance(i, float) or isinstance(i, int)
+    assert isinstance(prop['occupancies']['LUMO'], list)
+    assert len(prop['occupancies']['LUMO']) == 3
+    assert prop['occupancies']['LUMO'][1] == float(0)
+    for i in prop['occupancies']['LUMO']:
+        assert isinstance(i, float) or isinstance(i, int)
 
 
 def test_valid_solvent():
