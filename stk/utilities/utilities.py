@@ -1152,11 +1152,11 @@ def vector_theta(vector1, vector2):
     return np.arccos(numerator/denominator)
 
 
-class GFNXTBInvalidSolventError(Exception):
+class XTBInvalidSolventError(Exception):
     ...
 
 
-def valid_GFNXTB_solvent(gfn_version, solvent):
+def valid_XTB_solvent(gfn_version, solvent):
     '''Check if solvent is valid for the given GFN version.
 
     See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for discussion.
@@ -1176,7 +1176,7 @@ def valid_GFNXTB_solvent(gfn_version, solvent):
 
     '''
     if gfn_version == '0':
-        raise GFNXTBInvalidSolventError(
+        raise XTBInvalidSolventError(
             f'No solvent valid for version: {gfn_version}'
         )
     elif gfn_version == '1':
@@ -1187,7 +1187,7 @@ def valid_GFNXTB_solvent(gfn_version, solvent):
         if solvent in valid_solvents:
             return True
         else:
-            raise GFNXTBInvalidSolventError(
+            raise XTBInvalidSolventError(
                 f'{solvent} is an invalid solvent for version {gfn_version}!'
             )
     elif gfn_version == '2':
@@ -1198,6 +1198,6 @@ def valid_GFNXTB_solvent(gfn_version, solvent):
         if solvent in valid_solvents:
             return True
         else:
-            raise GFNXTBInvalidSolventError(
+            raise XTBInvalidSolventError(
                 f'{solvent} is an invalid solvent for version {gfn_version}!'
             )

@@ -649,11 +649,11 @@ class ETKDG(Optimizer):
         mol.mol.RemoveConformer(conf_id)
 
 
-class GFNXTBOptimizerFailedError(Exception):
+class XTBOptimizerFailedError(Exception):
     ...
 
 
-class GFNXTB(Optimizer):
+class XTB(Optimizer):
     """
     Uses GFN-xTB to optimize molecules.
 
@@ -890,7 +890,7 @@ class GFNXTB(Optimizer):
         self.strict = strict
         super().__init__(use_cache=use_cache)
 
-    def check_complete(self):
+    def __check_complete(self):
         """
         Check if GFN-xTB optimization was converged.
 
@@ -898,9 +898,66 @@ class GFNXTB(Optimizer):
         if os.path.isfile('.xtboptok'):
             return True
         elif os.path.isfile('NOT_CONVERGED'):
-            raise GFNXTBOptimizerFailedError(f'Optimization not converged.')
+            raise XTBOptimizerFailedError(f'Optimization not converged.')
         else:
             return False
+
+    def __write_and_run_command(self, mol, conformer):
+        """
+        Writes and runs the command for GFN.
+
+        """
+        # when in output_dir -- use relative paths as GFN does not handle
+        # full path in command
+        xyz = 'input_structure.xyz'
+        out_file = 'optimization.output'
+        mol.write(xyz, conformer=conformer)
+        # modify memory limit
+        if self.mem_ulimit:
+            cmd = ['ulimit -s unlimited ;']
+            # allow multiple shell commands to be run in one subprocess
+            shell = True
+        else:
+            cmd = []
+            shell = False
+        cmd.append(self.gfnxtb_path)
+        cmd.append(xyz)
+        # set GFN Parameterization
+        if self.gfn_version != '2':
+            cmd.append('--gfn')
+            cmd.append(self.gfn_version)
+        # set optimization level and type
+        cmd.append('--opt')
+        cmd.append(self.opt_level)
+        # set number of cores
+        cmd.append('--parallel')
+        cmd.append(self.num_cores)
+        # add eletronic temp term
+        if self.etemp != '300':
+            cmd.append('--etemp')
+            cmd.append(self.etemp)
+        # write solvent section of cmd
+        if self.solvent is not None:
+            cmd.append('--gbsa')
+            cmd.append(self.solvent)
+            if self.solvent_grid != 'normal':
+                cmd.append(self.solvent_grid)
+        # write charge section of cmd
+        if self.charge is not None:
+            cmd.append('--chrg')
+            cmd.append(self.charge)
+        # add strict term
+        if self.strict is True:
+            cmd.append('--strict')
+        cmd = ' '.join(cmd)
+        f = open(out_file, 'w')
+        # uses the shell if mem_ulimit = True and waits until
+        # subproces is complete. This is required to run the mem_ulimit_cmd
+        # and GFN calculation in one command, which is then closed, which
+        # minimizes the risk of unrestricting the memory limits.
+        sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE,
+                 shell=shell)
+        f.close()
 
     def optimize(self, mol, conformer=-1):
         """
@@ -936,61 +993,11 @@ class GFNXTB(Optimizer):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            # when in output_dir -- use relative paths as GFN does not handle
-            # full path in command
-            xyz = 'input_structure.xyz'
-            out_file = 'output_info.output'
-            mol.write(xyz, conformer=conformer)
-            # modify memory limit
-            if self.mem_ulimit:
-                cmd = ['ulimit -s unlimited ;']
-                # allow multiple shell commands to be run in one subprocess
-                shell = True
-            else:
-                cmd = []
-                shell = False
-            cmd.append(self.gfnxtb_path)
-            cmd.append(xyz)
-            # set GFN Parameterization
-            if self.gfn_version != '2':
-                cmd.append('--gfn')
-                cmd.append(self.gfn_version)
-            # set optimization level and type
-            cmd.append('--opt')
-            cmd.append(self.opt_level)
-            # set number of cores
-            cmd.append('--parallel')
-            cmd.append(self.num_cores)
-            # add eletronic temp term
-            if self.etemp != '300':
-                cmd.append('--etemp')
-                cmd.append(self.etemp)
-            # write solvent section of cmd
-            if self.solvent is not None:
-                cmd.append('--gbsa')
-                cmd.append(self.solvent)
-                if self.solvent_grid != 'normal':
-                    cmd.append(self.solvent_grid)
-            # write charge section of cmd
-            if self.charge is not None:
-                cmd.append('--chrg')
-                cmd.append(self.charge)
-            # add strict term
-            if self.strict is True:
-                cmd.append('--strict')
-            cmd = ' '.join(cmd)
-            f = open(out_file, 'w')
-            # uses the shell if mem_ulimit = True and waits until
-            # subproces is complete. This is required to run the mem_ulimit_cmd
-            # and GFN calculation in one command, which is then closed, which
-            # minimizes the risk of unrestricting the memory limits.
-            sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE,
-                     shell=shell)
-            f.close()
+            self.write_and_run_command(mol=mol, conformer=conformer)
             if self.check_complete():
                 output_xyz = join(output_dir, 'xtbopt.xyz')
                 mol.update_from_xyz(path=output_xyz, conformer=conformer)
             else:
-                raise GFNXTBOptimizerFailedError(f'Optimization failed incomplete')
+                raise XTBOptimizerFailedError(f'Optimization failed incomplete')
         finally:
             os.chdir(init_dir)

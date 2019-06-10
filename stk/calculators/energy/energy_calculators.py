@@ -13,7 +13,8 @@ import subprocess as sp
 import uuid
 import os
 import shutil
-from ...utilities import valid_GFNXTB_solvent
+from os.path import join
+from ...utilities import valid_XTB_solvent
 
 
 logger = logging.getLogger(__name__)
@@ -385,15 +386,15 @@ class UFFEnergy(EnergyCalculator):
         return ff.CalcEnergy()
 
 
-class GFNXTBEnergyHessianFailedError(Exception):
+class XTBEnergyHessianFailedError(Exception):
     ...
 
 
-class GFNXTBEnergyNegativeFreqError(Exception):
+class XTBEnergyNegativeFreqError(Exception):
     ...
 
 
-class GFNXTBEnergy(EnergyCalculator):
+class XTBEnergy(EnergyCalculator):
     """
     Uses GFN-xTB to calculate energies and other properties of molecules.
 
@@ -429,11 +430,6 @@ class GFNXTBEnergy(EnergyCalculator):
         The name of the directory into which files generated during
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
-
-    free : :class:`bool`, optional
-        If ``True`` :meth:`energy` will perform a numerical hessian
-        calculation on the structure to give free energy also. Ideally,
-        this should only be applied to an already optimized structure.
 
     output_dir : :class:`str`, optional
         The name of the directory into which files generated during
@@ -476,15 +472,15 @@ class GFNXTBEnergy(EnergyCalculator):
     .. code-block:: python
 
         mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        gfnxtb = GFNXTBEnergy('/opt/gfnxtb/xtb')
+        gfnxtb = XTBEnergy('/opt/gfnxtb/xtb')
         gfnxtb.energy(mol)
 
     Note that for :class:`.MacroMolecule` objects assembled by ``stk``
-    :class:`GFNXTBEnergy` should usually be used after optimization with some
+    :class:`XTBEnergy` should usually be used after optimization with some
     other method. This is because GFN-xTB only uses xyz coordinates as input
     and so will not recognize the long bonds created during assembly.
     An optimizer which can minimize these bonds should be used before
-    :class:`GFNXTBEnergy`.
+    :class:`XTBEnergy`.
 
     .. code-block:: python
 
@@ -494,12 +490,12 @@ class GFNXTBEnergy(EnergyCalculator):
 
         uff = UFF()
         uff.optimize(polymer)
-        gfnxtb = GFNXTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
+        gfnxtb = XTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
                               mem_ulimit=True)
         gfnxtb.energy(polymer)
 
     Energies and other properties of optimized structures can be
-    extracted using :class:`GFNXTBEnergy`. For example vibrational frequencies,
+    extracted using :class:`XTBEnergy`. For example vibrational frequencies,
     the HOMO-LUMO gap and thermodynamic properties (such as the Total Free
     Energy) can be calculated after an optimization with very tight contraints
     with an implicit solvent (THF). Very tight criteria are required to ensure
@@ -509,14 +505,14 @@ class GFNXTBEnergy(EnergyCalculator):
 
         gfnxtb = OptimizerSequence(
             UFF(),
-            GFNXTB(gfnxtb_path='/opt/gfnxtb/xtb',
+            XTB(gfnxtb_path='/opt/gfnxtb/xtb',
                    mem_ulimit=True,
                    opt_level='verytight',
                    solvent='THF')
         )
         gfnxtb.optimize(polymer)
 
-        gfnxtbenergy = GFNXTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
+        gfnxtbenergy = XTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
                                     mem_ulimit=True,
                                     free=True,
                                     solvent='THF')
@@ -529,7 +525,6 @@ class GFNXTBEnergy(EnergyCalculator):
                  gfnxtb_path,
                  gfn_version='2',
                  output_dir=None,
-                 free=False,
                  num_cores=1,
                  etemp=300,
                  solvent=None,
@@ -538,7 +533,7 @@ class GFNXTBEnergy(EnergyCalculator):
                  use_cache=False,
                  mem_ulimit=False):
         """
-        Initializes a :class:`GFNXTBEnergy` instance.
+        Initializes a :class:`XTBEnergy` instance.
 
         Parameters
         ----------
@@ -554,11 +549,6 @@ class GFNXTBEnergy(EnergyCalculator):
             The name of the directory into which files generated during
             the optimization are written, if ``None`` then
             :func:`uuid.uuid4` is used.
-
-        free : :class:`bool`, optional
-            If ``True`` :meth:`energy` will perform a numerical hessian
-            calculation on the structure to give free energy also. Ideally,
-            this should only be applied to an already optimized structure.
 
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
@@ -600,20 +590,19 @@ class GFNXTBEnergy(EnergyCalculator):
         self.gfnxtb_path = gfnxtb_path
         self.gfn_version = gfn_version
         self.output_dir = output_dir
-        self.free = free
         self.num_cores = str(num_cores)
         self.etemp = str(etemp)
         self.solvent = solvent
         if self.solvent is not None:
             self.solvent = solvent.lower()
-            valid_GFNXTB_solvent(gfn_version=self.gfn_version,
+            valid_XTB_solvent(gfn_version=self.gfn_version,
                                  solvent=self.solvent)
         self.solvent_grid = solvent_grid
         self.charge = charge
         self.mem_ulimit = mem_ulimit
         super().__init__(use_cache=use_cache)
 
-    def ext_total_energy(self, output_string):
+    def __ext_total_energy(self, output_string):
         """
         Extracts total energy (a.u.) from GFN-xTB output.
 
@@ -637,42 +626,7 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return float(value)
 
-    def ext_free_energy(self, output_string):
-        """
-        Extracts total free energy (a.u.) from GFN-xTB output at T=298.15K.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        "          | TOTAL FREE ENERGY         -75.832501154309 Eh   |"
-
-        Returns
-        -------
-        :class:`float`
-            Total free energy in a.u.
-        """
-        # check that hessian was performed on geometry optimized structure
-        # raise error if not
-        check_hessian = True
-        for line in reversed(output_string):
-            if '#WARNING! Hessian on incompletely optimized geometry!' in line:
-                check_hessian = False
-                break
-        if check_hessian is False:
-            raise GFNXTBEnergyHessianFailedError(
-                f'Hessian calculation performed on unoptimized structure.'
-            )
-        value = None
-
-        # regex for numbers
-        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
-        for line in reversed(output_string):
-            if '          | TOTAL FREE ENERGY  ' in line:
-                value = nums.search(line.rstrip()).group(0)
-                break
-
-        return float(value)
-
-    def ext_HLGap(self, output_string):
+    def __ext_HLGap(self, output_string):
         """
         Extracts total energy (eV) from GFN-xTB output.
 
@@ -695,7 +649,7 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return float(value)
 
-    def ext_FermiLevel(self, output_string):
+    def __ext_FermiLevel(self, output_string):
         """
         Extracts Fermi-Level energy (eV) from GFN-xTB output.
 
@@ -719,7 +673,7 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return float(value)
 
-    def ext_qdipolemom(self, output_string):
+    def __ext_qdipolemom(self, output_string):
         """
         Extracts `q only` dipole moment vector (Debye) from GFN-xTB output.
 
@@ -749,7 +703,7 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return value
 
-    def ext_fulldipolemom(self, output_string):
+    def __ext_fulldipolemom(self, output_string):
         """
         Extracts `full` dipole moment vector (Debye) from GFN-xTB output.
 
@@ -779,7 +733,7 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return value
 
-    def ext_qquadrupolemom(self, output_string):
+    def __ext_qquadrupolemom(self, output_string):
         """
         Extracts `q only` traceless quadrupole moment vector (Debye) from GFN-xTB output.
 
@@ -809,7 +763,7 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return value
 
-    def ext_qdipquadrupolemom(self, output_string):
+    def __ext_qdipquadrupolemom(self, output_string):
         """
         Extracts `q+dip` traceless quadrupole moment vector (Debye) from GFN-xTB output.
 
@@ -839,7 +793,7 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return value
 
-    def ext_fullquadrupolemom(self, output_string):
+    def __ext_fullquadrupolemom(self, output_string):
         """
         Extracts `full` traceless quadrupole moment vector (Debye) from GFN-xTB output.
 
@@ -869,55 +823,7 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return value
 
-    def ext_frequencies(self, output_string):
-        """
-        Extracts projected vibrational frequencies (cm-1) from GFN-xTB output.
-
-        This method will also check for negative frequencies.
-
-        Formatting based on latest version of GFN-xTB (190418).
-        Example line:
-        "eigval :       -0.00    -0.00    -0.00     0.00     0.00     0.00"
-
-        Returns
-        -------
-        :class:`list`
-            List of all vibrational frequencies as :class:`float`
-        """
-        value = None
-        neg_freq = False
-
-        # use a switch to make sure we are extracting values after the
-        # final property readout
-        switch = False
-
-        frequencies = []
-        for i, line in enumerate(output_string):
-            if '|               Frequency Printout                |' in line:
-                # turn on reading as final frequency printout has begun
-                switch = True
-            if ' reduced masses (amu)' in line:
-                # turn off reading as frequency section is done
-                switch = False
-            if 'eigval :' in line and switch is True:
-                split_line = [i for i in line.rstrip().split(':')[1].split(' ')
-                              if i != '']
-                for freq in split_line:
-                    frequencies.append(freq)
-
-        value = [float(i) for i in frequencies]
-        # checks for one negative frequency
-        if min(value) < 0:
-            neg_freq = True
-
-        if neg_freq:
-            raise GFNXTBEnergyNegativeFreqError(
-                f'Negative frequency in Hessian. Attempt further optimization.'
-            )
-
-        return value
-
-    def ext_HLoccupancies(self, output_string):
+    def __ext_HLoccupancies(self, output_string):
         """
         Extracts Orbital Energies and Occupations (eV) of the HOMO and LUMO from GFN-xTB output.
 
@@ -950,7 +856,7 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return value
 
-    def get_properties(self, output_file):
+    def __get_properties(self, output_file):
         """
         Extracts desired properties from GFN-xTB single point energy calculation.
 
@@ -962,17 +868,68 @@ class GFNXTBEnergy(EnergyCalculator):
 
         # get properties from output string
         self.properties['totalenergy'] = self.ext_total_energy(output_string)
-        if self.free is True:
-            self.properties['totalfreeenergy'] = self.ext_free_energy(output_string)
-            self.properties['frequencies'] = self.ext_frequencies(output_string)
-        self.properties['HLGap'] = self.ext_HLGap(output_string)
-        self.properties['FermiLevel'] = self.ext_FermiLevel(output_string)
-        self.properties['occupancies'] = self.ext_HLoccupancies(output_string)
-        self.properties['Qdipole'] = self.ext_qdipolemom(output_string)
-        self.properties['fulldipole'] = self.ext_fulldipolemom(output_string)
-        self.properties['Qquadrupole'] = self.ext_qquadrupolemom(output_string)
-        self.properties['QDIPquadrupole'] = self.ext_qdipquadrupolemom(output_string)
-        self.properties['fullquadrupole'] = self.ext_fullquadrupolemom(output_string)
+        self.properties['HLGap'] = self.__ext_HLGap(output_string)
+        self.properties['FermiLevel'] = self.__ext_FermiLevel(output_string)
+        self.properties['HLoccupancies'] = self.__ext_HLoccupancies(output_string)
+        self.properties['Qdipole'] = self.__ext_qdipolemom(output_string)
+        self.properties['fulldipole'] = self.__ext_fulldipolemom(output_string)
+        self.properties['Qquadrupole'] = self.__ext_qquadrupolemom(output_string)
+        self.properties['QDIPquadrupole'] = self.__ext_qdipquadrupolemom(output_string)
+        self.properties['fullquadrupole'] = self.__ext_fullquadrupolemom(output_string)
+
+    def __write_and_run_command(self, mol, conformer):
+        """
+        Writes and runs the command for GFN.
+
+        Returns
+        -------
+        out_file : :class:`str`
+            Name of output file with GFN-xTB results.
+        """
+        xyz = 'input_structure.xyz'
+        out_file = 'energy.output'
+        mol.write(xyz, conformer=conformer)
+        # modify memory limit
+        if self.mem_ulimit:
+            cmd = ['ulimit -s unlimited ;']
+            # allow multiple shell commands to be run in one subprocess
+            shell = True
+        else:
+            cmd = []
+            shell = False
+        cmd.append(self.gfnxtb_path)
+        cmd.append(xyz)
+        # set GFN Parameterization
+        if self.gfn_version != '2':
+            cmd.append('--gfn')
+            cmd.append(self.gfn_version)
+        # set number of cores
+        cmd.append('--parallel')
+        cmd.append(self.num_cores)
+        # add eletronic temp term
+        if self.etemp != '300':
+            cmd.append('--etemp')
+            cmd.append(self.etemp)
+        # write solvent section of cmd
+        if self.solvent is not None:
+            cmd.append('--gbsa')
+            cmd.append(self.solvent)
+            if self.solvent_grid != 'normal':
+                cmd.append(self.solvent_grid)
+        # write charge section of cmd
+        if self.charge is not None:
+            cmd.append('--chrg')
+            cmd.append(self.charge)
+        cmd = ' '.join(cmd)
+        f = open(out_file, 'w')
+        # uses the shell if mem_ulimit = True and waits until
+        # subproces is complete. This is required to run the mem_ulimit_cmd
+        # and GFN calculation in one command, which is then closed, which
+        # minimizes the risk of unrestricting the memory limits.
+        sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE,
+                 shell=shell)
+        f.close()
+        return out_file
 
     def energy(self, mol, conformer=-1):
         """
@@ -1008,53 +965,353 @@ class GFNXTBEnergy(EnergyCalculator):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            xyz = 'input_structure.xyz'
-            out_file = 'output_info.output'
-            mol.write(xyz, conformer=conformer)
-            # modify memory limit
-            if self.mem_ulimit:
-                cmd = ['ulimit -s unlimited ;']
-                # allow multiple shell commands to be run in one subprocess
-                shell = True
-            else:
-                cmd = []
-                shell = False
-            cmd.append(self.gfnxtb_path)
-            cmd.append(xyz)
-            # set GFN Parameterization
-            if self.gfn_version != '2':
-                cmd.append('--gfn')
-                cmd.append(self.gfn_version)
-            # turn on hessian calculation if free energy requested
-            if self.free is True:
-                cmd.append('--hess')
-            # set number of cores
-            cmd.append('--parallel')
-            cmd.append(self.num_cores)
-            # add eletronic temp term
-            if self.etemp != '300':
-                cmd.append('--etemp')
-                cmd.append(self.etemp)
-            # write solvent section of cmd
-            if self.solvent is not None:
-                cmd.append('--gbsa')
-                cmd.append(self.solvent)
-                if self.solvent_grid != 'normal':
-                    cmd.append(self.solvent_grid)
-            # write charge section of cmd
-            if self.charge is not None:
-                cmd.append('--chrg')
-                cmd.append(self.charge)
-            cmd = ' '.join(cmd)
-            f = open(out_file, 'w')
-            # uses the shell if mem_ulimit = True and waits until
-            # subproces is complete. This is required to run the mem_ulimit_cmd
-            # and GFN calculation in one command, which is then closed, which
-            # minimizes the risk of unrestricting the memory limits.
-            sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE,
-                     shell=shell)
-            f.close()
-            self.get_properties(output_file='output_info.output')
+            out_file = self.write_and_run_command(mol=mol, conformer=conformer)
+
+
+class XTBFreeEnergy(XTBEnergy):
+    """
+    Uses GFN-xTB to calculate free energies, vibrational frequencies and
+    other properties of molecules.
+
+    Notes
+    -----
+    When running :meth:`energy`, this calculator changes the
+    present working directory with :func:`os.chdir`. The original
+    working directory will be restored even if an error is raised so
+    unless multi-threading is being used this implementation detail
+    should not matter.
+
+    If multi-threading is being used an error could occur if two
+    different threads need to know about the current working directory
+    as this :class:`.EnergyCalculator` can change it from under them.
+
+    Note that this does not have any impact on multi-processing,
+    which should always be safe.
+
+    Documentation for GFN2-xTB available:
+    https://xtb-docs.readthedocs.io/en/latest/setup.html
+
+    Attributes
+    ----------
+    gfnxtb_path : :class:`str`
+        The path to the GFN-xTB executable.
+
+    gfn_version : :class:`str`
+        Parameterization of GFN-xTB to use.
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/basics.html
+
+    output_dir : :class:`str`, optional
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
+
+    output_dir : :class:`str`, optional
+        The name of the directory into which files generated during
+        the optimization are written, if ``None`` then
+        :func:`uuid.uuid4` is used.
+
+    num_cores : :class:`int`
+        The number of cores for GFN-xTB to use. Requires appropriate setup
+        of GFN-xTB by user.
+
+    use_cache : :class:`bool`, optional
+        If ``True`` :meth:`energy` will not run twice on the same
+        molecule and conformer.
+
+    mem_ulimit : :class: `bool`, optional
+        If ``True`` :meth:`energy` will be run without constraints on
+        the stacksize. If memory issues are encountered, this should be ``True``,
+        however this may raise issues on clusters.
+
+    etemp : :class:`int`, optional
+        Electronic temperature to use (in K). Defaults to 300K.
+
+    solvent : :class:`str`, optional
+        Solvent to use in GBSA implicit solvation method.
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+    solvent_grid : :class:`str`, optional
+        Grid level to use in SASA calculations for GBSA implicit solvent.
+        Options:
+            normal, tight, verytight, extreme
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+    charge : :class:`str`, optional
+        Formal molecular charge. `-` should be used to indicate sign.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        gfnxtb = XTBEnergy('/opt/gfnxtb/xtb')
+        gfnxtb.energy(mol)
+
+    Note that for :class:`.MacroMolecule` objects assembled by ``stk``
+    :class:`XTBEnergy` should usually be used after optimization with some
+    other method. This is because GFN-xTB only uses xyz coordinates as input
+    and so will not recognize the long bonds created during assembly.
+    An optimizer which can minimize these bonds should be used before
+    :class:`XTBEnergy`.
+
+    .. code-block:: python
+
+        bb1 = StructUnit2.smiles_init('NCCNCCN', ['amine'])
+        bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
+        polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
+
+        uff = UFF()
+        uff.optimize(polymer)
+        gfnxtb = XTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
+                              mem_ulimit=True)
+        gfnxtb.energy(polymer)
+
+    Energies and other properties of optimized structures can be
+    extracted using :class:`XTBEnergy`. For example vibrational frequencies,
+    the HOMO-LUMO gap and thermodynamic properties (such as the Total Free
+    Energy) can be calculated after an optimization with very tight contraints
+    with an implicit solvent (THF). Very tight criteria are required to ensure
+    that no negative vibrational frequencies are present.
+
+    .. code-block:: python
+
+        gfnxtb = OptimizerSequence(
+            UFF(),
+            XTB(gfnxtb_path='/opt/gfnxtb/xtb',
+                   mem_ulimit=True,
+                   opt_level='verytight',
+                   solvent='THF')
+        )
+        gfnxtb.optimize(polymer)
+
+        gfnxtbenergy = XTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
+                                    mem_ulimit=True,
+                                    free=True,
+                                    solvent='THF')
+        polymer_properties = gfnxtbenergy.energy(polymer)
+        polymer_free_energy = polymer_properties['totalfreeenergy']
+        polymer_freq = polymer_properties['frequencies']
+        polymer_gap = polymer_properties['HLGap']
+    """
+
+    def __init__(self,
+                 gfnxtb_path,
+                 gfn_version='2',
+                 output_dir=None,
+                 num_cores=1,
+                 etemp=300,
+                 solvent=None,
+                 solvent_grid='normal',
+                 charge=None,
+                 use_cache=False,
+                 mem_ulimit=False):
+        XTBEnergy.__init__(self,
+                           gfnxtb_path,
+                           gfn_version,
+                           output_dir,
+                           num_cores,
+                           etemp,
+                           solvent,
+                           solvent_grid,
+                           charge,
+                           use_cache,
+                           mem_ulimit)
+        self.homo_lumo_gaps = {}
+        self.whatever = {}
+        self.frequencies = {}
+
+    def __ext_free_energy(self, output_string):
+        """
+        Extracts total free energy (a.u.) from GFN-xTB output at T=298.15K.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "          | TOTAL FREE ENERGY         -75.832501154309 Eh   |"
+
+        Returns
+        -------
+        :class:`float`
+            Total free energy in a.u.
+        """
+        # check that hessian was performed on geometry optimized structure
+        # raise error if not
+        check_hessian = True
+        for line in reversed(output_string):
+            if '#WARNING! Hessian on incompletely optimized geometry!' in line:
+                check_hessian = False
+                break
+        if check_hessian is False:
+            raise XTBEnergyHessianFailedError(
+                f'Hessian calculation performed on unoptimized structure.'
+            )
+        value = None
+
+        # regex for numbers
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        for line in reversed(output_string):
+            if '          | TOTAL FREE ENERGY  ' in line:
+                value = nums.search(line.rstrip()).group(0)
+                break
+
+        return float(value)
+
+    def __ext_frequencies(self, output_string):
+        """
+        Extracts projected vibrational frequencies (cm-1) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418).
+        Example line:
+        "eigval :       -0.00    -0.00    -0.00     0.00     0.00     0.00"
+
+        Returns
+        -------
+        :class:`list`
+            List of all vibrational frequencies as :class:`float`
+        """
+        value = None
+
+        # use a switch to make sure we are extracting values after the
+        # final property readout
+        switch = False
+
+        frequencies = []
+        for i, line in enumerate(output_string):
+            if '|               Frequency Printout                |' in line:
+                # turn on reading as final frequency printout has begun
+                switch = True
+            if ' reduced masses (amu)' in line:
+                # turn off reading as frequency section is done
+                switch = False
+            if 'eigval :' in line and switch is True:
+                split_line = [i for i in line.rstrip().split(':')[1].split(' ')
+                              if i != '']
+                for freq in split_line:
+                    frequencies.append(freq)
+
+        value = [float(i) for i in frequencies]
+
+        return value
+
+    def __get_properties(self, output_file):
+        """
+        Extracts desired properties from GFN-xTB single point energy calculation.
+
+        """
+        self.properties = {}
+
+        # get output file in string
+        output_string = open(output_file, 'r').readlines()
+
+        # get properties from output string
+        self.frequenceies[(mol, conformer)] = 0
+
+        self.properties['totalenergy'] = self.__ext_total_energy(output_string)
+        self.properties['totalfreeenergy'] = self.__ext_free_energy(output_string)
+        self.properties['frequencies'] = self.__ext_frequencies(output_string)
+        self.properties['HLGap'] = self.__ext_HLGap(output_string)
+        self.properties['FermiLevel'] = self.__ext_FermiLevel(output_string)
+        self.properties['HLoccupancies'] = self.__ext_HLoccupancies(output_string)
+        self.properties['Qdipole'] = self.__ext_qdipolemom(output_string)
+        self.properties['fulldipole'] = self.__ext_fulldipolemom(output_string)
+        self.properties['Qquadrupole'] = self.__ext_qquadrupolemom(output_string)
+        self.properties['QDIPquadrupole'] = self.__ext_qdipquadrupolemom(output_string)
+        self.properties['fullquadrupole'] = self.__ext_fullquadrupolemom(output_string)
+
+    def __write_and_run_command(self, mol, conformer):
+        """
+        Writes and runs the command for GFN.
+
+        Returns
+        -------
+        out_file : :class:`str`
+            Name of output file with GFN-xTB results.
+        """
+        xyz = 'input_structure.xyz'
+        out_file = 'energy.output'
+        mol.write(xyz, conformer=conformer)
+        # modify memory limit
+        if self.mem_ulimit:
+            cmd = ['ulimit -s unlimited ;']
+            # allow multiple shell commands to be run in one subprocess
+            shell = True
+        else:
+            cmd = []
+            shell = False
+        cmd.append(self.gfnxtb_path)
+        cmd.append(xyz)
+        # set GFN Parameterization
+        if self.gfn_version != '2':
+            cmd.append('--gfn')
+            cmd.append(self.gfn_version)
+        # turn on hessian calculation if free energy requested
+        cmd.append('--hess')
+        # set number of cores
+        cmd.append('--parallel')
+        cmd.append(self.num_cores)
+        # add eletronic temp term
+        if self.etemp != '300':
+            cmd.append('--etemp')
+            cmd.append(self.etemp)
+        # write solvent section of cmd
+        if self.solvent is not None:
+            cmd.append('--gbsa')
+            cmd.append(self.solvent)
+            if self.solvent_grid != 'normal':
+                cmd.append(self.solvent_grid)
+        # write charge section of cmd
+        if self.charge is not None:
+            cmd.append('--chrg')
+            cmd.append(self.charge)
+        cmd = ' '.join(cmd)
+        f = open(out_file, 'w')
+        # uses the shell if mem_ulimit = True and waits until
+        # subproces is complete. This is required to run the mem_ulimit_cmd
+        # and GFN calculation in one command, which is then closed, which
+        # minimizes the risk of unrestricting the memory limits.
+        sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE,
+                 shell=shell)
+        f.close()
+        return out_file
+
+    def energy(self, mol, conformer=-1):
+        """
+        Calculates the energy of molecule `mol` using GFN-xTB.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule whose energy should be claculated.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        self.properties : :class:`dict`
+            Dictionary containing desired properties.
+        """
+
+        if conformer == -1:
+            conformer = mol.mol.GetConformer(conformer).GetId()
+
+        if self.output_dir is None:
+            output_dir = str(uuid.uuid4().int)
+        else:
+            output_dir = self.output_dir
+        output_dir = os.path.abspath(output_dir)
+
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+
+        os.mkdir(output_dir)
+        init_dir = os.getcwd()
+        try:
+            os.chdir(output_dir)
+            out_file = self.write_and_run_command(mol=mol, conformer=conformer)
+            self.get_properties(output_file=out_file)
         finally:
             os.chdir(init_dir)
-        return self.properties
+        return self.properties  # what do they return?
