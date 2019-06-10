@@ -32,6 +32,13 @@ existing fitness values based on all the fitness values in a
 population, for example by dividing the fitness value of all molecules
 by the mean fitness across the population.
 
+Available fitness calculators.
+------------------------------
+
+#. :class:`.PropertyVector`
+#. :class:`.RaisingFitnessCalculator`
+
+
 .. _`adding fitness calculators`:
 
 Extending stk: Making new fitness calculators.

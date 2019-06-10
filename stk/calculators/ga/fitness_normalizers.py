@@ -13,6 +13,18 @@ documention of the classes which inherit it, for example
 multiple :class:`FitnessNormalizer` can be chained using
 :meth:`.NormalizerSequence`.
 
+Available fitness normalizers.
+------------------------------
+
+#. :class:`.NullFitnessNormalizer`
+#. :class:`.Power`
+#. :class:`.Multiply`
+#. :class:`.Sum`
+#. :class:`.ScaleByMean`
+#. :class:`.ShiftUp`
+#. :class:`.NormalizerSequence`
+
+
 .. _`adding fitness normalizers`:
 
 Extending stk: Making new fitness normalizers.

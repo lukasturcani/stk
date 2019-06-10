@@ -7,6 +7,14 @@ them and then plot the results. To see examples of how to use plotters
 look at the documentation of the individual plotters. For example
 :class:`SelectionPlotter` and :class:`ProgressPlotter`.
 
+
+Available plotters.
+-------------------
+
+#. :class:`.ProgressPlotter`
+#. :class:`.SelectionPlotter`
+
+
 .. _`adding plotters`:
 
 Extending stk: Making new plotters.

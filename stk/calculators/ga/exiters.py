@@ -4,6 +4,15 @@ Defines :class:`Exiter` classes.
 :class:`Exiter` objects check to see if an exit condition for the GA
 has been fulfilled.
 
+Available exiters.
+------------------
+
+#. :class:`.NumGenerations`
+#. :class:`.MolPresent`
+#. :class:`.FitnessPlateau`
+#. :class:`.AnyExiter`
+#. :class:`.AllExiters`
+
 .. _`adding exiters`:
 
 Extending stk: Making new exiters.

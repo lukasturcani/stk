@@ -10,6 +10,15 @@ the various :class:`Mutator` classes, for example
 :class:`RandomBuildingBlock`, :class:`SimilarBuildingBlock`
 or :class:`RandomMutation`.
 
+Available mutators.
+-------------------
+
+#. :class:`RandomBuildingBlock`
+#. :class:`.SimilarBuildingBlock`
+#. :class:`.RandomTopology`
+#. :class:`.RandomMutation`
+
+
 .. _`adding mutators`:
 
 Extending stk: Making new mutators.

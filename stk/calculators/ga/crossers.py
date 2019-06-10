@@ -7,6 +7,13 @@ seen in the documentation of the various :class:`Crosser` classes,
 for example :class:`GeneticRecombination`,
 :class:`Jumble` or :class:`RandomCrossover`.
 
+Available crossers.
+-------------------
+
+#. :class:`.RandomCrossover`
+#. :class:`.GeneticRecombination`
+#. :class:`.Jumble`
+
 .. _`adding crossers`:
 
 Extending stk: Making new crossers.

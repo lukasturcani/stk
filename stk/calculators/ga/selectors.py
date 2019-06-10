@@ -12,6 +12,15 @@ processes, such as stochastic sampling, using
 :class:`.SelectorSequence` or :class:`SelectorFunnel`. Examples of how
 this can happen are given in the documentation of these two classes.
 
+Available selectors.
+--------------------
+
+#. :class:`.Fittest`
+#. :class:`.Roulette`
+#. :class:`.AboveAverage`
+#. :class:`SelectorSequence`
+#. :class:`.SelectorFunnel`
+
 .. _`adding selectors`:
 
 Extending stk: Making new selectors.
