@@ -5,7 +5,7 @@ Electronic property calculators calculate the electronic properties of
 molecules, namely the dipole moment, electron affinity and ionization
 potential. Each :class:`.ElectronicPropertyCalculator` is initialized
 with some settings and calculates the electronic properties of a
-molecule with :meth:`~.ElectronicPropertyCalculator.dopole_moment`,
+molecule with :meth:`~.ElectronicPropertyCalculator.dipole_moment`,
 :meth:`~.ElectronicPropertyCalculator.electron_affinity` and
 :meth:`~.ElectronicPropertyCalculator.ionization_potential`.
 
