@@ -16,18 +16,18 @@ gfnxtb = pytest.mark.skipif(
 @gfnxtb
 def test_gfnxtb_properties(tmp_polymer, gfnxtb_path):
     init_dir = os.getcwd()
-    # GFNXTB  requires an embedding before working.
+    # XTB  requires an embedding before working.
     etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
 
     # hessian requires optimized structure
-    gfnxtb = stk.GFNXTB(gfnxtb_path, output_dir=join(odir, 'gfnxtb_opt'),
+    gfnxtb = stk.XTB(gfnxtb_path, output_dir=join(odir, 'gfnxtb_opt'),
                         mem_ulimit=True, opt_level='verytight',
                         num_cores=2)
     gfnxtb.optimize(tmp_polymer)
-    energy_calculator = stk.GFNXTBEnergy(gfnxtb_path=gfnxtb_path,
-                                         output_dir=join(odir, 'gfnxtb_ey'),
-                                         mem_ulimit=True, free=True)
+    energy_calculator = stk.XTBFreeEnergy(gfnxtb_path=gfnxtb_path,
+                                          output_dir=join(odir, 'gfnxtb_ey'),
+                                          mem_ulimit=True)
     prop = energy_calculator.energy(tmp_polymer)
 
     energy = prop['totalenergy']
@@ -83,64 +83,93 @@ def test_valid_solvent():
     valid1 = 'benzene'  # valid in GFN 1 only
     valid2 = 'dmf'  # valid in GFN 2 only
     invalid = 'andrewtarziawrotethis'
-    assert stk.valid_GFNXTB_solvent(solvent=valid, gfn_version=gfn_1)
-    assert stk.valid_GFNXTB_solvent(solvent=valid, gfn_version=gfn_2)
-    assert stk.valid_GFNXTB_solvent(solvent=valid1, gfn_version=gfn_1)
-    assert stk.valid_GFNXTB_solvent(solvent=valid2, gfn_version=gfn_2)
+    assert stk.valid_XTB_solvent(solvent=valid, gfn_version=gfn_1)
+    assert stk.valid_XTB_solvent(solvent=valid, gfn_version=gfn_2)
+    assert stk.valid_XTB_solvent(solvent=valid1, gfn_version=gfn_1)
+    assert stk.valid_XTB_solvent(solvent=valid2, gfn_version=gfn_2)
     try:
-        stk.valid_GFNXTB_solvent(solvent=valid1, gfn_version=gfn_2)
+        stk.valid_XTB_solvent(solvent=valid1, gfn_version=gfn_2)
         assert False
-    except stk.GFNXTBInvalidSolventError:
+    except stk.XTBInvalidSolventError:
         assert True
     try:
-        stk.valid_GFNXTB_solvent(solvent=valid2, gfn_version=gfn_1)
+        stk.valid_XTB_solvent(solvent=valid2, gfn_version=gfn_1)
         assert False
-    except stk.GFNXTBInvalidSolventError:
+    except stk.XTBInvalidSolventError:
         assert True
     try:
-        stk.valid_GFNXTB_solvent(solvent=invalid, gfn_version=gfn_1)
+        stk.valid_XTB_solvent(solvent=invalid, gfn_version=gfn_1)
         assert False
-    except stk.GFNXTBInvalidSolventError:
+    except stk.XTBInvalidSolventError:
         assert True
     try:
-        stk.valid_GFNXTB_solvent(solvent=invalid, gfn_version=gfn_2)
+        stk.valid_XTB_solvent(solvent=invalid, gfn_version=gfn_2)
         assert False
-    except stk.GFNXTBInvalidSolventError:
+    except stk.XTBInvalidSolventError:
         assert True
+
+
+def test_gfnxtb_negfreq(tmp_polymer, gfnxtb_path):
+    init_dir = os.getcwd()
+    # XTB  requires an embedding before working.
+    etkdg = stk.ETKDG()
+    etkdg.optimize(tmp_polymer)
+
+    # get energy
+    energy_calculator = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
+                                         output_dir=join(odir, 'gfnxtb_ey'),
+                                         mem_ulimit=True)
+    init_prop = energy_calculator.energy(tmp_polymer)
+    init_energy = init_prop['totalenergy']
+
+    # run hessian on unoptimized structure, which will produce a second
+    # optimization or an error
+    tmp_polymer.write(join(odir, 'gfnxtb_hess/gfnxtb_opt_before.mol'))
+    energy_calculator = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
+                                         output_dir=join(odir, 'gfnxtb_hess'),
+                                         mem_ulimit=True, free=True)
+    new_prop = energy_calculator.energy(tmp_polymer)
+    new_energy = new_prop['totalenergy']
+    tmp_polymer.write(join(odir, 'gfnxtb_hess/gfnxtb_opt_after.mol'))
+    # check directory moving worked
+    assert os.getcwd() == init_dir
+    # optimized structure has lower energy than initial structure
+    assert new_energy < init_energy
 
 
 def test_gfnxtb_opt(tmp_polymer, gfnxtb_path):
     init_dir = os.getcwd()
-    # GFNXTB  requires an embedding before working.
+    # XTB  requires an embedding before working.
     etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
 
     # If the optimization was successful the energy should be lowered.
-    energy_calculator = stk.GFNXTBEnergy(gfnxtb_path=gfnxtb_path,
+    energy_calculator = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
                                          output_dir=join(odir, 'gfnxtb_ey'),
                                          mem_ulimit=True)
     init_prop = energy_calculator.energy(tmp_polymer)
     init_energy = init_prop['totalenergy']
 
     tmp_polymer.write(join(odir, 'gfnxtb_opt_before.mol'))
-    gfnxtb = stk.GFNXTB(gfnxtb_path, output_dir=join(odir, 'gfnxtb_opt'),
+    gfnxtb = stk.XTB(gfnxtb_path, output_dir=join(odir, 'gfnxtb_opt'),
                         mem_ulimit=True)
     gfnxtb.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'gfnxtb_opt_after.mol'))
     # check directory moving worked
     assert os.getcwd() == init_dir
     properties = energy_calculator.energy(tmp_polymer)
+    opt_energy = properties['totalenergy']
     # optimized structure has lower energy than initial structure
-    assert properties['totalenergy'] < init_energy
-    energy_calculator = stk.GFNXTBEnergy(gfnxtb_path=gfnxtb_path,
+    assert opt_energy < init_energy
+    energy_calculator = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
                                          output_dir=join(odir, 'gfnxtb_ey_chrg'),
                                          mem_ulimit=True, charge='-1')
     # energy of structure with formal charge differs from uncharged
     properties_chrg = energy_calculator.energy(tmp_polymer)
-    assert properties_chrg['totalenergy'] != init_energy
-    energy_calculator = stk.GFNXTBEnergy(gfnxtb_path=gfnxtb_path,
+    assert properties_chrg['totalenergy'] != opt_energy
+    energy_calculator = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
                                          output_dir=join(odir, 'gfnxtb_ey_solv'),
                                          mem_ulimit=True, solvent='h2o')
     # energy of structure in solvent differs from gas phase
     properties_solv = energy_calculator.energy(tmp_polymer)
-    assert properties_solv['totalenergy'] != init_energy
+    assert properties_solv['totalenergy'] != opt_energy
