@@ -79,10 +79,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">stk.calculators.energy.energy_calculators module</a><ul>
-<li><a class="reference internal" href="#extending-stk-making-new-energy-calculators">Extending stk: Making new energy calculators.</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">stk.calculators.energy.energy_calculators module</a></li>
 </ul>
 </div>
             
@@ -150,48 +147,6 @@
   <div class="section" id="module-stk.calculators.energy.energy_calculators">
 <span id="stk-calculators-energy-energy-calculators-module"></span><h1>stk.calculators.energy.energy_calculators module<a class="headerlink" href="#module-stk.calculators.energy.energy_calculators" title="Permalink to this headline">¶</a></h1>
 <p>Defines energy calculators.</p>
-<p>Energy calculators are objects which calculate the energy of molecules.
-Each <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a> is initialized with some settings and
-calculates the energy of a molecule with
-<a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.energy" title="stk.calculators.energy.energy_calculators.EnergyCalculator.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Energy calculators work with any Molecule objects, such as</span>
-<span class="c1"># StructUnit, Polymer, Cage, etc.</span>
-<span class="n">mol1</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="n">mol2</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="n">mol3</span> <span class="o">=</span> <span class="n">Polymer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-
-<span class="c1"># Create the energy calculator.</span>
-<span class="n">mmff</span> <span class="o">=</span> <span class="n">MMFFEnergy</span><span class="p">()</span>
-
-<span class="c1"># Calculate energies of various molecules.</span>
-<span class="n">mol1_energy</span> <span class="o">=</span> <span class="n">mmff</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol1</span><span class="p">)</span>
-<span class="c1"># We can optionally specify a conformer.</span>
-<span class="n">mol2_energy</span> <span class="o">=</span> <span class="n">mmff</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol2</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">mol3_energy</span> <span class="o">=</span> <span class="n">mmff</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol3</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>By default, calling <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.energy" title="stk.calculators.energy.energy_calculators.EnergyCalculator.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a> twice on the
-will calculate the energy a second time. However, we can use the
-<a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.use_cache" title="stk.calculators.energy.energy_calculators.EnergyCalculator.use_cache"><code class="xref py py-attr docutils literal notranslate"><span class="pre">use_cache</span></code></a> option to prevent recalculations
-when the same molecule and conformer are given to the same energy
-calculator a second time.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">caching_mmff</span> <span class="o">=</span> <span class="n">MMFFEnergy</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="c1"># Calculate the energy the first time.</span>
-<span class="n">energy1</span> <span class="o">=</span> <span class="n">caching_mmff</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="n">mol1</span><span class="p">)</span>
-<span class="c1"># The second time, the enegy is returned directly from memory, a</span>
-<span class="c1"># second calculation is not run.</span>
-<span class="n">energy2</span> <span class="o">=</span> <span class="n">caching_mmff</span><span class="o">.</span><span class="n">enegy</span><span class="p">(</span><span class="n">mol2</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="section" id="extending-stk-making-new-energy-calculators">
-<span id="adding-energy-calculators"></span><h2>Extending stk: Making new energy calculators.<a class="headerlink" href="#extending-stk-making-new-energy-calculators" title="Permalink to this headline">¶</a></h2>
-<p>New energy calculators can be made by simply making a class which
-inherits the <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator" title="stk.calculators.energy.energy_calculators.EnergyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCalculator</span></code></a> class. In addition to this,
-the new class must define a <a class="reference internal" href="#stk.calculators.energy.energy_calculators.EnergyCalculator.energy" title="stk.calculators.energy.energy_calculators.EnergyCalculator.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a> method.
-The method must take 2 arguments, a mandatory <cite>mol</cite> argument and an
-optional <cite>conformer</cite> argument. The method will then calculate and
-return the energy. There are no requirements regarding how it should
-go about calculating the energy.</p>
 <dl class="class">
 <dt id="stk.calculators.energy.energy_calculators.EnergyCalculator">
 <em class="property">class </em><code class="descclassname">stk.calculators.energy.energy_calculators.</code><code class="descname">EnergyCalculator</code><span class="sig-paren">(</span><em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.energy_calculators.EnergyCalculator" title="Permalink to this definition">¶</a></dt>
@@ -613,7 +568,6 @@ calculated. If so, and <a class="reference internal" href="#stk.calculators.ener
 </table>
 </dd></dl>
 
-</div>
 </div>
 
 

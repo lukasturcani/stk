@@ -472,9 +472,9 @@ previously calculated value</p>
 following modules:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference internal" href="stk.calculators.optimization.optimizers.html#module-stk.calculators.optimization.optimizers" title="stk.calculators.optimization.optimizers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optimizers</span></code></a></li>
-<li><a class="reference internal" href="stk.calculators.energy.energy_calculators.html#module-stk.calculators.energy.energy_calculators" title="stk.calculators.energy.energy_calculators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">energy_calculators</span></code></a></li>
-<li><a class="reference internal" href="stk.calculators.electronic_property.electronic_property_calculators.html#module-stk.calculators.electronic_property.electronic_property_calculators" title="stk.calculators.electronic_property.electronic_property_calculators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">electronic_property_calculators</span></code></a></li>
+<li><a class="reference internal" href="stk.calculators.optimization.html#module-stk.calculators.optimization" title="stk.calculators.optimization"><code class="xref py py-mod docutils literal notranslate"><span class="pre">optimization</span></code></a></li>
+<li><a class="reference internal" href="stk.calculators.energy.html#module-stk.calculators.energy" title="stk.calculators.energy"><code class="xref py py-mod docutils literal notranslate"><span class="pre">energy</span></code></a></li>
+<li><a class="reference internal" href="stk.calculators.electronic_property.html#module-stk.calculators.electronic_property" title="stk.calculators.electronic_property"><code class="xref py py-mod docutils literal notranslate"><span class="pre">electronic_property</span></code></a></li>
 <li><a class="reference internal" href="stk.calculators.ga.mutators.html#module-stk.calculators.ga.mutators" title="stk.calculators.ga.mutators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mutators</span></code></a></li>
 <li><a class="reference internal" href="stk.calculators.ga.crossers.html#module-stk.calculators.ga.crossers" title="stk.calculators.ga.crossers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">crossers</span></code></a></li>
 <li><a class="reference internal" href="stk.calculators.ga.fitness_calculators.html#module-stk.calculators.ga.fitness_calculators" title="stk.calculators.ga.fitness_calculators"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fitness_calculators</span></code></a></li>
@@ -500,8 +500,8 @@ this is to run the two optimizers in sequence</p>
 </pre></div>
 </div>
 <p>However, there is a better way! We can use an optimizer called
-<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.OptimizerSequence" title="stk.calculators.optimization.optimizers.OptimizerSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizerSequence</span></code></a>. The <code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code>
-method of this optimizer calls the <code class="xref py py-class docutils literal notranslate"><span class="pre">optimize</span></code> methods
+<a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.OptimizerSequence" title="stk.calculators.optimization.optimizers.OptimizerSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizerSequence</span></code></a>. The <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.OptimizerSequence.optimize" title="stk.calculators.optimization.optimizers.OptimizerSequence.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a>
+method of this optimizer calls the <a class="reference internal" href="stk.calculators.optimization.optimizers.html#stk.calculators.optimization.optimizers.Optimizer.optimize" title="stk.calculators.optimization.optimizers.Optimizer.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a> methods
 of the optimizers it was initialized with</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">opt_sequence</span> <span class="o">=</span> <span class="n">OptimizerSequence</span><span class="p">(</span><span class="n">mmff</span><span class="p">,</span> <span class="n">macromodel</span><span class="p">)</span>
 <span class="c1"># Optimize with mmff and then with macromodel.</span>
@@ -1136,7 +1136,8 @@ modified directly in order to be extended.</p>
 <li><a class="reference internal" href="stk.molecular.topologies.base.html#adding-topologies"><span class="std std-ref">Extending stk: Adding new topologies.</span></a></li>
 <li><a class="reference internal" href="stk.molecular.functional_groups.html#adding-functional-groups"><span class="std std-ref">Extending stk: Adding  more functional groups.</span></a></li>
 <li><a class="reference internal" href="stk.calculators.optimization.html#adding-optimizers"><span class="std std-ref">Extending stk: Making new optimizers.</span></a></li>
-<li><a class="reference internal" href="stk.calculators.energy.energy_calculators.html#adding-energy-calculators"><span class="std std-ref">Extending stk: Making new energy calculators.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.energy.html#adding-energy-calculators"><span class="std std-ref">Extending stk: Making new energy calculators.</span></a></li>
+<li><a class="reference internal" href="stk.calculators.electronic_property.html#adding-electronic-property-calculators"><span class="std std-ref">Extending stk: Making new electronic property calculators.</span></a></li>
 <li><a class="reference internal" href="stk.calculators.ga.mutators.html#adding-mutators"><span class="std std-ref">Extending stk: Making new mutators.</span></a></li>
 <li><a class="reference internal" href="stk.calculators.ga.crossers.html#adding-crossers"><span class="std std-ref">Extending stk: Making new crossers.</span></a></li>
 <li><a class="reference internal" href="stk.calculators.ga.fitness_calculators.html#adding-fitness-calculators"><span class="std std-ref">Extending stk: Making new fitness calculators.</span></a></li>
