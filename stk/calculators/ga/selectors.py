@@ -20,7 +20,7 @@ Extending stk: Making new selectors.
 When a new :class:`Selector` class is made it must inherit
 :class:`Selector` and define a :meth:`~Selection.select` method.
 :meth:`~Selection.select` must take a single argument, which is the
-:class:`Population` from which molecules are selected.
+:class:`.Population` from which molecules are selected.
 
 """
 
