@@ -15,7 +15,7 @@ import subprocess as sp
 import uuid
 from os.path import join
 import shutil
-from ...utilities import valid_GFNXTB_solvent
+from ...utilities import valid_XTB_solvent
 
 logger = logging.getLogger(__name__)
 
@@ -882,7 +882,7 @@ class XTB(Optimizer):
         self.solvent = solvent
         if self.solvent is not None:
             self.solvent = solvent.lower()
-            valid_GFNXTB_solvent(gfn_version=self.gfn_version,
+            valid_XTB_solvent(gfn_version=self.gfn_version,
                                  solvent=self.solvent)
         self.solvent_grid = solvent_grid
         self.charge = charge
