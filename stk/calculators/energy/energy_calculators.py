@@ -1,6 +1,8 @@
 """
 Defines energy calculators.
 
+See :mod:`.energy`.
+
 """
 
 import rdkit.Chem.AllChem as rdkit
