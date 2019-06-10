@@ -1,6 +1,8 @@
 """
 Defines optimizers.
 
+See :mod:`.optimization`.
+
 """
 
 import logging

@@ -1,3 +1,10 @@
+"""
+Defines electronic property calculators.
+
+See :mod:`.electronic_property`.
+
+"""
+
 class ElectronicPropertyCalculator:
     def dipole_moment(self, mol, conformer=-1):
         raise NotImplementedError()
