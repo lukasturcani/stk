@@ -392,9 +392,9 @@ previously calculated value
 More information on each type of calculator can be seen by visiting the
 following modules:
 
-    * :mod:`.optimizers`
-    * :mod:`.energy_calculators`
-    * :mod:`.electronic_property_calculators`
+    * :mod:`.optimization`
+    * :mod:`.energy`
+    * :mod:`.electronic_property`
     * :mod:`.mutators`
     * :mod:`.crossers`
     * :mod:`.fitness_calculators`
@@ -422,8 +422,8 @@ this is to run the two optimizers in sequence
     macromodel.optimize(mol)
 
 However, there is a better way! We can use an optimizer called
-:class:`.OptimizerSequence`. The :meth:`~OptimizerSequence.optimize`
-method of this optimizer calls the :class:`~Optimizer.optimize` methods
+:class:`.OptimizerSequence`. The :meth:`~.OptimizerSequence.optimize`
+method of this optimizer calls the :meth:`~.Optimizer.optimize` methods
 of the optimizers it was initialized with
 
 .. code-block:: python
@@ -1129,6 +1129,7 @@ modified directly in order to be extended.
     * :ref:`adding functional groups`
     * :ref:`adding optimizers`
     * :ref:`adding energy calculators`
+    * :ref:`adding electronic property calculators`
     * :ref:`adding mutators`
     * :ref:`adding crossers`
     * :ref:`adding fitness calculators`
