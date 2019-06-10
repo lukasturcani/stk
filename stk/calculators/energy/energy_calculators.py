@@ -965,13 +965,36 @@ class GFNXTBEnergy(EnergyCalculator):
 
         return value
 
-    def ext_occupancies(self, output_string):
+    def ext_HLoccupancies(self, output_string):
         """
-        Extracts Orbital Energies and Occupations (eV) from GFN-xTB output.
+        Extracts Orbital Energies and Occupations (eV) of the HOMO and LUMO from GFN-xTB output.
 
         Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "        70        2.0000           -0.3514143              -9.5625 (HOMO)"
+        "        71                         -0.2712405              -7.3808 (LUMO)"
+
+        Returns
+        -------
+        :class:`dict`
+            Dictionary of (#, occupation, Energy (eV)) of HOMO and LUMO orbital
         """
         value = None
+
+        for line in reversed(output_string):
+            if '(HOMO)' in line:
+                split_line = [i for i in line.rstrip().split(' ') if i != '']
+                # line is: Number, occupation, energy (Ha), energy (ev), label
+                # keep: Number, occupation, energy (eV)
+                homo_val = [int(split_line[0]), float(split_line[1]), float(split_line[3])]
+            if '(LUMO)' in line:
+                split_line = [i for i in line.rstrip().split(' ') if i != '']
+                # line is: Number, energy (Ha), energy (ev), label
+                # keep: Number, energy (eV)
+                lumo_val = [int(split_line[0]), float(0), float(split_line[2])]
+
+        value = {'HOMO': homo_val,
+                 'LUMO': lumo_val}
 
         return value
 
@@ -992,7 +1015,7 @@ class GFNXTBEnergy(EnergyCalculator):
             self.properties['frequencies'] = self.ext_frequencies(output_string)
         self.properties['HLGap'] = self.ext_HLGap(output_string)
         self.properties['FermiLevel'] = self.ext_FermiLevel(output_string)
-        self.properties['occupancies'] = self.ext_occupancies(output_string)
+        self.properties['occupancies'] = self.ext_HLoccupancies(output_string)
         self.properties['Qdipole'] = self.ext_qdipolemom(output_string)
         self.properties['fulldipole'] = self.ext_fulldipolemom(output_string)
         self.properties['Qquadrupole'] = self.ext_qquadrupolemom(output_string)
