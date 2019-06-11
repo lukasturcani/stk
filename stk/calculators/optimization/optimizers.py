@@ -927,8 +927,8 @@ class XTB(Optimizer):
         neg_freq = False
         XTBExt = XTBExts(output_file=output_file)
         value = XTBExt.ext_frequencies()
-        # checks for one negative frequency
-        if min(value) < 0:
+        # checks for one negative frequency excluding the first 6 frequencies
+        if min(value[7:]) < 0:
             neg_freq = True
         return neg_freq
 
