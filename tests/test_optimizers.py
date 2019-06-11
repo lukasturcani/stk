@@ -2,7 +2,6 @@ import stk
 from os.path import join
 import os
 import pytest
-import sys
 
 
 odir = 'optimizer_tests_output'
@@ -131,20 +130,3 @@ def test_try_catch_optimizer(tmp_amine2):
         path=join(odir, 'try_catch_optimizer_after.mol'),
         conformer=1
     )
-
-
-gfnxtb = pytest.mark.skipif(
-    all('gfnxtb' not in x for x in sys.argv),
-    reason="Only run when explicitly asked.")
-
-
-@gfnxtb
-def test_gfnxtb(tmp_polymer, gfnxtb_path):
-    # GFNXTB  requires an embedding before working.
-    etkdg = stk.ETKDG()
-    etkdg.optimize(tmp_polymer)
-
-    tmp_polymer.write(join(odir, 'gfnxtb_before.mol'))
-    gfnxtb = stk.GFNXTB(gfnxtb_path, output_dir=join(odir, 'gfnxtb'))
-    gfnxtb.optimize(tmp_polymer)
-    tmp_polymer.write(join(odir, 'gfnxtb_after.mol'))

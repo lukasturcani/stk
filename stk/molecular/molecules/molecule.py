@@ -304,11 +304,11 @@ class Molecule:
             for atoms_group in atoms_dihedral:
                 # Calculate the dihedral angle.
                 dihedral_value = rdMolTransforms.GetDihedralDeg(
-                                    self.mol.GetConformer(conformer),
-                                    atoms_group[0],
-                                    atoms_group[1],
-                                    atoms_group[2],
-                                    atoms_group[3])
+                    self.mol.GetConformer(conformer),
+                    atoms_group[0],
+                    atoms_group[1],
+                    atoms_group[2],
+                    atoms_group[3])
                 # Check that the dihedral is calculated in the right
                 # direction.
                 if abs(dihedral_value) > 90:
@@ -1100,6 +1100,77 @@ class Molecule:
                 )
 
             new_coords.append([float(i) for i in coords])
+
+        # Check that the correct number of atom
+        # lines was present in the file.
+        if i+1 != num_atoms:
+            raise RuntimeError(
+                f'The number of atom lines in the xyz file, {i+1}, '
+                'does not match the number of atoms in the '
+                f'molecule, {num_atoms}.'
+            )
+
+        # Update the structure.
+        new_coords = np.array(new_coords).T
+        self.set_position_from_matrix(new_coords, conformer=conformer)
+
+    def update_from_turbomole(self, path, conformer=-1):
+        """
+        Updates molecular structure to match a Turbomole ``.coord`` file.
+
+        Note that coordinates in ``.coord`` files are given in Bohr.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.mol`` file from which the structure
+            should be updated.
+
+        conformer : :class:`int`, optional
+            The conformer to be updated.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If the number of atoms in the file does not match the
+            number of atoms in the molecule or if atom elements in the
+            file do not agree with the atom elements in the molecule.
+
+        """
+        bohr_to_ang = 0.5291772105638411
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
+
+        with open(path, 'r') as f:
+            _, *content, __ = f.readlines()
+
+        # Check the atom count is correct.
+        num_atoms = self.mol.GetNumAtoms()
+        if int(len(content)) != num_atoms:
+            raise RuntimeError(
+                f'The number of atoms in the xyz file, {len(content)}, '
+                'does not match the number of atoms in the '
+                f'molecule, {num_atoms}.'
+            )
+
+        # Save all the coords in the file.
+        new_coords = []
+        for i, line in enumerate(content):
+            *coords, element = line.split()
+            if element.isnumeric():
+                element = periodic_table[int(element)]
+
+            if element != self.atom_symbol(i):
+                raise RuntimeError(
+                    f'Atom {i} element does not match file.'
+                )
+
+            new_coords.append([float(i)*bohr_to_ang for i in coords])
 
         # Check that the correct number of atom
         # lines was present in the file.
