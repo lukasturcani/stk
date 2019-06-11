@@ -907,7 +907,7 @@ class XTB(Optimizer):
         self.charge = charge
         self.multiplicity = multiplicity
         self.mem_ulimit = mem_ulimit
-        self.NOT_OPTIMIZED = False
+        self.NOT_OPTIMIZED = []
         super().__init__(use_cache=use_cache)
 
     def __check_neg_frequencies(self, output_file):
@@ -1069,7 +1069,7 @@ class XTB(Optimizer):
                     output_coord = join(output_dir, 'xtbopt.coord')
                     mol.update_from_coord(path=output_coord, conformer=conformer)
                     if run_count == self.max_count:
-                        self.NOT_OPTIMIZED = True
+                        self.NOT_OPTIMIZED.append((mol, conformer))
                         logging.warning(
                             f'Negative frequencies not removed in max_count optimizations')
                         break
