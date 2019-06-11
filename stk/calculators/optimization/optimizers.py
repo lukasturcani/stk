@@ -747,10 +747,6 @@ class XTB(Optimizer):
     charge : :class:`str`, optional
         Formal molecular charge. `-` should be used to indicate sign.
 
-    strict : :class:`bool`, optional
-        Whether to use the `--strict` during optimization, which turns all
-        internal GFN-xTB warnings into errors.
-
     Examples
     --------
     .. code-block:: python
@@ -820,8 +816,7 @@ class XTB(Optimizer):
                  charge=None,
                  multiplicity=None,
                  use_cache=False,
-                 mem_ulimit=False,
-                 strict=True):
+                 mem_ulimit=False):
         """
         Initializes a :class:`GFNXTB` instance.
 
@@ -912,7 +907,6 @@ class XTB(Optimizer):
         self.charge = charge
         self.multiplicity = multiplicity
         self.mem_ulimit = mem_ulimit
-        self.strict = strict
         self.NOT_OPTIMIZED = False
         super().__init__(use_cache=use_cache)
 
@@ -956,7 +950,7 @@ class XTB(Optimizer):
             # optimization has converged - however:
             # check for negative frequencies -- if they exist, return True
             # to allow for iteration
-            return self.check_neg_frequencies(output_file=output_file)
+            return self.__check_neg_frequencies(output_file=output_file)
         # else return errors
         elif os.path.isfile('NOT_CONVERGED'):
             raise XTBOptimizerFailedError(f'Optimization not converged.')
@@ -1015,9 +1009,6 @@ class XTB(Optimizer):
         if self.multiplicity is not None:
             cmd.append('--uhf')
             cmd.append(self.multiplicity)
-        # add strict term
-        if self.strict is True:
-            cmd.append('--strict')
         cmd = ' '.join(cmd)
         f = open(out_file, 'w')
         # uses the shell if mem_ulimit = True and waits until
