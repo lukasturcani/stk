@@ -672,6 +672,13 @@ class XTB(Optimizer):
     Note that this does not have any impact on multi-processing,
     which should always be safe.
 
+    Furthermore, the :meth:`optimize` calculator will check that the
+    structure is adequately optimized by checking for negative frequencies
+    after a Hessian calculation. A loop over at the given opt_level will
+    be performed by default to obtain an optimized structure. However,
+    in the examples we outline how to iterate over opt_levels to increase
+    convergence criteria and hopefully obtain an optimized structure.
+
     Documentation for GFN-xTB available:
     https://xtb-docs.readthedocs.io/en/latest/setup.html
 
@@ -689,6 +696,10 @@ class XTB(Optimizer):
         The name of the directory into which files generated during
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
+
+    max_count : :class:`int`, optional
+        Number of optimizations to attempt in a row to remove negative
+        frequencies.
 
     opt_level : :class:`str`, optional
         Optimization level to use.
@@ -801,6 +812,7 @@ class XTB(Optimizer):
                  gfn_version='2',
                  output_dir=None,
                  opt_level='normal',
+                 max_count=2,
                  num_cores=1,
                  etemp=300,
                  solvent=None,
@@ -834,6 +846,10 @@ class XTB(Optimizer):
                 crude, sloppy, loose, lax, normal, tight, vtight, extreme
             Definitions of levels:
                 https://xtb-docs.readthedocs.io/en/latest/optimization.html
+
+        max_count : :class:`int`, optional
+            Number of optimizations to attempt in a row to remove negative
+            frequencies.
 
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
@@ -884,6 +900,7 @@ class XTB(Optimizer):
         self.gfn_version = gfn_version
         self.output_dir = output_dir
         self.opt_level = opt_level
+        self.max_count = max_count
         self.num_cores = str(num_cores)
         self.etemp = str(etemp)
         self.solvent = solvent
@@ -898,27 +915,103 @@ class XTB(Optimizer):
         self.strict = strict
         super().__init__(use_cache=use_cache)
 
-    def __check_complete(self):
+    def __ext_frequencies(self, output_string):
+        """
+        Extracts projected vibrational frequencies (cm-1) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418).
+        Example line:
+        "eigval :       -0.00    -0.00    -0.00     0.00     0.00     0.00"
+
+        Returns
+        -------
+        :class:`list`
+            List of all vibrational frequencies as :class:`float`
+        """
+        value = None
+
+        # use a switch to make sure we are extracting values after the
+        # final property readout
+        switch = False
+
+        frequencies = []
+        for i, line in enumerate(output_string):
+            if '|               Frequency Printout                |' in line:
+                # turn on reading as final frequency printout has begun
+                switch = True
+            if ' reduced masses (amu)' in line:
+                # turn off reading as frequency section is done
+                switch = False
+            if 'eigval :' in line and switch is True:
+                split_line = [i for i in line.rstrip().split(':')[1].split(' ')
+                              if i != '']
+                for freq in split_line:
+                    frequencies.append(freq)
+
+        value = [float(i) for i in frequencies]
+
+        return value
+
+    def __check_neg_frequencies(self, output_file):
+        """
+        Check for negative frequencies in output_string.
+
+        Formatting based on latest version of GFN-xTB (190418).
+        Example line:
+        "eigval :       -0.00    -0.00    -0.00     0.00     0.00     0.00"
+
+        Returns
+        -------
+        :class:`bool`
+            Returns `True` if a negative frequency is present
+        """
+        # get output file in string
+        output_string = open(output_file, 'r').readlines()
+        neg_freq = False
+        value = self.ext_frequencies(output_string)
+        # checks for one negative frequency
+        if min(value) < 0:
+            neg_freq = True
+        return neg_freq
+
+    def __check_incomplete(self, output_file):
         """
         Check if GFN-xTB optimization was converged.
 
+        Returns
+        -------
+        :class:`bool`
+            Returns `True` if a negative frequency is present. Raises errors if
+            optimization did not converge.
         """
-        if os.path.isfile('.xtboptok'):
+        if output_file is None:
+            # no simulation run yet
             return True
+        # check for convergence
+        if os.path.isfile('.xtboptok'):
+            # optimization has converged - however:
+            # check for negative frequencies -- if they exist, return True
+            # to allow for iteration
+            return self.check_neg_frequencies(output_file=output_file)
+        # else return errors
         elif os.path.isfile('NOT_CONVERGED'):
             raise XTBOptimizerFailedError(f'Optimization not converged.')
         else:
-            return False
+            raise XTBOptimizerFailedError(f'Optimization failed to complete')
 
-    def __write_and_run_command(self, mol, conformer):
+    def __write_and_run_command(self, mol, conformer, count):
         """
         Writes and runs the command for GFN.
 
+        Returns
+        -------
+        out_file : :class:`str`
+            Returns output file of the optimization run by the command.
         """
         # when in output_dir -- use relative paths as GFN does not handle
         # full path in command
-        xyz = 'input_structure.xyz'
-        out_file = 'optimization.output'
+        xyz = f'input_structure_{count}.xyz'
+        out_file = f'optimization_{count}.output'
         mol.write(xyz, conformer=conformer)
         # modify memory limit
         if self.mem_ulimit:
@@ -935,7 +1028,7 @@ class XTB(Optimizer):
             cmd.append('--gfn')
             cmd.append(self.gfn_version)
         # set optimization level and type
-        cmd.append('--opt')
+        cmd.append('--ohess')
         cmd.append(self.opt_level)
         # set number of cores
         cmd.append('--parallel')
@@ -970,6 +1063,7 @@ class XTB(Optimizer):
         sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE,
                  shell=shell)
         f.close()
+        return out_file
 
     def optimize(self, mol, conformer=-1):
         """
@@ -1005,11 +1099,23 @@ class XTB(Optimizer):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            self.write_and_run_command(mol=mol, conformer=conformer)
-            if self.check_complete():
-                output_xyz = join(output_dir, 'xtbopt.xyz')
-                mol.update_from_xyz(path=output_xyz, conformer=conformer)
-            else:
-                raise XTBOptimizerFailedError(f'Optimization failed incomplete')
+            run_count = 0
+            out_file = None
+            while self.check_incomplete(output_file=out_file):
+                run_count += 1
+                out_file = self.write_and_run_command(mol=mol,
+                                                      conformer=conformer,
+                                                      count=run_count)
+                # automated restart from GFN produces xtbopt.coord
+                if run_count == 1:
+                    output_xyz = join(output_dir, 'xtbopt.xyz')
+                    mol.update_from_xyz(path=output_xyz, conformer=conformer)
+                else:
+                    output_coord = join(output_dir, 'xtbopt.coord')
+                    mol.update_from_coord(path=output_coord, conformer=conformer)
+                    if run_count == self.max_count:
+                        logging.warning(
+                            f'Negative frequencies not removed in max_count optimizations')
+                        break
         finally:
             os.chdir(init_dir)
