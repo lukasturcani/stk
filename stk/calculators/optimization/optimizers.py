@@ -1041,6 +1041,10 @@ class XTB(Optimizer):
         if conformer == -1:
             conformer = mol.mol.GetConformer(conformer).GetId()
 
+        # remove (mol, conformer) from NOT_OPTIMIZED if present.
+        if (mol, conformer) in self.NOT_OPTIMIZED:
+            self.NOT_OPTIMIZED.remove((mol, conformer))
+
         if self.output_dir is None:
             output_dir = str(uuid.uuid4().int)
         else:
