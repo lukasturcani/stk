@@ -464,6 +464,9 @@ class XTBEnergy(EnergyCalculator):
         For details:
             https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
+    multiplicity : :class:`str`, optional
+        Number of unpaired electrons.
+
     charge : :class:`str`, optional
         Formal molecular charge. `-` should be used to indicate sign.
 
@@ -530,6 +533,7 @@ class XTBEnergy(EnergyCalculator):
                  solvent=None,
                  solvent_grid='normal',
                  charge=None,
+                 multiplicity=None,
                  use_cache=False,
                  mem_ulimit=False):
         """
@@ -583,6 +587,9 @@ class XTBEnergy(EnergyCalculator):
             For details:
                 https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
+        multiplicity : :class:`str`, optional
+            Number of unpaired electrons.
+
         charge : :class:`str`, optional
             Formal molecular charge. `-` should be used to indicate sign.
 
@@ -599,6 +606,7 @@ class XTBEnergy(EnergyCalculator):
                                  solvent=self.solvent)
         self.solvent_grid = solvent_grid
         self.charge = charge
+        self.multiplicity = multiplicity
         self.mem_ulimit = mem_ulimit
         super().__init__(use_cache=use_cache)
 
@@ -920,6 +928,10 @@ class XTBEnergy(EnergyCalculator):
         if self.charge is not None:
             cmd.append('--chrg')
             cmd.append(self.charge)
+        # write multiplicity section of cmd
+        if self.multiplicity is not None:
+            cmd.append('--uhf')
+            cmd.append(self.multiplicity)
         cmd = ' '.join(cmd)
         f = open(out_file, 'w')
         # uses the shell if mem_ulimit = True and waits until
