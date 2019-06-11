@@ -7,7 +7,6 @@ See :mod:`.energy`.
 
 import rdkit.Chem.AllChem as rdkit
 import logging
-import re
 from functools import wraps
 import subprocess as sp
 import uuid
@@ -985,7 +984,7 @@ class XTBFreeEnergy(EnergyCalculator):
 
         """
         xyz = 'input_structure.xyz'
-        out_file = 'energy.output'
+        out_file = 'free_energy.output'
         mol.write(xyz, conformer=conformer)
         # modify memory limit
         if self.mem_ulimit:
