@@ -1207,6 +1207,11 @@ class XTBExts():
     """
     Methods for extracting properties from GFN-xTB output.
 
+    Parameters
+    ----------
+    output_file : :class:`str`
+        Output file to extract properties from.
+
     """
     def __init__(self, output_file):
         output_string = open(output_file, 'r').readlines()

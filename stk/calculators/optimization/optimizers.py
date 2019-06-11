@@ -674,12 +674,14 @@ class XTB(Optimizer):
 
     Furthermore, the :meth:`optimize` calculator will check that the
     structure is adequately optimized by checking for negative frequencies
-    after a Hessian calculation. A loop over at the given opt_level will
-    be performed by default to obtain an optimized structure. However,
-    in the examples we outline how to iterate over opt_levels to increase
-    convergence criteria and hopefully obtain an optimized structure.
+    after a Hessian calculation. ``max_count`` optimizations will be
+    attempted at the given opt_level to obtain an optimized structure. However,
+    we outline in the examples how to iterate over ``opt_levels`` to increase
+    convergence criteria and hopefully obtain an optimized structure. The
+    presence of negative frequencies can occur even when the optimization has
+    converged based on the given ``opt_level``.
 
-    Documentation for GFN-xTB available:
+    Documentation for xTB available:
     https://xtb-docs.readthedocs.io/en/latest/setup.html
 
     Attributes
@@ -697,10 +699,6 @@ class XTB(Optimizer):
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
 
-    max_count : :class:`int`, optional
-        Number of optimizations to attempt in a row to remove negative
-        frequencies.
-
     opt_level : :class:`str`, optional
         Optimization level to use.
         Options:
@@ -708,23 +706,13 @@ class XTB(Optimizer):
         Definitions of levels:
             https://xtb-docs.readthedocs.io/en/latest/optimization.html
 
-    output_dir : :class:`str`, optional
-        The name of the directory into which files generated during
-        the optimization are written, if ``None`` then
-        :func:`uuid.uuid4` is used.
+    max_count : :class:`int`, optional
+        Number of optimizations to attempt in a row to remove negative
+        frequencies.
 
     num_cores : :class:`int`
-        The number of cores for GFN-xTB to use. Requires appropriate setup
-        of GFN-xTB by user.
-
-    use_cache : :class:`bool`, optional
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule and conformer.
-
-    mem_ulimit : :class: `bool`, optional
-        If ``True`` :meth:`optimize` will be run without constraints on
-        the stacksize. If memory issues are encountered, this should be ``True``,
-        however this may raise issues on clusters.
+        The number of cores for xTB to use. Requires appropriate setup
+        of xTB by user.
 
     etemp : :class:`int`, optional
         Electronic temperature to use (in K). Defaults to 300K.
@@ -741,11 +729,20 @@ class XTB(Optimizer):
         For details:
             https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
+    charge : :class:`str`, optional
+        Formal molecular charge. `-` should be used to indicate sign.
+
     multiplicity : :class:`str`, optional
         Number of unpaired electrons.
 
-    charge : :class:`str`, optional
-        Formal molecular charge. `-` should be used to indicate sign.
+    use_cache : :class:`bool`, optional
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule and conformer.
+
+    mem_ulimit : :class: `bool`, optional
+        If ``True`` :meth:`optimize` will be run without constraints on
+        the stacksize. If memory issues are encountered, this should be
+        ``True``, however this may raise issues on clusters.
 
     Examples
     --------
@@ -776,32 +773,47 @@ class XTB(Optimizer):
         )
         xtb.optimize(polymer)
 
-    Note that energies and other properties of optimized structures can be
-    extracted using :class:`GFNXTBEnergy`. For example vibrational frequencies,
-    the HOMO-LUMO gap and thermodynamic properties (such as the Total Free
-    Energy) can be calculated after an optimization with very tight contraints
-    with an implicit solvent (THF). Very tight criteria are required to ensure
-    that no negative vibrational frequencies are present.
+    All optimizations with xTB are performed using the --ohess flag, which
+    forces the calculation of a numerical Hessian, thermodynamic properties and
+    vibrational frequencies. The :meth:`optimize` will check that the
+    structure is appropriately optimized (i.e. convergence is obtained and
+    no negative vibrational frequencies are present) and continue optimizing
+    a structure (up to ``max_count times``) until this is achieved. This loop
+    by default will be performed at the same ``opt_level``. The following
+    examples shows how a user may optimize structures with tigher convergence
+    criteria (i.e. different ``opt_level``) until the structure is
+    sufficiently optimized.
 
-    .. code-block:: python
+    # crude optimization with max_count == 1 because this will not achieve
+    # optimization
+    xtb_crude = XTB(xtb_path='/opt/gfnxtb/xtb',
+                    output_dir='xtb_crude',
+                    mem_ulimit=True,
+                    opt_level='crude',
+                    max_count=1)
+    # normal optimization with max_count == 2
+    xtb_normal = XTB(xtb_path='/opt/gfnxtb/xtb',
+                     output_dir='xtb_normal',
+                     mem_ulimit=True,
+                     opt_level='normal',
+                     max_count=2)
+    # vtight optimization with max_count == 2
+    # this should achieve sufficient optimization
+    xtb_vtight = XTB(xtb_path='/opt/gfnxtb/xtb',
+                     output_dir='xtb_vtight',
+                     mem_ulimit=True,
+                     opt_level='vtight',
+                     max_count=2)
 
-        gfnxtb = OptimizerSequence(
-            UFF(),
-            GFNXTB(gfnxtb_path='/opt/gfnxtb/xtb',
-                   mem_ulimit=True,
-                   opt_level='verytight',
-                   solvent='THF')
-        )
-        gfnxtb.optimize(polymer)
+    # conformer must be set
+    conformer = polymer.mol.GetConformer(-1).GetId()
 
-        gfnxtbenergy = GFNXTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
-                                    mem_ulimit=True,
-                                    free=True,
-                                    solvent='THF')
-        polymer_properties = gfnxtbenergy.energy(polymer)
-        polymer_free_energy = polymer_properties['totalfreeenergy']
-        polymer_freq = polymer_properties['frequencies']
-        polymer_gap = polymer_properties['HLGap']
+    xtb_crude.optimize(mol=polymer, conformer=conformer)
+    if (polymer, conformer) in xtb_crude.NOT_OPTIMIZED:
+        xtb_normal.optimize(mol=polymer, conformer=conformer)
+        if (polymer, conformer) in xtb_normal.NOT_OPTIMIZED:
+            xtb_vtight.optimize(mol=polymer, conformer=conformer)
+
     """
 
     def __init__(self,
@@ -847,23 +859,7 @@ class XTB(Optimizer):
             Number of optimizations to attempt in a row to remove negative
             frequencies.
 
-        output_dir : :class:`str`, optional
-            The name of the directory into which files generated during
-            the optimization are written, if ``None`` then
-            :func:`uuid.uuid4` is used.
-
         num_cores : :class:`int`
-            The number of cores for GFN-xTB to use. Requires appropriate setup
-            of GFN-xTB by user.
-
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
-
-        mem_ulimit : :class: `bool`, optional
-            If ``True`` :meth:`optimize` will be run without constraints on
-            the stacksize. If memory issues are encountered, this should be ``True``,
-            however this may raise issues on clusters.
             The number of cores for xTB to use. Requires appropriate setup
             of xTB by user.
 
@@ -882,15 +878,20 @@ class XTB(Optimizer):
             For details:
                 https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
-        multiplicity : :class:`str`, optional
-            Number of unpaired electrons.
-
         charge : :class:`str`, optional
             Formal molecular charge. `-` should be used to indicate sign.
 
-        strict : :class:`bool`, optional
-            Whether to use the `--strict` during optimization, which turns all
-            internal GFN-xTB warnings into errors.
+        multiplicity : :class:`str`, optional
+            Number of unpaired electrons.
+
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`optimize` will not run twice on the same
+            molecule and conformer.
+
+        mem_ulimit : :class: `bool`, optional
+            If ``True`` :meth:`optimize` will be run without constraints on
+            the stacksize. If memory issues are encountered, this should be
+            ``True``, however this may raise issues on clusters.
 
         """
 

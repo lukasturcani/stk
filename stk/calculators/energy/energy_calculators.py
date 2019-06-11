@@ -422,23 +422,7 @@ class XTBEnergy(EnergyCalculator):
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
 
-    output_dir : :class:`str`, optional
-        The name of the directory into which files generated during
-        the optimization are written, if ``None`` then
-        :func:`uuid.uuid4` is used.
-
     num_cores : :class:`int`
-        The number of cores for GFN-xTB to use. Requires appropriate setup
-        of GFN-xTB by user.
-
-    use_cache : :class:`bool`, optional
-        If ``True`` :meth:`energy` will not run twice on the same
-        molecule and conformer.
-
-    mem_ulimit : :class: `bool`, optional
-        If ``True`` :meth:`energy` will be run without constraints on
-        the stacksize. If memory issues are encountered, this should be ``True``,
-        however this may raise issues on clusters.
         The number of cores for xTB to use. Requires appropriate setup
         of xTB by user.
 
@@ -457,11 +441,20 @@ class XTBEnergy(EnergyCalculator):
         For details:
             https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
+    charge : :class:`str`, optional
+        Formal molecular charge. `-` should be used to indicate sign.
+
     multiplicity : :class:`str`, optional
         Number of unpaired electrons.
 
-    charge : :class:`str`, optional
-        Formal molecular charge. `-` should be used to indicate sign.
+    use_cache : :class:`bool`, optional
+        If ``True`` :meth:`energy` will not run twice on the same
+        molecule and conformer.
+
+    mem_ulimit : :class: `bool`, optional
+        If ``True`` :meth:`energy` will be run without constraints on
+        the stacksize. If memory issues are encountered, this should be
+        ``True``, however this may raise issues on clusters.
 
     Examples
     --------
@@ -491,11 +484,8 @@ class XTBEnergy(EnergyCalculator):
         xtb.energy(polymer)
 
     Energies and other properties of optimized structures can be
-    extracted using :class:`XTBEnergy`. For example vibrational frequencies,
-    the HOMO-LUMO gap and thermodynamic properties (such as the Total Free
-    Energy) can be calculated after an optimization with very tight contraints
-    with an implicit solvent (THF). Very tight criteria are required to ensure
-    that no negative vibrational frequencies are present.
+    extracted using :class:`XTBEnergy`. However, be aware that
+    :class:`XTBEnergy` will not check the quality of an optimized structure.
 
     .. code-block:: python
 
@@ -506,16 +496,27 @@ class XTBEnergy(EnergyCalculator):
                 opt_level='normal',
                 solvent='THF')
         )
-        gfnxtb.optimize(polymer)
+        xtb.optimize(polymer)
 
-        gfnxtbenergy = XTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
-                                    mem_ulimit=True,
-                                    free=True,
-                                    solvent='THF')
-        polymer_properties = gfnxtbenergy.energy(polymer)
-        polymer_free_energy = polymer_properties['totalfreeenergy']
-        polymer_freq = polymer_properties['frequencies']
-        polymer_gap = polymer_properties['HLGap']
+        xtbenergy = XTBEnergy(xtb_path='/opt/gfnxtb/xtb',
+                              mem_ulimit=True,
+                              solvent='THF')
+        # runs calculation and returns energy
+        polymer_totalenergy = xtbenergy.energy(polymer, conformer)
+
+        # extracts properties from energy calculator for given conformer
+        polymer_homo_lumo_gap = xtbenergy.homo_lumo_gaps[(polymer, conformer)]
+        polymer_fermi_levels = xtbenergy.fermi_levels[(polymer, conformer)]
+        polymer_homo_lumo_orbitals = xtbenergy.homo_lumo_orbitals[(polymer, conformer)]
+        polymer_Qonly_dipole_moments = xtbenergy.Qonly_dipole_moments[(polymer, conformer)]
+        polymer_full_dipole_moments = xtbenergy.full_dipole_moments[(polymer, conformer)]
+        polymer_Qonly_quadrupole_moments = xtbenergy.Qonly_quadrupole_moments[(polymer, conformer)]
+        polymer_QDip_quadrupole_moments = xtbenergy.QDip_quadrupole_moments[(polymer, conformer)]
+        polymer_full_quadrupole_moments = xtbenergy.full_quadrupole_moments[(polymer, conformer)]
+
+        # the total energy can be extracted at any point from the calculator
+        polymer_totalenergy = xtbenergy.total_energies[(polymer, conformer)]
+
     """
     def __init__(self,
                  xtb_path,
@@ -547,23 +548,7 @@ class XTBEnergy(EnergyCalculator):
             the optimization are written, if ``None`` then
             :func:`uuid.uuid4` is used.
 
-        output_dir : :class:`str`, optional
-            The name of the directory into which files generated during
-            the optimization are written, if ``None`` then
-            :func:`uuid.uuid4` is used.
-
         num_cores : :class:`int`
-            The number of cores for GFN-xTB to use. Requires appropriate setup
-            of GFN-xTB by user.
-
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`energy` will not run twice on the same
-            molecule and conformer.
-
-        mem_ulimit : :class: `bool`, optional
-            If ``True`` :meth:`energy` will be run without constraints on
-            the stacksize. If memory issues are encountered, this should be ``True``,
-            however this may raise issues on clusters.
             The number of cores for xTB to use. Requires appropriate setup
             of xTB by user.
 
@@ -582,11 +567,20 @@ class XTBEnergy(EnergyCalculator):
             For details:
                 https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
+        charge : :class:`str`, optional
+            Formal molecular charge. `-` should be used to indicate sign.
+
         multiplicity : :class:`str`, optional
             Number of unpaired electrons.
 
-        charge : :class:`str`, optional
-            Formal molecular charge. `-` should be used to indicate sign.
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`energy` will not run twice on the same
+            molecule and conformer.
+
+        mem_ulimit : :class: `bool`, optional
+            If ``True`` :meth:`energy` will be run without constraints on
+            the stacksize. If memory issues are encountered, this should be
+            ``True``, however this may raise issues on clusters.
 
         """
         self.xtb_path = xtb_path
@@ -698,15 +692,15 @@ class XTBEnergy(EnergyCalculator):
         Parameters
         ----------
         mol : :class:`.Molecule`
-            The molecule whose energy should be claculated.
+            The :class:`.Molecule` whose energy is to be calculated.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
+        conformer : :class:`int`, optinal
+            The conformer of `mol` to use.
 
         Returns
         -------
-        self.total_energies[(mol, conformer)] : :class:`float`
-            Total energy of system.
+        :class:`float`
+            The energy.
         """
 
         if conformer == -1:
@@ -773,23 +767,7 @@ class XTBFreeEnergy(EnergyCalculator):
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
 
-    output_dir : :class:`str`, optional
-        The name of the directory into which files generated during
-        the optimization are written, if ``None`` then
-        :func:`uuid.uuid4` is used.
-
     num_cores : :class:`int`
-        The number of cores for GFN-xTB to use. Requires appropriate setup
-        of GFN-xTB by user.
-
-    use_cache : :class:`bool`, optional
-        If ``True`` :meth:`energy` will not run twice on the same
-        molecule and conformer.
-
-    mem_ulimit : :class: `bool`, optional
-        If ``True`` :meth:`energy` will be run without constraints on
-        the stacksize. If memory issues are encountered, this should be ``True``,
-        however this may raise issues on clusters.
         The number of cores for xTB to use. Requires appropriate setup
         of xTB by user.
 
@@ -810,6 +788,18 @@ class XTBFreeEnergy(EnergyCalculator):
 
     charge : :class:`str`, optional
         Formal molecular charge. `-` should be used to indicate sign.
+
+    multiplicity : :class:`str`, optional
+        Number of unpaired electrons.
+
+    use_cache : :class:`bool`, optional
+        If ``True`` :meth:`energy` will not run twice on the same
+        molecule and conformer.
+
+    mem_ulimit : :class: `bool`, optional
+        If ``True`` :meth:`energy` will be run without constraints on
+        the stacksize. If memory issues are encountered, this should be
+        ``True``, however this may raise issues on clusters.
 
     Examples
     --------
@@ -839,31 +829,36 @@ class XTBFreeEnergy(EnergyCalculator):
         xtb.energy(polymer)
 
     Energies and other properties of optimized structures can be
-    extracted using :class:`XTBEnergy`. For example vibrational frequencies,
-    the HOMO-LUMO gap and thermodynamic properties (such as the Total Free
-    Energy) can be calculated after an optimization with very tight contraints
+    extracted using :class:`XTBFreeEnergy`. For example vibrational frequencies,
+    the HOMO-LUMO gap and thermodynamic properties (such as the total free
+    energy) can be calculated after an optimization with very tight contraints
     with an implicit solvent (THF). Very tight criteria are required to ensure
-    that no negative vibrational frequencies are present.
+    that no negative vibrational frequencies are present, however
+    :class:`XTBFreeEnergy` will not check for the presence of negative
+    frequencies or poorly optimized structures. It is recommended that
+    :class:`XTBFreeEnergy` is only used on well optimized structures.
 
     .. code-block:: python
 
-        gfnxtb = OptimizerSequence(
+        xtb = OptimizerSequence(
             UFF(),
-            XTB(gfnxtb_path='/opt/gfnxtb/xtb',
-                   mem_ulimit=True,
-                   opt_level='verytight',
-                   solvent='THF')
+            XTB(xtb_path='/opt/gfnxtb/xtb',
+                mem_ulimit=True,
+                opt_level='verytight',
+                solvent='THF')
         )
-        gfnxtb.optimize(polymer)
+        xtb.optimize(polymer)
 
-        gfnxtbenergy = XTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
-                                    mem_ulimit=True,
-                                    free=True,
-                                    solvent='THF')
-        polymer_properties = gfnxtbenergy.energy(polymer)
-        polymer_free_energy = polymer_properties['totalfreeenergy']
-        polymer_freq = polymer_properties['frequencies']
-        polymer_gap = polymer_properties['HLGap']
+        xtbfreeenergy = XTBFreeEnergy(xtb_path='/opt/gfnxtb/xtb',
+                                      mem_ulimit=True,
+                                      solvent='THF')
+        # runs calculation and returns energy
+        polymer_totalenergy = xtbfreeenergy.energy(polymer, conformer)
+
+        # extracts properties from energy calculator for given conformer
+        polymer_free_energy = xtbfreeenergy.total_free_energies[(polymer, conformer)]
+        polymer_freq = xtbfreeenergy.frequencies[(polymer, conformer)]
+        polymer_homo_lumo_gap = xtbfreeenergy.homo_lumo_gaps[(polymer, conformer)]
     """
 
     def __init__(self,
@@ -896,23 +891,7 @@ class XTBFreeEnergy(EnergyCalculator):
             the optimization are written, if ``None`` then
             :func:`uuid.uuid4` is used.
 
-        output_dir : :class:`str`, optional
-            The name of the directory into which files generated during
-            the optimization are written, if ``None`` then
-            :func:`uuid.uuid4` is used.
-
         num_cores : :class:`int`
-            The number of cores for GFN-xTB to use. Requires appropriate setup
-            of GFN-xTB by user.
-
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`energy` will not run twice on the same
-            molecule and conformer.
-
-        mem_ulimit : :class: `bool`, optional
-            If ``True`` :meth:`energy` will be run without constraints on
-            the stacksize. If memory issues are encountered, this should be ``True``,
-            however this may raise issues on clusters.
             The number of cores for xTB to use. Requires appropriate setup
             of xTB by user.
 
@@ -931,11 +910,20 @@ class XTBFreeEnergy(EnergyCalculator):
             For details:
                 https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
+        charge : :class:`str`, optional
+            Formal molecular charge. `-` should be used to indicate sign.
+
         multiplicity : :class:`str`, optional
             Number of unpaired electrons.
 
-        charge : :class:`str`, optional
-            Formal molecular charge. `-` should be used to indicate sign.
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`energy` will not run twice on the same
+            molecule and conformer.
+
+        mem_ulimit : :class: `bool`, optional
+            If ``True`` :meth:`energy` will be run without constraints on
+            the stacksize. If memory issues are encountered, this should be
+            ``True``, however this may raise issues on clusters.
 
         """
         self.xtb_path = xtb_path
@@ -1050,15 +1038,15 @@ class XTBFreeEnergy(EnergyCalculator):
         Parameters
         ----------
         mol : :class:`.Molecule`
-            The molecule whose energy should be claculated.
+            The :class:`.Molecule` whose energy is to be calculated.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
+        conformer : :class:`int`, optinal
+            The conformer of `mol` to use.
 
         Returns
         -------
-        self.total_energies[(mol, conformer)] : :class:`float`
-            Total energy of system.
+        :class:`float`
+            The energy.
         """
 
         if conformer == -1:
