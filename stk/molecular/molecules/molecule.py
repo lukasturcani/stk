@@ -304,11 +304,11 @@ class Molecule:
             for atoms_group in atoms_dihedral:
                 # Calculate the dihedral angle.
                 dihedral_value = rdMolTransforms.GetDihedralDeg(
-                                    self.mol.GetConformer(conformer),
-                                    atoms_group[0],
-                                    atoms_group[1],
-                                    atoms_group[2],
-                                    atoms_group[3])
+                    self.mol.GetConformer(conformer),
+                    atoms_group[0],
+                    atoms_group[1],
+                    atoms_group[2],
+                    atoms_group[3])
                 # Check that the dihedral is calculated in the right
                 # direction.
                 if abs(dihedral_value) > 90:
