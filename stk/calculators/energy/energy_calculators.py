@@ -731,7 +731,7 @@ class XTBEnergy(EnergyCalculator):
         return self.total_energies[(mol, conformer)]
 
 
-class XTBFreeEnergy(XTBEnergy):
+class XTBFreeEnergy(EnergyCalculator):
     """
     Uses GFN-xTB to calculate free energies, vibrational frequencies and
     other properties of molecules.
@@ -869,99 +869,94 @@ class XTBFreeEnergy(XTBEnergy):
                  solvent=None,
                  solvent_grid='normal',
                  charge=None,
+                 multiplicity=None,
                  use_cache=False,
                  mem_ulimit=False):
-        XTBEnergy.__init__(self,
-                           gfnxtb_path,
-                           gfn_version,
-                           output_dir,
-                           num_cores,
-                           etemp,
-                           solvent,
-                           solvent_grid,
-                           charge,
-                           use_cache,
-                           mem_ulimit)
+        """
+        Initializes a :class:`XTBEnergy` instance.
+
+        Parameters
+        ----------
+        gfnxtb_path : :class:`str`
+            The path to the GFN-xTB or GFN2-xTB executable.
+
+        gfn_version : :class:`str`
+            Parameterization of GFN-xTB to use.
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/basics.html
+
+        output_dir : :class:`str`, optional
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
+
+        output_dir : :class:`str`, optional
+            The name of the directory into which files generated during
+            the optimization are written, if ``None`` then
+            :func:`uuid.uuid4` is used.
+
+        num_cores : :class:`int`
+            The number of cores for GFN-xTB to use. Requires appropriate setup
+            of GFN-xTB by user.
+
+        use_cache : :class:`bool`, optional
+            If ``True`` :meth:`energy` will not run twice on the same
+            molecule and conformer.
+
+        mem_ulimit : :class: `bool`, optional
+            If ``True`` :meth:`energy` will be run without constraints on
+            the stacksize. If memory issues are encountered, this should be ``True``,
+            however this may raise issues on clusters.
+
+        etemp : :class:`int`, optional
+            Electronic temperature to use (in K). Defaults to 300K.
+
+        solvent : :class:`str`, optional
+            Solvent to use in GBSA implicit solvation method.
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+        solvent_grid : :class:`str`, optional
+            Grid level to use in SASA calculations for GBSA implicit solvent.
+            Options:
+                normal, tight, verytight, extreme
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+        multiplicity : :class:`str`, optional
+            Number of unpaired electrons.
+
+        charge : :class:`str`, optional
+            Formal molecular charge. `-` should be used to indicate sign.
+
+        """
+        self.gfnxtb_path = gfnxtb_path
+        self.gfn_version = gfn_version
+        self.output_dir = output_dir
+        self.num_cores = str(num_cores)
+        self.etemp = str(etemp)
+        self.solvent = solvent
+        if self.solvent is not None:
+            self.solvent = solvent.lower()
+            valid_XTB_solvent(gfn_version=self.gfn_version,
+                                 solvent=self.solvent)
+        self.solvent_grid = solvent_grid
+        self.charge = charge
+        self.multiplicity = multiplicity
+        self.mem_ulimit = mem_ulimit
+        # properties
+        self.total_energies = {}
+        self.homo_lumo_gaps = {}
+        self.fermi_levels = {}
+        self.homo_lumo_orbitals = {}
+        self.Qonly_dipole_moments = {}
+        self.full_dipole_moments = {}
+        self.Qonly_quadrupole_moments = {}
+        self.QDip_quadrupole_moments = {}
+        self.full_quadrupole_moments = {}
         self.total_free_energies = {}
         self.frequencies = {}
-
-    def __ext_total_free_energy(self, output_string):
-        """
-        Extracts total free energy (a.u.) from GFN-xTB output at T=298.15K.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        "          | TOTAL FREE ENERGY         -75.832501154309 Eh   |"
-
-        Returns
-        -------
-        :class:`float`
-            Total free energy in a.u.
-        """
-        # check that hessian was performed on geometry optimized structure
-        # raise error if not
-        check_hessian = True
-        for line in reversed(output_string):
-            if '#WARNING! Hessian on incompletely optimized geometry!' in line:
-                check_hessian = False
-                break
-        if check_hessian is False:
-            raise XTBEnergyHessianFailedError(
-                f'Hessian calculation performed on unoptimized structure.'
-            )
-        value = None
-
-        # regex for numbers
-        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
-        for line in reversed(output_string):
-            if '          | TOTAL FREE ENERGY  ' in line:
-                value = nums.search(line.rstrip()).group(0)
-                break
-
-        return float(value)
-
-    def __ext_frequencies(self, output_string):
-        """
-        Extracts projected vibrational frequencies (cm-1) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418).
-        Example line:
-        "eigval :       -0.00    -0.00    -0.00     0.00     0.00     0.00"
-
-        Returns
-        -------
-        :class:`list`
-            List of all vibrational frequencies as :class:`float`
-        """
-        value = None
-
-        # use a switch to make sure we are extracting values after the
-        # final property readout
-        switch = False
-
-        frequencies = []
-        for i, line in enumerate(output_string):
-            if '|               Frequency Printout                |' in line:
-                # turn on reading as final frequency printout has begun
-                switch = True
-            if ' reduced masses (amu)' in line:
-                # turn off reading as frequency section is done
-                switch = False
-            if 'eigval :' in line and switch is True:
-                split_line = [i for i in line.rstrip().split(':')[1].split(' ')
-                              if i != '']
-                for freq in split_line:
-                    frequencies.append(freq)
-
-        value = [float(i) for i in frequencies]
-
-        if min(value) < 0:
-            raise XTBEnergyNegativeFreqError(
-                'Negative frequency encountered.'
-                'Structures should be optimized prior to free energy calculation.'
-            )
-
-        return value
+        super().__init__(use_cache=use_cache)
 
     def __get_properties(self, mol, conformer, output_file):
         """
