@@ -1216,6 +1216,12 @@ class XTBFreeEnergy(XTBEnergy):
 
         value = [float(i) for i in frequencies]
 
+        if min(value) < 0:
+            raise XTBEnergyNegativeFreqError(
+                'Negative frequency encountered.'
+                'Structures should be optimized prior to free energy calculation.'
+            )
+
         return value
 
     def __get_properties(self, mol, conformer, output_file):
