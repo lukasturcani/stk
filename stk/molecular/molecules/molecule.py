@@ -1116,7 +1116,9 @@ class Molecule:
 
     def update_from_coord(self, path, conformer=-1):
         """
-        Updates molecular structure to match a ``.coord`` file.
+        Updates molecular structure to match a Turbomole ``.coord`` file.
+
+        Note that coordinates in ``.coord`` files are given in Bohr.
 
         Parameters
         ----------
@@ -1139,6 +1141,7 @@ class Molecule:
             file do not agree with the atom elements in the molecule.
 
         """
+        bohr_to_ang = 0.5291772105638411
 
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
@@ -1167,7 +1170,7 @@ class Molecule:
                     f'Atom {i} element does not match file.'
                 )
 
-            new_coords.append([float(i) for i in coords])
+            new_coords.append([float(i)*bohr_to_ang for i in coords])
 
         # Check that the correct number of atom
         # lines was present in the file.
