@@ -13,7 +13,6 @@ import subprocess as sp
 import uuid
 import os
 import shutil
-from os.path import join
 from ...utilities import valid_XTB_solvent
 
 
@@ -608,6 +607,16 @@ class XTBEnergy(EnergyCalculator):
         self.charge = charge
         self.multiplicity = multiplicity
         self.mem_ulimit = mem_ulimit
+        # properties
+        self.total_energies = {}
+        self.homo_lumo_gaps = {}
+        self.fermi_levels = {}
+        self.homo_lumo_orbitals = {}
+        self.Qonly_dipole_moments = {}
+        self.full_dipole_moments = {}
+        self.Qonly_quadrupole_moments = {}
+        self.QDip_quadrupole_moments = {}
+        self.full_quadrupole_moments = {}
         super().__init__(use_cache=use_cache)
 
     def __ext_total_energy(self, output_string):
@@ -634,7 +643,7 @@ class XTBEnergy(EnergyCalculator):
 
         return float(value)
 
-    def __ext_HLGap(self, output_string):
+    def __ext_homo_lumo_gap(self, output_string):
         """
         Extracts total energy (eV) from GFN-xTB output.
 
@@ -657,7 +666,7 @@ class XTBEnergy(EnergyCalculator):
 
         return float(value)
 
-    def __ext_FermiLevel(self, output_string):
+    def __ext_fermi_level(self, output_string):
         """
         Extracts Fermi-Level energy (eV) from GFN-xTB output.
 
@@ -681,7 +690,7 @@ class XTBEnergy(EnergyCalculator):
 
         return float(value)
 
-    def __ext_qdipolemom(self, output_string):
+    def __ext_Qonly_dipole_emom(self, output_string):
         """
         Extracts `q only` dipole moment vector (Debye) from GFN-xTB output.
 
@@ -711,7 +720,7 @@ class XTBEnergy(EnergyCalculator):
 
         return value
 
-    def __ext_fulldipolemom(self, output_string):
+    def __ext_full_dipole_mom(self, output_string):
         """
         Extracts `full` dipole moment vector (Debye) from GFN-xTB output.
 
@@ -741,7 +750,7 @@ class XTBEnergy(EnergyCalculator):
 
         return value
 
-    def __ext_qquadrupolemom(self, output_string):
+    def __ext_Qonly_quadrupole_mom(self, output_string):
         """
         Extracts `q only` traceless quadrupole moment vector (Debye) from GFN-xTB output.
 
@@ -771,7 +780,7 @@ class XTBEnergy(EnergyCalculator):
 
         return value
 
-    def __ext_qdipquadrupolemom(self, output_string):
+    def __ext_QDip_quadrupole_mom(self, output_string):
         """
         Extracts `q+dip` traceless quadrupole moment vector (Debye) from GFN-xTB output.
 
@@ -801,7 +810,7 @@ class XTBEnergy(EnergyCalculator):
 
         return value
 
-    def __ext_fullquadrupolemom(self, output_string):
+    def __ext_full_quadrupole_mom(self, output_string):
         """
         Extracts `full` traceless quadrupole moment vector (Debye) from GFN-xTB output.
 
@@ -831,7 +840,7 @@ class XTBEnergy(EnergyCalculator):
 
         return value
 
-    def __ext_HLoccupancies(self, output_string):
+    def __ext_homo_lumo_occ(self, output_string):
         """
         Extracts Orbital Energies and Occupations (eV) of the HOMO and LUMO from GFN-xTB output.
 
@@ -864,26 +873,24 @@ class XTBEnergy(EnergyCalculator):
 
         return value
 
-    def __get_properties(self, output_file):
+    def __get_properties(self, mol, conformer, output_file):
         """
         Extracts desired properties from GFN-xTB single point energy calculation.
 
         """
-        self.properties = {}
-
         # get output file in string
         output_string = open(output_file, 'r').readlines()
 
         # get properties from output string
-        self.properties['totalenergy'] = self.ext_total_energy(output_string)
-        self.properties['HLGap'] = self.__ext_HLGap(output_string)
-        self.properties['FermiLevel'] = self.__ext_FermiLevel(output_string)
-        self.properties['HLoccupancies'] = self.__ext_HLoccupancies(output_string)
-        self.properties['Qdipole'] = self.__ext_qdipolemom(output_string)
-        self.properties['fulldipole'] = self.__ext_fulldipolemom(output_string)
-        self.properties['Qquadrupole'] = self.__ext_qquadrupolemom(output_string)
-        self.properties['QDIPquadrupole'] = self.__ext_qdipquadrupolemom(output_string)
-        self.properties['fullquadrupole'] = self.__ext_fullquadrupolemom(output_string)
+        self.total_energies[(mol, conformer)] = self.__ext_total_energy(output_string)
+        self.homo_lumo_gaps[(mol, conformer)] = self.__ext_homo_lumo_gap(output_string)
+        self.fermi_levels[(mol, conformer)] = self.__ext_fermi_level(output_string)
+        self.homo_lumo_orbitals[(mol, conformer)] = self.__ext_homo_lumo_occ(output_string)
+        self.Qonly_dipole_moments[(mol, conformer)] = self.__ext_Qonly_dipole_emom(output_string)
+        self.full_dipole_moments[(mol, conformer)] = self.__ext_full_dipole_mom(output_string)
+        self.Qonly_quadrupole_moments[(mol, conformer)] = self.__ext_Qonly_quadrupole_mom(output_string)
+        self.QDip_quadrupole_moments[(mol, conformer)] = self.__ext_QDip_quadrupole_mom(output_string)
+        self.full_quadrupole_moments[(mol, conformer)] = self.__ext_full_quadrupole_mom(output_string)
 
     def __write_and_run_command(self, mol, conformer):
         """
@@ -957,8 +964,8 @@ class XTBEnergy(EnergyCalculator):
 
         Returns
         -------
-        self.properties : :class:`dict`
-            Dictionary containing desired properties.
+        self.total_energies[(mol, conformer)] : :class:`float`
+            Total energy of system.
         """
 
         if conformer == -1:
@@ -978,6 +985,11 @@ class XTBEnergy(EnergyCalculator):
         try:
             os.chdir(output_dir)
             out_file = self.write_and_run_command(mol=mol, conformer=conformer)
+            self.get_properties(mol=mol, conformer=conformer,
+                                output_file=out_file)
+        finally:
+            os.chdir(init_dir)
+        return self.total_energies[(mol, conformer)]
 
 
 class XTBFreeEnergy(XTBEnergy):
@@ -1131,11 +1143,10 @@ class XTBFreeEnergy(XTBEnergy):
                            charge,
                            use_cache,
                            mem_ulimit)
-        self.homo_lumo_gaps = {}
-        self.whatever = {}
+        self.total_free_energies = {}
         self.frequencies = {}
 
-    def __ext_free_energy(self, output_string):
+    def __ext_total_free_energy(self, output_string):
         """
         Extracts total free energy (a.u.) from GFN-xTB output at T=298.15K.
 
@@ -1207,30 +1218,26 @@ class XTBFreeEnergy(XTBEnergy):
 
         return value
 
-    def __get_properties(self, output_file):
+    def __get_properties(self, mol, conformer, output_file):
         """
         Extracts desired properties from GFN-xTB single point energy calculation.
 
         """
-        self.properties = {}
-
         # get output file in string
         output_string = open(output_file, 'r').readlines()
 
         # get properties from output string
-        self.frequenceies[(mol, conformer)] = 0
-
-        self.properties['totalenergy'] = self.__ext_total_energy(output_string)
-        self.properties['totalfreeenergy'] = self.__ext_free_energy(output_string)
-        self.properties['frequencies'] = self.__ext_frequencies(output_string)
-        self.properties['HLGap'] = self.__ext_HLGap(output_string)
-        self.properties['FermiLevel'] = self.__ext_FermiLevel(output_string)
-        self.properties['HLoccupancies'] = self.__ext_HLoccupancies(output_string)
-        self.properties['Qdipole'] = self.__ext_qdipolemom(output_string)
-        self.properties['fulldipole'] = self.__ext_fulldipolemom(output_string)
-        self.properties['Qquadrupole'] = self.__ext_qquadrupolemom(output_string)
-        self.properties['QDIPquadrupole'] = self.__ext_qdipquadrupolemom(output_string)
-        self.properties['fullquadrupole'] = self.__ext_fullquadrupolemom(output_string)
+        self.total_energies[(mol, conformer)] = self.__ext_total_energy(output_string)
+        self.total_free_energies[(mol, conformer)] = self.__ext_total_free_energy(output_string)
+        self.frequencies[(mol, conformer)] = self.__ext_frequencies(output_string)
+        self.homo_lumo_gaps[(mol, conformer)] = self.__ext_homo_lumo_gap(output_string)
+        self.fermi_levels[(mol, conformer)] = self.__ext_fermi_level(output_string)
+        self.homo_lumo_orbitals[(mol, conformer)] = self.__ext_homo_lumo_occ(output_string)
+        self.Qonly_dipole_moments[(mol, conformer)] = self.__ext_Qonly_dipole_emom(output_string)
+        self.full_dipole_moments[(mol, conformer)] = self.__ext_full_dipole_mom(output_string)
+        self.Qonly_quadrupole_moments[(mol, conformer)] = self.__ext_Qonly_quadrupole_mom(output_string)
+        self.QDip_quadrupole_moments[(mol, conformer)] = self.__ext_QDip_quadrupole_mom(output_string)
+        self.full_quadrupole_moments[(mol, conformer)] = self.__ext_full_quadrupole_mom(output_string)
 
     def __write_and_run_command(self, mol, conformer):
         """
@@ -1302,8 +1309,8 @@ class XTBFreeEnergy(XTBEnergy):
 
         Returns
         -------
-        self.properties : :class:`dict`
-            Dictionary containing desired properties.
+        self.total_energies[(mol, conformer)] : :class:`float`
+            Total energy of system.
         """
 
         if conformer == -1:
@@ -1323,7 +1330,8 @@ class XTBFreeEnergy(XTBEnergy):
         try:
             os.chdir(output_dir)
             out_file = self.write_and_run_command(mol=mol, conformer=conformer)
-            self.get_properties(output_file=out_file)
+            self.get_properties(mol=mol, conformer=conformer,
+                                output_file=out_file)
         finally:
             os.chdir(init_dir)
-        return self.properties  # what do they return?
+        return self.total_energies[(mol, conformer)]
