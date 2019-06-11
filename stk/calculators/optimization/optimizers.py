@@ -913,6 +913,7 @@ class XTB(Optimizer):
         self.multiplicity = multiplicity
         self.mem_ulimit = mem_ulimit
         self.strict = strict
+        self.NOT_OPTIMIZED = False
         super().__init__(use_cache=use_cache)
 
     def __ext_frequencies(self, output_string):
@@ -1101,11 +1102,11 @@ class XTB(Optimizer):
             os.chdir(output_dir)
             run_count = 0
             out_file = None
-            while self.check_incomplete(output_file=out_file):
+            while self.__check_incomplete(output_file=out_file):
                 run_count += 1
-                out_file = self.write_and_run_command(mol=mol,
-                                                      conformer=conformer,
-                                                      count=run_count)
+                out_file = self.__write_and_run_command(mol=mol,
+                                                        conformer=conformer,
+                                                        count=run_count)
                 # automated restart from GFN produces xtbopt.coord
                 if run_count == 1:
                     output_xyz = join(output_dir, 'xtbopt.xyz')
@@ -1114,6 +1115,7 @@ class XTB(Optimizer):
                     output_coord = join(output_dir, 'xtbopt.coord')
                     mol.update_from_coord(path=output_coord, conformer=conformer)
                     if run_count == self.max_count:
+                        self.NOT_OPTIMIZED = True
                         logging.warning(
                             f'Negative frequencies not removed in max_count optimizations')
                         break

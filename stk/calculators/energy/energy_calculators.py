@@ -984,9 +984,11 @@ class XTBEnergy(EnergyCalculator):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            out_file = self.write_and_run_command(mol=mol, conformer=conformer)
-            self.get_properties(mol=mol, conformer=conformer,
-                                output_file=out_file)
+            out_file = self.__write_and_run_command(mol=mol,
+                                                    conformer=conformer)
+            self.__get_properties(mol=mol,
+                                  conformer=conformer,
+                                  output_file=out_file)
         finally:
             os.chdir(init_dir)
         return self.total_energies[(mol, conformer)]
@@ -1335,9 +1337,11 @@ class XTBFreeEnergy(XTBEnergy):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            out_file = self.write_and_run_command(mol=mol, conformer=conformer)
-            self.get_properties(mol=mol, conformer=conformer,
-                                output_file=out_file)
+            out_file = self.__write_and_run_command(mol=mol,
+                                                    conformer=conformer)
+            self.__get_properties(mol=mol,
+                                  conformer=conformer,
+                                  output_file=out_file)
         finally:
             os.chdir(init_dir)
         return self.total_energies[(mol, conformer)]
