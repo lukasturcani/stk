@@ -684,11 +684,11 @@ class XTB(Optimizer):
 
     Attributes
     ----------
-    gfnxtb_path : :class:`str`
-        The path to the GFN-xTB executable.
+    xtb_path : :class:`str`
+        The path to the xTB executable.
 
     gfn_version : :class:`str`
-        Parameterization of GFN-xTB to use.
+        Parameterization of GFN to use in xTB.
         For details:
             https://xtb-docs.readthedocs.io/en/latest/basics.html
 
@@ -752,15 +752,16 @@ class XTB(Optimizer):
     .. code-block:: python
 
         mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        gfnxtb = GFNXTB('/opt/gfnxtb/xtb')
-        gfnxtb.optimize(mol)
+        xtb = XTB('/opt/gfnxtb/xtb',
+                  mem_ulimit=True)
+        xtb.optimize(mol)
 
     Note that for :class:`.MacroMolecule` objects assembled by ``stk``
-    :class:`GFNXTB` should usually be used in a
-    :class:`OptimizerSequence`. This is because GFN-xTB only uses
+    :class:`XTB` should usually be used in a
+    :class:`OptimizerSequence`. This is because xTB only uses
     xyz coordinates as input and so will not recognize the long bonds
     created during assembly. An optimizer which can minimize
-    these bonds should be used before :class:`GFNXTB`.
+    these bonds should be used before :class:`XTB`.
 
     .. code-block:: python
 
@@ -768,12 +769,12 @@ class XTB(Optimizer):
         bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
         polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
 
-        gfnxtb = OptimizerSequence(
+        xtb = OptimizerSequence(
             UFF(),
-            GFNXTB(gfnxtb_path='/opt/gfnxtb/xtb',
-                   mem_ulimit=True)
+            XTB(xtb_path='/opt/gfnxtb/xtb',
+                mem_ulimit=True)
         )
-        gfnxtb.optimize(polymer)
+        xtb.optimize(polymer)
 
     Note that energies and other properties of optimized structures can be
     extracted using :class:`GFNXTBEnergy`. For example vibrational frequencies,
@@ -804,7 +805,7 @@ class XTB(Optimizer):
     """
 
     def __init__(self,
-                 gfnxtb_path,
+                 xtb_path,
                  gfn_version='2',
                  output_dir=None,
                  opt_level='normal',
@@ -818,15 +819,15 @@ class XTB(Optimizer):
                  use_cache=False,
                  mem_ulimit=False):
         """
-        Initializes a :class:`GFNXTB` instance.
+        Initializes a :class:`XTB` instance.
 
         Parameters
         ----------
-        gfnxtb_path : :class:`str`
-            The path to the GFN-xTB or GFN2-xTB executable.
+        xtb_path : :class:`str`
+            The path to the xTB executable.
 
         gfn_version : :class:`str`
-            Parameterization of GFN-xTB to use.
+            Parameterization of GFN to use in xTB.
             For details:
                 https://xtb-docs.readthedocs.io/en/latest/basics.html
 
@@ -863,6 +864,8 @@ class XTB(Optimizer):
             If ``True`` :meth:`optimize` will be run without constraints on
             the stacksize. If memory issues are encountered, this should be ``True``,
             however this may raise issues on clusters.
+            The number of cores for xTB to use. Requires appropriate setup
+            of xTB by user.
 
         etemp : :class:`int`, optional
             Electronic temperature to use (in K). Defaults to 300K.
@@ -891,7 +894,7 @@ class XTB(Optimizer):
 
         """
 
-        self.gfnxtb_path = gfnxtb_path
+        self.xtb_path = xtb_path
         self.gfn_version = gfn_version
         self.output_dir = output_dir
         self.opt_level = opt_level
@@ -922,6 +925,7 @@ class XTB(Optimizer):
         -------
         :class:`bool`
             Returns `True` if a negative frequency is present
+
         """
         # get output file in string
         neg_freq = False
@@ -934,13 +938,14 @@ class XTB(Optimizer):
 
     def __check_incomplete(self, output_file):
         """
-        Check if GFN-xTB optimization was converged.
+        Check if GFN-xTB optimization has converged.
 
         Returns
         -------
         :class:`bool`
             Returns `True` if a negative frequency is present. Raises errors if
             optimization did not converge.
+
         """
         if output_file is None:
             # no simulation run yet
@@ -965,6 +970,7 @@ class XTB(Optimizer):
         -------
         out_file : :class:`str`
             Returns output file of the optimization run by the command.
+
         """
         # when in output_dir -- use relative paths as GFN does not handle
         # full path in command
@@ -979,7 +985,7 @@ class XTB(Optimizer):
         else:
             cmd = []
             shell = False
-        cmd.append(self.gfnxtb_path)
+        cmd.append(self.xtb_path)
         cmd.append(xyz)
         # set GFN Parameterization
         if self.gfn_version != '2':

@@ -404,16 +404,16 @@ class XTBEnergy(EnergyCalculator):
     Note that this does not have any impact on multi-processing,
     which should always be safe.
 
-    Documentation for GFN2-xTB available:
+    Documentation for xTB available:
     https://xtb-docs.readthedocs.io/en/latest/setup.html
 
     Attributes
     ----------
-    gfnxtb_path : :class:`str`
-        The path to the GFN-xTB executable.
+    xtb_path : :class:`str`
+        The path to the xTB executable.
 
     gfn_version : :class:`str`
-        Parameterization of GFN-xTB to use.
+        Parameterization of GFN to use in xTB.
         For details:
             https://xtb-docs.readthedocs.io/en/latest/basics.html
 
@@ -439,6 +439,8 @@ class XTBEnergy(EnergyCalculator):
         If ``True`` :meth:`energy` will be run without constraints on
         the stacksize. If memory issues are encountered, this should be ``True``,
         however this may raise issues on clusters.
+        The number of cores for xTB to use. Requires appropriate setup
+        of xTB by user.
 
     etemp : :class:`int`, optional
         Electronic temperature to use (in K). Defaults to 300K.
@@ -471,7 +473,7 @@ class XTBEnergy(EnergyCalculator):
 
     Note that for :class:`.MacroMolecule` objects assembled by ``stk``
     :class:`XTBEnergy` should usually be used after optimization with some
-    other method. This is because GFN-xTB only uses xyz coordinates as input
+    other method. This is because xTB only uses xyz coordinates as input
     and so will not recognize the long bonds created during assembly.
     An optimizer which can minimize these bonds should be used before
     :class:`XTBEnergy`.
@@ -484,9 +486,9 @@ class XTBEnergy(EnergyCalculator):
 
         uff = UFF()
         uff.optimize(polymer)
-        gfnxtb = XTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
-                              mem_ulimit=True)
-        gfnxtb.energy(polymer)
+        xtb = XTBEnergy(xtb_path='/opt/gfnxtb/xtb',
+                            mem_ulimit=True)
+        xtb.energy(polymer)
 
     Energies and other properties of optimized structures can be
     extracted using :class:`XTBEnergy`. For example vibrational frequencies,
@@ -497,12 +499,12 @@ class XTBEnergy(EnergyCalculator):
 
     .. code-block:: python
 
-        gfnxtb = OptimizerSequence(
+        xtb = OptimizerSequence(
             UFF(),
-            XTB(gfnxtb_path='/opt/gfnxtb/xtb',
-                   mem_ulimit=True,
-                   opt_level='verytight',
-                   solvent='THF')
+            XTB(xtb_path='/opt/gfnxtb/xtb',
+                mem_ulimit=True,
+                opt_level='normal',
+                solvent='THF')
         )
         gfnxtb.optimize(polymer)
 
@@ -516,7 +518,7 @@ class XTBEnergy(EnergyCalculator):
         polymer_gap = polymer_properties['HLGap']
     """
     def __init__(self,
-                 gfnxtb_path,
+                 xtb_path,
                  gfn_version='2',
                  output_dir=None,
                  num_cores=1,
@@ -532,11 +534,11 @@ class XTBEnergy(EnergyCalculator):
 
         Parameters
         ----------
-        gfnxtb_path : :class:`str`
-            The path to the GFN-xTB or GFN2-xTB executable.
+        xtb_path : :class:`str`
+            The path to the xTB executable.
 
         gfn_version : :class:`str`
-            Parameterization of GFN-xTB to use.
+            Parameterization of GFN to use in xTB.
             For details:
                 https://xtb-docs.readthedocs.io/en/latest/basics.html
 
@@ -562,6 +564,8 @@ class XTBEnergy(EnergyCalculator):
             If ``True`` :meth:`energy` will be run without constraints on
             the stacksize. If memory issues are encountered, this should be ``True``,
             however this may raise issues on clusters.
+            The number of cores for xTB to use. Requires appropriate setup
+            of xTB by user.
 
         etemp : :class:`int`, optional
             Electronic temperature to use (in K). Defaults to 300K.
@@ -585,7 +589,7 @@ class XTBEnergy(EnergyCalculator):
             Formal molecular charge. `-` should be used to indicate sign.
 
         """
-        self.gfnxtb_path = gfnxtb_path
+        self.xtb_path = xtb_path
         self.gfn_version = gfn_version
         self.output_dir = output_dir
         self.num_cores = str(num_cores)
@@ -649,7 +653,7 @@ class XTBEnergy(EnergyCalculator):
         else:
             cmd = []
             shell = False
-        cmd.append(self.gfnxtb_path)
+        cmd.append(self.xtb_path)
         cmd.append(xyz)
         # set GFN Parameterization
         if self.gfn_version != '2':
@@ -689,7 +693,7 @@ class XTBEnergy(EnergyCalculator):
 
     def energy(self, mol, conformer=-1):
         """
-        Calculates the energy of molecule `mol` using GFN-xTB.
+        Calculates the energy of molecule `mol` using xTB.
 
         Parameters
         ----------
@@ -751,16 +755,16 @@ class XTBFreeEnergy(EnergyCalculator):
     Note that this does not have any impact on multi-processing,
     which should always be safe.
 
-    Documentation for GFN2-xTB available:
+    Documentation for xTB available:
     https://xtb-docs.readthedocs.io/en/latest/setup.html
 
     Attributes
     ----------
-    gfnxtb_path : :class:`str`
-        The path to the GFN-xTB executable.
+    xtb_path : :class:`str`
+        The path to the xTB executable.
 
     gfn_version : :class:`str`
-        Parameterization of GFN-xTB to use.
+        Parameterization of GFN to use in xTB.
         For details:
             https://xtb-docs.readthedocs.io/en/latest/basics.html
 
@@ -786,6 +790,8 @@ class XTBFreeEnergy(EnergyCalculator):
         If ``True`` :meth:`energy` will be run without constraints on
         the stacksize. If memory issues are encountered, this should be ``True``,
         however this may raise issues on clusters.
+        The number of cores for xTB to use. Requires appropriate setup
+        of xTB by user.
 
     etemp : :class:`int`, optional
         Electronic temperature to use (in K). Defaults to 300K.
@@ -810,15 +816,15 @@ class XTBFreeEnergy(EnergyCalculator):
     .. code-block:: python
 
         mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        gfnxtb = XTBEnergy('/opt/gfnxtb/xtb')
-        gfnxtb.energy(mol)
+        xtb = XTBFreeEnergy('/opt/gfnxtb/xtb')
+        xtb.energy(mol)
 
     Note that for :class:`.MacroMolecule` objects assembled by ``stk``
-    :class:`XTBEnergy` should usually be used after optimization with some
-    other method. This is because GFN-xTB only uses xyz coordinates as input
+    :class:`XTBFreeEnergy` should usually be used after optimization with some
+    other method. This is because xTB only uses xyz coordinates as input
     and so will not recognize the long bonds created during assembly.
     An optimizer which can minimize these bonds should be used before
-    :class:`XTBEnergy`.
+    :class:`XTBFreeEnergy`.
 
     .. code-block:: python
 
@@ -828,9 +834,9 @@ class XTBFreeEnergy(EnergyCalculator):
 
         uff = UFF()
         uff.optimize(polymer)
-        gfnxtb = XTBEnergy(gfnxtb_path='/opt/gfnxtb/xtb',
-                              mem_ulimit=True)
-        gfnxtb.energy(polymer)
+        xtb = XTBFreeEnergy(xtb_path='/opt/gfnxtb/xtb',
+                            mem_ulimit=True)
+        xtb.energy(polymer)
 
     Energies and other properties of optimized structures can be
     extracted using :class:`XTBEnergy`. For example vibrational frequencies,
@@ -861,7 +867,7 @@ class XTBFreeEnergy(EnergyCalculator):
     """
 
     def __init__(self,
-                 gfnxtb_path,
+                 xtb_path,
                  gfn_version='2',
                  output_dir=None,
                  num_cores=1,
@@ -873,15 +879,15 @@ class XTBFreeEnergy(EnergyCalculator):
                  use_cache=False,
                  mem_ulimit=False):
         """
-        Initializes a :class:`XTBEnergy` instance.
+        Initializes a :class:`XTBFreeEnergy` instance.
 
         Parameters
         ----------
-        gfnxtb_path : :class:`str`
-            The path to the GFN-xTB or GFN2-xTB executable.
+        xtb_path : :class:`str`
+            The path to the xTB executable.
 
         gfn_version : :class:`str`
-            Parameterization of GFN-xTB to use.
+            Parameterization of GFN to use in xTB.
             For details:
                 https://xtb-docs.readthedocs.io/en/latest/basics.html
 
@@ -907,6 +913,8 @@ class XTBFreeEnergy(EnergyCalculator):
             If ``True`` :meth:`energy` will be run without constraints on
             the stacksize. If memory issues are encountered, this should be ``True``,
             however this may raise issues on clusters.
+            The number of cores for xTB to use. Requires appropriate setup
+            of xTB by user.
 
         etemp : :class:`int`, optional
             Electronic temperature to use (in K). Defaults to 300K.
@@ -930,7 +938,7 @@ class XTBFreeEnergy(EnergyCalculator):
             Formal molecular charge. `-` should be used to indicate sign.
 
         """
-        self.gfnxtb_path = gfnxtb_path
+        self.xtb_path = xtb_path
         self.gfn_version = gfn_version
         self.output_dir = output_dir
         self.num_cores = str(num_cores)
@@ -960,7 +968,7 @@ class XTBFreeEnergy(EnergyCalculator):
 
     def __get_properties(self, mol, conformer, output_file):
         """
-        Extracts desired properties from GFN-xTB single point energy calculation.
+        Extracts desired properties from xTB single point energy calculation.
 
         """
         XTBExt = XTBExts(output_file=output_file)
@@ -986,6 +994,7 @@ class XTBFreeEnergy(EnergyCalculator):
         -------
         out_file : :class:`str`
             Name of output file with GFN-xTB results.
+
         """
         xyz = 'input_structure.xyz'
         out_file = 'energy.output'
@@ -998,7 +1007,7 @@ class XTBFreeEnergy(EnergyCalculator):
         else:
             cmd = []
             shell = False
-        cmd.append(self.gfnxtb_path)
+        cmd.append(self.xtb_path)
         cmd.append(xyz)
         # set GFN Parameterization
         if self.gfn_version != '2':
@@ -1036,7 +1045,7 @@ class XTBFreeEnergy(EnergyCalculator):
 
     def energy(self, mol, conformer=-1):
         """
-        Calculates the energy of molecule `mol` using GFN-xTB.
+        Calculates the energy of molecule `mol` using xTB.
 
         Parameters
         ----------

@@ -9,13 +9,13 @@ odir = 'optimizer_tests_output'
 if not os.path.exists(odir):
     os.mkdir(odir)
 
-gfnxtb = pytest.mark.skipif(
-    all('gfnxtb' not in x for x in sys.argv),
+xtb = pytest.mark.skipif(
+    all('xtb' not in x for x in sys.argv),
     reason="Only run when explicitly asked.")
 
 
-@gfnxtb
-def test_gfnxtb_negfreq(tmp_polymer, gfnxtb_path):
+@xtb
+def test_gfnxtb_negfreq(tmp_polymer, xtb_path):
     init_dir = os.getcwd()
     # XTB  requires an embedding before working.
     etkdg = stk.ETKDG()
@@ -25,7 +25,7 @@ def test_gfnxtb_negfreq(tmp_polymer, gfnxtb_path):
     ID = (tmp_polymer, conformer)
 
     out_dir = 'gfnxtb_NF_energy'
-    energy = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
+    energy = stk.XTBEnergy(xtb_path=xtb_path,
                            output_dir=join(odir, out_dir),
                            mem_ulimit=True)
 
@@ -36,7 +36,7 @@ def test_gfnxtb_negfreq(tmp_polymer, gfnxtb_path):
     # are removed
     out_dir = 'gfnxtb_NF_crude_opt'
     tmp_polymer.write(join(odir, 'gfnxtb_opt_before.mol'))
-    opt_lowtol = stk.XTB(gfnxtb_path=gfnxtb_path,
+    opt_lowtol = stk.XTB(xtb_path=xtb_path,
                          output_dir=join(odir, out_dir),
                          mem_ulimit=True, opt_level='crude',
                          max_count=2)
@@ -56,7 +56,7 @@ def test_gfnxtb_negfreq(tmp_polymer, gfnxtb_path):
     # high criteria optimization
     out_dir = 'gfnxtb_NF_extreme_opt'
     tmp_polymer.write(join(odir, 'gfnxtb_opt_before.mol'))
-    opt_hightol = stk.XTB(gfnxtb_path=gfnxtb_path,
+    opt_hightol = stk.XTB(xtb_path=xtb_path,
                           output_dir=join(odir, out_dir),
                           mem_ulimit=True, opt_level='extreme',
                           max_count=1)
@@ -77,7 +77,7 @@ def test_gfnxtb_negfreq(tmp_polymer, gfnxtb_path):
     assert os.getcwd() == init_dir
 
 
-def test_gfnxtb_solvent_charge_multiplicity(tmp_polymer, gfnxtb_path):
+def test_gfnxtb_solvent_charge_multiplicity(tmp_polymer, xtb_path):
     # XTB  requires an embedding before working.
     etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
@@ -85,14 +85,14 @@ def test_gfnxtb_solvent_charge_multiplicity(tmp_polymer, gfnxtb_path):
     # test that the energies with implicit solvation, charge != 0 and non zero
     # multiplicity
     out_dir = 'gfnxtb_energy'
-    energy = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
+    energy = stk.XTBEnergy(xtb_path=xtb_path,
                            output_dir=join(odir, out_dir),
                            mem_ulimit=True)
     # initial energy
     init_energy = energy.energy(tmp_polymer)
 
     out_dir = 'gfnxtb_solv_energy'
-    solvent = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
+    solvent = stk.XTBEnergy(xtb_path=xtb_path,
                             output_dir=join(odir, out_dir),
                             mem_ulimit=True,
                             solvent='h2o')
@@ -101,7 +101,7 @@ def test_gfnxtb_solvent_charge_multiplicity(tmp_polymer, gfnxtb_path):
     assert solv_energy != init_energy
 
     out_dir = 'gfnxtb_charge_energy'
-    charge = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
+    charge = stk.XTBEnergy(xtb_path=xtb_path,
                            output_dir=join(odir, out_dir),
                            mem_ulimit=True,
                            charge='-1')
@@ -110,7 +110,7 @@ def test_gfnxtb_solvent_charge_multiplicity(tmp_polymer, gfnxtb_path):
     assert charge_energy != init_energy
 
     out_dir = 'gfnxtb_multi_energy'
-    multi = stk.XTBEnergy(gfnxtb_path=gfnxtb_path,
+    multi = stk.XTBEnergy(xtb_path=xtb_path,
                           output_dir=join(odir, out_dir),
                           mem_ulimit=True,
                           multiplicity='2')
@@ -119,7 +119,7 @@ def test_gfnxtb_solvent_charge_multiplicity(tmp_polymer, gfnxtb_path):
     assert multi_energy != init_energy
 
 
-def test_gfnxtb_properties(tmp_polymer, gfnxtb_path):
+def test_gfnxtb_properties(tmp_polymer, xtb_path):
     # XTB  requires an embedding before working.
     etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
@@ -127,11 +127,11 @@ def test_gfnxtb_properties(tmp_polymer, gfnxtb_path):
     conformer = tmp_polymer.mol.GetConformer(-1).GetId()
 
     # hessian requires optimized structure
-    gfnxtb = stk.XTB(gfnxtb_path, output_dir=join(odir, 'gfnxtb_opt'),
+    gfnxtb = stk.XTB(xtb_path, output_dir=join(odir, 'gfnxtb_opt'),
                      mem_ulimit=True, opt_level='extreme',
                      num_cores=2)
     gfnxtb.optimize(tmp_polymer)
-    EC = stk.XTBFreeEnergy(gfnxtb_path=gfnxtb_path,
+    EC = stk.XTBFreeEnergy(xtb_path=xtb_path,
                            output_dir=join(odir, 'gfnxtb_ey'),
                            mem_ulimit=True)
     total_energy = EC.energy(tmp_polymer)
