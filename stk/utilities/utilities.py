@@ -1203,14 +1203,6 @@ def valid_XTB_solvent(gfn_version, solvent):
             )
 
 
-class XTBNegativeFreqError(Exception):
-    ...
-
-
-class XTBHessianFailedError(Exception):
-    ...
-
-
 class XTBExts():
     """
     Methods for extracting properties from GFN-xTB output.
@@ -1474,7 +1466,7 @@ class XTBExts():
 
         return value
 
-    def ext_total_free_energy(self, ignore_hessian_error=True):
+    def ext_total_free_energy(self):
         """
         Extracts total free energy (a.u.) from GFN-xTB output at T=298.15K.
 
@@ -1487,15 +1479,6 @@ class XTBExts():
         :class:`float`
             Total free energy in a.u.
         """
-        # check that hessian was performed on geometry optimized structure
-        # raise error if not
-        for line in reversed(self.output_string):
-            if ignore_hessian_error is False:
-                if '#WARNING! Hessian on incompletely optimized geometry!' in line:
-                    raise XTBHessianFailedError(
-                        f'Hessian calculation performed on unoptimized structure.'
-                    )
-                break
         value = None
 
         # regex for numbers
@@ -1507,7 +1490,7 @@ class XTBExts():
 
         return float(value)
 
-    def ext_frequencies(self, ignore_neg_freq=True):
+    def ext_frequencies(self):
         """
         Extracts projected vibrational frequencies (cm-1) from GFN-xTB output.
 
@@ -1541,11 +1524,5 @@ class XTBExts():
                     frequencies.append(freq)
 
         value = [float(i) for i in frequencies]
-
-        if ignore_neg_freq is False and min(value) < 0:
-            raise XTBNegativeFreqError(
-                'Negative frequency encountered.'
-                'Structures should be optimized prior to free energy calculation.'
-            )
 
         return value

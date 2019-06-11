@@ -975,10 +975,8 @@ class XTBFreeEnergy(EnergyCalculator):
         self.Qonly_quadrupole_moments[(mol, conformer)] = XTBExt.ext_Qonly_quadrupole_mom()
         self.QDip_quadrupole_moments[(mol, conformer)] = XTBExt.ext_QDip_quadrupole_mom()
         self.full_quadrupole_moments[(mol, conformer)] = XTBExt.ext_full_quadrupole_mom()
-        self.total_free_energies[(mol, conformer)] = XTBExt.ext_total_free_energy(
-            ignore_hessian_error=False)
-        self.frequencies[(mol, conformer)] = XTBExt.ext_frequencies(
-            ignore_neg_freq=False)
+        self.total_free_energies[(mol, conformer)] = XTBExt.ext_total_free_energy()
+        self.frequencies[(mol, conformer)] = XTBExt.ext_frequencies()
 
     def __write_and_run_command(self, mol, conformer):
         """
