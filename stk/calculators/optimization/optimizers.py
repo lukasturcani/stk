@@ -1060,22 +1060,40 @@ class XTB(Optimizer):
             os.chdir(output_dir)
             run_count = 0
             out_file = None
-            while self.__check_incomplete(output_file=out_file):
+            while True:
                 run_count += 1
                 out_file = self.__write_and_run_command(mol=mol,
                                                         conformer=conformer,
                                                         count=run_count)
-                # automated restart from GFN produces xtbopt.coord
-                if run_count == 1:
-                    output_xyz = join(output_dir, 'xtbopt.xyz')
-                    mol.update_from_xyz(path=output_xyz, conformer=conformer)
-                else:
-                    output_coord = join(output_dir, 'xtbopt.coord')
-                    mol.update_from_coord(path=output_coord, conformer=conformer)
+                # check if optimization is complete
+                if self.__check_incomplete(output_file=out_file):
+                    # calculation incomplete
+                    # if the negative frequencies are small, then GFN may
+                    # not produce the restart file. If that is the case, exit
+                    # optimization loop and warn
+                    if os.path.isfile(join(output_dir, 'xtbhess.coord')):
+                        # update mol from from xtbhess.coord and continue
+                        output_coord = join(output_dir, 'xtbhess.coord')
+                        mol.update_from_coord(path=output_coord,
+                                              conformer=conformer)
+                    else:
+                        # break
+                        self.NOT_OPTIMIZED.append((mol, conformer))
+                        logging.warning(
+                            f'Small negative frequencies present.')
+                        break
+                    # break if run count == max_count
                     if run_count == self.max_count:
                         self.NOT_OPTIMIZED.append((mol, conformer))
                         logging.warning(
                             f'Negative frequencies not removed in max_count optimizations')
                         break
+                else:
+                    # calculation complete
+                    # update mol from xtbopt.xyz
+                    output_xyz = join(output_dir, 'xtbopt.xyz')
+                    mol.update_from_xyz(path=output_xyz, conformer=conformer)
+                    # break
+                    break
         finally:
             os.chdir(init_dir)
