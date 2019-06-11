@@ -13,7 +13,7 @@ import subprocess as sp
 import uuid
 import os
 import shutil
-from ...utilities import valid_XTB_solvent
+from ...utilities import valid_XTB_solvent, XTBExts
 
 
 logger = logging.getLogger(__name__)
@@ -385,14 +385,6 @@ class UFFEnergy(EnergyCalculator):
         return ff.CalcEnergy()
 
 
-class XTBEnergyHessianFailedError(Exception):
-    ...
-
-
-class XTBEnergyNegativeFreqError(Exception):
-    ...
-
-
 class XTBEnergy(EnergyCalculator):
     """
     Uses GFN-xTB to calculate energies and other properties of molecules.
@@ -619,278 +611,23 @@ class XTBEnergy(EnergyCalculator):
         self.full_quadrupole_moments = {}
         super().__init__(use_cache=use_cache)
 
-    def __ext_total_energy(self, output_string):
-        """
-        Extracts total energy (a.u.) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        "          | TOTAL ENERGY              -76.260405590154 Eh   |"
-
-        Returns
-        -------
-        :class:`float`
-            Total energy in a.u.
-        """
-        value = None
-
-        # regex for numbers
-        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
-        for line in reversed(output_string):
-            if '          | TOTAL ENERGY  ' in line:
-                value = nums.search(line.rstrip()).group(0)
-                break
-
-        return float(value)
-
-    def __ext_homo_lumo_gap(self, output_string):
-        """
-        Extracts total energy (eV) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        "          | HOMO-LUMO GAP               2.336339660160 eV   |"
-
-        Returns
-        -------
-        :class:`float`
-            Homo-Lumo gap in eV.
-        """
-        value = None
-
-        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
-        for line in reversed(output_string):
-            if '          | HOMO-LUMO GAP   ' in line:
-                value = nums.search(line.rstrip()).group(0)
-                break
-
-        return float(value)
-
-    def __ext_fermi_level(self, output_string):
-        """
-        Extracts Fermi-Level energy (eV) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        "             Fermi-level           -0.3159871 Eh           -8.5984 eV"
-
-        Returns
-        -------
-        :class:`float`
-            Fermi-level in eV.
-        """
-        value = None
-
-        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
-        for line in reversed(output_string):
-            if '             Fermi-level        ' in line:
-                part2 = line.split('Eh')
-                value = nums.search(part2[1].rstrip()).group(0)
-                break
-
-        return float(value)
-
-    def __ext_Qonly_dipole_emom(self, output_string):
-        """
-        Extracts `q only` dipole moment vector (Debye) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        " q only:       -0.033      -0.081      -0.815"
-
-        Returns
-        -------
-        :class:`list` of :class:`float`
-            Components of dipole moment in a list of length 3.
-            [`x`, `y`, `z`]
-        """
-        value = None
-
-        sample_set = []
-        for i, line in enumerate(output_string):
-            if 'molecular dipole:' in line:
-                sample_set = output_string[i+2].rstrip()
-
-        # get values from line
-        if 'q only:' in sample_set:
-            x, y, z = [i for i in sample_set.split(':')[1].split(' ')
-                       if i != '']
-
-        value = [float(x), float(y), float(z)]
-
-        return value
-
-    def __ext_full_dipole_mom(self, output_string):
-        """
-        Extracts `full` dipole moment vector (Debye) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        "   full:       -0.684       0.122      -1.071       3.245"
-
-        Returns
-        -------
-        :class:`list` of :class:`float`
-            Components of dipole moment and total magnitude in a list of length 4.
-            [`x`, `y`, `z`, `tot (Debye)`]
-        """
-        value = None
-
-        sample_set = []
-        for i, line in enumerate(output_string):
-            if 'molecular dipole:' in line:
-                sample_set = output_string[i+3].rstrip()
-
-        # get values from line
-        if 'full:' in sample_set:
-            x, y, z, m = [i for i in sample_set.split(':')[1].split(' ')
-                          if i != '']
-
-        value = [float(x), float(y), float(z), float(m)]
-
-        return value
-
-    def __ext_Qonly_quadrupole_mom(self, output_string):
-        """
-        Extracts `q only` traceless quadrupole moment vector (Debye) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        " q only:        7.152      10.952       3.364      15.349       2.074     -10.515"
-
-        Returns
-        -------
-        :class:`list` of :class:`float`
-            Components of quadrupole moment in a list of length 6.
-            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
-        """
-        value = None
-
-        sample_set = []
-        for i, line in enumerate(output_string):
-            if 'molecular quadrupole (traceless):' in line:
-                sample_set = output_string[i+2].rstrip()
-
-        # get values from line
-        if 'q only:' in sample_set:
-            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
-                                      if i != '']
-
-        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
-
-        return value
-
-    def __ext_QDip_quadrupole_mom(self, output_string):
-        """
-        Extracts `q+dip` traceless quadrupole moment vector (Debye) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        "  q+dip:       -6.239      21.552      16.601      12.864       2.504     -10.362"
-
-        Returns
-        -------
-        :class:`list` of :class:`float`
-            Components of quadrupole moment in a list of length 6.
-            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
-        """
-        value = None
-
-        sample_set = []
-        for i, line in enumerate(output_string):
-            if 'molecular quadrupole (traceless):' in line:
-                sample_set = output_string[i+3].rstrip()
-
-        # get values from line
-        if 'q+dip:' in sample_set:
-            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
-                                      if i != '']
-
-        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
-
-        return value
-
-    def __ext_full_quadrupole_mom(self, output_string):
-        """
-        Extracts `full` traceless quadrupole moment vector (Debye) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        "   full:       -6.662      22.015      16.959      12.710       3.119     -10.297"
-
-        Returns
-        -------
-        :class:`list` of :class:`float`
-            Components of quadrupole moment in a list of length 6.
-            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
-        """
-        value = None
-
-        sample_set = []
-        for i, line in enumerate(output_string):
-            if 'molecular quadrupole (traceless):' in line:
-                sample_set = output_string[i+4].rstrip()
-
-        # get values from line
-        if 'full:' in sample_set:
-            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
-                                      if i != '']
-
-        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
-
-        return value
-
-    def __ext_homo_lumo_occ(self, output_string):
-        """
-        Extracts Orbital Energies and Occupations (eV) of the HOMO and LUMO from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418)
-        Example line:
-        "        70        2.0000           -0.3514143              -9.5625 (HOMO)"
-        "        71                         -0.2712405              -7.3808 (LUMO)"
-
-        Returns
-        -------
-        :class:`dict`
-            Dictionary of (#, occupation, Energy (eV)) of HOMO and LUMO orbital
-        """
-        value = None
-
-        for line in reversed(output_string):
-            if '(HOMO)' in line:
-                split_line = [i for i in line.rstrip().split(' ') if i != '']
-                # line is: Number, occupation, energy (Ha), energy (ev), label
-                # keep: Number, occupation, energy (eV)
-                homo_val = [int(split_line[0]), float(split_line[1]), float(split_line[3])]
-            if '(LUMO)' in line:
-                split_line = [i for i in line.rstrip().split(' ') if i != '']
-                # line is: Number, energy (Ha), energy (ev), label
-                # keep: Number, energy (eV)
-                lumo_val = [int(split_line[0]), float(0), float(split_line[2])]
-
-        value = {'HOMO': homo_val,
-                 'LUMO': lumo_val}
-
-        return value
-
     def __get_properties(self, mol, conformer, output_file):
         """
         Extracts desired properties from GFN-xTB single point energy calculation.
 
         """
-        # get output file in string
-        output_string = open(output_file, 'r').readlines()
+        XTBExt = XTBExts(output_file=output_file)
 
         # get properties from output string
-        self.total_energies[(mol, conformer)] = self.__ext_total_energy(output_string)
-        self.homo_lumo_gaps[(mol, conformer)] = self.__ext_homo_lumo_gap(output_string)
-        self.fermi_levels[(mol, conformer)] = self.__ext_fermi_level(output_string)
-        self.homo_lumo_orbitals[(mol, conformer)] = self.__ext_homo_lumo_occ(output_string)
-        self.Qonly_dipole_moments[(mol, conformer)] = self.__ext_Qonly_dipole_emom(output_string)
-        self.full_dipole_moments[(mol, conformer)] = self.__ext_full_dipole_mom(output_string)
-        self.Qonly_quadrupole_moments[(mol, conformer)] = self.__ext_Qonly_quadrupole_mom(output_string)
-        self.QDip_quadrupole_moments[(mol, conformer)] = self.__ext_QDip_quadrupole_mom(output_string)
-        self.full_quadrupole_moments[(mol, conformer)] = self.__ext_full_quadrupole_mom(output_string)
+        self.total_energies[(mol, conformer)] = XTBExt.ext_total_energy()
+        self.homo_lumo_gaps[(mol, conformer)] = XTBExt.ext_homo_lumo_gap()
+        self.fermi_levels[(mol, conformer)] = XTBExt.ext_fermi_level()
+        self.homo_lumo_orbitals[(mol, conformer)] = XTBExt.ext_homo_lumo_occ()
+        self.Qonly_dipole_moments[(mol, conformer)] = XTBExt.ext_Qonly_dipole_mom()
+        self.full_dipole_moments[(mol, conformer)] = XTBExt.ext_full_dipole_mom()
+        self.Qonly_quadrupole_moments[(mol, conformer)] = XTBExt.ext_Qonly_quadrupole_mom()
+        self.QDip_quadrupole_moments[(mol, conformer)] = XTBExt.ext_QDip_quadrupole_mom()
+        self.full_quadrupole_moments[(mol, conformer)] = XTBExt.ext_full_quadrupole_mom()
 
     def __write_and_run_command(self, mol, conformer):
         """
@@ -1231,21 +968,22 @@ class XTBFreeEnergy(XTBEnergy):
         Extracts desired properties from GFN-xTB single point energy calculation.
 
         """
-        # get output file in string
-        output_string = open(output_file, 'r').readlines()
+        XTBExt = XTBExts(output_file=output_file)
 
         # get properties from output string
-        self.total_energies[(mol, conformer)] = self.__ext_total_energy(output_string)
-        self.total_free_energies[(mol, conformer)] = self.__ext_total_free_energy(output_string)
-        self.frequencies[(mol, conformer)] = self.__ext_frequencies(output_string)
-        self.homo_lumo_gaps[(mol, conformer)] = self.__ext_homo_lumo_gap(output_string)
-        self.fermi_levels[(mol, conformer)] = self.__ext_fermi_level(output_string)
-        self.homo_lumo_orbitals[(mol, conformer)] = self.__ext_homo_lumo_occ(output_string)
-        self.Qonly_dipole_moments[(mol, conformer)] = self.__ext_Qonly_dipole_emom(output_string)
-        self.full_dipole_moments[(mol, conformer)] = self.__ext_full_dipole_mom(output_string)
-        self.Qonly_quadrupole_moments[(mol, conformer)] = self.__ext_Qonly_quadrupole_mom(output_string)
-        self.QDip_quadrupole_moments[(mol, conformer)] = self.__ext_QDip_quadrupole_mom(output_string)
-        self.full_quadrupole_moments[(mol, conformer)] = self.__ext_full_quadrupole_mom(output_string)
+        self.total_energies[(mol, conformer)] = XTBExt.ext_total_energy()
+        self.homo_lumo_gaps[(mol, conformer)] = XTBExt.ext_homo_lumo_gap()
+        self.fermi_levels[(mol, conformer)] = XTBExt.ext_fermi_level()
+        self.homo_lumo_orbitals[(mol, conformer)] = XTBExt.ext_homo_lumo_occ()
+        self.Qonly_dipole_moments[(mol, conformer)] = XTBExt.ext_Qonly_dipole_mom()
+        self.full_dipole_moments[(mol, conformer)] = XTBExt.ext_full_dipole_mom()
+        self.Qonly_quadrupole_moments[(mol, conformer)] = XTBExt.ext_Qonly_quadrupole_mom()
+        self.QDip_quadrupole_moments[(mol, conformer)] = XTBExt.ext_QDip_quadrupole_mom()
+        self.full_quadrupole_moments[(mol, conformer)] = XTBExt.ext_full_quadrupole_mom()
+        self.total_free_energies[(mol, conformer)] = XTBExt.ext_total_free_energy(
+            ignore_hessian_error=False)
+        self.frequencies[(mol, conformer)] = XTBExt.ext_frequencies(
+            ignore_neg_freq=False)
 
     def __write_and_run_command(self, mol, conformer):
         """

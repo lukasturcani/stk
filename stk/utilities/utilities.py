@@ -1201,3 +1201,351 @@ def valid_XTB_solvent(gfn_version, solvent):
             raise XTBInvalidSolventError(
                 f'{solvent} is an invalid solvent for version {gfn_version}!'
             )
+
+
+class XTBNegativeFreqError(Exception):
+    ...
+
+
+class XTBHessianFailedError(Exception):
+    ...
+
+
+class XTBExts():
+    """
+    Methods for extracting properties from GFN-xTB output.
+
+    """
+    def __init__(self, output_file):
+        output_string = open(output_file, 'r').readlines()
+        self.output_string = output_string
+
+    def ext_total_energy(self):
+        """
+        Extracts total energy (a.u.) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "          | TOTAL ENERGY              -76.260405590154 Eh   |"
+
+        Returns
+        -------
+        :class:`float`
+            Total energy in a.u.
+        """
+        value = None
+
+        # regex for numbers
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        for line in reversed(self.output_string):
+            if '          | TOTAL ENERGY  ' in line:
+                value = nums.search(line.rstrip()).group(0)
+                break
+
+        return float(value)
+
+    def ext_homo_lumo_gap(self):
+        """
+        Extracts total energy (eV) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "          | HOMO-LUMO GAP               2.336339660160 eV   |"
+
+        Returns
+        -------
+        :class:`float`
+            Homo-Lumo gap in eV.
+        """
+        value = None
+
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        for line in reversed(self.output_string):
+            if '          | HOMO-LUMO GAP   ' in line:
+                value = nums.search(line.rstrip()).group(0)
+                break
+
+        return float(value)
+
+    def ext_fermi_level(self):
+        """
+        Extracts Fermi-Level energy (eV) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "             Fermi-level           -0.3159871 Eh           -8.5984 eV"
+
+        Returns
+        -------
+        :class:`float`
+            Fermi-level in eV.
+        """
+        value = None
+
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        for line in reversed(self.output_string):
+            if '             Fermi-level        ' in line:
+                part2 = line.split('Eh')
+                value = nums.search(part2[1].rstrip()).group(0)
+                break
+
+        return float(value)
+
+    def ext_Qonly_dipole_mom(self):
+        """
+        Extracts `q only` dipole moment vector (Debye) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        " q only:       -0.033      -0.081      -0.815"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of dipole moment in a list of length 3.
+            [`x`, `y`, `z`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular dipole:' in line:
+                sample_set = self.output_string[i+2].rstrip()
+
+        # get values from line
+        if 'q only:' in sample_set:
+            x, y, z = [i for i in sample_set.split(':')[1].split(' ')
+                       if i != '']
+
+        value = [float(x), float(y), float(z)]
+
+        return value
+
+    def ext_full_dipole_mom(self):
+        """
+        Extracts `full` dipole moment vector (Debye) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "   full:       -0.684       0.122      -1.071       3.245"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of dipole moment and total magnitude in a list of length 4.
+            [`x`, `y`, `z`, `tot (Debye)`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular dipole:' in line:
+                sample_set = self.output_string[i+3].rstrip()
+
+        # get values from line
+        if 'full:' in sample_set:
+            x, y, z, m = [i for i in sample_set.split(':')[1].split(' ')
+                          if i != '']
+
+        value = [float(x), float(y), float(z), float(m)]
+
+        return value
+
+    def ext_Qonly_quadrupole_mom(self):
+        """
+        Extracts `q only` traceless quadrupole moment vector (Debye) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        " q only:        7.152      10.952       3.364      15.349       2.074     -10.515"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of quadrupole moment in a list of length 6.
+            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular quadrupole (traceless):' in line:
+                sample_set = self.output_string[i+2].rstrip()
+
+        # get values from line
+        if 'q only:' in sample_set:
+            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
+                                      if i != '']
+
+        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
+
+        return value
+
+    def ext_QDip_quadrupole_mom(self):
+        """
+        Extracts `q+dip` traceless quadrupole moment vector (Debye) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "  q+dip:       -6.239      21.552      16.601      12.864       2.504     -10.362"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of quadrupole moment in a list of length 6.
+            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular quadrupole (traceless):' in line:
+                sample_set = self.output_string[i+3].rstrip()
+
+        # get values from line
+        if 'q+dip:' in sample_set:
+            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
+                                      if i != '']
+
+        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
+
+        return value
+
+    def ext_full_quadrupole_mom(self):
+        """
+        Extracts `full` traceless quadrupole moment vector (Debye) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "   full:       -6.662      22.015      16.959      12.710       3.119     -10.297"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of quadrupole moment in a list of length 6.
+            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular quadrupole (traceless):' in line:
+                sample_set = self.output_string[i+4].rstrip()
+
+        # get values from line
+        if 'full:' in sample_set:
+            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
+                                      if i != '']
+
+        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
+
+        return value
+
+    def ext_homo_lumo_occ(self):
+        """
+        Extracts Orbital Energies and Occupations (eV) of the HOMO and LUMO from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "        70        2.0000           -0.3514143              -9.5625 (HOMO)"
+        "        71                         -0.2712405              -7.3808 (LUMO)"
+
+        Returns
+        -------
+        :class:`dict`
+            Dictionary of (#, occupation, Energy (eV)) of HOMO and LUMO orbital
+        """
+        value = None
+
+        for line in reversed(self.output_string):
+            if '(HOMO)' in line:
+                split_line = [i for i in line.rstrip().split(' ') if i != '']
+                # line is: Number, occupation, energy (Ha), energy (ev), label
+                # keep: Number, occupation, energy (eV)
+                homo_val = [int(split_line[0]), float(split_line[1]), float(split_line[3])]
+            if '(LUMO)' in line:
+                split_line = [i for i in line.rstrip().split(' ') if i != '']
+                # line is: Number, energy (Ha), energy (ev), label
+                # keep: Number, energy (eV)
+                lumo_val = [int(split_line[0]), float(0), float(split_line[2])]
+
+        value = {'HOMO': homo_val,
+                 'LUMO': lumo_val}
+
+        return value
+
+    def ext_total_free_energy(self, ignore_hessian_error=True):
+        """
+        Extracts total free energy (a.u.) from GFN-xTB output at T=298.15K.
+
+        Formatting based on latest version of GFN-xTB (190418)
+        Example line:
+        "          | TOTAL FREE ENERGY         -75.832501154309 Eh   |"
+
+        Returns
+        -------
+        :class:`float`
+            Total free energy in a.u.
+        """
+        # check that hessian was performed on geometry optimized structure
+        # raise error if not
+        for line in reversed(self.output_string):
+            if ignore_hessian_error is False:
+                if '#WARNING! Hessian on incompletely optimized geometry!' in line:
+                    raise XTBHessianFailedError(
+                        f'Hessian calculation performed on unoptimized structure.'
+                    )
+                break
+        value = None
+
+        # regex for numbers
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        for line in reversed(self.output_string):
+            if '          | TOTAL FREE ENERGY  ' in line:
+                value = nums.search(line.rstrip()).group(0)
+                break
+
+        return float(value)
+
+    def ext_frequencies(self, ignore_neg_freq=True):
+        """
+        Extracts projected vibrational frequencies (cm-1) from GFN-xTB output.
+
+        Formatting based on latest version of GFN-xTB (190418).
+        Example line:
+        "eigval :       -0.00    -0.00    -0.00     0.00     0.00     0.00"
+
+        Returns
+        -------
+        :class:`list`
+            List of all vibrational frequencies as :class:`float`
+        """
+        value = None
+
+        # use a switch to make sure we are extracting values after the
+        # final property readout
+        switch = False
+
+        frequencies = []
+        for i, line in enumerate(self.output_string):
+            if '|               Frequency Printout                |' in line:
+                # turn on reading as final frequency printout has begun
+                switch = True
+            if ' reduced masses (amu)' in line:
+                # turn off reading as frequency section is done
+                switch = False
+            if 'eigval :' in line and switch is True:
+                split_line = [i for i in line.rstrip().split(':')[1].split(' ')
+                              if i != '']
+                for freq in split_line:
+                    frequencies.append(freq)
+
+        value = [float(i) for i in frequencies]
+
+        if ignore_neg_freq is False and min(value) < 0:
+            raise XTBNegativeFreqError(
+                'Negative frequency encountered.'
+                'Structures should be optimized prior to free energy calculation.'
+            )
+
+        return value

@@ -15,7 +15,7 @@ import subprocess as sp
 import uuid
 from os.path import join
 import shutil
-from ...utilities import valid_XTB_solvent
+from ...utilities import valid_XTB_solvent, XTBExts
 
 logger = logging.getLogger(__name__)
 
@@ -916,43 +916,6 @@ class XTB(Optimizer):
         self.NOT_OPTIMIZED = False
         super().__init__(use_cache=use_cache)
 
-    def __ext_frequencies(self, output_string):
-        """
-        Extracts projected vibrational frequencies (cm-1) from GFN-xTB output.
-
-        Formatting based on latest version of GFN-xTB (190418).
-        Example line:
-        "eigval :       -0.00    -0.00    -0.00     0.00     0.00     0.00"
-
-        Returns
-        -------
-        :class:`list`
-            List of all vibrational frequencies as :class:`float`
-        """
-        value = None
-
-        # use a switch to make sure we are extracting values after the
-        # final property readout
-        switch = False
-
-        frequencies = []
-        for i, line in enumerate(output_string):
-            if '|               Frequency Printout                |' in line:
-                # turn on reading as final frequency printout has begun
-                switch = True
-            if ' reduced masses (amu)' in line:
-                # turn off reading as frequency section is done
-                switch = False
-            if 'eigval :' in line and switch is True:
-                split_line = [i for i in line.rstrip().split(':')[1].split(' ')
-                              if i != '']
-                for freq in split_line:
-                    frequencies.append(freq)
-
-        value = [float(i) for i in frequencies]
-
-        return value
-
     def __check_neg_frequencies(self, output_file):
         """
         Check for negative frequencies in output_string.
@@ -967,9 +930,9 @@ class XTB(Optimizer):
             Returns `True` if a negative frequency is present
         """
         # get output file in string
-        output_string = open(output_file, 'r').readlines()
         neg_freq = False
-        value = self.ext_frequencies(output_string)
+        XTBExt = XTBExts(output_file=output_file)
+        value = XTBExt.ext_frequencies()
         # checks for one negative frequency
         if min(value) < 0:
             neg_freq = True
