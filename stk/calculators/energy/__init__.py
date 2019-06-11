@@ -46,6 +46,8 @@ Available energy calculators.
 #. :class:`.MacroModelEnergy`
 #. :class:`.MOPACEnergy`
 #. :class:`.FormationEnergy`
+#. :class:`.XTBEnergy`
+#. :class:`.XTBFreeEnergy`
 
 
 .. _`adding energy calculators`:

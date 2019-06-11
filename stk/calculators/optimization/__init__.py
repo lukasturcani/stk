@@ -59,7 +59,7 @@ Available optimizers.
 #. :class:`.MMFF`
 #. :class:`.UFF`
 #. :class:`.ETKDG`
-#. :class:`.GFNXTB`
+#. :class:`.XTB`
 #. :class:`.MacroModelForceField`
 #. :class:`.MacroModelMD`
 #. :class:`.MOPAC`

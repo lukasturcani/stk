@@ -9,12 +9,13 @@ import logging
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import warnings
+import os
 from functools import wraps
 import subprocess as sp
 import uuid
-import os
 from os.path import join
 import shutil
+from ...utilities import valid_xtb_solvent, XTBExts
 
 logger = logging.getLogger(__name__)
 
@@ -648,7 +649,11 @@ class ETKDG(Optimizer):
         mol.mol.RemoveConformer(conf_id)
 
 
-class GFNXTB(Optimizer):
+class XTBOptimizerFailedError(Exception):
+    ...
+
+
+class XTB(Optimizer):
     """
     Uses GFN-xTB to optimize molecules.
 
@@ -667,33 +672,99 @@ class GFNXTB(Optimizer):
     Note that this does not have any impact on multi-processing,
     which should always be safe.
 
+    Furthermore, the :meth:`optimize` calculator will check that the
+    structure is adequately optimized by checking for negative frequencies
+    after a Hessian calculation. ``max_count`` optimizations will be
+    attempted at the given opt_level to obtain an optimized structure. However,
+    we outline in the examples how to iterate over ``opt_levels`` to increase
+    convergence criteria and hopefully obtain an optimized structure. The
+    presence of negative frequencies can occur even when the optimization has
+    converged based on the given ``opt_level``.
+
+    Documentation for xTB available:
+    https://xtb-docs.readthedocs.io/en/latest/setup.html
+
     Attributes
     ----------
-    gfnxtb_path : :class:`str`
-        The path to the GFN-xTB executable.
+    xtb_path : :class:`str`
+        The path to the xTB executable.
+
+    gfn_version : :class:`str`
+        Parameterization of GFN to use in xTB.
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/basics.html
 
     output_dir : :class:`str`
         The name of the directory into which files generated during
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
 
-    num_cores : :class:`str`
-        The number of cores for GFN-xTB to use.
+    opt_level : :class:`str`
+        Optimization level to use.
+        Options:
+            crude, sloppy, loose, lax, normal, tight, vtight, extreme
+        Definitions of levels:
+            https://xtb-docs.readthedocs.io/en/latest/optimization.html
+
+    max_count : :class:`int`
+        Number of optimizations to attempt in a row to remove negative
+        frequencies.
+
+    num_cores : :class:`int`
+        The number of cores for xTB to use. Requires appropriate setup
+        of xTB by user.
+
+    etemp : :class:`int`
+        Electronic temperature to use (in K). Defaults to 300K.
+
+    solvent : :class:`str`
+        Solvent to use in GBSA implicit solvation method.
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+    solvent_grid : :class:`str`
+        Grid level to use in SASA calculations for GBSA implicit solvent.
+        Options:
+            normal, tight, verytight, extreme
+        For details:
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+    charge : :class:`str`
+        Formal molecular charge. `-` should be used to indicate sign.
+
+    multiplicity : :class:`str`
+        Number of unpaired electrons.
+
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule and conformer.
+
+    mem_ulimit : :class:`bool`
+        If ``True`` :meth:`optimize` will be run without constraints on
+        the stacksize. If memory issues are encountered, this should be
+        ``True``, however this may raise issues on clusters.
+
+    incomplete : :class:`list`
+        :class:`list` of :class:`tuple` giving the `mol` and `conformer` that
+        have undergone incomplete optimization.
 
     Examples
     --------
     .. code-block:: python
 
         mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        gfnxtb = GFNXTB('/opt/gfnxtb/xtb')
-        gfnxtb.optimize(mol)
+        xtb = XTB(
+            '/opt/gfnxtb/xtb',
+            mem_ulimit=True
+        )
+        xtb.optimize(mol)
 
     Note that for :class:`.MacroMolecule` objects assembled by ``stk``
-    :class:`GFNXTB` should usually be used in a
-    :class:`OptimizerSequence`. This is because GFN-xTB only uses
+    :class:`XTB` should usually be used in a
+    :class:`OptimizerSequence`. This is because xTB only uses
     xyz coordinates as input and so will not recognize the long bonds
     created during assembly. An optimizer which can minimize
-    these bonds should be used before :class:`GFNXTB`.
+    these bonds should be used before :class:`XTB`.
 
     .. code-block:: python
 
@@ -701,49 +772,288 @@ class GFNXTB(Optimizer):
         bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
         polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
 
-        gfnxtb = OptimizerSequence(
+        xtb = OptimizerSequence(
             UFF(),
-            GFNXTB('/opt/gfnxtb/xtb')
+            XTB(xtb_path='/opt/gfnxtb/xtb', mem_ulimit=True)
         )
-        gfnxtb.optimize(polymer)
+        xtb.optimize(polymer)
+
+    All optimizations with xTB are performed using the --ohess flag, which
+    forces the calculation of a numerical Hessian, thermodynamic properties and
+    vibrational frequencies. The :meth:`optimize` will check that the
+    structure is appropriately optimized (i.e. convergence is obtained and
+    no negative vibrational frequencies are present) and continue optimizing
+    a structure (up to ``max_count times``) until this is achieved. This loop
+    by default will be performed at the same ``opt_level``. The following
+    examples shows how a user may optimize structures with tigher convergence
+    criteria (i.e. different ``opt_level``) until the structure is
+    sufficiently optimized.
+
+    # crude optimization with max_count == 1 because this will not achieve
+    # optimization
+    xtb_crude = XTB(
+        xtb_path='/opt/gfnxtb/xtb',
+        output_dir='xtb_crude',
+        mem_ulimit=True,
+        opt_level='crude',
+        max_count=1
+    )
+    # normal optimization with max_count == 2
+    xtb_normal = XTB(
+        xtb_path='/opt/gfnxtb/xtb',
+        output_dir='xtb_normal',
+        mem_ulimit=True,
+        opt_level='normal',
+        max_count=2
+    )
+    # vtight optimization with max_count == 2
+    # this should achieve sufficient optimization
+    xtb_vtight = XTB(
+        xtb_path='/opt/gfnxtb/xtb',
+        output_dir='xtb_vtight',
+        mem_ulimit=True,
+        opt_level='vtight',
+        max_count=2
+    )
+
+    # conformer must be set
+    conformer = polymer.mol.GetConformer(-1).GetId()
+
+    xtb_crude.optimize(mol=polymer, conformer=conformer)
+    if (polymer, conformer) in xtb_crude.incomplete:
+        xtb_normal.optimize(mol=polymer, conformer=conformer)
+        if (polymer, conformer) in xtb_normal.incomplete:
+            xtb_vtight.optimize(mol=polymer, conformer=conformer)
 
     """
 
     def __init__(self,
-                 gfnxtb_path,
+                 xtb_path,
+                 gfn_version='2',
                  output_dir=None,
+                 opt_level='normal',
+                 max_count=2,
                  num_cores=1,
-                 use_cache=False):
+                 etemp=300,
+                 solvent=None,
+                 solvent_grid='normal',
+                 charge=None,
+                 multiplicity=None,
+                 use_cache=False,
+                 mem_ulimit=False):
         """
-        Initializes a :class:`GFNXTB` instance.
+        Initializes a :class:`XTB` instance.
 
         Parameters
         ----------
-        gfnxtb_path : :class:`str`
-            The path to the GFN-xTB executable.
+        xtb_path : :class:`str`
+            The path to the xTB executable.
+
+        gfn_version : :class:`str`
+            Parameterization of GFN to use in xTB.
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/basics.html
 
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
             the optimization are written, if ``None`` then
             :func:`uuid.uuid4` is used.
 
+        opt_level : :class:`str`, optional
+            Optimization level to use.
+            Options:
+                crude, sloppy, loose, lax, normal, tight, vtight, extreme
+            Definitions of levels:
+                https://xtb-docs.readthedocs.io/en/latest/optimization.html
+
+        max_count : :class:`int`, optional
+            Number of optimizations to attempt in a row to remove negative
+            frequencies.
+
         num_cores : :class:`int`
-            The number of cores for GFN-xTB to use.
+            The number of cores for xTB to use. Requires appropriate setup
+            of xTB by user.
+
+        etemp : :class:`int`, optional
+            Electronic temperature to use (in K). Defaults to 300K.
+
+        solvent : :class:`str`, optional
+            Solvent to use in GBSA implicit solvation method.
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+        solvent_grid : :class:`str`, optional
+            Grid level to use in SASA calculations for GBSA implicit solvent.
+            Options:
+                normal, tight, verytight, extreme
+            For details:
+                https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+        charge : :class:`str`, optional
+            Formal molecular charge. `-` should be used to indicate sign.
+
+        multiplicity : :class:`str`, optional
+            Number of unpaired electrons.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
             molecule and conformer.
 
+        mem_ulimit : :class: `bool`, optional
+            If ``True`` :meth:`optimize` will be run without constraints on
+            the stacksize. If memory issues are encountered, this should be
+            ``True``, however this may raise issues on clusters.
+
         """
 
-        self.gfnxtb_path = gfnxtb_path
+        self.xtb_path = xtb_path
+        self.gfn_version = gfn_version
         self.output_dir = output_dir
+        self.opt_level = opt_level
+        self.max_count = max_count
         self.num_cores = str(num_cores)
+        self.etemp = str(etemp)
+        self.solvent = solvent
+        if self.solvent is not None:
+            self.solvent = solvent.lower()
+            valid_xtb_solvent(gfn_version=self.gfn_version,
+                                 solvent=self.solvent)
+        self.solvent_grid = solvent_grid
+        self.charge = charge
+        self.multiplicity = multiplicity
+        self.mem_ulimit = mem_ulimit
+        self.incomplete = []
         super().__init__(use_cache=use_cache)
+
+    def __check_neg_frequencies(self, output_file):
+        """
+        Check for negative frequencies.
+
+        Parameters
+        ----------
+        output_file : :class:`str`
+            Name of output file with xTB results.
+
+        Returns
+        -------
+        :class:`bool`
+            Returns `True` if a negative frequency is present
+
+        """
+        neg_freq = False
+        xtbext = XTBExts(output_file=output_file)
+        value = xtbext.ext_frequencies()
+        # Check for one negative frequency, excluding the first 6 frequencies.
+        if min(value[7:]) < 0:
+            neg_freq = True
+        return neg_freq
+
+    def __check_incomplete(self, output_file):
+        """
+        Check if xTB optimization has converged and obtained a structure with
+        no negative frequencies.
+
+        Parameters
+        ----------
+        output_file : :class:`str`
+            Name of output file with xTB results.
+
+        Returns
+        -------
+        :class:`bool`
+            Returns `True` if a negative frequency is present. Raises errors
+            if optimization did not converge.
+
+        """
+        if output_file is None:
+            # No simulation has been run.
+            return True
+        # If convergence is achieved, then .xtboptok should exist.
+        if os.path.isfile('.xtboptok'):
+            # Check for negative frequencies in output file.
+            # Return True if there exists at leats one.
+            return self.__check_neg_frequencies(output_file=output_file)
+        elif os.path.isfile('NOT_CONVERGED'):
+            raise XTBOptimizerFailedError(f'Optimization not converged.')
+        else:
+            raise XTBOptimizerFailedError(f'Optimization failed to complete')
+
+    def __write_and_run_command(self, mol, conformer, count):
+        """
+        Writes and runs the command for GFN.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        count : :class:`int`
+            Count of optimization to be run.
+
+        Returns
+        -------
+        out_file : :class:`str`
+            Returns output file of the optimization run by the command.
+
+        """
+        xyz = f'input_structure_{count}.xyz'
+        out_file = f'optimization_{count}.output'
+        mol.write(xyz, conformer=conformer)
+        # Modify the memory limit.
+        if self.mem_ulimit:
+            cmd = ['ulimit -s unlimited ;']
+            # Allow multiple shell commands to be run in one subprocess.
+            shell = True
+        else:
+            cmd = []
+            shell = False
+        cmd.append(self.xtb_path)
+        cmd.append(xyz)
+        # Set the GFN Parameterization.
+        if self.gfn_version != '2':
+            cmd.append('--gfn')
+            cmd.append(self.gfn_version)
+        # Set optimization level and type.
+        cmd.append('--ohess')
+        cmd.append(self.opt_level)
+        # Set the number of cores.
+        cmd.append('--parallel')
+        cmd.append(self.num_cores)
+        # Add eletronic temp term to cmd.
+        if self.etemp != '300':
+            cmd.append('--etemp')
+            cmd.append(self.etemp)
+        # Write the solvent section of cmd.
+        if self.solvent is not None:
+            cmd.append('--gbsa')
+            cmd.append(self.solvent)
+            if self.solvent_grid != 'normal':
+                cmd.append(self.solvent_grid)
+        # Write the charge section of cmd.
+        if self.charge is not None:
+            cmd.append('--chrg')
+            cmd.append(self.charge)
+        # Write the multiplicity section of cmd.
+        if self.multiplicity is not None:
+            cmd.append('--uhf')
+            cmd.append(self.multiplicity)
+        cmd = ' '.join(cmd)
+        f = open(out_file, 'w')
+        # Uses the shell if mem_ulimit = True and waits until the
+        # subproces is complete. This is required to be able to run the
+        # mem_ulimit_cmd and GFN calculation in one command, which is
+        # then closed, which minimizes the risk of unrestricting the memory
+        # limits.
+        sp.call(cmd, stdin=sp.PIPE, stdout=f, stderr=sp.PIPE, shell=shell)
+        f.close()
+        return out_file
 
     def optimize(self, mol, conformer=-1):
         """
-        Optimizes a molecule.
+        Optimizes the molecule `mol` using xTB.
 
         Parameters
         ----------
@@ -762,6 +1072,10 @@ class GFNXTB(Optimizer):
         if conformer == -1:
             conformer = mol.mol.GetConformer(conformer).GetId()
 
+        # Remove (mol, conformer) from self.incomplete if present.
+        if (mol, conformer) in self.incomplete:
+            self.incomplete.remove((mol, conformer))
+
         if self.output_dir is None:
             output_dir = str(uuid.uuid4().int)
         else:
@@ -775,17 +1089,46 @@ class GFNXTB(Optimizer):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            xyz = join(output_dir, f'input_structure.xyz')
-            mol.write(xyz, conformer=conformer)
-            cmd = [
-                self.gfnxtb_path,
-                xyz,
-                '-opt',
-                '--parallel',
-                self.num_cores
-            ]
-            sp.run(cmd, stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
-            output_xyz = join(output_dir, 'xtbopt.xyz')
-            mol.update_from_xyz(path=output_xyz, conformer=conformer)
+            run_count = 0
+            out_file = None
+            while True:
+                run_count += 1
+                out_file = self.__write_and_run_command(
+                    mol=mol,
+                    conformer=conformer,
+                    count=run_count
+                )
+                # Check if the optimization is complete.
+                if self.__check_incomplete(output_file=out_file):
+                    # The alculation is incomplete.
+                    # If the negative frequencies are small, then GFN may
+                    # not produce the restart file. If that is the case, exit
+                    # optimization loop and warn.
+                    if os.path.isfile(join(output_dir, 'xtbhess.coord')):
+                        # Update mol from xtbhess.coord and continue.
+                        output_coord = join(output_dir, 'xtbhess.coord')
+                        mol.update_from_turbomole(
+                            path=output_coord,
+                            conformer=conformer
+                        )
+                    else:
+                        self.incomplete.append((mol, conformer))
+                        logging.warning(
+                            f'Small negative frequencies present.'
+                        )
+                        break
+                    # Break if run count == max_count.
+                    if run_count == self.max_count:
+                        self.incomplete.append((mol, conformer))
+                        msg = 'Negative frequencies present in'
+                        msg += f'{self.max_count} optimizations'
+                        logging.warning(msg)
+                        break
+                else:
+                    # Calculation is complete.
+                    # Update mol from xtbopt.xyz.
+                    output_xyz = join(output_dir, 'xtbopt.xyz')
+                    mol.update_from_xyz(path=output_xyz, conformer=conformer)
+                    break
         finally:
             os.chdir(init_dir)

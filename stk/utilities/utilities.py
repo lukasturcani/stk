@@ -24,24 +24,24 @@ OPTIONS = {}
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
-              'Al': 2, 'Sb': 2, 'Ar': 1.88, 'As': 1.85, 'Ba': 2,
-              'Be': 2, 'Bi': 2, 'B': 2, 'Br': 1.85, 'Cd': 1.58,
-              'Cs': 2, 'Ca': 2, 'C': 1.7, 'Ce': 2, 'Cl': 1.75,
-              'Cr': 2, 'Co': 2, 'Cu': 1.4, 'Dy': 2, 'Er': 2,
-              'Eu': 2, 'F':  1.47, 'Gd': 2, 'Ga': 1.87, 'Ge': 2,
-              'Au': 1.66, 'Hf': 2, 'He': 1.4, 'Ho': 2, 'H': 1.09,
-              'In': 1.93, 'I': 1.98, 'Ir': 2, 'Fe': 2, 'Kr': 2.02,
-              'La': 2, 'Pb': 2.02, 'Li': 1.82, 'Lu': 2, 'Mg': 1.73,
-              'Mn': 2, 'Hg': 1.55, 'Mo': 2, 'Nd': 2, 'Ne': 1.54,
-              'Ni': 1.63, 'Nb': 2, 'N':  1.55, 'Os': 2, 'O':  1.52,
-              'Pd': 1.63, 'P': 1.8, 'Pt': 1.72, 'K': 2.75, 'Pr': 2,
-              'Pa': 2, 'Re': 2, 'Rh': 2, 'Rb': 2, 'Ru': 2, 'Sm': 2,
-              'Sc': 2, 'Se': 1.9, 'Si': 2.1, 'Ag': 1.72, 'Na': 2.27,
-              'Sr': 2, 'S': 1.8, 'Ta': 2, 'Te': 2.06, 'Tb': 2,
-              'Tl': 1.96, 'Th': 2, 'Tm': 2, 'Sn': 2.17, 'Ti': 2,
-              'W': 2, 'U':  1.86, 'V':  2, 'Xe': 2.16, 'Yb': 2,
-              'Y': 2, 'Zn': 1.29, 'Zr': 2, 'X':  1.0, 'D':  1.0
-                 }
+    'Al': 2, 'Sb': 2, 'Ar': 1.88, 'As': 1.85, 'Ba': 2,
+    'Be': 2, 'Bi': 2, 'B': 2, 'Br': 1.85, 'Cd': 1.58,
+    'Cs': 2, 'Ca': 2, 'C': 1.7, 'Ce': 2, 'Cl': 1.75,
+    'Cr': 2, 'Co': 2, 'Cu': 1.4, 'Dy': 2, 'Er': 2,
+    'Eu': 2, 'F': 1.47, 'Gd': 2, 'Ga': 1.87, 'Ge': 2,
+    'Au': 1.66, 'Hf': 2, 'He': 1.4, 'Ho': 2, 'H': 1.09,
+    'In': 1.93, 'I': 1.98, 'Ir': 2, 'Fe': 2, 'Kr': 2.02,
+    'La': 2, 'Pb': 2.02, 'Li': 1.82, 'Lu': 2, 'Mg': 1.73,
+    'Mn': 2, 'Hg': 1.55, 'Mo': 2, 'Nd': 2, 'Ne': 1.54,
+    'Ni': 1.63, 'Nb': 2, 'N': 1.55, 'Os': 2, 'O': 1.52,
+    'Pd': 1.63, 'P': 1.8, 'Pt': 1.72, 'K': 2.75, 'Pr': 2,
+    'Pa': 2, 'Re': 2, 'Rh': 2, 'Rb': 2, 'Ru': 2, 'Sm': 2,
+    'Sc': 2, 'Se': 1.9, 'Si': 2.1, 'Ag': 1.72, 'Na': 2.27,
+    'Sr': 2, 'S': 1.8, 'Ta': 2, 'Te': 2.06, 'Tb': 2,
+    'Tl': 1.96, 'Th': 2, 'Tm': 2, 'Sn': 2.17, 'Ti': 2,
+    'W': 2, 'U': 1.86, 'V': 2, 'Xe': 2.16, 'Yb': 2,
+    'Y': 2, 'Zn': 1.29, 'Zr': 2, 'X': 1.0, 'D': 1.0
+}
 
 # This dictionary gives easy access to the rdkit bond types.
 bond_dict = {'1': rdkit.rdchem.BondType.SINGLE,
@@ -52,30 +52,31 @@ bond_dict = {'1': rdkit.rdchem.BondType.SINGLE,
 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {
-              1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C',
-              7: 'N', 8: 'O',  9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg',
-              13: 'Al', 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl',
-              18: 'Ar', 19: 'K', 20: 'Ca', 21: 'Sc', 22: 'Ti',
-              23: 'V', 24: 'Cr', 25: 'Mn', 26: 'Fe', 27: 'Co',
-              28: 'Ni', 29: 'Cu', 30: 'Zn', 31: 'Ga', 32: 'Ge',
-              33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 37: 'Rb',
-              38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo',
-              43: 'Tc', 44: 'Ru', 45: 'Rh', 46: 'Pd', 47: 'Ag',
-              48: 'Cd', 49: 'In', 50: 'Sn', 51: 'Sb', 52: 'Te',
-              53: 'I', 54: 'Xe', 55: 'Cs', 56: 'Ba', 57: 'La',
-              58: 'Ce', 59: 'Pr', 60: 'Nd', 61: 'Pm', 62: 'Sm',
-              63: 'Eu', 64: 'Gd', 65: 'Tb', 66: 'Dy', 67: 'Ho',
-              68: 'Er', 69: 'Tm', 70: 'Yb', 71: 'Lu', 72: 'Hf',
-              73: 'Ta', 74: 'W', 75: 'Re', 76: 'Os', 77: 'Ir',
-              78: 'Pt', 79: 'Au', 80: 'Hg', 81: 'Tl', 82: 'Pb',
-              83: 'Bi', 84: 'Po', 85: 'At', 86: 'Rn', 87: 'Fr',
-              88: 'Ra', 89: 'Ac', 90: 'Th', 91: 'Pa', 92: 'U',
-              93: 'Np', 94: 'Pu', 95: 'Am', 96: 'Cm', 97: 'Bk',
-              98: 'Cf', 99: 'Es', 100: 'Fm', 101: 'Md', 102: 'No',
-              103: 'Lr', 104: 'Rf', 105: 'Db', 106: 'Sg', 107: 'Bh',
-              108: 'Hs', 109: 'Mt', 110: 'Ds', 111: 'Rg', 112: 'Cn',
-              113: 'Uut', 114: 'Fl', 115: 'Uup', 116: 'Lv',
-              117: 'Uus', 118: 'Uuo'}
+    1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C',
+    7: 'N', 8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg',
+    13: 'Al', 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl',
+    18: 'Ar', 19: 'K', 20: 'Ca', 21: 'Sc', 22: 'Ti',
+    23: 'V', 24: 'Cr', 25: 'Mn', 26: 'Fe', 27: 'Co',
+    28: 'Ni', 29: 'Cu', 30: 'Zn', 31: 'Ga', 32: 'Ge',
+    33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 37: 'Rb',
+    38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo',
+    43: 'Tc', 44: 'Ru', 45: 'Rh', 46: 'Pd', 47: 'Ag',
+    48: 'Cd', 49: 'In', 50: 'Sn', 51: 'Sb', 52: 'Te',
+    53: 'I', 54: 'Xe', 55: 'Cs', 56: 'Ba', 57: 'La',
+    58: 'Ce', 59: 'Pr', 60: 'Nd', 61: 'Pm', 62: 'Sm',
+    63: 'Eu', 64: 'Gd', 65: 'Tb', 66: 'Dy', 67: 'Ho',
+    68: 'Er', 69: 'Tm', 70: 'Yb', 71: 'Lu', 72: 'Hf',
+    73: 'Ta', 74: 'W', 75: 'Re', 76: 'Os', 77: 'Ir',
+    78: 'Pt', 79: 'Au', 80: 'Hg', 81: 'Tl', 82: 'Pb',
+    83: 'Bi', 84: 'Po', 85: 'At', 86: 'Rn', 87: 'Fr',
+    88: 'Ra', 89: 'Ac', 90: 'Th', 91: 'Pa', 92: 'U',
+    93: 'Np', 94: 'Pu', 95: 'Am', 96: 'Cm', 97: 'Bk',
+    98: 'Cf', 99: 'Es', 100: 'Fm', 101: 'Md', 102: 'No',
+    103: 'Lr', 104: 'Rf', 105: 'Db', 106: 'Sg', 107: 'Bh',
+    108: 'Hs', 109: 'Mt', 110: 'Ds', 111: 'Rg', 112: 'Cn',
+    113: 'Uut', 114: 'Fl', 115: 'Uup', 116: 'Lv',
+    117: 'Uus', 118: 'Uuo'
+}
 
 
 class Cell:
@@ -225,12 +226,14 @@ class MAEExtractor:
                 # Write the structure block in its own .mae file, named
                 # after conformer extracted.
                 new_name = self.mae_path.replace(
-                                            '.mae',
-                                            f'EXTRACTED_{num}.mae')
+                    '.mae',
+                    f'EXTRACTED_{num}.mae'
+                )
             else:
                 new_name = self.mae_path.replace(
-                              '.mae',
-                              f'EXTRACTED_{num}_conf_{i}.mae')
+                    '.mae',
+                    f'EXTRACTED_{num}_conf_{i}.mae'
+                )
 
             with open(new_name, 'w') as mae_file:
                 mae_file.write(new_mae)
@@ -830,7 +833,7 @@ def mol_from_mol_file(mol_file):
                 continue
 
             if take_bond:
-                *_, bond_id,  bond_order, atom1, atom2 = line.split()
+                *_, bond_id, bond_order, atom1, atom2 = line.split()
                 e_mol.AddBond(int(atom1)-1, int(atom2)-1,
                               bond_dict[bond_order])
                 continue
@@ -1143,10 +1146,412 @@ def vector_theta(vector1, vector2):
     """
 
     numerator = np.dot(vector1, vector2)
-    denominator = (np.linalg.norm(vector1) *
-                   np.linalg.norm(vector2))
+    denominator = (np.linalg.norm(vector1) * np.linalg.norm(vector2))
     # This if statement prevents returns of NaN due to floating point
     # incurracy.
     if np.isclose(numerator, denominator, atol=1e-8):
         return 0.0
     return np.arccos(numerator/denominator)
+
+
+class XTBInvalidSolventError(Exception):
+    ...
+
+
+def valid_xtb_solvent(gfn_version, solvent):
+    '''Check if solvent is valid for the given GFN version.
+
+    See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for discussion.
+
+    Parameters
+    ----------
+    gfn_version : :class:`str`
+        GFN Parameterization version. `0`, `1` and `2` available.
+
+    solvent : :class:`str`
+        Solvent being tested.
+
+    Returns
+    -------
+    :class:`bool`
+        `True` if solvent is valid. Raises an error otherwise.
+
+    '''
+    if gfn_version == '0':
+        raise XTBInvalidSolventError(
+            f'No solvent valid for version: {gfn_version}'
+        )
+    elif gfn_version == '1':
+        valid_solvents = [
+            'acetone', 'acetonitrile', 'benzene',
+            'CH2Cl2'.lower(), 'CHCl3'.lower(), 'CS2'.lower(),
+            'DMSO'.lower(), 'ether', 'H2O'.lower(),
+            'methanol', 'THF'.lower(), 'toluene'
+        ]
+        if solvent in valid_solvents:
+            return True
+        else:
+            raise XTBInvalidSolventError(
+                f'{solvent} is an invalid solvent for version {gfn_version}!'
+            )
+    elif gfn_version == '2':
+        valid_solvents = [
+            'acetone', 'acetonitrile', 'CH2Cl2'.lower(),
+            'CHCl3'.lower(), 'CS2'.lower(), 'DMF'.lower(),
+            'DMSO'.lower(), 'ether', 'H2O'.lower(), 'methanol',
+            'n-hexane'.lower(), 'THF'.lower(), 'toluene'
+        ]
+        if solvent in valid_solvents:
+            return True
+        else:
+            raise XTBInvalidSolventError(
+                f'{solvent} is an invalid solvent for version {gfn_version}!'
+            )
+
+
+class XTBExts():
+    """
+    Methods for extracting properties from GFN-xTB output.
+
+    Parameters
+    ----------
+    output_file : :class:`str`
+        Output file to extract properties from.
+
+    """
+    def __init__(self, output_file):
+        output_string = open(output_file, 'r').readlines()
+        self.output_string = output_string
+
+    def ext_total_energy(self):
+        """
+        Extracts total energy (a.u.) from xTB output.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        "          | TOTAL ENERGY              -76.260405590154 Eh   |"
+
+        Returns
+        -------
+        :class:`float`
+            Total energy in a.u.
+        """
+        value = None
+
+        # Regular expression for numbers.
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        for line in reversed(self.output_string):
+            if '          | TOTAL ENERGY  ' in line:
+                value = nums.search(line.rstrip()).group(0)
+                break
+
+        return float(value)
+
+    def ext_homo_lumo_gap(self):
+        """
+        Extracts total energy (eV) from xTB output.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        "          | HOMO-LUMO GAP               2.336339660160 eV   |"
+
+        Returns
+        -------
+        :class:`float`
+            Homo-Lumo gap in eV.
+        """
+        value = None
+
+        # Regular expression for numbers.
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        for line in reversed(self.output_string):
+            if '          | HOMO-LUMO GAP   ' in line:
+                value = nums.search(line.rstrip()).group(0)
+                break
+
+        return float(value)
+
+    def ext_fermi_level(self):
+        """
+        Extracts Fermi-Level energy (eV) from xTB output.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        "             Fermi-level           -0.3159871 Eh           -8.5984 eV"
+
+        Returns
+        -------
+        :class:`float`
+            Fermi-level in eV.
+        """
+        value = None
+
+        # Regular expression for numbers.
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        for line in reversed(self.output_string):
+            if '             Fermi-level        ' in line:
+                part2 = line.split('Eh')
+                value = nums.search(part2[1].rstrip()).group(0)
+                break
+
+        return float(value)
+
+    def ext_qonly_dipole_mom(self):
+        """
+        Extracts `q only` dipole moment vector (Debye) from xTB output.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        " q only:       -0.033      -0.081      -0.815"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of dipole moment in a list of length 3.
+            [`x`, `y`, `z`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular dipole:' in line:
+                sample_set = self.output_string[i+2].rstrip()
+
+        # get values from line
+        if 'q only:' in sample_set:
+            x, y, z = [i for i in sample_set.split(':')[1].split(' ')
+                       if i != '']
+
+        value = [float(x), float(y), float(z)]
+
+        return value
+
+    def ext_full_dipole_mom(self):
+        """
+        Extracts `full` dipole moment vector (Debye) from xTB output.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        "   full:       -0.684       0.122      -1.071       3.245"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of dipole moment and total magnitude in a list of length
+            4.
+            [`x`, `y`, `z`, `tot (Debye)`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular dipole:' in line:
+                sample_set = self.output_string[i+3].rstrip()
+
+        # get values from line
+        if 'full:' in sample_set:
+            x, y, z, m = [i for i in sample_set.split(':')[1].split(' ')
+                          if i != '']
+
+        value = [float(x), float(y), float(z), float(m)]
+
+        return value
+
+    def ext_qonly_quadrupole_mom(self):
+        """
+        Extracts `q only` traceless quadrupole moment vector (Debye) from xTB output.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        " q only:        7.152      10.952       3.364      15.349       2.074     -10.515"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of quadrupole moment in a list of length 6.
+            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular quadrupole (traceless):' in line:
+                sample_set = self.output_string[i+2].rstrip()
+
+        # get values from line
+        if 'q only:' in sample_set:
+            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
+                                      if i != '']
+
+        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
+
+        return value
+
+    def ext_qdip_quadrupole_mom(self):
+        """
+        Extracts `q+dip` traceless quadrupole moment vector (Debye) from
+        xTB output.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        "  q+dip:       -6.239      21.552      16.601      12.864       2.504     -10.362"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of quadrupole moment in a list of length 6.
+            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular quadrupole (traceless):' in line:
+                sample_set = self.output_string[i+3].rstrip()
+
+        # get values from line
+        if 'q+dip:' in sample_set:
+            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
+                                      if i != '']
+
+        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
+
+        return value
+
+    def ext_full_quadrupole_mom(self):
+        """
+        Extracts `full` traceless quadrupole moment vector (Debye) from
+        xTB output.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        "   full:       -6.662      22.015      16.959      12.710       3.119     -10.297"
+
+        Returns
+        -------
+        :class:`list` of :class:`float`
+            Components of quadrupole moment in a list of length 6.
+            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
+        """
+        value = None
+
+        sample_set = []
+        for i, line in enumerate(self.output_string):
+            if 'molecular quadrupole (traceless):' in line:
+                sample_set = self.output_string[i+4].rstrip()
+
+        # get values from line
+        if 'full:' in sample_set:
+            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
+                                      if i != '']
+
+        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
+
+        return value
+
+    def ext_homo_lumo_occ(self):
+        """
+        Extracts Orbital Energies and Occupations (eV) of the HOMO and LUMO
+        from xTB output.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        "        70        2.0000           -0.3514143              -9.5625 (HOMO)"
+        "        71                         -0.2712405              -7.3808 (LUMO)"
+
+        Returns
+        -------
+        :class:`dict`
+            Dictionary of (#, occupation, Energy (eV)) of HOMO and LUMO orbital
+        """
+        value = None
+
+        for line in reversed(self.output_string):
+            if '(HOMO)' in line:
+                split_line = [i for i in line.rstrip().split(' ') if i != '']
+                # The line is:
+                #   Number, occupation, energy (Ha), energy (ev), label
+                # Extract:
+                #   Number, occupation, energy (eV)
+                homo_val = [
+                    int(split_line[0]),
+                    float(split_line[1]),
+                    float(split_line[3])
+                ]
+            if '(LUMO)' in line:
+                split_line = [i for i in line.rstrip().split(' ') if i != '']
+                # The line is:
+                #   Number, energy (Ha), energy (ev), label
+                # Extract:
+                #   Number, energy (eV)
+                lumo_val = [
+                    int(split_line[0]),
+                    float(0),
+                    float(split_line[2])
+                ]
+
+        value = {'HOMO': homo_val, 'LUMO': lumo_val}
+
+        return value
+
+    def ext_total_free_energy(self):
+        """
+        Extracts total free energy (a.u.) from xTB output at T=298.15K.
+
+        Formatting based on latest version of xTB (190418)
+        Example line:
+        "          | TOTAL FREE ENERGY         -75.832501154309 Eh   |"
+
+        Returns
+        -------
+        :class:`float`
+            Total free energy in a.u.
+        """
+        value = None
+
+        # Regular expression for numbers.
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        for line in reversed(self.output_string):
+            if '          | TOTAL FREE ENERGY  ' in line:
+                value = nums.search(line.rstrip()).group(0)
+                break
+
+        return float(value)
+
+    def ext_frequencies(self):
+        """
+        Extracts projected vibrational frequencies (cm-1) xTB output
+        at T=298.15K.
+
+        Formatting based on latest version of xTB (190418).
+        Example line:
+        "eigval :       -0.00    -0.00    -0.00     0.00     0.00     0.00"
+
+        Returns
+        -------
+        :class:`list`
+            List of all vibrational frequencies as :class:`float`
+        """
+        value = None
+
+        # Use a switch to make sure we are extracting values after the
+        # final property readout.
+        switch = False
+
+        frequencies = []
+        for i, line in enumerate(self.output_string):
+            if '|               Frequency Printout                |' in line:
+                # Turn on reading as final frequency printout has begun.
+                switch = True
+            if ' reduced masses (amu)' in line:
+                # Turn off reading as frequency section is done.
+                switch = False
+            if 'eigval :' in line and switch is True:
+                split_line = [i for i in line.rstrip().split(':')[1].split(' ')
+                              if i != '']
+                for freq in split_line:
+                    frequencies.append(freq)
+
+        value = [float(i) for i in frequencies]
+
+        return value
