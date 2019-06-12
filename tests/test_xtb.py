@@ -28,7 +28,7 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     energy = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        mem_ulimit=True
+        unlimited_memory=True
     )
 
     # initial energy
@@ -41,7 +41,7 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     opt_lowtol = stk.XTB(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        mem_ulimit=True,
+        unlimited_memory=True,
         opt_level='crude',
         max_runs=2
     )
@@ -64,7 +64,7 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     opt_hightol = stk.XTB(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        mem_ulimit=True,
+        unlimited_memory=True,
         opt_level='extreme',
         max_runs=1
     )
@@ -96,7 +96,7 @@ def test_xtb_solvent_charge_unpaired_electrons(tmp_polymer, xtb_path):
     energy = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        mem_ulimit=True
+        unlimited_memory=True
     )
     # initial energy
     init_energy = energy.energy(tmp_polymer)
@@ -105,7 +105,7 @@ def test_xtb_solvent_charge_unpaired_electrons(tmp_polymer, xtb_path):
     solvent = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        mem_ulimit=True,
+        unlimited_memory=True,
         solvent='h2o'
     )
     # initial energy
@@ -116,7 +116,7 @@ def test_xtb_solvent_charge_unpaired_electrons(tmp_polymer, xtb_path):
     charge = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        mem_ulimit=True,
+        unlimited_memory=True,
         charge=-1
     )
     # initial energy
@@ -127,7 +127,7 @@ def test_xtb_solvent_charge_unpaired_electrons(tmp_polymer, xtb_path):
     multi = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        mem_ulimit=True,
+        unlimited_memory=True,
         unpaired_electrons=2
     )
     # initial energy
@@ -146,7 +146,7 @@ def test_xtb_properties(tmp_polymer, xtb_path):
     gfnxtb = stk.XTB(
         xtb_path,
         output_dir=join(odir, 'gfnxtb_opt'),
-        mem_ulimit=True,
+        unlimited_memory=True,
         opt_level='extreme',
         max_runs=None,
         num_cores=2,
@@ -155,7 +155,7 @@ def test_xtb_properties(tmp_polymer, xtb_path):
     EC = stk.XTBFreeEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, 'gfnxtb_ey'),
-        mem_ulimit=True
+        unlimited_memory=True
     )
     total_energy = EC.energy(tmp_polymer)
     id = (tmp_polymer, conformer)
@@ -172,28 +172,28 @@ def test_xtb_properties(tmp_polymer, xtb_path):
     assert isinstance(EC.homo_lumo_gaps[id], float)
     assert isinstance(EC.fermi_levels[id], float)
 
-    assert isinstance(EC.qonly_dipole_moments[id], list)
-    assert len(EC.qonly_dipole_moments[id]) == 3
-    for i in EC.qonly_dipole_moments[id]:
+    assert isinstance(EC.qonly_dipole_moms[id], list)
+    assert len(EC.qonly_dipole_moms[id]) == 3
+    for i in EC.qonly_dipole_moms[id]:
         assert isinstance(i, float)
 
-    assert isinstance(EC.full_dipole_moments[id], list)
-    assert len(EC.full_dipole_moments[id]) == 4
-    for i in EC.full_dipole_moments[id]:
+    assert isinstance(EC.full_dipole_moms[id], list)
+    assert len(EC.full_dipole_moms[id]) == 4
+    for i in EC.full_dipole_moms[id]:
         assert isinstance(i, float)
 
-    assert isinstance(EC.qonly_quadrupole_moments[id], list)
-    assert len(EC.qonly_quadrupole_moments[id]) == 6
-    for i in EC.qonly_quadrupole_moments[id]:
+    assert isinstance(EC.qonly_quadrupole_moms[id], list)
+    assert len(EC.qonly_quadrupole_moms[id]) == 6
+    for i in EC.qonly_quadrupole_moms[id]:
         assert isinstance(i, float)
 
-    assert isinstance(EC.qdip_quadrupole_moments[id], list)
-    assert len(EC.qdip_quadrupole_moments[id]) == 6
-    for i in EC.qdip_quadrupole_moments[id]:
+    assert isinstance(EC.qdip_quadrupole_moms[id], list)
+    assert len(EC.qdip_quadrupole_moms[id]) == 6
+    for i in EC.qdip_quadrupole_moms[id]:
         assert isinstance(i, float)
-    assert isinstance(EC.full_quadrupole_moments[id], list)
-    assert len(EC.full_quadrupole_moments[id]) == 6
-    for i in EC.full_quadrupole_moments[id]:
+    assert isinstance(EC.full_quadrupole_moms[id], list)
+    assert len(EC.full_quadrupole_moms[id]) == 6
+    for i in EC.full_quadrupole_moms[id]:
         assert isinstance(i, float)
 
     assert isinstance(EC.homo_lumo_orbitals[id], dict)

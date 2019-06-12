@@ -1161,8 +1161,6 @@ class XTBInvalidSolventError(Exception):
 def valid_xtb_solvent(gfn_version, solvent):
     '''Check if solvent is valid for the given GFN version.
 
-    See https://xtb-docs.readthedocs.io/en/latest/gbsa.html for discussion.
-
     Parameters
     ----------
     gfn_version : :class:`str`
@@ -1175,6 +1173,10 @@ def valid_xtb_solvent(gfn_version, solvent):
     -------
     :class:`bool`
         `True` if solvent is valid. Raises an error otherwise.
+
+    See Also
+    --------
+    # https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
     '''
     if gfn_version == '0':
@@ -1192,7 +1194,7 @@ def valid_xtb_solvent(gfn_version, solvent):
             return True
         else:
             raise XTBInvalidSolventError(
-                f'{solvent} is an invalid solvent for version {gfn_version}!'
+                f'{solvent} is invalid for version {gfn_version}!'
             )
     elif gfn_version == '2':
         valid_solvents = [
@@ -1205,11 +1207,11 @@ def valid_xtb_solvent(gfn_version, solvent):
             return True
         else:
             raise XTBInvalidSolventError(
-                f'{solvent} is an invalid solvent for version {gfn_version}!'
+                f'{solvent} is invalid for version {gfn_version}!'
             )
 
 
-class XTBExts():
+class XTBExtrators():
     """
     Methods for extracting properties from GFN-xTB output.
 
@@ -1223,7 +1225,7 @@ class XTBExts():
         output_string = open(output_file, 'r').readlines()
         self.output_string = output_string
 
-    def ext_total_energy(self):
+    def total_energy(self):
         """
         Extracts total energy (a.u.) from xTB output.
 
@@ -1247,7 +1249,7 @@ class XTBExts():
 
         return float(value)
 
-    def ext_homo_lumo_gap(self):
+    def homo_lumo_gap(self):
         """
         Extracts total energy (eV) from xTB output.
 
@@ -1271,13 +1273,14 @@ class XTBExts():
 
         return float(value)
 
-    def ext_fermi_level(self):
+    def fermi_level(self):
         """
         Extracts Fermi-Level energy (eV) from xTB output.
 
         Formatting based on latest version of xTB (190418)
         Example line:
-        "             Fermi-level           -0.3159871 Eh           -8.5984 eV"
+        "             Fermi-level           -0.3159871 Eh
+                   -8.5984 eV"
 
         Returns
         -------
@@ -1296,7 +1299,7 @@ class XTBExts():
 
         return float(value)
 
-    def ext_qonly_dipole_mom(self):
+    def qonly_dipole_mom(self):
         """
         Extracts `q only` dipole moment vector (Debye) from xTB output.
 
@@ -1307,8 +1310,9 @@ class XTBExts():
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of dipole moment in a list of length 3.
-            [`x`, `y`, `z`]
+            Components of dipole moment as ``[`x`, `y`, `z`]`` in a
+            list of length 3.
+
         """
         value = None
 
@@ -1326,7 +1330,7 @@ class XTBExts():
 
         return value
 
-    def ext_full_dipole_mom(self):
+    def full_dipole_mom(self):
         """
         Extracts `full` dipole moment vector (Debye) from xTB output.
 
@@ -1337,9 +1341,9 @@ class XTBExts():
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of dipole moment and total magnitude in a list of length
-            4.
-            [`x`, `y`, `z`, `tot (Debye)`]
+            Components of dipole moment and total magnitude as
+            ``[`x`, `y`, `z`, `tot (Debye)`]`` in a list of length 4.
+
         """
         value = None
 
@@ -1350,26 +1354,29 @@ class XTBExts():
 
         # get values from line
         if 'full:' in sample_set:
-            x, y, z, m = [i for i in sample_set.split(':')[1].split(' ')
-                          if i != '']
+            samp = sample_set.split(':')[1].split(' ')
+            x, y, z, m = [i for i in samp if i != '']
 
         value = [float(x), float(y), float(z), float(m)]
 
         return value
 
-    def ext_qonly_quadrupole_mom(self):
+    def qonly_quadrupole_mom(self):
         """
-        Extracts `q only` traceless quadrupole moment vector (Debye) from xTB output.
+        Extracts `q only` traceless quadrupole moment vector (Debye).
 
         Formatting based on latest version of xTB (190418)
         Example line:
-        " q only:        7.152      10.952       3.364      15.349       2.074     -10.515"
+        " q only:        7.152      10.952       3.364      15.349
+               2.074     -10.515"
 
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of quadrupole moment in a list of length 6.
-            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
+            Components of quadrupole moment as
+            ``[`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]`` in a list of
+            length 6.
+
         """
         value = None
 
@@ -1380,27 +1387,35 @@ class XTBExts():
 
         # get values from line
         if 'q only:' in sample_set:
-            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
-                                      if i != '']
+            samp = sample_set.split(':')[1].split(' ')
+            xx, xy, yy, xz, yz, zz = [i for i in samp if i != '']
 
-        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
+        value = [
+            float(xx),
+            float(xy),
+            float(yy),
+            float(xz),
+            float(yz),
+            float(zz)
+        ]
 
         return value
 
-    def ext_qdip_quadrupole_mom(self):
+    def qdip_quadrupole_mom(self):
         """
-        Extracts `q+dip` traceless quadrupole moment vector (Debye) from
-        xTB output.
+        Extracts `q+dip` traceless quadrupole moment vector (Debye).
 
         Formatting based on latest version of xTB (190418)
         Example line:
-        "  q+dip:       -6.239      21.552      16.601      12.864       2.504     -10.362"
+        "  q+dip:       -6.239      21.552      16.601      12.864
+               2.504     -10.362"
 
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of quadrupole moment in a list of length 6.
-            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
+            Components of quadrupole moment as
+            ``[`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]`` in a list of
+            length 6.
         """
         value = None
 
@@ -1411,27 +1426,36 @@ class XTBExts():
 
         # get values from line
         if 'q+dip:' in sample_set:
-            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
-                                      if i != '']
+            samp = sample_set.split(':')[1].split(' ')
+            xx, xy, yy, xz, yz, zz = [i for i in samp if i != '']
 
-        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
+        value = [
+            float(xx),
+            float(xy),
+            float(yy),
+            float(xz),
+            float(yz),
+            float(zz)
+        ]
 
         return value
 
-    def ext_full_quadrupole_mom(self):
+    def full_quadrupole_mom(self):
         """
         Extracts `full` traceless quadrupole moment vector (Debye) from
         xTB output.
 
         Formatting based on latest version of xTB (190418)
         Example line:
-        "   full:       -6.662      22.015      16.959      12.710       3.119     -10.297"
+        "   full:       -6.662      22.015      16.959      12.710
+               3.119     -10.297"
 
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of quadrupole moment in a list of length 6.
-            [`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]
+            Components of quadrupole moment as
+            ``[`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]`` in a list of
+            length 6.
         """
         value = None
 
@@ -1442,33 +1466,43 @@ class XTBExts():
 
         # get values from line
         if 'full:' in sample_set:
-            xx, xy, yy, xz, yz, zz = [i for i in sample_set.split(':')[1].split(' ')
-                                      if i != '']
+            samp = sample_set.split(':')[1].split(' ')
+            xx, xy, yy, xz, yz, zz = [i for i in samp if i != '']
 
-        value = [float(xx), float(xy), float(yy), float(xz), float(yz), float(zz)]
+        value = [
+            float(xx),
+            float(xy),
+            float(yy),
+            float(xz),
+            float(yz),
+            float(zz)
+        ]
 
         return value
 
-    def ext_homo_lumo_occ(self):
+    def homo_lumo_occ(self):
         """
-        Extracts Orbital Energies and Occupations (eV) of the HOMO and LUMO
-        from xTB output.
+        Extracts energies and occupations (eV) of the HOMO and LUMO.
 
         Formatting based on latest version of xTB (190418)
         Example line:
-        "        70        2.0000           -0.3514143              -9.5625 (HOMO)"
-        "        71                         -0.2712405              -7.3808 (LUMO)"
+        "        70        2.0000           -0.3514143
+                      -9.5625 (HOMO)"
+        "        71                         -0.2712405
+                      -7.3808 (LUMO)"
 
         Returns
         -------
         :class:`dict`
-            Dictionary of (#, occupation, Energy (eV)) of HOMO and LUMO orbital
+            Dictionary of ``(`#`, `occupation`, `Energy (eV)`)`` of
+            HOMO and LUMO orbital.
         """
         value = None
 
         for line in reversed(self.output_string):
             if '(HOMO)' in line:
-                split_line = [i for i in line.rstrip().split(' ') if i != '']
+                split_line = [i for i in line.rstrip().split(' ')
+                              if i != '']
                 # The line is:
                 #   Number, occupation, energy (Ha), energy (ev), label
                 # Extract:
@@ -1479,7 +1513,8 @@ class XTBExts():
                     float(split_line[3])
                 ]
             if '(LUMO)' in line:
-                split_line = [i for i in line.rstrip().split(' ') if i != '']
+                split_line = [i for i in line.rstrip().split(' ')
+                              if i != '']
                 # The line is:
                 #   Number, energy (Ha), energy (ev), label
                 # Extract:
@@ -1494,7 +1529,7 @@ class XTBExts():
 
         return value
 
-    def ext_total_free_energy(self):
+    def total_free_energy(self):
         """
         Extracts total free energy (a.u.) from xTB output at T=298.15K.
 
@@ -1518,21 +1553,24 @@ class XTBExts():
 
         return float(value)
 
-    def ext_frequencies(self):
+    def frequencies(self):
         """
         Extracts projected vibrational frequencies (cm-1) xTB output
         at T=298.15K.
 
         Formatting based on latest version of xTB (190418).
         Example line:
-        "eigval :       -0.00    -0.00    -0.00     0.00     0.00     0.00"
+        "eigval :       -0.00    -0.00    -0.00     0.00     0.00
+             0.00"
 
         Returns
         -------
         :class:`list`
-            List of all vibrational frequencies as :class:`float`
+            List of all vibrational frequencies as :class:`float`.
         """
         value = None
+
+        test = '|               Frequency Printout                |'
 
         # Use a switch to make sure we are extracting values after the
         # final property readout.
@@ -1540,15 +1578,16 @@ class XTBExts():
 
         frequencies = []
         for i, line in enumerate(self.output_string):
-            if '|               Frequency Printout                |' in line:
-                # Turn on reading as final frequency printout has begun.
+            if test in line:
+                # Turn on reading as final frequency printout has
+                # begun.
                 switch = True
             if ' reduced masses (amu)' in line:
                 # Turn off reading as frequency section is done.
                 switch = False
             if 'eigval :' in line and switch is True:
-                split_line = [i for i in line.rstrip().split(':')[1].split(' ')
-                              if i != '']
+                samp = line.rstrip().split(':')[1].split(' ')
+                split_line = [i for i in samp if i != '']
                 for freq in split_line:
                     frequencies.append(freq)
 
