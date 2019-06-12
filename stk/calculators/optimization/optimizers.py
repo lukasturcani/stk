@@ -674,7 +674,7 @@ class XTB(Optimizer):
 
     Furthermore, the :meth:`optimize` calculator will check that the
     structure is adequately optimized by checking for negative frequencies
-    after a Hessian calculation. ``max_count`` optimizations will be
+    after a Hessian calculation. ``max_runs`` optimizations will be
     attempted at the given opt_level to obtain an optimized structure. However,
     we outline in the examples how to iterate over ``opt_levels`` to increase
     convergence criteria and hopefully obtain an optimized structure. The
@@ -706,7 +706,7 @@ class XTB(Optimizer):
         Definitions of levels:
             https://xtb-docs.readthedocs.io/en/latest/optimization.html
 
-    max_count : :class:`int`
+    max_runs : :class:`int`
         Number of optimizations to attempt in a row to remove negative
         frequencies.
 
@@ -783,37 +783,37 @@ class XTB(Optimizer):
     vibrational frequencies. The :meth:`optimize` will check that the
     structure is appropriately optimized (i.e. convergence is obtained and
     no negative vibrational frequencies are present) and continue optimizing
-    a structure (up to ``max_count times``) until this is achieved. This loop
+    a structure (up to ``max_runs times``) until this is achieved. This loop
     by default will be performed at the same ``opt_level``. The following
     examples shows how a user may optimize structures with tigher convergence
     criteria (i.e. different ``opt_level``) until the structure is
     sufficiently optimized.
 
-    # crude optimization with max_count == 1 because this will not achieve
+    # crude optimization with max_runs == 1 because this will not achieve
     # optimization
     xtb_crude = XTB(
         xtb_path='/opt/gfnxtb/xtb',
         output_dir='xtb_crude',
         mem_ulimit=True,
         opt_level='crude',
-        max_count=1
+        max_runs=1
     )
-    # normal optimization with max_count == 2
+    # normal optimization with max_runs == 2
     xtb_normal = XTB(
         xtb_path='/opt/gfnxtb/xtb',
         output_dir='xtb_normal',
         mem_ulimit=True,
         opt_level='normal',
-        max_count=2
+        max_runs=2
     )
-    # vtight optimization with max_count == 2
+    # vtight optimization with max_runs == 2
     # this should achieve sufficient optimization
     xtb_vtight = XTB(
         xtb_path='/opt/gfnxtb/xtb',
         output_dir='xtb_vtight',
         mem_ulimit=True,
         opt_level='vtight',
-        max_count=2
+        max_runs=2
     )
 
     # conformer must be set
@@ -832,7 +832,7 @@ class XTB(Optimizer):
                  gfn_version='2',
                  output_dir=None,
                  opt_level='normal',
-                 max_count=2,
+                 max_runs=2,
                  num_cores=1,
                  etemp=300,
                  solvent=None,
@@ -866,7 +866,7 @@ class XTB(Optimizer):
             Definitions of levels:
                 https://xtb-docs.readthedocs.io/en/latest/optimization.html
 
-        max_count : :class:`int`, optional
+        max_runs : :class:`int`, optional
             Number of optimizations to attempt in a row to remove negative
             frequencies.
 
@@ -910,7 +910,7 @@ class XTB(Optimizer):
         self.gfn_version = gfn_version
         self.output_dir = output_dir
         self.opt_level = opt_level
-        self.max_count = max_count
+        self.max_runs = max_runs
         self.num_cores = str(num_cores)
         self.etemp = str(etemp)
         self.solvent = solvent
@@ -1117,11 +1117,11 @@ class XTB(Optimizer):
                             f'Small negative frequencies present.'
                         )
                         break
-                    # Break if run count == max_count.
-                    if run_count == self.max_count:
+                    # Break if run count == max_runs.
+                    if run_count == self.max_runs:
                         self.incomplete.append((mol, conformer))
                         msg = 'Negative frequencies present in'
-                        msg += f'{self.max_count} optimizations'
+                        msg += f'{self.max_runs} optimizations'
                         logging.warning(msg)
                         break
                 else:

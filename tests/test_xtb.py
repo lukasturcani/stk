@@ -41,7 +41,7 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
         output_dir=join(odir, out_dir),
         mem_ulimit=True,
         opt_level='crude',
-        max_count=2
+        max_runs=2
     )
     opt_lowtol.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'gfnxtb_opt_after.mol'))
@@ -64,7 +64,7 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
         output_dir=join(odir, out_dir),
         mem_ulimit=True,
         opt_level='extreme',
-        max_count=1
+        max_runs=1
     )
     opt_hightol.optimize(tmp_polymer)
     tmp_polymer.write(join(join(odir, out_dir), 'gfnxtb_opt_after.mol'))
