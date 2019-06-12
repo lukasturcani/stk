@@ -789,16 +789,16 @@ class XTB(Optimizer):
     criteria (i.e. different ``opt_level``) until the structure is
     sufficiently optimized.
 
-    # crude optimization with max_runs == 1 because this will not achieve
-    # optimization
+    # Use crude optimization with max_runs == 1 because this will not achieve
+    # optimization and rerunning it is unproductive.
     xtb_crude = XTB(
         xtb_path='/opt/gfnxtb/xtb',
         output_dir='xtb_crude',
         mem_ulimit=True,
         opt_level='crude',
-        max_runs=1
+        max_runs=None
     )
-    # normal optimization with max_runs == 2
+    # Use normal optimization with max_runs == 2.
     xtb_normal = XTB(
         xtb_path='/opt/gfnxtb/xtb',
         output_dir='xtb_normal',
@@ -806,8 +806,8 @@ class XTB(Optimizer):
         opt_level='normal',
         max_runs=2
     )
-    # vtight optimization with max_runs == 2
-    # this should achieve sufficient optimization
+    # Use vtight optimization with max_runs == 2, which should achieve
+    # sufficient optimization
     xtb_vtight = XTB(
         xtb_path='/opt/gfnxtb/xtb',
         output_dir='xtb_vtight',
@@ -866,14 +866,13 @@ class XTB(Optimizer):
             Definitions of levels:
                 https://xtb-docs.readthedocs.io/en/latest/optimization.html
 
-        max_runs : :class:`int`, optional
         max_runs : :class:`int` or :class:`NoneType`, optional
             Number of optimizations to attempt in a row to remove negative
             frequencies. If ``None``, no Hessian calculation will be run, which
             will drastically speed up the calculation but potentially provide
             incomplete optimizations.
 
-        num_cores : :class:`int`
+        num_cores : :class:`int`, optional
             The number of cores for xTB to use. Requires appropriate setup
             of xTB by user.
 
@@ -1020,9 +1019,8 @@ class XTB(Optimizer):
         cmd.append(self.xtb_path)
         cmd.append(xyz)
         # Set the GFN Parameterization.
-        if self.gfn_version != '2':
-            cmd.append('--gfn')
-            cmd.append(self.gfn_version)
+        cmd.append('--gfn')
+        cmd.append(self.gfn_version)
         # Set optimization level and type.
         if self.max_runs is None:
             # Do optimization.
@@ -1035,9 +1033,8 @@ class XTB(Optimizer):
         cmd.append('--parallel')
         cmd.append(self.num_cores)
         # Add eletronic temp term to cmd.
-        if self.etemp != '300':
-            cmd.append('--etemp')
-            cmd.append(self.etemp)
+        cmd.append('--etemp')
+        cmd.append(self.etemp)
         # Write the solvent section of cmd.
         if self.solvent is not None:
             cmd.append('--gbsa')
@@ -1045,13 +1042,12 @@ class XTB(Optimizer):
             if self.solvent_grid != 'normal':
                 cmd.append(self.solvent_grid)
         # Write the charge section of cmd.
-        if self.charge is not None:
-            cmd.append('--chrg')
-            cmd.append(self.charge)
-        # Write the multiplicity section of cmd.
-        if self.multiplicity is not None:
-            cmd.append('--uhf')
-            cmd.append(self.multiplicity)
+        cmd.append('--chrg')
+        cmd.append(self.charge)
+        # Write the unpaired_electrons section of cmd.
+        cmd.append('--uhf')
+        cmd.append(self.unpaired_electrons)
+
         cmd = ' '.join(cmd)
         f = open(out_file, 'w')
         # Uses the shell if mem_ulimit = True and waits until the

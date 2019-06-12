@@ -416,7 +416,7 @@ class XTBEnergy(EnergyCalculator):
         For details:
             https://xtb-docs.readthedocs.io/en/latest/basics.html
 
-    output_dir : :class:`str`, optional
+    output_dir : :class:`str`
         The name of the directory into which files generated during
         the optimization are written, if ``None`` then
         :func:`uuid.uuid4` is used.
@@ -425,15 +425,15 @@ class XTBEnergy(EnergyCalculator):
         The number of cores for xTB to use. Requires appropriate setup
         of xTB by user.
 
-    etemp : :class:`int`, optional
+    etemp : :class:`int`
         Electronic temperature to use (in K). Defaults to 300K.
 
-    solvent : :class:`str`, optional
+    solvent : :class:`str`
         Solvent to use in GBSA implicit solvation method.
         For details:
             https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
-    solvent_grid : :class:`str`, optional
+    solvent_grid : :class:`str`
         Grid level to use in SASA calculations for GBSA implicit solvent.
         Options:
             normal, tight, verytight, extreme
@@ -446,11 +446,11 @@ class XTBEnergy(EnergyCalculator):
     unpaired_electrons : :class:`int`
         Number of unpaired electrons.
 
-    use_cache : :class:`bool`, optional
+    use_cache : :class:`bool`
         If ``True`` :meth:`energy` will not run twice on the same
         molecule and conformer.
 
-    mem_ulimit : :class: `bool`, optional
+    mem_ulimit : :class: `bool`
         If ``True`` :meth:`energy` will be run without constraints on
         the stacksize. If memory issues are encountered, this should be
         ``True``, however this may raise issues on clusters.
@@ -589,7 +589,7 @@ class XTBEnergy(EnergyCalculator):
             the optimization are written, if ``None`` then
             :func:`uuid.uuid4` is used.
 
-        num_cores : :class:`int`
+        num_cores : :class:`int`, optional
             The number of cores for xTB to use. Requires appropriate setup
             of xTB by user.
 
@@ -715,16 +715,14 @@ class XTBEnergy(EnergyCalculator):
         cmd.append(self.xtb_path)
         cmd.append(xyz)
         # Set the GFN Parameterization.
-        if self.gfn_version != '2':
-            cmd.append('--gfn')
-            cmd.append(self.gfn_version)
+        cmd.append('--gfn')
+        cmd.append(self.gfn_version)
         # Set the number of cores.
         cmd.append('--parallel')
         cmd.append(self.num_cores)
         # Add eletronic temp term to cmd.
-        if self.etemp != '300':
-            cmd.append('--etemp')
-            cmd.append(self.etemp)
+        cmd.append('--etemp')
+        cmd.append(self.etemp)
         # Write the solvent section of cmd.
         if self.solvent is not None:
             cmd.append('--gbsa')
@@ -732,13 +730,11 @@ class XTBEnergy(EnergyCalculator):
             if self.solvent_grid != 'normal':
                 cmd.append(self.solvent_grid)
         # Write the charge section of cmd.
-        if self.charge is not None:
-            cmd.append('--chrg')
-            cmd.append(self.charge)
-        # Write the multiplicity section of cmd.
-        if self.multiplicity is not None:
-            cmd.append('--uhf')
-            cmd.append(self.multiplicity)
+        cmd.append('--chrg')
+        cmd.append(self.charge)
+        # Write the unpaired_electrons section of cmd.
+        cmd.append('--uhf')
+        cmd.append(self.unpaired_electrons)
 
         cmd = ' '.join(cmd)
         f = open(out_file, 'w')
@@ -1149,18 +1145,16 @@ class XTBFreeEnergy(EnergyCalculator):
         cmd.append(self.xtb_path)
         cmd.append(xyz)
         # Set the GFN Parameterization.
-        if self.gfn_version != '2':
-            cmd.append('--gfn')
-            cmd.append(self.gfn_version)
+        cmd.append('--gfn')
+        cmd.append(self.gfn_version)
         # Turn on the hessian calculation.
         cmd.append('--hess')
         # Set the number of cores.
         cmd.append('--parallel')
         cmd.append(self.num_cores)
         # Add eletronic temp term to cmd.
-        if self.etemp != '300':
-            cmd.append('--etemp')
-            cmd.append(self.etemp)
+        cmd.append('--etemp')
+        cmd.append(self.etemp)
         # Write the solvent section of cmd.
         if self.solvent is not None:
             cmd.append('--gbsa')
@@ -1168,13 +1162,11 @@ class XTBFreeEnergy(EnergyCalculator):
             if self.solvent_grid != 'normal':
                 cmd.append(self.solvent_grid)
         # Write the charge section of cmd.
-        if self.charge is not None:
-            cmd.append('--chrg')
-            cmd.append(self.charge)
-        # Write the multiplicity section of cmd.
-        if self.multiplicity is not None:
-            cmd.append('--uhf')
-            cmd.append(self.multiplicity)
+        cmd.append('--chrg')
+        cmd.append(self.charge)
+        # Write the unpaired_electrons section of cmd.
+        cmd.append('--uhf')
+        cmd.append(self.unpaired_electrons)
 
         cmd = ' '.join(cmd)
         f = open(out_file, 'w')
