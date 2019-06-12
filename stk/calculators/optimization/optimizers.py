@@ -973,9 +973,13 @@ class XTB(Optimizer):
             return True
         # If convergence is achieved, then .xtboptok should exist.
         if os.path.exists('.xtboptok'):
-            # Check for negative frequencies in output file.
-            # Return True if there exists at leats one.
-            return self.__check_neg_frequencies(output_file=output_file)
+            # Check for negative frequencies in output file in max_run
+            # is not None..
+            # Return True if there exists at least one.
+            if self.max_runs is not None:
+                return self._check_neg_frequencies(output_file=output_file)
+            else:
+                return False
         elif os.path.exists('NOT_CONVERGED'):
             raise XTBOptimizerFailedError(f'Optimization not converged.')
         else:
@@ -1020,7 +1024,12 @@ class XTB(Optimizer):
             cmd.append('--gfn')
             cmd.append(self.gfn_version)
         # Set optimization level and type.
-        cmd.append('--ohess')
+        if self.max_runs is None:
+            # Do optimization.
+            cmd.append('--opt')
+        else:
+            # Do optimization and check hessian.
+            cmd.append('--ohess')
         cmd.append(self.opt_level)
         # Set the number of cores.
         cmd.append('--parallel')
@@ -1103,7 +1112,7 @@ class XTB(Optimizer):
                 )
                 # Check if the optimization is complete.
                 if self._check_incomplete(output_file=out_file):
-                    # The alculation is incomplete.
+                    # The calculation is incomplete.
                     # If the negative frequencies are small, then GFN may
                     # not produce the restart file. If that is the case, exit
                     # optimization loop and warn.
