@@ -729,10 +729,10 @@ class XTB(Optimizer):
         For details:
             https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
-    charge : :class:`str`
-        Formal molecular charge. `-` should be used to indicate sign.
+    charge : :class:`int`
+        Formal molecular charge.
 
-    multiplicity : :class:`str`
+    unpaired_electrons : :class:`int`
         Number of unpaired electrons.
 
     use_cache : :class:`bool`
@@ -837,8 +837,8 @@ class XTB(Optimizer):
                  etemp=300,
                  solvent=None,
                  solvent_grid='normal',
-                 charge=None,
-                 multiplicity=None,
+                 charge=0,
+                 unpaired_electrons=0,
                  use_cache=False,
                  mem_ulimit=False):
         """
@@ -867,8 +867,11 @@ class XTB(Optimizer):
                 https://xtb-docs.readthedocs.io/en/latest/optimization.html
 
         max_runs : :class:`int`, optional
+        max_runs : :class:`int` or :class:`NoneType`, optional
             Number of optimizations to attempt in a row to remove negative
-            frequencies.
+            frequencies. If ``None``, no Hessian calculation will be run, which
+            will drastically speed up the calculation but potentially provide
+            incomplete optimizations.
 
         num_cores : :class:`int`
             The number of cores for xTB to use. Requires appropriate setup
@@ -889,10 +892,10 @@ class XTB(Optimizer):
             For details:
                 https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
-        charge : :class:`str`, optional
-            Formal molecular charge. `-` should be used to indicate sign.
+        charge : :class:`int`, optional
+            Formal molecular charge.
 
-        multiplicity : :class:`str`, optional
+        unpaired_electrons : :class:`int`, optional
             Number of unpaired electrons.
 
         use_cache : :class:`bool`, optional
@@ -919,8 +922,8 @@ class XTB(Optimizer):
             valid_xtb_solvent(gfn_version=self.gfn_version,
                                  solvent=self.solvent)
         self.solvent_grid = solvent_grid
-        self.charge = charge
-        self.multiplicity = multiplicity
+        self.charge = str(charge)
+        self.unpaired_electrons = str(unpaired_electrons)
         self.mem_ulimit = mem_ulimit
         self.incomplete = []
         super().__init__(use_cache=use_cache)
