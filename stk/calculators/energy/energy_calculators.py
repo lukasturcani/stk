@@ -652,7 +652,7 @@ class XTBEnergy(EnergyCalculator):
         self.full_quadrupole_moments = {}
         super().__init__(use_cache=use_cache)
 
-    def __get_properties(self, mol, conformer, output_file):
+    def _get_properties(self, mol, conformer, output_file):
         """
         Extracts desired properties from GFN-xTB single point energy
         calculation.
@@ -683,7 +683,7 @@ class XTBEnergy(EnergyCalculator):
         self.qdip_quadrupole_moments[key] = xtbext.ext_qdip_quadrupole_mom()
         self.full_quadrupole_moments[key] = xtbext.ext_full_quadrupole_mom()
 
-    def __write_and_run_command(self, mol, conformer):
+    def _write_and_run_command(self, mol, conformer):
         """
         Writes and runs the command for xTB.
 
@@ -786,11 +786,11 @@ class XTBEnergy(EnergyCalculator):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            out_file = self.__write_and_run_command(
+            out_file = self._write_and_run_command(
                 mol=mol,
                 conformer=conformer
             )
-            self.__get_properties(
+            self._get_properties(
                 mol=mol,
                 conformer=conformer,
                 output_file=out_file
@@ -1085,7 +1085,7 @@ class XTBFreeEnergy(EnergyCalculator):
         self.frequencies = {}
         super().__init__(use_cache=use_cache)
 
-    def __get_properties(self, mol, conformer, output_file):
+    def _get_properties(self, mol, conformer, output_file):
         """
         Extracts desired properties from xTB single point energy calculation.
 
@@ -1117,7 +1117,7 @@ class XTBFreeEnergy(EnergyCalculator):
         self.total_free_energies[key] = xtbext.ext_total_free_energy()
         self.frequencies[key] = xtbext.ext_frequencies()
 
-    def __write_and_run_command(self, mol, conformer):
+    def _write_and_run_command(self, mol, conformer):
         """
         Writes and runs the command for xTB.
 
@@ -1222,11 +1222,11 @@ class XTBFreeEnergy(EnergyCalculator):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            out_file = self.__write_and_run_command(
+            out_file = self._write_and_run_command(
                 mol=mol,
                 conformer=conformer
             )
-            self.__get_properties(
+            self._get_properties(
                 mol=mol,
                 conformer=conformer,
                 output_file=out_file

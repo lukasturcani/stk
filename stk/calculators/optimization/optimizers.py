@@ -925,7 +925,7 @@ class XTB(Optimizer):
         self.incomplete = []
         super().__init__(use_cache=use_cache)
 
-    def __check_neg_frequencies(self, output_file):
+    def _check_neg_frequencies(self, output_file):
         """
         Check for negative frequencies.
 
@@ -948,7 +948,7 @@ class XTB(Optimizer):
             neg_freq = True
         return neg_freq
 
-    def __check_incomplete(self, output_file):
+    def _check_incomplete(self, output_file):
         """
         Check if xTB optimization has converged and obtained a structure with
         no negative frequencies.
@@ -969,16 +969,16 @@ class XTB(Optimizer):
             # No simulation has been run.
             return True
         # If convergence is achieved, then .xtboptok should exist.
-        if os.path.isfile('.xtboptok'):
+        if os.path.exists('.xtboptok'):
             # Check for negative frequencies in output file.
             # Return True if there exists at leats one.
             return self.__check_neg_frequencies(output_file=output_file)
-        elif os.path.isfile('NOT_CONVERGED'):
+        elif os.path.exists('NOT_CONVERGED'):
             raise XTBOptimizerFailedError(f'Optimization not converged.')
         else:
             raise XTBOptimizerFailedError(f'Optimization failed to complete')
 
-    def __write_and_run_command(self, mol, conformer, count):
+    def _write_and_run_command(self, mol, conformer, count):
         """
         Writes and runs the command for GFN.
 
@@ -1093,18 +1093,18 @@ class XTB(Optimizer):
             out_file = None
             while True:
                 run_count += 1
-                out_file = self.__write_and_run_command(
+                out_file = self._write_and_run_command(
                     mol=mol,
                     conformer=conformer,
                     count=run_count
                 )
                 # Check if the optimization is complete.
-                if self.__check_incomplete(output_file=out_file):
+                if self._check_incomplete(output_file=out_file):
                     # The alculation is incomplete.
                     # If the negative frequencies are small, then GFN may
                     # not produce the restart file. If that is the case, exit
                     # optimization loop and warn.
-                    if os.path.isfile(join(output_dir, 'xtbhess.coord')):
+                    if os.path.exists(join(output_dir, 'xtbhess.coord')):
                         # Update mol from xtbhess.coord and continue.
                         output_coord = join(output_dir, 'xtbhess.coord')
                         mol.update_from_turbomole(
