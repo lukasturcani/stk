@@ -25,9 +25,11 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     id = (tmp_polymer, conformer)
 
     out_dir = 'gfnxtb_NF_energy'
-    energy = stk.XTBEnergy(xtb_path=xtb_path,
-                           output_dir=join(odir, out_dir),
-                           mem_ulimit=True)
+    energy = stk.XTBEnergy(
+        xtb_path=xtb_path,
+        output_dir=join(odir, out_dir),
+        mem_ulimit=True
+    )
 
     # initial energy
     init_energy = energy.energy(tmp_polymer)
@@ -83,13 +85,13 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     assert os.getcwd() == init_dir
 
 
-def test_xtb_solvent_charge_multiplicity(tmp_polymer, xtb_path):
+def test_xtb_solvent_charge_unpaired_electrons(tmp_polymer, xtb_path):
     # XTB  requires an embedding before working.
     etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
 
     # test that the energies with implicit solvation, charge != 0 and non zero
-    # multiplicity
+    # unpaired_electrons
     out_dir = 'gfnxtb_energy'
     energy = stk.XTBEnergy(
         xtb_path=xtb_path,
@@ -115,7 +117,7 @@ def test_xtb_solvent_charge_multiplicity(tmp_polymer, xtb_path):
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
         mem_ulimit=True,
-        charge='-1'
+        charge=-1
     )
     # initial energy
     charge_energy = charge.energy(tmp_polymer)
@@ -126,7 +128,7 @@ def test_xtb_solvent_charge_multiplicity(tmp_polymer, xtb_path):
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
         mem_ulimit=True,
-        multiplicity='2'
+        unpaired_electrons=2
     )
     # initial energy
     multi_energy = multi.energy(tmp_polymer)
@@ -134,19 +136,20 @@ def test_xtb_solvent_charge_multiplicity(tmp_polymer, xtb_path):
 
 
 def test_xtb_properties(tmp_polymer, xtb_path):
-    # XTB  requires an embedding before working.
+    # XTB requires an embedding before working.
     etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
 
     conformer = tmp_polymer.mol.GetConformer(-1).GetId()
 
-    # hessian requires optimized structure
+    # hessian requires well optimized structure
     gfnxtb = stk.XTB(
         xtb_path,
         output_dir=join(odir, 'gfnxtb_opt'),
         mem_ulimit=True,
         opt_level='extreme',
-        num_cores=2
+        max_runs=None,
+        num_cores=2,
     )
     gfnxtb.optimize(tmp_polymer)
     EC = stk.XTBFreeEnergy(
