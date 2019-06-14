@@ -189,7 +189,7 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
     Molecular construction should happen in
     :meth:`ConstructedMolecule.__init__` via
     :meth:`.Topology.construct`. The :meth:`~.Topology.construct`
-    method places the constructed molecule in
+    method places the constructed :mod:`rdkit` molecule in
     :attr:`ConstructedMolecule.mol`.
 
     Because of the computational cost associated with molecular
@@ -200,10 +200,10 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
     This class is not intended to be used directly but should be
     inherited by subclasses representing specific a specific type of
-    :class:`ConstructedMolecule`. The :class:`Cage` and
-    :class:`Polymer` classes are examples of this. Any information or
+    :class:`ConstructedMolecule`. The :class:`.Cage` and
+    :class:`.Polymer` classes are examples of this. Any information or
     methods that apply generally to all constructed molecules should be
-    defined within this class, while those taht are specific and
+    defined within this class, while those that are specific and
     non-general should be included in the derived classes.
 
     Attributes
@@ -212,12 +212,12 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         This attribute holds :class:`.StructUnit` instances which
         represent the building block molecules of the
         :class:`ConstructedMolecule`. Only one :class:`.StructUnit`
-        instance is needed per building block, even if multiples of
+        instance is present per building block, even if multiples of
         that building block join up to form the
         :class:`ConstructedMolecule`.
 
     bb_counter : :class:`collections.Counter`
-        A counter keeping track the number of each building block in
+        A counter keeping track of the number of each building block in
         the :class:`ConstructedMolecule`. Added by
         :func:`.Topology.construct`.
 
@@ -231,9 +231,9 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
         The remnants of building block functional groups present in the
-        molecule. These functional groups track which atoms belonged to
-        functional groups in the building block molecules. The id of
-        each :class:`.FunctionalGroup` should match its index in
+        molecule. They track which atoms belonged to functional groups
+        in the building block molecules. The id of each
+        :class:`.FunctionalGroup` should match its index in
         :attr:`func_groups`.
 
     """
@@ -252,8 +252,12 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         Parameters
         ---------
         building_blocks : :class:`list` of :class:`.StructUnit`
-            The :class:`.StructUnit` instances of building blocks
-            forming the :class:`ConstructedMolecule`.
+            The :class:`.StructUnit` instances which
+            represent the building block molecules of the
+            :class:`ConstructedMolecule`. Only one :class:`.StructUnit`
+            instance is present per building block, even if multiples
+            of that building block join up to form the
+            :class:`ConstructedMolecule`.
 
         topology : :class:`.Topology`
             Defines the topology of the :class:`ConstructedMolecule`
@@ -282,8 +286,8 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
         try:
             # Ask the ``Topology`` instance to construct the
-            # molecule. This creates the `mol` and `func_groups`
-            # attributes.
+            # molecule. This creates the `mol`, `bonds_made` and
+            # `func_groups` attributes.
             topology.construct(self, bb_conformers)
 
         except Exception as ex:
@@ -327,9 +331,9 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         ----------
         bb_conformers : :class:`list` of :class:`int`
             The ids of the building block conformers to be used. Must
-            be equal in length to :attr:`building_blocks` and orders
-            must correspond. If ``None``, then ``-1`` is used for all
-            building blocks.
+            be equal in length to :attr:`building_blocks` and the
+            orders must correspond. If ``None``, then ``-1`` is used
+            for all building blocks.
 
         Returns
         -------
@@ -343,8 +347,8 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         # Build a new molecule.
         try:
             # Ask the ``Topology`` instance to construct the
-            # macromolecule. This creates the `mol` and `func_groups`
-            # attributes.
+            # macromolecule. This creates the `mol`, `bonds_made`
+            # and `func_groups` attributes.
             self.topology.construct(self, bb_conformers)
 
         except Exception as ex:
@@ -605,7 +609,7 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
         Parameters
         ----------
-        bb_conformers : :class:`list` of :class:`int`
+        bb_conformers : :class:`list` of :class:`int`, optional
             The ids of building block conformers to use. 1 id for
             each building block, in an order corresponding to
             :attr:`building_blocks`. If ``None``, all conformer ids
