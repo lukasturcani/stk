@@ -1,7 +1,7 @@
-from .macro_molecule import MacroMolecule
+from .constructed_molecule import ConstructedMolecule
 
 
-class Polymer(MacroMolecule):
+class Polymer(ConstructedMolecule):
     """
     Represents constructed polymers.
 

@@ -15,7 +15,7 @@ import pywindow
 from scipy.optimize import minimize
 from sklearn.metrics.pairwise import euclidean_distances
 
-from .macro_molecule import MacroMolecule
+from .constructed_molecule import ConstructedMolecule
 from .struct_unit import StructUnit
 from ...utilities import atom_vdw_radii
 
@@ -102,7 +102,7 @@ class CageStructUnit(CageBase, StructUnit):
     """
 
 
-class Cage(CageBase, MacroMolecule):
+class Cage(CageBase, ConstructedMolecule):
     """
     Represents molecular cages constructed by ``stk``.
 
@@ -295,7 +295,7 @@ class Cage(CageBase, MacroMolecule):
         return valid_windows[:self.topology.n_windows]
 
 
-class CageComplex(MacroMolecule):
+class CageComplex(ConstructedMolecule):
     """
     Represents a cage-guest system.
 

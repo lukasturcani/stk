@@ -1,26 +1,27 @@
 """
 Defines :class:`StructUnit` classes.
 
-:class:`StructUnit` represents the monomers that make up
-macromolecules. These are commonly refered to as ``building blocks`` in
-the documentation. :class:`StructUnit` holds information concerning
-only a single building block molecule. For example, the number of atoms
-and bonds a building block may have. It also has information about the
-functional groups present in the building block molecule (see
-:class:`.FGInfo`). The class also allows manipulation of the lone
-building block molecule, such as rotations and translations.
+:class:`StructUnit` represents the building block molecules, which are
+used to construct other molecules. :class:`StructUnit` holds
+information concerning only a single building block molecule. For
+example, the number of atoms and bonds a building block may have. It
+also has information about the functional groups present in the
+building block molecule (see :class:`.FGInfo`). The class also allows
+manipulation of the lone building block molecule, such as rotations and
+translations.
 
 The :class:`StructUnit` should be inherited as necessary. For example,
 :class:`StructUnit2` adds manipulations relavant to molecules with 2
 functional groups. :class:`StructUnit3` adds manipulations relavant to
-molecules with 3 or more functional groups. If you have a monomer which
-needs specific information or manipulations, give it its own class.
+molecules with 3 or more functional groups. If you have a building
+block which needs specific information or manipulations, give it its
+own class.
 
 :class:`.StructUnit` contains :class:`.FunctionalGroup` instances
-representing functional groups used during macromolecular assembly.
+representing functional groups used during molecular construction.
 There are divided into bonders and deleters (see the documentation of
 :class:`.FGInfo` and :class:`.FunctionalGroup`), which determines
-which atoms form bonds and which are removed during assembly.
+which atoms form bonds and which are removed during construction.
 
 """
 
@@ -120,10 +121,10 @@ class CachedStructUnit(type):
 
 class StructUnit(Molecule, metaclass=CachedStructUnit):
     """
-    Represents the building blocks of macromolecules.
+    Represents the building blocks of a :class:`.ConstructedMolecule`.
 
     The goal of this class is to conveniently store information about,
-    and perform operations on, single instances of macromolecular
+    and perform operations on, single instances of molecular
     building blocks.
 
     Attributes
@@ -701,8 +702,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             An ``rdkit`` instance of the molecule.
 
         functional_groups : :class:`tuple` of :class:`str`
-            The name of the functional groups being used to make
-            macromolecules.
+            The name of the functional groups being used during
+            construction.
 
         Returns
         -------

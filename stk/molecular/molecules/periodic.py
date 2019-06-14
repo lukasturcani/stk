@@ -4,18 +4,18 @@ import itertools as it
 import math
 
 from .struct_unit import StructUnit
-from .macro_molecule import MacroMolecule
+from .constructed_molecule import ConstructedMolecule
 from ..functional_groups import Reactor
 from ...utilities import flatten, vector_theta, Cell
 
 
-class Periodic(MacroMolecule):
+class Periodic(ConstructedMolecule):
     """
     Represents periodic structures.
 
-    This class is essentially the same as :class:`.MacroMolecule`,
-    with additional methods and attributes relevant to periodic
-    materials being added.
+    This class is essentially the same as
+    :class:`.ConstructedMolecule`, with additional methods and
+    attributes relevant to periodic materials being added.
 
     Attributes
     ----------
@@ -41,9 +41,9 @@ class Periodic(MacroMolecule):
         bond type is an :class:`rdkit.Chem.rdchem.BondType`.
 
     periodic_bonds : :class:`list` of :class:`.PeriodicBond`
-        When periodic topologies are assembled, periodic bonds
+        When periodic topologies are constructed, periodic bonds
         do not get added to the ``rdkit`` molecule in the
-        :attr:`~.MacroMolecule.mol` attribute. Instead,
+        :attr:`~.ConstructedMolecule.mol` attribute. Instead,
         :meth:`~.PeriodicLattice.join_mols` adds
         :class:`.PeriodicBond` instances representing the bonds into
         this list.
@@ -51,7 +51,8 @@ class Periodic(MacroMolecule):
     cell_dimensions : :class:`list` of :class:`numpy.ndarray`
         The dimensions of the unit cell. The first array is the vector
         ``a`` the second is ``b`` and the third is ``c``. This should
-        be added during the build process by the periodic topology.
+        be added during the construction process by the periodic
+        topology.
 
     """
 

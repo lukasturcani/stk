@@ -28,8 +28,8 @@ class Molecule:
 
     This class defines the operations which any class
     describing molecules should inherit or may find useful. Examples of
-    such are :class:`StructUnit` and :class:`MacroMolecule`. This class
-    should not be used directly.
+    such are :class:`StructUnit` and :class:`ConstructedMolecule`. This
+    class should not be used directly.
 
     Attributes
     ----------
@@ -1210,7 +1210,7 @@ class Molecule:
         Writes a molecular structure file of the molecule.
 
         This bypasses the need for writing functions in ``rdkit``.
-        These have issues with macromolecules due to poor ring finding
+        These have issues with large molecules due to poor ring finding
         and sanitization issues.
 
         Parameters

@@ -1,18 +1,15 @@
 """
 Defines classes that describe rotaxanes.
 
-A new :class:`.MacroMolecule` called :class:`.Rotaxane` is defined.
-This class stores constructed rotaxanes, normally originating from
-:class:`.NRotaxane` topology.
-
 """
 
-from .macro_molecule import MacroMolecule
+from .constructed_molecule import ConstructedMolecule
 
 
-class Rotaxane(MacroMolecule):
+class Rotaxane(ConstructedMolecule):
     """
-    Used to represent rotaxanes.
+    Represents constructed rotaxanes.
 
     """
+
     pass

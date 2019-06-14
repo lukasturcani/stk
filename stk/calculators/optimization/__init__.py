@@ -2,7 +2,7 @@
 Defines optimizers.
 
 Optimizers are objects used to optimize molecules. Each optimizer is
-initialized with some settings and used to optimize a molecule
+initialized with some settings and can optimize a molecule
 with :meth:`~.Optimizer.optimize`.
 
 .. code-block:: python
@@ -15,7 +15,7 @@ with :meth:`~.Optimizer.optimize`.
     # Optionally, a conformer can be provided.
     mmff.optimize(mol, conformer=2)
 
-    # Optimizers also work with MacroMolecule objects.
+    # Optimizers also work with ConstructedMolecule objects.
     polymer = Polymer([mol], Linear('A', [0], n=3))
     etkdg = ETKDG()
     etkdg.optimize(polymer)
