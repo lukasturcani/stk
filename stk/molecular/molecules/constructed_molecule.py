@@ -1,43 +1,25 @@
 """
-Defines :class:`MacroMolecule`.
+Defines :class:`ConstructedMolecule`.
 
-The :class:`MacroMolecule` class represents an assembled macromolecule.
-It requires at least 2 basic pieces of information: which monomers are
-used to assemble the macromolecule and what the topology/structure
-of the macromolecule is.
+.. _`molecular construction`:
 
-:attr:`MacroMolecule.building_blocks` holds a :class:`list` of
-:class:`.StructUnit` instances. These represent the monomers which
-make up the macromolecule. Only one :class:`.StructUnit` instance per
-monomer type is held. So if 4 of one type of monomer and 2 of another
-type of monomer form a macromolecule, only 2 :class:`.StructUnit`
-instances are in :attr:`MacroMolecule.building_blocks`.
+A more detailed description of molecular construction.
+------------------------------------------------------
 
-:attr:`MacroMolecule.topology` holds a :class:`.Topology` instance.
-This instance is responsible for assembling the macromolecule from the
-building blocks. The building should happen in
-:meth:`MacroMolecule.__init__` via :meth:`.Topology.build`. The
-:meth:`~.Topology.build` method places the assembled macromolecule in
-:attr:`MacroMolecule.mol` as an ``rdkit`` molecule.
+This is a step-by-step guide of how :class:`.ConstructedMolecule`
+instances are constructed.
 
-.. _`macromolecular assembly`:
-
-A more detailed description of macromolecular assembly.
--------------------------------------------------------
-
-This is a step-by-step guide of how macromolecular assembly is carried
-out and what the classes do.
-
-First you create :class:`.StructUnit` instances of the building blocks
-which make up the macromolecule:
+First, you create :class:`.StructUnit` instances of the building blocks
+which make up the :class:`ConstructedMolecule`:
 
 .. code-block:: python
 
     bb = StructUnit('/path/to/struct/file.mol2', ['amine'])
 
 The :class:`.StructUnit` instances are initialized using paths to
-molecular structure files. (Initializing a :class:`.StructUnit`
-automatically completes steps 1 to 4.)
+molecular structure files or :mod:`rdkit` molecules or with SMILES
+strings. Initializing a :class:`.StructUnit` automatically completes
+steps 1 to 4.
 
     1. Place an ``rdkit`` instance of the molecule into
        :attr:`StructUnit.mol`, i.e.
@@ -62,84 +44,92 @@ and a :class:`tuple` of instances of this class called
     3. Using :class:`.FGInfo` create :class:`.FunctionalGroup`
        instances, which determine the bonder and deleter atoms in the
        molecule. These identify which atoms form bonds during
-       macromolecular assembly and which ones are deleted. Place the
-       :class:`.FunctionalGroup` instances into
-       :attr:`StructUnit.func_groups`.
+       the construction of a :class:`ConstructedMolecule` and which
+       ones are deleted. Place the :class:`.FunctionalGroup` instances
+       into :attr:`StructUnit.func_groups`.
 
        .. code-block:: python
 
            bb.func_groups
-           # (FunctionalGroup(id=0,
-           #                  atom_ids=(45, 21, 0),
-           #                  bonder_ids=(21, ),
-           #                  deleter_ids=(0, 45),
-           #                  info=FGInfo('amine')),
-           #  FunctionalGroup(id=1,
-           #                  atom_ids=(47, 23, 15),
-           #                  bonder_ids=(47, ),
-           #                  deleter_ids=(23, 15),
-           #                  info=FGInfo('amine')))
+           # (
+           #     FunctionalGroup(
+           #         id_=0,
+           #         atom_ids=(45, 21, 0),
+           #         bonder_ids=(21, ),
+           #         deleter_ids=(0, 45),
+           #         info=FGInfo('amine')
+           #     ),
+           #     FunctionalGroup(
+           #         id_=1,
+           #         atom_ids=(47, 23, 15),
+           #         bonder_ids=(47, ),
+           #         deleter_ids=(23, 15),
+           #         info=FGInfo('amine')
+           #     )
+           # )
 
-    5. Give the :class:`.StructUnit` and :class:`.Topology` instances
-       to the macromolecule's initializer.
+    5. Initialize an instance of :class:`.ConstructedMolecule`.
 
        .. code-block:: python
 
-           macro_mol = MacroMolecule([bb1, bb2], Topology())
+           mol = ConstructedMolecule([bb1, bb2], Topology())
 
-       Normally, :class:`MacroMolecule` and :class:`.Topology` will
-       not be used directly. Instead, classes derived from these
+       Normally, :class:`.ConstructedMolecule` and :class:`.Topology`
+       will not be used directly. Instead, classes derived from these
        will be used. For example,
 
            .. code-block:: python
 
-               macro_mol = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
+               polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
 
-    6. Run :meth:`.Topology.build` inside
-       :meth:`MacroMolecule.__init__`.
+    6. Run :meth:`.Topology.construct` inside
+       :meth:`ConstructedMolecule.__init__`.
 
-    7. The details of :meth:`.Topology.build` will vary depending on
-       the :class:`.Topology` class used. However, the basic structure
-       is the same (steps 8 - 10).
+    7. The details of :meth:`.Topology.construct` will vary depending
+       on the :class:`.Topology` class used. However, the basic
+       structure is the same (steps 8 - 10).
 
-    8. Use :meth:`.Topology.place_mols` to combine the ``rdkit``
-       molecules of all the building blocks into a single ``rdkit``
-       instance. The combined ``rdkit`` instance is placed into
-       ``macro_mol.mol``. :meth:`.Topology.place_mols` also usually
-       keeps track of each functional group in the macromolecule.
-       If a buliding block is placed in a macromolecule, the atom
-       ids have to be shifted upward by some amount.
-       :meth:`.FunctionalGroup.shifted_fg` performs this operation.
+    8. Use :meth:`.Topology.place_mols` to combine the :mod:`rdkit`
+       molecules of all building blocks into a single :mod:`rdkit`
+       instance. The combined :mod:`rdkit` instance is placed into the
+       :attr:`.ConstructedMolecule.mol`. attribute.
+       :meth:`.Topology.place_mols` also usually
+       keeps track of each functional groups in the constructed
+       molecule. If a buliding block is placed during the construction
+       of a molecule, the atom ids have to be shifted upward by some
+       amount. :meth:`.FunctionalGroup.shifted_fg` performs this
+       operation.
 
     9. Use :meth:`.Topology.prepare` to run any additional operations
        before joining up the building blocks and deleting extra
        atoms, this method may do nothing.
 
     10. Use :meth:`.Topology.bonded_fgs` to yield the functional groups
-        which react. The :class:`.FunctionalGroup`s in the
-        macromolecule are passed to :meth:`.Reactor.react`, which
-        performs the reaction. See the documentation of
-        :class:`Reactor` for information on how reactions are carried
+        which react. The :class:`.FunctionalGroup` instances in the
+        constructed molecule are passed to :meth:`.Reactor.react`,
+        which performs the reaction. See the documentation of
+        :class:`.Reactor` for information on how reactions are carried
         out.
 
     11. Run :meth:`.Topology.cleanup` to perform any final operations
-        on the assembled molecule. Can be nothing.
+        on the constructed molecule. Can be nothing.
 
-After all this you should have a ``rdkit`` instance of the
-macromolecule which should be placed into :attr:`MacroMolecule.mol`.
+After all this you should have a :mod:`rdkit` instance of the
+constructed molecule, which should be placed into
+:attr:`ConstructedMolecule.mol`.
 
-.. _`adding macromolecules`:
+.. _`adding constructed molecules`:
 
-Extending stk: Adding new macromolecules.
------------------------------------------
+Extending stk: Adding new types of constructed molecules.
+---------------------------------------------------------
 
-To add new macromolecules create a new class which inherits
-:class:`MacroMolecule`.
+To add new constructed molecules create a new class which inherits
+:class:`.ConstructedMolecule`.
 
-If you're adding a new class of macromolecules, it quite likely you
-want to add a new :class:`.Topology` class. See the
+If you're adding a new class of constructed molecules, it quite likely
+you want to add a new :class:`.Topology` class. See the
 :mod:`.topologies.base` for guidance on adding these. The topology
-class does the assembly of the macromolecule from the building blocks.
+class does the construction of the molecule from the building blocks.
 
 """
 
@@ -183,76 +173,94 @@ class Cached(type):
             return obj
 
 
-class MacroMoleculeBuildError(Exception):
+class ConstructionError(Exception):
     ...
 
 
-class MacroMolecule(Molecule, metaclass=Cached):
+class ConstructedMolecule(Molecule, metaclass=Cached):
     """
-    A representing assembled macromolecules.
+    Represents constructed molecules.
 
-    Because of the computational cost associated with macromolecule
-    assembly, instances of this class are cached. This means that
+    A :class:`ConstructedMolecule` requires at least 2 basic pieces of
+    information: which building block molecules are used to construct
+    the molecule and what the :class:`.Topology` of the constructed
+    molecule is.
+
+    Molecular construction should happen in
+    :meth:`ConstructedMolecule.__init__` via
+    :meth:`.Topology.construct`. The :meth:`~.Topology.construct`
+    method places the constructed molecule in
+    :attr:`ConstructedMolecule.mol`.
+
+    Because of the computational cost associated with molecular
+    construction, instances of this class are cached. This means that
     providing the same arguments to the initializer will not build a
     different instance with the same attribute values. It will yield
     the original instance, retrieved from memory.
 
     This class is not intended to be used directly but should be
-    inherited by subclasses representing specific macromolecules. The
-    :class:`Cage` and :class:`Polymer` classes are examples of this.
-    Any information or methods that apply generally to all
-    macromolecule should be defined within this class while specific
-    non-general data should be included in the derived classes.
+    inherited by subclasses representing specific a specific type of
+    :class:`ConstructedMolecule`. The :class:`Cage` and
+    :class:`Polymer` classes are examples of this. Any information or
+    methods that apply generally to all constructed molecules should be
+    defined within this class, while those taht are specific and
+    non-general should be included in the derived classes.
 
     Attributes
     ----------
     building_blocks : :class:`list` of :class:`.StructUnit`
         This attribute holds :class:`.StructUnit` instances which
-        represent the monomers forming the macromolecule. Only one
-        :class:`.StructUnit` instance is needed per building block,
-        even if multiples of that molecule join up to form the
-        macromolecule.
+        represent the building block molecules of the
+        :class:`ConstructedMolecule`. Only one :class:`.StructUnit`
+        instance is needed per building block, even if multiples of
+        that building block join up to form the
+        :class:`ConstructedMolecule`.
 
     bb_counter : :class:`collections.Counter`
-        A counter keeping track of how much of each building block is
-        used to form the macromolecule. Added by
-        :func:`.Topology.build`.
+        A counter keeping track the number of each building block in
+        the :class:`ConstructedMolecule`. Added by
+        :func:`.Topology.construct`.
 
     topology : :class:`.Topology`
-        Defines the shape of macromolecule and assembles it.
+        Defines the topology of :class:`ConstructedMolecule` and
+        is responsible for constructing it.
 
     bonds_made : :class:`int`
-        The number of bonds made during assembly. Added by
-        :func:`.Topology.build`.
+        The number of bonds made during construction. Added by
+        :func:`.Topology.construct`.
 
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
         The remnants of building block functional groups present in the
         molecule. These functional groups track which atoms belonged to
         functional groups in the building block molecules. The id of
-        each :class:`.FunctionalGroup` should match its index.
+        each :class:`.FunctionalGroup` should match its index in
+        :attr:`func_groups`.
 
     """
 
-    def __init__(self,
-                 building_blocks,
-                 topology,
-                 name="",
-                 note="",
-                 bb_conformers=None):
+    def __init__(
+        self,
+        building_blocks,
+        topology,
+        name='',
+        note='',
+        bb_conformers=None
+    ):
         """
-        Initialize a :class:`MacroMolecule` instance.
+        Initialize a :class:`ConstructedMolecule` instance.
 
         Parameters
         ---------
         building_blocks : :class:`list` of :class:`.StructUnit`
             The :class:`.StructUnit` instances of building blocks
-            forming the macromolecule.
+            forming the :class:`ConstructedMolecule`.
 
         topology : :class:`.Topology`
-            Defines the shape of macromolecule and assembles it.
+            Defines the topology of the :class:`ConstructedMolecule`
+            and constructs it.
 
         name : :class:`str`, optional
-            A name which can be given to the molcule for easy
+            A name which can be given to the molecule for easy
             identification.
 
         note : :class:`str`, optional
@@ -273,32 +281,34 @@ class MacroMolecule(Molecule, metaclass=Cached):
         self.topology = topology
 
         try:
-            # Ask the ``Topology`` instance to assemble/build the
-            # macromolecule. This creates the `mol` and `func_groups`
+            # Ask the ``Topology`` instance to construct the
+            # molecule. This creates the `mol` and `func_groups`
             # attributes.
-            topology.build(self, bb_conformers)
+            topology.construct(self, bb_conformers)
 
         except Exception as ex:
-            errormsg = ('Build failure.\n'
-                        '\n'
-                        'topology\n'
-                        '--------\n'
-                        '{}\n'
-                        '\n'
-                        'building blocks\n'
-                        '---------------\n').format(topology)
+            errormsg = (
+                'Construction failure.\n'
+                '\n'
+                'topology\n'
+                '--------\n'
+                f'{topology}\n'
+                '\n'
+                'building blocks\n'
+                '---------------\n'
+            )
 
             bb_blocks = []
             for i, bb in enumerate(building_blocks):
                 bb_conf = bb_conformers[i]
-                bb_blocks.append('{} {}\n{}'.format(
-                    bb.__class__.__name__,
-                    [info.name for info in bb.func_group_infos],
-                    bb.mdl_mol_block(bb_conf)))
+                bb_blocks.append(
+                    f'{bb.__class__.__name__} '
+                    f'{[info.name for info in bb.func_group_infos]}\n'
+                    f'{bb.mdl_mol_block(bb_conf)}'
+                )
 
             errormsg += '\n'.join(bb_blocks)
-
-            raise MacroMoleculeBuildError(errormsg) from ex
+            raise ConstructionError(errormsg) from ex
 
         self.func_groups = tuple(self.func_groups)
 
@@ -311,7 +321,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     def add_conformer(self, bb_conformers):
         """
-        Assembles a new conformer.
+        Constructs a new conformer.
 
         Parameters
         ----------
@@ -332,33 +342,35 @@ class MacroMolecule(Molecule, metaclass=Cached):
         original_mol = self.mol
         # Build a new molecule.
         try:
-            # Ask the ``Topology`` instance to assemble/build the
+            # Ask the ``Topology`` instance to construct the
             # macromolecule. This creates the `mol` and `func_groups`
             # attributes.
-            self.topology.build(self, bb_conformers)
+            self.topology.construct(self, bb_conformers)
 
         except Exception as ex:
-            self.mol = rdkit.Mol()
-            errormsg = ('Build failure.\n'
-                        '\n'
-                        'topology\n'
-                        '--------\n'
-                        '{}\n'
-                        '\n'
-                        'building blocks\n'
-                        '---------------\n').format(self.topology)
+            self.mol = original_mol
+            errormsg = (
+                'Construction failure.\n'
+                '\n'
+                'topology\n'
+                '--------\n'
+                f'{self.topology}\n'
+                '\n'
+                'building blocks\n'
+                '---------------\n'
+            )
 
             bb_blocks = []
             for i, bb in enumerate(self.building_blocks):
                 bb_conf = bb_conformers[i]
-                bb_blocks.append('{} {}\n{}'.format(
-                    bb.__class__.__name__,
-                    [info.name for info in bb.functional_group_infos],
-                    bb.mdl_mol_block(bb_conf)))
+                bb_blocks.append(
+                    f'{bb.__class__.__name__} '
+                    f'{[info.name for info in bb.func_group_infos]}\n'
+                    f'{bb.mdl_mol_block(bb_conf)}'
+                )
 
             errormsg += '\n'.join(bb_blocks)
-
-            raise MacroMoleculeBuildError(errormsg) from ex
+            raise ConstructionError(errormsg) from ex
 
         self.func_groups = tuple(self.func_groups)
 
@@ -378,7 +390,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         Yields the "cores" of the building block molecules.
 
         The structure of the yielded cores has the geometry found in
-        the macromolecule.
+        the :class:`ConstructedMolecule`.
 
         Parameters
         ----------
@@ -391,7 +403,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         ------
         :class:`rdkit.Mol`
             The core of a building block molecule, as found in the
-            macromolecule.
+            :class:`ConstructedMolecule`.
 
         """
 
@@ -425,8 +437,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 'topology' : 'Copolymer(repeating_unit="AB")',
                 'note' : 'A nice molecule.',
                 'name' : 'Poly-Benzene',
-                'atom_props': {0: {'prop1': 1.0,
-                                   'prop2': 'value1'}}
+                'atom_props': {
+                    0: {'prop1': 1.0, 'prop2': 'value1'}
+                }
             }
 
         Parameters
@@ -452,8 +465,10 @@ class MacroMolecule(Molecule, metaclass=Cached):
         ]
 
         json = {
-            'bb_counter': [(key.json(), val) for key, val in
-                           self.bb_counter.items()],
+            'bb_counter': [
+                (key.json(), val)
+                for key, val in self.bb_counter.items()
+            ],
             'bonds_made': self.bonds_made,
             'class': self.__class__.__name__,
             'conformers': conformers,
@@ -478,7 +493,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         """
         Completes a JSON initialization.
 
-        This function is not to be used. Use :meth:`Molecule.load`
+        This function is not to be used. Use :meth:`.Molecule.load`
         for loading instances from a JSON string. That function will
         automatically call this one.
 
@@ -497,8 +512,10 @@ class MacroMolecule(Molecule, metaclass=Cached):
         d.pop('building_blocks')
         d.pop('class')
 
-        bb_counter = Counter({Molecule.from_dict(key): val for
-                              key, val in d.pop('bb_counter')})
+        bb_counter = Counter({
+            Molecule.from_dict(key): val
+            for key, val in d.pop('bb_counter')
+        })
         bbs = list(bb_counter)
         topology = eval(d.pop('topology'),  topologies.__dict__)
 
@@ -509,15 +526,19 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj = cls.__new__(cls)
 
         (conf_id, mol_block), *confs = d.pop('conformers')
-        obj.mol = rdkit.MolFromMolBlock(molBlock=mol_block,
-                                        sanitize=False,
-                                        removeHs=False)
+        obj.mol = rdkit.MolFromMolBlock(
+            molBlock=mol_block,
+            sanitize=False,
+            removeHs=False
+        )
         obj.mol.GetConformer().SetId(conf_id)
 
         for conf_id, mol_block in confs:
-            conf_mol = rdkit.MolFromMolBlock(molBlock=mol_block,
-                                             sanitize=False,
-                                             removeHs=False)
+            conf_mol = rdkit.MolFromMolBlock(
+                molBlock=mol_block,
+                sanitize=False,
+                removeHs=False
+            )
             conf = conf_mol.GetConformer()
             conf.SetId(conf_id)
             obj.mol.AddConformer(conf)
@@ -529,8 +550,10 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.name = d.pop('name') if d.pop('load_names') else ''
         obj.key = key
         obj.building_blocks = bbs
-        obj.atom_props = {int(key): value for key, value in
-                          d.pop('atom_props').items()}
+        obj.atom_props = {
+            int(key): value
+            for key, value in d.pop('atom_props').items()
+        }
         # Globals for eval.
         g = {'FunctionalGroup': FunctionalGroup}
         obj.func_groups = tuple(eval(d.pop('func_groups'), g))
@@ -550,15 +573,17 @@ class MacroMolecule(Molecule, metaclass=Cached):
         Parameters
         ----------
         building_blocks : :class:`list` of :class:`.StructUnit`
-            The building blocks used to make the macromolecule.
+            The building blocks used to construct the
+            :class:`ConstructedMolecule`.
 
         topology : :class:`.Topology`
-            The topology used to make the macromolecule.
+            The topology used to construct the
+            :class:`ConstructedMolecule`.
 
         Returns
         -------
         :class:`tuple`
-            The key used for caching the macromolecule.
+            The key used for caching the :class:`ConstructedMolecule`.
 
         """
 
@@ -569,9 +594,10 @@ class MacroMolecule(Molecule, metaclass=Cached):
         """
         Rmsd difference of building blocks before and after assembly.
 
-        The function looks at each building block in the macromolecule
-        and calculates the rmsd between the "free" version and the one
-        present in the macromolecule. The mean of these rmsds is
+        The function looks at each building block in the
+        :class:`ConstructedMolecule` and calculates the rmsd between
+        the "free" version and the one present in the
+        :class:`ConstructedMolecule`. The mean of these rmsds is
         returned.
 
         Atoms which form the functional group of the building blocks
@@ -580,8 +606,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         Parameters
         ----------
         bb_conformers : :class:`list` of :class:`int`
-            The ids of building block conformers to use. 1 id for each
-            building block, in an order corresponding to
+            The ids of building block conformers to use. 1 id for
+            each building block, in an order corresponding to
             :attr:`building_blocks`. If ``None``, all conformer ids
             default to ``-1``.
 
@@ -591,8 +617,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         Returns
         -------
         :class:`float`
-            The mean rmsd of the macromole's building blocks to their
-            "free" counterparts.
+            The mean rmsd of the building blocks in the constructed
+            molecule to their "free" counterparts.
 
         """
 
@@ -602,28 +628,32 @@ class MacroMolecule(Molecule, metaclass=Cached):
             ]
 
         # Go through each of the building blocks. For each building
-        # block get the core. Get the corrospending cores in the
-        # macromolecules and add the rmsd to the sum. Increment the
-        # count to calculate the mean later.
+        # block get the core. Get the corrosponding cores in the
+        # constructed molecule and add the rmsd to the sum. Increment
+        # the count to calculate the mean later.
         rmsd = 0
         n = 0
         for i, bb in enumerate(self.building_blocks):
             free = bb.core()
             am = [(x, x) for x in range(free.GetNumAtoms())]
             for frag in self.building_block_cores(i):
-                rmsd += rdkit.AlignMol(free,
-                                       frag,
-                                       bb_conformers[i],
-                                       conformer,
-                                       atomMap=am)
+                rmsd += rdkit.AlignMol(
+                    prbMol=free,
+                    refMol=frag,
+                    prbCid=bb_conformers[i],
+                    refCid=conformer,
+                    atomMap=am
+                )
                 n += 1
         return rmsd / n
 
     def __str__(self):
-        return "{}(building_blocks={}, topology={!r})".format(
-                        self.__class__.__name__,
-                        [str(x) for x in self.building_blocks],
-                        self.topology)
+        return (
+            f'{self.__class__.__name__}'
+            '(building_blocks='
+            f'{[str(x) for x in self.building_blocks]}, '
+            f'topology={self.topology!r})'
+        )
 
     def __repr__(self):
         return str(self)
