@@ -22,7 +22,7 @@ before it is joined up and has atoms deleted via
 assembled molecule. For example, converting the end functional groups
 of a polymer into hydrogen atoms. See also :meth:`Topology.cleanup`.
 
-During the build process, every time a building block is placed
+During the construction process, every time a building block is placed
 in the macromolecule, new :class:`FunctionalGroup` instances must be
 made, which correspond to the functional groups added by virtue of
 adding the building block. These must be added to the
@@ -93,13 +93,14 @@ def remove_confs(building_blocks, keep):
     Parameters
     ----------
     building_blocks : :class:`iterable` of :class:`.StructUnit`
-        A set of :class:`.StructUnit` instances which represent the
-        building blocks forming a macromolecule.
+        A :class:`.set` of :class:`.StructUnit` instances which
+        represent the building blocks forming a
+        :class:`.ConstructedMolecule`.
 
     keep : :class:`list` of :class:`int`
         The ids of the building block conformers to be used for
-        assembling the :class:`.MacroMolecule`. Must be equal in length
-        to `building_blocks` and orders must correspond.
+        constructing the :class:`.ConstructedMolecule`. Must be equal
+        in length to `building_blocks` and the orders must correspond.
 
     Returns
     -------
@@ -117,12 +118,15 @@ def remove_confs(building_blocks, keep):
 
     """
 
-    keep_ids = [bb.mol.GetConformer(id_).GetId() for
-                bb, id_ in zip(building_blocks, keep)]
+    keep_ids = [
+        bb.mol.GetConformer(id_).GetId()
+        for bb, id_ in zip(building_blocks, keep)
+    ]
 
-    original_confs = [[rdkit.Conformer(conf) for
-                       conf in bb.mol.GetConformers()]
-                      for bb in building_blocks]
+    original_confs = [
+        [rdkit.Conformer(conf) for conf in bb.mol.GetConformers()]
+        for bb in building_blocks
+    ]
     for bb, conf in zip(building_blocks, keep_ids):
         keep_conf = rdkit.Conformer(bb.mol.GetConformer(conf))
         keep_conf.SetId(0)
@@ -161,22 +165,23 @@ class TopologyMeta(type):
 
 class Topology(metaclass=TopologyMeta):
     """
-    Builds macromolecules.
+    Constructs :class:`.ConstructedMolecule` from building blocks.
 
     More accurately, child classes of :class:`Topology` take care of
-    building macromolecules.
+    constructing :class:`.ConstructedMolecule` from building blocks.
 
     This class directly defines any operations and attributes that are
-    needed by any topology during assembly. However, this class is not
-    used directly. It is intended to be inherited from. All
-    :attr:`.MacroMolecule.topology` attributes hold an instance of a
-    :class:`Topology` child class. Child classes of :class:`Topology`
-    define operations specific to that one topology. For example, each
-    child class must define a :meth:`join_mols`, which creates bonds
-    between the building blocks of a macromolecule. The way in which
-    this is done will depend on what kind of macromolecules are being
-    built. In addition, each child class must define methods which
-    place the building blocks in approriate positions.
+    needed by any topology during construction. However, this class is
+    not used directly. It is intended to be inherited. All
+    :attr:`.ConstructedMolecule.topology` attributes hold an instance
+    of a :class:`Topology` child class. Child classes of
+    :class:`Topology` define operations specific to that one topology.
+    For example, each child class must define a :meth:`join_mols`,
+    which creates bonds between the building blocks of a
+    :class:`.ConstructedMolecule`. The way in which this is done will
+    depend on what kind of molecules are being constructed. In
+    addition, each child class must define methods which place the
+    building blocks in appropriate positions.
 
     Attributes
     ----------
@@ -198,9 +203,9 @@ class Topology(metaclass=TopologyMeta):
         self.del_atoms = del_atoms
         self.track_fgs = track_fgs
 
-    def build(self, macro_mol, bb_conformers=None):
+    def construct(self, mol, bb_conformers=None):
         """
-        Assembles ``rdkit`` instances of macromolecules.
+        Assembles :mod:`rdkit` instances of molecules.
 
         This method places an ``rdkit`` molecule of the assembled
         macromolecule into the :attr:`~.Molecule.mol` attribute of
@@ -210,9 +215,9 @@ class Topology(metaclass=TopologyMeta):
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The :class:`.MacroMolecule` instance which needs to be
-            built.
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` instance which needs to
+            be constructed.
 
         bb_conformers : :class:`list` of :class:`int`, optional
             The ids of the building block conformers to be used. Must
@@ -228,40 +233,41 @@ class Topology(metaclass=TopologyMeta):
 
         if bb_conformers is None:
             bb_conformers = [
-                -1 for _ in range(len(macro_mol.building_blocks))
+                -1 for _ in range(len(mol.building_blocks))
             ]
 
-        # When building, only a single conformer should exist per
+        # During construction, only a single conformer should exist per
         # building block. Otherwise, rdkit.CombineMols won't work. It
         # only combines conformers with the same id.
-        original_confs = remove_confs(macro_mol.building_blocks,
-                                      bb_conformers)
+        original_confs = remove_confs(
+            mol.building_blocks,
+            bb_conformers
+        )
 
-        macro_mol.bonds_made = 0
-        macro_mol.mol = rdkit.Mol()
-        macro_mol.bb_counter = Counter()
+        mol.bonds_made = 0
+        mol.mol = rdkit.Mol()
+        mol.bb_counter = Counter()
 
         self.reactor = Reactor()
-        self.place_mols(macro_mol)
-        self.prepare(macro_mol)
+        self.place_mols(mol)
+        self.prepare(mol)
 
-        self.reactor.set_molecule(macro_mol.mol)
-        macro_mol.func_groups = self.reactor.func_groups
+        self.reactor.set_molecule(mol.mol)
+        mol.func_groups = self.reactor.func_groups
 
-        for fgs in self.bonded_fgs(macro_mol):
+        for fgs in self.bonded_fgs(mol):
             self.reactor.react(*fgs, track_fgs=self.track_fgs)
-        macro_mol.mol = self.reactor.result(self.del_atoms)
-        macro_mol.bonds_made = self.reactor.bonds_made
+        mol.mol = self.reactor.result(self.del_atoms)
+        mol.bonds_made = self.reactor.bonds_made
 
-        self.cleanup(macro_mol)
+        self.cleanup(mol)
 
         # Make sure that the property cache of each atom is up to date.
-        for atom in macro_mol.mol.GetAtoms():
+        for atom in mol.mol.GetAtoms():
             atom.UpdatePropertyCache()
 
         # Restore the original conformers.
-        for bb, confs in zip(macro_mol.building_blocks,
-                             original_confs):
+        for bb, confs in zip(mol.building_blocks, original_confs):
             bb.mol.RemoveAllConformers()
             for conf in confs:
                 bb.mol.AddConformer(conf)
@@ -270,12 +276,12 @@ class Topology(metaclass=TopologyMeta):
         # which can't be pickled.
         self.reactor = None
 
-    def place_mols(self, macro_mol):
+    def place_mols(self, mol):
         """
         Places building blocks.
 
-        The ``rdkit`` molecules of the building blocks are
-        combined into a single ``rdkit`` molecule and placed into
+        The :mod:`rdkit` molecules of the building blocks are
+        combined into a single :mod:`rdkit` molecule and placed into
         `macro_mol.mol`.
 
         The function is also reponsible for updating
@@ -295,8 +301,8 @@ class Topology(metaclass=TopologyMeta):
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The molecule being assembled.
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
 
         Raises
         ------
@@ -306,20 +312,21 @@ class Topology(metaclass=TopologyMeta):
 
         raise NotImplementedError()
 
-    def bonded_fgs(self, macro_mol):
+    def bonded_fgs(self, mol):
         """
         An iterator which yields functional groups to be bonded.
 
         This iterator must yield :class:`tuple`s of
         :class:`.FunctionalGroup` molecules. These are the functional
-        groups in the macromolecule which need to be bonded.
+        groups in the molecule being constructed which need to be
+        bonded.
 
         This :class:`tuple` gets passed to :meth:`Reactor.react`.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The molecule being assembled.
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
 
         Raises
         ------
@@ -329,14 +336,14 @@ class Topology(metaclass=TopologyMeta):
 
         raise NotImplementedError()
 
-    def cleanup(self, macro_mol):
+    def cleanup(self, mol):
         """
-        Performs final clean up actions on an assembled molecule.
+        Performs final clean up actions on a constructed molecule.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The molecule being assembled.
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
 
         Returns
         -------
@@ -346,14 +353,14 @@ class Topology(metaclass=TopologyMeta):
 
         return
 
-    def prepare(self, macro_mol):
+    def prepare(self, mol):
         """
         Performs ops between placing and reacting building blocks.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The molecule being assembled.
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
 
         Returns
         -------

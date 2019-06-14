@@ -13,25 +13,29 @@ class SixPlusEight(VertexOnlyCageTopology):
     """
 
     x = 1
-    positions_A = [Vertex(-x, x, 0),
-                   Vertex(-x, -x, 0),
-                   Vertex(x, x, 0),
-                   Vertex(x, -x, 0),
+    positions_A = [
+        Vertex(-x, x, 0),
+        Vertex(-x, -x, 0),
+        Vertex(x, x, 0),
+        Vertex(x, -x, 0),
 
-                   Vertex(0, 0, x),
-                   Vertex(0, 0, -x)]
+        Vertex(0, 0, x),
+        Vertex(0, 0, -x)
+    ]
 
     a, b, c, d, e, f = positions_A
 
-    positions_B = [Vertex.vertex_init(a, e, b),
-                   Vertex.vertex_init(b, e, d),
-                   Vertex.vertex_init(e, d, c),
-                   Vertex.vertex_init(e, c, a),
+    positions_B = [
+        Vertex.vertex_init(a, e, b),
+        Vertex.vertex_init(b, e, d),
+        Vertex.vertex_init(e, d, c),
+        Vertex.vertex_init(e, c, a),
 
-                   Vertex.vertex_init(a, f, b),
-                   Vertex.vertex_init(f, b, d),
-                   Vertex.vertex_init(d, f, c),
-                   Vertex.vertex_init(c, f, a)]
+        Vertex.vertex_init(a, f, b),
+        Vertex.vertex_init(f, b, d),
+        Vertex.vertex_init(d, f, c),
+        Vertex.vertex_init(c, f, a)
+    ]
 
     n_windows = 12
     n_window_types = 1

@@ -1,5 +1,5 @@
 """
-Defines cage topologies from di and 4 functionalised building blocks.
+Defines cage topologies from 2 and 4 functionalized building blocks.
 
 """
 
@@ -15,19 +15,18 @@ class TwoPlusFour(CageTopology):
 
     """
 
-    positions_A = [Vertex(0, 0, -1), Vertex(0, 0, 1)]
-    alpha, beta = positions_A
+    positions_A = alpha, beta = [Vertex(0, 0, -1), Vertex(0, 0, 1)]
     beta.edge_plane_normal = (
         lambda scale, alpha=alpha:
             np.multiply(alpha.edge_plane_normal(scale), -1)
     )
 
-    positions_B = [Edge(alpha, beta),
-                   Edge(alpha, beta),
-                   Edge(alpha, beta),
-                   Edge(alpha, beta)]
-
-    a, b, c, d = positions_B
+    positions_B = a, b, c, d = [
+        Edge(alpha, beta),
+        Edge(alpha, beta),
+        Edge(alpha, beta),
+        Edge(alpha, beta)
+    ]
 
     a.coord = np.array([2, 0, 0])
     b.coord = np.array([-2, 0, 0])
@@ -43,21 +42,23 @@ class ThreePlusSix(CageTopology):
     A cage topology from 2 and 4 functionalized building blocks.
 
     """
+
     x = 1
-    positions_A = [Vertex(-2*x, -x*np.sqrt(3), 0),
-                   Vertex(2*x, -x*np.sqrt(3), 0),
-                   Vertex(0, x*np.sqrt(3), 0)]
+    positions_A = a, b, c = [
+        Vertex(-2*x, -x*np.sqrt(3), 0),
+        Vertex(2*x, -x*np.sqrt(3), 0),
+        Vertex(0, x*np.sqrt(3), 0)
+    ]
 
-    a, b, c = positions_A
+    positions_B = e1, e2, e3, e4, e5, e6 = [
+        Edge(a, b, custom_position=True),
+        Edge(a, b, custom_position=True),
+        Edge(b, c, custom_position=True),
+        Edge(b, c, custom_position=True),
+        Edge(a, c, custom_position=True),
+        Edge(a, c, custom_position=True)
+    ]
 
-    positions_B = [Edge(a, b, custom_position=True),
-                   Edge(a, b, custom_position=True),
-                   Edge(b, c, custom_position=True),
-                   Edge(b, c, custom_position=True),
-                   Edge(a, c, custom_position=True),
-                   Edge(a, c, custom_position=True)]
-
-    e1, e2, e3, e4, e5, e6 = positions_B
     for e in [e1, e3, e5]:
         e.coord = np.add(e.coord, [0, 0, x])
 
@@ -74,23 +75,24 @@ class FourPlusEight(CageTopology):
 
     """
 
-    positions_A = [Vertex(-1, -1, 0),
-                   Vertex(-1, 1, 0),
-                   Vertex(1, -1, 0),
-                   Vertex(1, 1, 0)]
+    positions_A = a, b, c, d = [
+        Vertex(-1, -1, 0),
+        Vertex(-1, 1, 0),
+        Vertex(1, -1, 0),
+        Vertex(1, 1, 0)
+    ]
 
-    a, b, c, d = positions_A
+    positions_B = e1, e2, e3, e4, e5, e6, e7, e8 = [
+        Edge(a, b, custom_position=True),
+        Edge(a, b, custom_position=True),
+        Edge(b, d, custom_position=True),
+        Edge(b, d, custom_position=True),
+        Edge(a, c, custom_position=True),
+        Edge(a, c, custom_position=True),
+        Edge(c, d, custom_position=True),
+        Edge(c, d, custom_position=True)
+    ]
 
-    positions_B = [Edge(a, b, custom_position=True),
-                   Edge(a, b, custom_position=True),
-                   Edge(b, d, custom_position=True),
-                   Edge(b, d, custom_position=True),
-                   Edge(a, c, custom_position=True),
-                   Edge(a, c, custom_position=True),
-                   Edge(c, d, custom_position=True),
-                   Edge(c, d, custom_position=True)]
-
-    e1, e2, e3, e4, e5, e6, e7, e8 = positions_B
     for e in [e1, e3, e5, e7]:
         e.coord = np.add(e.coord, [0, 0, 1])
 
@@ -108,24 +110,26 @@ class FivePlusTen(CageTopology):
     s1 = np.sin(2*np.pi/5)
     s2 = np.sin(4*np.pi/5)
 
-    positions_A = [Vertex(0, 1, 0),
-                   Vertex(s1, c1, 0),
-                   Vertex(s2, -c2, 0),
-                   Vertex(-s2, -c2, 0),
-                   Vertex(-s1, c1, 0)]
+    positions_A = a, b, c, d, e = [
+        Vertex(0, 1, 0),
+        Vertex(s1, c1, 0),
+        Vertex(s2, -c2, 0),
+        Vertex(-s2, -c2, 0),
+        Vertex(-s1, c1, 0)
+    ]
 
-    a, b, c, d, e = positions_A
-
-    positions_B = [Edge(a, b, custom_position=True),
-                   Edge(a, b, custom_position=True),
-                   Edge(b, c, custom_position=True),
-                   Edge(b, c, custom_position=True),
-                   Edge(c, d, custom_position=True),
-                   Edge(c, d, custom_position=True),
-                   Edge(d, e, custom_position=True),
-                   Edge(d, e, custom_position=True),
-                   Edge(e, a, custom_position=True),
-                   Edge(e, a, custom_position=True)]
+    positions_B = [
+        Edge(a, b, custom_position=True),
+        Edge(a, b, custom_position=True),
+        Edge(b, c, custom_position=True),
+        Edge(b, c, custom_position=True),
+        Edge(c, d, custom_position=True),
+        Edge(c, d, custom_position=True),
+        Edge(d, e, custom_position=True),
+        Edge(d, e, custom_position=True),
+        Edge(e, a, custom_position=True),
+        Edge(e, a, custom_position=True)
+    ]
 
     for e in positions_B[::2]:
         e.coord = np.add(e.coord, [0, 0, 0.5])
@@ -143,27 +147,29 @@ class SixPlusTwelve(CageTopology):
 
     """
 
-    positions_A = [Vertex(-1, -1, 0),
-                   Vertex(-1, 1, 0),
-                   Vertex(1, -1, 0),
-                   Vertex(1, 1, 0),
-                   Vertex(0, 0, 1),
-                   Vertex(0, 0, -1)]
+    positions_A = a, b, c, d, e, f = [
+        Vertex(-1, -1, 0),
+        Vertex(-1, 1, 0),
+        Vertex(1, -1, 0),
+        Vertex(1, 1, 0),
+        Vertex(0, 0, 1),
+        Vertex(0, 0, -1)
+    ]
 
-    a, b, c, d, e, f = positions_A
-
-    positions_B = [Edge(a, b),
-                   Edge(b, d),
-                   Edge(d, c),
-                   Edge(a, c),
-                   Edge(e, a),
-                   Edge(e, b),
-                   Edge(e, c),
-                   Edge(e, d),
-                   Edge(f, a),
-                   Edge(f, b),
-                   Edge(f, c),
-                   Edge(f, d)]
+    positions_B = [
+        Edge(a, b),
+        Edge(b, d),
+        Edge(d, c),
+        Edge(a, c),
+        Edge(e, a),
+        Edge(e, b),
+        Edge(e, c),
+        Edge(e, d),
+        Edge(f, a),
+        Edge(f, b),
+        Edge(f, c),
+        Edge(f, d)
+    ]
 
     n_windows = 8
     n_window_types = 1
@@ -173,35 +179,38 @@ class EightPlusSixteen(CageTopology):
 
     x = 2
     positions_A = a, b, c, d, e, f, g, h = [
-                    Vertex(-0.5*x, 0.5*x, -0.35*x),
-                    Vertex(-0.5*x, -0.5*x, -0.35*x),
-                    Vertex(0.5*x, -0.5*x, -0.35*x),
-                    Vertex(0.5*x, 0.5*x, -0.35*x),
+        Vertex(-0.5*x, 0.5*x, -0.35*x),
+        Vertex(-0.5*x, -0.5*x, -0.35*x),
+        Vertex(0.5*x, -0.5*x, -0.35*x),
+        Vertex(0.5*x, 0.5*x, -0.35*x),
 
-                    Vertex(-x*np.sqrt(2)/2, 0, x*0.35),
-                    Vertex(0, -x*np.sqrt(2)/2, x*0.35),
-                    Vertex(x*np.sqrt(2)/2, 0, x*0.35),
-                    Vertex(0, x*np.sqrt(2)/2, x*0.35)]
+        Vertex(-x*np.sqrt(2)/2, 0, x*0.35),
+        Vertex(0, -x*np.sqrt(2)/2, x*0.35),
+        Vertex(x*np.sqrt(2)/2, 0, x*0.35),
+        Vertex(0, x*np.sqrt(2)/2, x*0.35)
+    ]
 
-    positions_B = [Edge(b, f),
-                   Edge(c, f),
-                   Edge(a, e),
-                   Edge(b, e),
+    positions_B = [
+        Edge(b, f),
+        Edge(c, f),
+        Edge(a, e),
+        Edge(b, e),
 
-                   Edge(c, g),
-                   Edge(d, g),
-                   Edge(a, h),
-                   Edge(d, h),
+        Edge(c, g),
+        Edge(d, g),
+        Edge(a, h),
+        Edge(d, h),
 
-                   Edge(a, b),
-                   Edge(b, c),
-                   Edge(c, d),
-                   Edge(d, a),
+        Edge(a, b),
+        Edge(b, c),
+        Edge(c, d),
+        Edge(d, a),
 
-                   Edge(e, f),
-                   Edge(f, g),
-                   Edge(g, h),
-                   Edge(h, e)]
+        Edge(e, f),
+        Edge(f, g),
+        Edge(g, h),
+        Edge(h, e)
+    ]
     n_windows = 10
     n_window_types = 2
 
@@ -213,46 +222,48 @@ class TenPlusTwenty(CageTopology):
     """
 
     x = 2
-    positions_A = [Vertex(-x, x, -x),
-                   Vertex(-x, -x, -x),
-                   Vertex(x, x, -x),
-                   Vertex(x, -x, -x),
+    positions_A = a, b, c, d, e, f, g, h, i, j = [
+        Vertex(-x, x, -x),
+        Vertex(-x, -x, -x),
+        Vertex(x, x, -x),
+        Vertex(x, -x, -x),
 
-                   Vertex(-x, x, x),
-                   Vertex(-x, -x, x),
-                   Vertex(x, x, x),
-                   Vertex(x, -x, x),
+        Vertex(-x, x, x),
+        Vertex(-x, -x, x),
+        Vertex(x, x, x),
+        Vertex(x, -x, x),
 
-                   Vertex(0, 0, x*1.5),
-                   Vertex(0, 0, -x*1.5)]
+        Vertex(0, 0, x*1.5),
+        Vertex(0, 0, -x*1.5)
+    ]
 
-    a, b, c, d, e, f, g, h, i, j = positions_A
+    positions_B = [
+        Edge(a, c),
+        Edge(a, b),
+        Edge(b, d),
+        Edge(c, d),
 
-    positions_B = [Edge(a, c),
-                   Edge(a, b),
-                   Edge(b, d),
-                   Edge(c, d),
-
-                   Edge(e, g),
-                   Edge(e, f),
-                   Edge(f, h),
-                   Edge(g, h),
+        Edge(e, g),
+        Edge(e, f),
+        Edge(f, h),
+        Edge(g, h),
 
 
-                   Edge(a, e),
-                   Edge(b, f),
-                   Edge(c, g),
-                   Edge(d, h),
+        Edge(a, e),
+        Edge(b, f),
+        Edge(c, g),
+        Edge(d, h),
 
-                   Edge(i, e),
-                   Edge(i, f),
-                   Edge(i, g),
-                   Edge(i, h),
+        Edge(i, e),
+        Edge(i, f),
+        Edge(i, g),
+        Edge(i, h),
 
-                   Edge(j, a),
-                   Edge(j, b),
-                   Edge(j, c),
-                   Edge(j, d)]
+        Edge(j, a),
+        Edge(j, b),
+        Edge(j, c),
+        Edge(j, d)
+    ]
 
     n_windows = 12
     n_window_types = 2

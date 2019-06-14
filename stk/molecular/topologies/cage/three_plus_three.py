@@ -16,9 +16,7 @@ class OnePlusOne(NoLinkerCageTopology):
     """
 
     x = 1
-    positions_A = [Vertex(x, 0., 0.),
-                   Vertex(-x, 0., 0.)]
-    a, b = positions_A
+    positions_A = a, b = [Vertex(x, 0., 0.), Vertex(-x, 0., 0.)]
     connections = [(a, b)]
 
     a.edge_plane_normal = lambda scale: scale*np.array([1, 0, 0])
@@ -30,11 +28,12 @@ class OnePlusOne(NoLinkerCageTopology):
     n_windows = 3
     n_window_types = 1
 
-    def bonded_fgs(self, macro_mol):
+    def bonded_fgs(self, mol):
 
         for position in self.positions_A:
-            other_position = next(x for x in self.positions_A if
-                                  x is not position)
+            other_position = next(
+                x for x in self.positions_A if x is not position
+            )
 
             position.fg_position_pairs = [
                 (fg, other_position) for fg in position.fgs
@@ -45,8 +44,8 @@ class OnePlusOne(NoLinkerCageTopology):
                 # on the vertex. Store this information on the vertex.
 
                 for fg2 in vertex.fgs:
-                    c1 = macro_mol.atom_centroid(fg1.bonder_ids)
-                    c2 = macro_mol.atom_centroid(fg2.bonder_ids)
+                    c1 = mol.atom_centroid(fg1.bonder_ids)
+                    c2 = mol.atom_centroid(fg2.bonder_ids)
                     distance = euclidean(c1, c2)
                     position.distances.append((distance, fg1, fg2))
 
@@ -69,20 +68,20 @@ class TwoPlusTwo(NoLinkerCageTopology):
     """
 
     x = 1
-    positions_A = [Vertex(x, 0, -x/np.sqrt(2)),
-                   Vertex(-x, 0, -x/np.sqrt(2)),
-                   Vertex(0, x, x/np.sqrt(2)),
-                   Vertex(0, -x, x/np.sqrt(2))]
-
-    a, b, c, d = positions_A
+    positions_A = a, b, c, d = [
+        Vertex(x, 0, -x/np.sqrt(2)),
+        Vertex(-x, 0, -x/np.sqrt(2)),
+        Vertex(0, x, x/np.sqrt(2)),
+        Vertex(0, -x, x/np.sqrt(2))
+    ]
 
     for x in positions_A:
         old_normal = x.edge_plane_normal
         x.edge_plane_normal = lambda scale, a=old_normal: -1*a(scale)
 
-    connections = [(a, b), (a, c), (a, d),
-                   (b, c), (b, d),
-                   (c, d)]
+    connections = [
+        (a, b), (a, c), (a, d), (b, c), (b, d), (c, d)
+    ]
 
     n_windows = 4
     n_window_types = 1
@@ -95,20 +94,22 @@ class FourPlusFour(NoLinkerCageTopology):
     """
 
     x = 1
-    positions_A = [Vertex(-x, x, -x),
-                   Vertex(-x, -x, -x),
-                   Vertex(x, x, -x),
-                   Vertex(x, -x, -x),
+    positions_A = a, b, c, d, e, f, g, h = [
+        Vertex(-x, x, -x),
+        Vertex(-x, -x, -x),
+        Vertex(x, x, -x),
+        Vertex(x, -x, -x),
 
-                   Vertex(-x, x, x),
-                   Vertex(-x, -x, x),
-                   Vertex(x, x, x),
-                   Vertex(x, -x, x)]
+        Vertex(-x, x, x),
+        Vertex(-x, -x, x),
+        Vertex(x, x, x),
+        Vertex(x, -x, x)
+    ]
 
-    a, b, c, d, e, f, g, h = positions_A
-
-    connections = [(a, b), (a, c), (a, e), (b, d), (b, f), (c, g),
-                   (c, d), (d, h), (e, g), (e, f), (f, h), (g, h)]
+    connections = [
+        (a, b), (a, c), (a, e), (b, d), (b, f), (c, g),
+        (c, d), (d, h), (e, g), (e, f), (f, h), (g, h)
+    ]
 
     n_windows = 6
     n_window_types = 1

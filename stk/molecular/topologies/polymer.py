@@ -1,3 +1,8 @@
+"""
+Defines :class:`.Polymer` topologies.
+
+"""
+
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
@@ -77,14 +82,14 @@ class Linear(Topology):
         self.ends = ends
         super().__init__(track_fgs=False)
 
-    def cleanup(self, macro_mol):
+    def cleanup(self, mol):
         """
         Deletes the atoms which are lost during assembly.
 
         Parameters
         ----------
-        macro_mol : :class:`.Polymer`
-            The polymer being assembled.
+        mol : :class:`.Polymer`
+            The polymer being constructed.
 
         Returns
         -------
@@ -93,9 +98,9 @@ class Linear(Topology):
         """
 
         if self.ends == 'h':
-            self.hygrogen_ends(macro_mol)
+            self.hygrogen_ends(mol)
 
-    def hygrogen_ends(self, macro_mol):
+    def hygrogen_ends(self, mol):
         """
         Removes all deleter atoms and adds hydrogens.
 
@@ -104,8 +109,8 @@ class Linear(Topology):
 
         Parameters
         ----------
-        macro_mol : :class:`.Polymer`
-            The polymer being assembled.
+        mol : :class:`.Polymer`
+            The polymer being constructed.
 
         Returns
         -------
@@ -117,13 +122,13 @@ class Linear(Topology):
         for func_group in self.reactor.func_groups:
             deleters.extend(func_group.deleter_ids)
 
-        emol = rdkit.EditableMol(macro_mol.mol)
+        emol = rdkit.EditableMol(mol.mol)
         for atom_id in sorted(deleters, reverse=True):
             emol.RemoveAtom(atom_id)
-        macro_mol.mol = remake(emol.GetMol())
-        macro_mol.mol = rdkit.AddHs(macro_mol.mol, addCoords=True)
+        mol.mol = remake(emol.GetMol())
+        mol.mol = rdkit.AddHs(mol.mol, addCoords=True)
 
-    def place_mols(self, macro_mol):
+    def place_mols(self, mol):
         """
         Places monomers side by side.
 
@@ -132,8 +137,8 @@ class Linear(Topology):
 
         Parameters
         ----------
-        macro_mol : :class:`.Polymer`
-            The polymer being assembled.
+        mol : :class:`.Polymer`
+            The polymer being constructed.
 
         Returns
         -------
@@ -144,8 +149,11 @@ class Linear(Topology):
         # Make a map from monomer label to object.
         mapping = {}
         # Assign every monomer a label ("A", "B", "C", etc.).
-        for label, monomer in zip(dedupe(self.repeating_unit),
-                                  macro_mol.building_blocks):
+        monomers = zip(
+            dedupe(self.repeating_unit),
+            mol.building_blocks
+        )
+        for label, monomer in monomers:
             mapping[label] = monomer
 
         # Make string representing the entire polymer, not just the
@@ -158,7 +166,7 @@ class Linear(Topology):
         # Go through the repeating unit and place each monomer.
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             bb = mapping[label]
-            macro_mol.bb_counter.update([bb])
+            mol.bb_counter.update([bb])
             original_position = bb.mol.GetConformer().GetPositions().T
 
             # Flip or not flip the monomer as given by the probability
@@ -168,11 +176,11 @@ class Linear(Topology):
 
             # The first building block should be placed at 0, the
             # others have positions calculated based on bb size.
-            x_coord = self._x_position(macro_mol, bb) if i else 0
+            x_coord = self._x_position(mol, bb) if i else 0
             monomer_mol = bb.set_bonder_centroid([x_coord, 0, 0])
             monomer_mol = rdkit.Mol(monomer_mol)
 
-            bb_index = macro_mol.building_blocks.index(bb)
+            bb_index = mol.building_blocks.index(bb)
             add_fragment_props(monomer_mol, bb_index, i)
 
             # Check which functional group is at the back and which
@@ -187,9 +195,8 @@ class Linear(Topology):
             if i == 0:
                 self.bond_first = True if n_fgs == 1 else False
 
-            num_atoms = macro_mol.mol.GetNumAtoms()
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
-                                              monomer_mol)
+            num_atoms = mol.mol.GetNumAtoms()
+            mol.mol = rdkit.CombineMols(mol.mol, monomer_mol)
 
             for fg in bb.func_groups:
                 if n_fgs == 2:
@@ -204,14 +211,14 @@ class Linear(Topology):
 
             bb.set_position_from_matrix(original_position)
 
-    def bonded_fgs(self, macro_mol):
+    def bonded_fgs(self, mol):
         """
         Yields functional groups to react.
 
         Parameters
         ----------
-        macro_mol : :class:`.Polymer`
-            The polymer being assembled.
+        mol : :class:`.Polymer`
+            The polymer being constructed.
 
         Yields
         -------
@@ -221,27 +228,26 @@ class Linear(Topology):
         """
 
         fgs = sorted(self.reactor.func_groups, key=lambda fg: fg.id)
-
         start = 0 if self.bond_first else 1
         for i in range(start, len(self.reactor.func_groups)-1, 2):
             yield fgs[i], fgs[i+1]
 
-    def _x_position(self, macro_mol, bb):
+    def _x_position(self, mol, bb):
         """
         Calculates the x coordinate on which to place `bb`.
 
         Does this by checking the most how for down the x axis
         `macro_mol` stretches and checking the distance between
         the minimum x position of `bb` and its centroid.
-        It then tries to place `bb` about 3 A away from `macro_mol`.
+        It then tries to place `bb` about 3 A away from `mol`.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
+        mol : :class:`.Polymer`
+            The polymer being constructed.
 
         bb : :class:`.StructUnit`
-            The building block to be added to `macro_mol`.
+            The building block to be added to `mol`.
 
         Returns
         -------
@@ -250,9 +256,11 @@ class Linear(Topology):
 
         """
 
-        mm_max_x = max(macro_mol.all_atom_coords(),
-                       key=lambda x: x[1][0])[1][0]
-        bb_min_x = min(bb.all_atom_coords(),
-                       key=lambda x: x[1][0])[1][0]
+        mm_max_x = max(
+            mol.all_atom_coords(), key=lambda x: x[1][0]
+        )[1][0]
+        bb_min_x = min(
+            bb.all_atom_coords(), key=lambda x: x[1][0]
+        )[1][0]
         bb_len = bb.centroid()[0] - bb_min_x
         return mm_max_x + bb_len + 3
