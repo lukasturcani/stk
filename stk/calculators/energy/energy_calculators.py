@@ -697,27 +697,24 @@ class XTBEnergy(EnergyCalculator):
         self.full_quadrupole_moments[key] = \
             xtbext.full_quadrupole_moment()
 
-    def _write_and_run_command(self, mol, conformer):
+    def _run_xtb(self, xyz, out_file):
         """
-        Writes and runs the command for GFN-xTB.
+        Runs the command for GFN-xTB using subprocess.
 
         Parameters
         ----------
-        mol : :class:`.Molecule`
-            The :class:`.Molecule` whose energy is to be calculated.
+        xyz : :class:`str`
+            The name of the input structure `.xyz` file.
 
-        conformer : :class:`int`
-            The conformer of `mol` to use.
+        out_file : :class:`str`
+            The name of output file with xTB results.
 
         Returns
         -------
-        :class:`str`
-            Name of output file with xTB results.
+        None : :class:`NoneType`
 
         """
-        xyz = 'input_structure.xyz'
-        out_file = 'energy.output'
-        mol.write(xyz, conformer=conformer)
+
         # Modify the memory limit.
         if self.unlimited_memory:
             # Uses the shell if unlimited_memory is True to be run
@@ -754,8 +751,6 @@ class XTBEnergy(EnergyCalculator):
                 shell=self.unlimited_memory
             )
 
-        return out_file
-
     def energy(self, mol, conformer=-1):
         """
         Calculates the energy `mol` using xTB.
@@ -791,10 +786,10 @@ class XTBEnergy(EnergyCalculator):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            out_file = self._write_and_run_command(
-                mol=mol,
-                conformer=conformer
-            )
+            xyz = 'input_structure.xyz'
+            out_file = 'energy.output'
+            mol.write(xyz, conformer=conformer)
+            self._run_xtb(xyz=xyz, out_file=out_file)
             self._get_properties(
                 mol=mol,
                 conformer=conformer,
@@ -1149,27 +1144,24 @@ class XTBFreeEnergy(EnergyCalculator):
         self.total_free_energies[key] = xtbext.total_free_energy()
         self.frequencies[key] = xtbext.frequencies()
 
-    def _write_and_run_command(self, mol, conformer):
+    def _run_xtb(self, xyz, out_file):
         """
-        Writes and runs the command for GFN-xTB.
+        Runs the command for GFN-xTB using subprocess.
 
         Parameters
         ----------
-        mol : :class:`.Molecule`
-            The :class:`.Molecule` whose energy is to be calculated.
+        xyz : :class:`str`
+            The name of the input structure `.xyz` file.
 
-        conformer : :class:`int`
-            The conformer of `mol` to use.
+        out_file : :class:`str`
+            The name of output file with xTB results.
 
         Returns
         -------
-        :class:`str`
-            Name of output file with xTB results.
+        None : :class:`NoneType`
 
         """
-        xyz = 'input_structure.xyz'
-        out_file = 'free_energy.output'
-        mol.write(xyz, conformer=conformer)
+
         # Modify the memory limit.
         if self.unlimited_memory:
             # Uses the shell if unlimited_memory is True to be run
@@ -1206,8 +1198,6 @@ class XTBFreeEnergy(EnergyCalculator):
                 shell=self.unlimited_memory
             )
 
-        return out_file
-
     def energy(self, mol, conformer=-1):
         """
         Calculates the energy `mol` using xTB.
@@ -1243,10 +1233,10 @@ class XTBFreeEnergy(EnergyCalculator):
         init_dir = os.getcwd()
         try:
             os.chdir(output_dir)
-            out_file = self._write_and_run_command(
-                mol=mol,
-                conformer=conformer
-            )
+            xyz = 'input_structure.xyz'
+            out_file = 'free_energy.output'
+            mol.write(xyz, conformer=conformer)
+            self._run_xtb(xyz=xyz, out_file=out_file)
             self._get_properties(
                 mol=mol,
                 conformer=conformer,

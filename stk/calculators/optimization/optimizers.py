@@ -1002,30 +1002,24 @@ class XTB(Optimizer):
                 f'Optimization failed to complete'
             )
 
-    def _write_and_run_command(self, mol, conformer, count):
+    def _run_xtb(self, xyz, out_file):
         """
-        Writes and runs the command for GFN-xTB.
+        Runs the command for GFN-xTB using subprocess.
 
         Parameters
         ----------
-        mol : :class:`.Molecule`
-            The molecule to be optimized.
+        xyz : :class:`str`
+            The name of the input structure `.xyz` file.
 
-        conformer : :class:`int`
-            The conformer to use.
-
-        count : :class:`int`
-            Count of optimization to be run.
+        out_file : :class:`str`
+            The name of output file with xTB results.
 
         Returns
         -------
-        out_file : :class:`str`
-            Returns output file of the optimization run by the command.
+        None : :class:`NoneType`
 
         """
-        xyz = f'input_structure_{count}.xyz'
-        out_file = f'optimization_{count}.output'
-        mol.write(xyz, conformer=conformer)
+
         # Modify the memory limit.
         if self.unlimited_memory:
             # Uses the shell if unlimited_memory is True to be run
@@ -1070,8 +1064,6 @@ class XTB(Optimizer):
                 shell=self.unlimited_memory
             )
 
-        return out_file
-
     def optimize(self, mol, conformer=-1):
         """
         Optimizes the molecule `mol` using xTB.
@@ -1114,11 +1106,10 @@ class XTB(Optimizer):
             out_file = None
             while True:
                 run_count += 1
-                out_file = self._write_and_run_command(
-                    mol=mol,
-                    conformer=conformer,
-                    count=run_count
-                )
+                xyz = f'input_structure_{run_count}.xyz'
+                out_file = f'optimization_{run_count}.output'
+                mol.write(xyz, conformer=conformer)
+                self._run_xtb(xyz=xyz, out_file=out_file)
                 # Check if the optimization is complete.
                 if self._check_incomplete(output_file=out_file):
                     # The calculation is incomplete.
