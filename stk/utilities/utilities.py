@@ -1158,7 +1158,7 @@ class XTBInvalidSolventError(Exception):
     ...
 
 
-def valid_xtb_solvent(gfn_version, solvent):
+def is_valid_xtb_solvent(gfn_version, solvent):
     '''Check if solvent is valid for the given GFN version.
 
     Parameters
@@ -1172,7 +1172,7 @@ def valid_xtb_solvent(gfn_version, solvent):
     Returns
     -------
     :class:`bool`
-        `True` if solvent is valid. Raises an error otherwise.
+        `True` if solvent is valid.
 
     See Also
     --------
@@ -1180,9 +1180,7 @@ def valid_xtb_solvent(gfn_version, solvent):
 
     '''
     if gfn_version == '0':
-        raise XTBInvalidSolventError(
-            f'No solvent valid for version: {gfn_version}'
-        )
+        return False
     elif gfn_version == '1':
         valid_solvents = [
             'acetone', 'acetonitrile', 'benzene',
@@ -1193,9 +1191,7 @@ def valid_xtb_solvent(gfn_version, solvent):
         if solvent in valid_solvents:
             return True
         else:
-            raise XTBInvalidSolventError(
-                f'{solvent} is invalid for version {gfn_version}!'
-            )
+            return False
     elif gfn_version == '2':
         valid_solvents = [
             'acetone', 'acetonitrile', 'CH2Cl2'.lower(),
@@ -1206,9 +1202,7 @@ def valid_xtb_solvent(gfn_version, solvent):
         if solvent in valid_solvents:
             return True
         else:
-            raise XTBInvalidSolventError(
-                f'{solvent} is invalid for version {gfn_version}!'
-            )
+            return False
 
 
 class XTBExtrators():
@@ -1299,9 +1293,9 @@ class XTBExtrators():
 
         return float(value)
 
-    def qonly_dipole_mom(self):
+    def qonly_dipole_moment(self):
         """
-        Extracts `q only` dipole moment vector (Debye) from xTB output.
+        Extracts `q only` dipole momentent vector (Debye) from xTB output.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1310,7 +1304,7 @@ class XTBExtrators():
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of dipole moment as ``[`x`, `y`, `z`]`` in a
+            Components of dipole momentent as ``[`x`, `y`, `z`]`` in a
             list of length 3.
 
         """
@@ -1330,9 +1324,9 @@ class XTBExtrators():
 
         return value
 
-    def full_dipole_mom(self):
+    def full_dipole_moment(self):
         """
-        Extracts `full` dipole moment vector (Debye) from xTB output.
+        Extracts `full` dipole momentent vector (Debye) from xTB output.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1341,7 +1335,7 @@ class XTBExtrators():
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of dipole moment and total magnitude as
+            Components of dipole momentent and total magnitude as
             ``[`x`, `y`, `z`, `tot (Debye)`]`` in a list of length 4.
 
         """
@@ -1361,9 +1355,9 @@ class XTBExtrators():
 
         return value
 
-    def qonly_quadrupole_mom(self):
+    def qonly_quadrupole_moment(self):
         """
-        Extracts `q only` traceless quadrupole moment vector (Debye).
+        Extracts `q only` traceless quadrupole momentent vector (Debye).
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1373,7 +1367,7 @@ class XTBExtrators():
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of quadrupole moment as
+            Components of quadrupole momentent as
             ``[`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]`` in a list of
             length 6.
 
@@ -1401,9 +1395,9 @@ class XTBExtrators():
 
         return value
 
-    def qdip_quadrupole_mom(self):
+    def qdip_quadrupole_moment(self):
         """
-        Extracts `q+dip` traceless quadrupole moment vector (Debye).
+        Extracts `q+dip` traceless quadrupole momentent vector (Debye).
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1413,7 +1407,7 @@ class XTBExtrators():
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of quadrupole moment as
+            Components of quadrupole momentent as
             ``[`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]`` in a list of
             length 6.
         """
@@ -1440,9 +1434,9 @@ class XTBExtrators():
 
         return value
 
-    def full_quadrupole_mom(self):
+    def full_quadrupole_moment(self):
         """
-        Extracts `full` traceless quadrupole moment vector (Debye) from
+        Extracts `full` traceless quadrupole momentent vector (Debye) from
         xTB output.
 
         Formatting based on latest version of xTB (190418)
@@ -1453,7 +1447,7 @@ class XTBExtrators():
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of quadrupole moment as
+            Components of quadrupole momentent as
             ``[`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]`` in a list of
             length 6.
         """

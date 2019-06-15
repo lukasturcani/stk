@@ -85,13 +85,13 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     assert os.getcwd() == init_dir
 
 
-def test_xtb_solvent_charge_unpaired_electrons(tmp_polymer, xtb_path):
+def test_xtb_solvent_charge_num_unpaired_electrons(tmp_polymer, xtb_path):
     # XTB  requires an embedding before working.
     etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
 
     # test that the energies with implicit solvation, charge != 0 and non zero
-    # unpaired_electrons
+    # num_unpaired_electrons
     out_dir = 'gfnxtb_energy'
     energy = stk.XTBEnergy(
         xtb_path=xtb_path,
@@ -128,7 +128,7 @@ def test_xtb_solvent_charge_unpaired_electrons(tmp_polymer, xtb_path):
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
         unlimited_memory=True,
-        unpaired_electrons=2
+        num_unpaired_electrons=2
     )
     # initial energy
     multi_energy = multi.energy(tmp_polymer)
@@ -172,28 +172,28 @@ def test_xtb_properties(tmp_polymer, xtb_path):
     assert isinstance(EC.homo_lumo_gaps[id], float)
     assert isinstance(EC.fermi_levels[id], float)
 
-    assert isinstance(EC.qonly_dipole_moms[id], list)
-    assert len(EC.qonly_dipole_moms[id]) == 3
-    for i in EC.qonly_dipole_moms[id]:
+    assert isinstance(EC.qonly_dipole_moments[id], list)
+    assert len(EC.qonly_dipole_moments[id]) == 3
+    for i in EC.qonly_dipole_moments[id]:
         assert isinstance(i, float)
 
-    assert isinstance(EC.full_dipole_moms[id], list)
-    assert len(EC.full_dipole_moms[id]) == 4
-    for i in EC.full_dipole_moms[id]:
+    assert isinstance(EC.full_dipole_moments[id], list)
+    assert len(EC.full_dipole_moments[id]) == 4
+    for i in EC.full_dipole_moments[id]:
         assert isinstance(i, float)
 
-    assert isinstance(EC.qonly_quadrupole_moms[id], list)
-    assert len(EC.qonly_quadrupole_moms[id]) == 6
-    for i in EC.qonly_quadrupole_moms[id]:
+    assert isinstance(EC.qonly_quadrupole_moments[id], list)
+    assert len(EC.qonly_quadrupole_moments[id]) == 6
+    for i in EC.qonly_quadrupole_moments[id]:
         assert isinstance(i, float)
 
-    assert isinstance(EC.qdip_quadrupole_moms[id], list)
-    assert len(EC.qdip_quadrupole_moms[id]) == 6
-    for i in EC.qdip_quadrupole_moms[id]:
+    assert isinstance(EC.qdip_quadrupole_moments[id], list)
+    assert len(EC.qdip_quadrupole_moments[id]) == 6
+    for i in EC.qdip_quadrupole_moments[id]:
         assert isinstance(i, float)
-    assert isinstance(EC.full_quadrupole_moms[id], list)
-    assert len(EC.full_quadrupole_moms[id]) == 6
-    for i in EC.full_quadrupole_moms[id]:
+    assert isinstance(EC.full_quadrupole_moments[id], list)
+    assert len(EC.full_quadrupole_moments[id]) == 6
+    for i in EC.full_quadrupole_moments[id]:
         assert isinstance(i, float)
 
     assert isinstance(EC.homo_lumo_orbitals[id], dict)
@@ -216,27 +216,35 @@ def test_valid_solvent():
     valid1 = 'benzene'  # valid in GFN 1 only
     valid2 = 'dmf'  # valid in GFN 2 only
     invalid = 'andrewtarziawrotethis'
-    assert stk.valid_xtb_solvent(solvent=valid, gfn_version=gfn_1)
-    assert stk.valid_xtb_solvent(solvent=valid, gfn_version=gfn_2)
-    assert stk.valid_xtb_solvent(solvent=valid1, gfn_version=gfn_1)
-    assert stk.valid_xtb_solvent(solvent=valid2, gfn_version=gfn_2)
-    try:
-        stk.valid_xtb_solvent(solvent=valid1, gfn_version=gfn_2)
-        assert False
-    except stk.XTBInvalidSolventError:
-        assert True
-    try:
-        stk.valid_xtb_solvent(solvent=valid2, gfn_version=gfn_1)
-        assert False
-    except stk.XTBInvalidSolventError:
-        assert True
-    try:
-        stk.valid_xtb_solvent(solvent=invalid, gfn_version=gfn_1)
-        assert False
-    except stk.XTBInvalidSolventError:
-        assert True
-    try:
-        stk.valid_xtb_solvent(solvent=invalid, gfn_version=gfn_2)
-        assert False
-    except stk.XTBInvalidSolventError:
-        assert True
+    assert stk.is_valid_xtb_solvent(
+        solvent=valid,
+        gfn_version=gfn_1
+    )
+    assert stk.is_valid_xtb_solvent(
+        solvent=valid,
+        gfn_version=gfn_2
+    )
+    assert stk.is_valid_xtb_solvent(
+        solvent=valid1,
+        gfn_version=gfn_1
+    )
+    assert stk.is_valid_xtb_solvent(
+        solvent=valid2,
+        gfn_version=gfn_2
+    )
+    assert stk.is_valid_xtb_solvent(
+        solvent=valid1,
+        gfn_version=gfn_2
+    ) is False
+    assert stk.is_valid_xtb_solvent(
+        solvent=valid2,
+        gfn_version=gfn_1
+    ) is False
+    assert stk.is_valid_xtb_solvent(
+        solvent=invalid,
+        gfn_version=gfn_1
+    ) is False
+    assert stk.is_valid_xtb_solvent(
+        solvent=invalid,
+        gfn_version=gfn_2
+    ) is False

@@ -15,7 +15,9 @@ import subprocess as sp
 import uuid
 from os.path import join
 import shutil
-from ...utilities import valid_xtb_solvent, XTBExtrators
+from ...utilities import (is_valid_xtb_solvent,
+                          XTBInvalidSolventError,
+                          XTBExtrators)
 
 logger = logging.getLogger(__name__)
 
@@ -675,7 +677,7 @@ class XTB(Optimizer):
     Furthermore, the :meth:`optimize` calculator will check that the
     structure is adequately optimized by checking for negative
     frequencies after a Hessian calculation. ``max_runs`` optimizations
-    will be attempted at the given opt_level to obtain an optimized
+    will be attempted at the given ``opt_level`` to obtain an optimized
     structure. However, we outline in the examples how to iterate over
     ``opt_levels`` to increase convergence criteria and hopefully
     obtain an optimized structure. The presence of negative
@@ -687,10 +689,10 @@ class XTB(Optimizer):
     xtb_path : :class:`str`
         The path to the xTB executable.
 
-    gfn_version : :class:`str`
+    gfn_version : :class:`int`
         Parameterization of GFN to use in xTB.
         For details see
-        https://xtb-docs.readthedocs.io/en/latest/basics.html
+        https://xtb-docs.readthedocs.io/en/latest/basics.html.
 
     output_dir : :class:`str`
         The name of the directory into which files generated during
@@ -701,9 +703,9 @@ class XTB(Optimizer):
         Optimization level to use.
         Can be one of ``'crude'``, ``'sloppy'``, ``'loose'``,
         ``'lax'``, ``'normal'``, ``'tight'``, ``'vtight'``
-        or ``'extreme'``
+        or ``'extreme'``.
         For details see
-        https://xtb-docs.readthedocs.io/en/latest/optimization.html
+        https://xtb-docs.readthedocs.io/en/latest/optimization.html.
 
     max_runs : :class:`int`
         Number of optimizations to attempt in a row to remove negative
@@ -718,20 +720,20 @@ class XTB(Optimizer):
     solvent : :class:`str`
         Solvent to use in GBSA implicit solvation method.
         For details see
-        https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+        https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
 
     solvent_grid : :class:`str`
         Grid level to use in SASA calculations for GBSA implicit
         solvent.
         Can be one of ``'normal'``, ``'tight'``, ``'verytight'``
-        or ``'extreme'``
+        or ``'extreme'``.
         For details see
-        https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+        https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
 
     charge : :class:`int`
         Formal molecular charge.
 
-    unpaired_electrons : :class:`int`
+    num_unpaired_electrons : :class:`int`
         Number of unpaired electrons.
 
     use_cache : :class:`bool`
@@ -749,14 +751,6 @@ class XTB(Optimizer):
 
     Examples
     --------
-    .. code-block:: python
-
-        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        xtb = XTB(
-            '/opt/gfnxtb/xtb',
-            unlimited_memory=True
-        )
-        xtb.optimize(mol)
 
     Note that for :class:`.MacroMolecule` objects assembled by ``stk``
     :class:`XTB` should usually be used in a
@@ -777,20 +771,21 @@ class XTB(Optimizer):
         )
         xtb.optimize(polymer)
 
-    All optimizations with xTB are performed using the --ohess flag,
-    which forces the calculation of a numerical Hessian, thermodynamic
-    properties and vibrational frequencies. The :meth:`optimize` will
-    check that the structure is appropriately optimized (i.e.
-    convergence is obtained and no negative vibrational frequencies
-    are present) and continue optimizing a structure (up to
-    ``max_runs times``) until this is achieved. This loop by default
+    By default, all optimizations with xTB are performed using the
+    `--ohess` flag, which forces the calculation of a numerical
+    Hessian, thermodynamic properties and vibrational frequencies.
+    The :meth:`optimize` will check that the structure is appropriately
+    optimized (i.e. convergence is obtained and no negative vibrational
+    frequencies are present) and continue optimizing a structure (up to
+    ``max_runs`` times) until this is achieved. This loop, by default,
     will be performed at the same ``opt_level``. The following examples
     shows how a user may optimize structures with tigher convergence
     criteria (i.e. different ``opt_level``) until the structure is
-    sufficiently optimized.
+    sufficiently optimized. Furthermore, the calculation of the
+    Hessian can be turned off using ``max_runs`` = None.
 
-    # Use crude optimization with max_runs == 1 because this will not
-    # achieve optimization and rerunning it is unproductive.
+    # Use crude optimization with max_runs = None because this will
+    # not achieve optimization and rerunning it is unproductive.
     xtb_crude = XTB(
         xtb_path='/opt/gfnxtb/xtb',
         output_dir='xtb_crude',
@@ -807,7 +802,7 @@ class XTB(Optimizer):
         max_runs=2
     )
     # Use vtight optimization with max_runs == 2, which should achieve
-    # sufficient optimization
+    # sufficient optimization.
     xtb_vtight = XTB(
         xtb_path='/opt/gfnxtb/xtb',
         output_dir='xtb_vtight',
@@ -816,7 +811,7 @@ class XTB(Optimizer):
         max_runs=2
     )
 
-    # conformer must be set
+    # The conformer must be set to check the `incomplete` attribute.
     conformer = polymer.mol.GetConformer(-1).GetId()
 
     xtb_crude.optimize(mol=polymer, conformer=conformer)
@@ -833,7 +828,7 @@ class XTB(Optimizer):
 
     def __init__(self,
                  xtb_path,
-                 gfn_version='2',
+                 gfn_version=2,
                  output_dir=None,
                  opt_level='normal',
                  max_runs=2,
@@ -842,7 +837,7 @@ class XTB(Optimizer):
                  solvent=None,
                  solvent_grid='normal',
                  charge=0,
-                 unpaired_electrons=0,
+                 num_unpaired_electrons=0,
                  use_cache=False,
                  unlimited_memory=False):
         """
@@ -853,10 +848,10 @@ class XTB(Optimizer):
         xtb_path : :class:`str`
             The path to the xTB executable.
 
-        gfn_version : :class:`str`, optional
+        gfn_version : :class:`int`, optional
             Parameterization of GFN to use in xTB.
             For details see
-            https://xtb-docs.readthedocs.io/en/latest/basics.html
+            https://xtb-docs.readthedocs.io/en/latest/basics.html.
 
         output_dir : :class:`str`, optional
             The name of the directory into which files generated during
@@ -867,9 +862,10 @@ class XTB(Optimizer):
             Optimization level to use.
             Can be one of ``'crude'``, ``'sloppy'``, ``'loose'``,
             ``'lax'``, ``'normal'``, ``'tight'``, ``'vtight'``
-            or ``'extreme'``
+            or ``'extreme'``.
             For details see
             https://xtb-docs.readthedocs.io/en/latest/optimization.html
+            .
 
         max_runs : :class:`int` or :class:`NoneType`, optional
             Number of optimizations to attempt in a row to remove
@@ -887,20 +883,20 @@ class XTB(Optimizer):
         solvent : :class:`str`, optional
             Solvent to use in GBSA implicit solvation method.
             For details see
-            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
 
         solvent_grid : :class:`str`, optional
             Grid level to use in SASA calculations for GBSA implicit
             solvent.
             Can be one of ``'normal'``, ``'tight'``, ``'verytight'``
-            or ``'extreme'``
+            or ``'extreme'``.
             For details see
-            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+            https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
 
         charge : :class:`int`, optional
             Formal molecular charge.
 
-        unpaired_electrons : :class:`int`, optional
+        num_unpaired_electrons : :class:`int`, optional
             Number of unpaired electrons.
 
         use_cache : :class:`bool`, optional
@@ -914,22 +910,31 @@ class XTB(Optimizer):
             raise issues on clusters.
 
         """
+        if solvent is not None:
+            solvent = solvent.lower()
+            if not is_valid_xtb_solvent(gfn_version, solvent):
+                if gfn_version == '0':
+                    raise XTBInvalidSolventError(
+                        f'No solvent valid for version ',
+                        f'{gfn_version!r}.'
+                    )
+                else:
+                    raise XTBInvalidSolventError(
+                        f'Solvent {solvent!r} is invalid for ',
+                        f'version {gfn_version!r}.'
+                    )
 
         self.xtb_path = xtb_path
-        self.gfn_version = gfn_version
+        self.gfn_version = str(gfn_version)
         self.output_dir = output_dir
         self.opt_level = opt_level
         self.max_runs = max_runs
         self.num_cores = str(num_cores)
         self.electronic_temperature = str(electronic_temperature)
         self.solvent = solvent
-        if self.solvent is not None:
-            self.solvent = solvent.lower()
-            valid_xtb_solvent(gfn_version=self.gfn_version,
-                                 solvent=self.solvent)
         self.solvent_grid = solvent_grid
         self.charge = str(charge)
-        self.unpaired_electrons = str(unpaired_electrons)
+        self.num_unpaired_electrons = str(num_unpaired_electrons)
         self.unlimited_memory = unlimited_memory
         self.incomplete = []
         super().__init__(use_cache=use_cache)
@@ -960,8 +965,7 @@ class XTB(Optimizer):
 
     def _check_incomplete(self, output_file):
         """
-        Check if xTB optimization has converged and obtained a
-        structure with no negative frequencies.
+        Check if xTB optimization has converged.
 
         Parameters
         ----------
@@ -1000,14 +1004,14 @@ class XTB(Optimizer):
 
     def _write_and_run_command(self, mol, conformer, count):
         """
-        Writes and runs the command for GFN.
+        Writes and runs the command for GFN-xTB.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
 
-        conformer : :class:`int`, optional
+        conformer : :class:`int`
             The conformer to use.
 
         count : :class:`int`
@@ -1024,60 +1028,48 @@ class XTB(Optimizer):
         mol.write(xyz, conformer=conformer)
         # Modify the memory limit.
         if self.unlimited_memory:
-            cmd = ['ulimit -s unlimited ;']
-            # Allow multiple shell commands to be run in one
-            # subprocess.
-            shell = True
+            # Uses the shell if unlimited_memory is True to be run
+            # multiple commpands in one subprocess.
+            memory = 'ulimit -s unlimited ;'
         else:
-            cmd = []
-            shell = False
-        cmd.append(self.xtb_path)
-        cmd.append(xyz)
-        # Set the GFN Parameterization.
-        cmd.append('--gfn')
-        cmd.append(self.gfn_version)
+            memory = ''
+
         # Set optimization level and type.
         if self.max_runs is None:
             # Do optimization.
-            cmd.append('--opt')
+            optimization = f'--opt {self.opt_level}'
         else:
             # Do optimization and check hessian.
-            cmd.append('--ohess')
-        cmd.append(self.opt_level)
-        # Set the number of cores.
-        cmd.append('--parallel')
-        cmd.append(self.num_cores)
-        # Add eletronic temp term to cmd.
-        cmd.append('--etemp')
-        cmd.append(self.electronic_temperature)
-        # Write the solvent section of cmd.
-        if self.solvent is not None:
-            cmd.append('--gbsa')
-            cmd.append(self.solvent)
-            if self.solvent_grid != 'normal':
-                cmd.append(self.solvent_grid)
-        # Write the charge section of cmd.
-        cmd.append('--chrg')
-        cmd.append(self.charge)
-        # Write the unpaired_electrons section of cmd.
-        cmd.append('--uhf')
-        cmd.append(self.unpaired_electrons)
+            optimization = f'--ohess {self.opt_level}'
 
-        cmd = ' '.join(cmd)
-        f = open(out_file, 'w')
-        # Uses the shell if unlimited_memory = True and waits until the
-        # subproces is complete. This is required to be able to run the
-        # unlimited_memory_cmd and GFN calculation in one command,
-        # which is then closed, which minimizes the risk of
-        # unrestricting the memory limits.
-        sp.call(
-            cmd,
-            stdin=sp.PIPE,
-            stdout=f,
-            stderr=sp.PIPE,
-            shell=shell
+        if self.solvent is not None:
+            if self.solvent_grid == 'normal':
+                solvent_grid = ''
+            else:
+                solvent_grid = ''
+            solvent = f'--gbsa {self.solvent} {solvent_grid}'
+        else:
+            solvent = ''
+
+        cmd = (
+            f'{memory} {self.xtb_path} {xyz} --gfn {self.gfn_version} '
+            f'{optimization} --parallel {self.num_cores} '
+            f'--etemp {self.electronic_temperature} '
+            f'{solvent} --chrg {self.charge} '
+            f'--uhf {self.num_unpaired_electrons}'
         )
-        f.close()
+
+        with open(out_file, 'w') as f:
+            # Note that sp.call will hold the program until completion
+            # of the calculation.
+            sp.call(
+                cmd,
+                stdin=sp.PIPE,
+                stdout=f,
+                stderr=sp.PIPE,
+                shell=self.unlimited_memory
+            )
+
         return out_file
 
     def optimize(self, mol, conformer=-1):
