@@ -427,6 +427,10 @@ class XTBEnergy(EnergyCalculator):
     num_cores : :class:`int`
         The number of cores xTB should use.
 
+    calculate_free_energy : :class:`bool`
+        Whether to calculate the total free energy and vibrational
+        frequencies.
+
     electronic_temperature : :class:`int`
         Electronic temperature to use (in K).
 
@@ -459,78 +463,78 @@ class XTBEnergy(EnergyCalculator):
         ``True``, however this may raise issues on clusters.
 
     total_energies : :class:`dict`
-        :class:`dict` of the total energy of :class:`.Molecule` and
-        conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
+        :class:`dict` of the total energy of each :class:`.Molecule`
+        and conformer passed to :meth:`energy`. The key has the
         form ``(mol, conformer)``.
 
     homo_lumo_gaps : :class:`dict`
-        :class:`dict` of the HOMO-LUMO gap of :class:`.Molecule` and
-        conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
+        :class:`dict` of the HOMO-LUMO gap of each :class:`.Molecule`
+        and conformer passed to :meth:`energy`. The key has the
         form ``(mol, conformer)``.
 
     fermi_levels : :class:`dict`
-        :class:`dict` of the Fermi level of :class:`.Molecule` and
-        conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
+        :class:`dict` of the Fermi level of each :class:`.Molecule` and
+        conformer passed to :meth:`energy`. The key has the
         form ``(mol, conformer)``.
 
     homo_lumo_orbitals : :class:`dict`
         :class:`dict` of the HOMO-LUMO orbital properties of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
+        each :class:`.Molecule` and conformer passed to :meth:`energy`.
+        The key has the form ``(mol, conformer)``.
 
     qonly_dipole_moments : :class:`dict`
         :class:`dict` of the `q only` dipole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
+        each :class:`.Molecule` and conformer passed to :meth:`energy`.
+        The key has the form ``(mol, conformer)``.
 
     full_dipole_moments : :class:`dict`
         :class:`dict` of the `full` dipole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
+        each :class:`.Molecule` and conformer passed to :meth:`energy`.
+        The key has the form ``(mol, conformer)``.
 
     qonly_quadrupole_moments : :class:`dict`
         :class:`dict` of the `q only` quadrupole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
+        each :class:`.Molecule` and conformer passed to :meth:`energy`.
+        The key has the form ``(mol, conformer)``.
 
     qdip_quadrupole_moments : :class:`dict`
         :class:`dict` of the `q+dip` quadrupole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
+        each :class:`.Molecule` and conformer passed to :meth:`energy`.
+        The key has the form ``(mol, conformer)``.
 
     full_quadrupole_moments : :class:`dict`
         :class:`dict` of the `full` quadrupole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
+        each :class:`.Molecule` and conformer passed to :meth:`energy`.
+        The key has the form ``(mol, conformer)``.
+
+    total_free_energies : :class:`dict`
+        :class:`dict` of the total free energy of
+        each :class:`.Molecule` and conformer passed to :meth:`energy`.
+        The key has the form ``(mol, conformer)``. This is empty if
+        `calculate_free_energy` is False.
+
+    frequencies : :class:`dict`
+        :class:`dict` of the vibrational frequencies of
+        each :class:`.Molecule` and conformer passed to :meth:`energy`.
+        The key has the form ``(mol, conformer)``. This is empty if
+        `calculate_free_energy` is False.
 
     Examples
     --------
-
-    Note that for :class:`.MacroMolecule` objects assembled by ``stk``
-    :class:`XTBEnergy` should usually be used after optimization with
-    some other method. This is because xTB only uses xyz coordinates
-    as input and so will not recognize the long bonds created during
-    assembly. An optimizer which can minimize these bonds should be
-    used before :class:`XTBEnergy`.
-
     .. code-block:: python
 
         bb1 = StructUnit2.smiles_init('NCCNCCN', ['amine'])
         bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
         polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
+        conformer = 0
 
-        # Pre optimize molecule with UFF.
-        uff = UFF()
-        uff.optimize(polymer)
+        # Optimize the constructed molecule so that it has a
+        # reasonable structure.
+        optimizer = OptimizerSequence(
+            ETKDG(),
+            XTB(xtb_path='/opt/gfnxtb/xtb', unlimited_memory=True)
+        )
+        optimizer.optimize(polymer)
 
         # Calculate energy using GFN-xTB.
         xtb = XTBEnergy(
@@ -539,7 +543,7 @@ class XTBEnergy(EnergyCalculator):
         )
 
         # Runs the calculation and returns energy.
-        p_totalenergy = xtb.energy(polymer, conformer)
+        p_total_energy = xtb.energy(polymer, conformer)
 
         # Extracts properties from energy calculator for a given
         # molecule and conformer.
@@ -552,7 +556,46 @@ class XTBEnergy(EnergyCalculator):
 
         # The total energy can be extracted at any point from the
         # calculator.
-        polymer_totalenergy = xtb.total_energies[key]
+        polymer_total_energy = xtb.total_energies[key]
+
+    If `calculate_free_energy` is True, xTB performs a numerical
+    Hessian calculation and calculates the total free energy and
+    vibrational frequencies of a molecule. It is recommended that a
+    well optimized structure be used as input for these calculations.
+
+    .. code-block:: python
+
+        # Optimize the constructed molecule so that it has a
+        # reasonable structure.
+        optimizer = OptimizerSequence(
+            ETKDG(),
+            XTB(
+                xtb_path='/opt/gfnxtb/xtb',
+                unlimited_memory=True,
+                opt_level='verytight'
+            )
+        )
+        optimizer.optimize(polymer)
+
+        # Define optimizer sequence and run optimzations.
+        opt = OptimizerSequence(uff, xtb_opt)
+        opt.optimize(polymer)
+
+        # Calculate energy using GFN-xTB.
+        xtb = XTBFreeEnergy(
+            xtb_path='/opt/gfnxtb/xtb',
+            unlimited_memory=True,
+        )
+
+        # Runs the calculation and returns energy.
+        p_total_energy = xtb.energy(polymer, conformer)
+
+        # Extracts properties from energy calculator for a given
+        # molecule and conformer.
+        key = (polymer, conformer)
+        # Extract the total free energy and vibrational frequencies.
+        p_total_free_energy = xtb.total_energies[key]
+        p_frequencies = xtb.frequencies[key]
 
     See Also
     --------
@@ -564,6 +607,7 @@ class XTBEnergy(EnergyCalculator):
                  gfn_version=2,
                  output_dir=None,
                  num_cores=1,
+                 calculate_free_energy=False,
                  electronic_temperature=300,
                  solvent=None,
                  solvent_grid='normal',
@@ -591,6 +635,10 @@ class XTBEnergy(EnergyCalculator):
 
         num_cores : :class:`int`, optional
             The number of cores xTB should use.
+
+        calculate_free_energy : :class:`bool`, optional
+            Whether to calculate the total free energy and vibrational
+            frequencies.
 
         electronic_temperature : :class:`int`, optional
             Electronic temperature to use (in K).
@@ -627,22 +675,22 @@ class XTBEnergy(EnergyCalculator):
         """
         if solvent is not None:
             solvent = solvent.lower()
+            if gfn_version == 0:
+                raise XTBInvalidSolventError(
+                    f'No solvent valid for version',
+                    f' {gfn_version!r}.'
+                )
             if not is_valid_xtb_solvent(gfn_version, solvent):
-                if gfn_version == '0':
-                    raise XTBInvalidSolventError(
-                        f'No solvent valid for version',
-                        f' {gfn_version!r}.'
-                    )
-                else:
-                    raise XTBInvalidSolventError(
-                        f'Solvent {solvent!r} is invalid for ',
-                        f'version {gfn_version!r}.'
-                    )
+                raise XTBInvalidSolventError(
+                    f'Solvent {solvent!r} is invalid for ',
+                    f'version {gfn_version!r}.'
+                )
 
         self.xtb_path = xtb_path
         self.gfn_version = str(gfn_version)
         self.output_dir = output_dir
         self.num_cores = str(num_cores)
+        self.calculate_free_energy = calculate_free_energy
         self.electronic_temperature = str(electronic_temperature)
         self.solvent = solvent
         self.solvent_grid = solvent_grid
@@ -659,6 +707,8 @@ class XTBEnergy(EnergyCalculator):
         self.qonly_quadrupole_moments = {}
         self.qdip_quadrupole_moments = {}
         self.full_quadrupole_moments = {}
+        self.total_free_energies = {}
+        self.frequencies = {}
         super().__init__(use_cache=use_cache)
 
     def _get_properties(self, mol, conformer, output_file):
@@ -668,13 +718,13 @@ class XTBEnergy(EnergyCalculator):
         Parameters
         ----------
         mol : :class:`.Molecule`
-            The :class:`.Molecule` whose energy is to be calculated.
+            The :class:`.Molecule` whose energy was calculated.
 
         conformer : :class:`int`
             The conformer of `mol` to use.
 
         output_file : :class: `str`
-            Name of output file with xTB results.
+            Name of the output file with xTB results.
 
         Returns
         -------
@@ -696,10 +746,13 @@ class XTBEnergy(EnergyCalculator):
             xtbext.qdip_quadrupole_moment()
         self.full_quadrupole_moments[key] = \
             xtbext.full_quadrupole_moment()
+        if self.calculate_free_energy:
+            self.total_free_energies[key] = xtbext.total_free_energy()
+            self.frequencies[key] = xtbext.frequencies()
 
     def _run_xtb(self, xyz, out_file):
         """
-        Runs the command for GFN-xTB using subprocess.
+        Runs the command for GFN-xTB.
 
         Parameters
         ----------
@@ -732,9 +785,14 @@ class XTBEnergy(EnergyCalculator):
         else:
             solvent = ''
 
+        if self.calculate_free_energy:
+            calc_type = '--hess'
+        else:
+            calc_type = ''
+
         cmd = (
             f'{memory} {self.xtb_path} {xyz} --gfn {self.gfn_version} '
-            f'--parallel {self.num_cores} '
+            f'{calc_type} --parallel {self.num_cores} '
             f'--etemp {self.electronic_temperature} '
             f'{solvent} --chrg {self.charge} '
             f'--uhf {self.num_unpaired_electrons}'
@@ -753,7 +811,7 @@ class XTBEnergy(EnergyCalculator):
 
     def energy(self, mol, conformer=-1):
         """
-        Calculates the energy `mol` using xTB.
+        Calculates the energy of `mol` using xTB.
 
         Parameters
         ----------
@@ -788,453 +846,6 @@ class XTBEnergy(EnergyCalculator):
             os.chdir(output_dir)
             xyz = 'input_structure.xyz'
             out_file = 'energy.output'
-            mol.write(xyz, conformer=conformer)
-            self._run_xtb(xyz=xyz, out_file=out_file)
-            self._get_properties(
-                mol=mol,
-                conformer=conformer,
-                output_file=out_file
-            )
-        finally:
-            os.chdir(init_dir)
-        return self.total_energies[(mol, conformer)]
-
-
-class XTBFreeEnergy(EnergyCalculator):
-    """
-    Uses GFN-xTB to calculate free energy and other properties.
-
-    By default, :meth:`energy` will extract other properties of the
-    :class:`.Molecule` and conformer passed to :meth:`energy`, which
-    will be saved in attributes of :class:`.XTBFreeEnergy`.
-
-    Notes
-    -----
-    When running :meth:`energy`, this calculator changes the
-    present working directory with :func:`os.chdir`. The original
-    working directory will be restored even if an error is raised so
-    unless multi-threading is being used this implementation detail
-    should not matter.
-
-    If multi-threading is being used an error could occur if two
-    different threads need to know about the current working directory
-    as :class:`.XTBFreeEnergy` can change it from under them.
-
-    Note that this does not have any impact on multi-processing,
-    which should always be safe.
-
-    Attributes
-    ----------
-    xtb_path : :class:`str`
-        The path to the xTB executable.
-
-    gfn_version : :class:`int`
-        Parameterization of GFN to use in xTB.
-        For details see
-        https://xtb-docs.readthedocs.io/en/latest/basics.html.
-
-    output_dir : :class:`str`
-        The name of the directory into which files generated during
-        the calculation are written, if ``None`` then
-        :func:`uuid.uuid4` is used.
-
-    num_cores : :class:`int`
-        The number of cores xTB should use.
-
-    electronic_temperature : :class:`int`
-        Electronic temperature to use (in K).
-
-    solvent : :class:`str`
-        Solvent to use in GBSA implicit solvation method.
-        For details see
-        https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
-
-    solvent_grid : :class:`str`
-        Grid level to use in SASA calculations for GBSA implicit
-        solvent.
-        Can be one of ``'normal'``, ``'tight'``, ``'verytight'``
-        or ``'extreme'``.
-        For details see
-        https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
-
-    charge : :class:`int`
-        Formal molecular charge.
-
-    num_unpaired_electrons : :class:`int`
-        Number of unpaired electrons.
-
-    use_cache : :class:`bool`
-        If ``True`` :meth:`energy` will not run twice on the same
-        molecule and conformer.
-
-    unlimited_memory : :class: `bool`
-        If ``True`` :meth:`energy` will be run without constraints on
-        the stacksize. If memory issues are encountered, this should be
-        ``True``, however this may raise issues on clusters.
-
-    total_energies : :class:`dict`
-        :class:`dict` of the total energy of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    homo_lumo_gaps : :class:`dict`
-        :class:`dict` of the HOMO-LUMO gap of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    fermi_levels : :class:`dict`
-        :class:`dict` of the Fermi level of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    homo_lumo_orbitals : :class:`dict`
-        :class:`dict` of the HOMO-LUMO orbital properties of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    qonly_dipole_moments : :class:`dict`
-        :class:`dict` of the `q only` dipole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    full_dipole_moments : :class:`dict`
-        :class:`dict` of the `full` dipole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    qonly_quadrupole_moments : :class:`dict`
-        :class:`dict` of the `q only` quadrupole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    qdip_quadrupole_moments : :class:`dict`
-        :class:`dict` of the `q+dip` quadrupole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    full_quadrupole_moments : :class:`dict`
-        :class:`dict` of the `full` quadrupole momentent of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    total_free_energies : :class:`dict`
-        :class:`dict` of the total free energy of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-    frequencies : :class:`dict`
-        :class:`dict` of the vibrational frequencies of
-        :class:`.Molecule` and conformer passed to :meth:`energy`.
-        A :class:`dict` mapping each :class:`.Molecule` and Key has the
-        form ``(mol, conformer)``.
-
-
-    Examples
-    --------
-
-    Note that for :class:`.MacroMolecule` objects assembled by ``stk``
-    :class:`XTBFreeEnergy` should usually be used after optimization
-    with some other method. This is because xTB only uses xyz
-    coordinates as input and so will not recognize the long bonds
-    created during assembly. An optimizer which can minimize these
-    bonds should be used before :class:`XTBFreeEnergy`.
-
-    :class:`XTBFreeEnergy` performs a numerical Hessian calculation
-    and calculates the total free energy and vibrational frequencies
-    of a molecule. It is recommended that a well optimized structure
-    be used as input for these calculations. For example, very tight
-    criteria in the :class:`XTB` optimizer will provide a reasonable
-    structure for this analysis.
-
-    .. code-block:: python
-
-        bb1 = StructUnit2.smiles_init('NCCNCCN', ['amine'])
-        bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
-        polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
-
-        # Pre optimize molecule with UFF.
-        uff = UFF()
-
-        # Optimization with XTB using very tight convergence
-        # criteria.
-        xtb_opt = stk.XTB(
-            xtb_path='/opt/gfnxtb/xtb',
-            unlimited_memory=True,
-            opt_level='verytight',
-        )
-
-        # Define optimizer sequence and run optimzations.
-        opt = OptimizerSequence(uff, xtb_opt)
-        opt.optimize(polymer)
-
-        # Calculate energy using GFN-xTB.
-        xtb = XTBFreeEnergy(
-            xtb_path='/opt/gfnxtb/xtb',
-            unlimited_memory=True,
-        )
-
-        # Runs the calculation and returns energy.
-        p_totalenergy = xtb.energy(polymer, conformer)
-
-        # Extracts properties from energy calculator for a given
-        # molecule and conformer.
-        key = (polymer, conformer)
-        # Extract the total free energy and vibrational frequencies.
-        p_total_free_energy = xtb.total_energies[key]
-        p_frequencies = xtb.frequencies[key]
-
-        # All the properties available in :class:`XTBEnergy` are also
-        # available.
-
-    See Also
-    --------
-    #. https://xtb-docs.readthedocs.io/en/latest/setup.html
-
-    """
-
-    def __init__(self,
-                 xtb_path,
-                 gfn_version=2,
-                 output_dir=None,
-                 num_cores=1,
-                 electronic_temperature=300,
-                 solvent=None,
-                 solvent_grid='normal',
-                 charge=0,
-                 num_unpaired_electrons=0,
-                 use_cache=False,
-                 unlimited_memory=False):
-        """
-        Initializes a :class:`XTBFreeEnergy` instance.
-
-        Parameters
-        ----------
-        xtb_path : :class:`str`
-            The path to the xTB executable.
-
-        gfn_version : :class:`int`, optional
-            Parameterization of GFN to use in xTB.
-            For details see
-            https://xtb-docs.readthedocs.io/en/latest/basics.html.
-
-        output_dir : :class:`str`, optional
-            The name of the directory into which files generated during
-            the calculation are written, if ``None`` then
-            :func:`uuid.uuid4` is used.
-
-        num_cores : :class:`int`, optional
-            The number of cores xTB should use.
-
-        electronic_temperature : :class:`int`, optional
-            Electronic temperature to use (in K).
-
-        solvent : :class:`str`, optional
-            Solvent to use in GBSA implicit solvation method.
-            For details see
-            https://xtb-docs.readthedocs.io/en/latest/gbsa.html
-
-        solvent_grid : :class:`str`, optional
-            Grid level to use in SASA calculations for GBSA implicit
-            solvent.
-            Can be one of ``'normal'``, ``'tight'``, ``'verytight'``
-            or ``'extreme'``.
-            For details see
-            https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
-
-        charge : :class:`int`, optional
-            Formal molecular charge.
-
-        num_unpaired_electrons : :class:`int`, optional
-            Number of unpaired electrons.
-
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`energy` will not run twice on the same
-            molecule and conformer.
-
-        unlimited_memory : :class: `bool`, optional
-            If ``True`` :meth:`energy` will be run without constraints
-            on the stacksize. If memory issues are encountered, this
-            should be ``True``, however this may raise issues on
-            clusters.
-
-        """
-        if solvent is not None:
-            solvent = solvent.lower()
-            if not is_valid_xtb_solvent(gfn_version, solvent):
-                if gfn_version == '0':
-                    raise XTBInvalidSolventError(
-                        f'No solvent valid for version',
-                        f' {gfn_version!r}.'
-                    )
-                else:
-                    raise XTBInvalidSolventError(
-                        f'Solvent {solvent!r} is invalid for ',
-                        f'version {gfn_version!r}.'
-                    )
-
-        self.xtb_path = xtb_path
-        self.gfn_version = str(gfn_version)
-        self.output_dir = output_dir
-        self.num_cores = str(num_cores)
-        self.electronic_temperature = str(electronic_temperature)
-        self.solvent = solvent
-        self.solvent_grid = solvent_grid
-        self.charge = str(charge)
-        self.num_unpaired_electrons = str(num_unpaired_electrons)
-        self.unlimited_memory = unlimited_memory
-
-        self.total_energies = {}
-        self.homo_lumo_gaps = {}
-        self.fermi_levels = {}
-        self.homo_lumo_orbitals = {}
-        self.qonly_dipole_moments = {}
-        self.full_dipole_moments = {}
-        self.qonly_quadrupole_moments = {}
-        self.qdip_quadrupole_moments = {}
-        self.full_quadrupole_moments = {}
-        self.total_free_energies = {}
-        self.frequencies = {}
-        super().__init__(use_cache=use_cache)
-
-    def _get_properties(self, mol, conformer, output_file):
-        """
-        Extracts properties from a GFN-xTB energy calculation.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The :class:`.Molecule` whose energy is to be calculated.
-
-        conformer : :class:`int`
-            The conformer of `mol` to use.
-
-        output_file : :class: `str`
-            Name of output file with xTB results.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-        # Get properties from output_file.
-        xtbext = XTBExtrators(output_file=output_file)
-        key = (mol, conformer)
-        self.total_energies[key] = xtbext.total_energy()
-        self.homo_lumo_gaps[key] = xtbext.homo_lumo_gap()
-        self.fermi_levels[key] = xtbext.fermi_level()
-        self.homo_lumo_orbitals[key] = xtbext.homo_lumo_occ()
-        self.qonly_dipole_moments[key] = xtbext.qonly_dipole_moment()
-        self.full_dipole_moments[key] = xtbext.full_dipole_moment()
-        self.qonly_quadrupole_moments[key] = \
-            xtbext.qonly_quadrupole_moment()
-        self.qdip_quadrupole_moments[key] = \
-            xtbext.qdip_quadrupole_moment()
-        self.full_quadrupole_moments[key] = \
-            xtbext.full_quadrupole_moment()
-        self.total_free_energies[key] = xtbext.total_free_energy()
-        self.frequencies[key] = xtbext.frequencies()
-
-    def _run_xtb(self, xyz, out_file):
-        """
-        Runs the command for GFN-xTB using subprocess.
-
-        Parameters
-        ----------
-        xyz : :class:`str`
-            The name of the input structure `.xyz` file.
-
-        out_file : :class:`str`
-            The name of output file with xTB results.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # Modify the memory limit.
-        if self.unlimited_memory:
-            # Uses the shell if unlimited_memory is True to be run
-            # multiple commpands in one subprocess.
-            memory = 'ulimit -s unlimited ;'
-        else:
-            memory = ''
-
-        if self.solvent is not None:
-            if self.solvent_grid == 'normal':
-                solvent_grid = ''
-            else:
-                solvent_grid = ''
-            solvent = f'--gbsa {self.solvent} {solvent_grid}'
-        else:
-            solvent = ''
-
-        cmd = (
-            f'{memory} {self.xtb_path} {xyz} --gfn {self.gfn_version} '
-            f'--hess --parallel {self.num_cores} '
-            f'--etemp {self.electronic_temperature} '
-            f'{solvent} --chrg {self.charge} '
-            f'--uhf {self.num_unpaired_electrons}'
-        )
-
-        with open(out_file, 'w') as f:
-            # Note that sp.call will hold the program until completion
-            # of the calculation.
-            sp.call(
-                cmd,
-                stdin=sp.PIPE,
-                stdout=f,
-                stderr=sp.PIPE,
-                shell=self.unlimited_memory
-            )
-
-    def energy(self, mol, conformer=-1):
-        """
-        Calculates the energy `mol` using xTB.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The :class:`.Molecule` whose energy is to be calculated.
-
-        conformer : :class:`int`, optional
-            The conformer of `mol` to use.
-
-        Returns
-        -------
-        :class:`float`
-            The energy.
-
-        """
-
-        if conformer == -1:
-            conformer = mol.mol.GetConformer(conformer).GetId()
-
-        if self.output_dir is None:
-            output_dir = str(uuid.uuid4().int)
-        else:
-            output_dir = self.output_dir
-        output_dir = os.path.abspath(output_dir)
-
-        if os.path.exists(output_dir):
-            shutil.rmtree(output_dir)
-
-        os.mkdir(output_dir)
-        init_dir = os.getcwd()
-        try:
-            os.chdir(output_dir)
-            xyz = 'input_structure.xyz'
-            out_file = 'free_energy.output'
             mol.write(xyz, conformer=conformer)
             self._run_xtb(xyz=xyz, out_file=out_file)
             self._get_properties(

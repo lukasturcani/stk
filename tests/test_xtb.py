@@ -34,8 +34,8 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     # initial energy
     init_energy = energy.energy(tmp_polymer)
 
-    # run low criteria optimization that will loop until negative frequencies
-    # are removed
+    # run low criteria optimization that will loop until negative
+    # frequencies are removed
     out_dir = 'gfnxtb_NF_crude_opt'
     tmp_polymer.write(join(odir, 'gfnxtb_opt_before.mol'))
     opt_lowtol = stk.XTB(
@@ -69,7 +69,9 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
         max_runs=1
     )
     opt_hightol.optimize(tmp_polymer)
-    tmp_polymer.write(join(join(odir, out_dir), 'gfnxtb_opt_after.mol'))
+    tmp_polymer.write(
+        join(join(odir, out_dir), 'gfnxtb_opt_after.mol')
+    )
     # check incomplete flag
     assert id not in opt_hightol.incomplete
     # check for restart file
@@ -85,13 +87,13 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     assert os.getcwd() == init_dir
 
 
-def test_xtb_solvent_charge_num_unpaired_electrons(tmp_polymer, xtb_path):
+def test_xtb_solvent_charge_uhf(tmp_polymer, xtb_path):
     # XTB  requires an embedding before working.
     etkdg = stk.ETKDG()
     etkdg.optimize(tmp_polymer)
 
-    # test that the energies with implicit solvation, charge != 0 and non zero
-    # num_unpaired_electrons
+    # test that the energies with implicit solvation, charge != 0 and
+    # non zero num_unpaired_electrons
     out_dir = 'gfnxtb_energy'
     energy = stk.XTBEnergy(
         xtb_path=xtb_path,
@@ -152,10 +154,11 @@ def test_xtb_properties(tmp_polymer, xtb_path):
         num_cores=2,
     )
     gfnxtb.optimize(tmp_polymer)
-    EC = stk.XTBFreeEnergy(
+    EC = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, 'gfnxtb_ey'),
-        unlimited_memory=True
+        unlimited_memory=True,
+        calculate_free_energy=True
     )
     total_energy = EC.energy(tmp_polymer)
     id = (tmp_polymer, conformer)

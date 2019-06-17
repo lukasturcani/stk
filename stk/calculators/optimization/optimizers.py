@@ -751,7 +751,6 @@ class XTB(Optimizer):
 
     Examples
     --------
-
     Note that for :class:`.MacroMolecule` objects assembled by ``stk``
     :class:`XTB` should usually be used in a
     :class:`OptimizerSequence`. This is because xTB only uses
@@ -912,17 +911,16 @@ class XTB(Optimizer):
         """
         if solvent is not None:
             solvent = solvent.lower()
+            if gfn_version == 0:
+                raise XTBInvalidSolventError(
+                    f'No solvent valid for version',
+                    f' {gfn_version!r}.'
+                )
             if not is_valid_xtb_solvent(gfn_version, solvent):
-                if gfn_version == '0':
-                    raise XTBInvalidSolventError(
-                        f'No solvent valid for version ',
-                        f'{gfn_version!r}.'
-                    )
-                else:
-                    raise XTBInvalidSolventError(
-                        f'Solvent {solvent!r} is invalid for ',
-                        f'version {gfn_version!r}.'
-                    )
+                raise XTBInvalidSolventError(
+                    f'Solvent {solvent!r} is invalid for ',
+                    f'version {gfn_version!r}.'
+                )
 
         self.xtb_path = xtb_path
         self.gfn_version = str(gfn_version)
