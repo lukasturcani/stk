@@ -1164,7 +1164,7 @@ def is_valid_xtb_solvent(gfn_version, solvent):
     Parameters
     ----------
     gfn_version : :class:`str`
-        GFN Parameterization version. `0`, `1` and `2` available.
+        GFN parameterization version. Can be: 0, 1 or 2.
 
     solvent : :class:`str`
         Solvent being tested.
@@ -1172,7 +1172,7 @@ def is_valid_xtb_solvent(gfn_version, solvent):
     Returns
     -------
     :class:`bool`
-        `True` if solvent is valid.
+        ``True`` if solvent is valid.
 
     See Also
     --------
@@ -1188,10 +1188,7 @@ def is_valid_xtb_solvent(gfn_version, solvent):
             'DMSO'.lower(), 'ether', 'H2O'.lower(),
             'methanol', 'THF'.lower(), 'toluene'
         ]
-        if solvent in valid_solvents:
-            return True
-        else:
-            return False
+        return solvent in valid_solvents
     elif str(gfn_version) == '2':
         valid_solvents = [
             'acetone', 'acetonitrile', 'CH2Cl2'.lower(),
@@ -1199,13 +1196,10 @@ def is_valid_xtb_solvent(gfn_version, solvent):
             'DMSO'.lower(), 'ether', 'H2O'.lower(), 'methanol',
             'n-hexane'.lower(), 'THF'.lower(), 'toluene'
         ]
-        if solvent in valid_solvents:
-            return True
-        else:
-            return False
+        return solvent in valid_solvents
 
 
-class XTBExtrators():
+class XTBExtrator:
     """
     Methods for extracting properties from GFN-xTB output.
 
@@ -1221,7 +1215,7 @@ class XTBExtrators():
 
     def total_energy(self):
         """
-        Extracts total energy (a.u.) from xTB output.
+        Extracts total energy in a.u. from xTB output.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1245,7 +1239,7 @@ class XTBExtrators():
 
     def homo_lumo_gap(self):
         """
-        Extracts total energy (eV) from xTB output.
+        Extracts HOMO-LUMO gap in eV from xTB output.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1269,7 +1263,7 @@ class XTBExtrators():
 
     def fermi_level(self):
         """
-        Extracts Fermi-Level energy (eV) from xTB output.
+        Extracts Fermi-level energy in eV from xTB output.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1295,7 +1289,7 @@ class XTBExtrators():
 
     def qonly_dipole_moment(self):
         """
-        Extracts `q only` dipole moment vector (Debye) from xTB output.
+        Extracts `q only` dipole moment in Debye from xTB output.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1326,7 +1320,7 @@ class XTBExtrators():
 
     def full_dipole_moment(self):
         """
-        Extracts `full` dipole moment vector (Debye) from xTB output.
+        Extracts `full` dipole moment in Debye from xTB output.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1336,7 +1330,7 @@ class XTBExtrators():
         -------
         :class:`list` of :class:`float`
             Components of dipole moment and total magnitude as
-            ``[`x`, `y`, `z`, `tot (Debye)`]`` in a list of length 4.
+            ``[`x`, `y`, `z`, `total`]`` in a list of length 4.
 
         """
         value = None
@@ -1357,7 +1351,7 @@ class XTBExtrators():
 
     def qonly_quadrupole_moment(self):
         """
-        Extracts `q only` traceless quadrupole moment vector (Debye).
+        Extracts `q only` traceless quadrupole moment in Debye.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1397,7 +1391,7 @@ class XTBExtrators():
 
     def qdip_quadrupole_moment(self):
         """
-        Extracts `q+dip` traceless quadrupole moment vector (Debye).
+        Extracts `q+dip` traceless quadrupole moment in Debye.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1436,8 +1430,7 @@ class XTBExtrators():
 
     def full_quadrupole_moment(self):
         """
-        Extracts `full` traceless quadrupole moment vector (Debye) from
-        xTB output.
+        Extracts `full` traceless quadrupole moment in (Debye).
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1476,7 +1469,7 @@ class XTBExtrators():
 
     def homo_lumo_occ(self):
         """
-        Extracts energies and occupations (eV) of the HOMO and LUMO.
+        Extracts energies in eV and occupations of the HOMO and LUMO.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1488,8 +1481,9 @@ class XTBExtrators():
         Returns
         -------
         :class:`dict`
-            Dictionary of ``(`#`, `occupation`, `Energy (eV)`)`` of
-            HOMO and LUMO orbital.
+            :class:`dict` with items of the form
+            'HOMO':(#, occupation, energy) and
+            'LUMO':(#, occupation, energy).
         """
         value = None
 
@@ -1525,7 +1519,7 @@ class XTBExtrators():
 
     def total_free_energy(self):
         """
-        Extracts total free energy (a.u.) from xTB output at T=298.15K.
+        Extracts total free energy in a.u. at 298.15K.
 
         Formatting based on latest version of xTB (190418)
         Example line:
@@ -1549,8 +1543,7 @@ class XTBExtrators():
 
     def frequencies(self):
         """
-        Extracts projected vibrational frequencies (cm-1) xTB output
-        at T=298.15K.
+        Extracts vibrational frequencies in wavenumbers at T=298.15K.
 
         Formatting based on latest version of xTB (190418).
         Example line:

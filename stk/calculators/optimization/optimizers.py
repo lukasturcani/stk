@@ -651,7 +651,11 @@ class ETKDG(Optimizer):
         mol.mol.RemoveConformer(conf_id)
 
 
-class XTBOptimizerFailedError(Exception):
+class XTBOptimizerError(Exception):
+    ...
+
+
+class XTBConvergenceError(XTBOptimizerError):
     ...
 
 
@@ -676,14 +680,14 @@ class XTB(Optimizer):
 
     Furthermore, the :meth:`optimize` will check that the
     structure is adequately optimized by checking for negative
-    frequencies after a Hessian calculation. :attr:`XTB.max_runs`
-    optimizations will be attempted at the given :attr:`XTB.opt_level`
+    frequencies after a Hessian calculation. :attr:`max_runs`
+    optimizations will be attempted at the given :attr:`opt_level`
     to obtain an optimized structure. However, we outline in the
-    examples how to iterate over :attr:`XTB.opt_levels` to increase
+    examples how to iterate over :attr:`opt_levels` to increase
     convergence criteria and hopefully obtain an optimized structure.
     The presence of negative frequencies can occur even when the
     optimization has converged based on the given
-    :attr:`XTB.opt_level`.
+    :attr:`opt_level`.
 
     Attributes
     ----------
@@ -772,53 +776,57 @@ class XTB(Optimizer):
         xtb.optimize(polymer)
 
     By default, all optimizations with xTB are performed using the
-    `--ohess` flag, which forces the calculation of a numerical
+    --ohess flag, which forces the calculation of a numerical
     Hessian, thermodynamic properties and vibrational frequencies.
     The :meth:`optimize` will check that the structure is appropriately
     optimized (i.e. convergence is obtained and no negative vibrational
     frequencies are present) and continue optimizing a structure (up to
-    ``max_runs`` times) until this is achieved. This loop, by default,
-    will be performed at the same ``opt_level``. The following examples
-    shows how a user may optimize structures with tigher convergence
-    criteria (i.e. different ``opt_level``) until the structure is
-    sufficiently optimized. Furthermore, the calculation of the
-    Hessian can be turned off using ``max_runs`` = None.
+    :attr:`max_runs` times) until this is achieved. This loop, by
+    default, will be performed at the same :attr:`opt_level`. The
+    following examples shows how a user may optimize structures with
+    tigher convergence criteria (i.e. different :attr:`opt_level`)
+    until the structure is sufficiently optimized. Furthermore, the
+    calculation of the Hessian can be turned off using
+    :attr:`max_runs` = None.
 
-    # Use crude optimization with max_runs = None because this will
-    # not achieve optimization and rerunning it is unproductive.
-    xtb_crude = XTB(
-        xtb_path='/opt/gfnxtb/xtb',
-        output_dir='xtb_crude',
-        unlimited_memory=True,
-        opt_level='crude',
-        max_runs=None
-    )
-    # Use normal optimization with max_runs == 2.
-    xtb_normal = XTB(
-        xtb_path='/opt/gfnxtb/xtb',
-        output_dir='xtb_normal',
-        unlimited_memory=True,
-        opt_level='normal',
-        max_runs=2
-    )
-    # Use vtight optimization with max_runs == 2, which should achieve
-    # sufficient optimization.
-    xtb_vtight = XTB(
-        xtb_path='/opt/gfnxtb/xtb',
-        output_dir='xtb_vtight',
-        unlimited_memory=True,
-        opt_level='vtight',
-        max_runs=2
-    )
+    .. code-block:: python
 
-    # The conformer must be set to check the `incomplete` attribute.
-    conformer = polymer.mol.GetConformer(-1).GetId()
+        # Use crude optimization with max_runs = None because this will
+        # not achieve optimization and rerunning it is unproductive.
+        xtb_crude = XTB(
+            xtb_path='/opt/gfnxtb/xtb',
+            output_dir='xtb_crude',
+            unlimited_memory=True,
+            opt_level='crude',
+            max_runs=None
+        )
+        # Use normal optimization with max_runs == 2.
+        xtb_normal = XTB(
+            xtb_path='/opt/gfnxtb/xtb',
+            output_dir='xtb_normal',
+            unlimited_memory=True,
+            opt_level='normal',
+            max_runs=2
+        )
+        # Use vtight optimization with max_runs == 2, which should
+        # achieve sufficient optimization.
+        xtb_vtight = XTB(
+            xtb_path='/opt/gfnxtb/xtb',
+            output_dir='xtb_vtight',
+            unlimited_memory=True,
+            opt_level='vtight',
+            max_runs=2
+        )
 
-    xtb_crude.optimize(mol=polymer, conformer=conformer)
-    if (polymer, conformer) in xtb_crude.incomplete:
-        xtb_normal.optimize(mol=polymer, conformer=conformer)
-        if (polymer, conformer) in xtb_normal.incomplete:
-            xtb_vtight.optimize(mol=polymer, conformer=conformer)
+        # The conformer must be set to check the `incomplete`
+        # attribute.
+        conformer = polymer.mol.GetConformer(-1).GetId()
+
+        xtb_crude.optimize(mol=polymer, conformer=conformer)
+        if (polymer, conformer) in xtb_crude.incomplete:
+            xtb_normal.optimize(mol=polymer, conformer=conformer)
+            if (polymer, conformer) in xtb_normal.incomplete:
+                xtb_vtight.optimize(mol=polymer, conformer=conformer)
 
     See Also
     --------
@@ -993,13 +1001,9 @@ class XTB(Optimizer):
             else:
                 return False
         elif os.path.exists('NOT_CONVERGED'):
-            raise XTBOptimizerFailedError(
-                f'Optimization not converged.'
-            )
+            XTBConvergenceError('Optimization not converged.')
         else:
-            raise XTBOptimizerFailedError(
-                f'Optimization failed to complete'
-            )
+            XTBOptimizerError('Optimization failed to complete')
 
     def _run_xtb(self, xyz, out_file):
         """
@@ -1063,6 +1067,42 @@ class XTB(Optimizer):
                 shell=self.unlimited_memory
             )
 
+    def _run_optimizations(self):
+        for run in range(self.max_runs):
+            xyz = f'input_structure_{run}.xyz'
+            out_file = f'optimization_{run_count}.output'
+            mol.write(xyz, conformer=conformer)
+            self._run_xtb(xyz=xyz, out_file=out_file)
+            # Check if the optimization is complete.
+            if self._incomplete(output_file=out_file):
+                # The calculation is incomplete.
+                # If the negative frequencies are small, then GFN
+                # may not produce the restart file. If that is the
+                # case, exit optimization loop and warn.
+                file_name = join(output_dir, 'xtbhess.coord')
+                if os.path.exists(file_name):
+                    # Update mol from xtbhess.coord and continue.
+                    mol.update_from_turbomole(
+                        path=file_name,
+                        conformer=conformer
+                    )
+                else:
+                    self.incomplete.add((mol, conformer))
+                    logging.warning(
+                        'Small negative frequencies present in '
+                        f'{mol.name} conformer {conformer}.'
+                    )
+                    return
+            else:
+                # Calculation is complete.
+                # Update mol from xtbopt.xyz.
+                output_xyz = join(output_dir, 'xtbopt.xyz')
+                mol.update_from_xyz(
+                    path=output_xyz,
+                    conformer=conformer
+                )
+                return
+
     def optimize(self, mol, conformer=-1):
         """
         Optimizes the molecule `mol` using xTB.
@@ -1099,54 +1139,17 @@ class XTB(Optimizer):
 
         os.mkdir(output_dir)
         init_dir = os.getcwd()
+        os.chdir(output_dir)
         try:
-            os.chdir(output_dir)
-            run_count = 0
-            out_file = None
-            while True:
-                run_count += 1
-                xyz = f'input_structure_{run_count}.xyz'
-                out_file = f'optimization_{run_count}.output'
-                mol.write(xyz, conformer=conformer)
-                self._run_xtb(xyz=xyz, out_file=out_file)
-                # Check if the optimization is complete.
-                if self._check_incomplete(output_file=out_file):
-                    # The calculation is incomplete.
-                    # If the negative frequencies are small, then GFN
-                    # may not produce the restart file. If that is the
-                    # case, exit optimization loop and warn.
-                    if os.path.exists(
-                        join(output_dir, 'xtbhess.coord')
-                    ):
-                        # Update mol from xtbhess.coord and continue.
-                        output_coord = join(
-                            output_dir, 'xtbhess.coord'
-                        )
-                        mol.update_from_turbomole(
-                            path=output_coord,
-                            conformer=conformer
-                        )
-                    else:
-                        self.incomplete.add((mol, conformer))
-                        logging.warning(
-                            f'Small negative frequencies present.'
-                        )
-                        break
-                    # Break if run count == max_runs.
-                    if run_count == self.max_runs:
-                        self.incomplete.add((mol, conformer))
-                        msg = 'Negative frequencies present in'
-                        msg += f'{self.max_runs} optimizations'
-                        logging.warning(msg)
-                        break
-                else:
-                    # Calculation is complete.
-                    # Update mol from xtbopt.xyz.
-                    output_xyz = join(output_dir, 'xtbopt.xyz')
-                    mol.update_from_xyz(
-                        path=output_xyz,
-                        conformer=conformer
-                    )
-                    break
+            self._run_optimizations()
+
         finally:
             os.chdir(init_dir)
+
+        self.incomplete.add((mol, conformer))
+        logging.warning(
+            'Negative frequencies present in '
+            f'{mol.name} conformer {conformer} '
+            f'after {self.max_runs} optimizations '
+            'completed.'
+        )
