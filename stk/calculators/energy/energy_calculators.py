@@ -414,7 +414,7 @@ class XTBEnergy(EnergyCalculator):
     xtb_path : :class:`str`
         The path to the xTB executable.
 
-    gfn_version : :class:`int`
+    gfn_version : :class:`str`
         Parameterization of GFN to use in xTB.
         For details see
         https://xtb-docs.readthedocs.io/en/latest/basics.html.
@@ -424,15 +424,15 @@ class XTBEnergy(EnergyCalculator):
         the calculation are written, if ``None`` then
         :func:`uuid.uuid4` is used.
 
-    num_cores : :class:`int`
+    num_cores : :class:`str`
         The number of cores xTB should use.
 
     calculate_free_energy : :class:`bool`
         Whether to calculate the total free energy and vibrational
         frequencies.
 
-    electronic_temperature : :class:`int`
-        Electronic temperature to use (in K).
+    electronic_temperature : :class:`str`
+        Electronic temperature in Kelvin.
 
     solvent : :class:`str`
         Solvent to use in GBSA implicit solvation method.
@@ -447,10 +447,10 @@ class XTBEnergy(EnergyCalculator):
         For details see
         https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
 
-    charge : :class:`int`
+    charge : :class:`str`
         Formal molecular charge.
 
-    num_unpaired_electrons : :class:`int`
+    num_unpaired_electrons : :class:`str`
         Number of unpaired electrons.
 
     use_cache : :class:`bool`
@@ -641,7 +641,7 @@ class XTBEnergy(EnergyCalculator):
             frequencies.
 
         electronic_temperature : :class:`int`, optional
-            Electronic temperature to use (in K).
+            Electronic temperature in Kelvin.
 
         solvent : :class:`str`, optional
             Solvent to use in GBSA implicit solvation method.
@@ -770,8 +770,6 @@ class XTBEnergy(EnergyCalculator):
 
         # Modify the memory limit.
         if self.unlimited_memory:
-            # Uses the shell if unlimited_memory is True to be run
-            # multiple commpands in one subprocess.
             memory = 'ulimit -s unlimited ;'
         else:
             memory = ''
@@ -806,6 +804,8 @@ class XTBEnergy(EnergyCalculator):
                 stdin=sp.PIPE,
                 stdout=f,
                 stderr=sp.PIPE,
+                # Uses the shell if unlimited_memory is True to be run
+                # multiple commpands in one subprocess.
                 shell=self.unlimited_memory
             )
 

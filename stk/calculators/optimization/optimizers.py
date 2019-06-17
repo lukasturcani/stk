@@ -669,27 +669,28 @@ class XTB(Optimizer):
 
     If multi-threading is being used an error could occur if two
     different threads need to know about the current working directory
-    as this :class:`.XTB` can change it from under them.
+    as :class:`.XTB` can change it from under them.
 
     Note that this does not have any impact on multi-processing,
     which should always be safe.
 
-    Furthermore, the :meth:`optimize` calculator will check that the
+    Furthermore, the :meth:`optimize` will check that the
     structure is adequately optimized by checking for negative
-    frequencies after a Hessian calculation. ``max_runs`` optimizations
-    will be attempted at the given ``opt_level`` to obtain an optimized
-    structure. However, we outline in the examples how to iterate over
-    ``opt_levels`` to increase convergence criteria and hopefully
-    obtain an optimized structure. The presence of negative
-    frequencies can occur even when the optimization has
-    converged based on the given ``opt_level``.
+    frequencies after a Hessian calculation. :attr:`XTB.max_runs`
+    optimizations will be attempted at the given :attr:`XTB.opt_level`
+    to obtain an optimized structure. However, we outline in the
+    examples how to iterate over :attr:`XTB.opt_levels` to increase
+    convergence criteria and hopefully obtain an optimized structure.
+    The presence of negative frequencies can occur even when the
+    optimization has converged based on the given
+    :attr:`XTB.opt_level`.
 
     Attributes
     ----------
     xtb_path : :class:`str`
         The path to the xTB executable.
 
-    gfn_version : :class:`int`
+    gfn_version : :class:`str`
         Parameterization of GFN to use in xTB.
         For details see
         https://xtb-docs.readthedocs.io/en/latest/basics.html.
@@ -711,11 +712,11 @@ class XTB(Optimizer):
         Number of optimizations to attempt in a row to remove negative
         frequencies.
 
-    num_cores : :class:`int`
+    num_cores : :class:`str`
         The number of cores xTB should use.
 
-    electronic_temperature : :class:`int`
-        Electronic temperature to use (in K).
+    electronic_temperature : :class:`str`
+        Electronic temperature in Kelvin.
 
     solvent : :class:`str`
         Solvent to use in GBSA implicit solvation method.
@@ -730,10 +731,10 @@ class XTB(Optimizer):
         For details see
         https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
 
-    charge : :class:`int`
+    charge : :class:`str`
         Formal molecular charge.
 
-    num_unpaired_electrons : :class:`int`
+    num_unpaired_electrons : :class:`str`
         Number of unpaired electrons.
 
     use_cache : :class:`bool`
@@ -745,8 +746,8 @@ class XTB(Optimizer):
         the stacksize. If memory issues are encountered, this should be
         ``True``, however this may raise issues on clusters.
 
-    incomplete : :class:`list`
-        :class:`list` of :class:`tuple` giving the `mol` and
+    incomplete : :class:`set`
+        :class:`set` of :class:`tuple` containing the `mol` and
         `conformer` that have undergone incomplete optimization.
 
     Examples
@@ -877,7 +878,7 @@ class XTB(Optimizer):
             The number of cores xTB should use.
 
         electronic_temperature : :class:`int`, optional
-            Electronic temperature to use (in K).
+            Electronic temperature in Kelvin.
 
         solvent : :class:`str`, optional
             Solvent to use in GBSA implicit solvation method.
@@ -934,7 +935,7 @@ class XTB(Optimizer):
         self.charge = str(charge)
         self.num_unpaired_electrons = str(num_unpaired_electrons)
         self.unlimited_memory = unlimited_memory
-        self.incomplete = []
+        self.incomplete = set()
         super().__init__(use_cache=use_cache)
 
     def _check_neg_frequencies(self, output_file):
@@ -1020,8 +1021,6 @@ class XTB(Optimizer):
 
         # Modify the memory limit.
         if self.unlimited_memory:
-            # Uses the shell if unlimited_memory is True to be run
-            # multiple commpands in one subprocess.
             memory = 'ulimit -s unlimited ;'
         else:
             memory = ''
@@ -1059,6 +1058,8 @@ class XTB(Optimizer):
                 stdin=sp.PIPE,
                 stdout=f,
                 stderr=sp.PIPE,
+                # Uses the shell if unlimited_memory is True to be run
+                # multiple commpands in one subprocess.
                 shell=self.unlimited_memory
             )
 
@@ -1126,14 +1127,14 @@ class XTB(Optimizer):
                             conformer=conformer
                         )
                     else:
-                        self.incomplete.append((mol, conformer))
+                        self.incomplete.add((mol, conformer))
                         logging.warning(
                             f'Small negative frequencies present.'
                         )
                         break
                     # Break if run count == max_runs.
                     if run_count == self.max_runs:
-                        self.incomplete.append((mol, conformer))
+                        self.incomplete.add((mol, conformer))
                         msg = 'Negative frequencies present in'
                         msg += f'{self.max_runs} optimizations'
                         logging.warning(msg)
