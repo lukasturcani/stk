@@ -1199,7 +1199,7 @@ def is_valid_xtb_solvent(gfn_version, solvent):
         return solvent in valid_solvents
 
 
-class XTBExtrator:
+class XTBExtractor:
     """
     Methods for extracting properties from GFN-xTB output.
 

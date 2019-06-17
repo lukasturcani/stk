@@ -10,7 +10,7 @@ if not os.path.exists(odir):
     os.mkdir(odir)
 
 xtb = pytest.mark.skipif(
-    all('xtb' not in x for x in sys.argv),
+    all('xtb_path' not in x for x in sys.argv),
     reason="Only run when explicitly asked.")
 
 
@@ -83,6 +83,7 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     assert new_energy < init_energy
 
 
+@xtb
 def test_xtb_solvent_charge_uhf(tmp_polymer, xtb_path):
     init_dir = os.getcwd()
     # XTB requires an embedding before working.
@@ -143,6 +144,7 @@ def test_xtb_solvent_charge_uhf(tmp_polymer, xtb_path):
     assert os.getcwd() == init_dir
 
 
+@xtb
 def test_xtb_properties(tmp_polymer, xtb_path):
     # XTB requires an embedding before working.
     etkdg = stk.ETKDG()
@@ -217,6 +219,7 @@ def test_xtb_properties(tmp_polymer, xtb_path):
         assert isinstance(i, float) or isinstance(i, int)
 
 
+@xtb
 def test_valid_solvent():
     gfn_1 = '1'
     gfn_2 = '2'

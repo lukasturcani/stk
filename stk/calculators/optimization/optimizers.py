@@ -13,11 +13,10 @@ import os
 from functools import wraps
 import subprocess as sp
 import uuid
-from os.path import join
 import shutil
 from ...utilities import (is_valid_xtb_solvent,
                           XTBInvalidSolventError,
-                          XTBExtrators)
+                          XTBExtractor)
 
 logger = logging.getLogger(__name__)
 
@@ -962,7 +961,7 @@ class XTB(Optimizer):
 
         """
         neg_freq = False
-        xtbext = XTBExtrators(output_file=output_file)
+        xtbext = XTBExtractor(output_file=output_file)
         value = xtbext.frequencies()
         # Check for one negative frequency, excluding the first
         # 6 frequencies.

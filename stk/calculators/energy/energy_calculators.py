@@ -14,7 +14,7 @@ import os
 import shutil
 from ...utilities import (is_valid_xtb_solvent,
                           XTBInvalidSolventError,
-                          XTBExtrators)
+                          XTBExtractor)
 
 
 logger = logging.getLogger(__name__)
@@ -732,7 +732,7 @@ class XTBEnergy(EnergyCalculator):
 
         """
         # Get properties from output_file.
-        xtbext = XTBExtrators(output_file=output_file)
+        xtbext = XTBExtractor(output_file=output_file)
         key = (mol, conformer)
         self.total_energies[key] = xtbext.total_energy()
         self.homo_lumo_gaps[key] = xtbext.homo_lumo_gap()
