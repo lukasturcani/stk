@@ -969,7 +969,7 @@ class XTB(Optimizer):
             neg_freq = True
         return neg_freq
 
-    def _check_incomplete(self, output_file):
+    def _incomplete(self, output_file):
         """
         Check if xTB optimization has converged.
 
@@ -994,9 +994,7 @@ class XTB(Optimizer):
             # is not None..
             # Return True if there exists at least one.
             if self.max_runs is not None:
-                return self._check_neg_frequencies(
-                    output_file=output_file
-                )
+                return self._check_neg_frequencies(output_file)
             else:
                 return False
         elif os.path.exists('NOT_CONVERGED'):
@@ -1066,41 +1064,61 @@ class XTB(Optimizer):
                 shell=self.unlimited_memory
             )
 
-    def _run_optimizations(self):
-        for run in range(self.max_runs):
-            xyz = f'input_structure_{run}.xyz'
-            out_file = f'optimization_{run_count}.output'
+    def _run_optimizations(self, mol, conformer):
+        """
+        Run loop of optimizations of the molecule `mol` using xTB.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        conformer : :class:`int`
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+        runs = self.max_runs if self.max_runs is not None else 0
+        for run in range(runs):
+            xyz = f'input_structure_{run+1}.xyz'
+            out_file = f'optimization_{run+1}.output'
             mol.write(xyz, conformer=conformer)
             self._run_xtb(xyz=xyz, out_file=out_file)
             # Check if the optimization is complete.
-            if self._incomplete(output_file=out_file):
+            coord_file = 'xtbhess.coord'
+            coord_exists = os.path.exists(coord_file)
+            output_xyz = 'xtbopt.xyz'
+            opt_incomplete = self._incomplete(out_file)
+            if opt_incomplete and coord_exists:
                 # The calculation is incomplete.
-                # If the negative frequencies are small, then GFN
-                # may not produce the restart file. If that is the
-                # case, exit optimization loop and warn.
-                file_name = join(output_dir, 'xtbhess.coord')
-                if os.path.exists(file_name):
-                    # Update mol from xtbhess.coord and continue.
-                    mol.update_from_turbomole(
-                        path=file_name,
-                        conformer=conformer
-                    )
-                else:
+                # Update mol from xtbhess.coord and continue.
+                mol.update_from_turbomole(
+                    path=coord_file,
+                    conformer=conformer
+                )
+            else:
+                # Update mol from xtbopt.xyz.
+                mol.update_from_xyz(
+                    path=output_xyz,
+                    conformer=conformer
+                )
+                if opt_incomplete:
+                    # If the negative frequencies are small, then GFN
+                    # may not produce the restart file. If that is the
+                    # case, exit optimization loop and warn.
                     self.incomplete.add((mol, conformer))
                     logging.warning(
                         'Small negative frequencies present in '
                         f'{mol.name} conformer {conformer}.'
                     )
-                    return
-            else:
-                # Calculation is complete.
-                # Update mol from xtbopt.xyz.
-                output_xyz = join(output_dir, 'xtbopt.xyz')
-                mol.update_from_xyz(
-                    path=output_xyz,
-                    conformer=conformer
-                )
-                return
+                    return False
+                else:
+                    # Calculation is complete.
+                    return True
+        return None
 
     def optimize(self, mol, conformer=-1):
         """
@@ -1139,16 +1157,17 @@ class XTB(Optimizer):
         os.mkdir(output_dir)
         init_dir = os.getcwd()
         os.chdir(output_dir)
-        try:
-            self._run_optimizations()
 
+        try:
+            result = self._run_optimizations(mol, conformer)
         finally:
             os.chdir(init_dir)
 
-        self.incomplete.add((mol, conformer))
-        logging.warning(
-            'Negative frequencies present in '
-            f'{mol.name} conformer {conformer} '
-            f'after {self.max_runs} optimizations '
-            'completed.'
-        )
+        if result is None:
+            self.incomplete.add((mol, conformer))
+            logging.warning(
+                'Negative frequencies present in '
+                f'{mol.name} conformer {conformer} '
+                f'after {self.max_runs} optimizations '
+                'completed.'
+            )
