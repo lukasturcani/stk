@@ -304,11 +304,12 @@ class Molecule:
             for atoms_group in atoms_dihedral:
                 # Calculate the dihedral angle.
                 dihedral_value = rdMolTransforms.GetDihedralDeg(
-                                    self.mol.GetConformer(conformer),
-                                    atoms_group[0],
-                                    atoms_group[1],
-                                    atoms_group[2],
-                                    atoms_group[3])
+                    self.mol.GetConformer(conformer),
+                    atoms_group[0],
+                    atoms_group[1],
+                    atoms_group[2],
+                    atoms_group[3]
+                )
                 # Check that the dihedral is calculated in the right
                 # direction.
                 if abs(dihedral_value) > 90:
@@ -1275,19 +1276,23 @@ class Molecule:
         atom_counts = {}
         hetatm = 'HETATM'
         alt_loc = ''
-        res_name = 'UNL'
+        res_name = 'UNK'
         chain_id = ''
         res_seq = '1'
         i_code = ''
         occupancy = '1.00'
         temp_factor = '0.00'
+        print(res_name)
         for atom in atoms:
             serial = atom+1
             element = self.atom_symbol(atom)
             atom_counts[element] = atom_counts.get(element, 0) + 1
             name = f'{element}{atom_counts[element]}'
-            # Make sure the coords are no more than 8 columns wide each.
-            x, y, z = (f'{i}'[:8] for i in self.atom_coords(atom, conformer))
+            # Make sure the coords are no more than 8 columns wide
+            # each.
+            x, y, z = (
+                f'{i}'[:8] for i in self.atom_coords(atom, conformer)
+            )
             charge = self.mol.GetAtomWithIdx(atom).GetFormalCharge()
             lines.append(
                 f'{hetatm:<6}{serial:>5} {name:<4}'
