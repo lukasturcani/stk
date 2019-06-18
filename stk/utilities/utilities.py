@@ -1159,12 +1159,13 @@ class XTBInvalidSolventError(Exception):
 
 
 def is_valid_xtb_solvent(gfn_version, solvent):
-    '''Check if solvent is valid for the given GFN version.
+    """
+    Check if solvent is valid for the given GFN version.
 
     Parameters
     ----------
-    gfn_version : :class:`str`
-        GFN parameterization version. Can be: 0, 1 or 2.
+    gfn_version : :class:`int`
+        GFN parameterization version. Can be: ``0``, ``1`` or ``2``.
 
     solvent : :class:`str`
         Solvent being tested.
@@ -1178,131 +1179,119 @@ def is_valid_xtb_solvent(gfn_version, solvent):
     --------
     # https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
-    '''
-    if str(gfn_version) == '0':
+    """
+    if gfn_version == 0:
         return False
-    elif str(gfn_version) == '1':
-        valid_solvents = [
+    elif gfn_version == 1:
+        valid_solvents = set([
             'acetone', 'acetonitrile', 'benzene',
             'CH2Cl2'.lower(), 'CHCl3'.lower(), 'CS2'.lower(),
             'DMSO'.lower(), 'ether', 'H2O'.lower(),
             'methanol', 'THF'.lower(), 'toluene'
-        ]
+        ])
         return solvent in valid_solvents
-    elif str(gfn_version) == '2':
-        valid_solvents = [
+    elif gfn_version == 2:
+        valid_solvents = set([
             'acetone', 'acetonitrile', 'CH2Cl2'.lower(),
             'CHCl3'.lower(), 'CS2'.lower(), 'DMF'.lower(),
             'DMSO'.lower(), 'ether', 'H2O'.lower(), 'methanol',
             'n-hexane'.lower(), 'THF'.lower(), 'toluene'
-        ]
+        ])
         return solvent in valid_solvents
 
 
 class XTBExtractor:
     """
-    Methods for extracting properties from GFN-xTB output.
+    Extracts properties from GFN-xTB output files.
 
-    Parameters
+    Attributes
     ----------
     output_file : :class:`str`
         Output file to extract properties from.
 
     """
     def __init__(self, output_file):
-        output_string = open(output_file, 'r').readlines()
-        self.output_string = output_string
+        """
+        Initializes :class:`XTBExtractor`
+
+        Parameters
+        ----------
+        output_file : :class:`str`
+            Output file to extract properties from.
+
+        """
+        self.output_file = output_file
+        with open(self.output_file, 'r') as f:
+            self.output_string = f.readlines()
 
     def total_energy(self):
         """
         Extracts total energy in a.u. from xTB output.
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        "          | TOTAL ENERGY              -76.260405590154 Eh   |"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`float`
             Total energy in a.u.
-        """
-        value = None
 
-        # Regular expression for numbers.
+        """
+
         nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
         for line in reversed(self.output_string):
             if '          | TOTAL ENERGY  ' in line:
-                value = nums.search(line.rstrip()).group(0)
-                break
-
-        return float(value)
+                return float(nums.search(line.rstrip()).group(0))
 
     def homo_lumo_gap(self):
         """
         Extracts HOMO-LUMO gap in eV from xTB output.
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        "          | HOMO-LUMO GAP               2.336339660160 eV   |"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`float`
             Homo-Lumo gap in eV.
-        """
-        value = None
 
-        # Regular expression for numbers.
+        """
+
         nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
         for line in reversed(self.output_string):
             if '          | HOMO-LUMO GAP   ' in line:
-                value = nums.search(line.rstrip()).group(0)
-                break
-
-        return float(value)
+                return float(nums.search(line.rstrip()).group(0))
 
     def fermi_level(self):
         """
         Extracts Fermi-level energy in eV from xTB output.
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        "             Fermi-level           -0.3159871 Eh
-                   -8.5984 eV"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`float`
             Fermi-level in eV.
-        """
-        value = None
 
-        # Regular expression for numbers.
+        """
+
         nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
         for line in reversed(self.output_string):
             if '             Fermi-level        ' in line:
                 part2 = line.split('Eh')
-                value = nums.search(part2[1].rstrip()).group(0)
-                break
-
-        return float(value)
+                return float(nums.search(part2[1].rstrip()).group(0))
 
     def qonly_dipole_moment(self):
         """
-        Extracts `q only` dipole moment in Debye from xTB output.
+        Extracts q only dipole moment in Debye from xTB output.
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        " q only:       -0.033      -0.081      -0.815"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`list` of :class:`float`
-            Components of dipole moment as ``[`x`, `y`, `z`]`` in a
-            list of length 3.
+            Components of dipole moment as [x, y, z] in a
+            :class:`list` of length 3.
 
         """
-        value = None
 
         sample_set = []
         for i, line in enumerate(self.output_string):
@@ -1311,29 +1300,24 @@ class XTBExtractor:
 
         # get values from line
         if 'q only:' in sample_set:
-            x, y, z = [i for i in sample_set.split(':')[1].split(' ')
-                       if i != '']
-
-        value = [float(x), float(y), float(z)]
-
-        return value
+            return [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
 
     def full_dipole_moment(self):
         """
-        Extracts `full` dipole moment in Debye from xTB output.
+        Extracts full dipole moment in Debye from xTB output.
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        "   full:       -0.684       0.122      -1.071       3.245"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`list` of :class:`float`
             Components of dipole moment and total magnitude as
-            ``[`x`, `y`, `z`, `total`]`` in a list of length 4.
+            [x, y, z, total] in a :class:`list` of length 4.
 
         """
-        value = None
 
         sample_set = []
         for i, line in enumerate(self.output_string):
@@ -1342,31 +1326,24 @@ class XTBExtractor:
 
         # get values from line
         if 'full:' in sample_set:
-            samp = sample_set.split(':')[1].split(' ')
-            x, y, z, m = [i for i in samp if i != '']
-
-        value = [float(x), float(y), float(z), float(m)]
-
-        return value
+            return [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
 
     def qonly_quadrupole_moment(self):
         """
-        Extracts `q only` traceless quadrupole moment in Debye.
+        Extracts q only traceless quadrupole moment in Debye.
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        " q only:        7.152      10.952       3.364      15.349
-               2.074     -10.515"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`list` of :class:`float`
             Components of quadrupole moment as
-            ``[`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]`` in a list of
-            length 6.
+            [xx, xy, xy, xz, yz, zz] in a :class:`list` of length 6.
 
         """
-        value = None
 
         sample_set = []
         for i, line in enumerate(self.output_string):
@@ -1375,37 +1352,24 @@ class XTBExtractor:
 
         # get values from line
         if 'q only:' in sample_set:
-            samp = sample_set.split(':')[1].split(' ')
-            xx, xy, yy, xz, yz, zz = [i for i in samp if i != '']
-
-        value = [
-            float(xx),
-            float(xy),
-            float(yy),
-            float(xz),
-            float(yz),
-            float(zz)
-        ]
-
-        return value
+            return [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
 
     def qdip_quadrupole_moment(self):
         """
-        Extracts `q+dip` traceless quadrupole moment in Debye.
+        Extracts q+dip traceless quadrupole moment in Debye.
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        "  q+dip:       -6.239      21.552      16.601      12.864
-               2.504     -10.362"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`list` of :class:`float`
             Components of quadrupole moment as
-            ``[`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]`` in a list of
-            length 6.
+            [xx, xy, xy, xz, yz, zz] in a :class:`list` of length 6.
+
         """
-        value = None
 
         sample_set = []
         for i, line in enumerate(self.output_string):
@@ -1414,37 +1378,24 @@ class XTBExtractor:
 
         # get values from line
         if 'q+dip:' in sample_set:
-            samp = sample_set.split(':')[1].split(' ')
-            xx, xy, yy, xz, yz, zz = [i for i in samp if i != '']
-
-        value = [
-            float(xx),
-            float(xy),
-            float(yy),
-            float(xz),
-            float(yz),
-            float(zz)
-        ]
-
-        return value
+            return [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
 
     def full_quadrupole_moment(self):
         """
-        Extracts `full` traceless quadrupole moment in (Debye).
+        Extracts full traceless quadrupole moment in (Debye).
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        "   full:       -6.662      22.015      16.959      12.710
-               3.119     -10.297"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`list` of :class:`float`
             Components of quadrupole moment as
-            ``[`xx`, `xy`, `xy`, `xz`, `yz`, `zz`]`` in a list of
-            length 6.
+            [xx, xy, xy, xz, yz, zz] in a :class:`list` of length 6.
+
         """
-        value = None
 
         sample_set = []
         for i, line in enumerate(self.output_string):
@@ -1453,30 +1404,16 @@ class XTBExtractor:
 
         # get values from line
         if 'full:' in sample_set:
-            samp = sample_set.split(':')[1].split(' ')
-            xx, xy, yy, xz, yz, zz = [i for i in samp if i != '']
-
-        value = [
-            float(xx),
-            float(xy),
-            float(yy),
-            float(xz),
-            float(yz),
-            float(zz)
-        ]
-
-        return value
+            return [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
 
     def homo_lumo_occ(self):
         """
         Extracts energies in eV and occupations of the HOMO and LUMO.
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        "        70        2.0000           -0.3514143
-                      -9.5625 (HOMO)"
-        "        71                         -0.2712405
-                      -7.3808 (LUMO)"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
@@ -1484,8 +1421,8 @@ class XTBExtractor:
             :class:`dict` with items of the form
             'HOMO':(#, occupation, energy) and
             'LUMO':(#, occupation, energy).
+
         """
-        value = None
 
         for line in reversed(self.output_string):
             if '(HOMO)' in line:
@@ -1513,22 +1450,19 @@ class XTBExtractor:
                     float(split_line[2])
                 ]
 
-        value = {'HOMO': homo_val, 'LUMO': lumo_val}
-
-        return value
+        return {'HOMO': homo_val, 'LUMO': lumo_val}
 
     def total_free_energy(self):
         """
         Extracts total free energy in a.u. at 298.15K.
 
-        Formatting based on latest version of xTB (190418)
-        Example line:
-        "          | TOTAL FREE ENERGY         -75.832501154309 Eh   |"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`float`
             Total free energy in a.u.
+
         """
         value = None
 
@@ -1545,15 +1479,14 @@ class XTBExtractor:
         """
         Extracts vibrational frequencies in wavenumbers at T=298.15K.
 
-        Formatting based on latest version of xTB (190418).
-        Example line:
-        "eigval :       -0.00    -0.00    -0.00     0.00     0.00
-             0.00"
+        Formatting based on the 190418 version of xTB.
 
         Returns
         -------
         :class:`list`
-            List of all vibrational frequencies as :class:`float`.
+            :class:`list` of all vibrational frequencies as
+            :class:`float`.
+
         """
         value = None
 

@@ -11,6 +11,7 @@ from functools import wraps
 import subprocess as sp
 import uuid
 import os
+from os.path import join
 import shutil
 from ...utilities import (is_valid_xtb_solvent,
                           XTBInvalidSolventError,
@@ -392,13 +393,13 @@ class XTBEnergy(EnergyCalculator):
 
     By default, :meth:`energy` will extract other properties of the
     :class:`.Molecule` and conformer passed to :meth:`energy`, which
-    will be saved in attributes of :class:`.XTBEnergy`.
+    will be saved in the attributes of :class:`.XTBEnergy`.
 
     Notes
     -----
     When running :meth:`energy`, this calculator changes the
     present working directory with :func:`os.chdir`. The original
-    working directory will be restored even if an error is raised so
+    working directory will be restored even if an error is raised, so
     unless multi-threading is being used this implementation detail
     should not matter.
 
@@ -429,7 +430,8 @@ class XTBEnergy(EnergyCalculator):
 
     calculate_free_energy : :class:`bool`
         Whether to calculate the total free energy and vibrational
-        frequencies.
+        frequencies. Setting this to ``True`` can drastically
+        increase calculation time and memory requirements.
 
     electronic_temperature : :class:`str`
         Electronic temperature in Kelvin.
@@ -483,27 +485,27 @@ class XTBEnergy(EnergyCalculator):
         The key has the form ``(mol, conformer)``.
 
     qonly_dipole_moments : :class:`dict`
-        :class:`dict` of the `q only` dipole momentent of
+        :class:`dict` of the q only dipole momentent of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
     full_dipole_moments : :class:`dict`
-        :class:`dict` of the `full` dipole momentent of
+        :class:`dict` of the full dipole momentent of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
     qonly_quadrupole_moments : :class:`dict`
-        :class:`dict` of the `q only` quadrupole momentent of
+        :class:`dict` of the q only quadrupole momentent of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
     qdip_quadrupole_moments : :class:`dict`
-        :class:`dict` of the `q+dip` quadrupole momentent of
+        :class:`dict` of the q+dip quadrupole momentent of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
     full_quadrupole_moments : :class:`dict`
-        :class:`dict` of the `full` quadrupole momentent of
+        :class:`dict` of the full quadrupole momentent of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
@@ -511,13 +513,13 @@ class XTBEnergy(EnergyCalculator):
         :class:`dict` of the total free energy of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``. This is empty if
-        `calculate_free_energy` is False.
+        :attr:`calculate_free_energy` is ``False``.
 
     frequencies : :class:`dict`
         :class:`dict` of the vibrational frequencies of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``. This is empty if
-        `calculate_free_energy` is False.
+        :attr:`calculate_free_energy` is ``False``.
 
     Examples
     --------
@@ -542,10 +544,9 @@ class XTBEnergy(EnergyCalculator):
             unlimited_memory=True,
         )
 
-        # Runs the calculation and returns energy.
         p_total_energy = xtb.energy(polymer, conformer)
 
-        # Extracts properties from energy calculator for a given
+        # Extract properties from energy calculator for a given
         # molecule and conformer.
         key = (polymer, conformer)
         p_homo_lumo_gap = xtb.homo_lumo_gaps[key]
@@ -558,9 +559,9 @@ class XTBEnergy(EnergyCalculator):
         # calculator.
         polymer_total_energy = xtb.total_energies[key]
 
-    If `calculate_free_energy` is True, xTB performs a numerical
-    Hessian calculation and calculates the total free energy and
-    vibrational frequencies of a molecule. It is recommended that a
+    If :attr:`calculate_free_energy` is ``True``, xTB performs a
+    numerical Hessian calculation and calculates the total free energy
+    and vibrational frequencies of a molecule. It is recommended that a
     well optimized structure be used as input for these calculations.
 
     .. code-block:: python
@@ -577,23 +578,18 @@ class XTBEnergy(EnergyCalculator):
         )
         optimizer.optimize(polymer)
 
-        # Define optimizer sequence and run optimzations.
-        opt = OptimizerSequence(uff, xtb_opt)
-        opt.optimize(polymer)
-
         # Calculate energy using GFN-xTB.
-        xtb = XTBFreeEnergy(
+        xtb = XTBEnergy(
             xtb_path='/opt/gfnxtb/xtb',
             unlimited_memory=True,
+            calculate_free_energy=True,
         )
 
-        # Runs the calculation and returns energy.
         p_total_energy = xtb.energy(polymer, conformer)
 
-        # Extracts properties from energy calculator for a given
+        # Extract properties from energy calculator for a given
         # molecule and conformer.
         key = (polymer, conformer)
-        # Extract the total free energy and vibrational frequencies.
         p_total_free_energy = xtb.total_energies[key]
         p_frequencies = xtb.frequencies[key]
 
@@ -638,7 +634,8 @@ class XTBEnergy(EnergyCalculator):
 
         calculate_free_energy : :class:`bool`, optional
             Whether to calculate the total free energy and vibrational
-            frequencies.
+            frequencies. Setting this to ``True`` can drastically
+            increase calculation time and memory requirements.
 
         electronic_temperature : :class:`int`, optional
             Electronic temperature in Kelvin.
@@ -752,12 +749,12 @@ class XTBEnergy(EnergyCalculator):
 
     def _run_xtb(self, xyz, out_file):
         """
-        Runs the command for GFN-xTB.
+        Runs GFN-xTB.
 
         Parameters
         ----------
         xyz : :class:`str`
-            The name of the input structure `.xyz` file.
+            The name of the input structure ``.xyz`` file.
 
         out_file : :class:`str`
             The name of output file with xTB results.
@@ -775,11 +772,7 @@ class XTBEnergy(EnergyCalculator):
             memory = ''
 
         if self.solvent is not None:
-            if self.solvent_grid == 'normal':
-                solvent_grid = ''
-            else:
-                solvent_grid = ''
-            solvent = f'--gbsa {self.solvent} {solvent_grid}'
+            solvent = f'--gbsa {self.solvent} {self.solvent_grid}'
         else:
             solvent = ''
 
@@ -842,17 +835,19 @@ class XTBEnergy(EnergyCalculator):
 
         os.mkdir(output_dir)
         init_dir = os.getcwd()
+        xyz = join(output_dir, 'input_structure.xyz')
+        out_file = join(output_dir, 'energy.output')
+        mol.write(xyz, conformer=conformer)
+
         try:
             os.chdir(output_dir)
-            xyz = 'input_structure.xyz'
-            out_file = 'energy.output'
-            mol.write(xyz, conformer=conformer)
             self._run_xtb(xyz=xyz, out_file=out_file)
-            self._get_properties(
-                mol=mol,
-                conformer=conformer,
-                output_file=out_file
-            )
         finally:
             os.chdir(init_dir)
+
+        self._get_properties(
+            mol=mol,
+            conformer=conformer,
+            output_file=out_file
+        )
         return self.total_energies[(mol, conformer)]

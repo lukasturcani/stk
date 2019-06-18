@@ -666,7 +666,7 @@ class XTB(Optimizer):
     -----
     When running :meth:`optimize`, this calculator changes the
     present working directory with :func:`os.chdir`. The original
-    working directory will be restored even if an error is raised so
+    working directory will be restored even if an error is raised, so
     unless multi-threading is being used this implementation detail
     should not matter.
 
@@ -677,7 +677,7 @@ class XTB(Optimizer):
     Note that this does not have any impact on multi-processing,
     which should always be safe.
 
-    Furthermore, the :meth:`optimize` will check that the
+    Furthermore, :meth:`optimize` will check that the
     structure is adequately optimized by checking for negative
     frequencies after a Hessian calculation. :attr:`max_runs`
     optimizations will be attempted at the given :attr:`opt_level`
@@ -750,8 +750,9 @@ class XTB(Optimizer):
         ``True``, however this may raise issues on clusters.
 
     incomplete : :class:`set`
-        :class:`set` of :class:`tuple` containing the `mol` and
-        `conformer` that have undergone incomplete optimization.
+        A :class:`set` holding tuples of the form ``(mol, conformer)``,
+        which are the :class:`.Molecule` objects and conformer ids
+        passed to :meth:`optimize` whose optimzation was incomplete.
 
     Examples
     --------
@@ -775,9 +776,9 @@ class XTB(Optimizer):
         xtb.optimize(polymer)
 
     By default, all optimizations with xTB are performed using the
-    --ohess flag, which forces the calculation of a numerical
+    ``--ohess`` flag, which forces the calculation of a numerical
     Hessian, thermodynamic properties and vibrational frequencies.
-    The :meth:`optimize` will check that the structure is appropriately
+    :meth:`optimize` will check that the structure is appropriately
     optimized (i.e. convergence is obtained and no negative vibrational
     frequencies are present) and continue optimizing a structure (up to
     :attr:`max_runs` times) until this is achieved. This loop, by
@@ -990,26 +991,26 @@ class XTB(Optimizer):
             return True
         # If convergence is achieved, then .xtboptok should exist.
         if os.path.exists('.xtboptok'):
-            # Check for negative frequencies in output file in max_run
-            # is not None..
+            # Check for negative frequencies in output file if max_runs
+            # is > 1.
             # Return True if there exists at least one.
-            if self.max_runs is not None:
+            if self.max_runs > 1:
                 return self._check_neg_frequencies(output_file)
             else:
                 return False
         elif os.path.exists('NOT_CONVERGED'):
-            XTBConvergenceError('Optimization not converged.')
+            raise XTBConvergenceError('Optimization not converged.')
         else:
-            XTBOptimizerError('Optimization failed to complete')
+            raise XTBOptimizerError('Optimization failed to complete')
 
     def _run_xtb(self, xyz, out_file):
         """
-        Runs the command for GFN-xTB using subprocess.
+        Runs GFN-xTB.
 
         Parameters
         ----------
         xyz : :class:`str`
-            The name of the input structure `.xyz` file.
+            The name of the input structure ``.xyz`` file.
 
         out_file : :class:`str`
             The name of output file with xTB results.
@@ -1035,11 +1036,7 @@ class XTB(Optimizer):
             optimization = f'--ohess {self.opt_level}'
 
         if self.solvent is not None:
-            if self.solvent_grid == 'normal':
-                solvent_grid = ''
-            else:
-                solvent_grid = ''
-            solvent = f'--gbsa {self.solvent} {solvent_grid}'
+            solvent = f'--gbsa {self.solvent} {self.solvent_grid}'
         else:
             solvent = ''
 
@@ -1118,7 +1115,6 @@ class XTB(Optimizer):
                 else:
                     # Calculation is complete.
                     return True
-        return None
 
     def optimize(self, mol, conformer=-1):
         """

@@ -1116,15 +1116,15 @@ class Molecule:
 
     def update_from_turbomole(self, path, conformer=-1):
         """
-        Updates molecular structure to match a Turbomole ``.coord`` file.
+        Updates molecular structure from a Turbomole ``.coord`` file.
 
         Note that coordinates in ``.coord`` files are given in Bohr.
 
         Parameters
         ----------
         path : :class:`str`
-            The full path of the ``.mol`` file from which the structure
-            should be updated.
+            The full path of the ``.coord`` file from which the
+            structure should be updated.
 
         conformer : :class:`int`, optional
             The conformer to be updated.
@@ -1151,11 +1151,11 @@ class Molecule:
 
         # Check the atom count is correct.
         num_atoms = self.mol.GetNumAtoms()
-        if int(len(content)) != num_atoms:
+        if len(content) != num_atoms:
             raise RuntimeError(
-                f'The number of atoms in the xyz file, {len(content)}, '
-                'does not match the number of atoms in the '
-                f'molecule, {num_atoms}.'
+                'The number of atoms in the coord file, '
+                f'{len(content)}, does not match the number of atoms '
+                f'in the molecule, {num_atoms}.'
             )
 
         # Save all the coords in the file.
@@ -1176,9 +1176,9 @@ class Molecule:
         # lines was present in the file.
         if i+1 != num_atoms:
             raise RuntimeError(
-                f'The number of atom lines in the xyz file, {i+1}, '
-                'does not match the number of atoms in the '
-                f'molecule, {num_atoms}.'
+                'The number of atoms lines in the coord file, '
+                f'{i+1}, does not match the number of atoms '
+                f'in the molecule, {num_atoms}.'
             )
 
         # Update the structure.
@@ -1357,8 +1357,12 @@ class Molecule:
             element = self.atom_symbol(atom)
             atom_counts[element] = atom_counts.get(element, 0) + 1
             name = f'{element}{atom_counts[element]}'
-            # Make sure the coords are no more than 8 columns wide each.
-            x, y, z = (f'{i}'[:8] for i in self.atom_coords(atom, conformer))
+            # Make sure the coords are no more than 8 columns wide
+            # each.
+            x, y, z = (
+                f'{i}'[:8]
+                for i in self.atom_coords(atom, conformer)
+            )
             charge = self.mol.GetAtomWithIdx(atom).GetFormalCharge()
             lines.append(
                 f'{hetatm:<6}{serial:>5} {name:<4}'

@@ -158,7 +158,8 @@ def test_xtb_properties(tmp_polymer, xtb_path):
         output_dir=join(odir, 'gfnxtb_opt'),
         unlimited_memory=True,
         opt_level='extreme',
-        max_runs=None,
+        max_runs=1,
+        calculate_hessian=False,
         num_cores=2,
     )
     gfnxtb.optimize(tmp_polymer)
@@ -221,8 +222,8 @@ def test_xtb_properties(tmp_polymer, xtb_path):
 
 @xtb
 def test_valid_solvent():
-    gfn_1 = '1'
-    gfn_2 = '2'
+    gfn_1 = 1
+    gfn_2 = 2
     valid = 'acetone'
     valid1 = 'benzene'
     valid2 = 'dmf'
