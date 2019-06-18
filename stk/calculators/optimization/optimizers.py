@@ -712,8 +712,14 @@ class XTB(Optimizer):
         https://xtb-docs.readthedocs.io/en/latest/optimization.html.
 
     max_runs : :class:`int`
-        Number of optimizations to attempt in a row to remove negative
-        frequencies.
+        Maximum number of optimizations to attempt in a row.
+
+    calculate_hessian : :class:`bool`
+        Toggle calculation of the hessian and vibrational frequencies
+        after optimization. ``True`` is required to check that the
+        structure is completely optimized. ``False`` will drastically
+        speed up the calculation but potentially provide incomplete
+        optimizations and forces :attr:`max_runs` to be 1.
 
     num_cores : :class:`str`
         The number of cores xTB should use.
@@ -791,14 +797,16 @@ class XTB(Optimizer):
 
     .. code-block:: python
 
-        # Use crude optimization with max_runs = None because this will
+        # Use crude optimization with max_runs=1 and
+        # calculate_hessian=False because this will
         # not achieve optimization and rerunning it is unproductive.
         xtb_crude = XTB(
             xtb_path='/opt/gfnxtb/xtb',
             output_dir='xtb_crude',
             unlimited_memory=True,
             opt_level='crude',
-            max_runs=None
+            max_runs=1,
+            calculate_hessian=False
         )
         # Use normal optimization with max_runs == 2.
         xtb_normal = XTB(
@@ -840,6 +848,7 @@ class XTB(Optimizer):
                  output_dir=None,
                  opt_level='normal',
                  max_runs=2,
+                 calculate_hessian=True,
                  num_cores=1,
                  electronic_temperature=300,
                  solvent=None,
@@ -875,12 +884,16 @@ class XTB(Optimizer):
             https://xtb-docs.readthedocs.io/en/latest/optimization.html
             .
 
-        max_runs : :class:`int` or :class:`NoneType`, optional
-            Number of optimizations to attempt in a row to remove
-            negative frequencies. If ``None``, no Hessian calculation
-            will be run, which will drastically speed up the
-            calculation but potentially provide incomplete
-            optimizations.
+        max_runs : :class:`int`, optional
+            Maximum number of optimizations to attempt in a row.
+
+        calculate_hessian : :class:`bool`, optional
+            Toggle calculation of the hessian and vibrational
+            frequencies after optimization. ``True`` is required to
+            check that the structure is completely optimized.
+            ``False`` will drastically speed up the calculation but
+            potentially provide incomplete optimizations and forces
+            :attr:`max_runs` to be 1.
 
         num_cores : :class:`int`, optional
             The number of cores xTB should use.
@@ -931,11 +944,21 @@ class XTB(Optimizer):
                     f'version {gfn_version!r}.'
                 )
 
+        if not calculate_hessian and max_runs != 1:
+            max_runs = 1
+            logger.warning(
+                'Requested that hessian calculation was skipped '
+                'but the number of optimizations requested was '
+                'greater than 1. The number of optimizations has been '
+                'set to 1.'
+            )
+
         self.xtb_path = xtb_path
         self.gfn_version = str(gfn_version)
         self.output_dir = output_dir
         self.opt_level = opt_level
         self.max_runs = max_runs
+        self.calculate_hessian = calculate_hessian
         self.num_cores = str(num_cores)
         self.electronic_temperature = str(electronic_temperature)
         self.solvent = solvent
@@ -961,29 +984,33 @@ class XTB(Optimizer):
             Returns `True` if a negative frequency is present
 
         """
-        neg_freq = False
         xtbext = XTBExtractor(output_file=output_file)
         value = xtbext.frequencies()
         # Check for one negative frequency, excluding the first
         # 6 frequencies.
-        if min(value[7:]) < 0:
-            neg_freq = True
-        return neg_freq
+        return min(value[6:]) < 0
 
     def _incomplete(self, output_file):
         """
-        Check if xTB optimization has converged.
+        Check if xTB optimization has completed and converged.
 
         Parameters
         ----------
         output_file : :class:`str`
-            Name of output file with xTB results.
+            Name of xTB output file.
 
         Returns
         -------
         :class:`bool`
-            Returns `True` if a negative frequency is present. Raises
-            errors if optimization did not converge.
+            Returns ``True`` if a negative frequency is present.
+
+        Raises
+        -------
+        :class:`XTBOptimizerError`
+            If the optimization failed.
+
+        :class:`XTBConvergenceError`
+            If the optimization did not converge.
 
         """
         if output_file is None:
@@ -1028,12 +1055,12 @@ class XTB(Optimizer):
             memory = ''
 
         # Set optimization level and type.
-        if self.max_runs is None:
-            # Do optimization.
-            optimization = f'--opt {self.opt_level}'
-        else:
+        if self.calculate_hessian:
             # Do optimization and check hessian.
             optimization = f'--ohess {self.opt_level}'
+        else:
+            # Do optimization.
+            optimization = f'--opt {self.opt_level}'
 
         if self.solvent is not None:
             solvent = f'--gbsa {self.solvent} {self.solvent_grid}'
@@ -1078,8 +1105,7 @@ class XTB(Optimizer):
         None : :class:`NoneType`
 
         """
-        runs = self.max_runs if self.max_runs is not None else 0
-        for run in range(runs):
+        for run in range(self.max_runs):
             xyz = f'input_structure_{run+1}.xyz'
             out_file = f'optimization_{run+1}.output'
             mol.write(xyz, conformer=conformer)
