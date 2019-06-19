@@ -719,7 +719,7 @@ class XTB(Optimizer):
         after optimization. ``True`` is required to check that the
         structure is completely optimized. ``False`` will drastically
         speed up the calculation but potentially provide incomplete
-        optimizations and forces :attr:`max_runs` to be 1.
+        optimizations and forces :attr:`max_runs` to be ``1``.
 
     num_cores : :class:`str`
         The number of cores xTB should use.
@@ -746,14 +746,10 @@ class XTB(Optimizer):
     num_unpaired_electrons : :class:`str`
         Number of unpaired electrons.
 
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule and conformer.
-
     unlimited_memory : :class:`bool`
         If ``True`` :meth:`optimize` will be run without constraints on
-        the stacksize. If memory issues are encountered, this should be
-        ``True``, however this may raise issues on clusters.
+        the stack size. If memory issues are encountered, this should
+        be ``True``, however this may raise issues on clusters.
 
     incomplete : :class:`set`
         A :class:`set` holding tuples of the form ``(mol, conformer)``,
@@ -793,7 +789,7 @@ class XTB(Optimizer):
     tigher convergence criteria (i.e. different :attr:`opt_level`)
     until the structure is sufficiently optimized. Furthermore, the
     calculation of the Hessian can be turned off using
-    :attr:`max_runs` = None.
+    :attr:`max_runs` = 1 and :attr:`calculate_hessian`=False.
 
     .. code-block:: python
 
@@ -826,15 +822,15 @@ class XTB(Optimizer):
             max_runs=2
         )
 
-        # The conformer must be set to check the `incomplete`
+        # The conformer must be known to check the `incomplete`
         # attribute.
         conformer = polymer.mol.GetConformer(-1).GetId()
 
-        xtb_crude.optimize(mol=polymer, conformer=conformer)
-        if (polymer, conformer) in xtb_crude.incomplete:
-            xtb_normal.optimize(mol=polymer, conformer=conformer)
-            if (polymer, conformer) in xtb_normal.incomplete:
-                xtb_vtight.optimize(mol=polymer, conformer=conformer)
+        optimizers = [xtb_crude, xtb_normal, xtb_vtight]
+        for optimizer in optimizers:
+            optimizer.optimize(polymer, conformer)
+            if (polymer, conformer) not in in optimizer.incomplete:
+                break
 
     See Also
     --------
@@ -855,8 +851,8 @@ class XTB(Optimizer):
                  solvent_grid='normal',
                  charge=0,
                  num_unpaired_electrons=0,
-                 use_cache=False,
-                 unlimited_memory=False):
+                 unlimited_memory=False,
+                 use_cache=False):
         """
         Initializes a :class:`XTB` instance.
 
@@ -893,7 +889,7 @@ class XTB(Optimizer):
             check that the structure is completely optimized.
             ``False`` will drastically speed up the calculation but
             potentially provide incomplete optimizations and forces
-            :attr:`max_runs` to be 1.
+            :attr:`max_runs` to be ``1``.
 
         num_cores : :class:`int`, optional
             The number of cores xTB should use.
@@ -920,15 +916,15 @@ class XTB(Optimizer):
         num_unpaired_electrons : :class:`int`, optional
             Number of unpaired electrons.
 
+        unlimited_memory : :class: `bool`, optional
+            If ``True`` :meth:`optimize` will be run without
+            constraints on the stack size. If memory issues are
+            encountered, this should be ``True``, however this may
+            raise issues on clusters.
+
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
             molecule and conformer.
-
-        unlimited_memory : :class: `bool`, optional
-            If ``True`` :meth:`optimize` will be run without
-            constraints on the stacksize. If memory issues are
-            encountered, this should be ``True``, however this may
-            raise issues on clusters.
 
         """
         if solvent is not None:
@@ -981,14 +977,13 @@ class XTB(Optimizer):
         Returns
         -------
         :class:`bool`
-            Returns `True` if a negative frequency is present
+            Returns ``True`` if a negative frequency is present
 
         """
         xtbext = XTBExtractor(output_file=output_file)
-        value = xtbext.frequencies()
         # Check for one negative frequency, excluding the first
         # 6 frequencies.
-        return min(value[6:]) < 0
+        return min(xtbext.frequencies[6:]) < 0
 
     def _incomplete(self, output_file):
         """
@@ -1083,8 +1078,8 @@ class XTB(Optimizer):
                 stdin=sp.PIPE,
                 stdout=f,
                 stderr=sp.PIPE,
-                # Uses the shell if unlimited_memory is True to be run
-                # multiple commpands in one subprocess.
+                # Uses the shell if unlimited_memory is True to run
+                # multiple commands in one subprocess.
                 shell=self.unlimited_memory
             )
 
@@ -1102,10 +1097,13 @@ class XTB(Optimizer):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`bool`
+            Returns ``True`` if the calculation is complete and either
+            ``False`` if the calculation is incomplete.
 
         """
-        for run in range(self.max_runs):
+        iterator = range(self.max_runs)
+        for run in iterator:
             xyz = f'input_structure_{run+1}.xyz'
             out_file = f'optimization_{run+1}.output'
             mol.write(xyz, conformer=conformer)
@@ -1122,6 +1120,9 @@ class XTB(Optimizer):
                     path=coord_file,
                     conformer=conformer
                 )
+                if run+1 == self.max_runs:
+                    # Return False because max_runs has been reached.
+                    return False
             else:
                 # Update mol from xtbopt.xyz.
                 mol.update_from_xyz(
@@ -1140,7 +1141,8 @@ class XTB(Optimizer):
                     return False
                 else:
                     # Calculation is complete.
-                    return True
+                    break
+        return True
 
     def optimize(self, mol, conformer=-1):
         """
@@ -1162,10 +1164,11 @@ class XTB(Optimizer):
 
         if conformer == -1:
             conformer = mol.mol.GetConformer(conformer).GetId()
+        key = (mol, conformer)
 
         # Remove (mol, conformer) from self.incomplete if present.
-        if (mol, conformer) in self.incomplete:
-            self.incomplete.remove((mol, conformer))
+        if key in self.incomplete:
+            self.incomplete.remove(key)
 
         if self.output_dir is None:
             output_dir = str(uuid.uuid4().int)
@@ -1181,15 +1184,13 @@ class XTB(Optimizer):
         os.chdir(output_dir)
 
         try:
-            result = self._run_optimizations(mol, conformer)
+            complete = self._run_optimizations(mol, conformer)
         finally:
             os.chdir(init_dir)
 
-        if result is None:
-            self.incomplete.add((mol, conformer))
+        if not complete:
+            self.incomplete.add(key)
             logging.warning(
-                'Negative frequencies present in '
-                f'{mol.name} conformer {conformer} '
-                f'after {self.max_runs} optimizations '
-                'completed.'
+                'Negative frequencies present in the final structure '
+                f'of {mol.name} conformer {conformer}.'
             )

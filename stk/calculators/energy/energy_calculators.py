@@ -455,14 +455,10 @@ class XTBEnergy(EnergyCalculator):
     num_unpaired_electrons : :class:`str`
         Number of unpaired electrons.
 
-    use_cache : :class:`bool`
-        If ``True`` :meth:`energy` will not run twice on the same
-        molecule and conformer.
-
     unlimited_memory : :class: `bool`
         If ``True`` :meth:`energy` will be run without constraints on
-        the stacksize. If memory issues are encountered, this should be
-        ``True``, however this may raise issues on clusters.
+        the stack size. If memory issues are encountered, this should
+        be ``True``, however this may raise issues on clusters.
 
     total_energies : :class:`dict`
         :class:`dict` of the total energy of each :class:`.Molecule`
@@ -485,27 +481,27 @@ class XTBEnergy(EnergyCalculator):
         The key has the form ``(mol, conformer)``.
 
     qonly_dipole_moments : :class:`dict`
-        :class:`dict` of the q only dipole momentent of
+        :class:`dict` of the q only dipole moment of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
     full_dipole_moments : :class:`dict`
-        :class:`dict` of the full dipole momentent of
+        :class:`dict` of the full dipole moment of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
     qonly_quadrupole_moments : :class:`dict`
-        :class:`dict` of the q only quadrupole momentent of
+        :class:`dict` of the q only quadrupole moment of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
     qdip_quadrupole_moments : :class:`dict`
-        :class:`dict` of the q+dip quadrupole momentent of
+        :class:`dict` of the q+dip quadrupole moment of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
     full_quadrupole_moments : :class:`dict`
-        :class:`dict` of the full quadrupole momentent of
+        :class:`dict` of the full quadrupole moment of
         each :class:`.Molecule` and conformer passed to :meth:`energy`.
         The key has the form ``(mol, conformer)``.
 
@@ -541,12 +537,12 @@ class XTBEnergy(EnergyCalculator):
         # Calculate energy using GFN-xTB.
         xtb = XTBEnergy(
             xtb_path='/opt/gfnxtb/xtb',
-            unlimited_memory=True,
+            unlimited_memory=True
         )
 
         p_total_energy = xtb.energy(polymer, conformer)
 
-        # Extract properties from energy calculator for a given
+        # Extract properties from the energy calculator for a given
         # molecule and conformer.
         key = (polymer, conformer)
         p_homo_lumo_gap = xtb.homo_lumo_gaps[key]
@@ -582,12 +578,12 @@ class XTBEnergy(EnergyCalculator):
         xtb = XTBEnergy(
             xtb_path='/opt/gfnxtb/xtb',
             unlimited_memory=True,
-            calculate_free_energy=True,
+            calculate_free_energy=True
         )
 
         p_total_energy = xtb.energy(polymer, conformer)
 
-        # Extract properties from energy calculator for a given
+        # Extract properties from the energy calculator for a given
         # molecule and conformer.
         key = (polymer, conformer)
         p_total_free_energy = xtb.total_energies[key]
@@ -609,8 +605,8 @@ class XTBEnergy(EnergyCalculator):
                  solvent_grid='normal',
                  charge=0,
                  num_unpaired_electrons=0,
-                 use_cache=False,
-                 unlimited_memory=False):
+                 unlimited_memory=False,
+                 use_cache=False):
         """
         Initializes a :class:`XTBEnergy` instance.
 
@@ -659,15 +655,15 @@ class XTBEnergy(EnergyCalculator):
         num_unpaired_electrons : :class:`int`, optional
             Number of unpaired electrons.
 
+        unlimited_memory : :class: `bool`, optional
+            If ``True`` :meth:`energy` will be run without constraints
+            on the stack size. If memory issues are encountered, this
+            should be ``True``, however this may raise issues on
+            clusters.
+
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`energy` will not run twice on the same
             molecule and conformer.
-
-        unlimited_memory : :class: `bool`, optional
-            If ``True`` :meth:`energy` will be run without constraints
-            on the stacksize. If memory issues are encountered, this
-            should be ``True``, however this may raise issues on
-            clusters.
 
         """
         if solvent is not None:
@@ -731,21 +727,21 @@ class XTBEnergy(EnergyCalculator):
         # Get properties from output_file.
         xtbext = XTBExtractor(output_file=output_file)
         key = (mol, conformer)
-        self.total_energies[key] = xtbext.total_energy()
-        self.homo_lumo_gaps[key] = xtbext.homo_lumo_gap()
-        self.fermi_levels[key] = xtbext.fermi_level()
-        self.homo_lumo_orbitals[key] = xtbext.homo_lumo_occ()
-        self.qonly_dipole_moments[key] = xtbext.qonly_dipole_moment()
-        self.full_dipole_moments[key] = xtbext.full_dipole_moment()
+        self.total_energies[key] = xtbext.total_energy
+        self.homo_lumo_gaps[key] = xtbext.homo_lumo_gap
+        self.fermi_levels[key] = xtbext.fermi_level
+        self.homo_lumo_orbitals[key] = xtbext.homo_lumo_occ
+        self.qonly_dipole_moments[key] = xtbext.qonly_dipole_moment
+        self.full_dipole_moments[key] = xtbext.full_dipole_moment
         self.qonly_quadrupole_moments[key] = \
-            xtbext.qonly_quadrupole_moment()
+            xtbext.qonly_quadrupole_moment
         self.qdip_quadrupole_moments[key] = \
-            xtbext.qdip_quadrupole_moment()
+            xtbext.qdip_quadrupole_moment
         self.full_quadrupole_moments[key] = \
-            xtbext.full_quadrupole_moment()
+            xtbext.full_quadrupole_moment
         if self.calculate_free_energy:
-            self.total_free_energies[key] = xtbext.total_free_energy()
-            self.frequencies[key] = xtbext.frequencies()
+            self.total_free_energies[key] = xtbext.total_free_energy
+            self.frequencies[key] = xtbext.frequencies
 
     def _run_xtb(self, xyz, out_file):
         """
@@ -797,8 +793,8 @@ class XTBEnergy(EnergyCalculator):
                 stdin=sp.PIPE,
                 stdout=f,
                 stderr=sp.PIPE,
-                # Uses the shell if unlimited_memory is True to be run
-                # multiple commpands in one subprocess.
+                # Uses the shell if unlimited_memory is True to run
+                # multiple commands in one subprocess.
                 shell=self.unlimited_memory
             )
 

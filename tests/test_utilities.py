@@ -8,17 +8,17 @@ def test_xtb_extractor():
 
     # Get properties from output_file.
     xtbext = stk.XTBExtractor(output_file=known_output_file)
-    total_energy = xtbext.total_energy()
-    homo_lumo_gap = xtbext.homo_lumo_gap()
-    fermi_level = xtbext.fermi_level()
-    homo_lumo_occ = xtbext.homo_lumo_occ()
-    qonly_dipole_moment = xtbext.qonly_dipole_moment()
-    full_dipole_moment = xtbext.full_dipole_moment()
-    qonly_quadrupole_moment = xtbext.qonly_quadrupole_moment()
-    qdip_quadrupole_moment = xtbext.qdip_quadrupole_moment()
-    full_quadrupole_moment = xtbext.full_quadrupole_moment()
-    total_free_energy = xtbext.total_free_energy()
-    frequencies = xtbext.frequencies()
+    total_energy = xtbext.total_energy
+    homo_lumo_gap = xtbext.homo_lumo_gap
+    fermi_level = xtbext.fermi_level
+    homo_lumo_occ = xtbext.homo_lumo_occ
+    qonly_dipole_moment = xtbext.qonly_dipole_moment
+    full_dipole_moment = xtbext.full_dipole_moment
+    qonly_quadrupole_moment = xtbext.qonly_quadrupole_moment
+    qdip_quadrupole_moment = xtbext.qdip_quadrupole_moment
+    full_quadrupole_moment = xtbext.full_quadrupole_moment
+    total_free_energy = xtbext.total_free_energy
+    frequencies = xtbext.frequencies
 
     assert np.isclose(
         total_energy, -76.323188311664, rtol=0, atol=1.e-8
