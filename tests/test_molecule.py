@@ -363,7 +363,7 @@ def test_pdb_write(cycle_su):
     assert np.allclose(
         a=cycle_su.position_matrix(),
         b=cycle.position_matrix(),
-        atol=1e-5
+        atol=1e-3
     )
 
     # Make sure the connectivity is the same.
@@ -387,7 +387,7 @@ def test_pdb_write(cycle_su):
     assert np.allclose(
         a=cycle_su.position_matrix()[:, atoms],
         b=cycle.position_matrix(),
-        atol=1e-5
+        atol=1e-3
     )
 
     # Make sure the bonds which need to exist exist.
@@ -415,5 +415,5 @@ def test_pdb_write(cycle_su):
     assert np.allclose(
         a=bonds1,
         b=bonds2,
-        atol=1e-5
+        atol=1e-3
     )

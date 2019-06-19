@@ -1282,23 +1282,22 @@ class Molecule:
         i_code = ''
         occupancy = '1.00'
         temp_factor = '0.00'
-        print(res_name)
         for atom in atoms:
             serial = atom+1
             element = self.atom_symbol(atom)
             atom_counts[element] = atom_counts.get(element, 0) + 1
             name = f'{element}{atom_counts[element]}'
             # Make sure the coords are no more than 8 columns wide
-            # each.
+            # each. Round numbers to 7 digits to avoid overlap.
             x, y, z = (
-                f'{i}'[:8] for i in self.atom_coords(atom, conformer)
+                f'{i}'[:7] for i in self.atom_coords(atom, conformer)
             )
             charge = self.mol.GetAtomWithIdx(atom).GetFormalCharge()
             lines.append(
                 f'{hetatm:<6}{serial:>5} {name:<4}'
                 f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'
                 f'{res_seq:>4}{i_code:<1}   '
-                f'{x:>8}{y:>8}{z:>8}'
+                f' {x:>7} {y:>7} {z:>7}'
                 f'{occupancy:>6}{temp_factor:>6}          '
                 f'{element:>2}{charge:>2}\n'
             )
