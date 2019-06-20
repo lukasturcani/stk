@@ -1209,8 +1209,61 @@ class XTBExtractor:
     output_file : :class:`str`
         Output file to extract properties from.
 
-    output_list : :class:`list`
-        :class:`list` of all lines in as :class:`str` in output file.
+    output_lines : :class:`list` : :class:`str`
+        :class:`list` of all lines in as :class:`str` in the output
+        file.
+
+    total_energy : :class:`float`
+        The total energy in the :attr:`output_file` as
+        :class:`float`. The energy is in units of a.u..
+
+    homo_lumo_gap : :class:`float`
+        The HOMO-LUMO gap in the :attr:`output_file` as
+        :class:`float`. The gap is in units of eV.
+
+    fermi_level : :class:`float`
+        The Fermi level in the :attr:`output_file` as
+        :class:`float` in units of eV.
+
+    qonly_dipole_moment : :class:`list`
+        Components of the Q only dipole moment in units
+        of Debye in :class:`list` of the form
+        ``[x, y, z]``.
+
+    full_dipole_moment : :class:`list`
+        Components of the full dipole moment in units
+        of Debye in :class:`list` of the form
+        ``[x, y, z, total]``.
+
+    qonly_quadrupole_moment : :class:`list`
+        Components of the Q only traceless quadrupole moment in units
+        of Debye in :class:`list` of the form
+        ``[xx, xy, xy, xz, yz, zz]``.
+
+    qdip_quadrupole_moment : :class:`list`
+        Components of the Q+Dip traceless quadrupole moment in units of
+        Debye in :class:`list` of the form
+        ``[xx, xy, xy, xz, yz, zz]``.
+
+    full_quadrupole_moment : :class:`list`
+        Components of the full traceless quadrupole moment in units of
+        Debye in :class:`list` of the form
+        ``[xx, xy, xy, xz, yz, zz]``.
+
+    homo_lumo_occ : :class:`dict`
+        :class:`dict` of :class:`list` containing the orbital number,
+        energy in eV and occupation of the HOMO and LUMO orbitals in
+        the :attr:`output_file`.
+
+    total_free_energy : :class:`float`
+        The total free energy in the :attr:`output_file` as
+        :class:`float`. The free energy is in units of a.u. and
+        calculated at 298.15K.
+
+    frequencies : :class:`list`
+        :class:`list` of the vibrational frequencies as :class:`float`
+        in the :attr:`output_file`. Vibrational frequencies are in
+        units of wavenumber and calculated at 298.15K.
 
     """
     def __init__(self, output_file):
@@ -1225,7 +1278,7 @@ class XTBExtractor:
         """
         self.output_file = output_file
         with open(self.output_file, 'r') as f:
-            self.output_list = f.readlines()
+            self.output_lines = f.readlines()
 
         self._extract_values()
 
@@ -1233,9 +1286,13 @@ class XTBExtractor:
         """
         Extract all properties from xTB output file.
 
+        Returns
+        -------
+        None : :class:`NoneType`
+
         """
 
-        for i, line in enumerate(self.output_list):
+        for i, line in enumerate(self.output_lines):
             if self._check_line(line, 'total_energy'):
                 self._extract_total_energy(line)
             elif self._check_line(line, 'homo_lumo_gap'):
@@ -1301,7 +1358,7 @@ class XTBExtractor:
 
     def _extract_total_energy(self, line):
         """
-        Extracts total energy in a.u. from xTB output.
+        Updates :attr:`total_energy`.
 
         Parameters
         ----------
@@ -1310,7 +1367,7 @@ class XTBExtractor:
 
         Returns
         -------
-        :class:`NoneType`
+        None : :class:`NoneType`
 
         """
 
@@ -1320,7 +1377,7 @@ class XTBExtractor:
 
     def _extract_homo_lumo_gap(self, line):
         """
-        Extracts HOMO-LUMO gap in eV from xTB output.
+        Updates :attr:`homo_lumo_gap`.
 
         Parameters
         ----------
@@ -1329,7 +1386,7 @@ class XTBExtractor:
 
         Returns
         -------
-        :class:`NoneType`
+        None : :class:`NoneType`
 
         """
 
@@ -1339,7 +1396,7 @@ class XTBExtractor:
 
     def _extract_fermi_level(self, line):
         """
-        Extracts Fermi-level energy in eV from xTB output.
+        Updates :attr:`fermi_level`.
 
         Parameters
         ----------
@@ -1348,7 +1405,7 @@ class XTBExtractor:
 
         Returns
         -------
-        :class:`NoneType`
+        None : :class:`NoneType`
 
         """
 
@@ -1359,10 +1416,7 @@ class XTBExtractor:
 
     def _extract_qonly_dipole_moment(self, index):
         """
-        Extracts q only dipole moment in Debye from xTB output.
-
-        Gives components of quadrupole moment as
-        ``[x, y, z]`` in a :class:`list`.
+        Updates :attr:`qonly_dipole_moment`.
 
         Parameters
         ----------
@@ -1370,15 +1424,15 @@ class XTBExtractor:
             Line of output file to extract property from.
 
         index : :class:`int`
-            Index of line in :attr:`output_list`.
+            Index of line in :attr:`output_lines`.
 
         Returns
         -------
-        :class:`NoneType`
+        None : :class:`NoneType`
 
         """
 
-        sample_set = self.output_list[index+2].rstrip()
+        sample_set = self.output_lines[index+2].rstrip()
 
         if 'q only:' in sample_set:
             self.qonly_dipole_moment = [
@@ -1388,10 +1442,7 @@ class XTBExtractor:
 
     def _extract_full_dipole_moment(self, index):
         """
-        Extracts full dipole moment in Debye from xTB output.
-
-        Gives components of quadrupole moment as
-        ``[x, y, z, total]`` in a :class:`list`.
+        Updates :attr:`full_dipole_moment`.
 
         Parameters
         ----------
@@ -1399,15 +1450,15 @@ class XTBExtractor:
             Line of output file to extract property from.
 
         index : :class:`int`
-            Index of line in :attr:`output_list`.
+            Index of line in :attr:`output_lines`.
 
         Returns
         -------
-        :class:`NoneType`
+        None : :class:`NoneType`
 
         """
 
-        sample_set = self.output_list[index+3].rstrip()
+        sample_set = self.output_lines[index+3].rstrip()
 
         if 'full:' in sample_set:
             self.full_dipole_moment = [
@@ -1417,10 +1468,7 @@ class XTBExtractor:
 
     def _extract_qonly_quadrupole_moment(self, index):
         """
-        Extracts q only traceless quadrupole moment in Debye.
-
-        Gives components of quadrupole moment as
-        ``[xx, xy, xy, xz, yz, zz]`` in a :class:`list`.
+        Updates :attr:`qonly_quadrupole_moment`.
 
         Parameters
         ----------
@@ -1428,15 +1476,15 @@ class XTBExtractor:
             Line of output file to extract property from.
 
         index : :class:`int`
-            Index of line in :attr:`output_list`.
+            Index of line in :attr:`output_lines`.
 
         Returns
         -------
-        :class:`NoneType`
+        None : :class:`NoneType`
 
         """
 
-        sample_set = self.output_list[index+2].rstrip()
+        sample_set = self.output_lines[index+2].rstrip()
 
         if 'q only:' in sample_set:
             self.qonly_quadrupole_moment = [
@@ -1446,10 +1494,7 @@ class XTBExtractor:
 
     def _extract_qdip_quadrupole_moment(self, index):
         """
-        Extracts q+dip traceless quadrupole moment in Debye.
-
-        Gives components of quadrupole moment as
-        ``[xx, xy, xy, xz, yz, zz]`` in a :class:`list`.
+        Updates :attr:`qdip_quadrupole_moment`.
 
         Parameters
         ----------
@@ -1457,15 +1502,15 @@ class XTBExtractor:
             Line of output file to extract property from.
 
         index : :class:`int`
-            Index of line in :attr:`output_list`.
+            Index of line in :attr:`output_lines`.
 
         Returns
         -------
-        :class:`NoneType`
+        None : :class:`NoneType`
 
         """
 
-        sample_set = self.output_list[index+3].rstrip()
+        sample_set = self.output_lines[index+3].rstrip()
 
         if 'q+dip:' in sample_set:
             self.qdip_quadrupole_moment = [
@@ -1475,10 +1520,7 @@ class XTBExtractor:
 
     def _extract_full_quadrupole_moment(self, index):
         """
-        Extracts full traceless quadrupole moment in (Debye).
-
-        Gives components of quadrupole moment as
-        ``[xx, xy, xy, xz, yz, zz]`` in a :class:`list`.
+        Updates :attr:`full_quadrupole_moment`.
 
         Parameters
         ----------
@@ -1486,15 +1528,15 @@ class XTBExtractor:
             Line of output file to extract property from.
 
         index : :class:`int`
-            Index of line in :attr:`output_list`.
+            Index of line in :attr:`output_lines`.
 
         Returns
         -------
-        :class:`NoneType`
+        None : :class:`NoneType`
 
         """
 
-        sample_set = self.output_list[index+4].rstrip()
+        sample_set = self.output_lines[index+4].rstrip()
 
         if 'full:' in sample_set:
             self.full_quadrupole_moment = [
@@ -1504,7 +1546,7 @@ class XTBExtractor:
 
     def _extract_homo_lumo_occ(self, line, orbital):
         """
-        Extracts energies in eV and occupations of the HOMO and LUMO.
+        Updates :attr:`homo_lumo_occ`.
 
         Parameters
         ----------
@@ -1516,7 +1558,7 @@ class XTBExtractor:
 
         Returns
         -------
-        :class:`NoneType`
+        None : :class:`NoneType`
 
         """
 
@@ -1547,7 +1589,7 @@ class XTBExtractor:
 
     def _extract_total_free_energy(self, line):
         """
-        Extracts total free energy in a.u. at 298.15K.
+        Updates :attr:`total_free_energy`.
 
         Returns
         -------
@@ -1561,9 +1603,7 @@ class XTBExtractor:
 
     def _extract_frequencies(self):
         """
-        Extracts vibrational frequencies in wavenumbers at T=298.15K.
-
-        Formatting based on the 190418 version of xTB.
+        Updates :attr:`frequencies`.
 
         Returns
         -------
@@ -1578,7 +1618,7 @@ class XTBExtractor:
         switch = False
 
         frequencies = []
-        for i, line in enumerate(self.output_list):
+        for i, line in enumerate(self.output_lines):
             if test in line:
                 # Turn on reading as final frequency printout has
                 # begun.
@@ -1588,7 +1628,7 @@ class XTBExtractor:
                 switch = False
             if 'eigval :' in line and switch is True:
                 samp = line.rstrip().split(':')[1].split(' ')
-                split_line = [i for i in samp if i != '']
+                split_line = [i for i in samp if i]
                 for freq in split_line:
                     frequencies.append(freq)
 
