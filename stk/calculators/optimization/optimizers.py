@@ -785,11 +785,12 @@ class XTB(Optimizer):
     frequencies are present) and continue optimizing a structure (up to
     :attr:`max_runs` times) until this is achieved. This loop, by
     default, will be performed at the same :attr:`opt_level`. The
-    following examples shows how a user may optimize structures with
+    following example shows how a user may optimize structures with
     tigher convergence criteria (i.e. different :attr:`opt_level`)
     until the structure is sufficiently optimized. Furthermore, the
     calculation of the Hessian can be turned off using
-    :attr:`max_runs` = 1 and :attr:`calculate_hessian`=False.
+    :attr:`max_runs` to ``1`` and :attr:`calculate_hessian` to
+    ``False``.
 
     .. code-block:: python
 
@@ -977,7 +978,7 @@ class XTB(Optimizer):
         Returns
         -------
         :class:`bool`
-            Returns ``True`` if a negative frequency is present
+            Returns ``True`` if a negative frequency is present.
 
         """
         xtbext = XTBExtractor(output_file=output_file)
@@ -1098,12 +1099,11 @@ class XTB(Optimizer):
         Returns
         -------
         :class:`bool`
-            Returns ``True`` if the calculation is complete and either
+            Returns ``True`` if the calculation is complete and
             ``False`` if the calculation is incomplete.
 
         """
-        iterator = range(self.max_runs)
-        for run in iterator:
+        for run in range(self.max_runs):
             xyz = f'input_structure_{run+1}.xyz'
             out_file = f'optimization_{run+1}.output'
             mol.write(xyz, conformer=conformer)
@@ -1113,23 +1113,20 @@ class XTB(Optimizer):
             coord_exists = os.path.exists(coord_file)
             output_xyz = 'xtbopt.xyz'
             opt_incomplete = self._incomplete(out_file)
-            if opt_incomplete and coord_exists:
-                # The calculation is incomplete.
-                # Update mol from xtbhess.coord and continue.
-                mol.update_from_turbomole(
-                    path=coord_file,
-                    conformer=conformer
-                )
-                if run+1 == self.max_runs:
-                    # Return False because max_runs has been reached.
-                    return False
-            else:
-                # Update mol from xtbopt.xyz.
-                mol.update_from_xyz(
-                    path=output_xyz,
-                    conformer=conformer
-                )
-                if opt_incomplete:
+            if opt_incomplete:
+                if coord_exists:
+                    # The calculation is incomplete.
+                    # Update mol from xtbhess.coord and continue.
+                    mol.update_from_turbomole(
+                        path=coord_file,
+                        conformer=conformer
+                    )
+                else:
+                    # Update mol from xtbopt.xyz.
+                    mol.update_from_xyz(
+                        path=output_xyz,
+                        conformer=conformer
+                    )
                     # If the negative frequencies are small, then GFN
                     # may not produce the restart file. If that is the
                     # case, exit optimization loop and warn.
@@ -1139,10 +1136,14 @@ class XTB(Optimizer):
                         f'{mol.name} conformer {conformer}.'
                     )
                     return False
-                else:
-                    # Calculation is complete.
-                    break
-        return True
+            else:
+                # Optimization is complete.
+                # Update mol from xtbopt.xyz.
+                mol.update_from_xyz(
+                    path=output_xyz,
+                    conformer=conformer
+                )
+        return opt_incomplete
 
     def optimize(self, mol, conformer=-1):
         """
@@ -1191,6 +1192,6 @@ class XTB(Optimizer):
         if not complete:
             self.incomplete.add(key)
             logging.warning(
-                'Negative frequencies present in the final structure '
-                f'of {mol.name} conformer {conformer}.'
+                'Optimization is incomplete for '
+                f'{mol.name} conformer {conformer}.'
             )
