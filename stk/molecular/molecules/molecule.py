@@ -603,7 +603,7 @@ class Molecule:
                     bond_id = len(bond_lines)
                 bond_type = int(bond.GetBondTypeAsDouble())
                 bond_lines.append(
-                    f'M  V30 {bond_id} {bond_type} {a1+1} {a2+1}\n'
+                    f'M  V30 {bond_id+1} {bond_type} {a1+1} {a2+1}\n'
                 )
 
         n_bonds = len(bond_lines)
