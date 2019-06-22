@@ -794,8 +794,7 @@ class XTB(Optimizer):
 
     .. code-block:: python
 
-        # Use crude optimization with max_runs=1 and
-        # calculate_hessian=False because this will
+        # Use crude optimization with max_runs=1 because this will
         # not achieve optimization and rerunning it is unproductive.
         xtb_crude = XTB(
             xtb_path='/opt/gfnxtb/xtb',
@@ -803,7 +802,7 @@ class XTB(Optimizer):
             unlimited_memory=True,
             opt_level='crude',
             max_runs=1,
-            calculate_hessian=False
+            calculate_hessian=True
         )
         # Use normal optimization with max_runs == 2.
         xtb_normal = XTB(
@@ -1014,10 +1013,10 @@ class XTB(Optimizer):
             return True
         # If convergence is achieved, then .xtboptok should exist.
         if os.path.exists('.xtboptok'):
-            # Check for negative frequencies in output file if max_runs
-            # is > 1.
+            # Check for negative frequencies in output file if the
+            # hessian was calculated.
             # Return True if there exists at least one.
-            if self.max_runs > 1:
+            if self.calculate_hessian:
                 return self._check_neg_frequencies(output_file)
             else:
                 return False
@@ -1135,7 +1134,7 @@ class XTB(Optimizer):
                         'Small negative frequencies present in '
                         f'{mol.name} conformer {conformer}.'
                     )
-                    return False
+                    return opt_incomplete
             else:
                 # Optimization is complete.
                 # Update mol from xtbopt.xyz.
@@ -1186,11 +1185,11 @@ class XTB(Optimizer):
         os.chdir(output_dir)
 
         try:
-            complete = self._run_optimizations(mol, conformer)
+            incomplete = self._run_optimizations(mol, conformer)
         finally:
             os.chdir(init_dir)
 
-        if not complete:
+        if incomplete:
             self.incomplete.add(key)
             logging.warning(
                 'Optimization is incomplete for '
