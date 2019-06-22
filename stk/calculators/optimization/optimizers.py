@@ -965,7 +965,7 @@ class XTB(Optimizer):
         self.incomplete = set()
         super().__init__(use_cache=use_cache)
 
-    def _check_neg_frequencies(self, output_file):
+    def _has_neg_frequencies(self, output_file):
         """
         Check for negative frequencies.
 
@@ -1017,7 +1017,7 @@ class XTB(Optimizer):
             # hessian was calculated.
             # Return True if there exists at least one.
             if self.calculate_hessian:
-                return not self._check_neg_frequencies(output_file)
+                return not self._has_neg_frequencies(output_file)
             else:
                 return True
         elif os.path.exists('NOT_CONVERGED'):
