@@ -24,24 +24,24 @@ OPTIONS = {}
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
-              'Al': 2, 'Sb': 2, 'Ar': 1.88, 'As': 1.85, 'Ba': 2,
-              'Be': 2, 'Bi': 2, 'B': 2, 'Br': 1.85, 'Cd': 1.58,
-              'Cs': 2, 'Ca': 2, 'C': 1.7, 'Ce': 2, 'Cl': 1.75,
-              'Cr': 2, 'Co': 2, 'Cu': 1.4, 'Dy': 2, 'Er': 2,
-              'Eu': 2, 'F':  1.47, 'Gd': 2, 'Ga': 1.87, 'Ge': 2,
-              'Au': 1.66, 'Hf': 2, 'He': 1.4, 'Ho': 2, 'H': 1.09,
-              'In': 1.93, 'I': 1.98, 'Ir': 2, 'Fe': 2, 'Kr': 2.02,
-              'La': 2, 'Pb': 2.02, 'Li': 1.82, 'Lu': 2, 'Mg': 1.73,
-              'Mn': 2, 'Hg': 1.55, 'Mo': 2, 'Nd': 2, 'Ne': 1.54,
-              'Ni': 1.63, 'Nb': 2, 'N':  1.55, 'Os': 2, 'O':  1.52,
-              'Pd': 1.63, 'P': 1.8, 'Pt': 1.72, 'K': 2.75, 'Pr': 2,
-              'Pa': 2, 'Re': 2, 'Rh': 2, 'Rb': 2, 'Ru': 2, 'Sm': 2,
-              'Sc': 2, 'Se': 1.9, 'Si': 2.1, 'Ag': 1.72, 'Na': 2.27,
-              'Sr': 2, 'S': 1.8, 'Ta': 2, 'Te': 2.06, 'Tb': 2,
-              'Tl': 1.96, 'Th': 2, 'Tm': 2, 'Sn': 2.17, 'Ti': 2,
-              'W': 2, 'U':  1.86, 'V':  2, 'Xe': 2.16, 'Yb': 2,
-              'Y': 2, 'Zn': 1.29, 'Zr': 2, 'X':  1.0, 'D':  1.0
-                 }
+    'Al': 2, 'Sb': 2, 'Ar': 1.88, 'As': 1.85, 'Ba': 2,
+    'Be': 2, 'Bi': 2, 'B': 2, 'Br': 1.85, 'Cd': 1.58,
+    'Cs': 2, 'Ca': 2, 'C': 1.7, 'Ce': 2, 'Cl': 1.75,
+    'Cr': 2, 'Co': 2, 'Cu': 1.4, 'Dy': 2, 'Er': 2,
+    'Eu': 2, 'F': 1.47, 'Gd': 2, 'Ga': 1.87, 'Ge': 2,
+    'Au': 1.66, 'Hf': 2, 'He': 1.4, 'Ho': 2, 'H': 1.09,
+    'In': 1.93, 'I': 1.98, 'Ir': 2, 'Fe': 2, 'Kr': 2.02,
+    'La': 2, 'Pb': 2.02, 'Li': 1.82, 'Lu': 2, 'Mg': 1.73,
+    'Mn': 2, 'Hg': 1.55, 'Mo': 2, 'Nd': 2, 'Ne': 1.54,
+    'Ni': 1.63, 'Nb': 2, 'N': 1.55, 'Os': 2, 'O': 1.52,
+    'Pd': 1.63, 'P': 1.8, 'Pt': 1.72, 'K': 2.75, 'Pr': 2,
+    'Pa': 2, 'Re': 2, 'Rh': 2, 'Rb': 2, 'Ru': 2, 'Sm': 2,
+    'Sc': 2, 'Se': 1.9, 'Si': 2.1, 'Ag': 1.72, 'Na': 2.27,
+    'Sr': 2, 'S': 1.8, 'Ta': 2, 'Te': 2.06, 'Tb': 2,
+    'Tl': 1.96, 'Th': 2, 'Tm': 2, 'Sn': 2.17, 'Ti': 2,
+    'W': 2, 'U': 1.86, 'V': 2, 'Xe': 2.16, 'Yb': 2,
+    'Y': 2, 'Zn': 1.29, 'Zr': 2, 'X': 1.0, 'D': 1.0
+}
 
 # This dictionary gives easy access to the rdkit bond types.
 bond_dict = {'1': rdkit.rdchem.BondType.SINGLE,
@@ -52,30 +52,31 @@ bond_dict = {'1': rdkit.rdchem.BondType.SINGLE,
 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {
-              1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C',
-              7: 'N', 8: 'O',  9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg',
-              13: 'Al', 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl',
-              18: 'Ar', 19: 'K', 20: 'Ca', 21: 'Sc', 22: 'Ti',
-              23: 'V', 24: 'Cr', 25: 'Mn', 26: 'Fe', 27: 'Co',
-              28: 'Ni', 29: 'Cu', 30: 'Zn', 31: 'Ga', 32: 'Ge',
-              33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 37: 'Rb',
-              38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo',
-              43: 'Tc', 44: 'Ru', 45: 'Rh', 46: 'Pd', 47: 'Ag',
-              48: 'Cd', 49: 'In', 50: 'Sn', 51: 'Sb', 52: 'Te',
-              53: 'I', 54: 'Xe', 55: 'Cs', 56: 'Ba', 57: 'La',
-              58: 'Ce', 59: 'Pr', 60: 'Nd', 61: 'Pm', 62: 'Sm',
-              63: 'Eu', 64: 'Gd', 65: 'Tb', 66: 'Dy', 67: 'Ho',
-              68: 'Er', 69: 'Tm', 70: 'Yb', 71: 'Lu', 72: 'Hf',
-              73: 'Ta', 74: 'W', 75: 'Re', 76: 'Os', 77: 'Ir',
-              78: 'Pt', 79: 'Au', 80: 'Hg', 81: 'Tl', 82: 'Pb',
-              83: 'Bi', 84: 'Po', 85: 'At', 86: 'Rn', 87: 'Fr',
-              88: 'Ra', 89: 'Ac', 90: 'Th', 91: 'Pa', 92: 'U',
-              93: 'Np', 94: 'Pu', 95: 'Am', 96: 'Cm', 97: 'Bk',
-              98: 'Cf', 99: 'Es', 100: 'Fm', 101: 'Md', 102: 'No',
-              103: 'Lr', 104: 'Rf', 105: 'Db', 106: 'Sg', 107: 'Bh',
-              108: 'Hs', 109: 'Mt', 110: 'Ds', 111: 'Rg', 112: 'Cn',
-              113: 'Uut', 114: 'Fl', 115: 'Uup', 116: 'Lv',
-              117: 'Uus', 118: 'Uuo'}
+    1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C',
+    7: 'N', 8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg',
+    13: 'Al', 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl',
+    18: 'Ar', 19: 'K', 20: 'Ca', 21: 'Sc', 22: 'Ti',
+    23: 'V', 24: 'Cr', 25: 'Mn', 26: 'Fe', 27: 'Co',
+    28: 'Ni', 29: 'Cu', 30: 'Zn', 31: 'Ga', 32: 'Ge',
+    33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 37: 'Rb',
+    38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo',
+    43: 'Tc', 44: 'Ru', 45: 'Rh', 46: 'Pd', 47: 'Ag',
+    48: 'Cd', 49: 'In', 50: 'Sn', 51: 'Sb', 52: 'Te',
+    53: 'I', 54: 'Xe', 55: 'Cs', 56: 'Ba', 57: 'La',
+    58: 'Ce', 59: 'Pr', 60: 'Nd', 61: 'Pm', 62: 'Sm',
+    63: 'Eu', 64: 'Gd', 65: 'Tb', 66: 'Dy', 67: 'Ho',
+    68: 'Er', 69: 'Tm', 70: 'Yb', 71: 'Lu', 72: 'Hf',
+    73: 'Ta', 74: 'W', 75: 'Re', 76: 'Os', 77: 'Ir',
+    78: 'Pt', 79: 'Au', 80: 'Hg', 81: 'Tl', 82: 'Pb',
+    83: 'Bi', 84: 'Po', 85: 'At', 86: 'Rn', 87: 'Fr',
+    88: 'Ra', 89: 'Ac', 90: 'Th', 91: 'Pa', 92: 'U',
+    93: 'Np', 94: 'Pu', 95: 'Am', 96: 'Cm', 97: 'Bk',
+    98: 'Cf', 99: 'Es', 100: 'Fm', 101: 'Md', 102: 'No',
+    103: 'Lr', 104: 'Rf', 105: 'Db', 106: 'Sg', 107: 'Bh',
+    108: 'Hs', 109: 'Mt', 110: 'Ds', 111: 'Rg', 112: 'Cn',
+    113: 'Uut', 114: 'Fl', 115: 'Uup', 116: 'Lv',
+    117: 'Uus', 118: 'Uuo'
+}
 
 
 class Cell:
@@ -225,12 +226,14 @@ class MAEExtractor:
                 # Write the structure block in its own .mae file, named
                 # after conformer extracted.
                 new_name = self.mae_path.replace(
-                                            '.mae',
-                                            f'EXTRACTED_{num}.mae')
+                    '.mae',
+                    f'EXTRACTED_{num}.mae'
+                )
             else:
                 new_name = self.mae_path.replace(
-                              '.mae',
-                              f'EXTRACTED_{num}_conf_{i}.mae')
+                    '.mae',
+                    f'EXTRACTED_{num}_conf_{i}.mae'
+                )
 
             with open(new_name, 'w') as mae_file:
                 mae_file.write(new_mae)
@@ -830,7 +833,7 @@ def mol_from_mol_file(mol_file):
                 continue
 
             if take_bond:
-                *_, bond_id,  bond_order, atom1, atom2 = line.split()
+                *_, bond_id, bond_order, atom1, atom2 = line.split()
                 e_mol.AddBond(int(atom1)-1, int(atom2)-1,
                               bond_dict[bond_order])
                 continue
@@ -1143,10 +1146,490 @@ def vector_theta(vector1, vector2):
     """
 
     numerator = np.dot(vector1, vector2)
-    denominator = (np.linalg.norm(vector1) *
-                   np.linalg.norm(vector2))
+    denominator = (np.linalg.norm(vector1) * np.linalg.norm(vector2))
     # This if statement prevents returns of NaN due to floating point
     # incurracy.
     if np.isclose(numerator, denominator, atol=1e-8):
         return 0.0
     return np.arccos(numerator/denominator)
+
+
+class XTBInvalidSolventError(Exception):
+    ...
+
+
+def is_valid_xtb_solvent(gfn_version, solvent):
+    """
+    Check if solvent is valid for the given GFN version.
+
+    Parameters
+    ----------
+    gfn_version : :class:`int`
+        GFN parameterization version. Can be: ``0``, ``1`` or ``2``.
+
+    solvent : :class:`str`
+        Solvent being tested.
+
+    Returns
+    -------
+    :class:`bool`
+        ``True`` if solvent is valid.
+
+    See Also
+    --------
+    # https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+
+    """
+    if gfn_version == 0:
+        return False
+    elif gfn_version == 1:
+        valid_solvents = {
+            'acetone', 'acetonitrile', 'benzene',
+            'CH2Cl2'.lower(), 'CHCl3'.lower(), 'CS2'.lower(),
+            'DMSO'.lower(), 'ether', 'H2O'.lower(),
+            'methanol', 'THF'.lower(), 'toluene'
+        }
+        return solvent in valid_solvents
+    elif gfn_version == 2:
+        valid_solvents = {
+            'acetone', 'acetonitrile', 'CH2Cl2'.lower(),
+            'CHCl3'.lower(), 'CS2'.lower(), 'DMF'.lower(),
+            'DMSO'.lower(), 'ether', 'H2O'.lower(), 'methanol',
+            'n-hexane'.lower(), 'THF'.lower(), 'toluene'
+        }
+        return solvent in valid_solvents
+
+
+class XTBExtractor:
+    """
+    Extracts properties from GFN-xTB output files.
+
+    Attributes
+    ----------
+    output_file : :class:`str`
+        Output file to extract properties from.
+
+    output_lines : :class:`list` : :class:`str`
+        :class:`list` of all lines in as :class:`str` in the output
+        file.
+
+    total_energy : :class:`float`
+        The total energy in the :attr:`output_file` as
+        :class:`float`. The energy is in units of a.u..
+
+    homo_lumo_gap : :class:`float`
+        The HOMO-LUMO gap in the :attr:`output_file` as
+        :class:`float`. The gap is in units of eV.
+
+    fermi_level : :class:`float`
+        The Fermi level in the :attr:`output_file` as
+        :class:`float` in units of eV.
+
+    qonly_dipole_moment : :class:`list`
+        Components of the Q only dipole moment in units
+        of Debye in :class:`list` of the form
+        ``[x, y, z]``.
+
+    full_dipole_moment : :class:`list`
+        Components of the full dipole moment in units
+        of Debye in :class:`list` of the form
+        ``[x, y, z, total]``.
+
+    qonly_quadrupole_moment : :class:`list`
+        Components of the Q only traceless quadrupole moment in units
+        of Debye in :class:`list` of the form
+        ``[xx, xy, xy, xz, yz, zz]``.
+
+    qdip_quadrupole_moment : :class:`list`
+        Components of the Q+Dip traceless quadrupole moment in units of
+        Debye in :class:`list` of the form
+        ``[xx, xy, xy, xz, yz, zz]``.
+
+    full_quadrupole_moment : :class:`list`
+        Components of the full traceless quadrupole moment in units of
+        Debye in :class:`list` of the form
+        ``[xx, xy, xy, xz, yz, zz]``.
+
+    homo_lumo_occ : :class:`dict`
+        :class:`dict` of :class:`list` containing the orbital number,
+        energy in eV and occupation of the HOMO and LUMO orbitals in
+        the :attr:`output_file`.
+
+    total_free_energy : :class:`float`
+        The total free energy in the :attr:`output_file` as
+        :class:`float`. The free energy is in units of a.u. and
+        calculated at 298.15K.
+
+    frequencies : :class:`list`
+        :class:`list` of the vibrational frequencies as :class:`float`
+        in the :attr:`output_file`. Vibrational frequencies are in
+        units of wavenumber and calculated at 298.15K.
+
+    """
+    def __init__(self, output_file):
+        """
+        Initializes :class:`XTBExtractor`
+
+        Parameters
+        ----------
+        output_file : :class:`str`
+            Output file to extract properties from.
+
+        """
+        self.output_file = output_file
+        with open(self.output_file, 'r') as f:
+            self.output_lines = f.readlines()
+
+        self._extract_values()
+
+    def _extract_values(self):
+        """
+        Extract all properties from xTB output file.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        for i, line in enumerate(self.output_lines):
+            if self._check_line(line, 'total_energy'):
+                self._extract_total_energy(line)
+            elif self._check_line(line, 'homo_lumo_gap'):
+                self._extract_homo_lumo_gap(line)
+            elif self._check_line(line, 'fermi_level'):
+                self._extract_fermi_level(line)
+            elif self._check_line(line, 'dipole_moment'):
+                self._extract_qonly_dipole_moment(i)
+                self._extract_full_dipole_moment(i)
+            elif self._check_line(line, 'quadrupole_moment'):
+                self._extract_qonly_quadrupole_moment(i)
+                self._extract_qdip_quadrupole_moment(i)
+                self._extract_full_quadrupole_moment(i)
+            elif self._check_line(line, 'homo_lumo_occ_HOMO'):
+                self.homo_lumo_occ = {}
+                self._extract_homo_lumo_occ(line, 'HOMO')
+            elif self._check_line(line, 'homo_lumo_occ_LUMO'):
+                self._extract_homo_lumo_occ(line, 'LUMO')
+            elif self._check_line(line, 'total_free_energy'):
+                self._extract_total_free_energy(line)
+
+        # Frequency formatting requires loop through full file.
+        self._extract_frequencies()
+
+    def _check_line(self, line, option):
+        """
+        Checks a line for a string based on option.
+
+        All formatting based on the 190418 version of xTB.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to check.
+
+        option : :class:`str`
+            Define which property and string being checked for.
+            Can be one of ``'total_energy'``, ``'homo_lumo_gap'``,
+            ``'fermi_level'``, ``'dipole_moment'``,
+            ``'quadrupole_moment'``, ``'homo_lumo_occ_HOMO'``,
+            ``'homo_lumo_occ_LUMO'``,
+            ``'total_free_energy'``.
+
+        Returns
+        -------
+        :class:`bool`
+            Returns ``True`` if the desired string is present.
+
+        """
+        options = {
+            'total_energy': '          | TOTAL ENERGY  ',
+            'homo_lumo_gap': '          | HOMO-LUMO GAP   ',
+            'fermi_level': '             Fermi-level        ',
+            'dipole_moment': 'molecular dipole:',
+            'quadrupole_moment': 'molecular quadrupole (traceless):',
+            'homo_lumo_occ_HOMO': '(HOMO)',
+            'homo_lumo_occ_LUMO': '(LUMO)',
+            'total_free_energy': '          | TOTAL FREE ENERGY  ',
+        }
+
+        if options[option] in line:
+            return True
+
+    def _extract_total_energy(self, line):
+        """
+        Updates :attr:`total_energy`.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to extract property from.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        string = nums.search(line.rstrip()).group(0)
+        self.total_energy = float(string)
+
+    def _extract_homo_lumo_gap(self, line):
+        """
+        Updates :attr:`homo_lumo_gap`.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to extract property from.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        string = nums.search(line.rstrip()).group(0)
+        self.homo_lumo_gap = float(string)
+
+    def _extract_fermi_level(self, line):
+        """
+        Updates :attr:`fermi_level`.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to extract property from.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        part2 = line.split('Eh')
+        string = nums.search(part2[1].rstrip()).group(0)
+        self.fermi_level = float(string)
+
+    def _extract_qonly_dipole_moment(self, index):
+        """
+        Updates :attr:`qonly_dipole_moment`.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to extract property from.
+
+        index : :class:`int`
+            Index of line in :attr:`output_lines`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        sample_set = self.output_lines[index+2].rstrip()
+
+        if 'q only:' in sample_set:
+            self.qonly_dipole_moment = [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
+
+    def _extract_full_dipole_moment(self, index):
+        """
+        Updates :attr:`full_dipole_moment`.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to extract property from.
+
+        index : :class:`int`
+            Index of line in :attr:`output_lines`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        sample_set = self.output_lines[index+3].rstrip()
+
+        if 'full:' in sample_set:
+            self.full_dipole_moment = [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
+
+    def _extract_qonly_quadrupole_moment(self, index):
+        """
+        Updates :attr:`qonly_quadrupole_moment`.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to extract property from.
+
+        index : :class:`int`
+            Index of line in :attr:`output_lines`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        sample_set = self.output_lines[index+2].rstrip()
+
+        if 'q only:' in sample_set:
+            self.qonly_quadrupole_moment = [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
+
+    def _extract_qdip_quadrupole_moment(self, index):
+        """
+        Updates :attr:`qdip_quadrupole_moment`.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to extract property from.
+
+        index : :class:`int`
+            Index of line in :attr:`output_lines`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        sample_set = self.output_lines[index+3].rstrip()
+
+        if 'q+dip:' in sample_set:
+            self.qdip_quadrupole_moment = [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
+
+    def _extract_full_quadrupole_moment(self, index):
+        """
+        Updates :attr:`full_quadrupole_moment`.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to extract property from.
+
+        index : :class:`int`
+            Index of line in :attr:`output_lines`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        sample_set = self.output_lines[index+4].rstrip()
+
+        if 'full:' in sample_set:
+            self.full_quadrupole_moment = [
+                float(i)
+                for i in sample_set.split(':')[1].split(' ') if i
+            ]
+
+    def _extract_homo_lumo_occ(self, line, orbital):
+        """
+        Updates :attr:`homo_lumo_occ`.
+
+        Parameters
+        ----------
+        line : :class:`str`
+            Line of output file to extract property from.
+
+        orbital : :class:`str`
+            Can be 'HOMO' or 'LUMO'.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if orbital == 'HOMO':
+            split_line = [i for i in line.rstrip().split(' ') if i]
+            # The line is:
+            #   Number, occupation, energy (Ha), energy (ev), label
+            # Extract:
+            #   Number, occupation, energy (eV)
+            orbital_val = [
+                int(split_line[0]),
+                float(split_line[1]),
+                float(split_line[3])
+            ]
+        elif orbital == 'LUMO':
+            split_line = [i for i in line.rstrip().split(' ') if i]
+            # The line is:
+            #   Number, energy (Ha), energy (ev), label
+            # Extract:
+            #   Number, occupation (zero), energy (eV)
+            orbital_val = [
+                int(split_line[0]),
+                0,
+                float(split_line[2])
+            ]
+
+        self.homo_lumo_occ[orbital] = orbital_val
+
+    def _extract_total_free_energy(self, line):
+        """
+        Updates :attr:`total_free_energy`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+        string = nums.search(line.rstrip()).group(0)
+        self.total_free_energy = float(string)
+
+    def _extract_frequencies(self):
+        """
+        Updates :attr:`frequencies`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        test = '|               Frequency Printout                |'
+
+        # Use a switch to make sure we are extracting values after the
+        # final property readout.
+        switch = False
+
+        frequencies = []
+        for i, line in enumerate(self.output_lines):
+            if test in line:
+                # Turn on reading as final frequency printout has
+                # begun.
+                switch = True
+            if ' reduced masses (amu)' in line:
+                # Turn off reading as frequency section is done.
+                switch = False
+            if 'eigval :' in line and switch is True:
+                samp = line.rstrip().split(':')[1].split(' ')
+                split_line = [i for i in samp if i]
+                for freq in split_line:
+                    frequencies.append(freq)
+
+        self.frequencies = [float(i) for i in frequencies]
