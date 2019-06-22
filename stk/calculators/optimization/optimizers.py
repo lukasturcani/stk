@@ -1134,7 +1134,7 @@ class XTB(Optimizer):
                         'Small negative frequencies present in '
                         f'{mol.name} conformer {conformer}.'
                     )
-                    return opt_complete
+                    return False
             else:
                 # Optimization is complete.
                 # Update mol from xtbopt.xyz.
