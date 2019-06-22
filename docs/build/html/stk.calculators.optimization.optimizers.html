@@ -1128,8 +1128,7 @@ until the structure is sufficiently optimized. Furthermore, the
 calculation of the Hessian can be turned off using
 <a class="reference internal" href="#stk.calculators.optimization.optimizers.XTB.max_runs" title="stk.calculators.optimization.optimizers.XTB.max_runs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">max_runs</span></code></a> to <code class="docutils literal notranslate"><span class="pre">1</span></code> and <a class="reference internal" href="#stk.calculators.optimization.optimizers.XTB.calculate_hessian" title="stk.calculators.optimization.optimizers.XTB.calculate_hessian"><code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_hessian</span></code></a> to
 <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use crude optimization with max_runs=1 and</span>
-<span class="c1"># calculate_hessian=False because this will</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use crude optimization with max_runs=1 because this will</span>
 <span class="c1"># not achieve optimization and rerunning it is unproductive.</span>
 <span class="n">xtb_crude</span> <span class="o">=</span> <span class="n">XTB</span><span class="p">(</span>
     <span class="n">xtb_path</span><span class="o">=</span><span class="s1">&#39;/opt/gfnxtb/xtb&#39;</span><span class="p">,</span>
@@ -1137,7 +1136,7 @@ calculation of the Hessian can be turned off using
     <span class="n">unlimited_memory</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
     <span class="n">opt_level</span><span class="o">=</span><span class="s1">&#39;crude&#39;</span><span class="p">,</span>
     <span class="n">max_runs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">calculate_hessian</span><span class="o">=</span><span class="bp">False</span>
+    <span class="n">calculate_hessian</span><span class="o">=</span><span class="bp">True</span>
 <span class="p">)</span>
 <span class="c1"># Use normal optimization with max_runs == 2.</span>
 <span class="n">xtb_normal</span> <span class="o">=</span> <span class="n">XTB</span><span class="p">(</span>
@@ -1231,26 +1230,8 @@ molecule and conformer.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.calculators.optimization.optimizers.XTB._check_neg_frequencies">
-<code class="descname">_check_neg_frequencies</code><span class="sig-paren">(</span><em>output_file</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.XTB._check_neg_frequencies" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check for negative frequencies.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of output file with xTB results.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if a negative frequency is present.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.calculators.optimization.optimizers.XTB._incomplete">
-<code class="descname">_incomplete</code><span class="sig-paren">(</span><em>output_file</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.XTB._incomplete" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.calculators.optimization.optimizers.XTB._complete">
+<code class="descname">_complete</code><span class="sig-paren">(</span><em>output_file</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.XTB._complete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if xTB optimization has completed and converged.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1259,7 +1240,7 @@ molecule and conformer.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>output_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of xTB output file.</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if a negative frequency is present.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Returns <code class="docutils literal notranslate"><span class="pre">False</span></code> if a negative frequency is present.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
@@ -1270,6 +1251,24 @@ molecule and conformer.</li>
 <li><a class="reference internal" href="#stk.calculators.optimization.optimizers.XTBConvergenceError" title="stk.calculators.optimization.optimizers.XTBConvergenceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">XTBConvergenceError</span></code></a> – If the optimization did not converge.</li>
 </ul>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.optimization.optimizers.XTB._has_neg_frequencies">
+<code class="descname">_has_neg_frequencies</code><span class="sig-paren">(</span><em>output_file</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.optimization.optimizers.XTB._has_neg_frequencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for negative frequencies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of output file with xTB results.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if a negative frequency is present.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></td>
 </tr>
 </tbody>
 </table>
