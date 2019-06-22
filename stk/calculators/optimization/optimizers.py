@@ -796,8 +796,7 @@ class XTB(Optimizer):
 
     .. code-block:: python
 
-        # Use crude optimization with max_runs=1 and
-        # calculate_hessian=False because this will
+        # Use crude optimization with max_runs=1 because this will
         # not achieve optimization and rerunning it is unproductive.
         xtb_crude = XTB(
             xtb_path='/opt/gfnxtb/xtb',
@@ -805,7 +804,7 @@ class XTB(Optimizer):
             unlimited_memory=True,
             opt_level='crude',
             max_runs=1,
-            calculate_hessian=False
+            calculate_hessian=True
         )
         # Use normal optimization with max_runs == 2.
         xtb_normal = XTB(
@@ -968,7 +967,7 @@ class XTB(Optimizer):
         self.incomplete = set()
         super().__init__(use_cache=use_cache)
 
-    def _check_neg_frequencies(self, output_file):
+    def _has_neg_frequencies(self, output_file):
         """
         Check for negative frequencies.
 
@@ -986,9 +985,9 @@ class XTB(Optimizer):
         xtbext = XTBExtractor(output_file=output_file)
         # Check for one negative frequency, excluding the first
         # 6 frequencies.
-        return min(xtbext.frequencies[6:]) < 0
+        return any(x < 0 for x in xtbext.frequencies[6:])
 
-    def _incomplete(self, output_file):
+    def _complete(self, output_file):
         """
         Check if xTB optimization has completed and converged.
 
@@ -1000,7 +999,7 @@ class XTB(Optimizer):
         Returns
         -------
         :class:`bool`
-            Returns ``True`` if a negative frequency is present.
+            Returns ``False`` if a negative frequency is present.
 
         Raises
         -------
@@ -1013,16 +1012,16 @@ class XTB(Optimizer):
         """
         if output_file is None:
             # No simulation has been run.
-            return True
+            return False
         # If convergence is achieved, then .xtboptok should exist.
         if os.path.exists('.xtboptok'):
-            # Check for negative frequencies in output file if max_runs
-            # is > 1.
+            # Check for negative frequencies in output file if the
+            # hessian was calculated.
             # Return True if there exists at least one.
-            if self.max_runs > 1:
-                return self._check_neg_frequencies(output_file)
+            if self.calculate_hessian:
+                return not self._has_neg_frequencies(output_file)
             else:
-                return False
+                return True
         elif os.path.exists('NOT_CONVERGED'):
             raise XTBConvergenceError('Optimization not converged.')
         else:
@@ -1114,8 +1113,8 @@ class XTB(Optimizer):
             coord_file = 'xtbhess.coord'
             coord_exists = os.path.exists(coord_file)
             output_xyz = 'xtbopt.xyz'
-            opt_incomplete = self._incomplete(out_file)
-            if opt_incomplete:
+            opt_complete = self._complete(out_file)
+            if not opt_complete:
                 if coord_exists:
                     # The calculation is incomplete.
                     # Update mol from xtbhess.coord and continue.
@@ -1146,7 +1145,7 @@ class XTB(Optimizer):
                     conformer=conformer
                 )
                 break
-        return opt_incomplete
+        return opt_complete
 
     def optimize(self, mol, conformer=-1):
         """
