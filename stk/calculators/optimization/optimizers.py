@@ -983,7 +983,7 @@ class XTB(Optimizer):
         xtbext = XTBExtractor(output_file=output_file)
         # Check for one negative frequency, excluding the first
         # 6 frequencies.
-        return min(xtbext.frequencies[6:]) < 0
+        return any(x < 0 for x in xtbext.frequencies[6:])
 
     def _complete(self, output_file):
         """
