@@ -1143,6 +1143,7 @@ class XTB(Optimizer):
                     path=output_xyz,
                     conformer=conformer
                 )
+                break
         return opt_incomplete
 
     def optimize(self, mol, conformer=-1):
