@@ -985,7 +985,7 @@ class XTB(Optimizer):
         # 6 frequencies.
         return min(xtbext.frequencies[6:]) < 0
 
-    def _incomplete(self, output_file):
+    def _complete(self, output_file):
         """
         Check if xTB optimization has completed and converged.
 
@@ -997,7 +997,7 @@ class XTB(Optimizer):
         Returns
         -------
         :class:`bool`
-            Returns ``True`` if a negative frequency is present.
+            Returns ``False`` if a negative frequency is present.
 
         Raises
         -------
@@ -1010,16 +1010,16 @@ class XTB(Optimizer):
         """
         if output_file is None:
             # No simulation has been run.
-            return True
+            return False
         # If convergence is achieved, then .xtboptok should exist.
         if os.path.exists('.xtboptok'):
             # Check for negative frequencies in output file if the
             # hessian was calculated.
             # Return True if there exists at least one.
             if self.calculate_hessian:
-                return self._check_neg_frequencies(output_file)
+                return not self._check_neg_frequencies(output_file)
             else:
-                return False
+                return True
         elif os.path.exists('NOT_CONVERGED'):
             raise XTBConvergenceError('Optimization not converged.')
         else:
@@ -1111,8 +1111,8 @@ class XTB(Optimizer):
             coord_file = 'xtbhess.coord'
             coord_exists = os.path.exists(coord_file)
             output_xyz = 'xtbopt.xyz'
-            opt_incomplete = self._incomplete(out_file)
-            if opt_incomplete:
+            opt_complete = self._complete(out_file)
+            if not opt_complete:
                 if coord_exists:
                     # The calculation is incomplete.
                     # Update mol from xtbhess.coord and continue.
@@ -1134,7 +1134,7 @@ class XTB(Optimizer):
                         'Small negative frequencies present in '
                         f'{mol.name} conformer {conformer}.'
                     )
-                    return opt_incomplete
+                    return opt_complete
             else:
                 # Optimization is complete.
                 # Update mol from xtbopt.xyz.
@@ -1143,7 +1143,7 @@ class XTB(Optimizer):
                     conformer=conformer
                 )
                 break
-        return opt_incomplete
+        return opt_complete
 
     def optimize(self, mol, conformer=-1):
         """
@@ -1185,11 +1185,11 @@ class XTB(Optimizer):
         os.chdir(output_dir)
 
         try:
-            incomplete = self._run_optimizations(mol, conformer)
+            complete = self._run_optimizations(mol, conformer)
         finally:
             os.chdir(init_dir)
 
-        if incomplete:
+        if not complete:
             self.incomplete.add(key)
             logging.warning(
                 'Optimization is incomplete for '
