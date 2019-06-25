@@ -6,7 +6,7 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def test_assembly(amine2, aldehyde2, boronic_acid2, diol2):
+def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
     repeat_units = 3
     monomer_joins = 2*repeat_units
 

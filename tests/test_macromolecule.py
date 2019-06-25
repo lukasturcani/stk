@@ -1,9 +1,10 @@
 import os
 import stk
 import pickle
+from os.path import join
 
-if not os.path.exists('macromolecule_tests_output'):
-    os.mkdir('macromolecule_tests_output')
+if not os.path.exists('constructed_molecule_tests_output'):
+    os.mkdir('constructed_molecule_tests_output')
 
 
 def test_building_block_cores(polymer):
@@ -65,7 +66,7 @@ def test_save_rdkit_atom_props(tmp_amine2):
 
 def test_json_init(tmp_polymer):
 
-    path = os.path.join('macromolecule_tests_output', 'mol.json')
+    path = join('constructed_molecule_tests_output', 'mol.json')
 
     tmp_polymer.test_attr1 = 'something'
     tmp_polymer.test_attr2 = 12
