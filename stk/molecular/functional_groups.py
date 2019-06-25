@@ -14,10 +14,10 @@ If ``stk`` is to incorporate a new functional group, a new
 :data:`functional_groups`, which is defined in this module.
 
 Adding a new :class:`FGInfo` instance to :data:`functional_groups` will
-allow :meth:`.Topology.build` to connect the functional group to
-all others during assembly. In most cases, nothing except adding this
-instance should be necessary in order to incorporate new functional
-groups.
+allow :meth:`.Topology.construct` to connect the functional group to
+all others during construction. In most cases, nothing except adding
+this instance should be necessary in order to incorporate new
+functional groups.
 
 Note that when adding SMARTS, if you want to make a SMARTS that targets
 an atom in an environment, for example, a bromine connected to a
@@ -137,8 +137,8 @@ class FGInfo:
     Contains key information about functional groups.
 
     The point of this class is to register which atoms of a functional
-    group form bonds, and which are deleted during assembly of
-    macromolecules.
+    group form bonds, and which are deleted during construction of
+    :class:`.ConstructedMolecule` instances.
 
     Attributes
     ----------
@@ -413,7 +413,7 @@ class Reactor:
     Performs reactions between functional groups of a molecule.
 
     This class is responsible for reacting the functional groups in a
-    molecule during assembly. First, an instance of this class is
+    molecule during construction. First, an instance of this class is
     initialized with a :class:`rdkit.Mol`. This is the molecule which
     is going to have atom and bonds added and removed.
 

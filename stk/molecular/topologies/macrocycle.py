@@ -12,14 +12,14 @@ from ...utilities import dedupe, add_fragment_props
 
 class Cyclic(Topology):
     """
-    Represents cyclic polymers forming a macrocycle.
+    Represents cyclic polymers forming a :class:`.Macrocycle`.
 
     Attributes
     ----------
     repeating_unit : :class:`str`
         A string showing the repeating unit of the :class:`.Cyclic`.
         For example, ``"AB"`` or ``"ABB"``. The building block with
-        index ``0`` in :attr:`.MacroMolecule.building_blocks` is
+        index ``0`` in :attr:`.ConstructedMolecule.building_blocks` is
         labelled as ``"A"`` while index ``1`` as ``"B"`` and so on.
 
     orientation : :class:`tuple` of :class:`float`
@@ -48,7 +48,7 @@ class Cyclic(Topology):
             A string showing the repeating unit of the
             :class:`.Cyclic`. For example, ``"AB"`` or ``"ABB"``. The
             building block with index ``0`` in
-            :attr:`.MacroMolecule.building_blocks` is labelled as
+            :attr:`.ConstructedMolecule.building_blocks` is labelled as
             ``"A"`` while index ``1`` as ``"B"`` and so on.
 
         orientation : :class:`tuple` of :class:`float`
@@ -73,7 +73,7 @@ class Cyclic(Topology):
         self.n = n
         super().__init__(track_fgs=False)
 
-    def place_mols(self, macro_mol):
+    def place_mols(self, mol):
         """
         Place monomers on a large circle.
 
@@ -83,8 +83,8 @@ class Cyclic(Topology):
 
         Parameters
         ----------
-        macro_mol : :class:`.Macrocycle`
-            The macrocycle being assembled.
+        mol : :class:`.Macrocycle`
+            The :class:`.Macrocycle` being constructed.
 
         Returns
         -------
@@ -95,8 +95,11 @@ class Cyclic(Topology):
         # Make a map from monomer label to object.
         mapping = {}
         # Assign every monomer a label ("A", "B", "C", etc.).
-        for label, monomer in zip(dedupe(self.repeating_unit),
-                                  macro_mol.building_blocks):
+        monomers = zip(
+            dedupe(self.repeating_unit),
+            mol.building_blocks
+        )
+        for label, monomer in monomers:
             mapping[label] = monomer
 
         # Make string representing the entire polymer, not just the
@@ -109,13 +112,13 @@ class Cyclic(Topology):
         # Calculate the radius of the circle so that the monomers
         # do not clash.
         md = max(x.max_diameter()[0]
-                 for x in macro_mol.building_blocks)
+                 for x in mol.building_blocks)
         radius = (md + 2)/(2*np.sin(np.pi / len(polymer)))
 
         # Go through the repeating unit and place each monomer.
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             bb = mapping[label]
-            macro_mol.bb_counter.update([bb])
+            mol.bb_counter.update([bb])
             original_position = bb.mol.GetConformer().GetPositions().T
 
             # Flip or not flip the monomer as given by the probability
@@ -142,12 +145,11 @@ class Cyclic(Topology):
             monomer_mol = bb.set_position([x_coord, y_coord, 0])
             monomer_mol = rdkit.Mol(monomer_mol)
 
-            bb_index = macro_mol.building_blocks.index(bb)
+            bb_index = mol.building_blocks.index(bb)
             add_fragment_props(monomer_mol, bb_index, i)
 
-            num_atoms = macro_mol.mol.GetNumAtoms()
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
-                                              monomer_mol)
+            num_atoms = mol.mol.GetNumAtoms()
+            mol.mol = rdkit.CombineMols(mol.mol, monomer_mol)
 
             # Set ids for self.reactor.func_groups.
             for fg in bb.func_groups:
@@ -158,14 +160,14 @@ class Cyclic(Topology):
 
             bb.set_position_from_matrix(original_position)
 
-    def bonded_fgs(self, macro_mol):
+    def bonded_fgs(self, mol):
         """
         Yield functional groups to react.
 
         Parameters
         ----------
-        macro_mol : :class:`.Macrocycle`
-            The polymer being assembled.
+        mol : :class:`.Macrocycle`
+            The :class:`.Macrocycle` being constructed.
 
         Yields
         -------

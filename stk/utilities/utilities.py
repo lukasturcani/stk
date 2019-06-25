@@ -152,10 +152,10 @@ class MAEExtractor:
     all of the conformers found during the search and their energies
     and other data.
 
-    Initializing this class with a MacroMolecule finds that
-    MacroMolecules -out.maegz file and converts it to a .mae file. It
-    then creates and additional .mae file holding only the lowest
-    energy conformer found.
+    Initializing this class with a :class:`.ConstructedMolecule` finds
+    the ``-out.maegz`` file of that :class:`.ConstructedMolecule` and
+    converts it to a ``.mae`` file. It then creates and additional
+    ``.mae`` file holding only the lowest energy conformer found.
 
     Attributes
     ----------
@@ -428,12 +428,14 @@ def add_fragment_props(mol, bb_index, mol_index):
         A molecule which needs to have its atoms tagged.
 
     bb_index : :class:`int`
-        The index of `mol` within `building_blocks` of some
-        macromolecule.
+        The index of `mol` within
+        :attr:`.`ConstructedMolecule.building_blocks` of the
+        :class:`.ConstructedMolecule` being constructed.
 
     mol_index : :class:`int`
-        If `mol` is the 5th molecule of building block with `bb_index`
-        to be added to a macromolecule, `mol_index` is 4.
+        If `mol` is the 5th molecule of a given building block with
+        `bb_index` to be added to a :class:`.ConstructedMolecule`,
+        `mol_index` is 4.
 
     Returns
     -------

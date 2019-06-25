@@ -172,7 +172,7 @@ class Vertex:
         return coord
 
     def create_fg_map(self,
-                      macro_mol,
+                      mol,
                       cell_params,
                       fgs,
                       aligned_fg):
@@ -181,8 +181,8 @@ class Vertex:
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being built.
+        mol : :class:`.ConstructedMolecule`
+            The molecule being built.
 
         cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
@@ -193,7 +193,7 @@ class Vertex:
         aligned_fg : :class:`int`
             The id of the functional group to be aligned with an edge.
             The id corresponods to the value in the building block,
-            not the macromolecule.
+            not the :class:`.ConstructedMolecule`.
 
         Returns
         -------
@@ -206,7 +206,7 @@ class Vertex:
         start = np.array([0, 1])
         angles = []
         for fg in fgs:
-            fg_coords = macro_mol.atom_centroid(fg.bonder_ids) - center
+            fg_coords = mol.atom_centroid(fg.bonder_ids) - center
             x, y, _ = normalize_vector(fg_coords)
             angle = np.arccos(start@np.array([x, y]))
             if x < 0:
@@ -302,14 +302,14 @@ class Edge:
         v1.connected.append(self)
         v2.connected.append(self)
 
-    def place_mol(self, macro_mol, cell_params, mol, alignment):
+    def place_mol(self, mol, cell_params, mol, alignment):
         """
         Places and aligned a building block along the edge.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being built.
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` being built.
 
         cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
@@ -328,25 +328,25 @@ class Edge:
 
         """
 
-        coord = self.fg_centroid(macro_mol, cell_params)
+        coord = self.fg_centroid(mol, cell_params)
         original_position = mol.mol.GetConformer().GetPositions().T
 
         mol.set_bonder_centroid(coord)
-        d = self.fg_direction(macro_mol, cell_params)*alignment
+        d = self.fg_direction(mol, cell_params)*alignment
         mol.set_orientation2(d)
 
         rdkit_mol = rdkit.Mol(mol.mol)
         mol.set_position_from_matrix(original_position)
         return rdkit_mol
 
-    def fg_direction(self, macro_mol, cell_params):
+    def fg_direction(self, mol, cell_params):
         """
         Calculates the direction vector between the fgs.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` being constructed.
 
         cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
@@ -362,7 +362,7 @@ class Edge:
         for i, position in enumerate(self.joint_positions):
             vertex = self.connected[i]
             fg = vertex.fg_map[position]
-            coords.append(macro_mol.atom_centroid(fg.bonder_ids))
+            coords.append(mol.atom_centroid(fg.bonder_ids))
 
         for d, param in zip(self.bond, cell_params):
             coords[1] += d*param
@@ -409,7 +409,7 @@ class Edge:
             coord += frac * dim
         return coord
 
-    def fg_centroid(self, macro_mol, cell_params):
+    def fg_centroid(self, mol, cell_params):
         """
         The centroid of the fgs connected to the edge.
 
@@ -417,8 +417,8 @@ class Edge:
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` being constructed.
 
         cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
@@ -434,21 +434,21 @@ class Edge:
         for i, position in enumerate(self.joint_positions):
             vertex = self.connected[i]
             fg = vertex.fg_map[position]
-            coord += macro_mol.atom_centroid(fg.bonder_ids)
+            coord += mol.atom_centroid(fg.bonder_ids)
 
         for d, param in zip(self.bond, cell_params):
             coord += d*param
 
         return coord / (i+1)
 
-    def create_fg_map(self, macro_mol, fgs, cell_params):
+    def create_fg_map(self, mol, fgs, cell_params):
         """
         Creates the attribute :attr:`fg_map`.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being built.
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` being built.
 
         fgs : :class:`list` of :class:`.FunctionalGroup`
             The functional groups which need to be mapped to edge
@@ -465,21 +465,21 @@ class Edge:
 
         def v1_dist(fg):
             v1_coord = self.v1.calc_coord(cell_params)
-            bonder_coord = macro_mol.atom_centroid(fg.bonder_ids)
+            bonder_coord = mol.atom_centroid(fg.bonder_ids)
             return euclidean(v1_coord, bonder_coord)
 
         fgs = sorted(fgs, key=v1_dist)
         self.fg_map = {0: fgs[0], 1: fgs[1]}
 
 
-def bb_size(macro_mol):
+def bb_size(mol):
     """
     Sums the diameters of the building blocks.
 
     Parameters
     ---------
-    macro_mol : :class:`.MacroMolecule`
-        The macromolecule being assembled.
+    mol : :class:`.ConstructedMolecule`
+        The molecule being constructed.
 
     Returns
     -------
@@ -489,19 +489,17 @@ def bb_size(macro_mol):
 
     """
 
-    return sum(
-        bb.max_diameter()[0] for bb in macro_mol.building_blocks
-    )
+    return sum(bb.max_diameter()[0] for bb in mol.building_blocks)
 
 
-def linker_cof_scale_func(macro_mol):
+def linker_cof_scale_func(mol):
     """
     Calculates the scale factor for :class:`LinkerCOFLattice`.
 
     Parameters
     ---------
-    macro_mol : :class:`.MacroMolecule`
-        The macromolecule being assembled.
+    mol : :class:`.ConstructedMolecule`
+        The molecule being constructed.
 
     Returns
     -------
@@ -511,8 +509,8 @@ def linker_cof_scale_func(macro_mol):
 
     """
 
-    nice_number = (len(macro_mol.topology.vertices)+1) // 1.5
-    return bb_size(macro_mol) * nice_number
+    nice_number = (len(mol.topology.vertices)+1) // 1.5
+    return bb_size(mol) * nice_number
 
 
 class COFLattice(Topology):
@@ -529,9 +527,9 @@ class COFLattice(Topology):
     Attributes
     ----------
     scale_func : :class:`function`
-        A function which takes a :class:`.MacroMolecule` as its only
-        argument returns a number. The number is used
-        to scale the size of the unit cell. See :func:`bb_size`
+        A function which takes a :class:`.ConstructedMolecule`
+        instance as its only argument and returns a number. The number
+        is used to scale the size of the unit cell. See :func:`bb_size`
         for an example.
 
     """
@@ -590,14 +588,14 @@ class LinkerCOFLattice(COFLattice):
         self.ditopic_directions = ditopic_directions
         self.multitopic_aligners = multitopic_aligners
 
-    def bonded_fgs(self, macro_mol):
+    def bonded_fgs(self, mol):
         """
         Yield functional groups to be bonded.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
 
         Yields
         ------
@@ -617,19 +615,19 @@ class LinkerCOFLattice(COFLattice):
             if all(b == 0 for b in e.bond):
                 yield fg3, fg4
             else:
-                macro_mol.func_groups.append(fg3)
-                macro_mol.func_groups.append(fg4)
+                mol.func_groups.append(fg3)
+                mol.func_groups.append(fg4)
                 periodic_bond = PeriodicBond(fg3, fg4, e.bond)
-                macro_mol.periodic_bonds.append(periodic_bond)
+                mol.periodic_bonds.append(periodic_bond)
 
-    def place_mols(self, macro_mol):
+    def place_mols(self, mol):
         """
         Places the building blocks on the topology.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
 
         Returns
         -------
@@ -638,13 +636,13 @@ class LinkerCOFLattice(COFLattice):
         """
 
         # Create the rdkit molecule of the assembled molecule.
-        macro_mol.mol = rdkit.Mol()
+        mol.mol = rdkit.Mol()
 
         # Identify which building block is ditopic and which is
         # tri or more topic.
-        di = next(bb for bb in macro_mol.building_blocks
+        di = next(bb for bb in mol.building_blocks
                   if len(bb.func_groups) == 2)
-        multi = next(bb for bb in macro_mol.building_blocks
+        multi = next(bb for bb in mol.building_blocks
                      if len(bb.func_groups) >= 3)
 
         # Keep track of the number of functional groups in the cof.
@@ -652,15 +650,15 @@ class LinkerCOFLattice(COFLattice):
 
         # Calculate the size of the unit cell by scaling to the size of
         # building blocks.
-        size = self.scale_func(macro_mol)
+        size = self.scale_func(mol)
         cell_params = [size*p for p in self.cell_dimensions]
-        macro_mol.cell_dimensions = cell_params
+        mol.cell_dimensions = cell_params
 
         # For each vertex in the topology, place a multitopic building
         # block on it. The Vertex object takes care of alignment.
 
         for i, v in enumerate(self.vertices):
-            n_atoms = macro_mol.mol.GetNumAtoms()
+            n_atoms = mol.mol.GetNumAtoms()
 
             # Make the functional groups of the bb being placed.
             ids = range(n_fgs, n_fgs+len(multi.func_groups))
@@ -670,39 +668,39 @@ class LinkerCOFLattice(COFLattice):
             # Place the bb.
             aligner = self.multitopic_aligners[i]
             mol = v.place_mol(cell_params, multi, aligner)
-            add_fragment_props(mol,
-                               macro_mol.building_blocks.index(multi),
-                               i)
+            add_fragment_props(
+                mol, mol.building_blocks.index(multi), i
+            )
 
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
-            macro_mol.bb_counter.update([multi])
+            mol.mol = rdkit.CombineMols(mol.mol, mol)
+            mol.bb_counter.update([multi])
 
             # Save the ids of the fgs in the assembled molecule.
             # This is used when creating bonds later in the assembly
             # process.
-            v.create_fg_map(macro_mol, cell_params, fgs, aligner)
+            v.create_fg_map(mol, cell_params, fgs, aligner)
 
         for i, e in enumerate(self.edges):
-            n_atoms = macro_mol.mol.GetNumAtoms()
+            n_atoms = mol.mol.GetNumAtoms()
 
             # Make the functional groups of the bb being placed.
             ids = range(n_fgs, n_fgs+2)
             fgs = list(di.shift_fgs(ids, n_atoms))
             n_fgs += 2
 
-            mol = e.place_mol(macro_mol,
+            mol = e.place_mol(mol,
                               cell_params,
                               di,
                               self.ditopic_directions[i])
 
             add_fragment_props(mol,
-                               macro_mol.building_blocks.index(di),
+                               mol.building_blocks.index(di),
                                i)
 
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
-            macro_mol.bb_counter.update([di])
+            mol.mol = rdkit.CombineMols(mol.mol, mol)
+            mol.bb_counter.update([di])
 
-            e.create_fg_map(macro_mol, fgs, cell_params)
+            e.create_fg_map(mol, fgs, cell_params)
 
 
 class NoLinkerCOFLattice(COFLattice):
@@ -722,7 +720,7 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
     vertices = [(a/3 + b/3 + c/2),
                 (2*a/3 + 2*b/3 + c/2)]
 
-    def bonded_fgs(self, macro_mol):
+    def bonded_fgs(self, mol):
         """
         Yields functional groups to be bonded.
 
@@ -733,7 +731,7 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
+        mol : :class:`.ConstructedMolecule`
             The unit cell being constructed.
 
         Yields
@@ -757,33 +755,33 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         top_fg = max(
             top,
             key=lambda x:
-                macro_mol.atom_centroid(x.bonder_ids)[1]
+                mol.atom_centroid(x.bonder_ids)[1]
         )
         bottom_fg = min(
             bottom,
             key=lambda x:
-                macro_mol.atom_centroid(x.bonder_ids)[1]
+                mol.atom_centroid(x.bonder_ids)[1]
         )
-        macro_mol.func_groups.append(top_fg)
-        macro_mol.func_groups.append(bottom_fg)
+        mol.func_groups.append(top_fg)
+        mol.func_groups.append(bottom_fg)
         periodic_bond = PeriodicBond(top_fg, bottom_fg, [0, 1, 0])
-        macro_mol.periodic_bonds.append(periodic_bond)
+        mol.periodic_bonds.append(periodic_bond)
 
         # Do the same for the x-axis periodic bonds.
         right_fg = max(
             top,
             key=lambda x:
-                macro_mol.atom_centroid(x.bonder_ids)[0]
+                mol.atom_centroid(x.bonder_ids)[0]
         )
         left_fg = min(
             bottom,
             key=lambda x:
-                macro_mol.atom_centroid(x.bonder_ids)[0]
+                mol.atom_centroid(x.bonder_ids)[0]
         )
-        macro_mol.func_groups.append(right_fg)
-        macro_mol.func_groups.append(left_fg)
+        mol.func_groups.append(right_fg)
+        mol.func_groups.append(left_fg)
         periodic_bond = PeriodicBond(right_fg, left_fg, [1, 0, 0])
-        macro_mol.periodic_bonds.append(periodic_bond)
+        mol.periodic_bonds.append(periodic_bond)
 
         # For the bond which gets created directly, find the bonder
         # atom in the bottom fragment closest to the position of the
@@ -792,29 +790,29 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
             bottom,
             key=lambda x:
                 euclidean(self.vertices[1],
-                          macro_mol.atom_centroid(x.bonder_ids))
+                          mol.atom_centroid(x.bonder_ids))
         )
         top_fg2 = min(
             top,
             key=lambda x:
                 euclidean(self.vertices[0],
-                          macro_mol.atom_centroid(x.bonder_ids))
+                          mol.atom_centroid(x.bonder_ids))
         )
         yield top_fg2, bottom_fg2
 
-    def place_mols(self, macro_mol):
+    def place_mols(self, mol):
         """
         Places and aligns building blocks in the unit cell.
 
         Notes
         -----
-        This method modifies `macro_mol`. An ``rdkit`` molecule of the
+        This method modifies `mol`. A :mod:`rdkit` molecule of the
         unit cell with the building blocks not joined up is placed in
-        the :attr:`~.MacroMolecule.mol` attribute.
+        the :attr:`~.ConstructedMolecule.mol` attribute.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
+        mol : :class:`.ConstructedMolecule`
             The unit cell being constructed.
 
         Returns
@@ -823,13 +821,13 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
 
         """
 
-        # Keep track of functional groups in the macromolecule.
+        # Keep track of functional groups in the constructed molecule.
         self._func_groups = []
 
         # Get the building blocks.
-        bb1, bb2 = macro_mol.building_blocks
-        cell_size = self.scale_func(macro_mol)
-        macro_mol.cell_dimensions = [cell_size*x for x in
+        bb1, bb2 = mol.building_blocks
+        cell_size = self.scale_func(mol)
+        mol.cell_dimensions = [cell_size*x for x in
                                      self.cell_dimensions]
         self.vertices = [cell_size*x for x in self.vertices]
 
@@ -838,92 +836,114 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         bb1.set_orientation2([0, 0, 1])
         bb1.minimize_theta2(0, [0, -1, 0], [0, 0, 1])
 
-        # Add to the macromolecule.
-        fgs = bb1.shift_fgs(range(0, 3), macro_mol.mol.GetNumAtoms())
+        # Add to the constructed molecule.
+        fgs = bb1.shift_fgs(range(0, 3), mol.mol.GetNumAtoms())
         self._func_groups.extend(fgs)
 
         add_fragment_props(bb1.mol,
-                           macro_mol.building_blocks.index(bb1),
+                           mol.building_blocks.index(bb1),
                            0)
-        macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb1.mol)
+        mol.mol = rdkit.CombineMols(mol.mol, bb1.mol)
 
         # Place and set orientation of the second building block.
         bb2.set_bonder_centroid(self.vertices[1])
         bb2.set_orientation2([0, 0, 1])
         bb2.minimize_theta2(0, [0, 1, 0], [0, 0, 1])
 
-        # Add to the macromolecule.
-        fgs = bb2.shift_fgs(range(3, 6), macro_mol.mol.GetNumAtoms())
+        # Add to the constructed molecule.
+        fgs = bb2.shift_fgs(range(3, 6), mol.mol.GetNumAtoms())
         self._func_groups.extend(fgs)
 
         add_fragment_props(bb2.mol,
-                           macro_mol.building_blocks.index(bb2),
+                           mol.building_blocks.index(bb2),
                            0)
 
         mol = rdkit.Mol(bb2.mol)
-        macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
-        macro_mol.bb_counter.update([bb1, bb2])
+        mol.mol = rdkit.CombineMols(mol.mol, mol)
+        mol.bb_counter.update([bb1, bb2])
 
 
 class Honeycomb(LinkerCOFLattice):
-    cell_dimensions = a, b, c = [np.array([1, 0, 0]),
-                                 np.array([0.5, 0.866, 0]),
-                                 np.array([0, 0, 5/1.7321])]
+    cell_dimensions = a, b, c = [
+        np.array([1, 0, 0]),
+        np.array([0.5, 0.866, 0]),
+        np.array([0, 0, 5/1.7321])
+    ]
 
-    vertices = v1, v2 = [Vertex((1/3, 1/3, 1/2)),
-                         Vertex((2/3, 2/3, 1/2))]
+    vertices = v1, v2 = [
+        Vertex((1/3, 1/3, 1/2)),
+        Vertex((2/3, 2/3, 1/2))
+    ]
 
-    edges = [Edge(v1, v2, (0, 2)),
-             Edge(v1, v2, (1, 0), [0, -1, 0]),
-             Edge(v1, v2, (2, 1), [-1, 0, 0])]
+    edges = [
+        Edge(v1, v2, (0, 2)),
+        Edge(v1, v2, (1, 0), [0, -1, 0]),
+        Edge(v1, v2, (2, 1), [-1, 0, 0])
+    ]
 
 
 class Hexagonal(LinkerCOFLattice):
-    cell_dimensions = a, b, c = [np.array([1, 0, 0]),
-                                 np.array([0.5, 0.866, 0]),
-                                 np.array([0, 0, 5/1.7321])]
+    cell_dimensions = a, b, c = [
+        np.array([1, 0, 0]),
+        np.array([0.5, 0.866, 0]),
+        np.array([0, 0, 5/1.7321])
+    ]
 
-    vertices = v1, v2, v3, v4 = [Vertex((1/4, 1/4, 1/2)),
-                                 Vertex((1/4, 3/4, 1/2)),
-                                 Vertex((3/4, 1/4, 1/2)),
-                                 Vertex((3/4, 3/4, 1/2))]
+    vertices = v1, v2, v3, v4 = [
+        Vertex((1/4, 1/4, 1/2)),
+        Vertex((1/4, 3/4, 1/2)),
+        Vertex((3/4, 1/4, 1/2)),
+        Vertex((3/4, 3/4, 1/2))
+    ]
 
-    edges = [Edge(v1, v2, (0, 3)),
-             Edge(v1, v3, (1, 4)),
-             Edge(v2, v3, (2, 5)),
-             Edge(v2, v4, (1, 4)),
-             Edge(v3, v4, (0, 3)),
-             Edge(v1, v3, (4, 1), [-1, 0, 0]),
-             Edge(v1, v2, (3, 0), [0, -1, 0]),
-             Edge(v1, v4, (2, 5), [0, -1, 0]),
-             Edge(v3, v2, (2, 5), [1, -1, 0]),
-             Edge(v3, v4, (3, 0), [0, -1, 0]),
-             Edge(v2, v4, (4, 1), [-1, 0, 0]),
-             Edge(v4, v1, (2, 5), [1, 0, 0])]
+    edges = [
+        Edge(v1, v2, (0, 3)),
+        Edge(v1, v3, (1, 4)),
+        Edge(v2, v3, (2, 5)),
+        Edge(v2, v4, (1, 4)),
+        Edge(v3, v4, (0, 3)),
+        Edge(v1, v3, (4, 1), [-1, 0, 0]),
+        Edge(v1, v2, (3, 0), [0, -1, 0]),
+        Edge(v1, v4, (2, 5), [0, -1, 0]),
+        Edge(v3, v2, (2, 5), [1, -1, 0]),
+        Edge(v3, v4, (3, 0), [0, -1, 0]),
+        Edge(v2, v4, (4, 1), [-1, 0, 0]),
+        Edge(v4, v1, (2, 5), [1, 0, 0])
+    ]
 
 
 class Square(LinkerCOFLattice):
-    cell_dimensions = a, b, c = [np.array([1, 0, 0]),
-                                 np.array([0, 1, 0]),
-                                 np.array([0, 0, 1])]
+    cell_dimensions = a, b, c = [
+        np.array([1, 0, 0]),
+        np.array([0, 1, 0]),
+        np.array([0, 0, 1])
+    ]
 
     vertices = v1, = [Vertex((0.5, 0.5, 0.5))]
-    edges = [Edge(v1, v1, (1, 3), [1, 0, 0]),
-             Edge(v1, v1, (0, 2), [0, 1, 0])]
+    edges = [
+        Edge(v1, v1, (1, 3), [1, 0, 0]),
+        Edge(v1, v1, (0, 2), [0, 1, 0])
+    ]
 
 
 class Kagome(LinkerCOFLattice):
-    cell_dimensions = a, b, c = [np.array([1, 0, 0]),
-                                 np.array([0.5, 0.866, 0]),
-                                 np.array([0, 0, 5/1.7321])]
+    cell_dimensions = a, b, c = [
+        np.array([1, 0, 0]),
+        np.array([0.5, 0.866, 0]),
+        np.array([0, 0, 5/1.7321])
+    ]
 
-    vertices = v1, v2, v3 = [Vertex((1/4, 3/4, 0.5)),
-                             Vertex((3/4, 3/4, 1/2)),
-                             Vertex((3/4, 1/4, 1/2))]
+    vertices = v1, v2, v3 = [
+        Vertex((1/4, 3/4, 0.5)),
+        Vertex((3/4, 3/4, 1/2)),
+        Vertex((3/4, 1/4, 1/2))
+    ]
 
-    edges = [Edge(v1, v2, (0, 3)),
-             Edge(v1, v3, (1, 3)),
-             Edge(v2, v3, (2, 0)),
-             Edge(v1, v2, (2, 1), [-1, 0, 0]),
-             Edge(v1, v3, (3, 1), [-1, 1, 0]),
-             Edge(v2, v3, (0, 2), [0, 1, 0])]
+    edges = [
+        Edge(v1, v2, (0, 3)),
+        Edge(v1, v3, (1, 3)),
+        Edge(v2, v3, (2, 0)),
+        Edge(v1, v2, (2, 1), [-1, 0, 0]),
+        Edge(v1, v3, (3, 1), [-1, 1, 0]),
+        Edge(v2, v3, (0, 2), [0, 1, 0])
+    ]

@@ -497,8 +497,9 @@ class _MacroModel(Optimizer):
         Fix bond distances and angles in ``.com`` file.
 
         For each bond distance, bond angle and torisional angle that
-        does not involve a bond created during assembly a "FX" command
-        is added to the body of the ``.com`` file.
+        does not involve a bond created by
+        :meth:`~.Topology.construct`, a "FX" command is added to the
+        body of the ``.com`` file.
 
         These lines replace the filler line in the main string.
 
@@ -541,10 +542,9 @@ class MacroModelForceField(_MacroModel):
     Attributes
     ----------
     restricted : :class:`bool`
-        If ``False`` then all bonds are optimized, not just the ones
-        created during macromolecular assembly. If ``True`` then an
-        optimization is performed only on the bonds added during
-        molecular assembly.
+        If ``True`` then an optimization is performed only on the bonds
+        added by :meth:`~.Topology.construct`. If ``False`` then all
+        bonds are optimized.
 
     """
 
@@ -573,10 +573,9 @@ class MacroModelForceField(_MacroModel):
             :func:`uuid.uuid4` is used.
 
         restricted : :class:`bool`, optional
-            If ``False`` then all bonds are optimized, not just the
-            ones created during macromolecular assembly. If ``True``
-            then an optimization is performed only on the bonds added
-            during molecular assembly.
+            If ``True`` then an optimization is performed only on the
+            bonds added by :meth:`~.Topology.construct`. If ``False``
+            then all bonds are optimized.
 
         timeout : :class:`float`, optional
             The amount in seconds the optimization is allowed to run
@@ -613,9 +612,10 @@ class MacroModelForceField(_MacroModel):
         Create a ``.com`` file for a MacroModel optimization.
 
         The created ``.com`` file fixes all bond parameters which were
-        not added during assembly. This means all bond distances, bond
-        angles and torsional angles are fixed, except for cases where
-        it involves a bond added during assembly of the macromolecule.
+        not added by :meth:`~.Topology.construct`. This means all bond
+        distances, bond angles and torsional angles are fixed, except
+        for cases where it involves a bond added by
+        :meth:`.Topology.construct`.
 
         This fixing is implemented by creating a ``.com`` file with
         various "FX" commands written within its body.
@@ -726,7 +726,7 @@ class MacroModelForceField(_MacroModel):
         Adds lines fixing bond distances to ``.com`` body.
 
         Only bond distances which do not involve bonds created during
-        assembly are fixed.
+        construction are fixed.
 
         Parameters
         ----------
@@ -751,8 +751,8 @@ class MacroModelForceField(_MacroModel):
         # is not between bonder atoms add a fix line to the
         # ``fix_block``. If the bond does invovle two bonder atoms go
         # to the next bond. This is because a bond between 2 bonder
-        # atoms was added during assembly and should therefore not be
-        # fixed.
+        # atoms was added during construction and should therefore not
+        # be fixed.
         for bond in mol.mol.GetBonds():
             atom1 = bond.GetBeginAtom()
             atom2 = bond.GetEndAtom()
@@ -1047,9 +1047,10 @@ class MacroModelMD(_MacroModel):
         Create a ``.com`` file for a MacroModel optimization.
 
         The created ``.com`` file fixes all bond parameters which were
-        not added during assembly. This means all bond distances, bond
-        angles and torsional angles are fixed, except for cases where
-        it involves a bond added during assembly of the macromolecule.
+        not added by :meth:`~.Topology.construct`. This means all bond
+        distances, bond angles and torsional angles are fixed, except
+        for cases where it involves a bond added by
+        :meth:`~.Topology.construct`.
 
         This fixing is implemented by creating a ``.com`` file with
         various "FX" commands written within its body.
@@ -1182,8 +1183,8 @@ class MacroModelMD(_MacroModel):
         # is not between bonder atoms add a fix line to the
         # ``fix_block``. If the bond does invovle two bonder atoms go
         # to the next bond. This is because a bond between 2 bonder
-        # atoms was added during assembly and should therefore not be
-        # fixed.
+        # atoms was added during construction and should therefore not
+        # be fixed.
         for bond in mol.mol.GetBonds():
             atom1 = bond.GetBeginAtom()
             atom2 = bond.GetEndAtom()

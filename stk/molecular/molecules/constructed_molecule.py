@@ -194,8 +194,8 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
     Because of the computational cost associated with molecular
     construction, instances of this class are cached. This means that
-    providing the same arguments to the initializer will not build a
-    different instance with the same attribute values. It will yield
+    providing the same arguments to the initializer will not construct
+    a different instance with the same attribute values. It will yield
     the original instance, retrieved from memory.
 
     This class is not intended to be used directly but should be
@@ -344,10 +344,10 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
         # Save the original rdkit molecule.
         original_mol = self.mol
-        # Build a new molecule.
+        # Construct a new molecule.
         try:
             # Ask the ``Topology`` instance to construct the
-            # macromolecule. This creates the `mol`, `bonds_made`
+            # molecule. This creates the `mol`, `bonds_made`
             # and `func_groups` attributes.
             self.topology.construct(self, bb_conformers)
 
@@ -596,7 +596,7 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
     def bb_distortion(self, bb_conformers=None, conformer=-1):
         """
-        Rmsd difference of building blocks before and after assembly.
+        Rmsd difference of building blocks pre and post construction.
 
         The function looks at each building block in the
         :class:`ConstructedMolecule` and calculates the rmsd between

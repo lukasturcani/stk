@@ -19,7 +19,7 @@ class Linear(Topology):
     repeating_unit : :class:`str`
         A string showing the repeating unit of the :class:`.Polymer`.
         For example, ``"AB"`` or ``"ABB"``. The building block with
-        index ``0`` in :attr:`.MacroMolecule.building_blocks` is
+        index ``0`` in :attr:`.ConstructedMolecule.building_blocks` is
         labelled as ``"A"`` while index ``1`` as ``"B"`` and so on.
 
     orientation : :class:`tuple` of :class:`float`
@@ -50,7 +50,7 @@ class Linear(Topology):
             A string showing the repeating unit of the
             :class:`.Polymer`. For example, ``"AB"`` or ``"ABB"``. The
             building block with index ``0`` in
-            :attr:`.MacroMolecule.building_blocks` is labelled as
+            :attr:`.ConstructedMolecule.building_blocks` is labelled as
             ``"A"`` while index ``1`` as ``"B"`` and so on.
 
         orientation : :class:`tuple` of :class:`float`
@@ -84,7 +84,7 @@ class Linear(Topology):
 
     def cleanup(self, mol):
         """
-        Deletes the atoms which are lost during assembly.
+        Deletes the atoms which are lost during construction.
 
         Parameters
         ----------
@@ -237,7 +237,7 @@ class Linear(Topology):
         Calculates the x coordinate on which to place `bb`.
 
         Does this by checking the most how for down the x axis
-        `macro_mol` stretches and checking the distance between
+        `mol` stretches and checking the distance between
         the minimum x position of `bb` and its centroid.
         It then tries to place `bb` about 3 A away from `mol`.
 

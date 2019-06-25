@@ -758,7 +758,7 @@ class XTB(Optimizer):
 
     Examples
     --------
-    Note that for :class:`.ConstructedMolecule` objects assembled by
+    Note that for :class:`.ConstructedMolecule` objects constructed by
     ``stk``, :class:`XTB` should usually be used in a
     :class:`.OptimizerSequence`. This is because xTB only uses
     xyz coordinates as input and so will not recognize the long bonds

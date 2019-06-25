@@ -21,8 +21,9 @@ class NRotaxane(Topology):
     orientation of the macrocycle defines the threading direction, thus
     giving access to different mechanical stereoisomers. The axle is
     automatically found in the :class:`list` of
-    :attr:`.MacroMolecule.building_blocks` so only the order of the
-    macrocycles in the list is important for construction.
+    :attr:`.ConstructedMolecule.building_blocks` so only the order of
+    the macrocycles in the :class:`list` is important for
+    construction.
 
     Attributes
     ----------
@@ -31,8 +32,8 @@ class NRotaxane(Topology):
         :class:`.Rotaxane`. For example, ``"AB"`` or ``"ABB"``, would
         implied two or three macrocycles threaded, respectively.
         The building block with index ``0`` in
-        :attr:`.MacroMolecule.building_blocks` is labelled as ``"A"``
-        while index ``1`` as ``"B"`` and so on.
+        :attr:`.ConstructedMolecule.building_blocks` is labelled as
+        ``"A"`` while index ``1`` as ``"B"`` and so on.
 
     orientation : :class:`tuple` of :class:`float`
         For each character in the repeating unit, a value between ``0``
@@ -59,7 +60,7 @@ class NRotaxane(Topology):
             within :class:`.Rotaxane`. For example, ``"AB"`` or
             ``"ABB"``, would implied two or three macrocycles threaded,
             respectively. The building block with index ``0`` in
-            :attr:`.MacroMolecule.building_blocks` is labelled as
+            :attr:`.ConstructedMolecule.building_blocks` is labelled as
             ``"A"`` while index ``1`` as ``"B"`` and so on.
 
         orientation : :class:`tuple` of :class:`float`
@@ -72,7 +73,7 @@ class NRotaxane(Topology):
             axle. This allows the user to create stereoisomers.
 
         n : :class:`int`
-            The number of macrocyclerepeating units which are used to
+            The number of macrocycle repeating units which are used to
             make rotaxane. Constructs [n*len(repeat_unit)+1]rotaxane.
 
         """
@@ -82,7 +83,7 @@ class NRotaxane(Topology):
         self.n = n
         super().__init__(track_fgs=False)
 
-    def place_mols(self, macro_mol):
+    def place_mols(self, mol):
         """
         Distribute the macrocycles evenly along the axis.
 
@@ -92,8 +93,8 @@ class NRotaxane(Topology):
 
         Parameters
         ----------
-        macro_mol : :class:`.Rotaxane`
-            The rotaxane being assembled.
+        mol : :class:`.Rotaxane`
+            The :class:`.Rotaxane` being constructed.
 
         Returns
         -------
@@ -102,7 +103,7 @@ class NRotaxane(Topology):
         """
 
         # Identify the axle and the macrocycles in the building_blocks.
-        bbs = macro_mol.building_blocks
+        bbs = mol.building_blocks
         axle = next(m for m in bbs if not hasattr(m, 'cycle_atoms'))
 
         cycles = [m for m in bbs if m is not axle]
@@ -126,8 +127,8 @@ class NRotaxane(Topology):
         axle.set_orientation(axle_dir, [1, 0, 0])
         axle.set_position([0, 0, 0])
 
-        macro_mol.bb_counter.update([axle])
-        macro_mol.mol = rdkit.CombineMols(macro_mol.mol, axle.mol)
+        mol.bb_counter.update([axle])
+        mol.mol = rdkit.CombineMols(mol.mol, axle.mol)
 
         # Find the limiting x coordinates to space the cycles evenly.
         min_x, max_x = self._minmax_x(axle)
@@ -138,7 +139,7 @@ class NRotaxane(Topology):
 
         for i, (label, mdir) in enumerate(zip(polycycle, dirs)):
             cycle = mapping[label]
-            macro_mol.bb_counter.update([cycle])
+            mol.bb_counter.update([cycle])
             ring_ids = cycle.cycle_atoms()
             normal = cycle.plane_normal(atom_ids=ring_ids)
             org_pos = cycle.mol.GetConformer().GetPositions().T
@@ -154,20 +155,20 @@ class NRotaxane(Topology):
             mono_cyc = cycle.shift([cycle_x, 0, 0] -
                                    cycle.atom_centroid(ring_ids))
 
-            cycle_index = macro_mol.building_blocks.index(cycle)
+            cycle_index = mol.building_blocks.index(cycle)
             add_fragment_props(mono_cyc, cycle_index, i)
 
-            macro_mol.mol = rdkit.CombineMols(mono_cyc, macro_mol.mol)
+            mol.mol = rdkit.CombineMols(mono_cyc, mol.mol)
             cycle.set_position_from_matrix(org_pos)
 
-    def bonded_fgs(self, macro_mol):
+    def bonded_fgs(self, mol):
         """
         Yield functional groups to react.
 
         Parameters
         ----------
-        macro_mol : :class:`.Rotaxane`
-            The polymer being assembled.
+        mol : :class:`.Rotaxane`
+            The :class:`.Rotaxane` being constructed.
 
         Yields
         -------
@@ -184,11 +185,11 @@ class NRotaxane(Topology):
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
+        mol : :class:`.Rotaxane`
+            The :class:`.Rotaxane` being constructed.
 
         axle : :class:`.StructUnit`
-            The axle of the rotaxane.
+            The axle of the :class:`.Rotaxane`.
 
         Returns
         -------

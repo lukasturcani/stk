@@ -86,7 +86,7 @@ class Population:
 
     @classmethod
     def init_all(cls,
-                 macromol_class,
+                 constructed_molecule_class,
                  building_blocks,
                  topologies,
                  processes=None,
@@ -96,39 +96,45 @@ class Population:
 
         Parameters
         ----------
-        macromol_class : :class:`type`
-            The class of the :class:`.MacroMolecule` objects being
-            built.
+        constructed_molecule_class : :class:`type`
+            The class of the :class:`.ConstructedMolecule` objects
+            being constructed. For example, could be :class:`.Polymer`,
+            :class:`.Macrocycle` or :class:.`Cage`.
 
         building_blocks : :class:`list`
             A :class:`list` of the form
 
             .. code-block:: python
 
-                building_blocks = [[StructUnit2(), StructUnit2(), ...],
-                                   [StructUnit3(), StructUnit3(), ...],
-                                   [StructUnit2(), StructUnit2(), ...]]
+                building_blocks = [
+                    [StructUnit2(), StructUnit2(), ...],
+                    [StructUnit3(), StructUnit3(), ...],
+                    [StructUnit2(), StructUnit2(), ...]
+                ]
 
-            To assemble a new :class:`.MacroMolecule`, a
+            To construct a new :class:`.ConstructedMolecule`, a
             :class:`.StructUnit` is picked from each of the sublists
             in `building_blocks`. The picked :class:`.StructUnit`
-            instances are then supplied to the macromolecule:
+            instances are then supplied to the
+            `constructed_molecule_class`:
 
             .. code-block:: python
 
-                macro_mol = MacroMolecule([pick1, pick2, pick3],
-                                          Topology())
+                mol = ConstructedMolecule(
+                    [pick1, pick2, pick3],
+                    Topology()
+                )
 
             The order of picked :class:`.StructUnit` instances
             corresponds to the order of the sublists.
 
         topologies : :class:`list` of :class:`.Topology`
-            The topologies of macromolecules being made.
+            The topologies of `constructed_molecule_class` being made.
 
         processes : :class:`int`, optional
-            The number of parallel processes to create when building
-            the molecules. If ``None``, creates a process for each
-            core on the computer.
+            The number of parallel processes to create when
+            constructing the molecules. If ``None``, creates a process
+            for each core on the computer.
 
         duplicates : :class:`bool`, optional
             If ``False``, duplicate structures are removed from
@@ -137,8 +143,8 @@ class Population:
         Returns
         -------
         :class:`Population`
-            A population holding all possible macromolecules from
-            assembled from `databases`.
+            A population holding `constructed_molecule_class`
+            instances.
 
         """
 
@@ -147,18 +153,18 @@ class Population:
             args.append((bbs, topology))
 
         with mp.Pool(processes) as pool:
-            mols = pool.starmap(macromol_class, args)
+            mols = pool.starmap(constructed_molecule_class, args)
 
         # Update the cache.
         for i, mol in enumerate(mols):
             # If the molecule did not exist already add it to the
             # cache.
-            if mol.key not in macromol_class.cache:
-                macromol_class.cache[mol.key] = mol
+            if mol.key not in constructed_molecule_class.cache:
+                constructed_molecule_class.cache[mol.key] = mol
             # If the molecule did exist already, use the cached
             # version.
             else:
-                mols[i] = macromol_class.cache[mol.key]
+                mols[i] = constructed_molecule_class.cache[mol.key]
 
         p = cls(*mols)
         if not duplicates:
@@ -192,27 +198,29 @@ class Population:
 
     @classmethod
     def init_diverse(cls,
-                     macromol_class,
+                     constructed_molecule_class,
                      building_blocks,
                      topologies,
                      size):
         """
-        Assembles a population of :class:`.MacroMolecule`.
+        Constructs a population of :class:`.ConstructedMolecule`.
 
         All molecules are held in the :attr:`members`.
 
         From the supplied sublists of building blocks, a random
-        molecule is selected to initialize a :class:`.MacroMolecule`
-        per sublist. The next molecule selected from the same sublist
-        is the one most with the most different Morgan fingerprint. The
-        next molecule is picked at random again and so on. This is done
-        until `size` :class:`.MacroMolecule` instances have been
-        formed.
+        molecule is selected to initialize a
+        :class:`.ConstructedMolecule` per sublist. The next molecule
+        selected from the same sublist is the one most with the most
+        different Morgan fingerprint. The next molecule is picked at
+        random again and so on. This is done until `size`
+        :class:`.ConstructedMolecule` instances have been constructed.
 
         Parameters
         ----------
-        macromol_class : :class:`type`
-            The class of :class:`.MacroMolecule` to be assembled.
+        constructed_molecule_class : :class:`type`
+            The class of :class:`.ConstructedMolecule` to be
+            constructed. For example, :class:`.Polymer`,
+            :class:`.Macrocycle` or :class:`.Cage`.
 
         building_blocks : :class:`list`
             A :class:`list` of the form
@@ -223,22 +231,25 @@ class Population:
                                    [StructUnit3(), StructUnit3(), ...],
                                    [StructUnit2(), StructUnit2(), ...]]
 
-            To assemble a new :class:`.MacroMolecule`, a
+            To construct a new :class:`.ConstructedMolecule`, a
             :class:`.StructUnit` is picked from each of the sublists
             in `building_blocks`. The picked :class:`.StructUnit`
-            instances are then supplied to the macromolecule:
+            instances are then supplied to the initializer:
 
             .. code-block:: python
 
-                macro_mol = MacroMolecule([pick1, pick2, pick3],
-                                          Topology())
+                mol = ConstructedMolecule(
+                    [pick1, pick2, pick3],
+                    Topology()
+                )
 
             The order of picked :class:`.StructUnit` instances
             corresponds to the order of the sublists.
 
         topolgies : :class:`iterable` of :class:`.Topology`
             An iterable holding topologies which should be randomly
-            selected during initialization of :class:`.MacroMolecule`.
+            selected during initialization of
+            :class:`.ConstructedMolecule`.
 
         size : :class:`int`
             The size of the population to be initialized.
@@ -256,37 +267,45 @@ class Population:
         for db in building_blocks:
             np.random.shuffle(db)
 
-        # Go through every possible macromolecule.
+        # Go through every possible constructed molecule.
         for *bbs, top in it.product(*building_blocks, topologies):
 
-            # Generate the random macromolecule.
-            macro_mol = macromol_class(bbs, top)
-            if macro_mol not in pop:
-                pop.members.append(macro_mol)
+            # Generate the random constructed molecule.
+            mol = constructed_molecule_class(bbs, top)
+            if mol not in pop:
+                pop.members.append(mol)
 
             if len(pop) == size:
                 break
 
             # Make an iterators which goes through all rdkit molecules
             # in the sublists.
-            mol_iters = [(struct_unit.mol for struct_unit in db) for
-                         db in building_blocks]
+            mol_iters = [
+                (struct_unit.mol for struct_unit in db)
+                for db in building_blocks
+            ]
             # Make a dictionary which maps every rdkit molecule to its
             # StructUnit, for every sublist in building_blocks.
-            mol_maps = [{struct_unit.mol: struct_unit for struct_unit in db}
-                        for db in building_blocks]
+            mol_maps = [
+                {struct_unit.mol: struct_unit for struct_unit in db}
+                for db in building_blocks
+            ]
 
             # Get the most different StructUnit to the previously
             # selected one, per sublist. Take index of 1 because the
             # index of 0 will the molecule itself.
-            diff_mols = [bb.similar_molecules(mols)[1][1] for
-                         bb, mols in zip(bbs, mol_iters)]
-            diff_bbs = [mol_map[mol] for
-                        mol_map, mol in zip(mol_maps, diff_mols)]
+            diff_mols = [
+                bb.similar_molecules(mols)[1][1]
+                for bb, mols in zip(bbs, mol_iters)
+            ]
+            diff_bbs = [
+                mol_map[mol]
+                for mol_map, mol in zip(mol_maps, diff_mols)
+            ]
 
-            macro_mol = macromol_class(diff_bbs, top)
-            if macro_mol not in pop:
-                pop.members.append(macro_mol)
+            mol = constructed_molecule_class(diff_bbs, top)
+            if mol not in pop:
+                pop.members.append(mol)
 
             if len(pop) == size:
                 break
@@ -310,8 +329,8 @@ class Population:
             An initializer for the molecular structure files. For
             example, :class:`.StructUnit` or :class:`.StructUnit2`.
             If `folder` contains ``.json`` dump files of
-            :class:`.MacroMolecule` then :meth:`.Molecule.load` could
-            also be used.
+            :class:`.ConstructedMolecule` then :meth:`.Molecule.load`
+            could also be used.
 
         glob_pattern : :class:`str`, optional
             A glob used for selecting specific files within `folder`.
@@ -328,49 +347,56 @@ class Population:
 
     @classmethod
     def init_random(cls,
-                    macromol_class,
+                    constructed_molecule_class,
                     building_blocks,
                     topologies,
                     size):
         """
-        Assembles a population of :class:`.MacroMolecule`.
+        Constructs a population of :class:`.ConstructedMolecule`.
 
         All molecules are held in :attr:`members`.
 
         From the supplied building blocks a random molecule is selected
-        per sublist to for a :class:`.MacroMolecule`. This is done
-        until `size` :class:`.MacroMolecule` have been formed.
+        per sublist to form a :class:`.ConstructedMolecule`. This is
+        done until `size` :class:`.ConstructedMolecule` have been formed.
 
         Parameters
         ----------
-        macromol_class : :class:`type`
-            The class of :class:`.MacroMolecule` to be assembled.
+        constructed_molecule_class : :class:`type`
+            The class of :class:`.ConstructedMolecule` to be
+            constructed. For example, :class:`.Polymer`,
+            :class:`.Macrocycle` or :class:`.Cage`.
 
         building_blocks : :class:`list`
             A :class:`list` of the form
 
             .. code-block:: python
 
-                building_blocks = [[StructUnit2(), StructUnit2(), ...],
-                                   [StructUnit3(), StructUnit3(), ...],
-                                   [StructUnit2(), StructUnit2(), ...]]
+                building_blocks = [
+                    [StructUnit2(), StructUnit2(), ...],
+                    [StructUnit3(), StructUnit3(), ...],
+                    [StructUnit2(), StructUnit2(), ...]
+                ]
 
-            To assemble a new :class:`.MacroMolecule`, a
+            To construct a new :class:`.ConstructedMolecule`, a
             :class:`.StructUnit` is picked from each of the sublists
             in `building_blocks`. The picked :class:`.StructUnit`
-            instances are then supplied to the macromolecule:
+            instances are then supplied to the initializer:
 
             .. code-block:: python
 
-                macro_mol = MacroMolecule([pick1, pick2, pick3],
-                                          Topology())
+                mol = ConstructedMolecule(
+                    [pick1, pick2, pick3],
+                    Topology()
+                )
 
             The order of picked :class:`.StructUnit` instances
             corresponds to the order of the sublists.
 
         topolgies : :class:`iterable` of :class:`.Topology`
-            An iterable holding topologies which should be randomly
-            selected during initialization of :class:`.MacroMolecule`.
+            An :class:`iterable` holding topologies which should be
+            randomly selected during initialization of
+            :class:`.ConstructedMolecule`.
 
         size : :class:`int`
             The size of the population to be initialized.
@@ -378,7 +404,8 @@ class Population:
         Returns
         -------
         :class:`.Population`
-            A population filled with random cages.
+            A population filled with random
+            `constructed_molecule_class` instances.
 
         """
 
@@ -388,13 +415,13 @@ class Population:
         for db in building_blocks:
             np.random.shuffle(db)
 
-        # Go through every possible macromolecule.
+        # Go through every possible constructed molecule.
         for *bbs, top in it.product(*building_blocks, topologies):
 
-            # Generate the random macromolecule.
-            macro_mol = macromol_class(bbs, top)
-            if macro_mol not in pop:
-                pop.members.append(macro_mol)
+            # Generate the random constructed molecule.
+            mol = constructed_molecule_class(bbs, top)
+            if mol not in pop:
+                pop.members.append(mol)
 
             if len(pop) == size:
                 break
@@ -658,7 +685,7 @@ class Population:
 
         .. code-block:: python
 
-            population.max(lambda macro_mol: macro_mol.cavity_size())
+            population.max(lambda mol: mol.cavity_size())
 
         Parameters
         ----------
@@ -688,7 +715,7 @@ class Population:
 
         .. code-block:: python
 
-            population.mean(lambda macro_mol: macro_mol.cavity_size())
+            population.mean(lambda mol: mol.cavity_size())
 
         Parameters
         ----------
@@ -718,7 +745,7 @@ class Population:
 
         .. code-block:: python
 
-            population.min(lambda macro_mol: macro_mol.cavity_size())
+            population.min(lambda mol: mol.cavity_size())
 
         Parameters
         ----------
