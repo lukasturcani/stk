@@ -290,6 +290,14 @@ def tmp_cage(amine2, aldehyde3):
 
 
 @pytest.fixture(scope='session')
+def aldehyde5():
+    return stk.StructUnit3(
+                        join('..', 'data', 'ald5.mol'),
+                        functional_groups=['aldehyde'],
+                        name='aldehyde5')
+
+
+@pytest.fixture(scope='session')
 def aldehyde6():
     return stk.StructUnit3.smiles_init(
                                 smiles='O=CC(C=O)(C=O)C(C=O)(C=O)C=O',
