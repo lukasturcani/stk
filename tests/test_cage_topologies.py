@@ -510,6 +510,29 @@ def test_Dodecahedron(amine2, aldehyde3):
     assert c.bb_counter[aldehyde3] == aldehyde_count
 
 
+def test_Icosahedron(amine2, aldehyde5):
+    top = stk.Icosahedron()
+    amine_fg_count = 2
+    amine_count = 30
+    aldehyde_count = 12
+
+    c = stk.Cage([amine2, aldehyde5], top)
+    c.write(join(test_dir, 'Icosahedron.mol'))
+
+    assert c.bonds_made == amine_fg_count*amine_count
+    assert (c.mol.GetNumAtoms() ==
+            amine2.mol.GetNumAtoms()*amine_count +
+            aldehyde5.mol.GetNumAtoms()*aldehyde_count -
+            c.bonds_made*3)
+    assert (c.mol.GetNumBonds() ==
+            amine2.mol.GetNumBonds()*amine_count +
+            aldehyde5.mol.GetNumBonds()*aldehyde_count -
+            c.bonds_made*2)
+    assert c.topology == top
+    assert c.bb_counter[amine2] == amine_count
+    assert c.bb_counter[aldehyde5] == aldehyde_count
+
+
 def test_multiconformer(tmp_amine2, tmp_aldehyde3):
     top = stk.FourPlusSix()
     amine_fg_count = 2
