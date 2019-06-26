@@ -69,7 +69,7 @@ class TestMol(stk.Cage):
 def pytest_addoption(parser):
     parser.addoption('--macromodel_path', default='')
     parser.addoption('--mopac_path', default='')
-    parser.addoption('--gfnxtb_path', default='')
+    parser.addoption('--xtb_path', default='')
 
 
 def pytest_generate_tests(metafunc):
@@ -81,9 +81,9 @@ def pytest_generate_tests(metafunc):
         mopac_path = metafunc.config.getoption('mopac_path')
         metafunc.parametrize('mopac_path', [mopac_path])
 
-    if 'gfnxtb_path' in metafunc.fixturenames:
-        gfnxtb_path = metafunc.config.getoption('gfnxtb_path')
-        metafunc.parametrize('gfnxtb_path', [gfnxtb_path])
+    if 'xtb_path' in metafunc.fixturenames:
+        xtb_path = metafunc.config.getoption('xtb_path')
+        metafunc.parametrize('xtb_path', [xtb_path])
 
 
 @pytest.fixture(scope='session')
@@ -295,6 +295,27 @@ def aldehyde6():
                                 smiles='O=CC(C=O)(C=O)C(C=O)(C=O)C=O',
                                 functional_groups=['aldehyde'],
                                 name='aldehyde6')
+
+
+@pytest.fixture(scope='session')
+def cycle_su():
+    cycle = rdkit.MolFromSmiles('CCCC1CCCCCCCCC1')
+    cycle = rdkit.AddHs(cycle)
+    rdkit.EmbedMolecule(cycle)
+
+    return stk.MacrocycleStructUnit(cycle, [])
+
+
+@pytest.fixture(scope='session')
+def cycle(amine2, aldehyde2):
+    return stk.Macrocycle([amine2, aldehyde2],
+                          stk.Cyclic('AB', [0, 0], 3))
+
+
+@pytest.fixture
+def tmp_cycle(amine2, aldehyde2):
+    return stk.Macrocycle([amine2, aldehyde2],
+                          stk.Cyclic('AB', [0, 0], 3))
 
 
 @pytest.fixture(scope='session')

@@ -14,7 +14,8 @@ from ...utilities import (normalize_vector,
                           mol_from_mae_file,
                           rotation_matrix_arbitrary_axis,
                           atom_vdw_radii,
-                          remake)
+                          remake,
+                          periodic_table)
 
 
 class MoleculeSubclassError(Exception):
@@ -303,11 +304,11 @@ class Molecule:
             for atoms_group in atoms_dihedral:
                 # Calculate the dihedral angle.
                 dihedral_value = rdMolTransforms.GetDihedralDeg(
-                                    self.mol.GetConformer(conformer),
-                                    atoms_group[0],
-                                    atoms_group[1],
-                                    atoms_group[2],
-                                    atoms_group[3])
+                    self.mol.GetConformer(conformer),
+                    atoms_group[0],
+                    atoms_group[1],
+                    atoms_group[2],
+                    atoms_group[3])
                 # Check that the dihedral is calculated in the right
                 # direction.
                 if abs(dihedral_value) > 90:
@@ -449,13 +450,9 @@ class Molecule:
             atom_id not in fg.atom_ids for fg in self.func_groups
         )
 
-    def linear_direction(self, exclude_ids=None, conformer=-1):
+    def direction(self, exclude_ids=None, conformer=-1):
         """
-        Find the linear direction of the molecule or its atoms.
-
-        The method uses singular value decomposition to find the best
-        fit line to the atomic coordinates. Returned is the vector
-        in the direction of the molecule.
+        Find the direction of the molecule or its atoms.
 
         Parameters
         ----------
@@ -545,12 +542,16 @@ class Molecule:
         maxid1, maxid2 = np.unravel_index(dist.argmax(), dist.shape)
         return dist[maxid1, maxid2], int(maxid1), int(maxid2)
 
-    def mdl_mol_block(self, conformer=-1):
+    def mdl_mol_block(self, atoms=None, conformer=-1):
         """
         Returns a V3000 mol block of the molecule.
 
         Parameters
-        ---------
+        ----------
+        atoms : :class:`set` of :class:`int`, optional
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
+
         conformer : :class:`int`, optional
             The id of the conformer to use.
 
@@ -570,69 +571,74 @@ class Molecule:
         except ValueError:
             pass
 
-        n_atoms = self.mol.GetNumAtoms()
-        n_bonds = self.mol.GetNumBonds()
+        if atoms is None:
+            atoms = range(self.mol.GetNumAtoms())
 
-        dtype = np.dtype(object)
+        n_atoms = len(atoms)
+        atom_lines = []
+        for atom_id in atoms:
+            x, y, z = self.atom_coords(atom_id, conformer)
+            symbol = self.atom_symbol(atom_id)
+            charge = self.mol.GetAtomWithIdx(atom_id).GetFormalCharge()
+            charge = f' CHG={charge}' if charge else ''
+            atom_lines.append(
+                'M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n'.format(
+                    atom_id+1, symbol, x, y, z, charge
+                )
+            )
+        atom_block = ''.join(atom_lines)
 
-        atom_ids = np.array([np.arange(1, n_atoms+1)],
-                            dtype=dtype).T
+        # Convert to set because membership is going to be checked by
+        # bonds.
+        atoms = set(atoms)
+        bond_lines = []
+        for bond in self.mol.GetBonds():
+            a1 = bond.GetBeginAtomIdx()
+            a2 = bond.GetEndAtomIdx()
+            if a1 in atoms and a2 in atoms:
+                # Keep bond ids if all bonds are getting written.
+                if n_atoms == self.mol.GetNumAtoms():
+                    bond_id = bond.GetIdx()
+                else:
+                    bond_id = len(bond_lines)
+                bond_type = int(bond.GetBondTypeAsDouble())
+                bond_lines.append(
+                    f'M  V30 {bond_id+1} {bond_type} {a1+1} {a2+1}\n'
+                )
 
-        atom_symbols = np.array([[self.atom_symbol(i)]
-                                 for i in range(n_atoms)],
-                                dtype=dtype)
+        n_bonds = len(bond_lines)
+        bond_block = ''.join(bond_lines)
 
-        pos_mat = self.mol.GetConformer(conformer).GetPositions()
-
-        charges = np.array([[f' CHG={a.GetFormalCharge()}' if
-                             a.GetFormalCharge() else '']
-                            for a in self.mol.GetAtoms()],
-                           dtype=dtype)
-
-        atom_data = np.concatenate(
-                        [atom_ids, atom_symbols, pos_mat, charges],
-                        axis=1).reshape((-1, ))
-        atom_block = "M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n"*n_atoms
-        atom_block = atom_block.format(*atom_data)
-
-        bond_data = [prop for bond in self.mol.GetBonds() for prop in
-                     (bond.GetIdx(),
-                      int(bond.GetBondTypeAsDouble()),
-                      bond.GetBeginAtomIdx()+1,
-                      bond.GetEndAtomIdx()+1)]
-        bond_block = "M  V30 {} {} {} {}\n"*n_bonds
-        bond_block = bond_block.format(*bond_data)
-
-        return ("\n"
-                "     RDKit          3D\n"
-                "\n"
-                "  0  0  0  0  0  0  0  0  0  0999 V3000\n"
-                "M  V30 BEGIN CTAB\n"
-                f"M  V30 COUNTS {n_atoms} {n_bonds} 0 0 0\n"
-                "M  V30 BEGIN ATOM\n"
-                f"{atom_block}"
-                "M  V30 END ATOM\n"
-                "M  V30 BEGIN BOND\n"
-                f"{bond_block}"
-                "M  V30 END BOND\n"
-                "M  V30 END CTAB\n"
-                "M  END\n"
-                "\n"
-                "$$$$\n")
+        return (
+            '\n'
+            '     RDKit          3D\n'
+            '\n'
+            '  0  0  0  0  0  0  0  0  0  0999 V3000\n'
+            'M  V30 BEGIN CTAB\n'
+            f'M  V30 COUNTS {n_atoms} {n_bonds} 0 0 0\n'
+            'M  V30 BEGIN ATOM\n'
+            f'{atom_block}'
+            'M  V30 END ATOM\n'
+            'M  V30 BEGIN BOND\n'
+            f'{bond_block}'
+            'M  V30 END BOND\n'
+            'M  V30 END CTAB\n'
+            'M  END\n'
+            '\n'
+            '$$$$\n'
+        )
 
     def plane_normal(self, atom_ids=None, conformer=-1):
         """
         Find the best fit plane of the molecule or its atoms.
-
-        The method uses singular value decomposition to find the best
-        fit line to the atomic coordinates. Returned is the vector
-        orthonormal to the best fit plane.
 
         Parameters
         ----------
         atom_ids : :class:`list` of :class:`int`, optional
             The ids of the atoms that are assumed to be on the plane.
             Only their coordinates will be used for fitting.
+            If ``None`` then atoms forming the largest cycle are found
+            prior to fitting the plane.
 
         conformer : :class:`int`, optional
             The id of the conformer to be used.
@@ -851,21 +857,16 @@ class Molecule:
 
         """
 
-        conf_id = self.mol.GetConformer(conformer).GetId()
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
 
         # Get the original centroid.
-        centroid = self.centroid(conf_id)
+        centroid = self.centroid(conformer)
         # Find out how much it needs to shift to reach `position`.
-        shift = position - centroid
-        # Apply the shift and get the resulting rdkit conformer object.
-        new_conf = self.shift(shift, conf_id).GetConformer()
-        new_conf.SetId(conf_id)
-
-        # Replace the old rkdit conformer with one where the centroid
-        # is at `position`.
-        self.mol.RemoveConformer(conf_id)
-        self.mol.AddConformer(new_conf)
-
+        shift = np.expand_dims(position - centroid, axis=1)
+        # Apply the shift.
+        positions = self.position_matrix(conformer)
+        self.set_position_from_matrix(positions+shift, conformer)
         return self.mol
 
     def set_position_from_matrix(self, pos_mat, conformer=-1):
@@ -1009,11 +1010,9 @@ class Molecule:
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
 
-        mol = mol_from_mae_file(path)
-        conf = rdkit.Conformer(mol.GetConformer())
-        conf.SetId(conformer)
-        self.mol.RemoveConformer(conformer)
-        self.mol.AddConformer(conf)
+        mol = Molecule()
+        mol.mol = mol_from_mae_file(path)
+        self.set_position_from_matrix(mol.position_matrix(), conformer)
 
     def update_from_mol(self, path, conformer=-1):
         """
@@ -1037,13 +1036,154 @@ class Molecule:
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
 
-        mol = remake(rdkit.MolFromMolFile(molFileName=path,
-                                          sanitize=False,
-                                          removeHs=False))
-        conf = rdkit.Conformer(mol.GetConformer())
-        conf.SetId(conformer)
-        self.mol.RemoveConformer(conformer)
-        self.mol.AddConformer(conf)
+        mol = Molecule()
+        mol.mol = remake(
+            rdkit.MolFromMolFile(
+                molFileName=path,
+                sanitize=False,
+                removeHs=False
+            )
+        )
+        self.set_position_from_matrix(mol.position_matrix(), conformer)
+
+    def update_from_xyz(self, path, conformer=-1):
+        """
+        Updates molecular structure to match a ``.xyz`` file.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.mol`` file from which the structure
+            should be updated.
+
+        conformer : :class:`int`, optional
+            The conformer to be updated.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If the number of atoms in the file does not match the
+            number of atoms in the molecule or if atom elements in the
+            file do not agree with the atom elements in the molecule.
+
+        """
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
+
+        with open(path, 'r') as f:
+            atom_count, _, *content = f.readlines()
+
+        # Check the atom count is correct.
+        num_atoms = self.mol.GetNumAtoms()
+        if int(atom_count) != num_atoms:
+            raise RuntimeError(
+                f'The number of atoms in the xyz file, {atom_count}, '
+                'does not match the number of atoms in the '
+                f'molecule, {num_atoms}.'
+            )
+
+        # Save all the coords in the file.
+        new_coords = []
+        for i, line in enumerate(content):
+            element, *coords = line.split()
+            if element.isnumeric():
+                element = periodic_table[int(element)]
+
+            if element != self.atom_symbol(i):
+                raise RuntimeError(
+                    f'Atom {i} element does not match file.'
+                )
+
+            new_coords.append([float(i) for i in coords])
+
+        # Check that the correct number of atom
+        # lines was present in the file.
+        if i+1 != num_atoms:
+            raise RuntimeError(
+                f'The number of atom lines in the xyz file, {i+1}, '
+                'does not match the number of atoms in the '
+                f'molecule, {num_atoms}.'
+            )
+
+        # Update the structure.
+        new_coords = np.array(new_coords).T
+        self.set_position_from_matrix(new_coords, conformer=conformer)
+
+    def update_from_turbomole(self, path, conformer=-1):
+        """
+        Updates molecular structure from a Turbomole ``.coord`` file.
+
+        Note that coordinates in ``.coord`` files are given in Bohr.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.coord`` file from which the
+            structure should be updated.
+
+        conformer : :class:`int`, optional
+            The conformer to be updated.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If the number of atoms in the file does not match the
+            number of atoms in the molecule or if atom elements in the
+            file do not agree with the atom elements in the molecule.
+
+        """
+        bohr_to_ang = 0.5291772105638411
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
+
+        with open(path, 'r') as f:
+            _, *content, __ = f.readlines()
+
+        # Check the atom count is correct.
+        num_atoms = self.mol.GetNumAtoms()
+        if len(content) != num_atoms:
+            raise RuntimeError(
+                'The number of atoms in the coord file, '
+                f'{len(content)}, does not match the number of atoms '
+                f'in the molecule, {num_atoms}.'
+            )
+
+        # Save all the coords in the file.
+        new_coords = []
+        for i, line in enumerate(content):
+            *coords, element = line.split()
+            if element.isnumeric():
+                element = periodic_table[int(element)]
+
+            if element != self.atom_symbol(i):
+                raise RuntimeError(
+                    f'Atom {i} element does not match file.'
+                )
+
+            new_coords.append([float(i)*bohr_to_ang for i in coords])
+
+        # Check that the correct number of atom
+        # lines was present in the file.
+        if i+1 != num_atoms:
+            raise RuntimeError(
+                'The number of atoms lines in the coord file, '
+                f'{i+1}, does not match the number of atoms '
+                f'in the molecule, {num_atoms}.'
+            )
+
+        # Update the structure.
+        new_coords = np.array(new_coords).T
+        self.set_position_from_matrix(new_coords, conformer=conformer)
 
     def update_stereochemistry(self, conformer=-1):
         """
@@ -1065,11 +1205,11 @@ class Molecule:
         rdkit.AssignAtomChiralTagsFromStructure(self.mol, conformer)
         rdkit.AssignStereochemistry(self.mol, True, True, True)
 
-    def write(self, path, conformer=-1):
+    def write(self, path, atoms=None, conformer=-1):
         """
         Writes a molecular structure file of the molecule.
 
-        This bypasses the need to the writining functions in ``rdkit``.
+        This bypasses the need for writing functions in ``rdkit``.
         These have issues with macromolecules due to poor ring finding
         and sanitization issues.
 
@@ -1077,6 +1217,10 @@ class Molecule:
         ----------
         path : :class:`str`
             The `path` to which the molecule should be written.
+
+        atoms : :class:`list` of :class:`int`, optional
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
 
         conformer : :class:`int`, optional
             The conformer to use.
@@ -1090,15 +1234,15 @@ class Molecule:
         write_funcs = {
             '.mol': self._write_mdl_mol_file,
             '.sdf': self._write_mdl_mol_file,
-            '.pdb': self._write_pdb_file,
-            '.xyz': self._write_xyz_file
+            '.xyz': self._write_xyz_file,
+            '.pdb': self._write_pdb_file
         }
 
         _, ext = os.path.splitext(path)
         write_func = write_funcs[ext]
-        write_func(path, conformer)
+        write_func(path, atoms, conformer)
 
-    def _write_mdl_mol_file(self, path, conformer=-1):
+    def _write_mdl_mol_file(self, path, atoms, conformer):
         """
         Writes a V3000 ``.mol`` file of the molecule
 
@@ -1110,7 +1254,11 @@ class Molecule:
         path : :class:`str`
             The full path to the file being written.
 
-        conformer : :class:`int`, optional
+        atoms : :class:`list` of :class:`int`
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
+
+        conformer : :class:`int`
             The conformer to use.
 
         Returns
@@ -1120,49 +1268,9 @@ class Molecule:
         """
 
         with open(path, 'w') as f:
-            f.write(self.mdl_mol_block(conformer))
+            f.write(self.mdl_mol_block(atoms, conformer))
 
-    def _write_pdb_file(self, path, conformer=-1):
-        """
-        Writes a ``.pdb`` file of the molecule
-
-        This function should not be used directly, only via
-        :meth:`write`.
-
-        Parameters
-        ----------
-        path : :class:`str`
-            The full path to the file being written.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # First write the file using rdkit.
-        rdkit.MolToPDBFile(self.mol, path, conformer)
-
-        # Edit the file because rkdit does poor atom labelling.
-        new_content = ''
-        with open(path, 'r') as pdb:
-            for line in pdb:
-                if 'HETATM' in line:
-                    words = line.split()
-                    lbl_word = words[2]
-                    rpl_word = words[-1]
-                    rpl_word += " "*(len(lbl_word)-len(rpl_word))
-                    line = line.replace(lbl_word, rpl_word)
-
-                new_content += line
-
-        with open(path, 'w') as pdb:
-            pdb.write(new_content)
-
-    def _write_xyz_file(self, path, conformer=-1):
+    def _write_xyz_file(self, path, atoms, conformer):
         """
         Writes a ``.xyz`` file of the molecule
 
@@ -1174,7 +1282,11 @@ class Molecule:
         path : :class:`str`
             The full path to the file being written.
 
-        conformer : :class:`int`, optional
+        atoms : :class:`list` of :class:`int`
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
+
+        conformer : :class:`int`
             The conformer to use.
 
         Returns
@@ -1185,15 +1297,94 @@ class Molecule:
 
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
+        if atoms is None:
+            atoms = range(self.mol.GetNumAtoms())
 
-        x, y, z = self.position_matrix(conformer)
-        number_atoms = str(len(x))
+        num_atoms = str(len(atoms))
+
+        content = [f'{num_atoms}\n\n']
+        for atom_id in atoms:
+            x, y, z = self.atom_coords(atom_id, conformer)
+            symbol = self.atom_symbol(atom_id)
+            content.append(f'{symbol} {x:f} {y:f} {z:f}\n')
 
         with open(path, "w") as xyz:
-            xyz.write(number_atoms)
-            xyz.write("\n")
-            xyz.write("\n")
-            for i in range(len(x)):
-                xyz.write('{} {:f} {:f} {:f}\n'.format(
-                    self.atom_symbol(i), x[i], y[i], z[i]
-                ))
+            xyz.write(''.join(content))
+
+    def _write_pdb_file(self, path, atoms, conformer):
+        """
+        Writes a ``.pdb`` file of the molecule
+
+        This function should not be used directly, only via
+        :meth:`write`.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path to the file being written.
+
+        atoms : :class:`list` of :class:`int`
+            The atom ids of atoms to write. If ``None`` then all atoms
+            are written.
+
+        conformer : :class:`int`
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if atoms is None:
+            atoms = range(self.mol.GetNumAtoms())
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
+
+        lines = []
+        atom_counts = {}
+        hetatm = 'HETATM'
+        alt_loc = ''
+        res_name = 'UNL'
+        chain_id = ''
+        res_seq = '1'
+        i_code = ''
+        occupancy = '1.00'
+        temp_factor = '0.00'
+        for atom in atoms:
+            serial = atom+1
+            element = self.atom_symbol(atom)
+            atom_counts[element] = atom_counts.get(element, 0) + 1
+            name = f'{element}{atom_counts[element]}'
+            # Make sure the coords are no more than 8 columns wide
+            # each.
+            x, y, z = (
+                f'{i}'[:8]
+                for i in self.atom_coords(atom, conformer)
+            )
+            charge = self.mol.GetAtomWithIdx(atom).GetFormalCharge()
+            lines.append(
+                f'{hetatm:<6}{serial:>5} {name:<4}'
+                f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'
+                f'{res_seq:>4}{i_code:<1}   '
+                f'{x:>8}{y:>8}{z:>8}'
+                f'{occupancy:>6}{temp_factor:>6}          '
+                f'{element:>2}{charge:>2}\n'
+            )
+
+        # Convert to set because membership is going to be checked by
+        # bonds.
+        atoms = set(atoms)
+        conect = 'CONECT'
+        for bond in self.mol.GetBonds():
+            a1 = bond.GetBeginAtomIdx()
+            a2 = bond.GetEndAtomIdx()
+            if a1 in atoms and a2 in atoms:
+                lines.append(
+                    f'{conect:<6}{a1+1:>5}{a2+1:>5}               \n'
+                )
+
+        lines.append('END\n')
+        with open(path, 'w') as f:
+            f.write(''.join(lines))

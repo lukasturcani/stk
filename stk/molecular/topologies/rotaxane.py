@@ -13,11 +13,11 @@ from ...utilities import dedupe, add_fragment_props
 
 class NRotaxane(Topology):
     """
-    A class representing the topology of [n]rotaxanes.
+    Represents the topology of [n]rotaxanes.
 
     This class assumes one axle with (n-1) macrocycles threaded on it.
     The macrocycles are spaced evenly along the thread in repeating
-    patterns analogous to non-bonded monomers in :class:`Linear`. The
+    patterns analogous to non-bonded monomers in :class:`.Linear`. The
     orientation of the macrocycle defines the threading direction, thus
     giving access to different mechanical stereoisomers. The axle is
     automatically found in the :class:`list` of
@@ -38,7 +38,10 @@ class NRotaxane(Topology):
         For each character in the repeating unit, a value between ``0``
         and ``1`` (both inclusive) must be given in a :class:`list`. It
         indicates the probability that each macrocycle will have its
-        orientation along the axle flipped.
+        orientation along the axle flipped.  If
+        ``0`` then the macrocycle is guaranteed be aligned with the
+        axle. If ``1`` it is guaranteed to be aligned against the
+        axle. This allows the user to create stereoisomers.
 
     n : :class:`int`
         The number of repeating units in the rotaxane.
@@ -52,12 +55,12 @@ class NRotaxane(Topology):
         Parameters
         ----------
         repeating_unit : :class:`str`
-            A string showing the repeating unit of the macrocycles within
-            :class:`.Rotaxane`. For example, ``"AB"`` or ``"ABB"``, would
-            implied two or three macrocycles threaded, respectively.
-            The building block with index ``0`` in
-            :attr:`.MacroMolecule.building_blocks` is labelled as ``"A"``
-            while index ``1`` as ``"B"`` and so on.
+            A string showing the repeating unit of the macrocycles
+            within :class:`.Rotaxane`. For example, ``"AB"`` or
+            ``"ABB"``, would implied two or three macrocycles threaded,
+            respectively. The building block with index ``0`` in
+            :attr:`.MacroMolecule.building_blocks` is labelled as
+            ``"A"`` while index ``1`` as ``"B"`` and so on.
 
         orientation : :class:`tuple` of :class:`float`
             For each character in the repeating unit, a value between
@@ -119,7 +122,7 @@ class NRotaxane(Topology):
         dirs = self.orientation*self.n
 
         # Place the axle along the x axis with the centroid at origin.
-        axle_dir = axle.linear_direction()
+        axle_dir = axle.direction()
         axle.set_orientation(axle_dir, [1, 0, 0])
         axle.set_position([0, 0, 0])
 

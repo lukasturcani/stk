@@ -2,6 +2,11 @@ from .energy_calculators import EnergyCalculator
 
 
 class MOPACEnergy(EnergyCalculator):
+    """
+    Uses MOPAC to calculate energy.
+
+    """
+
     def __init__(self, mopac_path):
         self.mopac_path = mopac_path
 

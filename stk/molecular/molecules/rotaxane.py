@@ -9,6 +9,7 @@ This class stores constructed rotaxanes, normally originating from
 
 from .macro_molecule import MacroMolecule
 
+
 class Rotaxane(MacroMolecule):
     """
     Used to represent rotaxanes.

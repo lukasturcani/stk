@@ -198,6 +198,31 @@ the optimization are written, if <code class="docutils literal notranslate"><spa
 </dd></dl>
 
 <dl class="method">
+<dt id="stk.calculators.energy.macromodel.MacroModelEnergy.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>macromodel_path</em>, <em>output_dir=None</em>, <em>force_field=16</em>, <em>use_cache=False</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.macromodel.MacroModelEnergy.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The full path of the Schrodinger suite within the user’s
+machine. For example, on a Linux machine this may be
+something like <code class="docutils literal notranslate"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</li>
+<li><strong>output_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – The name of the directory into which files generated during
+the optimization are written, if <code class="docutils literal notranslate"><span class="pre">None</span></code> then
+<code class="xref py py-func docutils literal notranslate"><span class="pre">uuid.uuid4()</span></code> is used.</li>
+<li><strong>force_field</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of the force field to be used.</li>
+<li><strong>use_cache</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> <a class="reference internal" href="#stk.calculators.energy.macromodel.MacroModelEnergy.energy" title="stk.calculators.energy.macromodel.MacroModelEnergy.energy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">energy()</span></code></a> will not run twice on the same
+molecule and conformer, but will instead return the previously
+calculated value.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.energy.macromodel.MacroModelEnergy.energy">
 <code class="descname">energy</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.energy.macromodel.MacroModelEnergy.energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the energy of <cite>mol</cite>.</p>
@@ -206,7 +231,7 @@ the optimization are written, if <code class="docutils literal notranslate"><spa
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose energy is to be calculated.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The <a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> whose energy is to be calculated.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optinal) – The conformer of <cite>mol</cite> to use.</li>
 </ul>
 </td>

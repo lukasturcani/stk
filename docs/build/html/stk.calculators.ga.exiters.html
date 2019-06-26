@@ -80,6 +80,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">stk.calculators.ga.exiters module</a><ul>
+<li><a class="reference internal" href="#available-exiters">Available exiters.</a></li>
 <li><a class="reference internal" href="#extending-stk-making-new-exiters">Extending stk: Making new exiters.</a></li>
 </ul>
 </li>
@@ -152,6 +153,16 @@
 <p>Defines <a class="reference internal" href="#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a> classes.</p>
 <p><a class="reference internal" href="#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a> objects check to see if an exit condition for the GA
 has been fulfilled.</p>
+<div class="section" id="available-exiters">
+<h2>Available exiters.<a class="headerlink" href="#available-exiters" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#stk.calculators.ga.exiters.NumGenerations" title="stk.calculators.ga.exiters.NumGenerations"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumGenerations</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.exiters.MolPresent" title="stk.calculators.ga.exiters.MolPresent"><code class="xref py py-class docutils literal notranslate"><span class="pre">MolPresent</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.exiters.FitnessPlateau" title="stk.calculators.ga.exiters.FitnessPlateau"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessPlateau</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.exiters.AnyExiter" title="stk.calculators.ga.exiters.AnyExiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnyExiter</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.exiters.AllExiters" title="stk.calculators.ga.exiters.AllExiters"><code class="xref py py-class docutils literal notranslate"><span class="pre">AllExiters</span></code></a></li>
+</ol>
+</div>
 <div class="section" id="extending-stk-making-new-exiters">
 <span id="adding-exiters"></span><h2>Extending stk: Making new exiters.<a class="headerlink" href="#extending-stk-making-new-exiters" title="Permalink to this headline">¶</a></h2>
 <p>A new <a class="reference internal" href="#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a> class should inherit <a class="reference internal" href="#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a> and
@@ -175,6 +186,21 @@ conditions have been satisfied.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.ga.exiters.AllExiters.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*exiters</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.exiters.AllExiters.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <code class="xref py py-class docutils literal notranslate"><span class="pre">AllExiter</span></code> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*exiters</strong> (<a class="reference internal" href="#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a>) – <a class="reference internal" href="#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a> objects which are checked to see if their
+exit conditions have been satisfied.</td>
 </tr>
 </tbody>
 </table>
@@ -222,6 +248,21 @@ conditions have been satisfied.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="stk.calculators.ga.exiters.AnyExiter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*exiters</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.exiters.AnyExiter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.exiters.AnyExiter" title="stk.calculators.ga.exiters.AnyExiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnyExiter</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*exiters</strong> (<a class="reference internal" href="#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a>) – <a class="reference internal" href="#stk.calculators.ga.exiters.Exiter" title="stk.calculators.ga.exiters.Exiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exiter</span></code></a> objects which are checked to see if their
+exit conditions have been satisfied.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.exiters.AnyExiter.exit">
 <code class="descname">exit</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.exiters.AnyExiter.exit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if any exit condition has been satisfied.</p>
@@ -247,6 +288,12 @@ satisfied its exit condition.</td>
 <em class="property">class </em><code class="descclassname">stk.calculators.ga.exiters.</code><code class="descname">Exiter</code><a class="headerlink" href="#stk.calculators.ga.exiters.Exiter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Checks if the exit criterion for the GA has been satisfied.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.exiters.Exiter.__init__">
+<code class="descname">__init__</code><a class="headerlink" href="#stk.calculators.ga.exiters.Exiter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.ga.exiters.Exiter.exit">
 <code class="descname">exit</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.exiters.Exiter.exit" title="Permalink to this definition">¶</a></dt>
@@ -304,6 +351,26 @@ number needs to be smaller than the population size.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="stk.calculators.ga.exiters.FitnessPlateau.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>num_generations</em>, <em>top_members=1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.exiters.FitnessPlateau.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.exiters.FitnessPlateau" title="stk.calculators.ga.exiters.FitnessPlateau"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitnessPlateau</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>num_generations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of generations in which the fittest molecules did
+not change.</li>
+<li><strong>top_members</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, optional) – The number of fittest molecules which are checked. This
+number needs to be smaller than the population size.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.exiters.FitnessPlateau.exit">
 <code class="descname">exit</code><span class="sig-paren">(</span><em>progress</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.exiters.FitnessPlateau.exit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if the fittest molecules changed between generations.</p>
@@ -338,7 +405,22 @@ causes it to stop running.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.ga.exiters.MolPresent.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.exiters.MolPresent.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.exiters.MolPresent" title="stk.calculators.ga.exiters.MolPresent"><code class="xref py py-class docutils literal notranslate"><span class="pre">MolPresent</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – A molecule which if present in any of the GA’s generations
+causes it to stop running.</td>
 </tr>
 </tbody>
 </table>
@@ -378,6 +460,20 @@ causes it to stop running.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.calculators.ga.exiters.NumGenerations.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>num_generations</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.exiters.NumGenerations.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.exiters.NumGenerations" title="stk.calculators.ga.exiters.NumGenerations"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumGenerations</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>num_generations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of generations after which the GA should stop.</td>
 </tr>
 </tbody>
 </table>

@@ -80,6 +80,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">stk.calculators.ga.crossers module</a><ul>
+<li><a class="reference internal" href="#available-crossers">Available crossers.</a></li>
 <li><a class="reference internal" href="#extending-stk-making-new-crossers">Extending stk: Making new crossers.</a></li>
 </ul>
 </li>
@@ -155,6 +156,14 @@ them to produce offspring molecules. How crossers are used can be
 seen in the documentation of the various <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> classes,
 for example <a class="reference internal" href="#stk.calculators.ga.crossers.GeneticRecombination" title="stk.calculators.ga.crossers.GeneticRecombination"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticRecombination</span></code></a>,
 <a class="reference internal" href="#stk.calculators.ga.crossers.Jumble" title="stk.calculators.ga.crossers.Jumble"><code class="xref py py-class docutils literal notranslate"><span class="pre">Jumble</span></code></a> or <a class="reference internal" href="#stk.calculators.ga.crossers.RandomCrossover" title="stk.calculators.ga.crossers.RandomCrossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomCrossover</span></code></a>.</p>
+<div class="section" id="available-crossers">
+<h2>Available crossers.<a class="headerlink" href="#available-crossers" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#stk.calculators.ga.crossers.RandomCrossover" title="stk.calculators.ga.crossers.RandomCrossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomCrossover</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.crossers.GeneticRecombination" title="stk.calculators.ga.crossers.GeneticRecombination"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticRecombination</span></code></a></li>
+<li><a class="reference internal" href="#stk.calculators.ga.crossers.Jumble" title="stk.calculators.ga.crossers.Jumble"><code class="xref py py-class docutils literal notranslate"><span class="pre">Jumble</span></code></a></li>
+</ol>
+</div>
 <div class="section" id="extending-stk-making-new-crossers">
 <span id="adding-crossers"></span><h2>Extending stk: Making new crossers.<a class="headerlink" href="#extending-stk-making-new-crossers" title="Permalink to this headline">¶</a></h2>
 <p>To add a new <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a>, make a new class which inherits
@@ -166,6 +175,12 @@ any number of molecules and yields the offspring molecules.</p>
 <em class="property">class </em><code class="descclassname">stk.calculators.ga.crossers.</code><code class="descname">Crosser</code><a class="headerlink" href="#stk.calculators.ga.crossers.Crosser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Carries out crossover on molecules.</p>
+<dl class="attribute">
+<dt id="stk.calculators.ga.crossers.Crosser.__init__">
+<code class="descname">__init__</code><a class="headerlink" href="#stk.calculators.ga.crossers.Crosser.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.calculators.ga.crossers.Crosser.crossover">
 <code class="descname">crossover</code><span class="sig-paren">(</span><em>*mols</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.Crosser.crossover" title="Permalink to this definition">¶</a></dt>
@@ -174,9 +189,9 @@ any number of molecules and yields the offspring molecules.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*mols</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecules on which a crossover operation is performed.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*mols</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecules on which a crossover operation is performed.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The generated offspring.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The generated offspring.</td>
 </tr>
 </tbody>
 </table>
@@ -245,7 +260,7 @@ parents.</p>
 <dl class="attribute">
 <dt id="stk.calculators.ga.crossers.GeneticRecombination.key">
 <code class="descname">key</code><a class="headerlink" href="#stk.calculators.ga.crossers.GeneticRecombination.key" title="Permalink to this definition">¶</a></dt>
-<dd><p>A function, which takes a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> object
+<dd><p>A function, which takes a <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> object
 and returns its gene or category. To produce an offspring,
 one of the building blocks from each category is picked
 at random.</p>
@@ -312,6 +327,28 @@ should be random.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.crossers.GeneticRecombination.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>key</em>, <em>random_yield_order=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.GeneticRecombination.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.crossers.GeneticRecombination" title="stk.calculators.ga.crossers.GeneticRecombination"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticRecombination</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">function</span></code>) – A function, which takes a <a class="reference internal" href="stk.molecular.molecules.struct_unit.html#stk.molecular.molecules.struct_unit.StructUnit" title="stk.molecular.molecules.struct_unit.StructUnit"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructUnit</span></code></a> object
+and returns its gene or category. To produce an offspring,
+one of the building blocks from each category is picked
+at random.</li>
+<li><strong>random_yield_order</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Toggles if the order in which the building blocks are
+made should be random.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.crossers.GeneticRecombination.crossover">
 <code class="descname">crossover</code><span class="sig-paren">(</span><em>*mols</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.GeneticRecombination.crossover" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies a crossover operation on some molecules.</p>
@@ -319,9 +356,9 @@ should be random.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*mols</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecules to be crossed.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*mols</strong> (<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The molecules to be crossed.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The generated offspring.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The generated offspring.</td>
 </tr>
 </tbody>
 </table>
@@ -413,6 +450,27 @@ should be random.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.crossers.Jumble.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>num_offspring_building_blocks</em>, <em>duplicate_building_blocks=False</em>, <em>random_yield_order=True</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.Jumble.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.crossers.Jumble" title="stk.calculators.ga.crossers.Jumble"><code class="xref py py-class docutils literal notranslate"><span class="pre">Jumble</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>num_offspring_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of building blocks each offspring is made from.</li>
+<li><strong>duplicate_building_blocks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Indicates whether the building blocks used to construct the
+offspring must all be unique.</li>
+<li><strong>random_yield_order</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Toggles if the order in which the building blocks are
+made should be random.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.crossers.Jumble.crossover">
 <code class="descname">crossover</code><span class="sig-paren">(</span><em>*mols</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.Jumble.crossover" title="Permalink to this definition">¶</a></dt>
 <dd><p>Carries out crossover on some molecules.</p>
@@ -420,9 +478,9 @@ should be random.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*mols</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The parent molecules.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*mols</strong> (<a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a>) – The parent molecules.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The offspring molecule.</td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="stk.molecular.molecules.macro_molecule.html#stk.molecular.molecules.macro_molecule.MacroMolecule" title="stk.molecular.molecules.macro_molecule.MacroMolecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MacroMolecule</span></code></a> – The offspring molecule.</td>
 </tr>
 </tbody>
 </table>
@@ -509,6 +567,26 @@ any number of parents.</p>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="stk.calculators.ga.crossers.RandomCrossover.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*crossers</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.RandomCrossover.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <a class="reference internal" href="#stk.calculators.ga.crossers.RandomCrossover" title="stk.calculators.ga.crossers.RandomCrossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomCrossover</span></code></a> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>crossers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a>) – <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> objects which are used to carry out the
+crossovers.</li>
+<li><strong>weights</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, optional) – The probability that each <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> will be selected
+to carry out a crossover.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.ga.crossers.RandomCrossover.crossover">
 <code class="descname">crossover</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.ga.crossers.RandomCrossover.crossover" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create offspring with a <a class="reference internal" href="#stk.calculators.ga.crossers.Crosser" title="stk.calculators.ga.crossers.Crosser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crosser</span></code></a> in <a class="reference internal" href="#stk.calculators.ga.crossers.RandomCrossover.crossers" title="stk.calculators.ga.crossers.RandomCrossover.crossers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">crossers</span></code></a>.</p>
@@ -524,7 +602,7 @@ any number of parents.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The generated offspring</p>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a> – The generated offspring</p>
 </td>
 </tr>
 </tbody>

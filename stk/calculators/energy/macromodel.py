@@ -100,7 +100,7 @@ class MacroModelEnergy(EnergyCalculator):
             output_dir = self.output_dir
 
         tmp_file = f'{basename}.mol'
-        mol.write(tmp_file, conformer)
+        mol.write(tmp_file, conformer=conformer)
 
         convrt_app = os.path.join(self.macromodel_path,
                                   'utilities',

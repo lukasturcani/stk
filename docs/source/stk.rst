@@ -1,11 +1,6 @@
 stk package
 ===========
 
-.. automodule:: stk
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
@@ -23,3 +18,10 @@ Submodules
    stk.ga
    stk.populations
 
+Module contents
+---------------
+
+.. automodule:: stk
+    :members:
+    :undoc-members:
+    :show-inheritance:

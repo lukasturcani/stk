@@ -11,10 +11,10 @@ def test_assembly(amine2, aldehyde2, boronic_acid2, diol2):
     monomer_joins = 2*repeat_units
 
     c1 = stk.Macrocycle([amine2, aldehyde2],
-                     stk.Cyclic('AB', [0, 0], repeat_units))
+                        stk.Cyclic('AB', [0, 0], repeat_units))
 
     c2 = stk.Macrocycle([boronic_acid2, diol2],
-                     stk.Cyclic('AB', [0, 0], repeat_units))
+                        stk.Cyclic('AB', [0, 0], repeat_units))
 
     path = os.path.join(test_dir, 'c1.mol')
     c1.write(path)
@@ -30,7 +30,7 @@ def test_assembly(amine2, aldehyde2, boronic_acid2, diol2):
     assert (c1.mol.GetNumAtoms() ==
             monomer_atom_count*repeat_units - 3*monomer_joins)
 
-    # p3 loses 2 atoms becaus OH groups are replaced with H.
+    # c2 loses 2 atoms because two OH groups are replaced with H atoms.
     monomer_atom_count = (boronic_acid2.mol.GetNumAtoms() +
                           diol2.mol.GetNumAtoms())
 

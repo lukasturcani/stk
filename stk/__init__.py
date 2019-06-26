@@ -3,4 +3,4 @@ from .molecular import *
 from .calculators import *
 from .populations import *
 
-__version__ = '2019.05.15.1'
+__version__ = '2019.06.22.0'

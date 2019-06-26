@@ -151,6 +151,12 @@
 <em class="property">class </em><code class="descclassname">stk.calculators.electronic_property.mopac.</code><code class="descname">MOPACElectronicProperties</code><span class="sig-paren">(</span><em>mopac_path</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.electronic_property.mopac.MOPACElectronicProperties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="stk.calculators.electronic_property.electronic_property_calculators.html#stk.calculators.electronic_property.electronic_property_calculators.ElectronicPropertyCalculator" title="stk.calculators.electronic_property.electronic_property_calculators.ElectronicPropertyCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">stk.calculators.electronic_property.electronic_property_calculators.ElectronicPropertyCalculator</span></code></a></p>
 <dl class="method">
+<dt id="stk.calculators.electronic_property.mopac.MOPACElectronicProperties.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>mopac_path</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.electronic_property.mopac.MOPACElectronicProperties.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.calculators.electronic_property.mopac.MOPACElectronicProperties.dipole_moment">
 <code class="descname">dipole_moment</code><span class="sig-paren">(</span><em>mol</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#stk.calculators.electronic_property.mopac.MOPACElectronicProperties.dipole_moment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the dipole moment using MOPAC.</p>
@@ -350,7 +356,7 @@ run before being terminated. The default value is
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule" title="stk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
+<li><strong>mol</strong> (<a class="reference internal" href="stk.molecular.molecules.molecule.html#stk.molecular.molecules.molecule.Molecule" title="stk.molecular.molecules.molecule.Molecule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
 structure file is converted to a <code class="docutils literal notranslate"><span class="pre">.mop</span></code> file. The original
 file is also kept.</li>
 <li><strong>settings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Dictionary defined by the MOPAC methods, where all the run

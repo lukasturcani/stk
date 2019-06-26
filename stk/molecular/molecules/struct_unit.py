@@ -622,8 +622,10 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             include_attrs = []
 
         fg_names = [info.name for info in self.func_group_infos]
-        conformers = [(conf.GetId(), self.mdl_mol_block(conf.GetId()))
-                      for conf in self.mol.GetConformers()]
+        conformers = [
+            (conf.GetId(), self.mdl_mol_block(conformer=conf.GetId()))
+            for conf in self.mol.GetConformers()
+        ]
         json = {
 
             'class': self.__class__.__name__,
