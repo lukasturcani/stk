@@ -1277,7 +1277,7 @@ class XTBExtractor:
 
         """
         self.output_file = output_file
-        with open(self.output_file, 'r') as f:
+        with open(self.output_file, 'r', encoding='UTF-8') as f:
             self.output_lines = f.readlines()
 
         self._extract_values()
