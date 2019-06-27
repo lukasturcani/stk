@@ -39,6 +39,10 @@ class MacroModelLewisStructureError(Exception):
     ...
 
 
+class MacroModelInputError(Exception):
+    ...
+
+
 class _MacroModel(Optimizer):
     """
     Base class for MacroModel optimzers.
@@ -633,10 +637,21 @@ class MacroModelForceField(_MacroModel):
 
         logger.debug('Creating .com file for "{}".'.format(mol.name))
 
+        # Check whether the values supplied fit in the ``.com`` file.
+        if self.minimum_gradient < 0.0001:
+            raise MacroModelInputError(
+                'Convergence gradient (< 0.0001) is too small.'
+            )
+
+        if self.maximum_iterations > 999999:
+            raise MacroModelInputError(
+                'Number of iterations (> 999999) is too high.'
+            )
+
         # This is the body of the ``.com`` file. The line that begins
         # and ends with exclamation lines is replaced with the various
         # commands that fix bond distances and angles.
-        line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
+        # line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
         line2 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
         line3 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
         line4 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
@@ -645,7 +660,7 @@ class MacroModelForceField(_MacroModel):
         line7 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
-            self.com_line(*line1),
+            # self.com_line(*line1),
             self.com_line(*line2),
             self.com_line(*line3),
             self.com_line(*line4),
@@ -1068,15 +1083,65 @@ class MacroModelMD(_MacroModel):
         logger.debug(f'Creating .com file for "{mol.name}".')
 
         # Define some short aliases to keep the following lines neat.
-        temp = self.temperature
-        sim_time = self.simulation_time
-        tstep = self.time_step
+        # And checking whether input satisfies requirements.
+        if self.temperature > 99999.99:
+            raise MacroModelInputError(
+                'Supplied temperature (> 99999 K) is too high.'
+            )
 
-        line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
+        else:
+            temp = self.temperature
+
+        if self.conformers > 9999:
+            raise MacroModelInputError(
+                'Supplied number of conformers (> 9999) is too high.'
+            )
+
+        if self.simulation_time > 999999.99:
+            raise MacroModelInputError(
+                'Supplied simulation time (> 999999 ps) is too long.'
+            )
+
+        elif self.simulation_time > 99999.99:
+            sim_time = - self.simulation_time/100
+
+        else:
+            sim_time = self.simulation_time
+
+        if self.time_step > 99999.99:
+            raise MacroModelInputError(
+                'Supplied time step (> 99999 fs) is too high.'
+            )
+
+        else:
+            tstep = self.time_step
+
+        if self.eq_time > 999999.99:
+            raise MacroModelInputError(
+                'Supplied eq time (> 999999 ps) is too long.'
+            )
+
+        elif self.eq_time > 99999.99:
+            eq_time = - self.eq_time/100
+
+        else:
+            eq_time = self.eq_time
+
+        if self.minimum_gradient < 0.0001:
+            raise MacroModelInputError(
+                'Convergence gradient (< 0.0001) is too small.'
+            )
+
+        if self.maximum_iterations > 999999:
+            raise MacroModelInputError(
+                'Number of iterations (> 999999) is too high.'
+            )
+
+        # line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
         line2 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
         line3 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
         line4 = ('MDIT', 0, 0, 0, 0, temp, 0, 0, 0)
-        line5 = ('MDYN', 0, 0, 0, 0, tstep, self.eq_time, temp, 0)
+        line5 = ('MDYN', 0, 0, 0, 0, tstep, eq_time, temp, 0)
         line6 = ('MDSA', self.conformers, 0, 0, 0, 0, 0, 1, 0)
         line7 = ('MDYN', 1, 0, 0, 0, tstep, sim_time, temp, 0)
         line8 = ('WRIT', 0, 0, 0, 0, 0, 0, 0, 0)
@@ -1088,7 +1153,7 @@ class MacroModelMD(_MacroModel):
         line14 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
-            self.com_line(*line1),
+            # self.com_line(*line1),
             self.com_line(*line2),
             self.com_line(*line3),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
