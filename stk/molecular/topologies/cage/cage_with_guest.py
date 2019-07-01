@@ -10,8 +10,8 @@ class CageWithGuest(Topology):
     A topology representing a cage with a guest.
 
     When using this topology the cage must be the first building block
-    in :attr:`.MacroMolecule.building_blocks` and the guest must be
-    the second.
+    in :attr:`.ConstructedMolecule.building_blocks` and the guest must
+    be the second.
 
     Attributes
     ----------
@@ -53,10 +53,10 @@ class CageWithGuest(Topology):
 
         super().__init__(del_atoms=False)
 
-    def place_mols(self, macro_mol):
+    def place_mols(self, mol):
         origin = [0, 0, 0]
 
-        for i, bb in enumerate(macro_mol.building_blocks):
+        for i, bb in enumerate(mol.building_blocks):
             pos = bb.position_matrix()
             bb.set_position(origin)
 
@@ -80,8 +80,8 @@ class CageWithGuest(Topology):
             # the original.
             bb_mol = rdkit.Mol(bb.mol)
             add_fragment_props(bb_mol, i, i)
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb_mol)
+            mol.mol = rdkit.CombineMols(mol.mol, bb_mol)
             bb.set_position_from_matrix(pos)
 
-    def bonded_fgs(self, macro_mol):
+    def bonded_fgs(self, mol):
         return iter(())

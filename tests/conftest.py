@@ -383,9 +383,9 @@ def tmp_fg():
 def test_mol1():
     bb1 = stk.StructUnit2.smiles_init('N')
     bb2 = stk.StructUnit3.smiles_init('NN')
-    # Make sure calling build does nothing.
+    # Make sure calling construct does nothing.
     top = stk.FourPlusSix()
-    top.build = lambda x: ...
+    top.construct = lambda x: ...
     test_mol = TestMol([bb1, bb2], top, 'test_mol1')
     test_mol.mol = rdkit.Mol(bb1.mol)
     test_mol.bonds_made = 2

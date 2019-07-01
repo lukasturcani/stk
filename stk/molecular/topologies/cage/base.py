@@ -142,7 +142,7 @@ class Vertex:
                   building_block,
                   aligner=0,
                   aligner_edge=0,
-                  macro_mol=None):
+                  mol=None):
         """
         Place a :class:`.StructUnit3` building block on the vertex.
 
@@ -174,8 +174,8 @@ class Vertex:
             The index of an edge in :attr:`connected`. It is the edge
             with which `aligner` is aligned.
 
-        macro_mol : :class:`.MacroMolecule`, optional
-            The macromolecule being built. Used for vertex only cage
+        mol : :class:`.Cage`, optional
+            The cage being constructed. Used for vertex only cage
             topologies where the position of some of the vertices
             is derived from the positions of the fgs on
             connected vertices.
@@ -201,7 +201,7 @@ class Vertex:
 
         # Next, define the direction vector going from the edge
         # centroid to the edge with which the fg is aligned.
-        bonder_centroid = self.bonder_centroid(macro_mol, scale)
+        bonder_centroid = self.bonder_centroid(mol, scale)
         building_block.set_bonder_centroid(bonder_centroid)
         vector = (self.connected[aligner_edge].coord*scale -
                   self.edge_centroid(scale))
@@ -212,9 +212,9 @@ class Vertex:
                                        vector,
                                        self.edge_plane_normal(scale))
 
-        mol = rdkit.Mol(building_block.mol)
+        bb = rdkit.Mol(building_block.mol)
         building_block.set_position_from_matrix(icoord)
-        return mol
+        return bb
 
     def edge_plane_normal(self, scale):
         """
@@ -365,17 +365,17 @@ class Vertex:
         coords = (edge.coord*scale for edge in self.connected)
         return sum(coords) / len(self.connected)
 
-    def bonder_centroid(self, macro_mol, scale):
+    def bonder_centroid(self, mol, scale):
         """
         Calculates the centroid of the fgs on the vertex.
 
         However if :attr:`custom_position` is ``True`` or
-        `macro_mol` is ``None``, then :attr:`coord` is returned.
+        `mol` is ``None``, then :attr:`coord` is returned.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being built.
+        mol : :class:`.Cage`
+            The cage being constructed.
 
         scale : :class:`float`
             The amount by which the size of the topology is scaled.
@@ -387,7 +387,7 @@ class Vertex:
 
         """
 
-        if self.custom_position or macro_mol is None:
+        if self.custom_position or mol is None:
             return self.coord*scale
 
         centroid = np.zeros((3, ))
@@ -395,7 +395,7 @@ class Vertex:
         for v in self.connected:
             for fg, edge in v.fg_position_pairs:
                 if edge is self:
-                    centroid += macro_mol.atom_centroid(fg.bonder_ids)
+                    centroid += mol.atom_centroid(fg.bonder_ids)
                     count += 1
         return centroid / count
 
@@ -440,7 +440,6 @@ class Edge(Vertex):
         custom_position : :class:`bool`
             See :attr:`Vertex.custom_position`
 
-
         """
 
         Vertex.__init__(self,
@@ -453,8 +452,8 @@ class Edge(Vertex):
         v1.connected.append(self)
         v2.connected.append(self)
 
-    def direction(self, macro_mol, scale):
-        if self.custom_position or macro_mol is None:
+    def direction(self, mol, scale):
+        if self.custom_position or mol is None:
             v1, v2 = self.connected
             return normalize_vector(v1.coord - v2.coord)
 
@@ -462,10 +461,10 @@ class Edge(Vertex):
         for v in self.connected:
             for fg, edge in v.fg_position_pairs:
                 if edge is self:
-                    fgs.append(macro_mol.atom_centroid(fg.bonder_ids))
+                    fgs.append(mol.atom_centroid(fg.bonder_ids))
         return normalize_vector(fgs[0] - fgs[1])
 
-    def place_mol(self, scale, linker, alignment, macro_mol):
+    def place_mol(self, scale, linker, alignment, mol):
         """
         Places a linker molecule on the coordinates of an edge.
 
@@ -486,8 +485,8 @@ class Edge(Vertex):
             ``1`` for parallel alignment with :attr:`direction` and
             ``-1`` for anti-parallel alignment with :attr:`direction`.
 
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being constructed.
+        mol : :class:`.Cage`
+            The cage being constructed.
 
         Returns
         -------
@@ -504,18 +503,18 @@ class Edge(Vertex):
         self.distances = []
 
         # Align then place the linker.
-        orientation = self.direction(macro_mol, scale)*alignment
+        orientation = self.direction(mol, scale)*alignment
         linker.set_orientation2(orientation)
 
         linker.minimize_theta2(self.coord*scale,
-                               self.direction(macro_mol, scale))
+                               self.direction(mol, scale))
 
-        bonder_centroid = self.bonder_centroid(macro_mol, scale)
+        bonder_centroid = self.bonder_centroid(mol, scale)
         linker.set_bonder_centroid(bonder_centroid)
 
-        mol = rdkit.Mol(linker.mol)
+        lk = rdkit.Mol(linker.mol)
         linker.set_position_from_matrix(icoord)
-        return mol
+        return lk
 
     def __repr__(self):
         v1, v2 = self.connected
@@ -533,8 +532,8 @@ class CageTopology(Topology):
     ----------
     A_alignments : :class:`list` of :class:`int`
         The length of this :class:`list` must be equal to the number of
-        building blocks in the cage. When cages are built one of the
-        fgs of each building block is aligned with an edge
+        building blocks in the cage. When cages are constructed one of
+        the fgs of each building block is aligned with an edge
         during placement. The :class:`int` is the id of the aligned
         functional group.
 
@@ -649,8 +648,8 @@ class CageTopology(Topology):
         because it has an index of ``1`` and so on.
 
     _func_groups : :class:`list` of :class:`.FunctionalGroup`
-        Keeps track of the functional groups in the macromolecule
-        during assembly.
+        Keeps track of the functional groups in the cage
+        during construction.
 
     """
 
@@ -674,14 +673,14 @@ class CageTopology(Topology):
         self.edge_alignments = edge_alignments
         self.bb_positions = bb_positions
 
-    def _bb_maps(self, macro_mol):
+    def _bb_maps(self, mol):
         """
         Creates a maps from position to building block.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule which needs to have its building blocks
+        mol : :class:`.Cage`
+            The cage which needs to have its building blocks
             mapped to positions.
 
         Returns
@@ -694,13 +693,13 @@ class CageTopology(Topology):
         """
 
         bb_fgs = max(len(bb.func_groups) for
-                     bb in macro_mol.building_blocks)
+                     bb in mol.building_blocks)
         bb_map, lk_map = {}, {}
 
         if self.bb_positions is None:
-            bbs = [bb for bb in macro_mol.building_blocks if
+            bbs = [bb for bb in mol.building_blocks if
                    len(bb.func_groups) == bb_fgs]
-            lks = [bb for bb in macro_mol.building_blocks if
+            lks = [bb for bb in mol.building_blocks if
                    len(bb.func_groups) != bb_fgs]
 
             for i in range(len(self.positions_A)):
@@ -713,7 +712,7 @@ class CageTopology(Topology):
                 # bb_positions can hold the StructUnits directly or
                 # refer to them by index.
                 if isinstance(bb, int):
-                    bb = macro_mol.building_blocks[bb]
+                    bb = mol.building_blocks[bb]
 
                 n_fgs = len(bb.func_groups)
                 map_ = bb_map if n_fgs == bb_fgs else lk_map
@@ -722,14 +721,14 @@ class CageTopology(Topology):
 
         return bb_map, lk_map
 
-    def bonded_fgs(self, macro_mol):
+    def bonded_fgs(self, mol):
         """
         Joins up the separate building blocks which form the molecule.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
+        mol : :class:`.Cage`
+            The cage being constructed.
 
         Yields
         ------
@@ -746,8 +745,8 @@ class CageTopology(Topology):
                 # fgs on the vertex. Store this information
                 # on the vertex.
                 for fg2 in vertex.fgs:
-                    c1 = macro_mol.atom_centroid(fg1.bonder_ids)
-                    c2 = macro_mol.atom_centroid(fg2.bonder_ids)
+                    c1 = mol.atom_centroid(fg1.bonder_ids)
+                    c2 = mol.atom_centroid(fg2.bonder_ids)
                     distance = euclidean(c1, c2)
                     position.distances.append((distance, fg1, fg2))
 
@@ -764,7 +763,7 @@ class CageTopology(Topology):
                 paired.add(fg1)
                 paired.add(fg2)
 
-    def pair_fgs_with_positions(self, scale, macro_mol, vertex):
+    def pair_fgs_with_positions(self, scale, mol, vertex):
         """
         Matches fgs with the closest building block position.
 
@@ -782,8 +781,8 @@ class CageTopology(Topology):
         scale : :class:`float`
             The amount by which the size of the topology is scaled.
 
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being buit.
+        mol : :class:`.Cage`
+            The cage being constructed.
 
         vertex : :class:`Vertex`
             The position at which all the atoms being paired are
@@ -800,7 +799,7 @@ class CageTopology(Topology):
         # finds the distances of all the options.
         distances = []
         for fg in vertex.fgs:
-            fg_coord = macro_mol.atom_centroid(fg.bonder_ids)
+            fg_coord = mol.atom_centroid(fg.bonder_ids)
             for position in vertex.connected:
                 distance = euclidean(fg_coord, position.coord*scale)
                 distances.append((distance, fg, position))
@@ -825,19 +824,19 @@ class CageTopology(Topology):
             paired_ids.add(fg.id)
             paired_pos.add(pos)
 
-    def place_mols(self, macro_mol):
+    def place_mols(self, mol):
         """
         Places all building block molecules on correct coordinates.
 
         The building block molecules are placed in their appropriate
         positions based on the topology. It does not join them.
 
-        Also updates :attr:`.MacroMolecule.bb_counter`.
+        Also updates :attr:`.ConstructedMolecule.bb_counter`.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being built.
+        mol : :class:`.Cage`
+            The cage being constructed.
 
         Returns
         -------
@@ -846,9 +845,9 @@ class CageTopology(Topology):
         """
 
         self._func_groups = []
-        bb_map, lk_map = self._bb_maps(macro_mol)
+        bb_map, lk_map = self._bb_maps(mol)
         scale = max(bb.max_diameter()[0]
-                    for bb in macro_mol.building_blocks)
+                    for bb in mol.building_blocks)
 
         # This loop places all building blocks on the points at
         # `positions_A`. It then pairs all fgs which form a new bond
@@ -856,7 +855,7 @@ class CageTopology(Topology):
         # counts the nubmer of building blocks which make up the
         # structure.
         for i, position in enumerate(self.positions_A):
-            num_atoms = macro_mol.mol.GetNumAtoms()
+            num_atoms = mol.mol.GetNumAtoms()
             bb = bb_map[i]
             n_bb = len(bb.func_groups)
             # Position the molecule on the vertex.
@@ -869,47 +868,47 @@ class CageTopology(Topology):
                                         int(self.A_alignments[i]),
                                         aligner_edge)
             add_fragment_props(bb_mol,
-                               macro_mol.building_blocks.index(bb),
+                               mol.building_blocks.index(bb),
                                i)
 
-            # Keep track of fgs in the macromolecule.
+            # Keep track of fgs in the cage.
             first_id = len(self._func_groups)
             ids = range(first_id, first_id+n_bb)
             self._func_groups.extend(bb.shift_fgs(ids, num_atoms))
 
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb_mol)
+            mol.mol = rdkit.CombineMols(mol.mol, bb_mol)
             # Update the counter each time a building-block* is added.
-            macro_mol.bb_counter.update([bb])
+            mol.bb_counter.update([bb])
 
             # Save the ids of fgs which form new bonds and pair them
             # up with positions.
             position.fgs = self._func_groups[-n_bb:]
-            self.pair_fgs_with_positions(scale, macro_mol, position)
+            self.pair_fgs_with_positions(scale, mol, position)
 
         # This loop places all linkers on the points at `positions_B`.
         # It then saves all fgs which form a new bond to the position
         # they are found at. It also counts the number of linkers which
         # make up the structure.
         for i, position in enumerate(self.positions_B):
-            num_atoms = macro_mol.mol.GetNumAtoms()
+            num_atoms = mol.mol.GetNumAtoms()
             lk = lk_map[i]
             n_lk = len(lk.func_groups)
             lk_mol = position.place_mol(scale,
                                         lk,
                                         int(self.B_alignments[i]),
-                                        macro_mol=macro_mol)
+                                        mol=mol)
             add_fragment_props(lk_mol,
-                               macro_mol.building_blocks.index(lk),
+                               mol.building_blocks.index(lk),
                                i)
 
-            # Keep track of fgs in the macromolecule.
+            # Keep track of fgs in the cage.
             first_id = len(self._func_groups)
             ids = range(first_id, first_id+n_lk)
             self._func_groups.extend(lk.shift_fgs(ids, num_atoms))
 
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, lk_mol)
+            mol.mol = rdkit.CombineMols(mol.mol, lk_mol)
             # Update the counter each time a linker is added.
-            macro_mol.bb_counter.update([lk])
+            mol.bb_counter.update([lk])
 
             # Save the ids of fgs which form new bonds.
             position.fgs = self._func_groups[-n_lk:]
@@ -948,48 +947,48 @@ class NoLinkerCageTopology(CageTopology):
         self.del_atoms = True
         self.track_fgs = True
 
-    def place_mols(self, macro_mol):
+    def place_mols(self, mol):
 
         self._func_groups = []
         scale = max(bb.max_diameter()[0]
-                    for bb in macro_mol.building_blocks)
+                    for bb in mol.building_blocks)
 
         bb_map = {}
         if self.bb_positions is None:
             for i in range(len(self.positions_A)):
-                bb_map[i] = np.random.choice(macro_mol.building_blocks)
+                bb_map[i] = np.random.choice(mol.building_blocks)
         else:
             for bb, positions in self.bb_positions.items():
                 # bb_positions can hold the StructUnits directly or
                 # refer to them by index.
                 if isinstance(bb, int):
-                    bb = macro_mol.building_blocks[bb]
+                    bb = mol.building_blocks[bb]
 
                 for position in positions:
                     bb_map[position] = bb
 
         bb_params = enumerate(zip(self.positions_A, self.alignments))
         for bb_index, (position, orientation) in bb_params:
-            num_atoms = macro_mol.mol.GetNumAtoms()
+            num_atoms = mol.mol.GetNumAtoms()
             bb = bb_map[bb_index]
             ipos = bb.mol.GetConformer().GetPositions().T
             n_bb = len(bb.func_groups)
 
-            mol = position.place_mol(scale, bb, int(orientation))
+            placed_mol = position.place_mol(scale, bb, int(orientation))
 
-            add_fragment_props(mol,
-                               macro_mol.building_blocks.index(bb),
+            add_fragment_props(placed_mol,
+                               mol.building_blocks.index(bb),
                                bb_index)
 
             first_id = len(self._func_groups)
             ids = range(first_id, first_id+n_bb)
             self._func_groups.extend(bb.shift_fgs(ids, num_atoms))
 
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
-            macro_mol.bb_counter.update([bb])
+            mol.mol = rdkit.CombineMols(mol.mol, placed_mol)
+            mol.bb_counter.update([bb])
 
             position.fgs = self._func_groups[-n_bb:]
-            self.pair_fgs_with_positions(scale, macro_mol, position)
+            self.pair_fgs_with_positions(scale, mol, position)
             bb.set_position_from_matrix(ipos)
 
     @classmethod

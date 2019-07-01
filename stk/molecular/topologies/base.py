@@ -18,14 +18,15 @@ and :meth:`Topology.bonded_fgs`.
 The new class may optionally define the methods :meth:`prepare` and
 :meth:`cleanup`. The former performs operations on the molecule
 before it is joined up and has atoms deleted via
-:meth:`.Reactor.react`. The latter any final cleanup operations on the
-assembled molecule. For example, converting the end functional groups
-of a polymer into hydrogen atoms. See also :meth:`Topology.cleanup`.
+:meth:`.Reactor.react`. The latter performs any final cleanup
+operations on the constructed molecule. For example, converting the end
+functional groups of a polymer into hydrogen atoms. See also
+:meth:`Topology.cleanup`.
 
 During the construction process, every time a building block is placed
-in the macromolecule, new :class:`FunctionalGroup` instances must be
-made, which correspond to the functional groups added by virtue of
-adding the building block. These must be added to the
+in the :class:`.ConstructedMolecule`, new :class:`FunctionalGroup`
+instances must be made, which correspond to the functional groups added
+by virtue of adding the building block. These must be added to the
 :class:`Reactor` held in :attr:`.Topology.reactor`, specifically into
 its :attr:`.Reactor.func_groups` attribute. This means that the
 reactor will keep the atom ids in these functional groups up to date
@@ -205,13 +206,14 @@ class Topology(metaclass=TopologyMeta):
 
     def construct(self, mol, bb_conformers=None):
         """
-        Assembles :mod:`rdkit` instances of molecules.
+        Constructs :mod:`rdkit` instances of molecules.
 
-        This method places an ``rdkit`` molecule of the assembled
-        macromolecule into the :attr:`~.Molecule.mol` attribute of
-        :class:`.MacroMolecule`. It also creates the
-        :attr:`.MacroMolecule.bb_counter` and
-        :attr:`.MacroMolecule.bonds_made` attributes.
+        This method places an :mod:`rdkit` molecule of the
+        :class:`.ConstructedMolecule`
+        into the :attr:`~.Molecule.mol` attribute of
+        :class:`.ConstructedMolecule`. It also creates the
+        :attr:`.ConstructedMolecule.bb_counter` and
+        :attr:`.ConstructedMolecule.bonds_made` attributes.
 
         Parameters
         ----------
@@ -282,22 +284,23 @@ class Topology(metaclass=TopologyMeta):
 
         The :mod:`rdkit` molecules of the building blocks are
         combined into a single :mod:`rdkit` molecule and placed into
-        `macro_mol.mol`.
+        `mol.mol`.
 
         The function is also reponsible for updating
-        :attr:`~.MacroMolecule.bb_counter`.
+        :attr:`~.ConstructedMolecule.bb_counter`.
 
         This function must also add the tags ``'bb_index'``
         and ``'mol_index'`` to every atom in the molecule. The
         ``'bb_index'`` tag identifies which building block the atom
         belongs to. The building block is identified by its index
-        within :attr:`MacroMolecule.building_blocks`.
+        within :attr:`ConstructedMolecule.building_blocks`.
         The ``'mol_index'`` identifies which molecule of a specific
-        building the atom belongs to. For example, if
+        building block the atom belongs to. For example, if
         ``bb_index = 1`` and ``mol_index = 3`` the atom belongs to
-        the 4th molecule of ``macro_mol.building_blocks[1]`` to
-        be added to the macromolecule. The utility function
-        :func:`.add_fragment_props` is provided to help with this.
+        the 4th molecule of ``mol.building_blocks[1]`` to
+        be added to the :class:`.ConstructedMolecule`. The utility
+        function :func:`.add_fragment_props` is provided to help with
+        this.
 
         Parameters
         ----------
