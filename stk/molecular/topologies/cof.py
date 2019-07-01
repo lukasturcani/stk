@@ -302,19 +302,19 @@ class Edge:
         v1.connected.append(self)
         v2.connected.append(self)
 
-    def place_mol(self, mol, cell_params, mol, alignment):
+    def place_mol(self, mol, cell_params, bb, alignment):
         """
         Places and aligned a building block along the edge.
 
         Parameters
         ----------
         mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` being built.
+            The :class:`.ConstructedMolecule` being constructed.
 
         cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
-        mol : :class:`.StructUnit3`
+        bb : :class:`.StructUnit3`
             The building block to be placed.
 
         alignment : :class:`int`
@@ -324,19 +324,19 @@ class Edge:
         Returns
         -------
         :class:`rdkit.Mol`
-            The rdkit instance of the placed `mol`.
+            The :class:`rdkit` instance of the placed `mol`.
 
         """
 
         coord = self.fg_centroid(mol, cell_params)
-        original_position = mol.mol.GetConformer().GetPositions().T
+        original_position = bb.mol.GetConformer().GetPositions().T
 
-        mol.set_bonder_centroid(coord)
+        bb.set_bonder_centroid(coord)
         d = self.fg_direction(mol, cell_params)*alignment
-        mol.set_orientation2(d)
+        bb.set_orientation2(d)
 
-        rdkit_mol = rdkit.Mol(mol.mol)
-        mol.set_position_from_matrix(original_position)
+        rdkit_mol = rdkit.Mol(bb.mol)
+        bb.set_position_from_matrix(original_position)
         return rdkit_mol
 
     def fg_direction(self, mol, cell_params):
@@ -667,12 +667,12 @@ class LinkerCOFLattice(COFLattice):
 
             # Place the bb.
             aligner = self.multitopic_aligners[i]
-            mol = v.place_mol(cell_params, multi, aligner)
+            bb = v.place_mol(cell_params, multi, aligner)
             add_fragment_props(
-                mol, mol.building_blocks.index(multi), i
+                bb, mol.building_blocks.index(multi), i
             )
 
-            mol.mol = rdkit.CombineMols(mol.mol, mol)
+            mol.mol = rdkit.CombineMols(mol.mol, bb)
             mol.bb_counter.update([multi])
 
             # Save the ids of the fgs in the assembled molecule.
@@ -688,16 +688,16 @@ class LinkerCOFLattice(COFLattice):
             fgs = list(di.shift_fgs(ids, n_atoms))
             n_fgs += 2
 
-            mol = e.place_mol(mol,
-                              cell_params,
-                              di,
-                              self.ditopic_directions[i])
+            bb = e.place_mol(mol,
+                             cell_params,
+                             di,
+                             self.ditopic_directions[i])
 
-            add_fragment_props(mol,
+            add_fragment_props(bb,
                                mol.building_blocks.index(di),
                                i)
 
-            mol.mol = rdkit.CombineMols(mol.mol, mol)
+            mol.mol = rdkit.CombineMols(mol.mol, bb)
             mol.bb_counter.update([di])
 
             e.create_fg_map(mol, fgs, cell_params)
@@ -827,8 +827,9 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         # Get the building blocks.
         bb1, bb2 = mol.building_blocks
         cell_size = self.scale_func(mol)
-        mol.cell_dimensions = [cell_size*x for x in
-                                     self.cell_dimensions]
+        mol.cell_dimensions = [
+            cell_size*x for x in self.cell_dimensions
+        ]
         self.vertices = [cell_size*x for x in self.vertices]
 
         # Place and set orientation of the first building block.
@@ -858,8 +859,8 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
                            mol.building_blocks.index(bb2),
                            0)
 
-        mol = rdkit.Mol(bb2.mol)
-        mol.mol = rdkit.CombineMols(mol.mol, mol)
+        bb = rdkit.Mol(bb2.mol)
+        mol.mol = rdkit.CombineMols(mol.mol, bb)
         mol.bb_counter.update([bb1, bb2])
 
 

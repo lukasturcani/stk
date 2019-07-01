@@ -1,7 +1,7 @@
 from ...utilities import OPTIONS
 
 from .cage import *
-from .macro_molecule import *
+from .constructed_molecule import *
 from .molecule import *
 from .periodic import *
 from .polymer import *
