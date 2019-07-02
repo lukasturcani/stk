@@ -64,9 +64,11 @@ class _MacroModel(Optimizer):
 
     maximum_iterations : :class:`int`
         The maximum number of iterations done during the optimization.
+        Cannot be more than ``999999``.
 
     minimum_gradient : :class:`float`
         The gradient at which optimization is stopped.
+        Cannot be less than ``0.0001``.
 
     timeout : :class:`float`
         The amount in seconds the MD is allowed to run before
@@ -107,10 +109,11 @@ class _MacroModel(Optimizer):
 
         maximum_iterations : :class:`int`, optional
             The maximum number of iterations done during the
-            optimization.
+            optimization. Cannot be more than ``999999``.
 
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
@@ -592,10 +595,11 @@ class MacroModelForceField(_MacroModel):
 
         maximum_iterations : :class:`int`, optional
             The maximum number of iterations done during the
-            optimization.
+            optimization. Cannot be more than ``999999``.
 
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
@@ -623,23 +627,25 @@ class MacroModelForceField(_MacroModel):
         """
         Check if the optimization parameters are valid for MacroModel.
 
-        MacroModel ``.com`` files have well-defined column widths and
-        special ways to implement too long input. This method raises
-        `MacroModelInputError` exception if the input cannot be
-        converted into a valid ``.com`` file entry.
-
         Parameters
         ----------
-        minimum_gradient : :class:`float`, optional
+        minimum_gradient : :class:`float`
             The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
 
-        maximum_iterations : :class:`int`, optional
+        maximum_iterations : :class:`int`
             The maximum number of iterations done during the
-            optimization.
+            optimization. Cannot be more than ``999999``.
 
         Returns
         -------
         None : :class:`NoneType`
+
+        Raises
+        ------
+        :class:`.MacroModelInputError`
+            If the parameters cannot be converted into a valid ``.com``
+            file entry.
 
         """
 
@@ -889,24 +895,29 @@ class MacroModelForceField(_MacroModel):
 
 class MacroModelMD(_MacroModel):
     """
-    Runs a MD conformer search using MacroModel.
+    Runs a molecular dynamics conformer search using MacroModel.
 
     Attributes
     ----------
     temperature : :class:`float`
         The temperature in Kelvin at which the MD is run.
+        Cannot be more than ``99999.99``.
 
     conformers : :class:`int`
         The number of conformers sampled and optimized from the MD.
+        Cannot be more than ``9999``.
 
     time_step : :class:`float`
         The time step in ``fs`` for the MD.
+        Cannot be more than ``99999.99``.
 
     eq_time : :class:`float`
         The equilibriation time in ``ps`` before the MD is run.
+        Cannot be more than ``999999.99``.
 
     simulation_time : :class:`float`
         The simulation time in ``ps`` of the MD.
+        Cannot be more than ``999999.99``.
 
     restricted_bonds : :class:`set`
         A :class:`set` of the form
@@ -952,6 +963,20 @@ class MacroModelMD(_MacroModel):
         should have a fixed size via the atom ids of atoms in the
         torsional angle.
 
+    _sim_time : class:`float`
+        The effective simulation time of the MD simulation, used for
+        generation of the lines in the ``.com`` file.
+
+        If positive then interpreted as ``ps``.
+        If negative then run 100 times the number of ``ps``.
+
+    _eq_time : class:`float`
+        The effective equilibration time of the MD simulation, used for
+        generation of the lines in the ``.com`` file.
+
+        If positive then interpreted as ``ps``.
+        If negative then run 100 times the number of ``ps``.
+
     """
 
     def __init__(self,
@@ -994,25 +1019,31 @@ class MacroModelMD(_MacroModel):
 
         temperature : :class:`float`, optional
             The temperature in Kelvin at which the MD is run.
+            Cannot be more than ``99999.99``.
 
         conformers' : :class:`int`, optional
             The number of conformers sampled and optimized from the MD.
-
-        time_step : :class:`float`, optional
-            The time step in ``fs`` for the MD.
-
-        eq_time : :class:`float`, optional
-            The equilibriation time in ``ps`` before the MD is run.
+            Cannot be more than ``9999``.
 
         simulation_time : :class:`float`, optional
             The simulation time in ``ps`` of the MD.
+            Cannot be more than ``999999.99``.
+
+        time_step : :class:`float`, optional
+            The time step in ``fs`` for the MD.
+            Cannot be more than ``99999.99``.
+
+        eq_time : :class:`float`, optional
+            The equilibriation time in ``ps`` before the MD is run.
+            Cannot be more than ``999999.99``.
 
         maximum_iterations : :class:`int`, optional
             The maximum number of iterations done during the
-            optimization.
+            optimization. Cannot be more than ``999999``.
 
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
 
         restricted_bonds : :class:`set`, optional
             A :class:`set` of the form
@@ -1123,38 +1154,45 @@ class MacroModelMD(_MacroModel):
         """
         Check if the optimization parameters are valid for MacroModel.
 
-        MacroModel ``.com`` files have well-defined column widths and
-        special ways to implement too long input. This method raises
-        `MacroModelInputError` exception if the input cannot be
-        converted into a valid ``.com`` file entry.
-
         Parameters
         ----------
-        temperature : :class:`float`, optional
+        temperature : :class:`float`
             The temperature in Kelvin at which the MD is run.
+            Cannot be more than ``99999.99``.
 
-        conformers' : :class:`int`, optional
+        conformers' : :class:`int`
             The number of conformers sampled and optimized from the MD.
+            Cannot be more than ``9999``.
 
-        simulation_time : :class:`float`, optional
+        simulation_time : :class:`float`
             The simulation time in ``ps`` of the MD.
+            Cannot be more than ``999999.99``.
 
-        time_step : :class:`float`, optional
+        time_step : :class:`float`
             The time step in ``fs`` for the MD.
+            Cannot be more than ``99999.99``.
 
-        eq_time : :class:`float`, optional
+        eq_time : :class:`float`
             The equilibriation time in ``ps`` before the MD is run.
+            Cannot be more than ``999999.99``.
 
-        minimum_gradient : :class:`float`, optional
+        minimum_gradient : :class:`float`
             The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
 
-        maximum_iterations : :class:`int`, optional
+        maximum_iterations : :class:`int`
             The maximum number of iterations done during the
-            optimization.
+            optimization. Cannot be more than ``999999``.
 
         Returns
         -------
         None : :class:`NoneType`
+
+        Raises
+        ------
+        :class:`.MacroModelInputError`
+            If the parameters cannot be converted into a valid ``.com``
+            file entry.
 
         """
 
