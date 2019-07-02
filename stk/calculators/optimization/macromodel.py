@@ -651,23 +651,21 @@ class MacroModelForceField(_MacroModel):
         # This is the body of the ``.com`` file. The line that begins
         # and ends with exclamation lines is replaced with the various
         # commands that fix bond distances and angles.
-        # line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
-        line2 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
-        line3 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
-        line4 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
-        line5 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
-        line6 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
-        line7 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
+        line1 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
+        line2 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
+        line3 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
+        line4 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
+        line5 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
+        line6 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
-            # self.com_line(*line1),
+            self.com_line(*line1),
             self.com_line(*line2),
             self.com_line(*line3),
-            self.com_line(*line4),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
+            self.com_line(*line4),
             self.com_line(*line5),
-            self.com_line(*line6),
-            self.com_line(*line7)
+            self.com_line(*line6)
         ])
 
         # Create a path for the ``.com`` file. It is the same as that
@@ -1137,26 +1135,26 @@ class MacroModelMD(_MacroModel):
                 'Number of iterations (> 999999) is too high.'
             )
 
-        # line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
-        line2 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
-        line3 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
-        line4 = ('MDIT', 0, 0, 0, 0, temp, 0, 0, 0)
-        line5 = ('MDYN', 0, 0, 0, 0, tstep, eq_time, temp, 0)
-        line6 = ('MDSA', self.conformers, 0, 0, 0, 0, 0, 1, 0)
-        line7 = ('MDYN', 1, 0, 0, 0, tstep, sim_time, temp, 0)
-        line8 = ('WRIT', 0, 0, 0, 0, 0, 0, 0, 0)
-        line9 = ('RWND', 0, 1, 0, 0, 0, 0, 0, 0)
-        line10 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
-        line11 = ('READ', -2, 0, 0, 0, 0, 0, 0, 0)
-        line12 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
-        line13 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
-        line14 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
+        line1 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
+        line2 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
+        line3 = ('MDIT', 0, 0, 0, 0, temp, 0, 0, 0)
+        line4 = ('MDYN', 0, 0, 0, 0, tstep, eq_time, temp, 0)
+        line5 = ('MDSA', self.conformers, 0, 0, 0, 0, 0, 1, 0)
+        line6 = ('MDYN', 1, 0, 0, 0, tstep, sim_time, temp, 0)
+        line7 = ('WRIT', 0, 0, 0, 0, 0, 0, 0, 0)
+        line8 = ('RWND', 0, 1, 0, 0, 0, 0, 0, 0)
+        line9 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
+        line10 = ('READ', -2, 0, 0, 0, 0, 0, 0, 0)
+        line11 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
+        line12 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
+        line13 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
-            # self.com_line(*line1),
+            self.com_line(*line1),
             self.com_line(*line2),
-            self.com_line(*line3),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
+            self.com_line(*line3),
+
             self.com_line(*line4),
             self.com_line(*line5),
             self.com_line(*line6),
@@ -1164,11 +1162,10 @@ class MacroModelMD(_MacroModel):
             self.com_line(*line8),
             self.com_line(*line9),
             self.com_line(*line10),
-            self.com_line(*line11),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
+            self.com_line(*line11),
             self.com_line(*line12),
             self.com_line(*line13),
-            self.com_line(*line14)
         ])
 
         com_block = self.fix_params(mol, com_block)
