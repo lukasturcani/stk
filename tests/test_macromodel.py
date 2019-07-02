@@ -130,14 +130,12 @@ def test_forcefield_com_exceptions(cc3):
             macromodel_path='dummy_path',
             maximum_iterations=1000000
         )
-        mm.generate_com(cc3)
 
     with pytest.raises(stk.MacroModelInputError):
         mm = stk.MacroModelForceField(
             macromodel_path='dummy_path',
             minimum_gradient=0.00001
         )
-        mm.generate_com(cc3)
 
 
 def test_md_com_exceptions(tmp_cc3):
@@ -146,42 +144,36 @@ def test_md_com_exceptions(tmp_cc3):
             macromodel_path='dummy_path',
             conformers=10000
         )
-        mm.generate_com(tmp_cc3)
 
     with pytest.raises(stk.MacroModelInputError):
         mm = stk.MacroModelMD(
             macromodel_path='dummy_path',
             simulation_time=1000000
         )
-        mm.generate_com(tmp_cc3)
 
     with pytest.raises(stk.MacroModelInputError):
         mm = stk.MacroModelMD(
             macromodel_path='dummy_path',
             time_step=100000
         )
-        mm.generate_com(tmp_cc3)
 
     with pytest.raises(stk.MacroModelInputError):
         mm = stk.MacroModelMD(
             macromodel_path='dummy_path',
             eq_time=1000000
         )
-        mm.generate_com(tmp_cc3)
 
     with pytest.raises(stk.MacroModelInputError):
         mm = stk.MacroModelMD(
             macromodel_path='dummy_path',
             maximum_iterations=1000000
         )
-        mm.generate_com(tmp_cc3)
 
     with pytest.raises(stk.MacroModelInputError):
         mm = stk.MacroModelMD(
             macromodel_path='dummy_path',
             minimum_gradient=0.00001
         )
-        mm.generate_com(tmp_cc3)
 
     tmp_cc3._file = join(outdir, 'com_test.mol')
 
