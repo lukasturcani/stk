@@ -602,7 +602,10 @@ class MacroModelForceField(_MacroModel):
             molecule and conformer.
 
         """
-
+        self._check_params(
+            minimum_gradient,
+            maximum_iterations
+        )
         self.restricted = restricted
         super().__init__(macromodel_path=macromodel_path,
                          output_dir=output_dir,
@@ -611,7 +614,46 @@ class MacroModelForceField(_MacroModel):
                          minimum_gradient=minimum_gradient,
                          timeout=timeout,
                          use_cache=use_cache)
-        self.check_com()
+
+    @staticmethod
+    def _check_params(
+        minimum_gradient,
+        maximum_iterations
+    ):
+        """
+        Check if the optimization parameters are valid for MacroModel.
+
+        MacroModel ``.com`` files have well-defined column widths and
+        special ways to implement too long input. This method raises
+        `MacroModelInputError` exception if the input cannot be
+        converted into a valid ``.com`` file entry.
+
+        Parameters
+        ----------
+        minimum_gradient : :class:`float`, optional
+            The gradient at which optimization is stopped.
+
+        maximum_iterations : :class:`int`, optional
+            The maximum number of iterations done during the
+            optimization.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        # Minimum convergence gradient is `00000.0001`
+        if minimum_gradient < 0.0001:
+            raise MacroModelInputError(
+                'Convergence gradient (< 0.0001) is too small.'
+            )
+
+        # Maximum number of iterations is `999999`
+        if maximum_iterations > 999999:
+            raise MacroModelInputError(
+                'Number of iterations (> 999999) is too high.'
+            )
 
     def generate_com(self, mol):
         """
@@ -683,24 +725,6 @@ class MacroModelForceField(_MacroModel):
             com.write(f'{name}-out.maegz\n')
             # Next is the body of the .com file.
             com.write(com_block)
-
-    def check_com(self):
-        """
-        Check if the optimization parameters are valid for MacroModel.
-
-        """
-
-        # Minimum convergence gradient is `00000.0001`
-        if self.minimum_gradient < 0.0001:
-            raise MacroModelInputError(
-                'Convergence gradient (< 0.0001) is too small.'
-            )
-
-        # Maximum number of iterations is `999999`
-        if self.maximum_iterations > 999999:
-            raise MacroModelInputError(
-                'Number of iterations (> 999999) is too high.'
-            )
 
     def optimize(self, mol, conformer=-1):
         """
@@ -1047,6 +1071,16 @@ class MacroModelMD(_MacroModel):
         if restricted_torsional_angles is None:
             restricted_torsional_angles = set()
 
+        self._check_params(
+            temperature,
+            conformers,
+            simulation_time,
+            time_step,
+            eq_time,
+            minimum_gradient,
+            maximum_iterations
+        )
+
         self.temperature = temperature
         self.conformers = conformers
         self.time_step = time_step
@@ -1055,6 +1089,19 @@ class MacroModelMD(_MacroModel):
         self.restricted_bonds = restricted_bonds
         self.restricted_bond_angles = restricted_bond_angles
         self.restricted_torsional_angles = restricted_torsional_angles
+
+        # Negative simulation time is interpreted as times 100 ps.
+        if simulation_time > 99999.99:
+            self._sim_time = -simulation_time/100
+        else:
+            self._sim_time = simulation_time
+
+        # Negative equilibration time is interpreted as times 100 ps.
+        if eq_time > 99999.99:
+            self._eq_time = -eq_time/100
+        else:
+            self._eq_time = eq_time
+
         super().__init__(macromodel_path=macromodel_path,
                          output_dir=output_dir,
                          timeout=timeout,
@@ -1062,7 +1109,96 @@ class MacroModelMD(_MacroModel):
                          maximum_iterations=maximum_iterations,
                          minimum_gradient=minimum_gradient,
                          use_cache=use_cache)
-        self.check_com()
+
+    @staticmethod
+    def _check_params(
+        temperature,
+        conformers,
+        simulation_time,
+        time_step,
+        eq_time,
+        minimum_gradient,
+        maximum_iterations
+    ):
+        """
+        Check if the optimization parameters are valid for MacroModel.
+
+        MacroModel ``.com`` files have well-defined column widths and
+        special ways to implement too long input. This method raises
+        `MacroModelInputError` exception if the input cannot be
+        converted into a valid ``.com`` file entry.
+
+        Parameters
+        ----------
+        temperature : :class:`float`, optional
+            The temperature in Kelvin at which the MD is run.
+
+        conformers' : :class:`int`, optional
+            The number of conformers sampled and optimized from the MD.
+
+        simulation_time : :class:`float`, optional
+            The simulation time in ``ps`` of the MD.
+
+        time_step : :class:`float`, optional
+            The time step in ``fs`` for the MD.
+
+        eq_time : :class:`float`, optional
+            The equilibriation time in ``ps`` before the MD is run.
+
+        minimum_gradient : :class:`float`, optional
+            The gradient at which optimization is stopped.
+
+        maximum_iterations : :class:`int`, optional
+            The maximum number of iterations done during the
+            optimization.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        # Maximum temperature is `99999.9999`.
+        if temperature > 99999.99:
+            raise MacroModelInputError(
+                'Supplied temperature (> 99999 K) is too high.'
+            )
+
+        # Maximum number of conformers is `9999`.
+        if conformers > 9999:
+            raise MacroModelInputError(
+                'Supplied number of conformers (> 9999) is too high.'
+            )
+
+        # Maximum time is `999999.99`.
+        if simulation_time > 999999.99:
+            raise MacroModelInputError(
+                'Supplied simulation time (> 999999 ps) is too long.'
+            )
+
+        # Maximum time step is `99999.9999`
+        if time_step > 99999.99:
+            raise MacroModelInputError(
+                'Supplied time step (> 99999 fs) is too high.'
+            )
+
+        # Maximum time is `999999.99`.
+        if eq_time > 999999.99:
+            raise MacroModelInputError(
+                'Supplied eq time (> 999999 ps) is too long.'
+            )
+
+        # Minimum convergence gradient is `00000.0001`
+        if minimum_gradient < 0.0001:
+            raise MacroModelInputError(
+                'Convergence gradient (< 0.0001) is too small.'
+            )
+
+        # Maximum number of iterations is `999999`
+        if maximum_iterations > 999999:
+            raise MacroModelInputError(
+                'Number of iterations (> 999999) is too high.'
+            )
 
     def generate_com(self, mol):
         """
@@ -1140,65 +1276,6 @@ class MacroModelMD(_MacroModel):
             com.write(f'{name}-out.maegz\n')
             # details of the macromodel run
             com.write(com_block)
-
-    def check_com(self):
-        """
-        Check if the optimization parameters are valid for MacroModel.
-
-        """
-
-        # Maximum temperature is `99999.9999`.
-        if self.temperature > 99999.99:
-            raise MacroModelInputError(
-                'Supplied temperature (> 99999 K) is too high.'
-            )
-
-        # Maximum number of conformers is `9999`.
-        if self.conformers > 9999:
-            raise MacroModelInputError(
-                'Supplied number of conformers (> 9999) is too high.'
-            )
-
-        # Maximum time is `999999.99`.
-        if self.simulation_time > 999999.99:
-            raise MacroModelInputError(
-                'Supplied simulation time (> 999999 ps) is too long.'
-            )
-
-        # Negative time is interpreted as times 100 ps.
-        elif self.simulation_time > 99999.99:
-            self._sim_time = -self.simulation_time/100
-
-        else:
-            self._sim_time = self.simulation_time
-
-        # Maximum time step is `99999.9999`
-        if self.time_step > 99999.99:
-            raise MacroModelInputError(
-                'Supplied time step (> 99999 fs) is too high.'
-            )
-
-        # Maximum time is `999999.99`.
-        if self.eq_time > 999999.99:
-            raise MacroModelInputError(
-                'Supplied eq time (> 999999 ps) is too long.'
-            )
-
-        # Negative time is interpreted as times 100 ps.
-        elif self.eq_time > 99999.99:
-            self._eq_time = -self.eq_time/100
-
-        # Minimum convergence gradient is `00000.0001`
-        if self.minimum_gradient < 0.0001:
-            raise MacroModelInputError(
-                'Convergence gradient (< 0.0001) is too small.'
-            )
-
-        # Maximum number of iterations is `999999`
-        if self.maximum_iterations > 999999:
-            raise MacroModelInputError(
-                'Number of iterations (> 999999) is too high.'
-            )
 
     def optimize(self, mol, conformer=-1):
         """
