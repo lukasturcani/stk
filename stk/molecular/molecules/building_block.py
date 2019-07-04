@@ -1,27 +1,5 @@
 """
-Defines :class:`StructUnit` classes.
-
-:class:`StructUnit` represents the building block molecules, which are
-used to construct other molecules. :class:`StructUnit` holds
-information concerning only a single building block molecule. For
-example, the number of atoms and bonds a building block may have. It
-also has information about the functional groups present in the
-building block molecule (see :class:`.FGInfo`). The class also allows
-manipulation of the lone building block molecule, such as rotations and
-translations.
-
-The :class:`StructUnit` should be inherited as necessary. For example,
-:class:`StructUnit2` adds manipulations relavant to molecules with 2
-functional groups. :class:`StructUnit3` adds manipulations relavant to
-molecules with 3 or more functional groups. If you have a building
-block which needs specific information or manipulations, give it its
-own class.
-
-:class:`.StructUnit` contains :class:`.FunctionalGroup` instances
-representing functional groups used during molecular construction.
-There are divided into bonders and deleters (see the documentation of
-:class:`.FGInfo` and :class:`.FunctionalGroup`), which determines
-which atoms form bonds and which are removed during construction.
+Defines the :class:`BuildingBlock` class.
 
 """
 
@@ -56,9 +34,9 @@ from ...utilities import (flatten,
 logger = logging.getLogger(__name__)
 
 
-class CachedStructUnit(type):
+class CachedBuildingBlock(type):
     """
-    A metaclass for making :class:`StructUnit` create cached instances.
+    A metaclass for making cached :class:`BuildingBlock` instances.
 
     """
 
@@ -119,13 +97,20 @@ class CachedStructUnit(type):
             return obj
 
 
-class StructUnit(Molecule, metaclass=CachedStructUnit):
+class BuildingBlock(Molecule, metaclass=CachedBuildingBlock):
     """
     Represents the building blocks of a :class:`.ConstructedMolecule`.
 
-    The goal of this class is to conveniently store information about,
-    and perform operations on, single instances of molecular
-    building blocks.
+    :class:`BuildingBlock` represents building block molecules, which
+    are either entire molecules or molecular fragments used for the
+    construction of a :class:`.ConstructedMolecule`.
+    :class:`BuildingBlock` holds information concerning a building
+    block molecule. For example, the number of atoms and bonds a
+    building block may have. It also has information about the
+    functional groups present in the building block molecule
+    (see :class:`.FGInfo` and :class:`.FunctionalGroup`). The class
+    also allows manipulation of the building block molecule, such
+    as rotations and translations.
 
     Attributes
     ----------
@@ -166,7 +151,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def __init__(self, mol, functional_groups=None, name="", note=""):
         """
-        Initializes a :class:`StructUnit` instance.
+        Initializes a :class:`BuildingBlock` instance.
 
         Parameters
         ----------
@@ -265,7 +250,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`StructUnit`
+        :class:`BuildingBlock`
             A random molecule from `db`.
 
         Raises
@@ -333,6 +318,88 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             bonder_coords = (self.atom_coords(bonder, conformer)
                              for bonder in fg.bonder_ids)
             yield sum(bonder_coords) / len(fg.bonder_ids)
+
+    def bonder_plane(self, conformer=-1):
+        """
+        Returns coeffs of the plane formed by the bonder centroids.
+
+        A plane is defined by the scalar plane equation::
+
+            ax + by + cz = d.
+
+        This method returns the ``a``, ``b``, ``c`` and ``d``
+        coefficients of this equation for the plane formed by the
+        bonder centroids. The coefficents ``a``, ``b`` and ``c``
+        describe the normal vector to the plane. The coefficent ``d``
+        is found by substituting these coefficients along with the
+        x, y and z variables in the scalar equation and
+        solving for ``d``. The variables x, y and z are
+        substituted by the coordinates of some point on the plane. For
+        example, the position of one of the bonder centroids.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            This array has the form ``[a, b, c, d]`` and represents the
+            scalar equation of the plane formed by the bonder
+            centroids.
+
+        References
+        ----------
+        https://tinyurl.com/okpqv6
+
+        """
+
+        centroid = next(self.bonder_centroids(conformer))
+        d = -np.sum(self.bonder_plane_normal(conformer) * centroid)
+        return np.append(self.bonder_plane_normal(conformer), d)
+
+    def bonder_plane_normal(self, conformer=-1):
+        """
+        Returns the normal to the plane formed by bonder centroids.
+
+        The normal of the plane is defined such that it goes in the
+        direction toward the centroid of the molecule.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            A unit vector which describes the normal to the plane of
+            the bonder centroids.
+
+        """
+
+        if len(self.func_groups) < 3:
+            raise ValueError(
+                'BuildingBlock molecule '
+                'has fewer than 3 functional groups.'
+            )
+
+        direction_vectors = (
+            v for *_, v in self.bonder_direction_vectors(conformer)
+        )
+        v1, v2 = it.islice(direction_vectors, 2)
+
+        normal_v = normalize_vector(np.cross(v1, v2))
+
+        theta = vector_theta(
+                    normal_v,
+                    self.centroid_centroid_dir_vector(conformer))
+
+        if theta > np.pi/2:
+            normal_v *= -1
+
+        return normal_v
 
     def all_bonder_distances(self, conformer=-1):
         """
@@ -596,7 +663,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         .. code-block:: python
 
             {
-                'class' : 'StructUnit',
+                'class' : 'BuildingBlock',
                 'mol_block' : '''A string holding the V3000 mol
                                  block of the molecule.''',
                 'note' : 'This molecule is nice.',
@@ -796,7 +863,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         self.set_position_from_matrix(new_pos_mat, conformer)
         self.set_position(iposition, conformer)
 
-    def rotate2(self, theta, axis, conformer=-1):
+    def rotate(self, theta, axis, conformer=-1):
         """
         Rotates the molecule by `theta` about `axis`.
 
@@ -869,104 +936,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return self.mol
 
-    def set_orientation2(self, end, conformer=-1):
-        """
-        Rotate the molecule so that bonder atoms lie on `end`.
-
-        The molecule is rotated about the centroid of the bonder atoms.
-        It is rotated so that the direction vector running between the
-        2 bonder centroids is aligned with the vector `end`.
-
-        Parameters
-        ----------
-        end : :class:`numpy.ndarray`
-            The vector with which the molecule's bonder atoms should be
-            aligned.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`rdkit.Mol`
-            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
-
-        """
-
-        start = self.centroid() - self.bonder_centroid()
-        return self._set_orientation2(start, end, conformer)
-
-    def _set_orientation2(self, start, end, conformer):
-        """
-        Rotates the molecule by a rotation from `start` to `end`.
-
-        Given two direction vectors, `start` and `end`, this method
-        applies the rotation required transform `start` to `end` on
-        the molecule. The rotation occurs about the centroid of the
-        molecule.
-
-        For example, if the `start` and `end` vectors
-        are 45 degrees apart, a 45 degree rotation will be applied to
-        the molecule. The rotation will be along the appropriate
-        direction.
-
-        The great thing about this method is that you as long as you
-        can associate a gemotric feature of the molecule with a vector,
-        then the molecule can be roatated so that this vector is
-        aligned with `end`. The defined vector can be virtually
-        anything. This means that any geometric feature of the molecule
-        can be easily aligned with any arbitrary axis.
-
-        Notes
-        -----
-        The difference between this method and
-        :meth:`~Molecule.set_orientation` is about which point the
-        rotation occurs: centroid of bonder atoms versus centroid of
-        entire molecule, respectively.
-
-        Parameters
-        ----------
-        start : :class:`numpy.ndarray`
-            A vector which is to be rotated so that it transforms to
-            the `end` vector.
-
-        end : :class:`numpy.ndarray`
-            This array holds the vector, onto which `start` is rotated.
-
-        conformer : :class:`int`
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`rdkit.Mol`
-            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
-
-        """
-
-        # Normalize the input direction vectors.
-        start = normalize_vector(start)
-        end = normalize_vector(end)
-
-        # Record the position of the molecule then translate the bonder
-        # atom centroid to the origin. This is so that the rotation
-        # occurs about this point.
-        og_center = self.bonder_centroid(conformer)
-        self.set_bonder_centroid(np.array([0, 0, 0]), conformer)
-
-        # Get the rotation matrix.
-        rot_mat = rotation_matrix(start, end)
-
-        # Apply the rotation matrix to the atomic positions to yield
-        # the new atomic positions.
-        pos_mat = self.mol.GetConformer(conformer).GetPositions().T
-        new_pos_mat = np.dot(rot_mat, pos_mat)
-
-        # Set the positions in the rdkit molecule.
-        self.set_position_from_matrix(new_pos_mat, conformer)
-        self.set_bonder_centroid(og_center, conformer)
-
-        return self.mol
-
     def shift_fgs(self, new_ids, shift):
         """
         Yield new functional groups with atomic ids shifted.
@@ -982,7 +951,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Yields
         ------
         :class:`.FunctionalGroup`
-            A functional group from :attr:`~StructUnit.func_groups`
+            A functional group from :attr:`~BuildingBlock.func_groups`
             with atomic ids shifted by `shift`.
 
         """
@@ -1071,8 +1040,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        :class:`StructUnit`
-            A :class:`StructUnit` instance of the molecule in `smarts`.
+        :class:`BuildingBlock`
+            A :class:`BuildingBlock` instance of the molecule in
+            `smiles`.
 
         """
 
@@ -1125,220 +1095,3 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def __repr__(self):
         return str(self)
-
-
-class StructUnit2(StructUnit):
-    """
-    Represents building blocks with 2 functional groups.
-
-    """
-
-    def set_orientation2(self, end, conformer=-1):
-        """
-        Rotate the molecule so that bonder atoms lie on `end`.
-
-        The molecule is rotated about the centroid of the bonder atoms.
-        It is rotated so that the direction vector running between the
-        2 bonder centroids is aligned with the vector `end`.
-
-        Parameters
-        ----------
-        end : :class:`numpy.ndarray`
-            The vector with which the molecule's bonder atoms should be
-            aligned.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`rdkit.Mol`
-            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
-
-        """
-
-        *_, start = next(self.bonder_direction_vectors(conformer))
-        return self._set_orientation2(start, end, conformer)
-
-    def minimize_theta2(self, vector, axis, conformer=-1):
-        """
-        Rotates molecule about `axis` to minimze theta with `vector`.
-
-        The molecule is rotated about `axis` passing through the bonder
-        centroid. It is rotated so that the vector between the bonder
-        and molecular centroids lies on the same plane as `vector`.
-
-        Parameters
-        ----------
-        vector : :class:`numpy.ndarray`
-            The vector to which the distance should be minimized.
-
-        axis : :class:`numpy.ndarray`
-            The direction vector along which the rotation happens.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self.minimize_theta(
-            v1=self.centroid_centroid_dir_vector(conformer),
-            v2=vector,
-            axis=axis,
-            centroid=self.bonder_centroid(conformer),
-            conformer=conformer)
-
-
-class StructUnit3(StructUnit):
-    """
-    Represents building blocks with 3 or more functional groups.
-
-    """
-
-    def bonder_plane(self, conformer=-1):
-        """
-        Returns coeffs of the plane formed by the bonder centroids.
-
-        A plane is defined by the scalar plane equation::
-
-            ax + by + cz = d.
-
-        This method returns the ``a``, ``b``, ``c`` and ``d``
-        coefficients of this equation for the plane formed by the
-        bonder centroids. The coefficents ``a``, ``b`` and ``c``
-        describe the normal vector to the plane. The coefficent ``d``
-        is found by substituting these coefficients along with the
-        x, y and z variables in the scalar equation and
-        solving for ``d``. The variables x, y and z are
-        substituted by the coordinates of some point on the plane. For
-        example, the position of one of the bonder centroids.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            This array has the form ``[a, b, c, d]`` and represents the
-            scalar equation of the plane formed by the bonder
-            centroids.
-
-        References
-        ----------
-        https://tinyurl.com/okpqv6
-
-        """
-
-        centroid = next(self.bonder_centroids(conformer))
-        d = -np.sum(self.bonder_plane_normal(conformer) * centroid)
-        return np.append(self.bonder_plane_normal(conformer), d)
-
-    def bonder_plane_normal(self, conformer=-1):
-        """
-        Returns the normal to the plane formed by bonder centroids.
-
-        The normal of the plane is defined such that it goes in the
-        direction toward the centroid of the molecule.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            A unit vector which describes the normal to the plane of
-            the bonder centroids.
-
-        """
-
-        if len(self.func_groups) < 3:
-            raise ValueError(("StructUnit3 molecule "
-                             "has fewer than 3 functional groups."))
-
-        direction_vectors = (
-            v for *_, v in self.bonder_direction_vectors(conformer)
-        )
-        v1, v2 = it.islice(direction_vectors, 2)
-
-        normal_v = normalize_vector(np.cross(v1, v2))
-
-        theta = vector_theta(
-                    normal_v,
-                    self.centroid_centroid_dir_vector(conformer))
-
-        if theta > np.pi/2:
-            normal_v *= -1
-
-        return normal_v
-
-    def minimize_theta2(self, fg_id, vector, axis, conformer=-1):
-        """
-        Rotate molecule to minimize angle between `fg_id` and `vector`.
-
-        The rotation is done about `axis` and is centered on the
-        bonder centroid, as given by
-        :meth:`~.StructUnit.bonder_centroid`.
-
-        Parameters
-        ----------
-        fg_id : :class:`int`
-            The id of functional group which is to have angle
-            minimized.
-
-        vector : :class:`numpy.ndarray`
-            A vector with which the angle is minimized.
-
-        axis : :class:`numpy.ndarray`
-            The vector about which the rotation happens.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        centroid = self.bonder_centroid(conformer)
-        fg = self.func_groups[fg_id]
-
-        bonder_centroid = self.atom_centroid(fg.bonder_ids)
-        v1 = bonder_centroid - centroid
-        self.minimize_theta(v1, vector, axis, centroid, conformer)
-
-    def set_orientation2(self, end, conformer=-1):
-        """
-        Rotates the molecule so the plane normal is aligned with `end`.
-
-        Here "plane normal" referes to the normal of the plane formed
-        by the bonder centroids. The molecule is rotated about
-        :meth:`~Molecule.bonder_centroid`. The rotation results in the
-        normal of the plane being aligned with `end`.
-
-        Parameters
-        ----------
-        end : :class:`numpy.ndarray`
-            The vector with which the normal of plane of bonder
-            centroids shoould be aligned.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`rdkit.Mol`
-            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
-
-        """
-
-        start = self.bonder_plane_normal(conformer)
-        return self._set_orientation2(start, end, conformer)
