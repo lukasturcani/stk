@@ -169,3 +169,17 @@ def test_shift_fgs(amine4):
 def test_pickle(amine2):
     result = pickle.loads(pickle.dumps(amine2))
     assert result.same(amine2)
+
+
+def test_set_orientation2(tmp_amine2):
+    tmp_amine2.set_orientation2([1, 2, 3], 0)
+    vector = next(tmp_amine2.bonder_direction_vectors(0))[-1]
+    assert np.allclose(vector,
+                       stk.normalize_vector([1, 2, 3]),
+                       atol=1e-8)
+
+
+def test_set_orientation2(tmp_aldehyde3):
+    tmp_aldehyde3.set_orientation2([1, 2, 3], 0)
+    assert np.allclose(tmp_aldehyde3.bonder_plane_normal(0),
+                       stk.normalize_vector([1, 2, 3]), atol=1e-4)
