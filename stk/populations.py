@@ -107,25 +107,25 @@ class Population:
             .. code-block:: python
 
                 building_blocks = [
-                    [StructUnit2(), StructUnit2(), ...],
-                    [StructUnit3(), StructUnit3(), ...],
-                    [StructUnit2(), StructUnit2(), ...]
+                    [BuildingBlock(...), BuildingBlock(...), ...],
+                    [BuildingBlock(...), BuildingBlock(...), ...],
+                    [BuildingBlock(...), BuildingBlock(...), ...]
                 ]
 
             To construct a new :class:`.ConstructedMolecule`, a
-            :class:`.StructUnit` is picked from each of the sublists
-            in `building_blocks`. The picked :class:`.StructUnit`
+            :class:`.BuildingBlock` is picked from each of the sublists
+            in `building_blocks`. The picked :class:`.BuildingBlock`
             instances are then supplied to the
             `constructed_molecule_class`:
 
             .. code-block:: python
 
                 mol = ConstructedMolecule(
-                    [pick1, pick2, pick3],
-                    Topology()
+                    building_blocks=[pick1, pick2, pick3],
+                    topology=Topology()
                 )
 
-            The order of picked :class:`.StructUnit` instances
+            The order of picked :class:`.BuildingBlock` instances
             corresponds to the order of the sublists.
 
         topologies : :class:`list` of :class:`.Topology`
@@ -227,13 +227,15 @@ class Population:
 
             .. code-block:: python
 
-                building_blocks = [[StructUnit2(), StructUnit2(), ...],
-                                   [StructUnit3(), StructUnit3(), ...],
-                                   [StructUnit2(), StructUnit2(), ...]]
+                building_blocks = [
+                    [BuildingBlock(...), BuildingBlock(...), ...],
+                    [BuildingBlock(...), BuildingBlock(...), ...],
+                    [BuildingBlock(...), BuildingBlock(...), ...]
+                ]
 
             To construct a new :class:`.ConstructedMolecule`, a
-            :class:`.StructUnit` is picked from each of the sublists
-            in `building_blocks`. The picked :class:`.StructUnit`
+            :class:`.BuildingBlock` is picked from each of the sublists
+            in `building_blocks`. The picked :class:`.BuildingBlock`
             instances are then supplied to the initializer:
 
             .. code-block:: python
@@ -243,7 +245,7 @@ class Population:
                     Topology()
                 )
 
-            The order of picked :class:`.StructUnit` instances
+            The order of picked :class:`.BuildingBlock` instances
             corresponds to the order of the sublists.
 
         topolgies : :class:`iterable` of :class:`.Topology`
@@ -281,17 +283,16 @@ class Population:
             # Make an iterators which goes through all rdkit molecules
             # in the sublists.
             mol_iters = [
-                (struct_unit.mol for struct_unit in db)
+                (bb.mol for bb in db)
                 for db in building_blocks
             ]
             # Make a dictionary which maps every rdkit molecule to its
-            # StructUnit, for every sublist in building_blocks.
+            # BuildingBlock, for every sublist in building_blocks.
             mol_maps = [
-                {struct_unit.mol: struct_unit for struct_unit in db}
-                for db in building_blocks
+                {bb.mol: bb for bb in db} for db in building_blocks
             ]
 
-            # Get the most different StructUnit to the previously
+            # Get the most different BuildingBlock to the previously
             # selected one, per sublist. Take index of 1 because the
             # index of 0 will the molecule itself.
             diff_mols = [
@@ -314,7 +315,7 @@ class Population:
         return pop
 
     @classmethod
-    def init_from_files(cls, folder, moltype, glob_pattern='*'):
+    def init_from_files(cls, folder, initializers, glob_pattern='*'):
         """
         Creates a population from files in `folder`.
 
@@ -325,12 +326,19 @@ class Population:
             used to initialize :class:`~.Molecule` objects held by
             the population.
 
-        moltype : :class:`type`
-            An initializer for the molecular structure files. For
-            example, :class:`.StructUnit` or :class:`.StructUnit2`.
-            If `folder` contains ``.json`` dump files of
-            :class:`.ConstructedMolecule` then :meth:`.Molecule.load`
-            could also be used.
+        initializers : :class:`dict`
+            Intializers for each file type. For example,
+
+            .. code-block:: python
+
+                initializers = {
+                    '.mol': BuildingBlock,
+                    '.json' : Molecule.load
+                }
+
+            Every .mol file will be passed as the first argument to
+            :meth:`.BuildingBlock.__init__` and every .json file will
+            be passed as the first argument to :meth:`.Molecule.load`.
 
         glob_pattern : :class:`str`, optional
             A glob used for selecting specific files within `folder`.
@@ -342,8 +350,11 @@ class Population:
 
         """
 
-        return cls(*(moltype(x) for x in
-                     iglob(join(folder, glob_pattern))))
+        pop = cls()
+        for filename in iglob(join(folder, glob_pattern)):
+            _, ext = os.path.splitext(filename)
+            pop.members.append(initializers[ext](filename))
+        return pop
 
     @classmethod
     def init_random(cls,
@@ -373,14 +384,14 @@ class Population:
             .. code-block:: python
 
                 building_blocks = [
-                    [StructUnit2(), StructUnit2(), ...],
-                    [StructUnit3(), StructUnit3(), ...],
-                    [StructUnit2(), StructUnit2(), ...]
+                    [BuildingBlock(...), BuildingBlock(...), ...],
+                    [BuildingBlock(...), BuildingBlock(...), ...],
+                    [BuildingBlock(...), BuildingBlock(...), ...]
                 ]
 
             To construct a new :class:`.ConstructedMolecule`, a
-            :class:`.StructUnit` is picked from each of the sublists
-            in `building_blocks`. The picked :class:`.StructUnit`
+            :class:`.BuildingBlock` is picked from each of the sublists
+            in `building_blocks`. The picked :class:`.BuildingBlock`
             instances are then supplied to the initializer:
 
             .. code-block:: python
@@ -390,7 +401,7 @@ class Population:
                     Topology()
                 )
 
-            The order of picked :class:`.StructUnit` instances
+            The order of picked :class:`.BuildingBlock` instances
             corresponds to the order of the sublists.
 
         topolgies : :class:`iterable` of :class:`.Topology`
