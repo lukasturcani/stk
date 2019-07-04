@@ -173,9 +173,9 @@ class FormationEnergy(EnergyCalculator):
     .. code-block:: python
 
         # Make the molecules needed to calculate formation energy.
-        water = StructUnit.smiles_init('[H]O[H]')
-        bb1 = StructUnit2(...)
-        bb2 = StructUnit3(...)
+        water = BuildingBlock.smiles_init('[H]O[H]')
+        bb1 = BuildingBlock(...)
+        bb2 = BuildingBlock(...)
         cage = Cage([bb1, bb2], FourPlusSix())
 
         # Make the energy calculator used to calculate energies.
@@ -293,7 +293,7 @@ class MMFFEnergy(EnergyCalculator):
     .. code-block:: python
 
         # Create a molecules whose energy we want to know.
-        mol1 = StructUnit.smiles_init('CCCNCCCN')
+        mol1 = BuildingBlock.smiles_init('CCCNCCCN')
         mol2 = Polymer(...)
         mol3 = Cage(...)
 
@@ -346,7 +346,7 @@ class UFFEnergy(EnergyCalculator):
     .. code-block:: python
 
         # Create a molecules whose energy we want to know.
-        mol1 = StructUnit.smiles_init('CCCNCCCN')
+        mol1 = BuildingBlock.smiles_init('CCCNCCCN')
         mol2 = Polymer(...)
         mol3 = Cage(...)
 
@@ -521,8 +521,8 @@ class XTBEnergy(EnergyCalculator):
     --------
     .. code-block:: python
 
-        bb1 = StructUnit2.smiles_init('NCCNCCN', ['amine'])
-        bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
+        bb1 = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
+        bb2 = BuildingBlock.smiles_init('O=CCCC=O', ['aldehyde'])
         polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
         conformer = 0
 

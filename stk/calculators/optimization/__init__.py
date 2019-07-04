@@ -8,7 +8,7 @@ with :meth:`~.Optimizer.optimize`.
 .. code-block:: python
 
     import rdkit.Chem.AllChem as rdkit
-    mol = StructUnit2.smiles_init('NCCCN', ['amine'])
+    mol = BuildingBlock.smiles_init('NCCCN', ['amine'])
     mmff = MMFF()
     mmff.optimize(mol)
 

@@ -144,11 +144,8 @@ class OptimizerSequence(Optimizer):
 
     .. code-block:: python
 
-        import rdkit.Chem.AllChem as rdkit
-        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        etkdg = RDKitEmbedder(rdkit.ETKDG())
-        mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
-        optimizer = OptimizerSequence(etkdg, mmff)
+        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
+        optimizer = OptimizerSequence(ETKDG(), MMFF())
         optimizer.optimize(mol)
 
     """
@@ -217,11 +214,8 @@ class CageOptimizerSequence(Optimizer):
 
     .. code-block:: python
 
-        import rdkit.Chem.AllChem as rdkit
-        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        etkdg = RDKitEmbedder(rdkit.ETKDG())
-        mmff = RDKitForceField(rdkit.MMFFOptimizeMolecule)
-        optimizer = CageOptimizerSequence(etkdg, mmff)
+        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
+        optimizer = CageOptimizerSequence(ETKDG(), MMFF())
         optimizer.optimize(mol)
 
     """
@@ -330,9 +324,9 @@ class TryCatchOptimizer(Optimizer):
     .. code-block:: python
 
         # Create some molecules to optimize.
-        mol1 = StructUnit2.smiles_init('NCCN', []'amine'])
-        mol2 = StructUnit.smiles_init('CCCCC')
-        mol3 = StructUnit.smiles_init('O=CCCN')
+        mol1 = BuildingBlock.smiles_init('NCCN', ['amine'])
+        mol2 = BuildingBlock.smiles_init('CCCCC')
+        mol3 = BuildingBlock.smiles_init('O=CCCN')
 
         # Create an optimizer which may fail.
         uff = UFF()
@@ -436,9 +430,8 @@ class RaisingOptimizer(Optimizer):
     --------
     .. code-block:: python
 
-        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
-        etkdg = RDKitEmbedder(rdkit.ETKDG())
-        partial_raiser = RaisingOptimizer(etkdg, fail_chance=0.75)
+        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
+        partial_raiser = RaisingOptimizer(ETKDG(), fail_chance=0.75)
         # 75 % chance an error will be raised by calling optimize.
         partial_raiser.optimize(mol)
 
@@ -504,7 +497,7 @@ class MMFF(Optimizer):
     --------
     .. code-block:: python
 
-        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
         mmff = MMFF()
         mmff.optimize(mol)
 
@@ -544,7 +537,7 @@ class UFF(Optimizer):
     --------
     .. code-block:: python
 
-        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
         uff = UFF()
         uff.optimize(mol)
 
@@ -589,8 +582,7 @@ class ETKDG(Optimizer):
     --------
     .. code-block:: python
 
-        import rdkit.Chem.AllChem as rdkit
-        mol = StructUnit.smiles_init('NCCNCCN', ['amine'])
+        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
         etkdg = ETKDG()
         etkdg.optimize(mol)
 
@@ -767,8 +759,8 @@ class XTB(Optimizer):
 
     .. code-block:: python
 
-        bb1 = StructUnit2.smiles_init('NCCNCCN', ['amine'])
-        bb2 = StructUnit2.smiles_init('O=CCCC=O', ['aldehyde'])
+        bb1 = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
+        bb2 = BuildingBlock.smiles_init('O=CCCC=O', ['aldehyde'])
         polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
 
         xtb = OptimizerSequence(
