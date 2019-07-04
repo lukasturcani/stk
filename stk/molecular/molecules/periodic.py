@@ -3,7 +3,7 @@ import rdkit.Chem.AllChem as rdkit
 import itertools as it
 import math
 
-from .struct_unit import StructUnit
+from .building_block import BuildingBlock
 from .constructed_molecule import ConstructedMolecule
 from ..functional_groups import Reactor
 from ...utilities import flatten, vector_theta, Cell
@@ -282,7 +282,7 @@ class Periodic(ConstructedMolecule):
             cell_fix = [0, 0, 0, 0, 0, 0]
 
         pmol, pbs = self.periodic_mol()
-        mol = StructUnit.__new__(StructUnit)
+        mol = BuildingBlock.__new__(BuildingBlock)
         mol.mol = pmol
 
         if atom_fix is None:

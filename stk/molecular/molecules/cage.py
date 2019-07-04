@@ -1,8 +1,8 @@
 """
 Defines classes for cage molecules.
 
-The difference between :class:`CageStructUnit` and :class:`Cage`
-is that :class:`CageStructUnit` is for cages loaded directly into
+The difference between :class:`CageBuildingBlock` and :class:`Cage`
+is that :class:`CageBuildingBlock` is for cages loaded directly into
 ``stk``, while :class:`Cage` is for cages constructed by ``stk``.
 
 """
@@ -16,7 +16,7 @@ from scipy.optimize import minimize
 from sklearn.metrics.pairwise import euclidean_distances
 
 from .constructed_molecule import ConstructedMolecule
-from .struct_unit import StructUnit
+from .building_block import BuildingBlock
 from ...utilities import atom_vdw_radii
 
 
@@ -95,7 +95,7 @@ class CageBase:
         return 0 if cavity < 0 else cavity
 
 
-class CageStructUnit(CageBase, StructUnit):
+class CageBuildingBlock(CageBase, BuildingBlock):
     """
     Represents molecular cages loaded into ``stk``.
 

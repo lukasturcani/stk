@@ -28,13 +28,13 @@ class Molecule:
 
     This class defines the operations which any class
     describing molecules should inherit or may find useful. Examples of
-    such are :class:`StructUnit` and :class:`ConstructedMolecule`. This
-    class should not be used directly.
+    such are :class:`.BuildingBlock` and :class:`.ConstructedMolecule`.
+    This class should not be used directly.
 
     Attributes
     ----------
     mol : :class:`rdkit.Mol`
-        An ``rdkit`` molecule instance representing the molecule.
+        A :mod:`rdkit` molecule instance representing the molecule.
 
     inchi : :class:`str`
         The InChI of the molecule.
@@ -788,8 +788,8 @@ class Molecule:
         Notes
         -----
         The difference between this method and
-        :meth:`StructUnit._set_orientation2` is about which point the
-        rotation occurs: centroid of the entire molecule versus
+        :meth:`.BuildingBlock._set_orientation2` is about which point
+        the rotation occurs: centroid of the entire molecule versus
         centroid of the bonder atoms, respectively.
 
         Parameters

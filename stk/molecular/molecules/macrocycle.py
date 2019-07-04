@@ -7,7 +7,7 @@ oligomer topology used to construct macrocycles.
 """
 
 from .constructed_molecule import ConstructedMolecule
-from .struct_unit import StructUnit
+from .building_block import BuildingBlock
 import rdkit.Chem.AllChem as rdkit
 
 
@@ -18,7 +18,7 @@ class MacrocycleBase:
     Macrocycles are molecules that contain a large cycle. A simple
     example is a polymer with two ends connected together. This base
     class allows for the macrocyles to be initialized as either
-    :class:`.StructUnit` or :class:`.ConstructedMolecule` but to be
+    :class:`.BuildingBlock` or :class:`.ConstructedMolecule` but to be
     equally identified as macrocycles.
 
     """
@@ -50,9 +50,9 @@ class MacrocycleBase:
         return list(max(ssr, key=len))
 
 
-class MacrocycleStructUnit(MacrocycleBase, StructUnit):
+class MacrocycleBuildingBlock(MacrocycleBase, BuildingBlock):
     """
-    Used to represent macrocyles loaded as :class:`.StructUnit`.
+    Used to represent macrocyles loaded as :class:`.BuildingBlock`.
 
     """
 

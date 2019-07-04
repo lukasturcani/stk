@@ -9,20 +9,20 @@ A more detailed description of molecular construction.
 This is a step-by-step guide of how :class:`.ConstructedMolecule`
 instances are constructed.
 
-First, you create :class:`.StructUnit` instances of the building blocks
+First, you create :class:`.BuildingBlock` instances of the building blocks
 which make up the :class:`ConstructedMolecule`:
 
 .. code-block:: python
 
-    bb = StructUnit('/path/to/struct/file.mol2', ['amine'])
+    bb = BuildingBlock('/path/to/struct/file.mol2', ['amine'])
 
-The :class:`.StructUnit` instances are initialized using paths to
+The :class:`.BuildingBlock` instances are initialized using paths to
 molecular structure files or :mod:`rdkit` molecules or with SMILES
-strings. Initializing a :class:`.StructUnit` automatically completes
+strings. Initializing a :class:`.BuildingBlock` automatically completes
 steps 1 to 4.
 
-    1. Place an ``rdkit`` instance of the molecule into
-       :attr:`StructUnit.mol`, i.e.
+    1. Place an :mod:`rdkit` instance of the molecule into
+       :attr:`.BuildingBlock.mol`, i.e.
 
        .. code-block:: python
 
@@ -46,7 +46,7 @@ and a :class:`tuple` of instances of this class called
        molecule. These identify which atoms form bonds during
        the construction of a :class:`ConstructedMolecule` and which
        ones are deleted. Place the :class:`.FunctionalGroup` instances
-       into :attr:`StructUnit.func_groups`.
+       into :attr:`.BuildingBlock.func_groups`.
 
        .. code-block:: python
 
@@ -208,10 +208,10 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
     Attributes
     ----------
-    building_blocks : :class:`list` of :class:`.StructUnit`
-        This attribute holds :class:`.StructUnit` instances which
+    building_blocks : :class:`list` of :class:`.BuildingBlock`
+        This attribute holds :class:`.BuildingBlock` instances which
         represent the building block molecules of the
-        :class:`ConstructedMolecule`. Only one :class:`.StructUnit`
+        :class:`ConstructedMolecule`. Only one :class:`.BuildingBlock`
         instance is present per building block, even if multiples of
         that building block join up to form the
         :class:`ConstructedMolecule`.
@@ -251,13 +251,13 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
         Parameters
         ---------
-        building_blocks : :class:`list` of :class:`.StructUnit`
-            The :class:`.StructUnit` instances which
+        building_blocks : :class:`list` of :class:`.BuildingBlock`
+            The :class:`.BuildingBlock` instances which
             represent the building block molecules of the
-            :class:`ConstructedMolecule`. Only one :class:`.StructUnit`
-            instance is present per building block, even if multiples
-            of that building block join up to form the
-            :class:`ConstructedMolecule`.
+            :class:`ConstructedMolecule`. Only one
+            :class:`.BuildingBlock` instance is present per building
+            block, even if multiples of that building block join up to
+            form the :class:`ConstructedMolecule`.
 
         topology : :class:`.Topology`
             Defines the topology of the :class:`ConstructedMolecule`
@@ -576,7 +576,7 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
 
         Parameters
         ----------
-        building_blocks : :class:`list` of :class:`.StructUnit`
+        building_blocks : :class:`list` of :class:`.BuildingBlock`
             The building blocks used to construct the
             :class:`ConstructedMolecule`.
 
