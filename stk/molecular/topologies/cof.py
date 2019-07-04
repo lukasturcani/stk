@@ -110,7 +110,7 @@ class Vertex:
         cell_params : :class:`list` of :class:`numpy.array`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
-        mol : :class:`.StructUnit3`
+        mol : :class:`.BuildingBlock`
             The building block to be placed.
 
         aligner : :class:`int`
@@ -314,7 +314,7 @@ class Edge:
         cell_params : :class:`list` of :class:`numpy.ndarray`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
-        bb : :class:`.StructUnit3`
+        bb : :class:`.BuildingBlock`
             The building block to be placed.
 
         alignment : :class:`int`

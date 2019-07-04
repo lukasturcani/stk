@@ -246,7 +246,7 @@ class Linear(Topology):
         mol : :class:`.Polymer`
             The polymer being constructed.
 
-        bb : :class:`.StructUnit`
+        bb : :class:`.BuildingBlock`
             The building block to be added to `mol`.
 
         Returns

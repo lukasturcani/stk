@@ -93,8 +93,8 @@ def remove_confs(building_blocks, keep):
 
     Parameters
     ----------
-    building_blocks : :class:`iterable` of :class:`.StructUnit`
-        A :class:`.set` of :class:`.StructUnit` instances which
+    building_blocks : :class:`iterable` of :class:`.BuildingBlock`
+        A :class:`.set` of :class:`.BuildingBlock` instances which
         represent the building blocks forming a
         :class:`.ConstructedMolecule`.
 

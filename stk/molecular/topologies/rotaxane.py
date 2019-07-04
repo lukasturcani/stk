@@ -188,7 +188,7 @@ class NRotaxane(Topology):
         mol : :class:`.Rotaxane`
             The :class:`.Rotaxane` being constructed.
 
-        axle : :class:`.StructUnit`
+        axle : :class:`.Molecule`
             The axle of the :class:`.Rotaxane`.
 
         Returns
