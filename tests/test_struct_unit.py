@@ -4,22 +4,22 @@ import rdkit.Chem.AllChem as rdkit
 import stk
 import pickle
 
-if not os.path.exists('struct_unit_tests_output'):
-    os.mkdir('struct_unit_tests_output')
+if not os.path.exists('building_block_tests_output'):
+    os.mkdir('building_block_tests_output')
 
 
 def test_init(amine2):
     assert len(amine2.func_groups) == 2
     assert amine2.func_groups[0].info.name == 'amine'
 
-    amine2_1 = stk.StructUnit(amine2.mol, ['amine'])
+    amine2_1 = stk.BuildingBlock(amine2.mol, ['amine'])
     assert amine2_1.same(amine2)
 
     mol_block = rdkit.MolToMolBlock(amine2.mol, forceV3000=True)
-    amine2_2 = stk.StructUnit(mol_block, ['amine'])
+    amine2_2 = stk.BuildingBlock(mol_block, ['amine'])
     assert amine2_2.same(amine2)
 
-    amine2_3 = stk.StructUnit(amine2.mol)
+    amine2_3 = stk.BuildingBlock(amine2.mol)
     assert amine2.same(amine2_3)
 
 
@@ -95,7 +95,7 @@ def test_functional_groups(amine2):
 
 
 def test_json_init(tmp_amine2):
-    path = os.path.join('struct_unit_tests_output', 'mol.json')
+    path = os.path.join('building_block_tests_output', 'mol.json')
 
     tmp_amine2.test_attr1 = 'something'
     tmp_amine2.test_attr2 = 12
@@ -122,15 +122,15 @@ def test_caching():
     # not affected by unexpected cache problems.
     try:
         stk.OPTIONS['cache'] = True
-        mol = stk.StructUnit.smiles_init('NCCCN', ['amine'])
-        mol2 = stk.StructUnit.smiles_init('NCCCN', ['amine'])
+        mol = stk.BuildingBlock.smiles_init('NCCCN', ['amine'])
+        mol2 = stk.BuildingBlock.smiles_init('NCCCN', ['amine'])
         assert mol is mol2
 
-        mol3 = stk.StructUnit.smiles_init('NCCCN', ['aldehyde'])
+        mol3 = stk.BuildingBlock.smiles_init('NCCCN', ['aldehyde'])
         assert mol3 is not mol
 
         stk.OPTIONS['cache'] = False
-        mol4 = stk.StructUnit.smiles_init('NCCCN', ['amine'])
+        mol4 = stk.BuildingBlock.smiles_init('NCCCN', ['amine'])
         stk.OPTIONS['cache'] = True
         assert mol is not mol4
 

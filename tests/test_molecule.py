@@ -282,7 +282,7 @@ def test_mol_write(cycle_su):
     atoms = cycle_su.cycle_atoms()
 
     cycle_su.write(join(test_dir, 'cycle.mol'))
-    cycle = stk.StructUnit(join(test_dir, 'cycle.mol'))
+    cycle = stk.BuildingBlock(join(test_dir, 'cycle.mol'))
     for i in range(cycle.mol.GetNumAtoms()):
         assert np.allclose(
             a=cycle_su.atom_coords(i),
@@ -309,7 +309,7 @@ def test_mol_write(cycle_su):
             f'{symbol} {x:.4f} {y:.4f} {z:.4f}'
         )
 
-    cycle = stk.StructUnit(join(test_dir, 'cycle_atoms.mol'))
+    cycle = stk.BuildingBlock(join(test_dir, 'cycle_atoms.mol'))
     # Note down all atoms read from the file.
     cycle_lines = []
     for atom_id in range(cycle.mol.GetNumAtoms()):
@@ -357,7 +357,7 @@ def test_xyz_write(cycle_su):
 
 def test_pdb_write(cycle_su):
     cycle_su.write(join(test_dir, 'cycle.pdb'))
-    cycle = stk.StructUnit(join(test_dir, 'cycle.pdb'))
+    cycle = stk.BuildingBlock(join(test_dir, 'cycle.pdb'))
 
     # Make sure the position matrices are basically the same.
     assert np.allclose(
@@ -381,7 +381,7 @@ def test_pdb_write(cycle_su):
     # Test writing of specific atoms only.
     atoms = cycle_su.cycle_atoms()
     cycle_su.write(join(test_dir, 'cycle_atoms.pdb'), atoms)
-    cycle = stk.StructUnit(join(test_dir, 'cycle_atoms.pdb'))
+    cycle = stk.BuildingBlock(join(test_dir, 'cycle_atoms.pdb'))
 
     # Make sure the position matrices are basically the same.
     assert np.allclose(
