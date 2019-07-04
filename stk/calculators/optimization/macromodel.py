@@ -39,6 +39,10 @@ class MacroModelLewisStructureError(Exception):
     ...
 
 
+class MacroModelInputError(Exception):
+    ...
+
+
 class _MacroModel(Optimizer):
     """
     Base class for MacroModel optimzers.
@@ -60,9 +64,11 @@ class _MacroModel(Optimizer):
 
     maximum_iterations : :class:`int`
         The maximum number of iterations done during the optimization.
+        Cannot be more than ``999999``.
 
     minimum_gradient : :class:`float`
         The gradient at which optimization is stopped.
+        Cannot be less than ``0.0001``.
 
     timeout : :class:`float`
         The amount in seconds the MD is allowed to run before
@@ -103,10 +109,11 @@ class _MacroModel(Optimizer):
 
         maximum_iterations : :class:`int`, optional
             The maximum number of iterations done during the
-            optimization.
+            optimization. Cannot be more than ``999999``.
 
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
@@ -588,17 +595,21 @@ class MacroModelForceField(_MacroModel):
 
         maximum_iterations : :class:`int`, optional
             The maximum number of iterations done during the
-            optimization.
+            optimization. Cannot be more than ``999999``.
 
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
             molecule and conformer.
 
         """
-
+        self._check_params(
+            minimum_gradient=minimum_gradient,
+            maximum_iterations=maximum_iterations
+        )
         self.restricted = restricted
         super().__init__(macromodel_path=macromodel_path,
                          output_dir=output_dir,
@@ -607,6 +618,46 @@ class MacroModelForceField(_MacroModel):
                          minimum_gradient=minimum_gradient,
                          timeout=timeout,
                          use_cache=use_cache)
+
+    @staticmethod
+    def _check_params(
+        minimum_gradient,
+        maximum_iterations
+    ):
+        """
+        Check if the optimization parameters are valid for MacroModel.
+
+        Parameters
+        ----------
+        minimum_gradient : :class:`float`
+            The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
+
+        maximum_iterations : :class:`int`
+            The maximum number of iterations done during the
+            optimization. Cannot be more than ``999999``.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        Raises
+        ------
+        :class:`.MacroModelInputError`
+            If the parameters cannot be converted into a valid ``.com``
+            file entry.
+
+        """
+
+        if minimum_gradient < 0.0001:
+            raise MacroModelInputError(
+                'Convergence gradient (< 0.0001) is too small.'
+            )
+
+        if maximum_iterations > 999999:
+            raise MacroModelInputError(
+                'Number of iterations (> 999999) is too high.'
+            )
 
     def generate_com(self, mol):
         """
@@ -636,23 +687,21 @@ class MacroModelForceField(_MacroModel):
         # This is the body of the ``.com`` file. The line that begins
         # and ends with exclamation lines is replaced with the various
         # commands that fix bond distances and angles.
-        line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
-        line2 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
-        line3 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
-        line4 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
-        line5 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
-        line6 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
-        line7 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
+        line1 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
+        line2 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
+        line3 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
+        line4 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
+        line5 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
+        line6 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
             self.com_line(*line1),
             self.com_line(*line2),
             self.com_line(*line3),
-            self.com_line(*line4),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
+            self.com_line(*line4),
             self.com_line(*line5),
-            self.com_line(*line6),
-            self.com_line(*line7)
+            self.com_line(*line6)
         ])
 
         # Create a path for the ``.com`` file. It is the same as that
@@ -844,24 +893,29 @@ class MacroModelForceField(_MacroModel):
 
 class MacroModelMD(_MacroModel):
     """
-    Runs a MD conformer search using MacroModel.
+    Runs a molecular dynamics conformer search using MacroModel.
 
     Attributes
     ----------
     temperature : :class:`float`
         The temperature in Kelvin at which the MD is run.
+        Cannot be more than ``99999.99``.
 
     conformers : :class:`int`
         The number of conformers sampled and optimized from the MD.
+        Cannot be more than ``9999``.
 
     time_step : :class:`float`
         The time step in ``fs`` for the MD.
+        Cannot be more than ``99999.99``.
 
     eq_time : :class:`float`
         The equilibriation time in ``ps`` before the MD is run.
+        Cannot be more than ``999999.99``.
 
     simulation_time : :class:`float`
         The simulation time in ``ps`` of the MD.
+        Cannot be more than ``999999.99``.
 
     restricted_bonds : :class:`set`
         A :class:`set` of the form
@@ -907,6 +961,20 @@ class MacroModelMD(_MacroModel):
         should have a fixed size via the atom ids of atoms in the
         torsional angle.
 
+    _sim_time : class:`float`
+        The effective simulation time of the MD simulation, used for
+        generation of the lines in the ``.com`` file.
+
+        If positive then interpreted as ``ps``.
+        If negative then run 100 times the number of ``ps``.
+
+    _eq_time : class:`float`
+        The effective equilibration time of the MD simulation, used for
+        generation of the lines in the ``.com`` file.
+
+        If positive then interpreted as ``ps``.
+        If negative then run 100 times the number of ``ps``.
+
     """
 
     def __init__(self,
@@ -949,25 +1017,31 @@ class MacroModelMD(_MacroModel):
 
         temperature : :class:`float`, optional
             The temperature in Kelvin at which the MD is run.
+            Cannot be more than ``99999.99``.
 
         conformers' : :class:`int`, optional
             The number of conformers sampled and optimized from the MD.
-
-        time_step : :class:`float`, optional
-            The time step in ``fs`` for the MD.
-
-        eq_time : :class:`float`, optional
-            The equilibriation time in ``ps`` before the MD is run.
+            Cannot be more than ``9999``.
 
         simulation_time : :class:`float`, optional
             The simulation time in ``ps`` of the MD.
+            Cannot be more than ``999999.99``.
+
+        time_step : :class:`float`, optional
+            The time step in ``fs`` for the MD.
+            Cannot be more than ``99999.99``.
+
+        eq_time : :class:`float`, optional
+            The equilibriation time in ``ps`` before the MD is run.
+            Cannot be more than ``999999.99``.
 
         maximum_iterations : :class:`int`, optional
             The maximum number of iterations done during the
-            optimization.
+            optimization. Cannot be more than ``999999``.
 
         minimum_gradient : :class:`float`, optional
             The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
 
         restricted_bonds : :class:`set`, optional
             A :class:`set` of the form
@@ -1026,6 +1100,16 @@ class MacroModelMD(_MacroModel):
         if restricted_torsional_angles is None:
             restricted_torsional_angles = set()
 
+        self._check_params(
+            temperature=temperature,
+            conformers=conformers,
+            simulation_time=simulation_time,
+            time_step=time_step,
+            eq_time=eq_time,
+            minimum_gradient=minimum_gradient,
+            maximum_iterations=maximum_iterations
+        )
+
         self.temperature = temperature
         self.conformers = conformers
         self.time_step = time_step
@@ -1034,6 +1118,19 @@ class MacroModelMD(_MacroModel):
         self.restricted_bonds = restricted_bonds
         self.restricted_bond_angles = restricted_bond_angles
         self.restricted_torsional_angles = restricted_torsional_angles
+
+        # Negative simulation time is interpreted as times 100 ps.
+        if simulation_time > 99999.99:
+            self._sim_time = -simulation_time/100
+        else:
+            self._sim_time = simulation_time
+
+        # Negative equilibration time is interpreted as times 100 ps.
+        if eq_time > 99999.99:
+            self._eq_time = -eq_time/100
+        else:
+            self._eq_time = eq_time
+
         super().__init__(macromodel_path=macromodel_path,
                          output_dir=output_dir,
                          timeout=timeout,
@@ -1041,6 +1138,96 @@ class MacroModelMD(_MacroModel):
                          maximum_iterations=maximum_iterations,
                          minimum_gradient=minimum_gradient,
                          use_cache=use_cache)
+
+    @staticmethod
+    def _check_params(
+        temperature,
+        conformers,
+        simulation_time,
+        time_step,
+        eq_time,
+        minimum_gradient,
+        maximum_iterations
+    ):
+        """
+        Check if the optimization parameters are valid for MacroModel.
+
+        Parameters
+        ----------
+        temperature : :class:`float`
+            The temperature in Kelvin at which the MD is run.
+            Cannot be more than ``99999.99``.
+
+        conformers' : :class:`int`
+            The number of conformers sampled and optimized from the MD.
+            Cannot be more than ``9999``.
+
+        simulation_time : :class:`float`
+            The simulation time in ``ps`` of the MD.
+            Cannot be more than ``999999.99``.
+
+        time_step : :class:`float`
+            The time step in ``fs`` for the MD.
+            Cannot be more than ``99999.99``.
+
+        eq_time : :class:`float`
+            The equilibriation time in ``ps`` before the MD is run.
+            Cannot be more than ``999999.99``.
+
+        minimum_gradient : :class:`float`
+            The gradient at which optimization is stopped.
+            Cannot be less than ``0.0001``.
+
+        maximum_iterations : :class:`int`
+            The maximum number of iterations done during the
+            optimization. Cannot be more than ``999999``.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        Raises
+        ------
+        :class:`.MacroModelInputError`
+            If the parameters cannot be converted into a valid ``.com``
+            file entry.
+
+        """
+
+        if temperature > 99999.99:
+            raise MacroModelInputError(
+                'Supplied temperature (> 99999 K) is too high.'
+            )
+
+        if conformers > 9999:
+            raise MacroModelInputError(
+                'Supplied number of conformers (> 9999) is too high.'
+            )
+
+        if simulation_time > 999999.99:
+            raise MacroModelInputError(
+                'Supplied simulation time (> 999999 ps) is too long.'
+            )
+
+        if time_step > 99999.99:
+            raise MacroModelInputError(
+                'Supplied time step (> 99999 fs) is too high.'
+            )
+
+        if eq_time > 999999.99:
+            raise MacroModelInputError(
+                'Supplied eq time (> 999999 ps) is too long.'
+            )
+
+        if minimum_gradient < 0.0001:
+            raise MacroModelInputError(
+                'Convergence gradient (< 0.0001) is too small.'
+            )
+
+        if maximum_iterations > 999999:
+            raise MacroModelInputError(
+                'Number of iterations (> 999999) is too high.'
+            )
 
     def generate_com(self, mol):
         """
@@ -1069,29 +1256,29 @@ class MacroModelMD(_MacroModel):
 
         # Define some short aliases to keep the following lines neat.
         temp = self.temperature
-        sim_time = self.simulation_time
+        sim_time = self._sim_time
         tstep = self.time_step
+        eq_time = self._eq_time
 
-        line1 = ('MMOD', 0, 1, 0, 0, 0, 0, 0, 0)
-        line2 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
-        line3 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
-        line4 = ('MDIT', 0, 0, 0, 0, temp, 0, 0, 0)
-        line5 = ('MDYN', 0, 0, 0, 0, tstep, self.eq_time, temp, 0)
-        line6 = ('MDSA', self.conformers, 0, 0, 0, 0, 0, 1, 0)
-        line7 = ('MDYN', 1, 0, 0, 0, tstep, sim_time, temp, 0)
-        line8 = ('WRIT', 0, 0, 0, 0, 0, 0, 0, 0)
-        line9 = ('RWND', 0, 1, 0, 0, 0, 0, 0, 0)
-        line10 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
-        line11 = ('READ', -2, 0, 0, 0, 0, 0, 0, 0)
-        line12 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
-        line13 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
-        line14 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
+        line1 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
+        line2 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
+        line3 = ('MDIT', 0, 0, 0, 0, temp, 0, 0, 0)
+        line4 = ('MDYN', 0, 0, 0, 0, tstep, eq_time, temp, 0)
+        line5 = ('MDSA', self.conformers, 0, 0, 0, 0, 0, 1, 0)
+        line6 = ('MDYN', 1, 0, 0, 0, tstep, sim_time, temp, 0)
+        line7 = ('WRIT', 0, 0, 0, 0, 0, 0, 0, 0)
+        line8 = ('RWND', 0, 1, 0, 0, 0, 0, 0, 0)
+        line9 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
+        line10 = ('READ', -2, 0, 0, 0, 0, 0, 0, 0)
+        line11 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
+        line12 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
+        line13 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
             self.com_line(*line1),
             self.com_line(*line2),
-            self.com_line(*line3),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
+            self.com_line(*line3),
             self.com_line(*line4),
             self.com_line(*line5),
             self.com_line(*line6),
@@ -1099,11 +1286,10 @@ class MacroModelMD(_MacroModel):
             self.com_line(*line8),
             self.com_line(*line9),
             self.com_line(*line10),
-            self.com_line(*line11),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
+            self.com_line(*line11),
             self.com_line(*line12),
             self.com_line(*line13),
-            self.com_line(*line14)
         ])
 
         com_block = self.fix_params(mol, com_block)
