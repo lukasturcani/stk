@@ -607,8 +607,8 @@ class MacroModelForceField(_MacroModel):
 
         """
         self._check_params(
-            minimum_gradient,
-            maximum_iterations
+            minimum_gradient=minimum_gradient,
+            maximum_iterations=maximum_iterations
         )
         self.restricted = restricted
         super().__init__(macromodel_path=macromodel_path,
@@ -649,13 +649,11 @@ class MacroModelForceField(_MacroModel):
 
         """
 
-        # Minimum convergence gradient is `00000.0001`
         if minimum_gradient < 0.0001:
             raise MacroModelInputError(
                 'Convergence gradient (< 0.0001) is too small.'
             )
 
-        # Maximum number of iterations is `999999`
         if maximum_iterations > 999999:
             raise MacroModelInputError(
                 'Number of iterations (> 999999) is too high.'
@@ -1103,13 +1101,13 @@ class MacroModelMD(_MacroModel):
             restricted_torsional_angles = set()
 
         self._check_params(
-            temperature,
-            conformers,
-            simulation_time,
-            time_step,
-            eq_time,
-            minimum_gradient,
-            maximum_iterations
+            temperature=temperature,
+            conformers=conformers,
+            simulation_time=simulation_time,
+            time_step=time_step,
+            eq_time=eq_time,
+            minimum_gradient=minimum_gradient,
+            maximum_iterations=maximum_iterations
         )
 
         self.temperature = temperature
@@ -1196,43 +1194,36 @@ class MacroModelMD(_MacroModel):
 
         """
 
-        # Maximum temperature is `99999.9999`.
         if temperature > 99999.99:
             raise MacroModelInputError(
                 'Supplied temperature (> 99999 K) is too high.'
             )
 
-        # Maximum number of conformers is `9999`.
         if conformers > 9999:
             raise MacroModelInputError(
                 'Supplied number of conformers (> 9999) is too high.'
             )
 
-        # Maximum time is `999999.99`.
         if simulation_time > 999999.99:
             raise MacroModelInputError(
                 'Supplied simulation time (> 999999 ps) is too long.'
             )
 
-        # Maximum time step is `99999.9999`
         if time_step > 99999.99:
             raise MacroModelInputError(
                 'Supplied time step (> 99999 fs) is too high.'
             )
 
-        # Maximum time is `999999.99`.
         if eq_time > 999999.99:
             raise MacroModelInputError(
                 'Supplied eq time (> 999999 ps) is too long.'
             )
 
-        # Minimum convergence gradient is `00000.0001`
         if minimum_gradient < 0.0001:
             raise MacroModelInputError(
                 'Convergence gradient (< 0.0001) is too small.'
             )
 
-        # Maximum number of iterations is `999999`
         if maximum_iterations > 999999:
             raise MacroModelInputError(
                 'Number of iterations (> 999999) is too high.'
@@ -1288,7 +1279,6 @@ class MacroModelMD(_MacroModel):
             self.com_line(*line2),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
             self.com_line(*line3),
-
             self.com_line(*line4),
             self.com_line(*line5),
             self.com_line(*line6),
