@@ -80,10 +80,6 @@ class Molecule:
     inchi : :class:`str`
         The InChI of the molecule.
 
-    name : :class:`str`
-        A name which can be optionally given to the molecule for easy
-        identification.
-
     key : :class:`object`
         A hashable :class:`object`. This attribute will be the same
         for molecules of the same class, which have the same structure.
@@ -127,11 +123,8 @@ class Molecule:
 
     subclasses = {}
 
-    def __init__(self, name):
-        self.name = name
-
     @classmethod
-    def init_from_dict(self, json_dict, load_names=True):
+    def init_from_dict(self, json_dict):
         """
         Create a :class:`Molecule` from a JSON :class:`dict`.
 
@@ -144,10 +137,6 @@ class Molecule:
             A :class:`dict` holding the JSON representation of a
             molecule.
 
-        load_names : :class:`bool`, optional
-            If ``True`` then the ``name`` key stored in `json_dict`
-            is loaded.
-
         Returns
         -------
         :class:`Molecule`
@@ -157,7 +146,6 @@ class Molecule:
 
         # Get the class of the object.
         c = self.subclasses[json_dict['class']]
-        json_dict['load_names'] = load_names
         return c._json_init(json_dict)
 
     def __init_subclass__(cls, **kwargs):
@@ -695,7 +683,7 @@ class Molecule:
         raise NotImplementedError()
 
     @classmethod
-    def load(cls, path, load_names=True):
+    def load(cls, path):
         """
         Create a :class:`Molecule` from a JSON file.
 
@@ -707,10 +695,6 @@ class Molecule:
         path : :class:`str`
             The full path holding a JSON representation to a molecule.
 
-        load_names : :class:`bool`, optional
-            If ``True`` then the ``name`` key stored in the JSON file
-            is loaded.
-
         Returns
         -------
         :class:`Molecule`
@@ -721,7 +705,7 @@ class Molecule:
         with open(path, 'r') as f:
             json_dict = json.load(f)
 
-        return cls.init_from_dict(json_dict, load_names)
+        return cls.init_from_dict(json_dict)
 
     def to_mdl_mol_block(self, atom_ids=None, conformer=-1):
         """
@@ -809,6 +793,19 @@ class Molecule:
             '\n'
             '$$$$\n'
         )
+
+    def to_rdkit_mol(self):
+        """
+        Return a :mod:`rdkit` version of the molecule.
+
+        Returns
+        -------
+        :class:`rdkit.Mol`
+            The molecule in :mod:`rdkit` format.
+
+        """
+
+        return rdkit.Mol(self._mol)
 
     def is_same_molecule(self, other):
         """
