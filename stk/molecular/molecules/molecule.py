@@ -95,10 +95,32 @@ class Molecule:
         :class:`.Molecule` instance with that :attr:`key`.
 
     _mol : :class:`rdkit.Mol`
-        A :mod:`rdkit` molecule instance representing the molecule.
+        A :mod:`rdkit` molecule instance representing the
+        :class:`.Molecule`.
 
     Methods
     -------
+    :meth:`__init__`
+    :meth:`init_from_dict`
+    :meth:`apply_displacement`
+    :meth:`apply_rotation_about_axis`
+    :meth:`apply_rotation_between_vectors`
+    :meth:`get_atom_coords`
+    :meth:`get_atom_distance`
+    :meth:`get_center_of_mass`
+    :meth:`get_centroid`
+    :meth:`get_direction`
+    :meth:`get_plane_normal`
+    :meth:`get_position_matrix`
+    :meth:`set_centroid`
+    :meth:`set_position_matrix`
+    :meth:`dump`
+    :meth:`load`
+    :meth:`to_mdl_mol_block`
+    :meth:`is_same_molecule`
+    :meth:`update_cache`
+    :meth:`update_from_file`
+    :meth:`write`
 
     """
 
@@ -171,7 +193,13 @@ class Molecule:
         )
         return self
 
-    def apply_rotation(self, theta, axis, origin, conformer=-1):
+    def apply_rotation_about_axis(
+        self,
+        theta,
+        axis,
+        origin,
+        conformer=-1
+    ):
         """
         Rotate the molecule by `theta` about `axis` on the `origin`.
 
@@ -206,6 +234,73 @@ class Molecule:
         # Apply the rotation.
         self.set_position_matrix(rot_mat @ pos_mat, conformer)
         # Return the centroid of the molecule to the original position.
+        self.apply_displacement(origin, conformer)
+        return self
+
+    def apply_rotation_between_vectors(
+        self,
+        start,
+        end,
+        origin,
+        conformer=-1
+    ):
+        """
+        Rotates the molecule by a rotation from `start` to `end`.
+
+        Given two direction vectors, `start` and `end`, this method
+        applies the rotation required transform `start` to `end` onto
+        the molecule. The rotation occurs about the `origin`.
+
+        For example, if the `start` and `end` vectors
+        are 45 degrees apart, a 45 degree rotation will be applied to
+        the molecule. The rotation will be along the appropriate
+        direction.
+
+        The great thing about this method is that you as long as you
+        can associate a geometric feature of the molecule with a
+        vector, then the molecule can be rotated so that this vector is
+        aligned with `end`. The defined vector can be virtually
+        anything. This means that any geometric feature of the molecule
+        can be easily aligned with any arbitrary axis.
+
+        Parameters
+        ----------
+        start : :class:`numpy.ndarray`
+            A vector which is to be rotated so that it transforms to
+            the `end` vector.
+
+        end : :class:`numpy.ndarray`
+            This array holds the vector, onto which `start` is rotated.
+
+        origin : :class:`numpy.ndarray`
+            The point about which the rotation occurs.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The molecule is returned.
+
+        """
+
+        # Normalize the input direction vectors.
+        start = normalize_vector(start)
+        end = normalize_vector(end)
+
+        # Set the origin to the origin.
+        self.apply_displacement(-origin, conformer)
+
+        # Get the rotation matrix.
+        rot_mat = rotation_matrix(start, end)
+
+        # Apply the rotation matrix to the atomic positions to yield
+        # the new atomic positions.
+        pos_mat = self.get_position_matrix(conformer=conformer)
+        self.set_position_matrix(rot_mat @ pos_mat, conformer)
+
+        # Restore original position.
         self.apply_displacement(origin, conformer)
         return self
 
@@ -408,6 +503,59 @@ class Molecule:
         else:
             self._mol.GetConformer(conformer).GetPositions()
 
+    def set_centroid(self, position, conformer=-1):
+        """
+        Set the centroid of the molecule to `position`.
+
+        Parameters
+        ----------
+        position : :class:`numpy.ndarray`
+            This array holds the position on which the centroid of the
+            molecule is going to be placed.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Returns
+        -------
+        :class:`Molecule`
+            The molecule is returned.
+
+        """
+
+        centroid = self.get_centroid(conformer=conformer)
+        self.apply_displacement(-centroid, conformer)
+        return self
+
+    def set_position_matrix(self, position_matrix, conformer=-1):
+        """
+        Set the molecule's coordinates to those in `position_matrix`.
+
+        Parameters
+        ----------
+        position_matrix : :class:`numpy.ndarray`
+            A position matrix of the molecule. The shape of the matrix
+            is ``[3, n]``.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Returns
+        -------
+        :class:`Molecule`
+            The molecule is returned.
+
+        """
+
+        conf = self.mol.GetConformer(conformer)
+        for i, coord_mat in enumerate(position_matrix.T):
+            coord = rdkit_geo.Point3D(
+                coord_mat.item(0),
+                coord_mat.item(1),
+                coord_mat.item(2)
+            )
+            conf.SetAtomPosition(i, coord)
+
     def dump(self, path, include_attrs=None):
         """
         Write a JSON :class:`dict` of the molecule to a file.
@@ -589,128 +737,6 @@ class Molecule:
 
         return self.inchi == other.inchi
 
-    def set_orientation(self, start, end, conformer=-1):
-        """
-        Rotates the molecule by a rotation from `start` to `end`.
-
-        Given two direction vectors, `start` and `end`, this method
-        applies the rotation required transform `start` to `end` on
-        the molecule. The rotation occurs about the centroid of the
-        molecule.
-
-        For example, if the `start` and `end` vectors
-        are 45 degrees apart, a 45 degree rotation will be applied to
-        the molecule. The rotation will be along the appropriate
-        direction.
-
-        The great thing about this method is that you as long as you
-        can associate a geometric feature of the molecule with a
-        vector, then the molecule can be rotated so that this vector is
-        aligned with `end`. The defined vector can be virtually
-        anything. This means that any geometric feature of the molecule
-        can be easily aligned with any arbitrary axis.
-
-        Notes
-        -----
-        The difference between this method and
-        :meth:`.BuildingBlock._set_orientation2` is about which point
-        the rotation occurs: centroid of the entire molecule versus
-        centroid of the bonder atoms, respectively.
-
-        Parameters
-        ----------
-        start : :class:`numpy.ndarray`
-            A vector which is to be rotated so that it transforms to
-            the `end` vector.
-
-        end : :class:`numpy.ndarray`
-            This array holds the vector, onto which `start` is rotated.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to use.
-
-        Returns
-        -------
-        :class:`rdkit.Mol`
-            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
-
-        """
-
-        # Normalize the input direction vectors.
-        start = normalize_vector(start)
-        end = normalize_vector(end)
-
-        # Record the position of the molecule then translate the
-        # centroid to the origin. This is so that the rotation occurs
-        # about this point.
-        og_center = self.centroid(conformer)
-        self.set_position([0, 0, 0], conformer)
-
-        # Get the rotation matrix.
-        rot_mat = rotation_matrix(start, end)
-
-        # Apply the rotation matrix to the atomic positions to yield
-        # the new atomic positions.
-        pos_mat = self.mol.GetConformer(conformer).GetPositions().T
-        new_pos_mat = np.dot(rot_mat, pos_mat)
-
-        # Set the positions of the molecule.
-        self.set_position_from_matrix(new_pos_mat, conformer)
-        self.set_position(og_center, conformer)
-
-        return self.mol
-
-    def set_centroid(self, position, conformer=-1):
-        """
-        Set the centroid of the molecule to `position`.
-
-        Parameters
-        ----------
-        position : :class:`numpy.ndarray`
-            This array holds the position on which the centroid of the
-            molecule is going to be placed.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        :class:`Molecule`
-            The molecule is returned.
-
-        """
-
-        centroid = self.get_centroid(conformer=conformer)
-        self.apply_displacement(-centroid, conformer)
-        return self
-
-    def set_position_matrix(self, position_matrix, conformer=-1):
-        """
-        Set the molecule's coordinates to those in `position_matrix`.
-
-        Parameters
-        ----------
-        position_matrix : :class:`numpy.ndarray`
-            A position matrix of the molecule. The shape of the matrix
-            is ``[3, n]``.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        :class:`Molecule`
-            The molecule is returned.
-
-        """
-
-        conf = self.mol.GetConformer(conformer)
-        for i, coord_mat in enumerate(pos_mat.T):
-            coord = rdkit_geo.Point3D(coord_mat.item(0),
-                                      coord_mat.item(1),
-                                      coord_mat.item(2))
-            conf.SetAtomPosition(i, coord)
-
     def update_cache(self):
         """
         Update attributes of cached molecule.
@@ -729,9 +755,48 @@ class Molecule:
         if self.key in self.__class__.cache:
             self.__class__.cache[self.key].__dict__ = dict(vars(self))
 
-    def update_from_mae(self, path, conformer=-1):
+    def update_from_file(self, path, conformer=-1):
         """
-        Updates molecular structure to match an ``.mae`` file.
+        Updates the molecular structure from a file.
+
+        Multiple file types are supported, namely:
+
+        #. ``.mol``, ``.sdf`` - MDL V2000 and V3000 files
+        #. ``.xyz`` - XYZ files
+        #. ``.mae`` - Schrodinger Maestro files
+        #. ``.coord`` - Turbomole files
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The path to a molecular structure file holding updated
+            coordinates for the :class:`.Moleucle`.
+
+        conformer : :class:`int`, optional
+            The conformer to update. If a conformer with this id does
+            not exist, it will be added.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The molecule.
+
+        """
+
+        update_fns = {
+            '.mol': self._update_from_mol,
+            '.sdf': self._update_from_mol,
+            '.mae': self._update_from_mae,
+            '.xyz': self._update_from_xyz,
+            '.coord': self._update_from_turbomole
+        }
+        _, ext = os.path.splitext(path)
+        update_fns[ext](path=path, conformer=conformer)
+        return self
+
+    def _update_from_mae(self, path, conformer=-1):
+        """
+        Update the molecular structure to match an ``.mae`` file.
 
         Parameters
         ----------
@@ -755,9 +820,9 @@ class Molecule:
         mol.mol = mol_from_mae_file(path)
         self.set_position_from_matrix(mol.position_matrix(), conformer)
 
-    def update_from_mol(self, path, conformer=-1):
+    def _update_from_mol(self, path, conformer=-1):
         """
-        Updates molecular structure to match an ``.mol`` file.
+        Update the molecular structure to match an ``.mol`` file.
 
         Parameters
         ----------
@@ -787,9 +852,9 @@ class Molecule:
         )
         self.set_position_from_matrix(mol.position_matrix(), conformer)
 
-    def update_from_xyz(self, path, conformer=-1):
+    def _update_from_xyz(self, path, conformer=-1):
         """
-        Updates molecular structure to match a ``.xyz`` file.
+        Update the molecular structure to match a ``.xyz`` file.
 
         Parameters
         ----------
@@ -855,9 +920,9 @@ class Molecule:
         new_coords = np.array(new_coords).T
         self.set_position_from_matrix(new_coords, conformer=conformer)
 
-    def update_from_turbomole(self, path, conformer=-1):
+    def _update_from_turbomole(self, path, conformer=-1):
         """
-        Updates molecular structure from a Turbomole ``.coord`` file.
+        Update the structure from a Turbomole ``.coord`` file.
 
         Note that coordinates in ``.coord`` files are given in Bohr.
 
@@ -928,7 +993,7 @@ class Molecule:
 
     def _update_stereochemistry(self, conformer=-1):
         """
-        Updates stereochemistry tags in :attr:`Molecule.mol`.
+        Update stereochemistry tags in :attr:`Molecule._mol`.
 
         Parameters
         ----------
@@ -948,11 +1013,14 @@ class Molecule:
 
     def write(self, path, atoms=None, conformer=-1):
         """
-        Writes a molecular structure file of the molecule.
+        Write a molecular structure file of the molecule.
 
-        This bypasses the need for writing functions in ``rdkit``.
-        These have issues with large molecules due to poor ring finding
-        and sanitization issues.
+        This function will write the format based on the extension
+        of `path`.
+
+        #. ``.mol``, ``.sdf`` - MDL V3000 file
+        #. ``.xyz`` - XYZ file
+        #. ``.pdb`` - PDB file
 
         Parameters
         ----------
@@ -985,7 +1053,7 @@ class Molecule:
 
     def _write_mdl_mol_file(self, path, atoms, conformer):
         """
-        Writes a V3000 ``.mol`` file of the molecule
+        Write a V3000 ``.mol`` file of the molecule.
 
         This function should not be used directly, only via
         :meth:`write`.
@@ -1013,7 +1081,7 @@ class Molecule:
 
     def _write_xyz_file(self, path, atoms, conformer):
         """
-        Writes a ``.xyz`` file of the molecule
+        Write a ``.xyz`` file of the molecule.
 
         This function should not be used directly, only via
         :meth:`write`.
@@ -1054,7 +1122,7 @@ class Molecule:
 
     def _write_pdb_file(self, path, atoms, conformer):
         """
-        Writes a ``.pdb`` file of the molecule
+        Write a ``.pdb`` file of the molecule.
 
         This function should not be used directly, only via
         :meth:`write`.
