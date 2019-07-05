@@ -367,7 +367,7 @@ class Molecule:
 
         Parameters
         ----------
-        atom_ids : :class:`list` of :class:`int`, optional
+        atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should be used to calculate the
             center of mass. If ``None``, then all atoms will be used.
 
@@ -387,6 +387,12 @@ class Molecule:
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
+        else:
+            # Iterable needs to be converted to a list because
+            # atom_ids will need to be iterated through twice, once
+            # when passed to get_atom_coords and once when passed to
+            # zip.
+            atom_ids = list(atom_ids)
 
         center = np.array([0., 0., 0.])
         total_mass = 0.
@@ -432,7 +438,7 @@ class Molecule:
 
         Parameters
         ----------
-        atom_ids : :class:`list` of :class:`int`, optional
+        atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should be used to calculate the
             vector. If ``None``, then all atoms will be used.
 
@@ -448,6 +454,10 @@ class Molecule:
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
+        else:
+            # Need to be able to use an iterable as an index for
+            # a numpy array, so needs to be converted to list.
+            atom_ids = list(atom_ids)
 
         pos = self.get_position_matrix(False, conformer)[:, atom_ids]
         return np.linalg.svd(pos - pos.mean(axis=1))[-1][0]
@@ -458,7 +468,7 @@ class Molecule:
 
         Parameters
         ----------
-        atom_ids : :class:`list` of :class:`int`, optional
+        atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should be used to calculate the
             plane. If ``None``, then all atoms will be used.
 
@@ -474,6 +484,10 @@ class Molecule:
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
+        else:
+            # Need to be able to use an iterable as an index for
+            # a numpy array, so needs to be converted to list.
+            atom_ids = list(atom_ids)
 
         pos = self.get_position_matrix(False, conformer)[:, atom_ids]
         centroid = self.get_centroid(atom_ids, conformer)
@@ -635,13 +649,13 @@ class Molecule:
 
         return cls.init_from_dict(json_dict, load_names)
 
-    def to_mdl_mol_block(self, atoms=None, conformer=-1):
+    def to_mdl_mol_block(self, atom_ids=None, conformer=-1):
         """
         Return a V3000 mol block of the molecule.
 
         Parameters
         ----------
-        atoms : :class:`set` of :class:`int`, optional
+        atom_ids : :class:`iterable` of :class:`int`, optional
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
 
@@ -664,12 +678,15 @@ class Molecule:
         except ValueError:
             pass
 
-        if atoms is None:
-            atoms = range(self.mol.GetNumAtoms())
+        if atom_ids is None:
+            atom_ids = range(self.mol.GetNumAtoms())
 
-        n_atoms = len(atoms)
         atom_lines = []
-        for atom_id in atoms:
+        # This set gets used by bonds.
+        atoms = set()
+        for i, atom_id in enumerate(atom_ids, 1):
+            atoms.add(atom_id)
+
             x, y, z = self.atom_coords(atom_id, conformer)
             symbol = self.atom_symbol(atom_id)
             charge = self.mol.GetAtomWithIdx(atom_id).GetFormalCharge()
@@ -680,17 +697,15 @@ class Molecule:
                 )
             )
         atom_block = ''.join(atom_lines)
+        num_atoms = i
 
-        # Convert to set because membership is going to be checked by
-        # bonds.
-        atoms = set(atoms)
         bond_lines = []
         for bond in self.mol.GetBonds():
             a1 = bond.GetBeginAtomIdx()
             a2 = bond.GetEndAtomIdx()
             if a1 in atoms and a2 in atoms:
                 # Keep bond ids if all bonds are getting written.
-                if n_atoms == self.mol.GetNumAtoms():
+                if num_atoms == self.mol.GetNumAtoms():
                     bond_id = bond.GetIdx()
                 else:
                     bond_id = len(bond_lines)
@@ -699,7 +714,7 @@ class Molecule:
                     f'M  V30 {bond_id+1} {bond_type} {a1+1} {a2+1}\n'
                 )
 
-        n_bonds = len(bond_lines)
+        num_bonds = len(bond_lines)
         bond_block = ''.join(bond_lines)
 
         return (
@@ -708,7 +723,7 @@ class Molecule:
             '\n'
             '  0  0  0  0  0  0  0  0  0  0999 V3000\n'
             'M  V30 BEGIN CTAB\n'
-            f'M  V30 COUNTS {n_atoms} {n_bonds} 0 0 0\n'
+            f'M  V30 COUNTS {num_atoms} {num_bonds} 0 0 0\n'
             'M  V30 BEGIN ATOM\n'
             f'{atom_block}'
             'M  V30 END ATOM\n'
@@ -1014,7 +1029,7 @@ class Molecule:
         rdkit.AssignAtomChiralTagsFromStructure(self._mol, conformer)
         rdkit.AssignStereochemistry(self._mol, True, True, True)
 
-    def write(self, path, atoms=None, conformer=-1):
+    def write(self, path, atom_ids=None, conformer=-1):
         """
         Write a molecular structure file of the molecule.
 
@@ -1030,7 +1045,7 @@ class Molecule:
         path : :class:`str`
             The `path` to which the molecule should be written.
 
-        atoms : :class:`list` of :class:`int`, optional
+        atom_ids : :class:`iterable` of :class:`int`, optional
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
 
@@ -1052,9 +1067,9 @@ class Molecule:
 
         _, ext = os.path.splitext(path)
         write_func = write_funcs[ext]
-        write_func(path, atoms, conformer)
+        write_func(path, atom_ids, conformer)
 
-    def _write_mdl_mol_file(self, path, atoms, conformer):
+    def _write_mdl_mol_file(self, path, atom_ids, conformer):
         """
         Write a V3000 ``.mol`` file of the molecule.
 
@@ -1066,7 +1081,7 @@ class Molecule:
         path : :class:`str`
             The full path to the file being written.
 
-        atoms : :class:`list` of :class:`int`
+        atom_ids : :class:`iterable` of :class:`int`
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
 
@@ -1080,9 +1095,9 @@ class Molecule:
         """
 
         with open(path, 'w') as f:
-            f.write(self.mdl_mol_block(atoms, conformer))
+            f.write(self.mdl_mol_block(atom_ids, conformer))
 
-    def _write_xyz_file(self, path, atoms, conformer):
+    def _write_xyz_file(self, path, atom_ids, conformer):
         """
         Write a ``.xyz`` file of the molecule.
 
@@ -1094,7 +1109,7 @@ class Molecule:
         path : :class:`str`
             The full path to the file being written.
 
-        atoms : :class:`list` of :class:`int`
+        atom_ids : :class:`iterable` of :class:`int`
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
 
@@ -1109,21 +1124,21 @@ class Molecule:
 
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
-        if atoms is None:
-            atoms = range(self.mol.GetNumAtoms())
+        if atom_ids is None:
+            atom_ids = range(self.mol.GetNumAtoms())
 
-        num_atoms = str(len(atoms))
-
-        content = [f'{num_atoms}\n\n']
-        for atom_id in atoms:
+        content = [0]
+        for i, atom_id in enumerate(atom_ids, 1):
             x, y, z = self.atom_coords(atom_id, conformer)
             symbol = self.atom_symbol(atom_id)
             content.append(f'{symbol} {x:f} {y:f} {z:f}\n')
+        # Set first line to the atom_count.
+        content[0] = f'{i}\n\n'
 
-        with open(path, "w") as xyz:
+        with open(path, 'w') as xyz:
             xyz.write(''.join(content))
 
-    def _write_pdb_file(self, path, atoms, conformer):
+    def _write_pdb_file(self, path, atom_ids, conformer):
         """
         Write a ``.pdb`` file of the molecule.
 
@@ -1135,7 +1150,7 @@ class Molecule:
         path : :class:`str`
             The full path to the file being written.
 
-        atoms : :class:`list` of :class:`int`
+        atom_ids : :class:`iterable` of :class:`int`
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
 
@@ -1148,8 +1163,8 @@ class Molecule:
 
         """
 
-        if atoms is None:
-            atoms = range(self.mol.GetNumAtoms())
+        if atom_ids is None:
+            atom_ids = range(self.mol.GetNumAtoms())
 
         if conformer == -1:
             conformer = self.mol.GetConformer(conformer).GetId()
@@ -1164,7 +1179,12 @@ class Molecule:
         i_code = ''
         occupancy = '1.00'
         temp_factor = '0.00'
-        for atom in atoms:
+
+        # This set will be used by bonds.
+        atoms = set()
+        for atom in atom_ids:
+            atoms.add(atom)
+
             serial = atom+1
             element = self.atom_symbol(atom)
             atom_counts[element] = atom_counts.get(element, 0) + 1
@@ -1185,9 +1205,6 @@ class Molecule:
                 f'{element:>2}{charge:>2}\n'
             )
 
-        # Convert to set because membership is going to be checked by
-        # bonds.
-        atoms = set(atoms)
         conect = 'CONECT'
         for bond in self.mol.GetBonds():
             a1 = bond.GetBeginAtomIdx()
