@@ -7,9 +7,10 @@ from scipy.spatial.distance import euclidean
 
 from ...utilities import (
     normalize_vector,
+    vector_theta,
     rotation_matrix,
-    mol_from_mae_file,
     rotation_matrix_arbitrary_axis,
+    mol_from_mae_file,
     remake,
     periodic_table
 )
@@ -301,6 +302,86 @@ class Molecule:
         self.set_position_matrix(rot_mat @ pos_mat, conformer)
 
         # Restore original position.
+        self.apply_displacement(origin, conformer)
+        return self
+
+    def apply_rotation_to_minimize_theta(
+        self,
+        v1,
+        v2,
+        axis,
+        origin,
+        conformer=-1
+    ):
+        """
+        Rotates the molecule to minimize angle between `v1` and `v2`.
+
+        Parameters
+        ----------
+        v1 : :class:`numpy.ndarray`
+            The vector which is rotated.
+
+        v2 : :class:`numpy.ndarray`
+            The vector which is stationary.
+
+        axis : :class:`numpy.ndarray`
+            The vector about which the rotation happens.
+
+        origin : :class:`numpy.ndarray`
+            The origin about which the rotation happens.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The molecule is returned.
+
+        """
+
+        # If the vector being rotated is not finite exit. This is
+        # probably due to a planar molecule.
+        if not all(np.isfinite(x) for x in v1):
+            return self
+
+        self.apply_displacement(-origin, conformer)
+
+        # 1. First transform the problem.
+        # 2. The rotation axis is set equal to the z-axis.
+        # 3. Apply this transformation to all vectors in the problem.
+        # 4. Take only the x and y components of `v1` and `v2`.
+        # 5. Work out the angle between them.
+        # 6. Apply that rotation along the original rotation axis.
+
+        rotmat = rotation_matrix(axis, [0, 0, 1])
+        tstart = np.dot(rotmat, v1)
+        tstart = np.array([tstart[0], tstart[1], 0])
+
+        # If the `tstart` vector is 0 after these transformations it
+        # means that it is parallel to the rotation axis, stop.
+        if np.allclose(tstart, [0, 0, 0], 1e-8):
+            self.apply_displacement(origin, conformer)
+            return self
+
+        tend = np.dot(rotmat, v2)
+        tend = np.array([tend[0], tend[1], 0])
+        angle = vector_theta(tstart, tend)
+
+        # Check in which direction the rotation should go.
+        # This is done by applying the rotation in each direction and
+        # seeing which one leads to a smaller theta.
+        r1 = rotation_matrix_arbitrary_axis(angle, [0, 0, 1])
+        t1 = vector_theta(np.dot(r1, tstart), tend)
+        r2 = rotation_matrix_arbitrary_axis(-angle, [0, 0, 1])
+        t2 = vector_theta(np.dot(r2, tstart), tend)
+
+        if t2 < t1:
+            angle *= -1
+
+        rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
+        pos_mat = self.get_position_matrix(conformer=conformer)
+        self.set_position_matrix(rot_mat @ pos_mat, conformer)
         self.apply_displacement(origin, conformer)
         return self
 
