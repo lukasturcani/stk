@@ -132,7 +132,7 @@ class Molecule:
     @classmethod
     def init_from_dict(self, json_dict, load_names=True):
         """
-        Creates a :class:`Molecule` from a JSON :class:`dict`.
+        Create a :class:`Molecule` from a JSON :class:`dict`.
 
         The :class:`Molecule` returned has the class specified in
         `json_dict`, not :class:`Molecule`.
@@ -245,7 +245,7 @@ class Molecule:
         conformer=-1
     ):
         """
-        Rotates the molecule by a rotation from `start` to `end`.
+        Rotate the molecule by a rotation from `start` to `end`.
 
         Given two direction vectors, `start` and `end`, this method
         applies the rotation required transform `start` to `end` onto
@@ -310,7 +310,7 @@ class Molecule:
 
         Parameters
         ----------
-        atom_ids : :class:`list` of :class:`int`, optional
+        atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of the atoms whose coordinates are desired.
             If ``None``, then the coordinates of all atoms will be
             yielded.
@@ -403,7 +403,7 @@ class Molecule:
 
         Parameters
         ----------
-        atom_ids : :class:`list` of :class:`int`, optional
+        atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which are used to calculate the
             centroid. If ``None``, then all atoms will be used.
 
@@ -420,8 +420,11 @@ class Molecule:
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
 
+        sum_ = 0
         coords = self.get_atom_coords(atom_ids, conformer)
-        return sum(coords) / len(atom_ids)
+        for i, coord in enumerate(coords, 1):
+            sum_ += coord
+        return sum_ / i
 
     def get_direction(self, atom_ids=None, conformer=-1):
         """
@@ -478,7 +481,7 @@ class Molecule:
 
     def get_position_matrix(self, atom_columns=True, conformer=-1):
         """
-        Returns a matrix holding the atomic positions of a conformer.
+        Return a matrix holding the atomic positions of a conformer.
 
         Parameters
         ----------
@@ -583,7 +586,7 @@ class Molecule:
     @property
     def inchi(self):
         """
-        Returns the InChI of the molecule.
+        Return the InChI of the molecule.
 
         Returns
         -------
@@ -757,7 +760,7 @@ class Molecule:
 
     def update_from_file(self, path, conformer=-1):
         """
-        Updates the molecular structure from a file.
+        Update the molecular structure from a file.
 
         Multiple file types are supported, namely:
 
