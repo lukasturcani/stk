@@ -242,13 +242,13 @@ class FunctionalGroup:
 
     """
 
-    def __init__(self, id_, atom_ids, bonder_ids, deleter_ids, info):
+    def __init__(self, id, atom_ids, bonder_ids, deleter_ids, info):
         """
         Initialize a functional group.
 
         Parameters
         ----------
-        id_ : :class:`int`
+        id : :class:`int`
             The id of the functional group.
 
         atom_ids : :class:`tuple` of :class:`int`
@@ -267,7 +267,7 @@ class FunctionalGroup:
 
         """
 
-        self.id = id_
+        self.id = id
         self.atom_ids = atom_ids
         self.bonder_ids = bonder_ids
         self.deleter_ids = deleter_ids
@@ -278,13 +278,13 @@ class FunctionalGroup:
         else:
             self.info = info
 
-    def shifted_fg(self, id_, shift):
+    def shifted_fg(self, id, shift):
         """
         Create a new :class:`FunctionalGroup` with shifted ids.
 
         Parameters
         ----------
-        id_ : :class:`int`
+        id : :class:`int`
             The id of the new functional group.
 
         shift : :class:`int`
@@ -302,7 +302,7 @@ class FunctionalGroup:
         bonder_ids = tuple(id + shift for id in self.bonder_ids)
         deleter_ids = tuple(id + shift for id in self.deleter_ids)
 
-        return self.__class__(id_=id_,
+        return self.__class__(id=id,
                               atom_ids=atom_ids,
                               bonder_ids=bonder_ids,
                               deleter_ids=deleter_ids,
@@ -398,7 +398,7 @@ class FunctionalGroup:
         return id(self)
 
     def __repr__(self):
-        return (f"FunctionalGroup(id_={self.id!r}, "
+        return (f"FunctionalGroup(id={self.id!r}, "
                 f"atom_ids={self.atom_ids!r}, "
                 f"bonder_ids={self.bonder_ids!r}, "
                 f"deleter_ids={self.deleter_ids!r}, "
@@ -429,7 +429,7 @@ class Reactor:
     .. code-block:: python
 
         # Represents a functional group found in mol.
-        fg1 = FunctionalGroup(id_=0,
+        fg1 = FunctionalGroup(id=0,
                               atom_ids=[1, 34, 3],
                               bonder_ids=[1],
                               deleter_ids=[34, 3],
@@ -437,7 +437,7 @@ class Reactor:
         )
 
         # Represents another functional group found in mol.
-        fg2 = FunctionalGroup(id_=1,
+        fg2 = FunctionalGroup(id=1,
                               atom_ids=[10, 2, 12],
                               bonder_ids=[12],
                               deleter_ids=[2, 10],

@@ -1,25 +1,62 @@
 import json
 import os
 import numpy as np
-import networkx as nx
 import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
-from rdkit.Chem import rdMolTransforms
 from scipy.spatial.distance import euclidean
-from sklearn.metrics.pairwise import euclidean_distances
-from collections import defaultdict
 
-from ...utilities import (normalize_vector,
-                          rotation_matrix,
-                          mol_from_mae_file,
-                          rotation_matrix_arbitrary_axis,
-                          atom_vdw_radii,
-                          remake,
-                          periodic_table)
+from ...utilities import (
+    normalize_vector,
+    rotation_matrix,
+    mol_from_mae_file,
+    rotation_matrix_arbitrary_axis,
+    remake,
+    periodic_table
+)
 
 
 class MoleculeSubclassError(Exception):
     ...
+
+
+class Atom:
+    """
+    Base class for atoms.
+
+    A subclass is made for each element. The name of each elemental
+    class is the periodic table symbol.
+
+    Attributes
+    ----------
+    atomic_number : :class:`int`
+        A class attribute. Specifies the atomic number.
+
+    """
+
+    ...
+
+
+class Bond:
+    """
+    Represents an atomic bond.
+
+    Attributes
+    ----------
+    order : :class:`float`
+        The bond order.
+
+    atom1 : :class:`Atom`
+        The first atom in the bond.
+
+    atom2 : :class:`Atom`
+        The second atom in the bond.
+
+    """
+
+    def __init__(self, order, atom1, atom2):
+        self.order = order
+        self.atom1 = atom1
+        self.atom2 = atom2
 
 
 class Molecule:
@@ -33,329 +70,45 @@ class Molecule:
 
     Attributes
     ----------
-    mol : :class:`rdkit.Mol`
-        A :mod:`rdkit` molecule instance representing the molecule.
+    atoms : :class:`tuple` of :class:`.Atom`
+        The atoms which compose the molecule.
+
+    bonds : :class:`tuple` of :class:`.Bond`
+        The bonds of the molecule.
 
     inchi : :class:`str`
         The InChI of the molecule.
-
-    atom_props : :class:`dict`
-        Maps atom id to a :class:`dict` holding the properties of
-        that atom. For example
-
-        .. code-block:: python
-
-            atom_props = {0: {'prop1': 0,
-                              'prop2': 'value1',
-                              'prop3': 10.},
-
-                          5: {'prop1': 'value2',
-                              'prop5': 2.0}}
 
     name : :class:`str`
         A name which can be optionally given to the molecule for easy
         identification.
 
-    note : :class:`str`
-        A note or comment about the molecule. Purely optional but can
-        be useful for labelling and debugging.
+    key : :class:`object`
+        A hashable :class:`object`. This attribute will be the same
+        for molecules of the same class, which have the same structure.
+        A private method :meth:`_generate_key` must be defined for
+        each subclass of :class:`.Molecule` and it will be used to
+        generate the :attr:`key`.
+
+    cache : :class:`dict`
+        This is a class attribute. Which maps :attr:`key` to the
+        :class:`.Molecule` instance with that :attr:`key`.
+
+    _mol : :class:`rdkit.Mol`
+        A :mod:`rdkit` molecule instance representing the molecule.
+
+    Methods
+    -------
 
     """
 
     subclasses = {}
 
-    def __init__(self, name="", note=""):
+    def __init__(self, name):
         self.name = name
-        self.note = note
-        self.atom_props = defaultdict(dict)
-
-    def __init_subclass__(cls, **kwargs):
-        if cls.__name__ in cls.subclasses:
-            msg = 'Subclass with this name already exists.'
-            raise MoleculeSubclassError(msg)
-        cls.subclasses[cls.__name__] = cls
-        super().__init_subclass__(**kwargs)
-
-    def all_atom_coords(self, conformer=-1):
-        """
-        Yields the coordinates of atoms in :attr:`mol`.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Yields
-        ------
-        :class:`tuple`
-            The yielded :class:`tuple` has the form
-
-            .. code-block:: python
-
-                (32, numpy.array([12, 34, 3]))
-
-            Where the first element is the atom id and the second
-            element is an array holding the coordinates of the atom.
-
-        """
-
-        # Get the conformer from the rdkit instance.
-        conf = self.mol.GetConformer(conformer)
-
-        # Go through all the atoms and ask the conformer to return
-        # the position of each atom. This is done by supplying the
-        # conformers `GetAtomPosition` method with the atom's id.
-        for atom in self.mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            atom_position = conf.GetAtomPosition(atom_id)
-            yield atom_id, np.array([*atom_position])
-
-    def atom_centroid(self, atom_ids, conformer=-1):
-        """
-        Return the centroid of a group of atoms.
-
-        Parameters
-        ----------
-        atom_ids : :class:`list` of :class:`int`
-            The ids of atoms which which are used to calculate the
-            centroid.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            The centroid of atoms specified by `atom_ids`.
-
-        """
-
-        coords = (self.atom_coords(a, conformer) for a in atom_ids)
-        return sum(coords) / len(atom_ids)
-
-    def atom_coords(self, atom_id, conformer=-1):
-        """
-        Return coordinates of an atom.
-
-        Parameters
-        ----------
-        atom_id : :class:`int`
-            The id of the atom whose coordinates are desired.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            An array holding the x, y and z coordinates of the atom.
-
-        """
-
-        conf = self.mol.GetConformer(conformer)
-        return np.array(conf.GetAtomPosition(atom_id))
-
-    def atom_distance(self, atom1_id, atom2_id, conformer=-1):
-        """
-        Return the distance between 2 atoms.
-
-        Parameters
-        ----------
-        atom1_id : :class:`int`
-            The id of the first atom.
-
-        atom2_id : :class:`int`
-            The id of the second atom.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        :class:`scipy.double`
-            The distance between the first and second atoms.
-
-        """
-
-        # Get the atomic positions of each atom and use the scipy
-        # function to calculate their distance in Euclidean space.
-        atom1_coords = self.atom_coords(atom1_id, conformer)
-        atom2_coords = self.atom_coords(atom2_id, conformer)
-        return euclidean(atom1_coords, atom2_coords)
-
-    def atom_symbol(self, atom_id):
-        """
-        Returns the symbol of the atom with id `atom_id`.
-
-        Parameters
-        ----------
-        atom_id : :class:`int`
-            The id number of the atom.
-
-        Returns
-        -------
-        :class:`str`
-            The atomic symbol of the atom.
-
-        """
-
-        return self.mol.GetAtomWithIdx(atom_id).GetSymbol()
-
-    def center_of_mass(self, conformer=-1):
-        """
-        Returns the centre of mass of the molecule.
-
-        Parameters
-        ---------
-        conformer : :class:`int`, optional
-            The id of the conformer to use.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            An array holding the coordinates of the center of mass.
-
-        References
-        ----------
-        https://en.wikipedia.org/wiki/Center_of_mass
-
-        """
-
-        center = np.array([0., 0., 0.])
-        total_mass = 0.
-        for atom_id, coord in self.all_atom_coords(conformer):
-            mass = self.mol.GetAtomWithIdx(atom_id).GetMass()
-            total_mass += mass
-            center += mass*coord
-        return np.divide(center, total_mass)
-
-    def centroid(self, conformer=-1):
-        """
-        Returns the centroid of the molecule.
-
-        Parameters
-        ---------
-        conformer : :class:`int`, optional
-            The id of the conformer to use.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            A numpy array holding the position of the centroid.
-
-        """
-
-        coords = (
-            coord for _, coord in self.all_atom_coords(conformer)
-        )
-        return sum(coords) / self.mol.GetNumAtoms()
-
-    def core(self):
-        """
-        Return the molecule with no H or functional group atoms.
-
-        Returns
-        -------
-        :class:`rdkit.Mol`
-            The "core" of the molecule.
-
-        """
-
-        emol = rdkit.EditableMol(self.mol)
-        for atom in reversed(self.mol.GetAtoms()):
-            atomid = atom.GetIdx()
-            if not self.is_core_atom(atomid):
-                emol.RemoveAtom(atomid)
-        return emol.GetMol()
-
-    def dihedral_strain(self,
-                        dihedral_SMARTS='',
-                        target=180,
-                        conformer=-1):
-        """
-        Returns the difference between the average dihedral and target.
-
-        The differences is a returned as a percent.
-
-        Parameters
-        ----------
-        dihedral_SMARTS : :class:`str`
-            The SMARTS code for the dihedral of interest.
-
-        target : :class:`float`
-            Float representing the target value for the dihedral angle.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        :class:`float`
-            The percent difference between the average dihedral in the
-            molecule and the target value.
-
-        """
-
-        match = rdkit.MolFromSmarts(dihedral_SMARTS)
-        atoms_dihedral = self.mol.GetSubstructMatches(match)
-
-        dihedral_info = []
-        if len(atoms_dihedral) > 0 and len(atoms_dihedral[0]) != 0:
-            for atoms_group in atoms_dihedral:
-                # Calculate the dihedral angle.
-                dihedral_value = rdMolTransforms.GetDihedralDeg(
-                    self.mol.GetConformer(conformer),
-                    atoms_group[0],
-                    atoms_group[1],
-                    atoms_group[2],
-                    atoms_group[3])
-                # Check that the dihedral is calculated in the right
-                # direction.
-                if abs(dihedral_value) > 90:
-                    dihedral_value = abs(dihedral_value)
-                else:
-                    dihedral_value = 180 - abs(dihedral_value)
-
-                dihedral_info.append(dihedral_value)
-
-            # Calculate the average dihedral value.
-            avg_dihedral = np.mean([abs(x) for x in dihedral_info])
-            # Calculate the relative diff with the target dihedral
-            # value.
-            diff = (abs(target - avg_dihedral) / target) * 100
-        else:
-            # If the molecule does not contain the bond, give 1%
-            # strain.
-            diff = 1
-
-        return diff
-
-    def dump(self, path, include_attrs=None):
-        """
-        Writes a JSON :class:`dict` of the molecule to a file.
-
-        Parameters
-        ----------
-        path : :class:`str`
-            The full path to the file to which the JSON dict should be
-            written.
-
-        include_attrs : :class:`list` of :class:`str`, optional
-            The names of attributes of the molecule to be added to
-            the JSON. Each attribute is saved as a string using
-            :func:`repr`.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        with open(path, 'w') as f:
-            json.dump(self.json(include_attrs), f, indent=4)
 
     @classmethod
-    def from_dict(self, json_dict, load_names=True):
+    def init_from_dict(self, json_dict, load_names=True):
         """
         Creates a :class:`Molecule` from a JSON :class:`dict`.
 
@@ -384,32 +137,300 @@ class Molecule:
         json_dict['load_names'] = load_names
         return c._json_init(json_dict)
 
-    def graph(self):
+    def __init_subclass__(cls, **kwargs):
+        if cls.__name__ in cls.subclasses:
+            msg = 'Subclass with this name already exists.'
+            raise MoleculeSubclassError(msg)
+        cls.subclasses[cls.__name__] = cls
+        cls.cache = {}
+        super().__init_subclass__(**kwargs)
+
+    def apply_displacement(self, displacement, conformer=-1):
         """
-        Returns a mathematical graph representing the molecule.
+        Shift the molecule by `displacement`.
+
+        Parameters
+        ----------
+        displacement : :class:`numpy.ndarray`
+            A displacement vector applied to the molecule.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
 
         Returns
         -------
-        :class:`networkx.Graph`
-            A graph where the nodes are the ids of the atoms and the
-            edges are the bonds.
+        :class:`.Molecule`
+            The molecule is returned.
 
         """
 
-        # Create a graph instance and add the atom ids as nodes. Use
-        # the atom ids from each end of a bond to define edges. Do this
-        # for all bonds to account for all edges.
+        position_matrix = self.get_position_matrix(False, conformer)
+        self.set_position_matrix(
+            position_matrix=(position_matrix+displacement).T,
+            conformer=conformer
+        )
+        return self
 
-        graph = nx.Graph()
+    def apply_rotation(self, theta, axis, origin, conformer=-1):
+        """
+        Rotate the molecule by `theta` about `axis` on the `origin`.
 
-        for atom in self.mol.GetAtoms():
-            graph.add_node(atom.GetIdx())
+        Parameters
+        ----------
+        theta : :class:`float`
+            The size of the rotation in radians.
 
-        for bond in self.mol.GetBonds():
-            graph.add_edge(bond.GetBeginAtomIdx(),
-                           bond.GetEndAtomIdx())
+        axis : :class:`numpy.ndarray`
+            The axis about which the rotation happens.
 
-        return graph
+        origin : :class:`numpy.ndarray`
+            The origin about which the rotation happens.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The molecule is returned.
+
+        """
+
+        # Set the origin of the rotation to the origin.
+        self.apply_displacement(-origin, conformer)
+        # Get the rotation matrix.
+        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
+        # Apply the rotation matrix on the position matrix, to get the
+        # new position matrix.
+        pos_mat = self.get_position_matrix(conformer=conformer)
+        # Apply the rotation.
+        self.set_position_matrix(rot_mat @ pos_mat, conformer)
+        # Return the centroid of the molecule to the original position.
+        self.apply_displacement(origin, conformer)
+        return self
+
+    def get_atom_coords(self, atom_ids=None, conformer=-1):
+        """
+        Yield the coordinates of atoms.
+
+        Parameters
+        ----------
+        atom_ids : :class:`list` of :class:`int`, optional
+            The ids of the atoms whose coordinates are desired.
+            If ``None``, then the coordinates of all atoms will be
+            yielded.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Yields
+        ------
+        :class:`numpy.ndarray`
+            An array holding the x, y and z coordinates of the
+            next atom.
+
+        """
+
+        if atom_ids is None:
+            atom_ids = range(len(self.atoms))
+
+        conf = self._mol.GetConformer(conformer)
+        for atom_id in atom_ids:
+            yield np.array(conf.GetAtomPosition(atom_id))
+
+    def get_atom_distance(self, atom1_id, atom2_id, conformer=-1):
+        """
+        Return the distance between 2 atoms.
+
+        Parameters
+        ----------
+        atom1_id : :class:`int`
+            The id of the first atom.
+
+        atom2_id : :class:`int`
+            The id of the second atom.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Returns
+        -------
+        :class:`float`
+            The distance between the first and second atoms.
+
+        """
+
+        coords = self.get_atom_coords(
+            atom_ids=(atom1_id, atom2_id),
+            conformer=conformer
+        )
+        return float(euclidean(*coords))
+
+    def get_center_of_mass(self, atom_ids=None, conformer=-1):
+        """
+        Return the centre of mass of a group of atoms.
+
+        Parameters
+        ----------
+        atom_ids : :class:`list` of :class:`int`, optional
+            The ids of atoms which should be used to calculate the
+            center of mass. If ``None``, then all atoms will be used.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            An array holding the coordinates of the center of mass.
+
+        References
+        ----------
+        https://en.wikipedia.org/wiki/Center_of_mass
+
+        """
+
+        if atom_ids is None:
+            atom_ids = range(len(self.atoms))
+
+        center = np.array([0., 0., 0.])
+        total_mass = 0.
+        coords = self.get_atom_coords(atom_ids, conformer)
+        for atom_id, coord in zip(atom_ids, coords):
+            mass = self.atoms[atom_id].mass
+            total_mass += mass
+            center += mass*coord
+        return np.divide(center, total_mass)
+
+    def get_centroid(self, atom_ids=None, conformer=-1):
+        """
+        Return the centroid of a group of atoms.
+
+        Parameters
+        ----------
+        atom_ids : :class:`list` of :class:`int`, optional
+            The ids of atoms which are used to calculate the
+            centroid. If ``None``, then all atoms will be used.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The centroid of atoms specified by `atom_ids`.
+
+        """
+
+        if atom_ids is None:
+            atom_ids = range(len(self.atoms))
+
+        coords = self.get_atom_coords(atom_ids, conformer)
+        return sum(coords) / len(atom_ids)
+
+    def get_direction(self, atom_ids=None, conformer=-1):
+        """
+        Return a vector of best fit through the molecule's atoms.
+
+        Parameters
+        ----------
+        atom_ids : :class:`list` of :class:`int`, optional
+            The ids of atoms which should be used to calculate the
+            vector. If ``None``, then all atoms will be used.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The vector of best fit.
+
+        """
+
+        if atom_ids is None:
+            atom_ids = range(len(self.atoms))
+
+        pos = self.get_position_matrix(False, conformer)[:, atom_ids]
+        return np.linalg.svd(pos - pos.mean(axis=1))[-1][0]
+
+    def get_plane_normal(self, atom_ids=None, conformer=-1):
+        """
+        Return the normal to the plane of best fit.
+
+        Parameters
+        ----------
+        atom_ids : :class:`list` of :class:`int`, optional
+            The ids of atoms which should be used to calculate the
+            plane. If ``None``, then all atoms will be used.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Vector orthonormal to the plane of the molecule.
+
+        """
+
+        if atom_ids is None:
+            atom_ids = range(len(self.atoms))
+
+        pos = self.get_position_matrix(False, conformer)[:, atom_ids]
+        centroid = self.get_centroid(atom_ids, conformer)
+        return np.linalg.svd(pos - centroid)[-1][2, :]
+
+    def get_position_matrix(self, atom_columns=True, conformer=-1):
+        """
+        Returns a matrix holding the atomic positions of a conformer.
+
+        Parameters
+        ----------
+        atom_columns : :class:`bool`, optional
+            The matrix has a shape of ``[3, n]`` if this is ``True``
+            and ``[n, 3]`` if it is ``False``.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The array has the shape ``[3, n]``. Each column holds the
+            x, y and z coordinates of a bonder centroid. The index of
+            the column corresponds to the atom id.
+
+        """
+
+        if atom_columns:
+            self._mol.GetConformer(conformer).GetPositions().T
+        else:
+            self._mol.GetConformer(conformer).GetPositions()
+
+    def dump(self, path, include_attrs=None):
+        """
+        Write a JSON :class:`dict` of the molecule to a file.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path to the file to which the JSON dict should be
+            written.
+
+        include_attrs : :class:`list` of :class:`str`, optional
+            The names of attributes of the molecule to be added to
+            the JSON. Each attribute is saved as a string using
+            :func:`repr`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        with open(path, 'w') as f:
+            json.dump(self.to_json(include_attrs), f, indent=4)
 
     @property
     def inchi(self):
@@ -423,68 +444,21 @@ class Molecule:
 
         """
 
-        self.update_stereochemistry()
+        self._update_stereochemistry()
         return rdkit.MolToInchi(self.mol)
 
-    def is_core_atom(self, atom_id):
+    @staticmethod
+    def _generate_key(*args, **kwargs):
         """
-        Returns ``True`` if atom is not H or part of a fg.
-
-        Parameters
-        ----------
-        atom_id : :class:`int`
-            The id of the atom being queried.
-
-        Returns
-        -------
-        :class:`bool`
-            Indicates whether the atom with `atom_id` is part of the
-            core.
 
         """
 
-        atom = self.mol.GetAtomWithIdx(atom_id)
-        if atom.GetAtomicNum() == 1:
-            return False
-        return all(
-            atom_id not in fg.atom_ids for fg in self.func_groups
-        )
-
-    def direction(self, exclude_ids=None, conformer=-1):
-        """
-        Find the direction of the molecule or its atoms.
-
-        Parameters
-        ----------
-        excluded_ids : :class:`list` of :class:`int`
-            The ids of atoms exluded from the direction calculation.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            Direction vector of the molecule (excluding `exclude_ids`).
-
-        """
-
-        conf = self.mol.GetConformer(conformer)
-        xyz = np.array(conf.GetPositions())
-
-        if exclude_ids is not None:
-            xyz = np.delete(xyz, exclude_ids, axis=0)
-
-        xyzmean = xyz.mean(axis=0)
-
-        *_, vh = np.linalg.svd(xyz - xyzmean)
-
-        return vh[0]
+        raise NotImplementedError()
 
     @classmethod
     def load(cls, path, load_names=True):
         """
-        Creates a :class:`Molecule` from a JSON file.
+        Create a :class:`Molecule` from a JSON file.
 
         The returned :class:`Molecule` has the class specified in the
         JSON file, not :class:`Molecule`.
@@ -508,43 +482,11 @@ class Molecule:
         with open(path, 'r') as f:
             json_dict = json.load(f)
 
-        return cls.from_dict(json_dict, load_names)
+        return cls.init_from_dict(json_dict, load_names)
 
-    def max_diameter(self, conformer=-1):
+    def to_mdl_mol_block(self, atoms=None, conformer=-1):
         """
-        Returns the largest distance between 2 atoms in the molecule.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The id of the conformer to use.
-
-        Returns
-        -------
-        :class:`tuple` of form (float, int, int)
-            A :class:`tuple` of the form
-
-            .. code-block:: python
-
-                max_diameter = (312.3, 4, 54)
-
-            Where the first element is the largest inter-atomic
-            distance in the molecule. The next 2 elements are the ids
-            of the involved atoms.
-
-        """
-
-        coords = self.mol.GetConformer(conformer).GetPositions()
-        dist = euclidean_distances(coords, coords)
-        vdw = np.array([[atom_vdw_radii[self.atom_symbol(i)] for
-                        i in range(self.mol.GetNumAtoms())]])
-        dist = dist + vdw + vdw.T
-        maxid1, maxid2 = np.unravel_index(dist.argmax(), dist.shape)
-        return dist[maxid1, maxid2], int(maxid1), int(maxid2)
-
-    def mdl_mol_block(self, atoms=None, conformer=-1):
-        """
-        Returns a V3000 mol block of the molecule.
+        Return a V3000 mol block of the molecule.
 
         Parameters
         ----------
@@ -628,63 +570,7 @@ class Molecule:
             '$$$$\n'
         )
 
-    def plane_normal(self, atom_ids=None, conformer=-1):
-        """
-        Find the best fit plane of the molecule or its atoms.
-
-        Parameters
-        ----------
-        atom_ids : :class:`list` of :class:`int`, optional
-            The ids of the atoms that are assumed to be on the plane.
-            Only their coordinates will be used for fitting.
-            If ``None`` then atoms forming the largest cycle are found
-            prior to fitting the plane.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to be used.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            Vector orthonormal to the plane of the molecule.
-
-        """
-
-        if atom_ids is None:
-            atom_ids = self.cycle_atoms(conformer=conformer)
-
-        conf = self.mol.GetConformer(conformer)
-
-        xyz = np.array(list(conf.GetAtomPosition(atom)
-                       for atom in atom_ids))
-
-        G = xyz.sum(axis=0) / xyz.shape[0]
-
-        *_, vh = np.linalg.svd(xyz - G)
-
-        return vh[2, :]
-
-    def position_matrix(self, conformer=-1):
-        """
-        Returns a matrix holding the atomic positions of a conformer.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            The array has the shape ``[3, n]``. Each column holds the
-            x, y and z coordinates of a bonder centroid. The index of
-            the column corresponds to the atom id.
-
-        """
-
-        return self.mol.GetConformer(conformer).GetPositions().T
-
-    def same(self, other):
+    def is_same_molecule(self, other):
         """
         Check if `other` has the same molecular structure.
 
@@ -702,67 +588,6 @@ class Molecule:
         """
 
         return self.inchi == other.inchi
-
-    def save_rdkit_atom_props(self, prop_names):
-        """
-        Updates :attr:`~.Molecule.atom_props` with rdkit atom tags.
-
-        Parameters
-        ----------
-        prop_names : :class:`set` of :class:`str`
-            The names of atom properties which should be saved.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for atom in self.mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            props = atom.GetPropsAsDict()
-            valid_props = props.keys() & prop_names
-            for prop_name in valid_props:
-                self.atom_props[atom_id][prop_name] = props[prop_name]
-
-    def rotate(self, theta, axis, conformer=-1):
-        """
-        Rotates the molecule by `theta` about `axis`.
-
-        The rotation occurs about the molecular centroid.
-
-        Parameters
-        ----------
-        theta : :class:`float`
-            The size of the rotation in radians.
-
-        axis : :class:`numpy.ndarray`
-            The axis about which the rotation happens.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to use.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # Save the original position.
-        og_position = self.centroid(conformer)
-        # Move the centroid of the molecule to the origin, so that the
-        # rotation occurs about this point.
-        self.set_position([0, 0, 0], conformer)
-        # Get the rotation matrix.
-        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
-        # Apply the rotation matrix on the position matrix, to get the
-        # new position matrix.
-        pos_mat = self.mol.GetConformer(conformer).GetPositions()
-        new_pos_mat = rot_mat @ pos_mat.T
-        # Apply the rotation.
-        self.set_position_from_matrix(new_pos_mat, conformer)
-        # Return the centroid of the molecule to the origin position.
-        self.set_position(og_position, conformer)
 
     def set_orientation(self, start, end, conformer=-1):
         """
@@ -835,62 +660,47 @@ class Molecule:
 
         return self.mol
 
-    def set_position(self, position, conformer=-1):
+    def set_centroid(self, position, conformer=-1):
         """
-        Sets the centroid of the molecule to `position`.
+        Set the centroid of the molecule to `position`.
 
         Parameters
         ----------
         position : :class:`numpy.ndarray`
             This array holds the position on which the centroid of the
-            molecule should be placed.
+            molecule is going to be placed.
 
         conformer : :class:`int`, optional
             The id of the conformer to be used.
 
         Returns
         -------
-        :class:`rdkit.Mol`
-            The ``rdkit`` molecule with the centroid placed at
-            `position`. This is the same instance as that in
-            :attr:`Molecule.mol`.
+        :class:`Molecule`
+            The molecule is returned.
 
         """
 
-        if conformer == -1:
-            conformer = self.mol.GetConformer(conformer).GetId()
+        centroid = self.get_centroid(conformer=conformer)
+        self.apply_displacement(-centroid, conformer)
+        return self
 
-        # Get the original centroid.
-        centroid = self.centroid(conformer)
-        # Find out how much it needs to shift to reach `position`.
-        shift = np.expand_dims(position - centroid, axis=1)
-        # Apply the shift.
-        positions = self.position_matrix(conformer)
-        self.set_position_from_matrix(positions+shift, conformer)
-        return self.mol
-
-    def set_position_from_matrix(self, pos_mat, conformer=-1):
+    def set_position_matrix(self, position_matrix, conformer=-1):
         """
-        Set atomic positions of the molecule to those in `pos_mat`.
+        Set the molecule's coordinates to those in `position_matrix`.
 
         Parameters
         ----------
-        pos_mat : :class:`numpy.ndarray`
-            The matrix holds the coordinates on which the atoms of the
-            molecule should be placed.
-
-            The shape of the matrix is ``[3, n]``. Each column of
-            `pos_mat` represents the coordinates of a single atom. The
-            1st column sets the coordinates of the atom with id of 0.
-            The next column sets the coordinates of the atom with id 1,
-            and so on.
+        position_matrix : :class:`numpy.ndarray`
+            A position matrix of the molecule. The shape of the matrix
+            is ``[3, n]``.
 
         conformer : :class:`int`, optional
             The id of the conformer to be used.
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`Molecule`
+            The molecule is returned.
 
         """
 
@@ -900,75 +710,6 @@ class Molecule:
                                       coord_mat.item(1),
                                       coord_mat.item(2))
             conf.SetAtomPosition(i, coord)
-
-    def shift(self, shift, conformer=-1):
-        """
-        Shifts the coordinates of all atoms.
-
-        This does not modify the molecule. A modified copy is returned.
-
-        Parameters
-        ----------
-        shift : :class:`numpy.ndarray`
-            A numpy array holding the value of the shift along each
-            axis.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to use.
-
-        Returns
-        -------
-        :class:`rdkit.Mol`
-            A copy of the molecule where the coordinates have been
-            shifted by `shift`.
-
-        """
-
-        # The function does not modify the existing conformer, as a
-        # result a new instance is created and used for modification.
-        conf = rdkit.Conformer(self.mol.GetConformer(conformer))
-
-        # For each atom, get the atomic positions from the conformer
-        # and shift them. Create a new geometry instance from these new
-        # coordinate values. The geometry instance is used by rdkit to
-        # store the coordinates of atoms. Finally, set the conformers
-        # atomic position to the values stored in this newly generated
-        # geometry instance.
-        for atom in self.mol.GetAtoms():
-
-            # Remember the id of the atom you are currently using. It
-            # is used to change the position of the correct atom at the
-            # end of the loop.
-            atom_id = atom.GetIdx()
-
-            # `atom_position` in an instance holding in the x, y and z
-            # coordinates of an atom in its 'x', 'y' and 'z'
-            # attributes.
-            atom_position = np.array(conf.GetAtomPosition(atom_id))
-
-            # Inducing the shift.
-            new_atom_position = atom_position + shift
-
-            # Creating a new geometry instance.
-            new_coords = rdkit_geo.Point3D(*new_atom_position)
-
-            # Changes the position of the atom in the conformer to the
-            # values stored in the new geometry instance.
-            conf.SetAtomPosition(atom_id, new_coords)
-
-        # Create a new copy of the rdkit molecule instance representing
-        # the molecule - the original instance is not to be modified.
-        new_mol = rdkit.Mol(self.mol)
-
-        # The new rdkit molecule was copied from the one held in the
-        # `mol` attribute, as result it has a copy of its conformer. To
-        # prevent the rdkit molecule from holding multiple conformers
-        # the `RemoveAllConformers` method is run first. The shifted
-        # conformer is then given to the rdkit molecule, which is
-        # returned.
-        new_mol.RemoveAllConformers()
-        new_mol.AddConformer(conf)
-        return new_mol
 
     def update_cache(self):
         """
@@ -1185,7 +926,7 @@ class Molecule:
         new_coords = np.array(new_coords).T
         self.set_position_from_matrix(new_coords, conformer=conformer)
 
-    def update_stereochemistry(self, conformer=-1):
+    def _update_stereochemistry(self, conformer=-1):
         """
         Updates stereochemistry tags in :attr:`Molecule.mol`.
 
@@ -1200,10 +941,10 @@ class Molecule:
 
         """
 
-        for atom in self.mol.GetAtoms():
+        for atom in self._mol.GetAtoms():
             atom.UpdatePropertyCache()
-        rdkit.AssignAtomChiralTagsFromStructure(self.mol, conformer)
-        rdkit.AssignStereochemistry(self.mol, True, True, True)
+        rdkit.AssignAtomChiralTagsFromStructure(self._mol, conformer)
+        rdkit.AssignStereochemistry(self._mol, True, True, True)
 
     def write(self, path, atoms=None, conformer=-1):
         """

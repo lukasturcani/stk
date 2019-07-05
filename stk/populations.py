@@ -1043,7 +1043,9 @@ class Population:
 
         .. code-block:: python
 
-            population.get_max(lambda mol: mol.max_diameter())
+            # diameter is a function which takes a Molecule and returns
+            # its diameter.
+            population.get_max(diameter)
 
         """
 
@@ -1070,11 +1072,13 @@ class Population:
 
         Examples
         --------
-        Get the mean max-width of molecules in the
-        :class:`.Population`.
+        Get the mean diameter of molecules in the :class:`.Population`.
 
         .. code-block:: python
-            population.get_mean(lambda mol: mol.max_diameter())
+
+            # diameter is a function which takes a Molecule and returns
+            # its diameter.
+            population.get_mean(diameter)
 
         """
 
@@ -1109,7 +1113,9 @@ class Population:
 
         .. code-block:: python
 
-            population.get_min(lambda mol: mol.max_diameter())
+            # diameter is a function which takes a Molecule and returns
+            # its diameter.
+            population.get_min(diameter)
 
         """
 
