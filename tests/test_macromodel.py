@@ -122,3 +122,73 @@ def test_unrestricted_md(tmp_cc3, macromodel_path):
 def test_energy(amine2, macromodel_path):
     mm = stk.MacroModelEnergy(macromodel_path, 'energy_calc')
     assert mm.energy(amine2) < mm.energy(amine2, 1)
+
+
+def test_forcefield_com_exceptions(cc3):
+    with pytest.raises(stk.MacroModelInputError):
+        mm = stk.MacroModelForceField(
+            macromodel_path='dummy_path',
+            maximum_iterations=1000000
+        )
+
+    with pytest.raises(stk.MacroModelInputError):
+        mm = stk.MacroModelForceField(
+            macromodel_path='dummy_path',
+            minimum_gradient=0.00001
+        )
+
+
+def test_md_com_exceptions(tmp_cc3):
+    with pytest.raises(stk.MacroModelInputError):
+        mm = stk.MacroModelMD(
+            macromodel_path='dummy_path',
+            conformers=10000
+        )
+
+    with pytest.raises(stk.MacroModelInputError):
+        mm = stk.MacroModelMD(
+            macromodel_path='dummy_path',
+            simulation_time=1000000
+        )
+
+    with pytest.raises(stk.MacroModelInputError):
+        mm = stk.MacroModelMD(
+            macromodel_path='dummy_path',
+            time_step=100000
+        )
+
+    with pytest.raises(stk.MacroModelInputError):
+        mm = stk.MacroModelMD(
+            macromodel_path='dummy_path',
+            eq_time=1000000
+        )
+
+    with pytest.raises(stk.MacroModelInputError):
+        mm = stk.MacroModelMD(
+            macromodel_path='dummy_path',
+            maximum_iterations=1000000
+        )
+
+    with pytest.raises(stk.MacroModelInputError):
+        mm = stk.MacroModelMD(
+            macromodel_path='dummy_path',
+            minimum_gradient=0.00001
+        )
+
+    tmp_cc3._file = join(outdir, 'com_test.mol')
+
+    mm = stk.MacroModelMD(
+        macromodel_path='dummy_path',
+        simulation_time=100000,
+        eq_time=100000
+    )
+
+    mm.generate_com(tmp_cc3)
+    with open(join(outdir, 'com_test.com'), 'r') as o:
+        comfile = o.read().splitlines()
+        expect1 = (' MDYN       0      0      0      0     1.0000 -10'
+                   '00.0000   300.0000     0.0000')
+        expect2 = (' MDYN       1      0      0      0     1.0000 -10'
+                   '00.0000   300.0000     0.0000')
+        assert comfile[5] == expect1
+        assert comfile[7] == expect2
