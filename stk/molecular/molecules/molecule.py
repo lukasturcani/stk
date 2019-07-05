@@ -186,7 +186,7 @@ class Molecule:
 
         """
 
-        position_matrix = self.get_position_matrix(False, conformer)
+        position_matrix = self.get_position_matrix(conformer).T
         self.set_position_matrix(
             position_matrix=(position_matrix+displacement).T,
             conformer=conformer
@@ -459,7 +459,7 @@ class Molecule:
             # a numpy array, so needs to be converted to list.
             atom_ids = list(atom_ids)
 
-        pos = self.get_position_matrix(False, conformer)[:, atom_ids]
+        pos = self.get_position_matrix(conformer).T[:, atom_ids]
         return np.linalg.svd(pos - pos.mean(axis=1))[-1][0]
 
     def get_plane_normal(self, atom_ids=None, conformer=-1):
@@ -489,20 +489,16 @@ class Molecule:
             # a numpy array, so needs to be converted to list.
             atom_ids = list(atom_ids)
 
-        pos = self.get_position_matrix(False, conformer)[:, atom_ids]
+        pos = self.get_position_matrix(conformer).T[:, atom_ids]
         centroid = self.get_centroid(atom_ids, conformer)
         return np.linalg.svd(pos - centroid)[-1][2, :]
 
-    def get_position_matrix(self, atom_columns=True, conformer=-1):
+    def get_position_matrix(self, conformer=-1):
         """
         Return a matrix holding the atomic positions of a conformer.
 
         Parameters
         ----------
-        atom_columns : :class:`bool`, optional
-            The matrix has a shape of ``[3, n]`` if this is ``True``
-            and ``[n, 3]`` if it is ``False``.
-
         conformer : :class:`int`, optional
             The conformer to use.
 
@@ -515,10 +511,7 @@ class Molecule:
 
         """
 
-        if atom_columns:
-            self._mol.GetConformer(conformer).GetPositions().T
-        else:
-            self._mol.GetConformer(conformer).GetPositions()
+        return self._mol.GetConformer(conformer).GetPositions().T
 
     def set_centroid(self, position, conformer=-1):
         """
