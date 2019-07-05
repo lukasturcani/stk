@@ -1,13 +1,3 @@
-from ...utilities import OPTIONS
-
-from .cage import *
-from .constructed_molecule import *
 from .molecule import *
-from .periodic import *
-from .polymer import *
-from .struct_unit import *
-from .macrocycle import *
-from .rotaxane import *
-
-# Toggle the caching of molecules.
-OPTIONS['cache'] = True
+from .building_block import *
+from .constructed_molecule import *
