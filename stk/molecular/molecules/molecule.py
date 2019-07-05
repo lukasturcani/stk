@@ -4,6 +4,7 @@ import numpy as np
 import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
 from scipy.spatial.distance import euclidean
+from inspect import signature
 
 from ...utilities import (
     normalize_vector,
@@ -60,7 +61,17 @@ class Bond:
         self.atom2 = atom2
 
 
-class Molecule:
+class _Cached(type):
+    def __call__(cls, *args, **kwargs):
+        key = cls._generate_key(*args, **kwargs)
+        sig = signature(cls.__init__).bind_partial(*args, **kwargs)
+        sig.apply_defaults()
+        if sig.arguments['use_cache'] and key in cls._cache:
+            return cls._cache[key]
+        return super().__call__(*args, **kwargs)
+
+
+class Molecule(metaclass=_Cached):
     """
     The most basic class representing molecules.
 
@@ -77,19 +88,16 @@ class Molecule:
     bonds : :class:`tuple` of :class:`.Bond`
         The bonds of the molecule.
 
-    inchi : :class:`str`
-        The InChI of the molecule.
+    _cache : :class:`dict`
+        This is a class attribute. It maps :attr:`_key` to the
+        :class:`.Molecule` instance with that :attr:`_key`.
 
-    key : :class:`object`
+    _key : :class:`object`
         A hashable :class:`object`. This attribute will be the same
         for molecules of the same class, which have the same structure.
         A private method :meth:`_generate_key` must be defined for
         each subclass of :class:`.Molecule` and it will be used to
-        generate the :attr:`key`.
-
-    cache : :class:`dict`
-        This is a class attribute. Which maps :attr:`key` to the
-        :class:`.Molecule` instance with that :attr:`key`.
+        generate the :attr:`_key`.
 
     _mol : :class:`rdkit.Mol`
         A :mod:`rdkit` molecule instance representing the
@@ -102,6 +110,7 @@ class Molecule:
     :meth:`apply_displacement`
     :meth:`apply_rotation_about_axis`
     :meth:`apply_rotation_between_vectors`
+    :meth:`apply_rotation_to_minimize_theta`
     :meth:`get_atom_coords`
     :meth:`get_atom_distance`
     :meth:`get_center_of_mass`
@@ -114,6 +123,7 @@ class Molecule:
     :meth:`dump`
     :meth:`load`
     :meth:`to_mdl_mol_block`
+    :meth:`to_rdkit_mol`
     :meth:`is_same_molecule`
     :meth:`update_cache`
     :meth:`update_from_file`
@@ -153,7 +163,7 @@ class Molecule:
             msg = 'Subclass with this name already exists.'
             raise MoleculeSubclassError(msg)
         cls.subclasses[cls.__name__] = cls
-        cls.cache = {}
+        cls._cache = {}
         super().__init_subclass__(**kwargs)
 
     def apply_displacement(self, displacement, conformer=-1):
@@ -659,27 +669,7 @@ class Molecule:
         with open(path, 'w') as f:
             json.dump(self.to_json(include_attrs), f, indent=4)
 
-    @property
-    def inchi(self):
-        """
-        Return the InChI of the molecule.
-
-        Returns
-        -------
-        :class:`str`
-            The InChI of the molecule.
-
-        """
-
-        self._update_stereochemistry()
-        return rdkit.MolToInchi(self.mol)
-
-    @staticmethod
     def _generate_key(*args, **kwargs):
-        """
-
-        """
-
         raise NotImplementedError()
 
     @classmethod
@@ -828,7 +818,10 @@ class Molecule:
 
     def update_cache(self):
         """
-        Update attributes of cached molecule.
+        Update attributes of the cached molecule.
+
+        If there is no identical molecule in the cache, then this
+        molecule is added.
 
         Using ``multiprocessing`` returns modified copies of molecules.
         In order to ensure that the cached molecules have
@@ -841,8 +834,11 @@ class Molecule:
 
         """
 
-        if self.key in self.__class__.cache:
-            self.__class__.cache[self.key].__dict__ = dict(vars(self))
+        if self._key in self.__class__._cache:
+            d = dict(vars(self))
+            self.__class__._cache[self._key].__dict__ = d
+        else:
+            self.__class__._cache[self._key] = self
 
     def update_from_file(self, path, conformer=-1):
         """
@@ -1079,26 +1075,6 @@ class Molecule:
         # Update the structure.
         new_coords = np.array(new_coords).T
         self.set_position_from_matrix(new_coords, conformer=conformer)
-
-    def _update_stereochemistry(self, conformer=-1):
-        """
-        Update stereochemistry tags in :attr:`Molecule._mol`.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for atom in self._mol.GetAtoms():
-            atom.UpdatePropertyCache()
-        rdkit.AssignAtomChiralTagsFromStructure(self._mol, conformer)
-        rdkit.AssignStereochemistry(self._mol, True, True, True)
 
     def write(self, path, atom_ids=None, conformer=-1):
         """
