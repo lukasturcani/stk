@@ -59,14 +59,26 @@ class BuildingBlock(Molecule):
     func_group_infos : :class:`tuple` of :class:`.FGInfo`
         The functional group types present in the molecule.
 
-    key : :class:`object`
-        Extends :class:`.Molecule.key`. :class:`BulidingBlock`
+    _key : :class:`object`
+        Extends :class:`.Molecule._key`. :class:`BulidingBlock`
         molecules with the same structure and with the same functional
         groups will have equal keys. Used for caching.
 
     Methods
     -------
-
+    :meth:`__init__`
+    :meth:`init_random`
+    :meth:`init_from_smiles`
+    :meth:`get_bonder_ids`
+    :meth:`get_bonder_centroids`
+    :meth:`get_bonder_plane`
+    :meth:`get_bonder_plane_normal`
+    :meth:`get_bonder_distances`
+    :meth:`get_bonder_direction_vectors`
+    :meth:`get_centroid_centroid_direction_vector`
+    :meth:`get_functional_groups`
+    :meth:`to_json`
+    :meth:`shift_fgs`
 
     """
 
@@ -98,12 +110,7 @@ class BuildingBlock(Molecule):
         ),
     }
 
-    def __init__(
-        self,
-        mol,
-        functional_groups=None,
-        use_cache=False
-    ):
+    def __init__(self, mol, functional_groups=None, use_cache=False):
         """
         Initialize a :class:`BuildingBlock` instance.
 
@@ -124,10 +131,11 @@ class BuildingBlock(Molecule):
             `file`, no tagging is done.
 
         use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` molecule will
-            not be made if one with the same :attr:`key`
-            already exists in the :attr:`~.Molecule.cache`. The one
-            found in the :attr:`~.Molecule.cache` will be returned.
+            If ``True``, a new :class:`.BuildingBlock` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`BuildingBlock` does not
+            yet exist the created one will be added to the cache.
 
         """
 
@@ -139,21 +147,23 @@ class BuildingBlock(Molecule):
                     raise TypeError(
                         f'Unable to initialize from "{ext}" files.'
                     )
-                self.mol = remake(self._init_funcs[ext](mol))
+                self._mol = remake(self._init_funcs[ext](mol))
 
             else:
-                self.mol = remake(
-                    rdkit.MolFromMolBlock(molBlock=mol,
-                                          removeHs=False,
-                                          sanitize=False)
+                self._mol = remake(
+                    rdkit.MolFromMolBlock(
+                        molBlock=mol,
+                        removeHs=False,
+                        sanitize=False
+                    )
                 )
 
         elif isinstance(mol, rdkit.Mol):
-            self.mol = remake(mol)
+            self._mol = remake(mol)
 
         # Update the property cache of each atom. This updates things
         # like valence.
-        for atom in self.mol.GetAtoms():
+        for atom in self._mol.GetAtoms():
             atom.UpdatePropertyCache()
 
         # If no functional group names passed, check if any functional
@@ -198,10 +208,11 @@ class BuildingBlock(Molecule):
             path of the files.
 
         use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` molecule will
-            not be made if one with the same :attr:`key`
-            already exists in the :attr:`~.Molecule.cache`. The one
-            found in the :attr:`~.Molecule.cache` will be returned.
+            If ``True``, a new :class:`.BuildingBlock` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`BuildingBlock` does not
+            yet exist the created one will be added to the cache.
 
         Returns
         -------
@@ -260,10 +271,11 @@ class BuildingBlock(Molecule):
             Random seed passed to :func:`rdkit.ETKDG`
 
         use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` molecule will
-            not be made if one with the same :attr:`key`
-            already exists in the :attr:`~.Molecule.cache`. The one
-            found in the :attr:`~.Molecule.cache` will be returned.
+            If ``True``, a new :class:`.BuildingBlock` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`BuildingBlock` does not
+            yet exist the created one will be added to the cache.
 
         Returns
         -------
@@ -279,9 +291,9 @@ class BuildingBlock(Molecule):
         mol = rdkit.MolFromSmiles(smiles)
         rdkit.SanitizeMol(mol)
         H_mol = rdkit.AddHs(mol)
-        key = cls._generate_key(H_mol, functional_groups)
-        if key in cls.cache and use_cache:
-            return cls.cache[key]
+        key = cls._generate_key(H_mol, functional_groups, None)
+        if key in cls._cache and use_cache:
+            return cls._cache[key]
 
         params = rdkit.ETKDGv2()
         params.randomSeed = random_seed
@@ -304,7 +316,7 @@ class BuildingBlock(Molecule):
         mol.GetConformer()
         obj = cls.__new__(cls)
         obj.file = smiles
-        obj.key = key
+        obj._key = key
         obj.mol = mol
         obj.func_groups = tuple(
             obj.functional_groups(functional_groups)
@@ -315,7 +327,8 @@ class BuildingBlock(Molecule):
         ))
 
         super().__init__()
-        cls.cache[key] = obj
+        if use_cache:
+            cls._cache[key] = obj
         return obj
 
     @classmethod
@@ -346,9 +359,11 @@ class BuildingBlock(Molecule):
         obj.mol.GetConformer().SetId(conf_id)
 
         for conf_id, mol_block in confs:
-            conf_mol = rdkit.MolFromMolBlock(molBlock=mol_block,
-                                             removeHs=False,
-                                             sanitize=False)
+            conf_mol = rdkit.MolFromMolBlock(
+                molBlock=mol_block,
+                removeHs=False,
+                sanitize=False
+            )
             conf = conf_mol.GetConformer()
             conf.SetId(conf_id)
             obj.mol.AddConformer(conf)
@@ -827,19 +842,30 @@ class BuildingBlock(Molecule):
 
         return json
 
-    @staticmethod
-    def _generate_key(rdkit_mol, functional_groups):
+    @classmethod
+    def _generate_key(cls, mol, functional_groups, use_cache):
         """
         Generate the key used for caching the molecule.
 
         Parameters
         ----------
-        rdkit_mol : :class:`rdkit.Mol`
-            An :mod:`rdkit` instance of the molecule.
+        mol : :class:`str` or :class:`rdkit.Mol`
+            Can be one of 3 things:
 
-        functional_groups : :class:`tuple` of :class:`str`
-            The name of the functional groups being used during
-            construction.
+                1. A path to a molecular structure file.
+                2. A :class:`rdkit.Mol` object.
+                3. V3000 MDL Mol block.
+
+        functional_groups : :class:`list` of :class:`str`
+            The names of the functional groups which are to have atoms
+            tagged. If ``None``, a functional group name found in the
+            path `file`  is used. If no functional groups are provided
+            to this parameter and the name of one is not present in
+            `file`, no tagging is done.
+
+        use_cache : :class:`bool`
+            This argument is ignored but included to be maintain
+            compatiblity the the :meth:`__init__` signature.
 
         Returns
         -------
@@ -852,8 +878,30 @@ class BuildingBlock(Molecule):
 
         """
 
+        if isinstance(mol, str):
+            if os.path.exists(mol):
+                _, ext = os.path.splitext(mol)
+
+                if ext not in cls._init_funcs:
+                    raise TypeError(
+                        f'Unable to initialize from "{ext}" files.'
+                    )
+                mol = remake(cls._init_funcs[ext](mol))
+
+            else:
+                mol = remake(
+                    rdkit.MolFromMolBlock(
+                        molBlock=mol,
+                        removeHs=False,
+                        sanitize=False
+                    )
+                )
+
+        elif isinstance(mol, rdkit.Mol):
+            mol = remake(mol)
+
         functional_groups = sorted(functional_groups)
-        return (*functional_groups, rdkit.MolToInchi(rdkit_mol))
+        return (*functional_groups, rdkit.MolToInchi(mol))
 
     def shift_fgs(self, new_ids, shift):
         """
@@ -879,7 +927,7 @@ class BuildingBlock(Molecule):
             yield fg.shifted_fg(id_=id_, shift=shift)
 
     def __str__(self):
-        return f'{self.__class__.__name__} {list(self.key)}'
+        return f'{self.__class__.__name__} {list(self._key)}'
 
     def __repr__(self):
         return str(self)
