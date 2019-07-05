@@ -136,48 +136,19 @@ class does the construction of the molecule from the building blocks.
 import logging
 import rdkit.Chem.AllChem as rdkit
 from collections import Counter, defaultdict
-from inspect import signature
 
 from .molecule import Molecule
 from .. import topologies
 from ..functional_groups import FunctionalGroup
-from ...utilities import OPTIONS
 
 logger = logging.getLogger(__name__)
-
-
-class Cached(type):
-    """
-    A metaclass for creating classes which create cached instances.
-
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.cache = dict()
-
-    def __call__(self, *args, **kwargs):
-        sig = signature(self.__init__)
-        sig = sig.bind_partial(self, *args, **kwargs)
-        sig.apply_defaults()
-        sig = sig.arguments
-        key = self.gen_key(sig['building_blocks'], sig['topology'])
-
-        if key in self.cache and OPTIONS['cache']:
-            return self.cache[key]
-        else:
-            obj = super().__call__(*args, **kwargs)
-            obj.key = key
-            if OPTIONS['cache']:
-                self.cache[key] = obj
-            return obj
 
 
 class ConstructionError(Exception):
     ...
 
 
-class ConstructedMolecule(Molecule, metaclass=Cached):
+class ConstructedMolecule(Molecule):
     """
     Represents constructed molecules.
 
@@ -242,9 +213,8 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         self,
         building_blocks,
         topology,
-        name='',
-        note='',
-        bb_conformers=None
+        bb_conformers=None,
+        use_cache=False
     ):
         """
         Initialize a :class:`ConstructedMolecule` instance.
@@ -263,18 +233,18 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
             Defines the topology of the :class:`ConstructedMolecule`
             and constructs it.
 
-        name : :class:`str`, optional
-            A name which can be given to the molecule for easy
-            identification.
-
-        note : :class:`str`, optional
-            A note or comment about the molecule.
-
         bb_conformers : :class:`list` of :class:`int`, optional
             The ids of the building block conformers to be used. Must
             be equal in length to `building_blocks` and orders must
             correspond. If ``None``, then ``-1`` is used for all
             building blocks.
+
+        use_cache : :class:`bool`, optional
+            If ``True``, a new :class:`.ConstructedMolecule` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`ConstructedMolecule` does
+            not yet exist the created one will be added to the cache.
 
         """
 
@@ -320,12 +290,11 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         for id_, func_group in enumerate(self.func_groups):
             func_group.id = id_
 
-        super().__init__(name, note)
-        self.save_rdkit_atom_props({'mol_index', 'bb_index'})
+        super().__init__()
 
     def add_conformer(self, bb_conformers):
         """
-        Constructs a new conformer.
+        Construct a new conformer.
 
         Parameters
         ----------
@@ -343,7 +312,7 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         """
 
         # Save the original rdkit molecule.
-        original_mol = self.mol
+        original_mol = self._mol
         # Construct a new molecule.
         try:
             # Ask the ``Topology`` instance to construct the
@@ -352,7 +321,7 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
             self.topology.construct(self, bb_conformers)
 
         except Exception as ex:
-            self.mol = original_mol
+            self._mol = original_mol
             errormsg = (
                 'Construction failure.\n'
                 '\n'
@@ -383,15 +352,15 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
             func_group.id = id_
 
         # Get the new conformer.
-        new_conf = rdkit.Conformer(self.mol.GetConformer())
+        new_conf = rdkit.Conformer(self._mol.GetConformer())
         # Add it to the original molecule.
         new_id = original_mol.AddConformer(new_conf, True)
-        self.mol = original_mol
+        self._mol = original_mol
         return new_id
 
     def building_block_cores(self, bb):
         """
-        Yields the "cores" of the building block molecules.
+        Yield the "cores" of the building block molecules.
 
         The structure of the yielded cores has the geometry found in
         the :class:`ConstructedMolecule`.
@@ -418,14 +387,14 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
                 mols[props['mol_index']].add(atom_id)
 
         for mol in mols.values():
-            core = rdkit.EditableMol(self.mol)
-            for atom in reversed(range(self.mol.GetNumAtoms())):
+            core = rdkit.EditableMol(self._mol)
+            for atom in reversed(range(self._mol.GetNumAtoms())):
                 if atom not in mol:
                     core.RemoveAtom(atom)
 
             yield core.GetMol()
 
-    def json(self, include_attrs=None):
+    def to_json(self, include_attrs=None):
         """
         Returns a JSON representation of the molecule.
 
@@ -439,11 +408,6 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
                                  block of the molecule.''',
                 'building_blocks' : {bb1.json(), bb2.json()},
                 'topology' : 'Copolymer(repeating_unit="AB")',
-                'note' : 'A nice molecule.',
-                'name' : 'Poly-Benzene',
-                'atom_props': {
-                    0: {'prop1': 1.0, 'prop2': 'value1'}
-                }
             }
 
         Parameters
@@ -464,8 +428,11 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
             include_attrs = []
 
         conformers = [
-            (conf.GetId(), self.mdl_mol_block(conformer=conf.GetId()))
-            for conf in self.mol.GetConformers()
+            (
+                conf.GetId(),
+                self.to_mdl_mol_block(conformer=conf.GetId())
+            )
+            for conf in self._mol.GetConformers()
         ]
 
         json = {
@@ -480,9 +447,6 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
                 x.json() for x in self.building_blocks
             ],
             'topology': repr(self.topology),
-            'note': self.note,
-            'name': self.name,
-            'atom_props': self.atom_props,
             'func_groups': repr(self.func_groups)
 
         }
@@ -493,9 +457,9 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         return json
 
     @classmethod
-    def _json_init(cls, json_dict):
+    def _init_from_json(cls, json_dict, use_cache):
         """
-        Completes a JSON initialization.
+        Initialize from a JSON representation.
 
         This function is not to be used. Use :meth:`.Molecule.load`
         for loading instances from a JSON string. That function will
@@ -506,9 +470,17 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         json_dict : :class:`dict`
             A dictionary holding the attribute data of the molecule.
 
+        use_cache : :class:`bool`
+            If ``True``, a new :class:`.ConstructedMolecule` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`ConstructedMolecule` does
+            not yet exist the created one will be added to the cache.
+
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`ConstructedMolecule`
+            The molecule.
 
         """
 
@@ -523,19 +495,19 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
         bbs = list(bb_counter)
         topology = eval(d.pop('topology'),  topologies.__dict__)
 
-        key = cls.gen_key(bbs, topology)
-        if key in cls.cache and OPTIONS['cache']:
+        key = cls._generate_key(bbs, topology)
+        if key in cls._cache and use_cache:
             return cls.cache[key]
 
         obj = cls.__new__(cls)
 
         (conf_id, mol_block), *confs = d.pop('conformers')
-        obj.mol = rdkit.MolFromMolBlock(
+        obj._mol = rdkit.MolFromMolBlock(
             molBlock=mol_block,
             sanitize=False,
             removeHs=False
         )
-        obj.mol.GetConformer().SetId(conf_id)
+        obj._mol.GetConformer().SetId(conf_id)
 
         for conf_id, mol_block in confs:
             conf_mol = rdkit.MolFromMolBlock(
@@ -545,49 +517,59 @@ class ConstructedMolecule(Molecule, metaclass=Cached):
             )
             conf = conf_mol.GetConformer()
             conf.SetId(conf_id)
-            obj.mol.AddConformer(conf)
+            obj._mol.AddConformer(conf)
 
         obj.topology = topology
         obj.bb_counter = bb_counter
         obj.bonds_made = d.pop('bonds_made')
-        obj.note = d.pop('note')
-        obj.name = d.pop('name') if d.pop('load_names') else ''
-        obj.key = key
+        obj._key = key
         obj.building_blocks = bbs
-        obj.atom_props = {
-            int(key): value
-            for key, value in d.pop('atom_props').items()
-        }
+
         # Globals for eval.
         g = {'FunctionalGroup': FunctionalGroup}
         obj.func_groups = tuple(eval(d.pop('func_groups'), g))
-        if OPTIONS['cache']:
-            cls.cache[key] = obj
+        if use_cache:
+            cls._cache[key] = obj
 
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
 
         return obj
 
-    @staticmethod
-    def gen_key(building_blocks, topology):
+    @classmethod
+    def _generate_key(
+        cls,
+        building_blocks,
+        topology,
+        bb_conformers,
+        use_cache
+    ):
         """
         Generates the key used for caching the molecule.
 
         Parameters
         ----------
         building_blocks : :class:`list` of :class:`.BuildingBlock`
-            The building blocks used to construct the
-            :class:`ConstructedMolecule`.
+            The :class:`.BuildingBlock` instances which
+            represent the building block molecules of the
+            :class:`ConstructedMolecule`. Only one
+            :class:`.BuildingBlock` instance is present per building
+            block, even if multiples of that building block join up to
+            form the :class:`ConstructedMolecule`.
 
         topology : :class:`.Topology`
-            The topology used to construct the
-            :class:`ConstructedMolecule`.
+            Defines the topology of the :class:`ConstructedMolecule`
+            and constructs it.
 
-        Returns
-        -------
-        :class:`tuple`
-            The key used for caching the :class:`ConstructedMolecule`.
+        bb_conformers : :class:`list` of :class:`int`
+            The ids of the building block conformers to be used. Must
+            be equal in length to `building_blocks` and orders must
+            correspond. If ``None``, then ``-1`` is used for all
+            building blocks.
+
+        use_cache : :class:`bool`
+            This argument is ignored but included to be maintain
+            compatiblity the the :meth:`__init__` signature.
 
         """
 
