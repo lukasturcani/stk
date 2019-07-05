@@ -1277,7 +1277,8 @@ class XTBExtractor:
 
         """
         self.output_file = output_file
-        # Handle bad default encoding on Windows.
+        # Handle bad default encoding on Windows, which cannot
+        # interpret UTF-8 encoded files by xTB.
         with open(self.output_file, 'r', encoding='UTF-8') as f:
             self.output_lines = f.readlines()
 
