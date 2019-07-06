@@ -398,7 +398,7 @@ class BuildingBlock(Molecule):
             for atom_id in self.func_groups[fg_id].bonder_ids:
                 yield atom_id
 
-    def get_bonder_centroids(self, fg_ids=None, conformer=-1):
+    def get_bonder_centroids(self, fg_ids=None, conformer_id=0):
         """
         Yield the centroids of bonder atoms in functional groups.
 
@@ -416,8 +416,8 @@ class BuildingBlock(Molecule):
             centroids are yielded in ascending order of functional
             group id.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
+        conformer_id : :class:`int`, optional
+            The id of the conformer to use.
 
         Yields
         ------
@@ -432,10 +432,10 @@ class BuildingBlock(Molecule):
         for fg_id in fg_ids:
             yield self.get_centroid(
                 atom_ids=self.func_groups[fg_id].bonder_ids,
-                conformer=conformer
+                conformer_id=conformer_id
             )
 
-    def get_bonder_plane(self, fg_ids=None, conformer=-1):
+    def get_bonder_plane(self, fg_ids=None, conformer_id=0):
         """
         Return coeffs of the plane formed by the bonder centroids.
 
@@ -465,8 +465,8 @@ class BuildingBlock(Molecule):
             If ``None``, all functional groups in the
             :class:`BuildingBlock` will be used.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
+        conformer_id : :class:`int`, optional
+            The id of the conformer to use.
 
         Returns
         -------
@@ -495,16 +495,16 @@ class BuildingBlock(Molecule):
 
         centroid = self.get_centroid(
             atom_ids=self.func_groups[fg_ids[0]].bonder_ids,
-            conformer=conformer
+            conformer_id=conformer_id
         )
         normal = self.get_bonder_plane_normal(
             fg_ids=fg_ids,
-            conformer=conformer
+            conformer_id=conformer_id
         )
         d = -np.sum(normal * centroid)
         return np.append(normal, d)
 
-    def get_bonder_plane_normal(self, fg_ids=None, conformer=-1):
+    def get_bonder_plane_normal(self, fg_ids=None, conformer_id=0):
         """
         Return the normal to the plane formed by bonder centroids.
 
@@ -523,8 +523,8 @@ class BuildingBlock(Molecule):
             If ``None``, all functional groups in the
             :class:`BuildingBlock` will be used.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
+        conformer_id : :class:`int`, optional
+            The id of the conformer to use.
 
         Returns
         -------
@@ -554,22 +554,22 @@ class BuildingBlock(Molecule):
 
         centroids = np.array(list(self.get_bonder_centroids(
             fg_ids=fg_ids,
-            conformer=conformer
+            conformer_id=conformer_id
         )))
         bonder_centroid = self.get_centroid(
             atom_ids=self.get_bonder_ids(fg_ids=fg_ids),
-            conformer=conformer
+            conformer_id=conformer_id
         )
         normal = np.linalg.svd(centroids - bonder_centroid)[-1][2, :]
         cc_vector = self.get_centroid_centroid_direction_vector(
             fg_ids=fg_ids,
-            conformer=conformer
+            conformer_id=conformer_id
         )
         if vector_theta(normal, cc_vector) > np.pi/2:
             normal *= -1
         return normalize_vector(normal)
 
-    def get_bonder_distances(self, fg_ids=None, conformer=-1):
+    def get_bonder_distances(self, fg_ids=None, conformer_id=0):
         """
         Yield distances between pairs of bonder centroids.
 
@@ -582,8 +582,8 @@ class BuildingBlock(Molecule):
             The ids of functional groups to be used.
             If ``None`` then all functional groups are used.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
+        conformer_id : :class:`int`, optional
+            The id of the conformer to use.
 
         Yields
         ------
@@ -602,7 +602,7 @@ class BuildingBlock(Molecule):
         centroids = ((
             i, self.get_centroid(
                 atom_ids=self.func_groups[i].bonder_ids,
-                conformer=conformer
+                conformer_id=conformer_id
             ))
             for i in fg_ids
         )
@@ -610,7 +610,11 @@ class BuildingBlock(Molecule):
         for (id1, c1), (id2, c2) in pairs:
             yield id1, id2, float(euclidean(c1, c2))
 
-    def get_bonder_direction_vectors(self, fg_ids=None, conformer=-1):
+    def get_bonder_direction_vectors(
+        self,
+        fg_ids=None,
+        conformer_id=0
+    ):
         """
         Yield the direction vectors between bonder centroids.
 
@@ -623,8 +627,8 @@ class BuildingBlock(Molecule):
             The ids of functional groups to be used.
             If ``None`` then all functional groups are used.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
+        conformer_id : :class:`int`, optional
+            The id of the conformer to use.
 
         Yields
         ------
@@ -649,7 +653,7 @@ class BuildingBlock(Molecule):
         centroids = ((
             i, self.get_centroid(
                 atom_ids=self.func_groups[i].bonder_ids,
-                conformer=conformer
+                conformer_id=conformer_id
             ))
             for i in fg_ids
         )
@@ -660,7 +664,7 @@ class BuildingBlock(Molecule):
     def get_centroid_centroid_direction_vector(
         self,
         fg_ids=None,
-        conformer=-1
+        conformer_id=0
     ):
         """
         Return the direction vector between the 2 molecular centroids.
@@ -676,8 +680,8 @@ class BuildingBlock(Molecule):
             bonder centroid. If ``None`` then all functional groups are
             used.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
+        conformer_id : :class:`int`, optional
+            The id of the conformer to use.
 
         Returns
         -------
@@ -695,16 +699,16 @@ class BuildingBlock(Molecule):
 
         bonder_centroid = self.get_centroid(
             atom_ids=self.get_bonder_ids(fg_ids=fg_ids),
-            conformer=conformer
+            conformer_id=conformer_id
         )
-        centroid = self.get_centroid(conformer=conformer)
+        centroid = self.get_centroid(conformer_id=conformer_id)
         # If the bonder centroid and centroid are in the same position,
         # the centroid - centroid vector should be orthogonal to the
         # bonder direction vector.
         if np.allclose(centroid, bonder_centroid, 1e-5):
             *_, bvec = self.get_bonder_direction_vectors(
                 fg_ids=fg_ids,
-                conformer=conformer
+                conformer_id=conformer_id
             )
             # Construct a secondary vector by finding the minimum
             # component of bvec and setting it to 0.
