@@ -11,28 +11,8 @@ if not os.path.exists('building_block_tests_output'):
 def test_init(amine2):
     assert len(amine2.func_groups) == 2
     assert amine2.func_groups[0].info.name == 'amine'
-
-    amine2_1 = stk.BuildingBlock(amine2.mol, ['amine'])
-    assert amine2_1.same(amine2)
-
-    mol_block = rdkit.MolToMolBlock(amine2.mol, forceV3000=True)
-    amine2_2 = stk.BuildingBlock(mol_block, ['amine'])
-    assert amine2_2.same(amine2)
-
-    amine2_3 = stk.BuildingBlock(amine2.mol)
-    assert amine2.same(amine2_3)
-
-
-def test_all_bonder_distances(tmp_aldehyde3):
-    coords = np.zeros((3, tmp_aldehyde3.mol.GetNumAtoms()))
-    tmp_aldehyde3.set_position_from_matrix(coords)
-    bonder_distances = tmp_aldehyde3.all_bonder_distances()
-    for i, (id1, id2, d) in enumerate(bonder_distances):
-        assert id1 != id2
-        assert type(id1) is int
-        assert type(id2) is int
-        assert abs(d) < 1e-5
-    assert i == 2
+    assert len(amine2.atoms) == 5
+    assert len(amine2.bonds) == 4
 
 
 def test_bonder_centroids(tmp_aldehyde3):
@@ -45,12 +25,16 @@ def test_bonder_centroids(tmp_aldehyde3):
     assert i == 2
 
 
-def test_bonder_centroid(tmp_aldehyde3):
-    shape = (3, tmp_aldehyde3.mol.GetNumAtoms())
-    tmp_aldehyde3.set_position_from_matrix(np.zeros(shape))
-    centroid = tmp_aldehyde3.bonder_centroid()
-    assert len(centroid) == 3
-    assert sum(centroid) < 1e-5
+def test_bonder_plane():
+    assert False
+
+
+def test_bonder_plane_normal():
+    assert False
+
+
+def test_bonder_distances():
+    assert False
 
 
 def test_bonder_direction_vectors(tmp_aldehyde3):
@@ -69,16 +53,7 @@ def test_bonder_direction_vectors(tmp_aldehyde3):
     assert i == 2
 
 
-def test_bonder_position_matrix(tmp_aldehyde3):
-    shape = (3, tmp_aldehyde3.mol.GetNumAtoms())
-    tmp_aldehyde3.set_position_from_matrix(np.zeros(shape))
-    position_matrix = tmp_aldehyde3.bonder_position_matrix()
-    assert np.allclose(position_matrix,
-                       np.zeros(position_matrix.shape),
-                       atol=1e-8)
-
-
-def test_centroid_centroid_dir_vector(aldehyde3):
+def test_centroid_centroid_direction_vector(aldehyde3):
     c1 = aldehyde3.bonder_centroid()
     c2 = aldehyde3.centroid()
     assert np.allclose(stk.normalize_vector(c2-c1),
@@ -141,13 +116,6 @@ def test_caching():
         stk.OPTIONS['cache'] = False
 
 
-def test_set_bonder_centroid(tmp_amine2):
-    tmp_amine2.set_bonder_centroid([1, 2, 3], 0)
-    assert np.allclose(tmp_amine2.bonder_centroid(0),
-                       [1, 2, 3],
-                       atol=1e-8)
-
-
 def test_shift_fgs(amine4):
     ids = [10, 20, 30, 40]
     shifted = amine4.shift_fgs(ids, 32)
@@ -169,17 +137,3 @@ def test_shift_fgs(amine4):
 def test_pickle(amine2):
     result = pickle.loads(pickle.dumps(amine2))
     assert result.same(amine2)
-
-
-def test_set_orientation2(tmp_amine2):
-    tmp_amine2.set_orientation2([1, 2, 3], 0)
-    vector = next(tmp_amine2.bonder_direction_vectors(0))[-1]
-    assert np.allclose(vector,
-                       stk.normalize_vector([1, 2, 3]),
-                       atol=1e-8)
-
-
-def test_set_orientation2(tmp_aldehyde3):
-    tmp_aldehyde3.set_orientation2([1, 2, 3], 0)
-    assert np.allclose(tmp_aldehyde3.bonder_plane_normal(0),
-                       stk.normalize_vector([1, 2, 3]), atol=1e-4)
