@@ -4,22 +4,20 @@ Defines :class:`.Polymer` topologies.
 """
 
 import numpy as np
-import rdkit.Chem.AllChem as rdkit
 import logging
 
 from .base import TopologyGraph, Vertex, Edge
-from ...utilities import dedupe, add_fragment_props, remake
 
 
 logger = logging.getLogger(__name__)
 
 
 class _LinearVertex(Vertex):
-    def __init__(self, x, y, z, direction):
+    def __init__(self, x, y, z, degree, direction):
         self._direction = np.array([direction, 0, 0])
-        super().__init__(x, y, z, 2)
+        super().__init__(x, y, z, degree)
 
-    def place_building_block(self, bb):
+    def place_building_block(self, bb, conformer_id):
         if len(bb.func_groups) > 2:
             logger.warning(
                 'You are placing a building block which has more than '
@@ -29,32 +27,82 @@ class _LinearVertex(Vertex):
                 'this message.'
             )
 
-        bb.apply_rotation_between_vectors(
-            start=next(bb.get_bonder_direction_vectors(fg_ids=(0, 1))),
-            end=self._direction,
-            origin=bb.get_centroid(bb.get_bonder_ids(fg_ids=(0, 1)))
+        bb.set_centroid(
+            position=self._coord,
+            atom_ids=bb.get_bonder_ids(fg_ids=(0, 1)),
+            conformer_id=conformer_id
         )
-        bb.set_centroid(self._coord)
-        return bb.get_position_matrix()
+        bonder_vector = next(bb.get_bonder_direction_vectors(
+            fg_ids=(0, 1),
+            conformer_id=conformer_id
+        ))
+        bb.apply_rotation_between_vectors(
+            start=bonder_vector,
+            end=self._direction,
+            origin=self._coord,
+            conformer_id=conformer_id
+        )
+        return bb.get_position_matrix(conformer_id=conformer_id)
+
+    def _assign_vertex_positions(self, bb, conformer_id):
+        fg1, fg2 = sorted(
+            iterable=bb.func_groups,
+            key=lambda fg: bb.get_centroid(
+                atom_ids=fg.bonder_ids,
+                conformer_id=conformer_id
+            )[0]
+        )
+        self._positions[0].func_group = fg1
+        self._positions[1].func_group = fg2
 
 
-class _TerminalLinearVertex(_LinearVertex):
+class _TerminalVertex(_LinearVertex):
 
-    def place_building_block(self, bb):
+    def __init__(self, x, y, z, direction):
+        super().__init__(x, y, z, 1, direction)
+
+    def place_building_block(self, bb, conformer_id):
         if len(bb.func_groups) != 1:
-            return super().place_building_block(bb)
+            return super().place_building_block(bb, conformer_id)
 
-        bb.apply_rotation_between_vectors(
-            start=bb.get_centroid_centroid_direction_vector(),
-            end=self._direction,
-            origin=bb.get_centroid(bb.get_bonder_ids())
+        bb.set_centroid(
+            position=self._coord,
+            atom_ids=bb.get_bonder_ids(fg_ids=(0, )),
+            conformer_id=conformer_id
         )
-        bb.set_centroid()
-        return bb.get_position_matrix()
+        centroid_vector = next(
+            bb.get_centroid_centroid_direction_vector(
+                conformer_id=conformer_id
+            )
+        )
+        bb.apply_rotation_between_vectors(
+            start=centroid_vector,
+            end=self._cap_direction,
+            origin=self._coord
+        )
+        return bb.get_position_matrix(conformer_id=conformer_id)
+
+    def _assign_vertex_positions(self, bb, conformer_id):
+        if len(bb.func_groups) != 1:
+            fg2, fg1 = sorted(
+                iterable=bb.func_groups,
+                key=lambda fg: bb.get_centroid(
+                    atom_ids=fg.bonder_ids,
+                    conformer_id=conformer_id
+                )[0]
+            )
+        else:
+            fg1 = bb.func_groups[0]
+
+        self._positions[0].func_group = fg1
 
 
-class _LinearEdge(Edge):
-    ...
+class _HeadVertex(_TerminalVertex):
+    _cap_direction = [-1, 0, 0]
+
+
+class _TailVertex(_TerminalVertex):
+    _cap_direction = [1, 0, 0]
 
 
 class Linear(TopologyGraph):
@@ -129,18 +177,25 @@ class Linear(TopologyGraph):
         self.ends = ends
 
         head, *body, tail = orientation*n
-        vertices = [_TerminalLinearVertex(head)]
+        vertices = [_HeadVertex(0, 0, 0, head)]
         edges = []
         for i, direction in enumerate(body, 1):
-            vertices.append(_LinearVertex(direction))
-            edges.append(_LinearEdge(vertices[i-1], vertices[i]))
+            v = _LinearVertex(
+                x=i, y=0, z=0, degree=2, direction=direction
+            )
+            vertices.append(v)
+            p1 = vertices[i-1].positions[-1]
+            p2 = vertices[i].positions[0]
+            edges.append(Edge(p1, p2))
 
-        vertices.append(_TerminalLinearVertex(tail))
-        edges.append(_LinearEdge())
+        vertices.append(_TailVertex(len(vertices), 0, 0, tail))
+        p1 = vertices[-2].positions[-1]
+        p2 = vertices[-1].positions[0]
+        edges.append(Edge(p1, p2))
 
         super().__init__(vertices, edges)
 
-    def cleanup(self, mol):
+    def _clean_up(self, mol):
         """
         Deletes the atoms which are lost during construction.
 
@@ -156,9 +211,11 @@ class Linear(TopologyGraph):
         """
 
         if self.ends == 'h':
-            self.hygrogen_ends(mol)
+            self._hygrogen_ends(mol)
 
-    def hygrogen_ends(self, mol):
+        super()._clean_up(mol)
+
+    def _hygrogen_ends(self, mol):
         """
         Removes all deleter atoms and adds hydrogens.
 
@@ -176,149 +233,19 @@ class Linear(TopologyGraph):
 
         """
 
-        deleters = []
-        for func_group in self.reactor.func_groups:
-            deleters.extend(func_group.deleter_ids)
+        raise NotImplementedError()
 
-        emol = rdkit.EditableMol(mol.mol)
-        for atom_id in sorted(deleters, reverse=True):
-            emol.RemoveAtom(atom_id)
-        mol.mol = remake(emol.GetMol())
-        mol.mol = rdkit.AddHs(mol.mol, addCoords=True)
+    def _get_bb_map(self, mol):
+        raise NotImplementedError()
 
-    def place_mols(self, mol):
-        """
-        Places monomers side by side.
+    def _get_conformer_map(self, mol):
+        raise NotImplementedError()
 
-        The monomers are placed along the x-axis, so that the vector
-        running between the functional groups is placed along the axis.
-
-        Parameters
-        ----------
-        mol : :class:`.Polymer`
-            The polymer being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # Make a map from monomer label to object.
-        mapping = {}
-        # Assign every monomer a label ("A", "B", "C", etc.).
-        monomers = zip(
-            dedupe(self.repeating_unit),
-            mol.building_blocks
-        )
-        for label, monomer in monomers:
-            mapping[label] = monomer
-
-        # Make string representing the entire polymer, not just the
-        # repeating unit.
-        polymer = self.repeating_unit*self.n
-        # Get the direction for each monomer along the entire chain,
-        # not just the repeating unit.
-        dirs = self.orientation*self.n
-
-        # Go through the repeating unit and place each monomer.
-        for i, (label, mdir) in enumerate(zip(polymer, dirs)):
-            bb = mapping[label]
-            mol.bb_counter.update([bb])
-            original_position = bb.mol.GetConformer().GetPositions().T
-
-            # Flip or not flip the monomer as given by the probability
-            # in `mdir`.
-            mdir = np.random.choice([1, -1], p=[mdir, 1-mdir])
-            bb.set_orientation2([mdir, 0, 0])
-
-            # The first building block should be placed at 0, the
-            # others have positions calculated based on bb size.
-            x_coord = self._x_position(mol, bb) if i else 0
-            monomer_mol = bb.set_bonder_centroid([x_coord, 0, 0])
-            monomer_mol = rdkit.Mol(monomer_mol)
-
-            bb_index = mol.building_blocks.index(bb)
-            add_fragment_props(monomer_mol, bb_index, i)
-
-            # Check which functional group is at the back and which
-            # one at the front.
-            n_fgs = len(bb.func_groups)
-            if n_fgs == 2:
-                c1, c2 = list(bb.bonder_centroids())
-                front = 1 if c1[0] < c2[0] else 0
-
-            # Flag to see if the first functional group in
-            # self.reactor.func_groups should be bonded.
-            if i == 0:
-                self.bond_first = True if n_fgs == 1 else False
-
-            num_atoms = mol.mol.GetNumAtoms()
-            mol.mol = rdkit.CombineMols(mol.mol, monomer_mol)
-
-            for fg in bb.func_groups:
-                if n_fgs == 2:
-                    id_ = 2*i + 1 if fg.id == front else 2*i
-                elif len(self.reactor.func_groups) == 0:
-                    id_ = 0
-                else:
-                    id_ = len(self.reactor.func_groups)
-
-                func_group = fg.shifted_fg(id_, num_atoms)
-                self.reactor.func_groups.append(func_group)
-
-            bb.set_position_from_matrix(original_position)
-
-    def bonded_fgs(self, mol):
-        """
-        Yields functional groups to react.
-
-        Parameters
-        ----------
-        mol : :class:`.Polymer`
-            The polymer being constructed.
-
-        Yields
-        -------
-        :class:`tuple` of :class:`int`
-            Holds the ids of the functional groups set to react.
-
-        """
-
-        fgs = sorted(self.reactor.func_groups, key=lambda fg: fg.id)
-        start = 0 if self.bond_first else 1
-        for i in range(start, len(self.reactor.func_groups)-1, 2):
-            yield fgs[i], fgs[i+1]
-
-    def _x_position(self, mol, bb):
-        """
-        Calculates the x coordinate on which to place `bb`.
-
-        Does this by checking the most how for down the x axis
-        `mol` stretches and checking the distance between
-        the minimum x position of `bb` and its centroid.
-        It then tries to place `bb` about 3 A away from `mol`.
-
-        Parameters
-        ----------
-        mol : :class:`.Polymer`
-            The polymer being constructed.
-
-        bb : :class:`.BuildingBlock`
-            The building block to be added to `mol`.
-
-        Returns
-        -------
-        :class:`float`
-            The x coordinate on which to place `bb`.
-
-        """
-
-        mm_max_x = max(
-            mol.all_atom_coords(), key=lambda x: x[1][0]
-        )[1][0]
-        bb_min_x = min(
-            bb.all_atom_coords(), key=lambda x: x[1][0]
-        )[1][0]
-        bb_len = bb.centroid()[0] - bb_min_x
-        return mm_max_x + bb_len + 3
+    def _get_scale(self, mol, bb_map, conformer_map):
+        maximum_diameter = 0
+        for vertex, bb in bb_map.items():
+            conformer_id = conformer_map[vertex]
+            d = bb.get_maximum_diameter(conformer_id=conformer_id)
+            if d > maximum_diameter:
+                maximum_diameter = d
+        return maximum_diameter

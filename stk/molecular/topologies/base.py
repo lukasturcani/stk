@@ -78,63 +78,12 @@ topology is at the origin.
 
 """
 
-import rdkit.Chem.AllChem as rdkit
 from inspect import signature
 from collections import Counter
 import numpy as np
+from functools import wraps
 
 from ..functional_groups import Reactor
-
-
-def remove_confs(building_blocks, keep):
-    """
-    Removes all conformers from `building_blocks` except `keep`.
-
-    All kept conformers have their id set to ``0``.
-
-    Parameters
-    ----------
-    building_blocks : :class:`iterable` of :class:`.BuildingBlock`
-        A :class:`.set` of :class:`.BuildingBlock` instances which
-        represent the building blocks forming a
-        :class:`.ConstructedMolecule`.
-
-    keep : :class:`list` of :class:`int`
-        The ids of the building block conformers to be used for
-        constructing the :class:`.ConstructedMolecule`. Must be equal
-        in length to `building_blocks` and the orders must correspond.
-
-    Returns
-    -------
-    :class:`list`
-        A :class:`list` of the form,
-
-        .. code-block:: python
-
-            returned = [[conf1, conf2, conf3],
-                        [conf4, conf5],
-                        [conf6, conf7, conf8, conf9]]
-
-        where each sublist holds all the original conformers of a
-        particular building block.
-
-    """
-
-    keep_ids = [
-        bb.mol.GetConformer(id_).GetId()
-        for bb, id_ in zip(building_blocks, keep)
-    ]
-
-    original_confs = [
-        [rdkit.Conformer(conf) for conf in bb.mol.GetConformers()]
-        for bb in building_blocks
-    ]
-    for bb, conf in zip(building_blocks, keep_ids):
-        keep_conf = rdkit.Conformer(bb.mol.GetConformer(conf))
-        keep_conf.SetId(0)
-        bb.mol.RemoveAllConformers()
-        bb.mol.AddConformer(keep_conf)
-    return original_confs
 
 
 class TopologyMeta(type):
@@ -209,174 +158,8 @@ class Topology(metaclass=TopologyMeta):
         self._del_atoms = del_atoms
         self._track_fgs = track_fgs
 
-    def construct(self, mol, bb_conformers=None):
-        """
-        Constructs :mod:`rdkit` instances of molecules.
-
-        This method places an :mod:`rdkit` molecule of the
-        :class:`.ConstructedMolecule`
-        into the :attr:`~.Molecule.mol` attribute of
-        :class:`.ConstructedMolecule`. It also creates the
-        :attr:`.ConstructedMolecule.bb_counter` and
-        :attr:`.ConstructedMolecule.bonds_made` attributes.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` instance which needs to
-            be constructed.
-
-        bb_conformers : :class:`list` of :class:`int`, optional
-            The ids of the building block conformers to be used. Must
-            be equal in length to `building_blocks` and orders must
-            correspond. If ``None``, then ``-1`` is used for all
-            building blocks.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        if bb_conformers is None:
-            bb_conformers = [
-                -1 for _ in range(len(mol.building_blocks))
-            ]
-
-        # During construction, only a single conformer should exist per
-        # building block. Otherwise, rdkit.CombineMols won't work. It
-        # only combines conformers with the same id.
-        original_confs = remove_confs(
-            mol.building_blocks,
-            bb_conformers
-        )
-
-        mol.bonds_made = 0
-        mol.mol = rdkit.Mol()
-        mol.bb_counter = Counter()
-
-        self._reactor = Reactor()
-        self._place_mols(mol)
-        self._prepare(mol)
-
-        self._reactor.set_molecule(mol.mol)
-        mol.func_groups = self._reactor.func_groups
-
-        for fgs in self._bonded_fgs(mol):
-            self.reactor.react(*fgs, track_fgs=self._track_fgs)
-        mol.mol = self._reactor.result(self._del_atoms)
-        mol.bonds_made = self._reactor.bonds_made
-
-        self._cleanup(mol)
-
-        # Make sure that the property cache of each atom is up to date.
-        for atom in mol.mol.GetAtoms():
-            atom.UpdatePropertyCache()
-
-        # Restore the original conformers.
-        for bb, confs in zip(mol.building_blocks, original_confs):
-            bb.mol.RemoveAllConformers()
-            for conf in confs:
-                bb.mol.AddConformer(conf)
-
-        # Reactor can't be pickled because it contains an EditableMol,
-        # which can't be pickled.
-        self._reactor = None
-
-    def _place_mols(self, mol):
-        """
-        Places building blocks.
-
-        The :mod:`rdkit` molecules of the building blocks are
-        combined into a single :mod:`rdkit` molecule and placed into
-        `mol.mol`.
-
-        The function is also reponsible for updating
-        :attr:`~.ConstructedMolecule.bb_counter`.
-
-        This function must also add the tags ``'bb_index'``
-        and ``'mol_index'`` to every atom in the molecule. The
-        ``'bb_index'`` tag identifies which building block the atom
-        belongs to. The building block is identified by its index
-        within :attr:`ConstructedMolecule.building_blocks`.
-        The ``'mol_index'`` identifies which molecule of a specific
-        building block the atom belongs to. For example, if
-        ``bb_index = 1`` and ``mol_index = 3`` the atom belongs to
-        the 4th molecule of ``mol.building_blocks[1]`` to
-        be added to the :class:`.ConstructedMolecule`. The utility
-        function :func:`.add_fragment_props` is provided to help with
-        this.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Raises
-        ------
-        :class:`NotImplementedError`
-
-        """
-
+    def construct(self, mol):
         raise NotImplementedError()
-
-    def _bonded_fgs(self, mol):
-        """
-        An iterator which yields functional groups to be bonded.
-
-        This iterator must yield :class:`tuple`s of
-        :class:`.FunctionalGroup` molecules. These are the functional
-        groups in the molecule being constructed which need to be
-        bonded.
-
-        This :class:`tuple` gets passed to :meth:`Reactor.react`.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Raises
-        ------
-        :class:`NotImplementedError`
-
-        """
-
-        raise NotImplementedError()
-
-    def _cleanup(self, mol):
-        """
-        Performs final clean up actions on a constructed molecule.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        return
-
-    def _prepare(self, mol):
-        """
-        Performs ops between placing and reacting building blocks.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        return
 
     def __str__(self):
         return repr(self)
@@ -395,7 +178,7 @@ class Topology(metaclass=TopologyMeta):
 
 class VertexPosition:
     def __init__(self):
-        ...
+        self.func_group = None
 
 
 class Vertex:
@@ -403,61 +186,154 @@ class Vertex:
 
     """
 
+    def __init__(self, x, y, z, degree):
+        self._coord = np.array([x, y, z])
+        self.positions = [VertexPosition() for i in range(degree)]
+
     @staticmethod
-    def _restore_position(fn):
+    def _add_vertex_position_assignment(fn):
 
         @wraps(fn)
-        def inner(self, bb):
-            pos_mat = bb.get_position_matrix()
-            r = fn(self, bb)
-            bb.set_position_matrix(pos_mat)
+        def inner(self, bb, conformer_id):
+            r = fn(self, bb, conformer_id)
+            self._assign_vertex_positions(bb, conformer_id)
+            return r
+
+        return inner
+
+    @staticmethod
+    def _add_position_restoration(fn):
+
+        @wraps(fn)
+        def inner(self, bb, conformer_id):
+            pos_mat = bb.get_position_matrix(conformer_id=conformer_id)
+            r = fn(self, bb, conformer_id)
+            bb.set_position_matrix(pos_mat, conformer_id)
             return r
 
         return inner
 
     def __init_subclass__(cls, **kwargs):
-        cls.place_building_block = cls._restore_position(
+        cls.place_building_block = cls._add_vertex_position_assignment(
+            cls.place_building_block
+        )
+        cls.place_building_block = cls._add_position_restoration(
             cls.place_building_block
         )
 
-    def __init__(self, x, y, z, degree):
-        self._coord = np.array([x, y, z])
-        self._positions = [VertexPosition() for i in range(degree)]
+    def apply_scale(self, scale):
+        self._coord *= scale
+        return self
 
-    def place_building_block(self, bb):
-        """
+    def place_building_block(self, bb, conformer_id):
+        raise NotImplementedError()
 
-        """
-
+    def _assign_vertex_positions(self, bb, conformer_id):
         raise NotImplementedError()
 
 
 class Edge:
-    def __init__(self, *vertices, ...):
-        ...
+    def __init__(self, *vertex_positions):
+        self._vertex_positions = vertex_positions
 
-    def bonded_fgs(self):
-        ...
+    def get_bonded_fgs(self):
+        return [p.func_group for p in self._vertex_positions]
 
 
 class TopologyGraph(Topology):
+    """
+
+    """
 
     def __init__(self, vertices, edges):
         self._vertices = vertices
         self._edges = edges
 
-    def _place_mols(self, mol, conformer_id):
-        bb_map = self._create_bb_map(mol)
-        for vertex in self._vertices:
-            bb = bb_map[vertex]
-            coords = vertex.place_building_block(bb)
-            mol._conformers[conformer_id].extend(coords)
-            mol.atoms.extend(a.clone() for a in bb.atoms)
-            mol.bonds.extend(b.clone() for b in bb.bonds)
+    def construct(self, mol):
+        """
+        Construct a :class:`.ConstructedMolecule` conformer.
 
-    def _bonded_fgs(self, mol):
-        for edge in self._edges:
-            yield edge.bonded_fgs()
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` instance which needs to
+            be constructed.
 
-    def _create_bb_map(self, mol):
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        vertices, edges = self._clone_vertices_and_edges()
+
+        mol.bonds_made = 0
+        mol.bb_counter = Counter()
+
+        self._reactor = Reactor()
+        self._place_building_blocks(mol, vertices)
+        self._prepare(mol)
+
+        self._reactor.set_molecule(mol.mol)
+        mol.func_groups = self._reactor.func_groups
+
+        for fgs in self._get_bonded_fgs(mol, edges):
+            self._reactor.react(*fgs, track_fgs=self._track_fgs)
+        mol.mol = self._reactor.result(self._del_atoms)
+        mol.bonds_made = self._reactor.bonds_made
+
+        self._clean_up(mol)
+
+        # Reactor can't be pickled because it contains an EditableMol,
+        # which can't be pickled.
+        self._reactor = None
+
+    def _get_scale(self, mol, bb_map, conformer_map):
         raise NotImplementedError()
+
+    def _clone_vertices_and_edges(self, mol):
+        vertices = [vertex.clone() for vertex in self._vertices]
+        positions = {}
+        for clone, vertex in zip(vertices, self._vertices):
+            for cp, vp in zip(clone.positions, vertex.positions):
+                positions[vp] = cp
+
+        edges = []
+        for edge in self._edges:
+            positions = (positions[p] for p in edge.positions)
+            edges.append(Edge(*positions))
+
+        return vertices, edges
+
+    def _prepare(self, mol):
+        mol._conformers.append([])
+
+    def _place_building_blocks(self, mol, vertices):
+        bb_map = self._get_bb_map(mol)
+        conformer_map = self._get_conformer_map(mol)
+        scale = self._get_scale(mol, bb_map, conformer_map)
+        for vertex in vertices:
+            vertex.apply_scale(scale)
+
+        for vertex in vertices:
+            bb = bb_map[vertex]
+            conformer_id = conformer_map[vertex]
+            coords = vertex.place_building_block(bb, conformer_id)
+            mol._conformers[-1].extend(coords)
+
+            if len(mol._conformers) == 1:
+                mol.atoms.extend(a.clone() for a in bb.atoms)
+                mol.bonds.extend(b.clone() for b in bb.bonds)
+
+    def _get_bonded_fgs(self, mol, edges):
+        for edge in edges:
+            yield edge.get_bonded_fgs()
+
+    def _get_bb_map(self, mol):
+        raise NotImplementedError()
+
+    def _get_conformer_map(self, mol):
+        raise NotImplementedError()
+
+    def _clean_up(self, mol):
+        mol._conformers[-1] = mol.conformers[-1].T
