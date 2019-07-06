@@ -13,6 +13,7 @@ from glob import glob
 from functools import partial
 from scipy.spatial.distance import euclidean
 
+from .elements import Atom, Bond
 from .molecule import Molecule
 from ..functional_groups import FunctionalGroup
 from ..functional_groups import functional_group_infos as fg_infos
@@ -147,10 +148,10 @@ class BuildingBlock(Molecule):
                     raise TypeError(
                         f'Unable to initialize from "{ext}" files.'
                     )
-                self._mol = remake(self._init_funcs[ext](mol))
+                rdkit_mol = remake(self._init_funcs[ext](mol))
 
             else:
-                self._mol = remake(
+                rdkit_mol = remake(
                     rdkit.MolFromMolBlock(
                         molBlock=mol,
                         removeHs=False,
@@ -159,12 +160,26 @@ class BuildingBlock(Molecule):
                 )
 
         elif isinstance(mol, rdkit.Mol):
-            self._mol = remake(mol)
+            rdkit_mol = remake(mol)
 
         # Update the property cache of each atom. This updates things
         # like valence.
-        for atom in self._mol.GetAtoms():
+        for atom in rdkit_mol.GetAtoms():
             atom.UpdatePropertyCache()
+
+        atoms = tuple(
+            Atom(a.GetAtomicNum()) for a in rdkit_mol.GetAtoms()
+        )
+        bonds = tuple(
+            Bond(
+                b.GetBeginAtomIdx(),
+                b.GetEndAtomIdx(),
+                b.GetBondTypeAsDouble()
+            )
+            for b in rdkit_mol.GetBonds()
+        )
+
+        super().__init__(atoms, bonds)
 
         # If no functional group names passed, check if any functional
         # group names appear in the file path.
@@ -184,8 +199,6 @@ class BuildingBlock(Molecule):
             iterable=(fg.info for fg in self.func_groups),
             key=lambda info: info.name
         ))
-
-        super().__init__()
 
     @classmethod
     def init_random(
