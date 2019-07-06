@@ -642,6 +642,9 @@ class BuildingBlock(Molecule):
 
         """
 
+        if fg_ids is None:
+            fg_ids = range(len(self.func_groups))
+
         # Iterator yielding tuples of form (fg_id, bonder_centroid)
         centroids = ((
             i, self.get_centroid(
@@ -738,22 +741,21 @@ class BuildingBlock(Molecule):
         # same id.
         fg_names = sorted(fg_names)
 
+        mol = self.to_rdkit_mol()
         func_groups = []
         for fg_name in fg_names:
             fg_info = fg_infos[fg_name]
 
             # Find all fg atoms.
             fg_query = rdkit.MolFromSmarts(fg_info.fg_smarts)
-            fg_atoms = self.mol.GetSubstructMatches(fg_query)
+            fg_atoms = mol.GetSubstructMatches(fg_query)
 
             # Find all bonder atoms.
             bonder_atoms = [[] for i in range(len(fg_atoms))]
 
             for match in fg_info.bonder_smarts:
                 query = rdkit.MolFromSmarts(match.smarts)
-                atoms = set(flatten(
-                    self.mol.GetSubstructMatches(query)
-                ))
+                atoms = set(flatten(mol.GetSubstructMatches(query)))
 
                 # Get all the bonders grouped by fg.
                 bonders = [
@@ -768,9 +770,7 @@ class BuildingBlock(Molecule):
             deleter_atoms = [[] for i in range(len(fg_atoms))]
             for match in fg_info.del_smarts:
                 query = rdkit.MolFromSmarts(match.smarts)
-                atoms = set(flatten(
-                    self.mol.GetSubstructMatches(query)
-                ))
+                atoms = set(flatten(mol.GetSubstructMatches(query)))
 
                 # Get all deleters grouped by fg.
                 deleters = [
@@ -827,8 +827,8 @@ class BuildingBlock(Molecule):
 
         fg_names = [info.name for info in self.func_group_infos]
         conformers = [
-            (conf.GetId(), self.mdl_mol_block(conformer=conf.GetId()))
-            for conf in self.mol.GetConformers()
+            self.to_mdl_mol_block(conformer_id=i)
+            for i in range(len(self._conformers))
         ]
         json = {
             'class': self.__class__.__name__,
