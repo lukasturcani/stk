@@ -642,6 +642,9 @@ class BuildingBlock(Molecule):
 
         """
 
+        if fg_ids is None:
+            fg_ids = range(len(self.func_groups))
+
         # Iterator yielding tuples of form (fg_id, bonder_centroid)
         centroids = ((
             i, self.get_centroid(
