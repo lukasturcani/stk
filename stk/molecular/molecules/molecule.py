@@ -20,46 +20,6 @@ class MoleculeSubclassError(Exception):
     ...
 
 
-class Atom:
-    """
-    Base class for atoms.
-
-    A subclass is made for each element. The name of each elemental
-    class is the periodic table symbol.
-
-    Attributes
-    ----------
-    atomic_number : :class:`int`
-        A class attribute. Specifies the atomic number.
-
-    """
-
-    ...
-
-
-class Bond:
-    """
-    Represents an atomic bond.
-
-    Attributes
-    ----------
-    order : :class:`int`
-        The bond order.
-
-    atom1 : :class:`Atom`
-        The first atom in the bond.
-
-    atom2 : :class:`Atom`
-        The second atom in the bond.
-
-    """
-
-    def __init__(self, order, atom1, atom2):
-        self.order = order
-        self.atom1 = atom1
-        self.atom2 = atom2
-
-
 class _Cached(type):
     def __call__(cls, *args, **kwargs):
         key = cls._generate_key(*args, **kwargs)
