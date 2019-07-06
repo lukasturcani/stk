@@ -5,14 +5,61 @@ Defines :class:`.Polymer` topologies.
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
+import logging
 
-from .base import Topology
+from .base import TopologyGraph, Vertex, Edge
 from ...utilities import dedupe, add_fragment_props, remake
 
 
-class Linear(Topology):
+logger = logging.getLogger(__name__)
+
+
+class _LinearVertex(Vertex):
+    def __init__(self, x, y, z, direction):
+        self._direction = np.array([direction, 0, 0])
+        super().__init__(x, y, z, 2)
+
+    def place_building_block(self, bb):
+        if len(bb.func_groups) > 2:
+            logger.warning(
+                'You are placing a building block which has more than '
+                'two functional groups along the backbone of '
+                'a Linear topology. You can remove extra functional '
+                'groups from the func_groups attribute to remove '
+                'this message.'
+            )
+
+        bb.apply_rotation_between_vectors(
+            start=next(bb.get_bonder_direction_vectors(fg_ids=(0, 1))),
+            end=self._direction,
+            origin=bb.get_centroid(bb.get_bonder_ids(fg_ids=(0, 1)))
+        )
+        bb.set_centroid(self._coord)
+        return bb.get_position_matrix()
+
+
+class _TerminalLinearVertex(_LinearVertex):
+
+    def place_building_block(self, bb):
+        if len(bb.func_groups) != 1:
+            return super().place_building_block(bb)
+
+        bb.apply_rotation_between_vectors(
+            start=bb.get_centroid_centroid_direction_vector(),
+            end=self._direction,
+            origin=bb.get_centroid(bb.get_bonder_ids())
+        )
+        bb.set_centroid()
+        return bb.get_position_matrix()
+
+
+class _LinearEdge(Edge):
+    ...
+
+
+class Linear(TopologyGraph):
     """
-    A class representing linear polymers.
+    Represents linear polymer topology graphs.
 
     Attributes
     ----------
@@ -80,7 +127,18 @@ class Linear(Topology):
         self.orientation = tuple(orientation)
         self.n = n
         self.ends = ends
-        super().__init__(track_fgs=False)
+
+        head, *body, tail = orientation*n
+        vertices = [_TerminalLinearVertex(head)]
+        edges = []
+        for i, direction in enumerate(body, 1):
+            vertices.append(_LinearVertex(direction))
+            edges.append(_LinearEdge(vertices[i-1], vertices[i]))
+
+        vertices.append(_TerminalLinearVertex(tail))
+        edges.append(_LinearEdge())
+
+        super().__init__(vertices, edges)
 
     def cleanup(self, mol):
         """

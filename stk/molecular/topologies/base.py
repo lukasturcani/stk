@@ -81,6 +81,7 @@ topology is at the origin.
 import rdkit.Chem.AllChem as rdkit
 from inspect import signature
 from collections import Counter
+import numpy as np
 
 from ..functional_groups import Reactor
 
@@ -186,23 +187,27 @@ class Topology(metaclass=TopologyMeta):
 
     Attributes
     ----------
-    del_atoms : :class:`bool`
+    _del_atoms : :class:`bool`
         Toggles whether deleter atoms are deleted by
         :meth:`.Reactor.result`.
 
-    reactor : :class:`.Reactor`
+    _reactor : :class:`.Reactor`
         The reactor which performs the reactions.
 
-    track_fgs : :class:`bool`
+    _track_fgs : :class:`bool`
         Toggles whether functional groups yielded by
         :meth:`bonded_fgs` are automatically added into
         :attr:`.Reactor.func_groups`.
 
+    Methods
+    -------
+    :meth:`construct`
+
     """
 
     def __init__(self, del_atoms=True, track_fgs=True):
-        self.del_atoms = del_atoms
-        self.track_fgs = track_fgs
+        self._del_atoms = del_atoms
+        self._track_fgs = track_fgs
 
     def construct(self, mol, bb_conformers=None):
         """
@@ -250,19 +255,19 @@ class Topology(metaclass=TopologyMeta):
         mol.mol = rdkit.Mol()
         mol.bb_counter = Counter()
 
-        self.reactor = Reactor()
-        self.place_mols(mol)
-        self.prepare(mol)
+        self._reactor = Reactor()
+        self._place_mols(mol)
+        self._prepare(mol)
 
-        self.reactor.set_molecule(mol.mol)
-        mol.func_groups = self.reactor.func_groups
+        self._reactor.set_molecule(mol.mol)
+        mol.func_groups = self._reactor.func_groups
 
-        for fgs in self.bonded_fgs(mol):
-            self.reactor.react(*fgs, track_fgs=self.track_fgs)
-        mol.mol = self.reactor.result(self.del_atoms)
-        mol.bonds_made = self.reactor.bonds_made
+        for fgs in self._bonded_fgs(mol):
+            self.reactor.react(*fgs, track_fgs=self._track_fgs)
+        mol.mol = self._reactor.result(self._del_atoms)
+        mol.bonds_made = self._reactor.bonds_made
 
-        self.cleanup(mol)
+        self._cleanup(mol)
 
         # Make sure that the property cache of each atom is up to date.
         for atom in mol.mol.GetAtoms():
@@ -276,9 +281,9 @@ class Topology(metaclass=TopologyMeta):
 
         # Reactor can't be pickled because it contains an EditableMol,
         # which can't be pickled.
-        self.reactor = None
+        self._reactor = None
 
-    def place_mols(self, mol):
+    def _place_mols(self, mol):
         """
         Places building blocks.
 
@@ -315,7 +320,7 @@ class Topology(metaclass=TopologyMeta):
 
         raise NotImplementedError()
 
-    def bonded_fgs(self, mol):
+    def _bonded_fgs(self, mol):
         """
         An iterator which yields functional groups to be bonded.
 
@@ -339,7 +344,7 @@ class Topology(metaclass=TopologyMeta):
 
         raise NotImplementedError()
 
-    def cleanup(self, mol):
+    def _cleanup(self, mol):
         """
         Performs final clean up actions on a constructed molecule.
 
@@ -356,7 +361,7 @@ class Topology(metaclass=TopologyMeta):
 
         return
 
-    def prepare(self, mol):
+    def _prepare(self, mol):
         """
         Performs ops between placing and reacting building blocks.
 
@@ -386,3 +391,73 @@ class Topology(metaclass=TopologyMeta):
 
     def __hash__(self):
         return id(self)
+
+
+class VertexPosition:
+    def __init__(self):
+        ...
+
+
+class Vertex:
+    """
+
+    """
+
+    @staticmethod
+    def _restore_position(fn):
+
+        @wraps(fn)
+        def inner(self, bb):
+            pos_mat = bb.get_position_matrix()
+            r = fn(self, bb)
+            bb.set_position_matrix(pos_mat)
+            return r
+
+        return inner
+
+    def __init_subclass__(cls, **kwargs):
+        cls.place_building_block = cls._restore_position(
+            cls.place_building_block
+        )
+
+    def __init__(self, x, y, z, degree):
+        self._coord = np.array([x, y, z])
+        self._positions = [VertexPosition() for i in range(degree)]
+
+    def place_building_block(self, bb):
+        """
+
+        """
+
+        raise NotImplementedError()
+
+
+class Edge:
+    def __init__(self, *vertices, ...):
+        ...
+
+    def bonded_fgs(self):
+        ...
+
+
+class TopologyGraph(Topology):
+
+    def __init__(self, vertices, edges):
+        self._vertices = vertices
+        self._edges = edges
+
+    def _place_mols(self, mol, conformer_id):
+        bb_map = self._create_bb_map(mol)
+        for vertex in self._vertices:
+            bb = bb_map[vertex]
+            coords = vertex.place_building_block(bb)
+            mol._conformers[conformer_id].extend(coords)
+            mol.atoms.extend(a.clone() for a in bb.atoms)
+            mol.bonds.extend(b.clone() for b in bb.bonds)
+
+    def _bonded_fgs(self, mol):
+        for edge in self._edges:
+            yield edge.bonded_fgs()
+
+    def _create_bb_map(self, mol):
+        raise NotImplementedError()
