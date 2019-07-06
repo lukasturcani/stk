@@ -114,6 +114,7 @@ class Molecule(metaclass=_Cached):
     :meth:`get_center_of_mass`
     :meth:`get_centroid`
     :meth:`get_direction`
+    :meth:`get_maximum_diameter`
     :meth:`get_plane_normal`
     :meth:`get_position_matrix`
     :meth:`set_centroid`
@@ -424,6 +425,9 @@ class Molecule(metaclass=_Cached):
         """
         Return the distance between 2 atoms.
 
+        This method does not account for the van der Waals radius of
+        atoms.
+
         Parameters
         ----------
         atom1_id : :class:`int`
@@ -542,6 +546,38 @@ class Molecule(metaclass=_Cached):
         pos = self._conformers[conformer_id][:, atom_ids].T
         return np.linalg.svd(pos - pos.mean(axis=1))[-1][0]
 
+    def get_maximum_diameter(self, atom_ids=None, conformer_id=0):
+        """
+        Get the maximum diameter in the molecule.
+
+        This method does not account for the van der Waals radius of
+        atoms.
+
+        Parameters
+        ----------
+        atom_ids : :class:`iterable` of :class:`int`
+            The ids of atoms which are considered when looking for the
+            maximum diamater. If ``None`` then all atoms in the
+            molecule are considered.
+
+        conformer_id : :class:`int`
+            The id of the conformer to use.
+
+        Returns
+        -------
+        :class:`float`
+            The maximum diameter in the molecule.
+
+        """
+
+        if atom_ids is None:
+            atom_ids = range(len(self.atoms))
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
+
+        coords = self._conformers[conformer_id][:, atom_ids]
+        return float(euclidean(coords.min(axis=1), coords.max(axis=1)))
+
     def get_plane_normal(self, atom_ids=None, conformer_id=0):
         """
         Return the normal to the plane of best fit.
@@ -590,7 +626,7 @@ class Molecule(metaclass=_Cached):
 
         return self._conformers[conformer_id].T
 
-    def set_centroid(self, position, conformer_id=0):
+    def set_centroid(self, position, atom_ids=None, conformer_id=0):
         """
         Set the centroid of the molecule to `position`.
 
@@ -599,6 +635,10 @@ class Molecule(metaclass=_Cached):
         position : :class:`numpy.ndarray`
             This array holds the position on which the centroid of the
             molecule is going to be placed.
+
+        atom_ids : :class:`iterable` of :class:`int`
+            The ids of atoms which should have their centroid set to
+            `position`. If ``None`` then all atoms are used.
 
         conformer_id : :class:`int`, optional
             The id of the conformer to be used.
@@ -610,7 +650,10 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        centroid = self.get_centroid(conformer_id=conformer_id)
+        centroid = self.get_centroid(
+            atom_ids=atom_ids,
+            conformer_id=conformer_id
+        )
         self.apply_displacement(position-centroid, conformer_id)
         return self
 
