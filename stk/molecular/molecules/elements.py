@@ -50,591 +50,596 @@ class Atom:
         self.__class__ = self._elements[atomic_number]
 
 
-class H(Atom):
+class _Atom(Atom):
+    def __init__(self):
+        return
+
+
+class H(_Atom):
     atomic_number = 1
     mass = 1.008
 
 
-class He(Atom):
+class He(_Atom):
     atomic_number = 2
     mass = 4.003
 
 
-class Li(Atom):
+class Li(_Atom):
     atomic_number = 3
     mass = 6.941
 
 
-class Be(Atom):
+class Be(_Atom):
     atomic_number = 4
     mass = 9.012
 
 
-class B(Atom):
+class B(_Atom):
     atomic_number = 5
     mass = 10.811
 
 
-class C(Atom):
+class C(_Atom):
     atomic_number = 6
     mass = 12.011
 
 
-class N(Atom):
+class N(_Atom):
     atomic_number = 7
     mass = 14.007
 
 
-class O(Atom):
+class O(_Atom):
     atomic_number = 8
     mass = 15.999
 
 
-class F(Atom):
+class F(_Atom):
     atomic_number = 9
     mass = 18.998
 
 
-class Ne(Atom):
+class Ne(_Atom):
     atomic_number = 10
     mass = 20.180
 
 
-class Na(Atom):
+class Na(_Atom):
     atomic_nubmer = 11
     mass = 22.990
 
 
-class Mg(Atom):
+class Mg(_Atom):
     atomic_number = 12
     mass = 24.305
 
 
-class Al(Atom):
+class Al(_Atom):
     atomic_number = 13
     mass = 26.982
 
 
-class Si(Atom):
+class Si(_Atom):
     atomic_number = 14
     mass = 28.086
 
 
-class P(Atom):
+class P(_Atom):
     atomic_number = 15
     mass = 30.974
 
 
-class S(Atom):
+class S(_Atom):
     atomic_number = 16
     mass = 32.066
 
 
-class Cl(Atom):
+class Cl(_Atom):
     atomic_nubmer = 17
     mass = 35.453
 
 
-class Ar(Atom):
+class Ar(_Atom):
     atomic_number = 18
     mass = 39.948
 
 
-class K(Atom):
+class K(_Atom):
     atomic_nubmer = 19
     mass = 39.098
 
 
-class Ca(Atom):
+class Ca(_Atom):
     atomic_number = 20
     mass = 40.078
 
 
-class Sc(Atom):
+class Sc(_Atom):
     atomic_number = 21
     mass = 44.956
 
 
-class Ti(Atom):
+class Ti(_Atom):
     atomic_number = 22
     mass = 47.867
 
 
-class V(Atom):
+class V(_Atom):
     atomic_number = 23
     mass = 50.942
 
 
-class Cr(Atom):
+class Cr(_Atom):
     atomic_number = 24
     mass = 51.996
 
 
-class Mn(Atom):
+class Mn(_Atom):
     atomic_number = 25
     mass = 54.938
 
 
-class Fe(Atom):
+class Fe(_Atom):
     atomic_number = 26
     mass = 55.845
 
 
-class Co(Atom):
+class Co(_Atom):
     atomic_number = 27
     mass = 58.933
 
 
-class Ni(Atom):
+class Ni(_Atom):
     atomic_number = 28
     mass = 58.693
 
 
-class Cu(Atom):
+class Cu(_Atom):
     atomic_number = 29
     mass = 63.546
 
 
-class Zn(Atom):
+class Zn(_Atom):
     atomic_number = 30
     mass = 65.38
 
 
-class Ga(Atom):
+class Ga(_Atom):
     atomic_number = 31
     mass = 69.723
 
 
-class Ge(Atom):
+class Ge(_Atom):
     atomic_number = 32
     mass = 72.631
 
 
-class As(Atom):
+class As(_Atom):
     atomic_number = 33
     mass = 74.922
 
 
-class Se(Atom):
+class Se(_Atom):
     atomic_number = 34
     mass = 78.971
 
 
-class Br(Atom):
+class Br(_Atom):
     atomic_number = 35
     mass = 79.904
 
 
-class Kr(Atom):
+class Kr(_Atom):
     atomic_number = 36
     mass = 83.798
 
 
-class Rb(Atom):
+class Rb(_Atom):
     atomic_number = 37
     mass = 85.468
 
 
-class Sr(Atom):
+class Sr(_Atom):
     atomic_number = 38
     mass = 87.62
 
 
-class Y(Atom):
+class Y(_Atom):
     atomic_number = 39
     mass = 88.906
 
 
-class Zr(Atom):
+class Zr(_Atom):
     atomic_number = 40
     mass = 91.224
 
 
-class Nb(Atom):
+class Nb(_Atom):
     atomic_number = 41
     mass = 92.906
 
 
-class Mo(Atom):
+class Mo(_Atom):
     atomic_number = 42
     mass = 95.95
 
 
-class Tc(Atom):
+class Tc(_Atom):
     atomic_number = 43
     mass = 98.907
 
 
-class Ru(Atom):
+class Ru(_Atom):
     atomic_number = 44
     mass = 101.07
 
 
-class Rh(Atom):
+class Rh(_Atom):
     atomic_number = 45
     mass = 102.906
 
 
-class Pd(Atom):
+class Pd(_Atom):
     atomic_number = 46
     mass = 106.42
 
 
-class Ag(Atom):
+class Ag(_Atom):
     atomic_number = 47
     mass = 107.868
 
 
-class Cd(Atom):
+class Cd(_Atom):
     atomic_number = 48
     mass = 112.414
 
 
-class In(Atom):
+class In(_Atom):
     atomic_number = 49
     mass = 114.818
 
 
-class Sn(Atom):
+class Sn(_Atom):
     atomic_number = 50
     mass = 118.711
 
 
-class Sb(Atom):
+class Sb(_Atom):
     atomic_number = 51
     mass = 121.760
 
 
-class Te(Atom):
+class Te(_Atom):
     atomic_number = 52
     mass = 127.6
 
 
-class I(Atom):
+class I(_Atom):
     atomic_number = 53
     mass = 126.904
 
 
-class Xe(Atom):
+class Xe(_Atom):
     atomic_number = 54
     mass = 131.293
 
 
-class Cs(Atom):
+class Cs(_Atom):
     atomic_number = 55
     mass = 132.905
 
 
-class Ba(Atom):
+class Ba(_Atom):
     atomic_number = 56
     mass = 137.328
 
 
-class La(Atom):
+class La(_Atom):
     atomic_number = 57
     mass = 138.905
 
 
-class Ce(Atom):
+class Ce(_Atom):
     atomic_number = 58
     mass = 140.116
 
 
-class Pr(Atom):
+class Pr(_Atom):
     atomic_number = 59
     mass = 140.908
 
 
-class Nd(Atom):
+class Nd(_Atom):
     atomic_number = 60
     mass = 144.243
 
 
-class Pm(Atom):
+class Pm(_Atom):
     atomic_number = 61
     mass = 144.913
 
 
-class Sm(Atom):
+class Sm(_Atom):
     atomic_number = 62
     mass = 150.36
 
 
-class Eu(Atom):
+class Eu(_Atom):
     atomic_number = 63
     mass = 151.964
 
 
-class Gd(Atom):
+class Gd(_Atom):
     atomic_number = 64
     mass = 157.25
 
 
-class Tb(Atom):
+class Tb(_Atom):
     atomic_number = 65
     mass = 158.925
 
 
-class Dy(Atom):
+class Dy(_Atom):
     atomic_number = 66
     mass = 162.500
 
 
-class Ho(Atom):
+class Ho(_Atom):
     atomic_number = 67
     mass = 164.930
 
 
-class Er(Atom):
+class Er(_Atom):
     atomic_number = 68
     mass = 167.259
 
 
-class Tm(Atom):
+class Tm(_Atom):
     atomic_number = 69
     mass = 168.934
 
 
-class Yb(Atom):
+class Yb(_Atom):
     atomic_nubmer = 70
     mass = 173.055
 
 
-class Lu(Atom):
+class Lu(_Atom):
     atomic_number = 71
     mass = 174.967
 
 
-class Hf(Atom):
+class Hf(_Atom):
     atomic_number = 72
     mass = 178.49
 
 
-class Ta(Atom):
+class Ta(_Atom):
     atomic_number = 73
     mass = 180.948
 
 
-class W(Atom):
+class W(_Atom):
     atomic_number = 74
     mass = 183.84
 
 
-class Re(Atom):
+class Re(_Atom):
     atomic_number = 75
     mass = 186.207
 
 
-class Os(Atom):
+class Os(_Atom):
     atomic_number = 76
     mass = 190.23
 
 
-class Ir(Atom):
+class Ir(_Atom):
     atomic_number = 77
     mass = 192.217
 
 
-class Pt(Atom):
+class Pt(_Atom):
     atomic_number = 78
     mass = 195.085
 
 
-class Au(Atom):
+class Au(_Atom):
     atomic_number = 79
     mass = 196.967
 
 
-class Hg(Atom):
+class Hg(_Atom):
     atomic_number = 80
     mass = 200.592
 
 
-class Tl(Atom):
+class Tl(_Atom):
     atomic_number = 81
     mass = 204.383
 
 
-class Pb(Atom):
+class Pb(_Atom):
     atomic_number = 82
     mass = 207.2
 
 
-class Bi(Atom):
+class Bi(_Atom):
     atomic_number = 83
     mass = 208.980
 
 
-class Po(Atom):
+class Po(_Atom):
     atomic_number = 84
     mass = 208.982
 
 
-class At(Atom):
+class At(_Atom):
     atomic_number = 85
     mass = 209.987
 
 
-class Rn(Atom):
+class Rn(_Atom):
     atomic_number = 86
     mass = 222.018
 
 
-class Fr(Atom):
+class Fr(_Atom):
     atomic_number = 87
     mass = 223.020
 
 
-class Ra(Atom):
+class Ra(_Atom):
     atomic_number = 88
     mass = 226.025
 
 
-class Ac(Atom):
+class Ac(_Atom):
     atomic_number = 89
     mass = 227.028
 
 
-class Th(Atom):
+class Th(_Atom):
     atomic_number = 90
     mass = 232.038
 
 
-class Pa(Atom):
+class Pa(_Atom):
     atomic_number = 91
     mass = 231.036
 
 
-class U(Atom):
+class U(_Atom):
     atomic_number = 92
     mass = 238.029
 
 
-class Np(Atom):
+class Np(_Atom):
     atomic_number = 93
     mass = 237.048
 
 
-class Pu(Atom):
+class Pu(_Atom):
     atomic_number = 94
     mass = 244.064
 
 
-class Am(Atom):
+class Am(_Atom):
     atomic_number = 95
     mass = 243.061
 
 
-class Cm(Atom):
+class Cm(_Atom):
     atomic_number = 96
     mass = 247.070
 
 
-class Bk(Atom):
+class Bk(_Atom):
     atomic_number = 97
     mass = 247.070
 
 
-class Cf(Atom):
+class Cf(_Atom):
     atomic_number = 98
     mass = 251.080
 
 
-class Es(Atom):
+class Es(_Atom):
     atomic_number = 99
     mass = 254
 
 
-class Fm(Atom):
+class Fm(_Atom):
     atomic_number = 100
     mass = 257.095
 
 
-class Md(Atom):
+class Md(_Atom):
     atomic_number = 101
     mass = 258.1
 
 
-class No(Atom):
+class No(_Atom):
     atomic_number = 102
     mass = 259.101
 
 
-class Lr(Atom):
+class Lr(_Atom):
     atomic_number = 103
     mass = 262
 
 
-class Rf(Atom):
+class Rf(_Atom):
     atomic_number = 104
     mass = 261
 
 
-class Db(Atom):
+class Db(_Atom):
     atomic_number = 105
     mass = 262
 
 
-class Sg(Atom):
+class Sg(_Atom):
     atomic_number = 106
     mass = 266
 
 
-class Bh(Atom):
+class Bh(_Atom):
     atomic_number = 107
     mass = 264
 
 
-class Hs(Atom):
+class Hs(_Atom):
     atomic_number = 108
     mass = 269
 
 
-class Mt(Atom):
+class Mt(_Atom):
     atomic_number = 109
     mass = 278
 
 
-class Ds(Atom):
+class Ds(_Atom):
     atomic_number = 110
     mass = 281
 
 
-class Rg(Atom):
+class Rg(_Atom):
     atomic_number = 111
     mass = 280
 
 
-class Cn(Atom):
+class Cn(_Atom):
     atomic_number = 112
     mass = 285
 
 
-class Nh(Atom):
+class Nh(_Atom):
     atomic_number = 113
     mass = 286
 
 
-class Fl(Atom):
+class Fl(_Atom):
     atomic_number = 114
     mass = 289
 
 
-class Mc(Atom):
+class Mc(_Atom):
     atomic_number = 115
     mass = 289
 
 
-class Lv(Atom):
+class Lv(_Atom):
     atomic_number = 116
     mass = 293
 
 
-class Ts(Atom):
+class Ts(_Atom):
     atomic_number = 117
     mass = 294
 
 
-class Og(Atom):
+class Og(_Atom):
     atomic_number = 118
     mass = 294
