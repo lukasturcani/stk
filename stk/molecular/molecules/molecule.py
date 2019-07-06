@@ -1,7 +1,6 @@
 import json
 import os
 import numpy as np
-import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
 from scipy.spatial.distance import euclidean
 from inspect import signature
@@ -44,7 +43,7 @@ class Bond:
 
     Attributes
     ----------
-    order : :class:`float`
+    order : :class:`int`
         The bond order.
 
     atom1 : :class:`Atom`
@@ -99,9 +98,8 @@ class Molecule(metaclass=_Cached):
         each subclass of :class:`.Molecule` and it will be used to
         generate the :attr:`_key`.
 
-    _mol : :class:`rdkit.Mol`
-        A :mod:`rdkit` molecule instance representing the
-        :class:`.Molecule`.
+    _conformers : :class:`list` of :class:`numpy.ndarray`
+        The position matrices of the conformers.
 
     Methods
     -------
@@ -124,14 +122,22 @@ class Molecule(metaclass=_Cached):
     :meth:`load`
     :meth:`to_mdl_mol_block`
     :meth:`to_rdkit_mol`
-    :meth:`is_same_molecule`
     :meth:`update_cache`
+    :meth:`update_from_rdkit_mol`
     :meth:`update_from_file`
     :meth:`write`
 
     """
 
     subclasses = {}
+
+    def __init__(self):
+        """
+        Initialize a :class:`Molecule`.
+
+        """
+
+        return
 
     @classmethod
     def init_from_dict(self, json_dict):
@@ -185,10 +191,9 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        position_matrix = self.get_position_matrix(conformer_id).T
-        self.set_position_matrix(
-            position_matrix=(position_matrix+displacement).T,
-            conformer_id=conformer_id
+        conf = self._conformers[conformer_id]
+        self._conformers[conformer_id] = (
+            conf + displacement[:, np.newaxis]
         )
         return self
 
@@ -229,9 +234,9 @@ class Molecule(metaclass=_Cached):
         rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
         # Apply the rotation matrix on the position matrix, to get the
         # new position matrix.
-        pos_mat = self.get_position_matrix(conformer_id=conformer_id)
-        # Apply the rotation.
-        self.set_position_matrix(rot_mat @ pos_mat, conformer_id)
+        self._conformers[conformer_id] = (
+            rot_mat @ self._conformers[conformer_id]
+        )
         # Return the centroid of the molecule to the original position.
         self.apply_displacement(origin, conformer_id)
         return self
@@ -296,8 +301,9 @@ class Molecule(metaclass=_Cached):
 
         # Apply the rotation matrix to the atomic positions to yield
         # the new atomic positions.
-        pos_mat = self.get_position_matrix(conformer_id=conformer_id)
-        self.set_position_matrix(rot_mat @ pos_mat, conformer_id)
+        self._conformers[conformer_id] = (
+            rot_mat @ self._conformers[conformer_id]
+        )
 
         # Restore original position.
         self.apply_displacement(origin, conformer_id)
@@ -378,8 +384,9 @@ class Molecule(metaclass=_Cached):
             angle *= -1
 
         rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
-        pos_mat = self.get_position_matrix(conformer_id=conformer_id)
-        self.set_position_matrix(rot_mat @ pos_mat, conformer_id)
+        self._conformers[conformer_id] = (
+            rot_mat @ self._conformers[conformer_id]
+        )
         self.apply_displacement(origin, conformer_id)
         return self
 
@@ -407,10 +414,11 @@ class Molecule(metaclass=_Cached):
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
 
-        conf = self._mol.GetConformer(conformer_id)
-        for atom_id in atom_ids:
-            yield np.array(conf.GetAtomPosition(atom_id))
+        for atom_coords in self._conformers[conformer_id][:, atom_ids]:
+            yield atom_coords
 
     def get_atom_distance(self, atom1_id, atom2_id, conformer_id=0):
         """
@@ -434,11 +442,9 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        coords = self.get_atom_coords(
-            atom_ids=(atom1_id, atom2_id),
-            conformer_id=conformer_id
-        )
-        return float(euclidean(*coords))
+        atom_ids = [atom1_id, atom2_id]
+        coord1, coord2 = self._conformers[conformer_id][:, atom_ids]
+        return float(euclidean(coord1, coord2))
 
     def get_center_of_mass(self, atom_ids=None, conformer_id=0):
         """
@@ -466,14 +472,12 @@ class Molecule(metaclass=_Cached):
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
-        else:
-            # Iterable needs to be converted to a list because
-            # atom_ids will need to be iterated through twice, once
-            # when passed to get_atom_coords and once when passed to
-            # zip.
+        elif not isinstance(atom_ids, (list, tuple)):
+            # Iterable gets used twice, once in get_atom_coords
+            # and once in zip.
             atom_ids = list(atom_ids)
 
-        center = np.array([0., 0., 0.])
+        center = 0
         total_mass = 0.
         coords = self.get_atom_coords(atom_ids, conformer_id)
         for atom_id, coord in zip(atom_ids, coords):
@@ -504,12 +508,11 @@ class Molecule(metaclass=_Cached):
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
 
-        sum_ = 0
-        coords = self.get_atom_coords(atom_ids, conformer_id)
-        for i, coord in enumerate(coords, 1):
-            sum_ += coord
-        return sum_ / i
+        s = self._conformers[conformer_id][:, atom_ids].sum(axis=1)
+        return s / len(atom_ids)
 
     def get_direction(self, atom_ids=None, conformer_id=0):
         """
@@ -533,12 +536,10 @@ class Molecule(metaclass=_Cached):
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
-        else:
-            # Need to be able to use an iterable as an index for
-            # a numpy array, so needs to be converted to list.
+        elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        pos = self.get_position_matrix(conformer_id).T[:, atom_ids]
+        pos = self._conformers[conformer_id][:, atom_ids].T
         return np.linalg.svd(pos - pos.mean(axis=1))[-1][0]
 
     def get_plane_normal(self, atom_ids=None, conformer_id=0):
@@ -563,12 +564,10 @@ class Molecule(metaclass=_Cached):
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
-        else:
-            # Need to be able to use an iterable as an index for
-            # a numpy array, so needs to be converted to list.
+        elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        pos = self.get_position_matrix(conformer_id).T[:, atom_ids]
+        pos = self._conformers[conformer_id][:, atom_ids].T
         centroid = self.get_centroid(atom_ids, conformer_id)
         return np.linalg.svd(pos - centroid)[-1][2, :]
 
@@ -584,13 +583,12 @@ class Molecule(metaclass=_Cached):
         Returns
         -------
         :class:`numpy.ndarray`
-            The array has the shape ``[3, n]``. Each column holds the
-            x, y and z coordinates of a bonder centroid. The index of
-            the column corresponds to the atom id.
+            The array has the shape ``(n, 3)``. Each row holds the
+            x, y and z coordinates of an atom.
 
         """
 
-        return self._mol.GetConformer(conformer_id).GetPositions().T
+        return self._conformers[conformer_id].T
 
     def set_centroid(self, position, conformer_id=0):
         """
@@ -613,7 +611,7 @@ class Molecule(metaclass=_Cached):
         """
 
         centroid = self.get_centroid(conformer_id=conformer_id)
-        self.apply_displacement(-centroid, conformer_id)
+        self.apply_displacement(position-centroid, conformer_id)
         return self
 
     def set_position_matrix(self, position_matrix, conformer_id=0):
@@ -624,10 +622,11 @@ class Molecule(metaclass=_Cached):
         ----------
         position_matrix : :class:`numpy.ndarray`
             A position matrix of the molecule. The shape of the matrix
-            is ``[3, n]``.
+            is ``(n, 3)``.
 
         conformer_id : :class:`int`, optional
-            The id of the conformer to be used.
+            The id of the conformer to be used. If ``None`` a new
+            conformer is added.
 
         Returns
         -------
@@ -636,14 +635,11 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        conf = self._mol.GetConformer(conformer_id)
-        for i, coord_mat in enumerate(position_matrix.T):
-            coord = rdkit_geo.Point3D(
-                coord_mat.item(0),
-                coord_mat.item(1),
-                coord_mat.item(2)
-            )
-            conf.SetAtomPosition(i, coord)
+        if conformer_id is None:
+            self._confomers.append(position_matrix.T)
+        else:
+            self._conformers[conformer_id] = position_matrix.T
+        return self
 
     def dump(self, path, include_attrs=None):
         """
@@ -717,27 +713,20 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        # Kekulize the mol, which means that each aromatic bond is
-        # converted to a single or double. This is necessary because
-        # .mol V3000 only supports integer bonds. However, this fails
-        # sometimes on big molecules.
-        try:
-            rdkit.Kekulize(self.mol)
-        except ValueError:
-            pass
-
         if atom_ids is None:
-            atom_ids = range(self.mol.GetNumAtoms())
+            atom_ids = range(len(self.atoms))
 
+        conf = self._conformers[conformer_id]
         atom_lines = []
         # This set gets used by bonds.
         atoms = set()
         for i, atom_id in enumerate(atom_ids, 1):
             atoms.add(atom_id)
 
-            x, y, z = self.atom_coords(atom_id, conformer_id)
-            symbol = self.atom_symbol(atom_id)
-            charge = self.mol.GetAtomWithIdx(atom_id).GetFormalCharge()
+            x, y, z = conf[:, atom_id]
+            atom = self.atoms[atom_id]
+            symbol = atom.__class__.__name__
+            charge = atom.charge
             charge = f' CHG={charge}' if charge else ''
             atom_lines.append(
                 'M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n'.format(
@@ -748,18 +737,18 @@ class Molecule(metaclass=_Cached):
         num_atoms = i
 
         bond_lines = []
-        for bond in self.mol.GetBonds():
-            a1 = bond.GetBeginAtomIdx()
-            a2 = bond.GetEndAtomIdx()
+        for bond_idx, bond in enumerate(self.bonds):
+            a1 = bond.atom1
+            a2 = bond.atom2
             if a1 in atoms and a2 in atoms:
                 # Keep bond ids if all bonds are getting written.
-                if num_atoms == self.mol.GetNumAtoms():
-                    bond_id = bond.GetIdx()
+                if num_atoms == len(self.atoms):
+                    bond_id = bond_idx
                 else:
                     bond_id = len(bond_lines)
-                bond_type = int(bond.GetBondTypeAsDouble())
+
                 bond_lines.append(
-                    f'M  V30 {bond_id+1} {bond_type} {a1+1} {a2+1}\n'
+                    f'M  V30 {bond_id+1} {bond.order} {a1+1} {a2+1}\n'
                 )
 
         num_bonds = len(bond_lines)
@@ -795,26 +784,18 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        return rdkit.Mol(self._mol)
+        mol = rdkit.EditableMol(rdkit.Mol())
+        for atom in self.atoms:
+            mol.AddAtom(atom.atomic_number)
 
-    def is_same_molecule(self, other):
-        """
-        Check if `other` has the same molecular structure.
+        for bond in self.bonds:
+            mol.AddBond(
+                beginAtomIdx=bond.atom1.id,
+                endAtomIdx=bond.atom2.id,
+                order=rdkit.BondType(bond.order)
+            )
 
-        Parameters
-        ----------
-        other : :class:`Molecule`
-            The :class:`Molecule` instance you are checking has
-            the same structure.
-
-        Returns
-        -------
-        :class:`bool`
-            Returns ``True`` if the structures match.
-
-        """
-
-        return self.inchi == other.inchi
+        return mol.GetMol()
 
     def update_cache(self):
         """
@@ -839,6 +820,30 @@ class Molecule(metaclass=_Cached):
             self.__class__._cache[self._key].__dict__ = d
         else:
             self.__class__._cache[self._key] = self
+
+    def update_from_rdkit_mol(self, mol, conformer_id=0):
+        """
+        Updates the structure to match an :mod:`rdkit` molecule.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Mol`
+            The :mod:`rdkit` molecule to use for the structure update.
+
+        conformer_id : :class:`int`
+            The id of the conformer to update. If ``None`` a new
+            conformer is added.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The molecule is returned.
+
+        """
+
+        pos_mat = mol.GetConformer().GetPositions()
+        self.set_position_matrix(pos_mat, conformer_id=conformer_id)
+        return self
 
     def update_from_file(self, path, conformer_id=0):
         """
@@ -899,12 +904,7 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        if conformer_id == -1:
-            conformer = self.mol.GetConformer(conformer).GetId()
-
-        mol = Molecule()
-        mol.mol = mol_from_mae_file(path)
-        self.set_position_from_matrix(mol.position_matrix(), conformer)
+        self._update_from_rdkit_mol(mol_from_mae_file(path))
 
     def _update_from_mol(self, path, conformer_id=0):
         """
@@ -926,18 +926,14 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        if conformer == -1:
-            conformer = self.mol.GetConformer(conformer).GetId()
-
-        mol = Molecule()
-        mol.mol = remake(
+        mol = remake(
             rdkit.MolFromMolFile(
                 molFileName=path,
                 sanitize=False,
                 removeHs=False
             )
         )
-        self.set_position_from_matrix(mol.position_matrix(), conformer)
+        self.update_from_rdkit_mol(mol=mol, conformer_id=conformer_id)
 
     def _update_from_xyz(self, path, conformer_id=0):
         """
@@ -966,14 +962,11 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        if conformer == -1:
-            conformer = self.mol.GetConformer(conformer).GetId()
-
         with open(path, 'r') as f:
             atom_count, _, *content = f.readlines()
 
         # Check the atom count is correct.
-        num_atoms = self.mol.GetNumAtoms()
+        num_atoms = len(self.atoms)
         if int(atom_count) != num_atoms:
             raise RuntimeError(
                 f'The number of atoms in the xyz file, {atom_count}, '
@@ -988,7 +981,7 @@ class Molecule(metaclass=_Cached):
             if element.isnumeric():
                 element = periodic_table[int(element)]
 
-            if element != self.atom_symbol(i):
+            if element != self.atoms[i].__class__.__name__:
                 raise RuntimeError(
                     f'Atom {i} element does not match file.'
                 )
@@ -1005,7 +998,7 @@ class Molecule(metaclass=_Cached):
             )
 
         # Update the structure.
-        new_coords = np.array(new_coords).T
+        new_coords = np.array(new_coords)
         self.set_position_matrix(new_coords, conformer_id=conformer_id)
 
     def _update_from_turbomole(self, path, conformer_id=0):
@@ -1038,14 +1031,11 @@ class Molecule(metaclass=_Cached):
         """
         bohr_to_ang = 0.5291772105638411
 
-        if conformer == -1:
-            conformer = self.mol.GetConformer(conformer).GetId()
-
         with open(path, 'r') as f:
             _, *content, __ = f.readlines()
 
         # Check the atom count is correct.
-        num_atoms = self.mol.GetNumAtoms()
+        num_atoms = len(self.atoms)
         if len(content) != num_atoms:
             raise RuntimeError(
                 'The number of atoms in the coord file, '
@@ -1060,7 +1050,7 @@ class Molecule(metaclass=_Cached):
             if element.isnumeric():
                 element = periodic_table[int(element)]
 
-            if element != self.atom_symbol(i):
+            if element != self.atoms[i].__class__.__name__:
                 raise RuntimeError(
                     f'Atom {i} element does not match file.'
                 )
@@ -1077,7 +1067,7 @@ class Molecule(metaclass=_Cached):
             )
 
         # Update the structure.
-        new_coords = np.array(new_coords).T
+        new_coords = np.array(new_coords)
         self.set_position_matrix(new_coords, conformer_id=conformer_id)
 
     def write(self, path, atom_ids=None, conformer_id=0):
@@ -1146,7 +1136,7 @@ class Molecule(metaclass=_Cached):
         """
 
         with open(path, 'w') as f:
-            f.write(self.mdl_mol_block(atom_ids, conformer_id))
+            f.write(self.to_mdl_mol_block(atom_ids, conformer_id))
 
     def _write_xyz_file(self, path, atom_ids, conformer_id):
         """
@@ -1173,15 +1163,14 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        if conformer == -1:
-            conformer = self.mol.GetConformer(conformer).GetId()
         if atom_ids is None:
-            atom_ids = range(self.mol.GetNumAtoms())
+            atom_ids = range(len(self.atoms))
 
+        conf = self._conformers[conformer_id]
         content = [0]
         for i, atom_id in enumerate(atom_ids, 1):
-            x, y, z = self.atom_coords(atom_id, conformer_id)
-            symbol = self.atom_symbol(atom_id)
+            x, y, z = conf[:, atom_id]
+            symbol = self.atoms[i].__class__.__name__
             content.append(f'{symbol} {x:f} {y:f} {z:f}\n')
         # Set first line to the atom_count.
         content[0] = f'{i}\n\n'
@@ -1215,10 +1204,7 @@ class Molecule(metaclass=_Cached):
         """
 
         if atom_ids is None:
-            atom_ids = range(self.mol.GetNumAtoms())
-
-        if conformer == -1:
-            conformer = self.mol.GetConformer(conformer).GetId()
+            atom_ids = range(len(self.atoms))
 
         lines = []
         atom_counts = {}
@@ -1231,35 +1217,32 @@ class Molecule(metaclass=_Cached):
         occupancy = '1.00'
         temp_factor = '0.00'
 
+        conf = self._conformers[conformer_id]
         # This set will be used by bonds.
         atoms = set()
         for atom in atom_ids:
             atoms.add(atom)
 
             serial = atom+1
-            element = self.atom_symbol(atom)
+            element = self.atoms[atom].__class__.__name__
             atom_counts[element] = atom_counts.get(element, 0) + 1
             name = f'{element}{atom_counts[element]}'
             # Make sure the coords are no more than 8 columns wide
             # each.
-            x, y, z = (
-                f'{i}'[:8]
-                for i in self.atom_coords(atom, conformer_id)
-            )
-            charge = self.mol.GetAtomWithIdx(atom).GetFormalCharge()
+            x, y, z = (f'{i}'[:8] for i in conf[:, atom])
             lines.append(
                 f'{hetatm:<6}{serial:>5} {name:<4}'
                 f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'
                 f'{res_seq:>4}{i_code:<1}   '
                 f'{x:>8}{y:>8}{z:>8}'
                 f'{occupancy:>6}{temp_factor:>6}          '
-                f'{element:>2}{charge:>2}\n'
+                f'{element:>2}{self.atoms[atom].charge:>2}\n'
             )
 
         conect = 'CONECT'
-        for bond in self.mol.GetBonds():
-            a1 = bond.GetBeginAtomIdx()
-            a2 = bond.GetEndAtomIdx()
+        for bond in self.bonds:
+            a1 = bond.atom1.id
+            a2 = bond.atom2.id
             if a1 in atoms and a2 in atoms:
                 lines.append(
                     f'{conect:<6}{a1+1:>5}{a2+1:>5}               \n'
