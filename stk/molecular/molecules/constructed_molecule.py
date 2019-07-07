@@ -394,9 +394,9 @@ class ConstructedMolecule(Molecule):
 
             yield core.GetMol()
 
-    def to_json(self, include_attrs=None):
+    def _to_dict(self, include_attrs=None):
         """
-        Returns a JSON representation of the molecule.
+        Returns a :class:`dict` representation of the molecule.
 
         The representation has the form
 
@@ -406,7 +406,7 @@ class ConstructedMolecule(Molecule):
                 'class' : 'Polymer',
                 'mol_block' : '''A string holding the V3000 mol
                                  block of the molecule.''',
-                'building_blocks' : {bb1.json(), bb2.json()},
+                'building_blocks' : {bb1._to_dict(), bb2._to_dict()},
                 'topology' : 'Copolymer(repeating_unit="AB")',
             }
 
@@ -414,8 +414,8 @@ class ConstructedMolecule(Molecule):
         ----------
         include_attrs : :class:`list` of :class:`str`, optional
             The names of attributes of the molecule to be added to
-            the JSON. Each attribute is saved as a string using
-            :func:`repr`.
+            the :class:`dict`. Each attribute is saved as a string
+            using :func:`repr`.
 
         Returns
         -------
@@ -435,39 +435,35 @@ class ConstructedMolecule(Molecule):
             for conf in self._mol.GetConformers()
         ]
 
-        json = {
+        d = {
             'bb_counter': [
-                (key.json(), val)
+                (key._to_dict(), val)
                 for key, val in self.bb_counter.items()
             ],
             'bonds_made': self.bonds_made,
             'class': self.__class__.__name__,
             'conformers': conformers,
             'building_blocks': [
-                x.json() for x in self.building_blocks
+                x._to_dict() for x in self.building_blocks
             ],
             'topology': repr(self.topology),
             'func_groups': repr(self.func_groups)
 
         }
 
-        json.update(
+        d.update(
             {attr: repr(getattr(self, attr)) for attr in include_attrs}
         )
-        return json
+        return d
 
     @classmethod
-    def _init_from_json(cls, json_dict, use_cache):
+    def _init_from_dict(cls, mol_dict, use_cache):
         """
-        Initialize from a JSON representation.
-
-        This function is not to be used. Use :meth:`.Molecule.load`
-        for loading instances from a JSON string. That function will
-        automatically call this one.
+        Initialize from a :class:`dict` representation.
 
         Parameters
         ----------
-        json_dict : :class:`dict`
+        mol_dict : :class:`dict`
             A dictionary holding the attribute data of the molecule.
 
         use_cache : :class:`bool`
@@ -484,7 +480,7 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        d = dict(json_dict)
+        d = dict(mol_dict)
         d.pop('building_blocks')
         d.pop('class')
 
