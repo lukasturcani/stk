@@ -38,11 +38,6 @@ class BuildingBlock(Molecule):
     :class:`BuildingBlock` represents building block molecules, which
     are either entire molecules or molecular fragments used for the
     construction of a :class:`.ConstructedMolecule`.
-    :class:`BuildingBlock` holds information concerning a building
-    block molecule. For example, the number of atoms and bonds a
-    building block may have. It also has information about the
-    functional groups present in the building block molecule
-    (see :class:`.FGInfo` and :class:`.FunctionalGroup`).
 
     Attributes
     ----------
