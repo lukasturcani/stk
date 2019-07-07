@@ -156,7 +156,13 @@ class ConstructedMolecule(Molecule):
     information: which building block molecules are used to construct
     the molecule and what the :class:`.Topology` of the constructed
     molecule is. The construction of the molecular structure is
-    performed by :meth:`.Topology.construct`.
+    performed by :meth:`.Topology.construct`. This method does not
+    have to be called explicitly by the user, it will be called
+    automatically during initialization.
+
+    Each :class:`.Topology` may add additional attributes to the
+    :class:`ConstructedMolecule`, which will be documented by that
+    class.
 
     Attributes
     ----------
@@ -178,29 +184,42 @@ class ConstructedMolecule(Molecule):
         will have a :attr:`building_block_id` of either
         ``0``or ``1``.
 
-    building_blocks : :class:`list` or :class:`dict`
-        This attribute holds :class:`.Molecule` instances which
-        represent the building block molecules of the
-        :class:`ConstructedMolecule`. Only one :class:`.Molecule`
-        instance is present per building block, even if multiples of
-        that building block join up to form the
-        :class:`ConstructedMolecule`. The building blocks can be
-        either :class:`.BuildingBlock` or other
-        :class:`ConstructedMolecule` instances, depending the
-        :class:`.Topology` you are trying to construct.
+    building_blocks : :class:`dict`
+        Maps the building blocks used for construction, which can be
+        either :class:`.BuildingBlock` or
+        :class:`.ConstructedMolecule`, to the
+        :class:`~.topologies.base.Vertex` objects they are placed on
+        during construction. The :class:`dict` has the form
+
+        .. code-block:: python
+
+            building_blocks = {
+                BuildingBlock(...): [Vertex(...), Vertex(...)],
+                BuildingBlock(...): [
+                    Vertex(...),
+                    Vertex(...),
+                    Vertex(...),
+                ]
+                ConstructedMolecule(...): [Vertex(...)]
+            }
+
+        Each :class:`.BuildingBlock` and :class:`ConstructedMolecule`
+        can be mapped to multiple :class:`~.topologies.base.Vertex`
+        objects.
+
+    building_block_conformers : :class:`list` of :class:`dict`
+        
 
     bb_counter : :class:`collections.Counter`
-        A counter keeping track of the number of each building block in
-        the :class:`ConstructedMolecule`. Added by
-        :func:`.Topology.construct`.
+        A counter keeping track of how many times each building block
+        molecule appears in the :class:`ConstructedMolecule`.
 
     topology : :class:`.Topology`
         Defines the topology of :class:`ConstructedMolecule` and
         is responsible for constructing it.
 
     bonds_made : :class:`int`
-        The number of bonds made during construction. Added by
-        :func:`.Topology.construct`.
+        The net number of bonds added during construction.
 
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
         The remnants of building block functional groups present in the
@@ -213,8 +232,6 @@ class ConstructedMolecule(Molecule):
     -------
     :meth:`__init__`
     :meth:`add_conformer`
-    :meth:`building_block_cores`
-    :meth:
 
     Examples
     --------
