@@ -40,7 +40,8 @@ class Molecule(metaclass=_Cached):
     This class defines the operations which any class
     describing molecules should inherit or may find useful. Examples of
     such are :class:`.BuildingBlock` and :class:`.ConstructedMolecule`.
-    This class should not be used directly.
+    This class should not be used directly, use an instance of a
+    derived class instead.
 
     Attributes
     ----------
