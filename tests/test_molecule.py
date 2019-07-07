@@ -136,7 +136,7 @@ def test_get_maximum_diamter(tmp_amine2):
     pos_mat[1] = [0, -50, 0]
     pos_mat[13] = [0, 50, 0]
     tmp_amine2.set_position_matrix(pos_mat)
-    assert abs(tmp_amine2.maximum_diameter() - 100) < 1e-6
+    assert abs(tmp_amine2.get_maximum_diameter() - 100) < 1e-6
 
 
 def test_get_plane_normal():
@@ -176,8 +176,8 @@ def test_set_centroid(tmp_amine2):
 
 def test_update_from_mae(tmp_amine2, mae_path):
     tmp_amine2.update_from_file(mae_path, None)
-    d1 = tmp_amine2.maximum_diameter(conformer_id=0)
-    d2 = tmp_amine2.maximum_diameter(conformer_id=2)
+    d1 = tmp_amine2.get_maximum_diameter(conformer_id=0)
+    d2 = tmp_amine2.get_maximum_diameter(conformer_id=2)
     assert abs(d1 - d2) > 1
 
 

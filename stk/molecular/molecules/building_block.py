@@ -168,18 +168,24 @@ class BuildingBlock(Molecule):
             atom.UpdatePropertyCache()
 
         atoms = tuple(
-            Atom(a.GetAtomicNum()) for a in rdkit_mol.GetAtoms()
+            Atom(a.GetIdx(), a.GetAtomicNum())
+            for a in rdkit_mol.GetAtoms()
         )
         bonds = tuple(
             Bond(
-                b.GetBeginAtomIdx(),
-                b.GetEndAtomIdx(),
+                atoms[b.GetBeginAtomIdx()],
+                atoms[b.GetEndAtomIdx()],
                 b.GetBondTypeAsDouble()
             )
             for b in rdkit_mol.GetBonds()
         )
 
         super().__init__(atoms, bonds)
+        coords = rdkit_mol.GetConformer().GetPositions()
+        self.set_position_matrix(
+            position_matrix=coords,
+            conformer_id=None
+        )
 
         # If no functional group names passed, check if any functional
         # group names appear in the file path.
@@ -192,7 +198,7 @@ class BuildingBlock(Molecule):
                 functional_groups = []
 
         self.func_groups = tuple(
-            self.functional_groups(functional_groups)
+            self.get_functional_groups(functional_groups)
         )
 
         self.func_group_infos = tuple(dedupe(
@@ -301,12 +307,7 @@ class BuildingBlock(Molecule):
         if functional_groups is None:
             functional_groups = ()
 
-        mol = rdkit.MolFromSmiles(smiles)
-        rdkit.SanitizeMol(mol)
-        H_mol = rdkit.AddHs(mol)
-        key = cls._generate_key(H_mol, functional_groups, None)
-        if key in cls._cache and use_cache:
-            return cls._cache[key]
+        mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
 
         params = rdkit.ETKDGv2()
         params.randomSeed = random_seed
@@ -325,24 +326,11 @@ class BuildingBlock(Molecule):
             )
             logger.warning(msg)
 
-        mol = rdkit.AddHs(mol, addCoords=True)
-        mol.GetConformer()
-        obj = cls.__new__(cls)
-        obj.file = smiles
-        obj._key = key
-        obj.mol = mol
-        obj.func_groups = tuple(
-            obj.functional_groups(functional_groups)
+        return cls(
+            mol=mol,
+            functional_groups=functional_groups,
+            use_cache=use_cache
         )
-        obj.func_group_infos = tuple(dedupe(
-            iterable=(fg.info for fg in obj.func_groups),
-            key=lambda info: info.name
-        ))
-
-        super().__init__()
-        if use_cache:
-            cls._cache[key] = obj
-        return obj
 
     @classmethod
     def _init_from_json(cls, json_dict):

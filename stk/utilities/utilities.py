@@ -917,7 +917,8 @@ def remake(mol):
                      bond.GetBondType())
 
     m = emol.GetMol()
-    m.AddConformer(rdkit.Conformer(mol.GetConformer()))
+    if mol.GetConformers():
+        m.AddConformer(rdkit.Conformer(mol.GetConformer()))
 
     for a in m.GetAtoms():
         a.UpdatePropertyCache()

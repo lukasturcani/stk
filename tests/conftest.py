@@ -61,7 +61,7 @@ def tmp_amine2():
         functional_groups=['amine']
     )
     # Make a second conformer with a distinct geometry.
-    amine2.set_position_from_matrix(
+    amine2.set_position_matrix(
         position_matrix=amine2.get_position_matrix()*4,
         conformer_id=None
     )
@@ -156,7 +156,7 @@ def aldehyde3():
         functional_groups=['aldehyde']
     )
     # Make a second conformer with a distinct geometry.
-    aldehyde3.set_position_from_matrix(
+    aldehyde3.set_position_matrix(
         position_matrix=aldehyde3.get_position_matrix()*4,
         conformer_id=None
     )
@@ -170,7 +170,7 @@ def tmp_aldehyde3():
         functional_groups=['aldehyde']
     )
     # Make a second conformer with a distinct geometry.
-    aldehyde3.set_position_from_matrix(
+    aldehyde3.set_position_matrix(
         position_matrix=aldehyde3.get_position_matrix()*4,
         conformer_id=None
     )

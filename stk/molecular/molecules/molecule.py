@@ -22,12 +22,15 @@ class MoleculeSubclassError(Exception):
 
 class _Cached(type):
     def __call__(cls, *args, **kwargs):
-        key = cls._generate_key(*args, **kwargs)
+        print(args, kwargs)
         sig = signature(cls.__init__).bind_partial(*args, **kwargs)
         sig.apply_defaults()
+        key = cls._generate_key(**sig.arguments)
         if sig.arguments['use_cache'] and key in cls._cache:
             return cls._cache[key]
-        return super().__call__(*args, **kwargs)
+        obj = super().__call__(*args, **kwargs)
+        obj._key = key
+        return obj
 
 
 class Molecule(metaclass=_Cached):
@@ -92,13 +95,23 @@ class Molecule(metaclass=_Cached):
 
     subclasses = {}
 
-    def __init__(self):
+    def __init__(self, atoms, bonds):
         """
         Initialize a :class:`Molecule`.
 
+        Parameters
+        ----------
+        atoms : :class:`tuple` of :class:`.Atom`
+            The atoms which compose the molecule.
+
+        bonds : :class:`tuple` of :class:`.Bond`
+            The bonds of the molecule.
+
         """
 
-        return
+        self.atoms = atoms
+        self.bonds = bonds
+        self._conformers = []
 
     @classmethod
     def init_from_dict(self, json_dict):
@@ -639,7 +652,7 @@ class Molecule(metaclass=_Cached):
         """
 
         if conformer_id is None:
-            self._confomers.append(position_matrix.T)
+            self._conformers.append(position_matrix.T)
         else:
             self._conformers[conformer_id] = position_matrix.T
         return self
@@ -789,7 +802,7 @@ class Molecule(metaclass=_Cached):
 
         mol = rdkit.EditableMol(rdkit.Mol())
         for atom in self.atoms:
-            mol.AddAtom(atom.atomic_number)
+            mol.AddAtom(rdkit.Atom(atom.atomic_number))
 
         for bond in self.bonds:
             mol.AddBond(
@@ -907,7 +920,7 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        self._update_from_rdkit_mol(mol_from_mae_file(path))
+        self.update_from_rdkit_mol(mol_from_mae_file(path))
 
     def _update_from_mol(self, path, conformer_id=0):
         """
@@ -1173,7 +1186,7 @@ class Molecule(metaclass=_Cached):
         content = [0]
         for i, atom_id in enumerate(atom_ids, 1):
             x, y, z = conf[:, atom_id]
-            symbol = self.atoms[i].__class__.__name__
+            symbol = self.atoms[atom_id].__class__.__name__
             content.append(f'{symbol} {x:f} {y:f} {z:f}\n')
         # Set first line to the atom_count.
         content[0] = f'{i}\n\n'

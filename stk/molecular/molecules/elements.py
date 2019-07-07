@@ -4,21 +4,21 @@ class Bond:
 
     Attributes
     ----------
-    order : :class:`int`
-        The bond order.
-
     atom1 : :class:`Atom`
         The first atom in the bond.
 
     atom2 : :class:`Atom`
         The second atom in the bond.
 
+    order : :class:`int`
+        The bond order.
+
     """
 
-    def __init__(self, order, atom1, atom2):
-        self.order = order
+    def __init__(self, atom1, atom2, order):
         self.atom1 = atom1
         self.atom2 = atom2
+        self.order = order
 
 
 class Atom:
@@ -36,6 +36,10 @@ class Atom:
     mass : :class:`int`
         A class attribute. Specifies the standard atmoic weight.
 
+    id : :class:`int`
+        The id of the atom. Should be equal to its index in
+        :attr:`.Molecule.atoms`.
+
     _elements : :class:`dict`
         Maps an atomic number to the class for that element.
 
@@ -46,13 +50,17 @@ class Atom:
     def __init_subclass__(cls, **kwargs):
         cls._elements[cls.atomic_number] = cls
 
-    def __init__(self, atomic_number):
+    def __init__(self, id, atomic_number, charge=0):
+        self.id = id
+        self.charge = charge
         self.__class__ = self._elements[atomic_number]
 
 
 class _Atom(Atom):
-    def __init__(self):
-        return
+    atomic_number = float('nan')
+
+    def __init__(self, id, charge=0):
+        super().__init__(id, self.atomic_number, charge)
 
 
 class H(_Atom):
