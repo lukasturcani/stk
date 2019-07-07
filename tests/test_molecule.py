@@ -13,9 +13,9 @@ def test_apply_displacement(tmp_amine2):
     before_conf0 = tmp_amine2.get_position_matrix(conformer_id=0)
     before_conf1 = tmp_amine2.get_position_matrix(conformer_id=1)
 
-    assert np.allclose(before_conf0*4, before_conf1, 1e-4)
+    assert np.allclose(before_conf0*4, before_conf1, 1e-6)
 
-    tmp_amine2.apply_displacement([0, 0, 0])
+    tmp_amine2.apply_displacement(np.array([0, 0, 0]))
 
     assert np.allclose(
         a=before_conf0,
@@ -28,7 +28,7 @@ def test_apply_displacement(tmp_amine2):
         atol=1e-6
     )
 
-    tmp_amine2.apply_displacement([10, 20, 30])
+    tmp_amine2.apply_displacement(np.array([10, 20, 30]))
 
     after_conf0 = tmp_amine2.get_position_matrix(conformer_id=0)
     assert np.allclose(
@@ -42,7 +42,10 @@ def test_apply_displacement(tmp_amine2):
         atol=1e-6
     )
 
-    tmp_amine2.apply_displacement([-10, 20, -30], conformer_id=1)
+    tmp_amine2.apply_displacement(
+        displacement=np.array([-10, 20, -30]),
+        conformer_id=1
+    )
 
     assert np.allclose(
         a=after_conf0,
@@ -50,27 +53,75 @@ def test_apply_displacement(tmp_amine2):
         atol=1e-6
     )
     assert np.allclose(
-        a=before_conf0+[-10, 20, -30],
+        a=before_conf1+[-10, 20, -30],
         b=tmp_amine2.get_position_matrix(conformer_id=1),
         atol=1e-6
     )
 
 
-def test_apply_rotation_about_axis():
-    assert False
+def test_apply_rotation_about_axis(tmp_amine2):
+    num_atoms = len(tmp_amine2.atoms)
+    coords = np.array([[i, 0, 0] for i in range(num_atoms)])
+    tmp_amine2.set_position_matrix(coords, conformer_id=1)
+
+    tmp_amine2.apply_rotation_about_axis(
+        theta=-np.pi/2,
+        axis=np.array([0, 1, 0]),
+        origin=np.array([0, 0, 0]),
+        conformer_id=1
+    )
+
+    assert np.allclose(
+        a=tmp_amine2.get_position_matrix(conformer_id=1),
+        b=np.array([[0, 0, i] for i in range(num_atoms)]),
+        atol=1e-6
+    )
 
 
-def test_apply_rotation_between_vectors():
-    assert False
+def test_apply_rotation_between_vectors(tmp_amine2):
+
+    assert not np.allclose(
+        a=next(tmp_amine2.get_bonder_direction_vectors())[-1],
+        b=[1, 0, 0],
+        atol=1e-6
+    )
+
+    tmp_amine2.apply_rotation_between_vectors(
+        start=next(tmp_amine2.get_bonder_direction_vectors())[-1],
+        target=[1, 0, 0],
+        origin=tmp_amine2.get_centroid()
+    )
+
+    assert np.allclose(
+        a=next(tmp_amine2.get_bonder_direction_vectors())[-1],
+        b=[1, 0, 0],
+        atol=1e-6
+    )
 
 
-def apply_rotation_to_minimize_theta():
-    assert False
+def test_apply_rotation_to_minimize_theta(tmp_amine2):
+    num_atoms = len(tmp_amine2.atoms)
+    coords = np.array([[i, 0, 0] for i in range(num_atoms)])
+    tmp_amine2.set_position_matrix(coords, conformer_id=1)
+
+    tmp_amine2.apply_rotation_to_minimize_theta(
+        start=np.array([1, 0, 0]),
+        target=np.array([0, 0, 1]),
+        axis=np.array([0, 1, 0]),
+        origin=np.array([0, 0, 0]),
+        conformer_id=1
+    )
+
+    assert np.allclose(
+        a=tmp_amine2.get_position_matrix(conformer_id=1),
+        b=np.array([[0, 0, i] for i in range(num_atoms)]),
+        atol=1e-6
+    )
 
 
 def test_get_atom_coords(tmp_amine2):
     num_atoms = len(tmp_amine2.atoms)
-    new_coords = np.stack([np.arange(num_atoms) for _ in range(3)])
+    new_coords = np.array([[i]*3 for i in range(num_atoms)])
     tmp_amine2.set_position_matrix(new_coords)
 
     for i, atom_coords in enumerate(tmp_amine2.get_atom_coords()):
@@ -88,7 +139,7 @@ def test_get_atom_coords(tmp_amine2):
 
 def test_get_atom_distance(tmp_amine2):
     num_atoms = len(tmp_amine2.atoms)
-    coords = np.stack([np.arange(num_atoms) for _ in range(3)])
+    coords = np.array([[i, 0, 0] for i in range(num_atoms)])
     tmp_amine2.set_position_matrix(coords)
     for i in range(1, num_atoms):
         assert tmp_amine2.get_atom_distance(i-1, i) == 1
@@ -113,7 +164,7 @@ def test_get_centroid(tmp_amine2):
     )
     assert all(tmp_amine2.get_centroid(conformer_id=1) == [1, 1, 1])
 
-    coords = np.stack([np.arange(num_atoms) for _ in range(3)])
+    coords = np.array([[i]*3 for i in range(num_atoms)])
     tmp_amine2.set_position_matrix(coords)
     assert np.allclose(
         a=tmp_amine2.get_centroid(atom_ids=[1, 3]),
@@ -123,10 +174,24 @@ def test_get_centroid(tmp_amine2):
 
 
 def test_get_direction(tmp_amine2):
-    direction = tmp_amine2.get_direction(conformer_id=1)
-    tmp_amine2.set_orientation(direction, [0, 1, 0], conformer_id=1)
-    direction = tmp_amine2.direction(conformer_id=1)
-    assert np.allclose(direction, [0, 1, 0], atol=1e-4)
+    num_atoms = len(tmp_amine2.atoms)
+    coords = np.array([[i, 0, 0] for i in range(num_atoms)])
+    tmp_amine2.set_position_matrix(coords)
+
+    assert np.allclose(
+        a=tmp_amine2.get_direction(),
+        b=[1, 0, 0],
+        atol=1e-6
+    )
+
+    coords = np.array([[i, i, i] for i in range(num_atoms)])
+    tmp_amine2.set_position_matrix(coords, conformer_id=1)
+
+    assert np.allclose(
+        a=tmp_amine2.get_direction(conformer_id=1),
+        b=stk.normalize_vector([1, 1, 1]),
+        atol=1e-6
+    )
 
 
 def test_get_maximum_diamter(tmp_amine2):
@@ -139,11 +204,18 @@ def test_get_maximum_diamter(tmp_amine2):
     assert abs(tmp_amine2.get_maximum_diameter() - 100) < 1e-6
 
 
-def test_get_plane_normal():
-    assert False
+def test_get_plane_normal(tmp_amine2):
+    coords = tmp_amine2.get_position_matrix()
+    coords[:, 2] = 0
+    tmp_amine2.set_position_matrix(coords)
+    assert np.allclose(
+        a=tmp_amine2.get_plane_normal(),
+        b=[0, 0, 1],
+        atol=1e-6
+    )
 
 
-def test_position_matrix(tmp_amine2):
+def test_get_set_position_matrix(tmp_amine2):
     zeros = np.zeros((len(tmp_amine2.atoms), 3))
     ones = np.ones((len(tmp_amine2.atoms), 3))
     tmp_amine2.set_position_matrix(zeros)
@@ -167,9 +239,28 @@ def test_set_centroid(tmp_amine2):
         b=[-12, 4, 160],
         atol=1e-6
     )
-    assert not np.allclose(
+    assert np.allclose(
         a=tmp_amine2.get_centroid(atom_ids=[1, 3]),
         b=[-12, 4, 160],
+        atol=1e-6
+    )
+
+
+def test_update_from_rdkit_mol(tmp_amine2):
+    mol = tmp_amine2.to_rdkit_mol()
+    conf = mol.GetConformer()
+    for atom_id, coord in enumerate(conf.GetPositions()):
+        conf.SetAtomPosition(atom_id, 0.5*coord)
+
+    tmp_amine2.update_from_rdkit_mol(mol, conformer_id=None)
+    assert np.allclose(
+        a=conf.GetPositions(),
+        b=tmp_amine2.get_position_matrix(conformer_id=2),
+        atol=1e-6
+    )
+    assert np.allclose(
+        a=conf.GetPositions(),
+        b=tmp_amine2.get_position_matrix()*0.5,
         atol=1e-6
     )
 
@@ -191,11 +282,6 @@ def test_update_from_mol(tmp_amine2):
         b=tmp_amine2.get_position_matrix(conformer_id=2),
         atol=1e-4
     )
-    assert not np.allclose(
-        a=tmp_amine2.get_position_matrix(conformer_id=1),
-        b=tmp_amine2.get_position_matrix(conformer_id=2),
-        atol=1e-4
-    )
 
 
 def test_update_from_xyz(tmp_amine2):
@@ -204,11 +290,6 @@ def test_update_from_xyz(tmp_amine2):
     tmp_amine2.update_from_file(path=path, conformer_id=None)
 
     assert np.allclose(
-        a=tmp_amine2.get_position_matrix(conformer_id=1),
-        b=tmp_amine2.get_position_matrix(conformer_id=2),
-        atol=1e-4
-    )
-    assert not np.allclose(
         a=tmp_amine2.get_position_matrix(conformer_id=1),
         b=tmp_amine2.get_position_matrix(conformer_id=2),
         atol=1e-4
@@ -225,8 +306,27 @@ def test_write_pdb(amine2):
         b=bb.get_position_matrix(),
         atol=1e-4
     )
-    assert not np.allclose(
-        a=amine2.get_position_matrix(conformer_id=1),
-        b=bb.get_position_matrix(),
-        atol=1e-4
-    )
+
+
+def test_to_rdkit_mol(tmp_amine2):
+    tmp_amine2.atoms[0].charge = 12
+    mol = tmp_amine2.to_rdkit_mol()
+    assert mol.GetNumConformers() == 2
+    assert mol.GetAtomWithIdx(0).GetFormalCharge() == 12
+    assert mol.GetNumAtoms() == len(tmp_amine2.atoms)
+    for atom, rdkit_atom in zip(tmp_amine2.atoms, mol.GetAtoms()):
+        assert atom.atomic_number == rdkit_atom.GetAtomicNum()
+        assert atom.mass == rdkit_atom.GetMass()
+
+    assert mol.GetNumBonds() == len(tmp_amine2.bonds)
+    for bond, rdkit_bond in zip(tmp_amine2.bonds, mol.GetBonds()):
+        assert rdkit_bond.GetBondTypeAsDouble() == bond.order
+        assert rdkit_bond.GetBeginAtomIdx() == bond.atom1.id
+        assert rdkit_bond.GetEndAtomIdx() == bond.atom2.id
+
+
+def test_update_cache(amine2):
+    amine2.test_value = np.random.randint(5, 10)
+    amine2.update_cache()
+    cached_val = amine2.__class__._cache[amine2._key].test_value
+    assert cached_val == amine2.test_value

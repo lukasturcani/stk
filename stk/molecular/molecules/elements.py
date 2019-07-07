@@ -55,6 +55,16 @@ class Atom:
         self.charge = charge
         self.__class__ = self._elements[atomic_number]
 
+    def __repr__(self):
+        charge = f', charge={self.charge}' if self.charge != 0 else ''
+        return (
+            f'{self.__class__.__name__}'
+            f'({self.id}{charge})'
+        )
+
+    def __str__(self):
+        return repr(self)
+
 
 class _Atom(Atom):
     atomic_number = float('nan')

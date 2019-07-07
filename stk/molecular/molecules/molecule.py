@@ -22,10 +22,10 @@ class MoleculeSubclassError(Exception):
 
 class _Cached(type):
     def __call__(cls, *args, **kwargs):
-        print(args, kwargs)
-        sig = signature(cls.__init__).bind_partial(*args, **kwargs)
+        sig = signature(cls.__init__)
+        sig = sig.bind_partial(cls, *args, **kwargs)
         sig.apply_defaults()
-        key = cls._generate_key(**sig.arguments)
+        key = cls._get_key(**sig.arguments)
         if sig.arguments['use_cache'] and key in cls._cache:
             return cls._cache[key]
         obj = super().__call__(*args, **kwargs)
@@ -57,7 +57,7 @@ class Molecule(metaclass=_Cached):
     _key : :class:`object`
         A hashable :class:`object`. This attribute will be the same
         for molecules of the same class, which have the same structure.
-        A private method :meth:`_generate_key` must be defined for
+        A private method :meth:`_get_key` must be defined for
         each subclass of :class:`.Molecule` and it will be used to
         generate the :attr:`_key`.
 
@@ -218,18 +218,18 @@ class Molecule(metaclass=_Cached):
     def apply_rotation_between_vectors(
         self,
         start,
-        end,
+        target,
         origin,
         conformer_id=0
     ):
         """
-        Rotate the molecule by a rotation from `start` to `end`.
+        Rotate the molecule by a rotation from `start` to `target`.
 
-        Given two direction vectors, `start` and `end`, this method
-        applies the rotation required transform `start` to `end` onto
-        the molecule. The rotation occurs about the `origin`.
+        Given two direction vectors, `start` and `target`, this method
+        applies the rotation required transform `start` to `target`
+        onto the molecule. The rotation occurs about the `origin`.
 
-        For example, if the `start` and `end` vectors
+        For example, if the `start` and `target` vectors
         are 45 degrees apart, a 45 degree rotation will be applied to
         the molecule. The rotation will be along the appropriate
         direction.
@@ -237,7 +237,7 @@ class Molecule(metaclass=_Cached):
         The great thing about this method is that you as long as you
         can associate a geometric feature of the molecule with a
         vector, then the molecule can be rotated so that this vector is
-        aligned with `end`. The defined vector can be virtually
+        aligned with `target`. The defined vector can be virtually
         anything. This means that any geometric feature of the molecule
         can be easily aligned with any arbitrary axis.
 
@@ -245,9 +245,9 @@ class Molecule(metaclass=_Cached):
         ----------
         start : :class:`numpy.ndarray`
             A vector which is to be rotated so that it transforms to
-            the `end` vector.
+            the `target` vector.
 
-        end : :class:`numpy.ndarray`
+        targert : :class:`numpy.ndarray`
             This array holds the vector, onto which `start` is rotated.
 
         origin : :class:`numpy.ndarray`
@@ -265,13 +265,13 @@ class Molecule(metaclass=_Cached):
 
         # Normalize the input direction vectors.
         start = normalize_vector(start)
-        end = normalize_vector(end)
+        target = normalize_vector(target)
 
         # Set the origin to the origin.
         self.apply_displacement(-origin, conformer_id)
 
         # Get the rotation matrix.
-        rot_mat = rotation_matrix(start, end)
+        rot_mat = rotation_matrix(start, target)
 
         # Apply the rotation matrix to the atomic positions to yield
         # the new atomic positions.
@@ -285,21 +285,25 @@ class Molecule(metaclass=_Cached):
 
     def apply_rotation_to_minimize_theta(
         self,
-        v1,
-        v2,
+        start,
+        target,
         axis,
         origin,
         conformer_id=0
     ):
         """
-        Rotates the molecule to minimize angle between `v1` and `v2`.
+        Rotates the molecule to minimize angle between vectors.
+
+        Note that this function will not necessarily overlay the
+        `start` and `target` vectors. This is because the possible
+        rotation is restricted to the `axis`.
 
         Parameters
         ----------
-        v1 : :class:`numpy.ndarray`
+        start : :class:`numpy.ndarray`
             The vector which is rotated.
 
-        v2 : :class:`numpy.ndarray`
+        target : :class:`numpy.ndarray`
             The vector which is stationary.
 
         axis : :class:`numpy.ndarray`
@@ -320,7 +324,7 @@ class Molecule(metaclass=_Cached):
 
         # If the vector being rotated is not finite exit. This is
         # probably due to a planar molecule.
-        if not all(np.isfinite(x) for x in v1):
+        if not all(np.isfinite(x) for x in start):
             return self
 
         self.apply_displacement(-origin, conformer_id)
@@ -328,12 +332,12 @@ class Molecule(metaclass=_Cached):
         # 1. First transform the problem.
         # 2. The rotation axis is set equal to the z-axis.
         # 3. Apply this transformation to all vectors in the problem.
-        # 4. Take only the x and y components of `v1` and `v2`.
+        # 4. Take only the x and y components of `start` and `target`.
         # 5. Work out the angle between them.
         # 6. Apply that rotation along the original rotation axis.
 
         rotmat = rotation_matrix(axis, [0, 0, 1])
-        tstart = np.dot(rotmat, v1)
+        tstart = np.dot(rotmat, start)
         tstart = np.array([tstart[0], tstart[1], 0])
 
         # If the `tstart` vector is 0 after these transformations it
@@ -342,7 +346,7 @@ class Molecule(metaclass=_Cached):
             self.apply_displacement(origin, conformer_id)
             return self
 
-        tend = np.dot(rotmat, v2)
+        tend = np.dot(rotmat, target)
         tend = np.array([tend[0], tend[1], 0])
         angle = vector_theta(tstart, tend)
 
@@ -391,7 +395,8 @@ class Molecule(metaclass=_Cached):
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        for atom_coords in self._conformers[conformer_id][:, atom_ids]:
+        coords = self._conformers[conformer_id][:, atom_ids].T
+        for atom_coords in coords:
             yield atom_coords
 
     def get_atom_distance(self, atom1_id, atom2_id, conformer_id=0):
@@ -419,9 +424,8 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        atom_ids = [atom1_id, atom2_id]
-        coord1, coord2 = self._conformers[conformer_id][:, atom_ids]
-        return float(euclidean(coord1, coord2))
+        conf = self._conformers[conformer_id]
+        return float(euclidean(conf[:, atom1_id], conf[:, atom2_id]))
 
     def get_center_of_mass(self, atom_ids=None, conformer_id=0):
         """
@@ -517,7 +521,9 @@ class Molecule(metaclass=_Cached):
             atom_ids = list(atom_ids)
 
         pos = self._conformers[conformer_id][:, atom_ids].T
-        return np.linalg.svd(pos - pos.mean(axis=1))[-1][0]
+        return normalize_vector(
+            np.linalg.svd(pos - pos.mean(axis=0))[-1][0]
+        )
 
     def get_maximum_diameter(self, atom_ids=None, conformer_id=0):
         """
@@ -681,7 +687,7 @@ class Molecule(metaclass=_Cached):
         with open(path, 'w') as f:
             json.dump(self.to_json(include_attrs), f, indent=4)
 
-    def _generate_key(*args, **kwargs):
+    def _get_key(*args, **kwargs):
         raise NotImplementedError()
 
     @classmethod
@@ -802,7 +808,9 @@ class Molecule(metaclass=_Cached):
 
         mol = rdkit.EditableMol(rdkit.Mol())
         for atom in self.atoms:
-            mol.AddAtom(rdkit.Atom(atom.atomic_number))
+            rdkit_atom = rdkit.Atom(atom.atomic_number)
+            rdkit_atom.SetFormalCharge(atom.charge)
+            mol.AddAtom(rdkit_atom)
 
         for bond in self.bonds:
             mol.AddBond(
@@ -811,7 +819,14 @@ class Molecule(metaclass=_Cached):
                 order=rdkit.BondType(bond.order)
             )
 
-        return mol.GetMol()
+        mol = mol.GetMol()
+        for conf in self._conformers:
+            rdkit_conf = rdkit.Conformer(len(self.atoms))
+            for atom_id, atom_coord in enumerate(conf.T):
+                rdkit_conf.SetAtomPosition(atom_id, atom_coord)
+            mol.AddConformer(rdkit_conf)
+
+        return mol
 
     def update_cache(self):
         """
@@ -920,7 +935,10 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        self.update_from_rdkit_mol(mol_from_mae_file(path))
+        self.update_from_rdkit_mol(
+            mol=mol_from_mae_file(path),
+            conformer_id=conformer_id
+        )
 
     def _update_from_mol(self, path, conformer_id=0):
         """

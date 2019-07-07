@@ -274,7 +274,7 @@ class BuildingBlock(Molecule):
         Initialize from a SMILES string.
 
         The structure of the molecule is embedded using
-        :func:`rdkit.ETKDG()`.
+        :func:`rdkit.ETKDGv2()`.
 
         Parameters
         ----------
@@ -847,10 +847,10 @@ class BuildingBlock(Molecule):
 
         return json
 
-    @classmethod
-    def _generate_key(cls, mol, functional_groups, use_cache):
+    @staticmethod
+    def _get_key(self, mol, functional_groups, use_cache):
         """
-        Generate the key used for caching the molecule.
+        Get the key used for caching the molecule.
 
         Parameters
         ----------
@@ -887,11 +887,11 @@ class BuildingBlock(Molecule):
             if os.path.exists(mol):
                 _, ext = os.path.splitext(mol)
 
-                if ext not in cls._init_funcs:
+                if ext not in self._init_funcs:
                     raise TypeError(
                         f'Unable to initialize from "{ext}" files.'
                     )
-                mol = remake(cls._init_funcs[ext](mol))
+                mol = remake(self._init_funcs[ext](mol))
 
             else:
                 mol = remake(
@@ -904,6 +904,14 @@ class BuildingBlock(Molecule):
 
         elif isinstance(mol, rdkit.Mol):
             mol = remake(mol)
+
+        if functional_groups is None:
+            if isinstance(mol, str) and os.path.exists(mol):
+                functional_groups = [
+                    fg.name for fg in fgs if fg.name in mol
+                ]
+            else:
+                functional_groups = []
 
         functional_groups = sorted(functional_groups)
         return (*functional_groups, rdkit.MolToInchi(mol))
