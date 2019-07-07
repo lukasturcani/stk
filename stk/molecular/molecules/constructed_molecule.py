@@ -135,7 +135,7 @@ class does the construction of the molecule from the building blocks.
 
 import logging
 import rdkit.Chem.AllChem as rdkit
-from collections import Counter, defaultdict
+from collections import Counter
 
 from .molecule import Molecule
 from .. import topologies
@@ -155,37 +155,39 @@ class ConstructedMolecule(Molecule):
     A :class:`ConstructedMolecule` requires at least 2 basic pieces of
     information: which building block molecules are used to construct
     the molecule and what the :class:`.Topology` of the constructed
-    molecule is.
-
-    Molecular construction should happen in
-    :meth:`ConstructedMolecule.__init__` via
-    :meth:`.Topology.construct`. The :meth:`~.Topology.construct`
-    method places the constructed :mod:`rdkit` molecule in
-    :attr:`ConstructedMolecule.mol`.
-
-    Because of the computational cost associated with molecular
-    construction, instances of this class are cached. This means that
-    providing the same arguments to the initializer will not construct
-    a different instance with the same attribute values. It will yield
-    the original instance, retrieved from memory.
-
-    This class is not intended to be used directly but should be
-    inherited by subclasses representing specific a specific type of
-    :class:`ConstructedMolecule`. The :class:`.Cage` and
-    :class:`.Polymer` classes are examples of this. Any information or
-    methods that apply generally to all constructed molecules should be
-    defined within this class, while those that are specific and
-    non-general should be included in the derived classes.
+    molecule is. The construction of the molecular structure is
+    performed by :meth:`.Topology.construct`.
 
     Attributes
     ----------
-    building_blocks : :class:`list` of :class:`.BuildingBlock`
-        This attribute holds :class:`.BuildingBlock` instances which
+    atoms : :class:`tuple` of :class:`.Atom`
+        Extends :class:`.Molecule.atoms`. Each :class:`.Atom`
+        instance has two additional attributes. The
+        first is :attr:`building_block`, which holds the building
+        block :class:`.Molecule` from which that
+        :class:`.Atom` came. If the :class:`.Atom` did not come from a
+        building block, but was added during contruction, the value
+        of this attribute will be ``None``.
+
+        The second attribute is :attr:`building_block_id`.
+        Every time a building block is added to the
+        :class:`ConstructedMolecule`, all added atoms will have the
+        same :attr:`building_block_id`. This means that if you use the
+        same building block twice during construction, each
+        :class:`.Atom` in the :class:`.ConstructedMolecule`
+        will have a :attr:`building_block_id` of either
+        ``0``or ``1``.
+
+    building_blocks : :class:`list` or :class:`dict`
+        This attribute holds :class:`.Molecule` instances which
         represent the building block molecules of the
-        :class:`ConstructedMolecule`. Only one :class:`.BuildingBlock`
+        :class:`ConstructedMolecule`. Only one :class:`.Molecule`
         instance is present per building block, even if multiples of
         that building block join up to form the
-        :class:`ConstructedMolecule`.
+        :class:`ConstructedMolecule`. The building blocks can be
+        either :class:`.BuildingBlock` or other
+        :class:`ConstructedMolecule` instances, depending the
+        :class:`.Topology` you are trying to construct.
 
     bb_counter : :class:`collections.Counter`
         A counter keeping track of the number of each building block in
@@ -206,6 +208,16 @@ class ConstructedMolecule(Molecule):
         in the building block molecules. The id of each
         :class:`.FunctionalGroup` should match its index in
         :attr:`func_groups`.
+
+    Methods
+    -------
+    :meth:`__init__`
+    :meth:`add_conformer`
+    :meth:`building_block_cores`
+    :meth:
+
+    Examples
+    --------
 
     """
 
@@ -357,42 +369,6 @@ class ConstructedMolecule(Molecule):
         new_id = original_mol.AddConformer(new_conf, True)
         self._mol = original_mol
         return new_id
-
-    def building_block_cores(self, bb):
-        """
-        Yield the "cores" of the building block molecules.
-
-        The structure of the yielded cores has the geometry found in
-        the :class:`ConstructedMolecule`.
-
-        Parameters
-        ----------
-        bb : :class:`int`
-            The index of a building block molecule within
-            :attr:`building_blocks`. The cores of this molecule are
-            yielded.
-
-        Yields
-        ------
-        :class:`rdkit.Mol`
-            The core of a building block molecule, as found in the
-            :class:`ConstructedMolecule`.
-
-        """
-
-        mols = defaultdict(set)
-        for atom_id, props in self.atom_props.items():
-            correct_bb = props.get('bb_index', float('nan')) == bb
-            if correct_bb and self.is_core_atom(atom_id):
-                mols[props['mol_index']].add(atom_id)
-
-        for mol in mols.values():
-            core = rdkit.EditableMol(self._mol)
-            for atom in reversed(range(self._mol.GetNumAtoms())):
-                if atom not in mol:
-                    core.RemoveAtom(atom)
-
-            yield core.GetMol()
 
     def _to_dict(self, include_attrs=None):
         """
@@ -571,63 +547,6 @@ class ConstructedMolecule(Molecule):
 
         bb_keys = frozenset(x.key for x in building_blocks)
         return bb_keys, repr(topology)
-
-    def bb_distortion(self, bb_conformers=None, conformer=-1):
-        """
-        Rmsd difference of building blocks pre and post construction.
-
-        The function looks at each building block in the
-        :class:`ConstructedMolecule` and calculates the rmsd between
-        the "free" version and the one present in the
-        :class:`ConstructedMolecule`. The mean of these rmsds is
-        returned.
-
-        Atoms which form the functional group of the building blocks
-        and hydrogens are excluded from the calculation.
-
-        Parameters
-        ----------
-        bb_conformers : :class:`list` of :class:`int`, optional
-            The ids of building block conformers to use. 1 id for
-            each building block, in an order corresponding to
-            :attr:`building_blocks`. If ``None``, all conformer ids
-            default to ``-1``.
-
-        conformer : :class:`int`, optional
-            The id of the conformer to use.
-
-        Returns
-        -------
-        :class:`float`
-            The mean rmsd of the building blocks in the constructed
-            molecule to their "free" counterparts.
-
-        """
-
-        if bb_conformers is None:
-            bb_conformers = [
-                -1 for _ in range(len(self.building_blocks))
-            ]
-
-        # Go through each of the building blocks. For each building
-        # block get the core. Get the corrosponding cores in the
-        # constructed molecule and add the rmsd to the sum. Increment
-        # the count to calculate the mean later.
-        rmsd = 0
-        n = 0
-        for i, bb in enumerate(self.building_blocks):
-            free = bb.core()
-            am = [(x, x) for x in range(free.GetNumAtoms())]
-            for frag in self.building_block_cores(i):
-                rmsd += rdkit.AlignMol(
-                    prbMol=free,
-                    refMol=frag,
-                    prbCid=bb_conformers[i],
-                    refCid=conformer,
-                    atomMap=am
-                )
-                n += 1
-        return rmsd / n
 
     def __str__(self):
         return (
