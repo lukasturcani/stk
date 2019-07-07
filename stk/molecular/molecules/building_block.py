@@ -42,16 +42,14 @@ class BuildingBlock(Molecule):
     block molecule. For example, the number of atoms and bonds a
     building block may have. It also has information about the
     functional groups present in the building block molecule
-    (see :class:`.FGInfo` and :class:`.FunctionalGroup`). The class
-    also allows manipulation of the building block molecule, such
-    as rotations and translations.
+    (see :class:`.FGInfo` and :class:`.FunctionalGroup`).
 
     Attributes
     ----------
     _init_funcs : :class:`dict`
-        This dictionary holds the various functions which can be used
-        to initialize ``rdkit`` molecules and pairs them with the
-        appropriate file extension.
+        This is a class attribute. It maps file extensions to
+        functions which can be used to initialize
+        :class:`BuildingBlock` from that file type.
 
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
         The functional groups present in the molecule. The id of
@@ -78,7 +76,6 @@ class BuildingBlock(Molecule):
     :meth:`get_bonder_direction_vectors`
     :meth:`get_centroid_centroid_direction_vector`
     :meth:`get_functional_groups`
-    :meth:`to_json`
     :meth:`shift_fgs`
 
     """
@@ -118,11 +115,10 @@ class BuildingBlock(Molecule):
         Parameters
         ----------
         mol : :class:`str` or :class:`rdkit.Mol`
-            Can be one of 3 things:
+            Can be one of 2 things:
 
                 1. A path to a molecular structure file.
                 2. A :class:`rdkit.Mol` object.
-                3. V3000 MDL Mol block.
 
         functional_groups : :class:`list` of :class:`str`, optional
             The names of the functional groups which are to have atoms
@@ -137,6 +133,11 @@ class BuildingBlock(Molecule):
             the one which already exists will be returned. If ``True``
             and a cached, identical :class:`BuildingBlock` does not
             yet exist the created one will be added to the cache.
+
+        Raises
+        ------
+        :class:`TypeError`
+            If the file type cannot be used for initialization.
 
         """
 
@@ -181,11 +182,12 @@ class BuildingBlock(Molecule):
         )
 
         super().__init__(atoms, bonds)
-        coords = rdkit_mol.GetConformer().GetPositions()
-        self.set_position_matrix(
-            position_matrix=coords,
-            conformer_id=None
-        )
+        for conf in rdkit_mol.GetConformers():
+            coords = conf.GetPositions()
+            self.set_position_matrix(
+                position_matrix=coords,
+                conformer_id=None
+            )
 
         # If no functional group names passed, check if any functional
         # group names appear in the file path.
@@ -333,18 +335,21 @@ class BuildingBlock(Molecule):
         )
 
     @classmethod
-    def _init_from_json(cls, json_dict):
+    def _init_from_dict(cls, mol_dict, use_cache):
         """
-        Use a JSON :class:`dict` for initialization.
-
-        This function is not to be used. Use :meth:`.Molecule.load`
-        for loading instances from a JSON. That function will
-        automatically call this one.
+        Use a :class:`dict` for initialization.
 
         Parameters
         ----------
-        json_dict : :class:`dict`
+        mol_dict : :class:`dict`
             A dictionary holding the attribute data of the molecule.
+
+        use_cache : :class:`bool`
+            If ``True``, a new instance will not be made if a cached
+            and identical one already exists, the one which already
+            exists will be returned. If ``True`` and a cached,
+            identical instance does not yet exist the created one will
+            be added to the cache.
 
         Returns
         -------
@@ -352,23 +357,24 @@ class BuildingBlock(Molecule):
 
         """
 
-        d = dict(json_dict)
+        d = dict(mol_dict)
         d.pop('class')
-        first_conf, *confs = d.pop('conformers')
-        conf_id, mol_block = first_conf
-        obj = cls(mol_block, d.pop('func_groups'))
-        obj.mol.GetConformer().SetId(conf_id)
-
-        for conf_id, mol_block in confs:
+        first_block, *blocks = d.pop('conformers')
+        rdkit_mol = rdkit.MolFromMolBlock(
+            molBlock=first_block,
+            removeHs=False,
+            sanitize=False
+        )
+        for mol_block in blocks:
             conf_mol = rdkit.MolFromMolBlock(
                 molBlock=mol_block,
                 removeHs=False,
                 sanitize=False
             )
             conf = conf_mol.GetConformer()
-            conf.SetId(conf_id)
-            obj.mol.AddConformer(conf)
+            rdkit_mol.AddConformer(conf)
 
+        obj = cls(rdkit_mol, d.pop('func_groups'), use_cache)
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
 
@@ -502,7 +508,7 @@ class BuildingBlock(Molecule):
             fg_ids=fg_ids,
             conformer_id=conformer_id
         )
-        d = -np.sum(normal * centroid)
+        d = np.sum(normal * centroid)
         return np.append(normal, d)
 
     def get_bonder_plane_normal(self, fg_ids=None, conformer_id=0):
@@ -568,7 +574,7 @@ class BuildingBlock(Molecule):
         )
         if vector_theta(normal, cc_vector) > np.pi/2:
             normal *= -1
-        return normalize_vector(normal)
+        return normal
 
     def get_bonder_distances(self, fg_ids=None, conformer_id=0):
         """
@@ -747,6 +753,7 @@ class BuildingBlock(Molecule):
         fg_names = sorted(fg_names)
 
         mol = self.to_rdkit_mol()
+        rdkit.SanitizeMol(mol)
         func_groups = []
         for fg_name in fg_names:
             fg_info = fg_infos[fg_name]
@@ -799,9 +806,9 @@ class BuildingBlock(Molecule):
 
         return func_groups
 
-    def to_json(self, include_attrs=None):
+    def _to_dict(self, include_attrs=None):
         """
-        Return a JSON representation of the molecule.
+        Return a :class:`dict` representation of the molecule.
 
         The representation has the following form:
 
@@ -817,8 +824,8 @@ class BuildingBlock(Molecule):
         ----------
         include_attrs : :class:`list` of :class:`str`, optional
             The names of attributes of the molecule to be added to
-            the JSON. Each attribute is saved as a string using
-            :func:`repr`.
+            the :class:`dict`. Each attribute is saved as a string
+            using :func:`repr`.
 
         Returns
         -------
@@ -832,20 +839,20 @@ class BuildingBlock(Molecule):
 
         fg_names = [info.name for info in self.func_group_infos]
         conformers = [
-            self.to_mdl_mol_block(conformer_id=i)
+            self._to_mdl_mol_block(conformer_id=i)
             for i in range(len(self._conformers))
         ]
-        json = {
+        d = {
             'class': self.__class__.__name__,
             'func_groups': fg_names,
             'conformers': conformers,
         }
 
-        json.update(
+        d.update(
             {attr: repr(getattr(self, attr)) for attr in include_attrs}
         )
 
-        return json
+        return d
 
     @staticmethod
     def _get_key(self, mol, functional_groups, use_cache):
@@ -880,6 +887,12 @@ class BuildingBlock(Molecule):
             .. code-block:: python
 
                 ('amine', 'bromine', 'InChIString')
+
+        Raises
+        ------
+        :class:`TypeError`
+            If the there is file type cannot be used for
+            initialization.
 
         """
 
@@ -936,8 +949,8 @@ class BuildingBlock(Molecule):
 
         """
 
-        for id_, fg in zip(new_ids, self.func_groups):
-            yield fg.shifted_fg(id_=id_, shift=shift)
+        for id, fg in zip(new_ids, self.func_groups):
+            yield fg.shifted_fg(id=id, shift=shift)
 
     def __str__(self):
         return f'{self.__class__.__name__} {list(self._key)}'

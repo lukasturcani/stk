@@ -30,6 +30,8 @@ class _Cached(type):
             return cls._cache[key]
         obj = super().__call__(*args, **kwargs)
         obj._key = key
+        if sig.arguments['use_cache']:
+            cls._cache[key] = obj
         return obj
 
 
@@ -68,7 +70,6 @@ class Molecule(metaclass=_Cached):
     Methods
     -------
     :meth:`__init__`
-    :meth:`init_from_dict`
     :meth:`apply_displacement`
     :meth:`apply_rotation_about_axis`
     :meth:`apply_rotation_between_vectors`
@@ -85,7 +86,6 @@ class Molecule(metaclass=_Cached):
     :meth:`set_position_matrix`
     :meth:`dump`
     :meth:`load`
-    :meth:`to_mdl_mol_block`
     :meth:`to_rdkit_mol`
     :meth:`update_cache`
     :meth:`update_from_rdkit_mol`
@@ -115,29 +115,37 @@ class Molecule(metaclass=_Cached):
         self._conformers = []
 
     @classmethod
-    def init_from_dict(self, json_dict):
+    def _init_from_dict(self, mol_dict, use_cache=False):
         """
-        Create a :class:`Molecule` from a JSON :class:`dict`.
+        Create a :class:`Molecule` from a :class:`dict`.
 
         The :class:`Molecule` returned has the class specified in
-        `json_dict`, not :class:`Molecule`.
+        `mol_dict`, not :class:`Molecule`. You can use this if you
+        don't know what class the instance in `mol_dict` is or should
+        be.
 
         Parameters
         ----------
-        json_dict : :class:`dict`
-            A :class:`dict` holding the JSON representation of a
-            molecule.
+        mol_dict : :class:`dict`
+            A :class:`dict` holding the :class:`dict` representation
+            of a molecule.
+
+        use_cache : :class:`bool`, optional
+            If ``True``, a new instance will not be made if a cached
+            and identical one already exists, the one which already
+            exists will be returned. If ``True`` and a cached,
+            identical instance does not yet exist the created one will
+            be added to the cache.
 
         Returns
         -------
         :class:`Molecule`
-            The molecule represented by `json_dict`.
+            The molecule represented by `mol_dict`.
 
         """
 
-        # Get the class of the object.
-        c = self.subclasses[json_dict['class']]
-        return c._json_init(json_dict)
+        c = self.subclasses[mol_dict['class']]
+        return c._init_from_dict(mol_dict, use_cache=use_cache)
 
     def __init_subclass__(cls, **kwargs):
         if cls.__name__ in cls.subclasses:
@@ -666,17 +674,17 @@ class Molecule(metaclass=_Cached):
 
     def dump(self, path, include_attrs=None):
         """
-        Write a JSON :class:`dict` of the molecule to a file.
+        Write a :class:`dict` of the molecule to a file.
 
         Parameters
         ----------
         path : :class:`str`
-            The full path to the file to which the JSON dict should be
-            written.
+            The full path to the file to which the  :class:`dict`
+            should be written.
 
         include_attrs : :class:`list` of :class:`str`, optional
             The names of attributes of the molecule to be added to
-            the JSON. Each attribute is saved as a string using
+            the :class:. Each attribute is saved as a string using
             :func:`repr`.
 
         Returns
@@ -686,23 +694,32 @@ class Molecule(metaclass=_Cached):
         """
 
         with open(path, 'w') as f:
-            json.dump(self.to_json(include_attrs), f, indent=4)
+            json.dump(self._to_dict(include_attrs), f, indent=4)
 
     def _get_key(*args, **kwargs):
         raise NotImplementedError()
 
     @classmethod
-    def load(cls, path):
+    def load(cls, path, use_cache=False):
         """
-        Create a :class:`Molecule` from a JSON file.
+        Create a :class:`Molecule` from a dump file.
 
-        The returned :class:`Molecule` has the class specified in the
-        JSON file, not :class:`Molecule`.
+        The :class:`Molecule` returned has the class specified in
+        in the file, not :class:`Molecule`. You can use this if you
+        don't know what class the instance in the loaded molecule is or
+        should be.
 
         Parameters
         ----------
         path : :class:`str`
-            The full path holding a JSON representation to a molecule.
+            The full path holding a dumped molecule.
+
+        use_cache : :class:`bool`, optional
+            If ``True``, a new instance will not be made if a cached
+            and identical one already exists, the one which already
+            exists will be returned. If ``True`` and a cached,
+            identical instance does not yet exist the created one will
+            be added to the cache.
 
         Returns
         -------
@@ -712,11 +729,11 @@ class Molecule(metaclass=_Cached):
         """
 
         with open(path, 'r') as f:
-            json_dict = json.load(f)
+            mol_dict = json.load(f)
 
-        return cls.init_from_dict(json_dict)
+        return cls._init_from_dict(mol_dict, use_cache=use_cache)
 
-    def to_mdl_mol_block(self, atom_ids=None, conformer_id=0):
+    def _to_mdl_mol_block(self, atom_ids=None, conformer_id=0):
         """
         Return a V3000 mol block of the molecule.
 
@@ -761,8 +778,8 @@ class Molecule(metaclass=_Cached):
 
         bond_lines = []
         for bond_idx, bond in enumerate(self.bonds):
-            a1 = bond.atom1
-            a2 = bond.atom2
+            a1 = bond.atom1.id
+            a2 = bond.atom2.id
             if a1 in atoms and a2 in atoms:
                 # Keep bond ids if all bonds are getting written.
                 if num_atoms == len(self.atoms):
@@ -776,7 +793,6 @@ class Molecule(metaclass=_Cached):
 
         num_bonds = len(bond_lines)
         bond_block = ''.join(bond_lines)
-
         return (
             '\n'
             '     RDKit          3D\n'
@@ -826,7 +842,6 @@ class Molecule(metaclass=_Cached):
             for atom_id, atom_coord in enumerate(conf.T):
                 rdkit_conf.SetAtomPosition(atom_id, atom_coord)
             mol.AddConformer(rdkit_conf)
-
         return mol
 
     def update_cache(self):
@@ -1171,7 +1186,7 @@ class Molecule(metaclass=_Cached):
         """
 
         with open(path, 'w') as f:
-            f.write(self.to_mdl_mol_block(atom_ids, conformer_id))
+            f.write(self._to_mdl_mol_block(atom_ids, conformer_id))
 
     def _write_xyz_file(self, path, atom_ids, conformer_id):
         """

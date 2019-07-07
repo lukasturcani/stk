@@ -20,6 +20,12 @@ class Bond:
         self.atom2 = atom2
         self.order = order
 
+    def __repr__(self):
+        return f'Bond({self.atom1}, {self.atom2}, {self.order})'
+
+    def __str__(self):
+        return repr(self)
+
 
 class Atom:
     """
