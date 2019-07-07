@@ -938,7 +938,7 @@ class BuildingBlock(Molecule):
         new_ids : :class:`iterable` of :class:`int`
             The ids assigned to the new functional groups.
 
-        num_atoms : :class:`int`
+        shift : :class:`int`
             The number to shift each atom id by.
 
         Yields
