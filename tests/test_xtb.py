@@ -26,8 +26,7 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     out_dir = 'gfnxtb_NF_energy'
     energy = stk.XTBEnergy(
         xtb_path=xtb_path,
-        output_dir=join(odir, out_dir),
-        unlimited_memory=True
+        output_dir=join(odir, out_dir)
     )
 
     # Calculate the initial energy.
@@ -39,7 +38,6 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     opt_lowtol = stk.XTB(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        unlimited_memory=True,
         opt_level='crude',
         max_runs=1,
         calculate_hessian=True
@@ -63,7 +61,6 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     opt_hightol = stk.XTB(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        unlimited_memory=True,
         opt_level='extreme',
         max_runs=1,
         calculate_hessian=True
@@ -98,8 +95,7 @@ def test_xtb_solvent_charge_uhf(tmp_polymer, xtb_path):
     out_dir = 'gfnxtb_energy'
     energy = stk.XTBEnergy(
         xtb_path=xtb_path,
-        output_dir=join(odir, out_dir),
-        unlimited_memory=True
+        output_dir=join(odir, out_dir)
     )
     init_energy = energy.energy(tmp_polymer)
 
@@ -110,7 +106,6 @@ def test_xtb_solvent_charge_uhf(tmp_polymer, xtb_path):
     solvent = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        unlimited_memory=True,
         solvent='h2o'
     )
     solv_energy = solvent.energy(tmp_polymer)
@@ -123,7 +118,6 @@ def test_xtb_solvent_charge_uhf(tmp_polymer, xtb_path):
     charge = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        unlimited_memory=True,
         charge=-1
     )
     charge_energy = charge.energy(tmp_polymer)
@@ -136,7 +130,6 @@ def test_xtb_solvent_charge_uhf(tmp_polymer, xtb_path):
     multi = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, out_dir),
-        unlimited_memory=True,
         num_unpaired_electrons=2
     )
     multi_energy = multi.energy(tmp_polymer)
@@ -158,7 +151,6 @@ def test_xtb_properties(tmp_polymer, xtb_path):
     gfnxtb = stk.XTB(
         xtb_path,
         output_dir=join(odir, 'gfnxtb_opt'),
-        unlimited_memory=False,
         opt_level='extreme',
         max_runs=1,
         calculate_hessian=False,
@@ -168,7 +160,6 @@ def test_xtb_properties(tmp_polymer, xtb_path):
     xtb = stk.XTBEnergy(
         xtb_path=xtb_path,
         output_dir=join(odir, 'gfnxtb_ey'),
-        unlimited_memory=False,
         calculate_free_energy=True
     )
     total_energy = xtb.energy(tmp_polymer)

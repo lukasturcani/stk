@@ -455,11 +455,6 @@ class XTBEnergy(EnergyCalculator):
     num_unpaired_electrons : :class:`str`
         Number of unpaired electrons.
 
-    unlimited_memory : :class: `bool`
-        If ``True`` :meth:`energy` will be run without constraints on
-        the stack size. If memory issues are encountered, this should
-        be ``True``, however this may raise issues on clusters.
-
     total_energies : :class:`dict`
         :class:`dict` of the total energy of each :class:`.Molecule`
         and conformer passed to :meth:`energy`. The key has the
@@ -530,14 +525,13 @@ class XTBEnergy(EnergyCalculator):
         # reasonable structure.
         optimizer = OptimizerSequence(
             ETKDG(),
-            XTB(xtb_path='/opt/gfnxtb/xtb', unlimited_memory=True)
+            XTB(xtb_path='/opt/gfnxtb/xtb')
         )
         optimizer.optimize(polymer)
 
         # Calculate energy using GFN-xTB.
         xtb = XTBEnergy(
-            xtb_path='/opt/gfnxtb/xtb',
-            unlimited_memory=True
+            xtb_path='/opt/gfnxtb/xtb'
         )
 
         p_total_energy = xtb.energy(polymer, conformer)
@@ -568,7 +562,6 @@ class XTBEnergy(EnergyCalculator):
             ETKDG(),
             XTB(
                 xtb_path='/opt/gfnxtb/xtb',
-                unlimited_memory=True,
                 opt_level='verytight'
             )
         )
@@ -577,7 +570,6 @@ class XTBEnergy(EnergyCalculator):
         # Calculate energy using GFN-xTB.
         xtb = XTBEnergy(
             xtb_path='/opt/gfnxtb/xtb',
-            unlimited_memory=True,
             calculate_free_energy=True
         )
 
@@ -605,7 +597,6 @@ class XTBEnergy(EnergyCalculator):
                  solvent_grid='normal',
                  charge=0,
                  num_unpaired_electrons=0,
-                 unlimited_memory=False,
                  use_cache=False):
         """
         Initializes a :class:`XTBEnergy` instance.
@@ -655,12 +646,6 @@ class XTBEnergy(EnergyCalculator):
         num_unpaired_electrons : :class:`int`, optional
             Number of unpaired electrons.
 
-        unlimited_memory : :class: `bool`, optional
-            If ``True`` :meth:`energy` will be run without constraints
-            on the stack size. If memory issues are encountered, this
-            should be ``True``, however this may raise issues on
-            clusters.
-
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`energy` will not run twice on the same
             molecule and conformer.
@@ -689,7 +674,6 @@ class XTBEnergy(EnergyCalculator):
         self.solvent_grid = solvent_grid
         self.charge = str(charge)
         self.num_unpaired_electrons = str(num_unpaired_electrons)
-        self.unlimited_memory = unlimited_memory
 
         self.total_energies = {}
         self.homo_lumo_gaps = {}
@@ -761,12 +745,6 @@ class XTBEnergy(EnergyCalculator):
 
         """
 
-        # Modify the memory limit.
-        if self.unlimited_memory:
-            memory = 'ulimit -s unlimited ;'
-        else:
-            memory = ''
-
         if self.solvent is not None:
             solvent = f'--gbsa {self.solvent} {self.solvent_grid}'
         else:
@@ -778,12 +756,14 @@ class XTBEnergy(EnergyCalculator):
             calc_type = ''
 
         cmd = (
-            f'{memory} {self.xtb_path} {xyz} --gfn {self.gfn_version} '
+            f'{self.xtb_path} {xyz} --gfn {self.gfn_version} '
             f'{calc_type} --parallel {self.num_cores} '
             f'--etemp {self.electronic_temperature} '
             f'{solvent} --chrg {self.charge} '
             f'--uhf {self.num_unpaired_electrons}'
         )
+        # Convert to list of arguments with no spaces.
+        cmd = [i for i in cmd.split(' ') if i]
 
         with open(out_file, 'w') as f:
             # Note that sp.call will hold the program until completion
@@ -793,8 +773,6 @@ class XTBEnergy(EnergyCalculator):
                 stdin=sp.PIPE,
                 stdout=f,
                 stderr=sp.PIPE,
-                # Shell is required to run complex arguments.
-                shell=True
             )
 
     def energy(self, mol, conformer=-1):

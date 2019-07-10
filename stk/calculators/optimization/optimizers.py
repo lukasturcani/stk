@@ -746,11 +746,6 @@ class XTB(Optimizer):
     num_unpaired_electrons : :class:`str`
         Number of unpaired electrons.
 
-    unlimited_memory : :class:`bool`
-        If ``True`` :meth:`optimize` will be run without constraints on
-        the stack size. If memory issues are encountered, this should
-        be ``True``, however this may raise issues on clusters.
-
     incomplete : :class:`set`
         A :class:`set` holding tuples of the form ``(mol, conformer)``,
         which are the :class:`.Molecule` objects and conformer ids
@@ -773,7 +768,7 @@ class XTB(Optimizer):
 
         xtb = OptimizerSequence(
             UFF(),
-            XTB(xtb_path='/opt/gfnxtb/xtb', unlimited_memory=True)
+            XTB(xtb_path='/opt/gfnxtb/xtb')
         )
         xtb.optimize(polymer)
 
@@ -799,7 +794,6 @@ class XTB(Optimizer):
         xtb_crude = XTB(
             xtb_path='/opt/gfnxtb/xtb',
             output_dir='xtb_crude',
-            unlimited_memory=True,
             opt_level='crude',
             max_runs=1,
             calculate_hessian=True
@@ -808,7 +802,6 @@ class XTB(Optimizer):
         xtb_normal = XTB(
             xtb_path='/opt/gfnxtb/xtb',
             output_dir='xtb_normal',
-            unlimited_memory=True,
             opt_level='normal',
             max_runs=2
         )
@@ -817,7 +810,6 @@ class XTB(Optimizer):
         xtb_vtight = XTB(
             xtb_path='/opt/gfnxtb/xtb',
             output_dir='xtb_vtight',
-            unlimited_memory=True,
             opt_level='vtight',
             max_runs=2
         )
@@ -851,7 +843,6 @@ class XTB(Optimizer):
                  solvent_grid='normal',
                  charge=0,
                  num_unpaired_electrons=0,
-                 unlimited_memory=False,
                  use_cache=False):
         """
         Initializes a :class:`XTB` instance.
@@ -916,12 +907,6 @@ class XTB(Optimizer):
         num_unpaired_electrons : :class:`int`, optional
             Number of unpaired electrons.
 
-        unlimited_memory : :class: `bool`, optional
-            If ``True`` :meth:`optimize` will be run without
-            constraints on the stack size. If memory issues are
-            encountered, this should be ``True``, however this may
-            raise issues on clusters.
-
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
             molecule and conformer.
@@ -961,7 +946,6 @@ class XTB(Optimizer):
         self.solvent_grid = solvent_grid
         self.charge = str(charge)
         self.num_unpaired_electrons = str(num_unpaired_electrons)
-        self.unlimited_memory = unlimited_memory
         self.incomplete = set()
         super().__init__(use_cache=use_cache)
 
@@ -1043,12 +1027,6 @@ class XTB(Optimizer):
 
         """
 
-        # Modify the memory limit.
-        if self.unlimited_memory:
-            memory = 'ulimit -s unlimited ;'
-        else:
-            memory = ''
-
         # Set optimization level and type.
         if self.calculate_hessian:
             # Do optimization and check hessian.
@@ -1063,12 +1041,14 @@ class XTB(Optimizer):
             solvent = ''
 
         cmd = (
-            f'{memory} {self.xtb_path} {xyz} --gfn {self.gfn_version} '
+            f'{self.xtb_path} {xyz} --gfn {self.gfn_version} '
             f'{optimization} --parallel {self.num_cores} '
             f'--etemp {self.electronic_temperature} '
             f'{solvent} --chrg {self.charge} '
             f'--uhf {self.num_unpaired_electrons}'
         )
+        # Convert to list of arguments with no spaces.
+        cmd = [i for i in cmd.split(' ') if i]
 
         with open(out_file, 'w') as f:
             # Note that sp.call will hold the program until completion
@@ -1078,8 +1058,6 @@ class XTB(Optimizer):
                 stdin=sp.PIPE,
                 stdout=f,
                 stderr=sp.PIPE,
-                # Shell is required to run complex arguments.
-                shell=True
             )
 
     def _run_optimizations(self, mol, conformer):
