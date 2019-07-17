@@ -83,6 +83,7 @@ class Molecule(metaclass=_Cached):
     :meth:`get_maximum_diameter`
     :meth:`get_plane_normal`
     :meth:`get_position_matrix`
+    :meth:`is_identical`
     :meth:`set_centroid`
     :meth:`set_position_matrix`
     :meth:`dump`
