@@ -105,6 +105,8 @@ def test_get_atom_coords(tmp_amine2):
     coords = tmp_amine2.get_atom_coords(atom_ids=atom_ids)
     for atom_id, atom_coords in zip(atom_ids, coords):
         assert all(atom_coords == [atom_id*10]*3)
+    num_coords = sum(1 for _ in tmp_amine2.get_atom_coords(atom_ids))
+    assert num_coords == len(atom_ids)
 
 
 def test_get_atom_distance(tmp_amine2):
