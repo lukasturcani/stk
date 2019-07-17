@@ -126,9 +126,7 @@ class Molecule(metaclass=_Cached):
         Create a :class:`Molecule` from a :class:`dict`.
 
         The :class:`Molecule` returned has the class specified in
-        `mol_dict`, not :class:`Molecule`. You can use this if you
-        don't know what class the instance in `mol_dict` is or should
-        be.
+        `mol_dict`, not :class:`Molecule`.
 
         Parameters
         ----------
