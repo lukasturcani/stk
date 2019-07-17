@@ -10,51 +10,26 @@ if not os.path.exists(test_dir):
 
 
 def test_apply_displacement(tmp_amine2):
-    before_conf0 = tmp_amine2.get_position_matrix(conformer_id=0)
-    before_conf1 = tmp_amine2.get_position_matrix(conformer_id=1)
-
-    assert np.allclose(before_conf0*4, before_conf1, 1e-6)
-
+    before = tmp_amine2.get_position_matrix()
     tmp_amine2.apply_displacement(np.array([0, 0, 0]))
-
     assert np.allclose(
-        a=before_conf0,
-        b=tmp_amine2.get_position_matrix(conformer_id=0),
-        atol=1e-6
-    )
-    assert np.allclose(
-        a=before_conf1,
-        b=tmp_amine2.get_position_matrix(conformer_id=1),
+        a=before,
+        b=tmp_amine2.get_position_matrix(),
         atol=1e-6
     )
 
     tmp_amine2.apply_displacement(np.array([10, 20, 30]))
-
-    after_conf0 = tmp_amine2.get_position_matrix(conformer_id=0)
+    after = tmp_amine2.get_position_matrix()
     assert np.allclose(
-        a=before_conf0+[10, 20, 30],
-        b=after_conf0,
-        atol=1e-6
-    )
-    assert np.allclose(
-        a=before_conf1,
-        b=tmp_amine2.get_position_matrix(conformer_id=1),
+        a=before+[10, 20, 30],
+        b=after,
         atol=1e-6
     )
 
-    tmp_amine2.apply_displacement(
-        displacement=np.array([-10, 20, -30]),
-        conformer_id=1
-    )
-
+    tmp_amine2.apply_displacement(np.array([-10, 20, -30]))
     assert np.allclose(
-        a=after_conf0,
-        b=tmp_amine2.get_position_matrix(conformer_id=0),
-        atol=1e-6
-    )
-    assert np.allclose(
-        a=before_conf1+[-10, 20, -30],
-        b=tmp_amine2.get_position_matrix(conformer_id=1),
+        a=after+[-10, 20, -30],
+        b=tmp_amine2.get_position_matrix(),
         atol=1e-6
     )
 
@@ -62,17 +37,16 @@ def test_apply_displacement(tmp_amine2):
 def test_apply_rotation_about_axis(tmp_amine2):
     num_atoms = len(tmp_amine2.atoms)
     coords = np.array([[i, 0, 0] for i in range(num_atoms)])
-    tmp_amine2.set_position_matrix(coords, conformer_id=1)
+    tmp_amine2.set_position_matrix(coords)
 
     tmp_amine2.apply_rotation_about_axis(
         theta=-np.pi/2,
         axis=np.array([0, 1, 0]),
-        origin=np.array([0, 0, 0]),
-        conformer_id=1
+        origin=np.array([0, 0, 0])
     )
 
     assert np.allclose(
-        a=tmp_amine2.get_position_matrix(conformer_id=1),
+        a=tmp_amine2.get_position_matrix(),
         b=np.array([[0, 0, i] for i in range(num_atoms)]),
         atol=1e-6
     )
@@ -102,18 +76,17 @@ def test_apply_rotation_between_vectors(tmp_amine2):
 def test_apply_rotation_to_minimize_theta(tmp_amine2):
     num_atoms = len(tmp_amine2.atoms)
     coords = np.array([[i, 0, 0] for i in range(num_atoms)])
-    tmp_amine2.set_position_matrix(coords, conformer_id=1)
+    tmp_amine2.set_position_matrix(coords)
 
     tmp_amine2.apply_rotation_to_minimize_theta(
         start=np.array([1, 0, 0]),
         target=np.array([0, 0, 1]),
         axis=np.array([0, 1, 0]),
-        origin=np.array([0, 0, 0]),
-        conformer_id=1
+        origin=np.array([0, 0, 0])
     )
 
     assert np.allclose(
-        a=tmp_amine2.get_position_matrix(conformer_id=1),
+        a=tmp_amine2.get_position_matrix(),
         b=np.array([[0, 0, i] for i in range(num_atoms)]),
         atol=1e-6
     )
@@ -127,12 +100,9 @@ def test_get_atom_coords(tmp_amine2):
     for i, atom_coords in enumerate(tmp_amine2.get_atom_coords()):
         assert all(atom_coords == [i, i, i])
 
-    tmp_amine2.set_position_matrix(new_coords*10, conformer_id=1)
+    tmp_amine2.set_position_matrix(new_coords*10)
     atom_ids = [0, 2, 4]
-    coords = tmp_amine2.get_atom_coords(
-        atom_ids=atom_ids,
-        conformer_id=1
-    )
+    coords = tmp_amine2.get_atom_coords(atom_ids=atom_ids)
     for atom_id, atom_coords in zip(atom_ids, coords):
         assert all(atom_coords == [atom_id*10]*3)
 
@@ -158,11 +128,8 @@ def test_get_centroid(tmp_amine2):
     assert all(tmp_amine2.get_centroid() == [0, 0, 0])
 
     num_atoms = len(tmp_amine2.atoms)
-    tmp_amine2.set_position_matrix(
-        position_matrix=np.ones((num_atoms, 3)),
-        conformer_id=1
-    )
-    assert all(tmp_amine2.get_centroid(conformer_id=1) == [1, 1, 1])
+    tmp_amine2.set_position_matrix(np.ones((num_atoms, 3)))
+    assert all(tmp_amine2.get_centroid() == [1, 1, 1])
 
     coords = np.array([[i]*3 for i in range(num_atoms)])
     tmp_amine2.set_position_matrix(coords)
@@ -185,10 +152,10 @@ def test_get_direction(tmp_amine2):
     )
 
     coords = np.array([[i, i, i] for i in range(num_atoms)])
-    tmp_amine2.set_position_matrix(coords, conformer_id=1)
+    tmp_amine2.set_position_matrix(coords)
 
     assert np.allclose(
-        a=tmp_amine2.get_direction(conformer_id=1),
+        a=tmp_amine2.get_direction(),
         b=stk.normalize_vector([1, 1, 1]),
         atol=1e-6
     )
@@ -217,16 +184,19 @@ def test_get_plane_normal(tmp_amine2):
 
 def test_get_set_position_matrix(tmp_amine2):
     zeros = np.zeros((len(tmp_amine2.atoms), 3))
-    ones = np.ones((len(tmp_amine2.atoms), 3))
     tmp_amine2.set_position_matrix(zeros)
-    tmp_amine2.set_position_matrix(ones, conformer_id=1)
-
     assert np.allclose(zeros, tmp_amine2.get_position_matrix(), 1e-6)
-    assert np.allclose(
-        a=ones,
-        b=tmp_amine2.get_position_matrix(conformer_id=1),
-        atol=1e-6
-    )
+
+    ones = np.ones((len(tmp_amine2.atoms), 3))
+    tmp_amine2.set_position_matrix(ones)
+    assert np.allclose(ones, tmp_amine2.get_position_matrix(), 1e-6)
+
+
+def test_is_identical(amine2, amine2_conf1, amine2_alt1):
+    assert amine2.is_identical(amine2_conf1)
+    assert amine2_conf1.is_identical(amine2)
+    assert not amine2.is_identical(amine2_alt1)
+    assert not amine2_conf1.is_identical(amine2_alt1)
 
 
 def test_set_centroid(tmp_amine2):
@@ -247,51 +217,58 @@ def test_set_centroid(tmp_amine2):
 
 
 def test_update_from_rdkit_mol(tmp_amine2):
+    before = tmp_amine2.get_position_matrix()
+
     mol = tmp_amine2.to_rdkit_mol()
     conf = mol.GetConformer()
     for atom_id, coord in enumerate(conf.GetPositions()):
         conf.SetAtomPosition(atom_id, 0.5*coord)
 
-    tmp_amine2.update_from_rdkit_mol(mol, conformer_id=None)
-    assert np.allclose(
-        a=conf.GetPositions(),
-        b=tmp_amine2.get_position_matrix(conformer_id=2),
-        atol=1e-6
-    )
-    assert np.allclose(
-        a=conf.GetPositions(),
-        b=tmp_amine2.get_position_matrix()*0.5,
-        atol=1e-6
-    )
+    tmp_amine2.update_from_rdkit_mol(mol)
+    after = tmp_amine2.get_position_matrix()
+    assert np.allclose(conf.GetPositions(), after, 1e-6)
+    assert not np.allclose(before, after, 1e-6)
 
 
 def test_update_from_mae(tmp_amine2, mae_path):
-    tmp_amine2.update_from_file(mae_path, None)
-    d1 = tmp_amine2.get_maximum_diameter(conformer_id=0)
-    d2 = tmp_amine2.get_maximum_diameter(conformer_id=2)
-    assert abs(d1 - d2) > 1
+    before = tmp_amine2.get_maximum_diameter()
+    tmp_amine2.update_from_file(mae_path)
+    after = tmp_amine2.get_maximum_diameter()
+    assert abs(before - after) > 1
 
 
-def test_update_from_mol(tmp_amine2):
+def test_update_from_mol(tmp_amine2, amine2_conf1):
+    assert not np.allclose(
+        a=tmp_amine2.get_position_matrix(),
+        b=amine2_conf1.get_position_matrix(),
+        atol=1e-4
+    )
+
     path = join(test_dir, 'update_from_mol.mol')
-    tmp_amine2.write(path=path, conformer_id=1)
-    tmp_amine2.update_from_file(path=path, conformer_id=None)
+    amine2_conf1.write(path=path)
+    tmp_amine2.update_from_file(path=path)
 
     assert np.allclose(
-        a=tmp_amine2.get_position_matrix(conformer_id=1),
-        b=tmp_amine2.get_position_matrix(conformer_id=2),
+        a=tmp_amine2.get_position_matrix(),
+        b=amine2_conf1.get_position_matrix(),
         atol=1e-4
     )
 
 
-def test_update_from_xyz(tmp_amine2):
-    path = join(test_dir, 'update_from_xyz.xyz')
-    tmp_amine2.write(path=path, conformer_id=1)
-    tmp_amine2.update_from_file(path=path, conformer_id=None)
+def test_update_from_xyz(tmp_amine2, amine2_conf1):
+    assert not np.allclose(
+        a=tmp_amine2.get_position_matrix(),
+        b=amine2_conf1.get_position_matrix(),
+        atol=1e-4
+    )
+
+    path = join(test_dir, 'update_from_mol.xyz')
+    amine2_conf1.write(path=path)
+    tmp_amine2.update_from_file(path=path)
 
     assert np.allclose(
-        a=tmp_amine2.get_position_matrix(conformer_id=1),
-        b=tmp_amine2.get_position_matrix(conformer_id=2),
+        a=tmp_amine2.get_position_matrix(),
+        b=amine2_conf1.get_position_matrix(),
         atol=1e-4
     )
 
@@ -302,7 +279,7 @@ def test_write_pdb(amine2):
     bb = stk.BuildingBlock(path)
 
     assert np.allclose(
-        a=amine2.get_position_matrix(conformer_id=1),
+        a=amine2.get_position_matrix(),
         b=bb.get_position_matrix(),
         atol=1e-4
     )

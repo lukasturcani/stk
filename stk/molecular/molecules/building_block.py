@@ -13,6 +13,7 @@ from glob import glob
 from functools import partial
 from scipy.spatial.distance import euclidean
 
+from . import elements
 from .elements import Atom, Bond
 from .molecule import Molecule
 from ..functional_groups import FunctionalGroup
@@ -47,14 +48,14 @@ class BuildingBlock(Molecule):
         :class:`BuildingBlock` from that file type.
 
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
-        The functional groups present in the molecule. The id of
-        each :class:`.FunctionalGroup` should match its index.
+        The functional groups present in the molecule. The
+        :attr:`.FunctionalGroup.id` is equal to the index.
 
     func_group_infos : :class:`tuple` of :class:`.FGInfo`
         The functional group types present in the molecule.
 
     _key : :class:`object`
-        Extends :class:`.Molecule._key`. :class:`BulidingBlock`
+        Extends :class:`.Molecule._key`. :class:`BuildingBlock`
         molecules with the same structure and with the same functional
         groups will have equal keys. Used for caching.
 
@@ -176,13 +177,8 @@ class BuildingBlock(Molecule):
             for b in rdkit_mol.GetBonds()
         )
 
-        super().__init__(atoms, bonds)
-        for conf in rdkit_mol.GetConformers():
-            coords = conf.GetPositions()
-            self.set_position_matrix(
-                position_matrix=coords,
-                conformer_id=None
-            )
+        position_matrix = rdkit_mol.GetConformer().GetPositions()
+        super().__init__(atoms, bonds, position_matrix)
 
         # If no functional group names passed, check if any functional
         # group names appear in the file path.
@@ -247,7 +243,7 @@ class BuildingBlock(Molecule):
 
         for molfile in files:
             try:
-                return cls(molfile, functional_groups)
+                return cls(molfile, functional_groups, use_cache)
 
             except Exception:
                 msg = (
@@ -354,25 +350,16 @@ class BuildingBlock(Molecule):
 
         d = dict(mol_dict)
         d.pop('class')
-        first_block, *blocks = d.pop('conformers')
-        rdkit_mol = rdkit.MolFromMolBlock(
-            molBlock=first_block,
+        mol_block = d.pop('mol_block')
+        rdkit_mol = remake(rdkit.MolFromMolBlock(
+            molBlock=mol_block,
             removeHs=False,
             sanitize=False
-        )
-        for mol_block in blocks:
-            conf_mol = rdkit.MolFromMolBlock(
-                molBlock=mol_block,
-                removeHs=False,
-                sanitize=False
-            )
-            conf = conf_mol.GetConformer()
-            rdkit_mol.AddConformer(conf)
-
+        ))
         obj = cls(rdkit_mol, d.pop('func_groups'), use_cache)
+        obj.atoms = eval(d.pop('atoms'), vars(elements))
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
-
         return obj
 
     def get_bonder_ids(self, fg_ids=None):
@@ -400,7 +387,7 @@ class BuildingBlock(Molecule):
             for atom_id in self.func_groups[fg_id].bonder_ids:
                 yield atom_id
 
-    def get_bonder_centroids(self, fg_ids=None, conformer_id=0):
+    def get_bonder_centroids(self, fg_ids=None):
         """
         Yield the centroids of bonder atoms in functional groups.
 
@@ -418,9 +405,6 @@ class BuildingBlock(Molecule):
             centroids are yielded in ascending order of functional
             group id.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
-
         Yields
         ------
         :class:`numpy.ndarray`
@@ -433,11 +417,10 @@ class BuildingBlock(Molecule):
 
         for fg_id in fg_ids:
             yield self.get_centroid(
-                atom_ids=self.func_groups[fg_id].bonder_ids,
-                conformer_id=conformer_id
+                atom_ids=self.func_groups[fg_id].bonder_ids
             )
 
-    def get_bonder_plane(self, fg_ids=None, conformer_id=0):
+    def get_bonder_plane(self, fg_ids=None):
         """
         Return coeffs of the plane formed by the bonder centroids.
 
@@ -467,9 +450,6 @@ class BuildingBlock(Molecule):
             If ``None``, all functional groups in the
             :class:`BuildingBlock` will be used.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
-
         Returns
         -------
         :class:`numpy.ndarray`
@@ -496,17 +476,15 @@ class BuildingBlock(Molecule):
             fg_ids = list(fg_ids)
 
         centroid = self.get_centroid(
-            atom_ids=self.func_groups[fg_ids[0]].bonder_ids,
-            conformer_id=conformer_id
+            atom_ids=self.func_groups[fg_ids[0]].bonder_ids
         )
         normal = self.get_bonder_plane_normal(
-            fg_ids=fg_ids,
-            conformer_id=conformer_id
+            fg_ids=fg_ids
         )
         d = np.sum(normal * centroid)
         return np.append(normal, d)
 
-    def get_bonder_plane_normal(self, fg_ids=None, conformer_id=0):
+    def get_bonder_plane_normal(self, fg_ids=None):
         """
         Return the normal to the plane formed by bonder centroids.
 
@@ -524,9 +502,6 @@ class BuildingBlock(Molecule):
             the bonder centroids of the functional groups will be made.
             If ``None``, all functional groups in the
             :class:`BuildingBlock` will be used.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
 
         Returns
         -------
@@ -555,23 +530,20 @@ class BuildingBlock(Molecule):
             )
 
         centroids = np.array(list(self.get_bonder_centroids(
-            fg_ids=fg_ids,
-            conformer_id=conformer_id
+            fg_ids=fg_ids
         )))
         bonder_centroid = self.get_centroid(
-            atom_ids=self.get_bonder_ids(fg_ids=fg_ids),
-            conformer_id=conformer_id
+            atom_ids=self.get_bonder_ids(fg_ids=fg_ids)
         )
         normal = np.linalg.svd(centroids - bonder_centroid)[-1][2, :]
         cc_vector = self.get_centroid_centroid_direction_vector(
-            fg_ids=fg_ids,
-            conformer_id=conformer_id
+            fg_ids=fg_ids
         )
         if vector_theta(normal, cc_vector) > np.pi/2:
             normal *= -1
         return normal
 
-    def get_bonder_distances(self, fg_ids=None, conformer_id=0):
+    def get_bonder_distances(self, fg_ids=None):
         """
         Yield distances between pairs of bonder centroids.
 
@@ -583,9 +555,6 @@ class BuildingBlock(Molecule):
         fg_ids : :class:`iterable` of :class:`int`
             The ids of functional groups to be used.
             If ``None`` then all functional groups are used.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
 
         Yields
         ------
@@ -603,8 +572,7 @@ class BuildingBlock(Molecule):
         # Iterator yielding tuples of form (fg_id, bonder_centroid)
         centroids = ((
             i, self.get_centroid(
-                atom_ids=self.func_groups[i].bonder_ids,
-                conformer_id=conformer_id
+                atom_ids=self.func_groups[i].bonder_ids
             ))
             for i in fg_ids
         )
@@ -614,8 +582,7 @@ class BuildingBlock(Molecule):
 
     def get_bonder_direction_vectors(
         self,
-        fg_ids=None,
-        conformer_id=0
+        fg_ids=None
     ):
         """
         Yield the direction vectors between bonder centroids.
@@ -628,9 +595,6 @@ class BuildingBlock(Molecule):
         fg_ids : :class:`iterable` of :class:`int`
             The ids of functional groups to be used.
             If ``None`` then all functional groups are used.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
 
         Yields
         ------
@@ -654,8 +618,7 @@ class BuildingBlock(Molecule):
         # Iterator yielding tuples of form (fg_id, bonder_centroid)
         centroids = ((
             i, self.get_centroid(
-                atom_ids=self.func_groups[i].bonder_ids,
-                conformer_id=conformer_id
+                atom_ids=self.func_groups[i].bonder_ids
             ))
             for i in fg_ids
         )
@@ -665,8 +628,7 @@ class BuildingBlock(Molecule):
 
     def get_centroid_centroid_direction_vector(
         self,
-        fg_ids=None,
-        conformer_id=0
+        fg_ids=None
     ):
         """
         Return the direction vector between the 2 molecular centroids.
@@ -681,9 +643,6 @@ class BuildingBlock(Molecule):
             The ids of functional groups to be used for calculating the
             bonder centroid. If ``None`` then all functional groups are
             used.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
 
         Returns
         -------
@@ -700,17 +659,15 @@ class BuildingBlock(Molecule):
             fg_ids = list(fg_ids)
 
         bonder_centroid = self.get_centroid(
-            atom_ids=self.get_bonder_ids(fg_ids=fg_ids),
-            conformer_id=conformer_id
+            atom_ids=self.get_bonder_ids(fg_ids=fg_ids)
         )
-        centroid = self.get_centroid(conformer_id=conformer_id)
+        centroid = self.get_centroid()
         # If the bonder centroid and centroid are in the same position,
         # the centroid - centroid vector should be orthogonal to the
         # bonder direction vector.
         if np.allclose(centroid, bonder_centroid, 1e-5):
             *_, bvec = self.get_bonder_direction_vectors(
-                fg_ids=fg_ids,
-                conformer_id=conformer_id
+                fg_ids=fg_ids
             )
             # Construct a secondary vector by finding the minimum
             # component of bvec and setting it to 0.
@@ -811,8 +768,10 @@ class BuildingBlock(Molecule):
 
             {
                 'class' : 'BuildingBlock',
+                'func_groups': ['amine', 'aldehyde'],
                 'mol_block' : '''A string holding the V3000 mol
                                  block of the molecule.''',
+                'atoms': [H(0), N(1), ...],
             }
 
         Parameters
@@ -833,14 +792,11 @@ class BuildingBlock(Molecule):
             include_attrs = []
 
         fg_names = [info.name for info in self.func_group_infos]
-        conformers = [
-            self._to_mdl_mol_block(conformer_id=i)
-            for i in range(len(self._conformers))
-        ]
         d = {
             'class': self.__class__.__name__,
             'func_groups': fg_names,
-            'conformers': conformers,
+            'mol_block': self._to_mdl_mol_block(),
+            'atoms': repr(self.atoms)
         }
 
         d.update(

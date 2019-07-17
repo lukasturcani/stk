@@ -42,29 +42,27 @@ def pytest_generate_tests(metafunc):
 
 @pytest.fixture(scope='session')
 def amine2():
-    amine2 = stk.BuildingBlock.init_from_smiles(
+    return stk.BuildingBlock.init_from_smiles(
         smiles='NCCCN',
         functional_groups=['amine']
     )
-    # Make a second conformer with a distinct geometry.
-    amine2.set_position_matrix(
-        position_matrix=amine2.get_position_matrix()*4,
-        conformer_id=None
-    )
-    return amine2
 
 
 @pytest.fixture
 def tmp_amine2():
+    return stk.BuildingBlock.init_from_smiles(
+        smiles='NCCCN',
+        functional_groups=['amine']
+    )
+
+
+@pytest.fixture
+def amine2_conf1():
     amine2 = stk.BuildingBlock.init_from_smiles(
         smiles='NCCCN',
         functional_groups=['amine']
     )
-    # Make a second conformer with a distinct geometry.
-    amine2.set_position_matrix(
-        position_matrix=amine2.get_position_matrix()*4,
-        conformer_id=None
-    )
+    amine2.set_position_matrix(amine2.get_position_matrix()*3)
     return amine2
 
 
@@ -142,39 +140,26 @@ def amine3():
 
 @pytest.fixture(scope='session')
 def ring_amine():
-    smiles = 'Nc1ccc2cc3cc(N)ccc3cc2c1'
     return stk.BuildingBlock.init_from_smiles(
-        smiles=smiles,
+        smiles='Nc1ccc2cc3cc(N)ccc3cc2c1',
         functional_groups=['ring_amine']
     )
 
 
 @pytest.fixture(scope='session')
 def aldehyde3():
-    aldehyde3 = stk.BuildingBlock.init_from_smiles(
+    return stk.BuildingBlock.init_from_smiles(
         smiles='O=CC(C=O)C=O',
         functional_groups=['aldehyde']
     )
-    # Make a second conformer with a distinct geometry.
-    aldehyde3.set_position_matrix(
-        position_matrix=aldehyde3.get_position_matrix()*4,
-        conformer_id=None
-    )
-    return aldehyde3
 
 
 @pytest.fixture
 def tmp_aldehyde3():
-    aldehyde3 = stk.BuildingBlock.init_from_smiles(
+    return stk.BuildingBlock.init_from_smiles(
         smiles='O=CC(C=O)C=O',
         functional_groups=['aldehyde']
     )
-    # Make a second conformer with a distinct geometry.
-    aldehyde3.set_position_matrix(
-        position_matrix=aldehyde3.get_position_matrix()*4,
-        conformer_id=None
-    )
-    return aldehyde3
 
 
 @pytest.fixture(scope='session')
@@ -287,22 +272,18 @@ def tmp_polymer(amine2, aldehyde2):
     )
 
 
-@pytest.fixture(scope='session')
-def cc3():
-    # This has an unoptimized conformer in conformer 0 and an
-    # optimized one in conformer 1.
-    m = stk.Molecule.load(join('..', 'data', 'cc3.json'))
-    m.name = 'cc3'
-    return m
-
-
-@pytest.fixture
-def tmp_cc3():
-    # This has an unoptimized conformer in conformer 0 and an
-    # optimized one in conformer 1.
-    m = stk.Molecule.load(join('..', 'data', 'cc3.json'))
-    m.name = 'tmp_cc3'
-    return m
+# @pytest.fixture(scope='session')
+# def cc3():
+#     m = stk.Molecule.load(join('..', 'data', 'cc3.json'))
+#     m.name = 'cc3'
+#     return m
+#
+#
+# @pytest.fixture
+# def tmp_cc3():
+#     m = stk.Molecule.load(join('..', 'data', 'cc3.json'))
+#     m.name = 'tmp_cc3'
+#     return m
 
 
 @pytest.fixture(scope='session')

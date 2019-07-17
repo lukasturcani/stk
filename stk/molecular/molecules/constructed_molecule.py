@@ -1,145 +1,17 @@
 """
 Defines :class:`ConstructedMolecule`.
 
-.. _`molecular construction`:
-
-A more detailed description of molecular construction.
-------------------------------------------------------
-
-This is a step-by-step guide of how :class:`.ConstructedMolecule`
-instances are constructed.
-
-First, you create :class:`.BuildingBlock` instances of the building blocks
-which make up the :class:`ConstructedMolecule`:
-
-.. code-block:: python
-
-    bb = BuildingBlock('/path/to/struct/file.mol2', ['amine'])
-
-The :class:`.BuildingBlock` instances are initialized using paths to
-molecular structure files or :mod:`rdkit` molecules or with SMILES
-strings. Initializing a :class:`.BuildingBlock` automatically completes
-steps 1 to 4.
-
-    1. Place an :mod:`rdkit` instance of the molecule into
-       :attr:`.BuildingBlock.mol`, i.e.
-
-       .. code-block:: python
-
-           bb.mol  # <rdkit.Chem.rdchem.Mol at 0x7f961a8f1f80>
-
-    2. Scan the path of the structure file for the names of functional
-       groups. (Alternatively the names of functional groups can be
-       supplied to the initializer). Find the :class:`.FGInfo` instance
-       for each functional group.
-
-
-Which functional groups are recognized by ``stk``?
-
-The module :mod:`.functional_groups` defines the class :class:`.FGInfo`
-and a :class:`tuple` of instances of this class called
-:data:`functional_groups`. If you put an :class:`.FGInfo` instance into
-:data:`functional_groups`, the functional group will be recognized.
-
-    3. Using :class:`.FGInfo` create :class:`.FunctionalGroup`
-       instances, which determine the bonder and deleter atoms in the
-       molecule. These identify which atoms form bonds during
-       the construction of a :class:`ConstructedMolecule` and which
-       ones are deleted. Place the :class:`.FunctionalGroup` instances
-       into :attr:`.BuildingBlock.func_groups`.
-
-       .. code-block:: python
-
-           bb.func_groups
-           # (
-           #     FunctionalGroup(
-           #         id_=0,
-           #         atom_ids=(45, 21, 0),
-           #         bonder_ids=(21, ),
-           #         deleter_ids=(0, 45),
-           #         info=FGInfo('amine')
-           #     ),
-           #     FunctionalGroup(
-           #         id_=1,
-           #         atom_ids=(47, 23, 15),
-           #         bonder_ids=(47, ),
-           #         deleter_ids=(23, 15),
-           #         info=FGInfo('amine')
-           #     )
-           # )
-
-    5. Initialize an instance of :class:`.ConstructedMolecule`.
-
-       .. code-block:: python
-
-           mol = ConstructedMolecule([bb1, bb2], Topology())
-
-       Normally, :class:`.ConstructedMolecule` and :class:`.Topology`
-       will not be used directly. Instead, classes derived from these
-       will be used. For example,
-
-           .. code-block:: python
-
-               polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
-
-    6. Run :meth:`.Topology.construct` inside
-       :meth:`ConstructedMolecule.__init__`.
-
-    7. The details of :meth:`.Topology.construct` will vary depending
-       on the :class:`.Topology` class used. However, the basic
-       structure is the same (steps 8 - 10).
-
-    8. Use :meth:`.Topology.place_mols` to combine the :mod:`rdkit`
-       molecules of all building blocks into a single :mod:`rdkit`
-       instance. The combined :mod:`rdkit` instance is placed into the
-       :attr:`.ConstructedMolecule.mol`. attribute.
-       :meth:`.Topology.place_mols` also usually
-       keeps track of each functional groups in the constructed
-       molecule. If a buliding block is placed during the construction
-       of a molecule, the atom ids have to be shifted upward by some
-       amount. :meth:`.FunctionalGroup.shifted_fg` performs this
-       operation.
-
-    9. Use :meth:`.Topology.prepare` to run any additional operations
-       before joining up the building blocks and deleting extra
-       atoms, this method may do nothing.
-
-    10. Use :meth:`.Topology.bonded_fgs` to yield the functional groups
-        which react. The :class:`.FunctionalGroup` instances in the
-        constructed molecule are passed to :meth:`.Reactor.react`,
-        which performs the reaction. See the documentation of
-        :class:`.Reactor` for information on how reactions are carried
-        out.
-
-    11. Run :meth:`.Topology.cleanup` to perform any final operations
-        on the constructed molecule. Can be nothing.
-
-After all this you should have a :mod:`rdkit` instance of the
-constructed molecule, which should be placed into
-:attr:`ConstructedMolecule.mol`.
-
-.. _`adding constructed molecules`:
-
-Extending stk: Adding new types of constructed molecules.
----------------------------------------------------------
-
-To add new constructed molecules create a new class which inherits
-:class:`.ConstructedMolecule`.
-
-If you're adding a new class of constructed molecules, it quite likely
-you want to add a new :class:`.Topology` class. See the
-:mod:`.topologies.base` for guidance on adding these. The topology
-class does the construction of the molecule from the building blocks.
-
 """
 
 import logging
 import rdkit.Chem.AllChem as rdkit
 from collections import Counter
 
+from . import elements
 from .molecule import Molecule
 from .. import topologies
 from ..functional_groups import FunctionalGroup
+from ...utilities import remake
 
 logger = logging.getLogger(__name__)
 
@@ -154,21 +26,25 @@ class ConstructedMolecule(Molecule):
 
     A :class:`ConstructedMolecule` requires at least 2 basic pieces of
     information: which building block molecules are used to construct
-    the molecule and what the :class:`.Topology` of the constructed
-    molecule is. The construction of the molecular structure is
-    performed by :meth:`.Topology.construct`. This method does not
-    have to be called explicitly by the user, it will be called
+    the molecule and what the :class:`.TopologyGraph` of the
+    constructe molecule is. The construction of the molecular structure
+    is performed by :meth:`.TopologyGraph.construct`. This method does
+    not have to be called explicitly by the user, it will be called
     automatically during initialization.
 
-    Each :class:`.Topology` may add additional attributes to the
-    :class:`ConstructedMolecule`, which will be documented by that
-    class.
+    The building block molecules used for construction can be either
+    :class:`.BuildingBlock` instances or other
+    :class:`.ConstructedMolecule` instances, or a combination both.
+
+    Each :class:`.TopologyGraph` subclass may add additional attributes
+    to the :class:`ConstructedMolecule`, which will be described within
+    its documentation.
 
     Attributes
     ----------
     atoms : :class:`tuple` of :class:`.Atom`
         Extends :class:`.Molecule.atoms`. Each :class:`.Atom`
-        instance has two additional attributes. The
+        instance is guaranteed to have two additional attributes. The
         first is :attr:`building_block`, which holds the building
         block :class:`.Molecule` from which that
         :class:`.Atom` came. If the :class:`.Atom` did not come from a
@@ -207,15 +83,12 @@ class ConstructedMolecule(Molecule):
         can be mapped to multiple :class:`~.topologies.base.Vertex`
         objects.
 
-    building_block_conformers : :class:`list` of :class:`dict`
-        
-
     bb_counter : :class:`collections.Counter`
         A counter keeping track of how many times each building block
         molecule appears in the :class:`ConstructedMolecule`.
 
-    topology : :class:`.Topology`
-        Defines the topology of :class:`ConstructedMolecule` and
+    topology_graph : :class:`.TopologyGraph`
+        Defines the topology graph of :class:`ConstructedMolecule` and
         is responsible for constructing it.
 
     bonds_made : :class:`int`
@@ -231,7 +104,6 @@ class ConstructedMolecule(Molecule):
     Methods
     -------
     :meth:`__init__`
-    :meth:`add_conformer`
 
     Examples
     --------
@@ -241,8 +113,8 @@ class ConstructedMolecule(Molecule):
     def __init__(
         self,
         building_blocks,
-        topology,
-        bb_conformers=None,
+        topology_graph,
+        bb_map=None,
         use_cache=False
     ):
         """
@@ -251,22 +123,36 @@ class ConstructedMolecule(Molecule):
         Parameters
         ---------
         building_blocks : :class:`list` of :class:`.BuildingBlock`
-            The :class:`.BuildingBlock` instances which
-            represent the building block molecules of the
-            :class:`ConstructedMolecule`. Only one
-            :class:`.BuildingBlock` instance is present per building
-            block, even if multiples of that building block join up to
-            form the :class:`ConstructedMolecule`.
+            The :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` instances which
+            represent the building block molecules used for
+            construction. Only one instance is present per building
+            block molecule, even if multiples of that building block
+            join up to form the :class:`ConstructedMolecule`.
 
-        topology : :class:`.Topology`
-            Defines the topology of the :class:`ConstructedMolecule`
-            and constructs it.
+        topolog_graph : :class:`.TopologyGraph`
+            Defines the topology graph of the
+            :class:`ConstructedMolecule` and constructs it.
 
-        bb_conformers : :class:`list` of :class:`int`, optional
-            The ids of the building block conformers to be used. Must
-            be equal in length to `building_blocks` and orders must
-            correspond. If ``None``, then ``-1`` is used for all
-            building blocks.
+        bb_map : :class:`dict`, optional
+            Maps each building block molecule in `building_blocks`
+            to the :class:`~.topologies.base.Vertex` objects it is
+            placed on during construction.
+            :class:`~.topologies.base.Vertex` objects are held in
+            :attr:`.TopologyGraph.vertices`.
+
+            .. code-block:: python
+
+                bb1 = BuildingBlock(...)
+                bb2 = BuildingBlock(...)
+                bb3 = ConstructedMolecule(...)
+                # Use some real TopologyGraph child class here.
+                topology_graph = TopologyGraphChildClass(...)
+                bb_map = {
+                    bb1: topology_graph.vertices[0:2],
+                    bb2: topology_graph.vertices[2:3],
+                    bb3: topology_graph.vertices[3:]
+                }
 
         use_cache : :class:`bool`, optional
             If ``True``, a new :class:`.ConstructedMolecule` will
@@ -277,25 +163,24 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        if bb_conformers is None:
-            bb_conformers = [-1 for _ in range(len(building_blocks))]
-
         self.building_blocks = building_blocks
-        self.topology = topology
+        self.topology_graph = topology_graph
+        self.atoms = []
+        self.bonds = []
+        self.bonds_made = 0
+        self.func_groups = []
+        self.bb_counter = Counter()
 
         try:
-            # Ask the ``Topology`` instance to construct the
-            # molecule. This creates the `mol`, `bonds_made` and
-            # `func_groups` attributes.
-            topology.construct(self, bb_conformers)
+            topology_graph.construct(self)
 
         except Exception as ex:
             errormsg = (
                 'Construction failure.\n'
                 '\n'
-                'topology\n'
-                '--------\n'
-                f'{topology}\n'
+                'topology_graph\n'
+                '--------------\n'
+                f'{topology_graph}\n'
                 '\n'
                 'building blocks\n'
                 '---------------\n'
@@ -303,104 +188,41 @@ class ConstructedMolecule(Molecule):
 
             bb_blocks = []
             for i, bb in enumerate(building_blocks):
-                bb_conf = bb_conformers[i]
                 bb_blocks.append(
                     f'{bb.__class__.__name__} '
                     f'{[info.name for info in bb.func_group_infos]}\n'
-                    f'{bb.mdl_mol_block(bb_conf)}'
+                    f'{bb._to_mdl_mol_block()}'
                 )
 
             errormsg += '\n'.join(bb_blocks)
             raise ConstructionError(errormsg) from ex
 
+        self.atoms = tuple(self.atoms)
+        self.bonds = tuple(self.bonds)
         self.func_groups = tuple(self.func_groups)
 
         # Ensure that functional group ids are set correctly.
         for id_, func_group in enumerate(self.func_groups):
             func_group.id = id_
-
-        super().__init__()
-
-    def add_conformer(self, bb_conformers):
-        """
-        Construct a new conformer.
-
-        Parameters
-        ----------
-        bb_conformers : :class:`list` of :class:`int`
-            The ids of the building block conformers to be used. Must
-            be equal in length to :attr:`building_blocks` and the
-            orders must correspond. If ``None``, then ``-1`` is used
-            for all building blocks.
-
-        Returns
-        -------
-        :class:`int`
-            The id of the new conformer.
-
-        """
-
-        # Save the original rdkit molecule.
-        original_mol = self._mol
-        # Construct a new molecule.
-        try:
-            # Ask the ``Topology`` instance to construct the
-            # molecule. This creates the `mol`, `bonds_made`
-            # and `func_groups` attributes.
-            self.topology.construct(self, bb_conformers)
-
-        except Exception as ex:
-            self._mol = original_mol
-            errormsg = (
-                'Construction failure.\n'
-                '\n'
-                'topology\n'
-                '--------\n'
-                f'{self.topology}\n'
-                '\n'
-                'building blocks\n'
-                '---------------\n'
-            )
-
-            bb_blocks = []
-            for i, bb in enumerate(self.building_blocks):
-                bb_conf = bb_conformers[i]
-                bb_blocks.append(
-                    f'{bb.__class__.__name__} '
-                    f'{[info.name for info in bb.func_group_infos]}\n'
-                    f'{bb.mdl_mol_block(bb_conf)}'
-                )
-
-            errormsg += '\n'.join(bb_blocks)
-            raise ConstructionError(errormsg) from ex
-
-        self.func_groups = tuple(self.func_groups)
-
-        # Ensure that functional group ids are set correctly.
-        for id_, func_group in enumerate(self.func_groups):
-            func_group.id = id_
-
-        # Get the new conformer.
-        new_conf = rdkit.Conformer(self._mol.GetConformer())
-        # Add it to the original molecule.
-        new_id = original_mol.AddConformer(new_conf, True)
-        self._mol = original_mol
-        return new_id
 
     def _to_dict(self, include_attrs=None):
         """
-        Returns a :class:`dict` representation of the molecule.
+        Return a :class:`dict` representation of the molecule.
 
         The representation has the form
 
         .. code-block:: python
 
             {
-                'class' : 'Polymer',
+                'class' : 'ConstructedMolecule',
                 'mol_block' : '''A string holding the V3000 mol
                                  block of the molecule.''',
-                'building_blocks' : {bb1._to_dict(), bb2._to_dict()},
-                'topology' : 'Copolymer(repeating_unit="AB")',
+                'building_blocks' : {
+                    bb1._to_dict(): [],
+                    bb2._to_dict(): []
+                },
+                'topology_graph' : 'Copolymer(repeating_unit="AB")',
+                'atoms': [H(0), N(1), ... ],
             }
 
         Parameters
@@ -420,14 +242,6 @@ class ConstructedMolecule(Molecule):
         if include_attrs is None:
             include_attrs = []
 
-        conformers = [
-            (
-                conf.GetId(),
-                self.to_mdl_mol_block(conformer=conf.GetId())
-            )
-            for conf in self._mol.GetConformers()
-        ]
-
         d = {
             'bb_counter': [
                 (key._to_dict(), val)
@@ -435,13 +249,13 @@ class ConstructedMolecule(Molecule):
             ],
             'bonds_made': self.bonds_made,
             'class': self.__class__.__name__,
-            'conformers': conformers,
+            'mol_block': self._to_mdl_mol_block(),
             'building_blocks': [
                 x._to_dict() for x in self.building_blocks
             ],
-            'topology': repr(self.topology),
-            'func_groups': repr(self.func_groups)
-
+            'topology_graph': repr(self.topology_graph),
+            'func_groups': repr(self.func_groups),
+            'atoms': repr(self.atoms),
         }
 
         d.update(
@@ -478,41 +292,41 @@ class ConstructedMolecule(Molecule):
         d.pop('class')
 
         bb_counter = Counter({
-            Molecule.from_dict(key): val
+            Molecule._init_from_dict(key, use_cache=use_cache): val
             for key, val in d.pop('bb_counter')
         })
         bbs = list(bb_counter)
-        topology = eval(d.pop('topology'),  topologies.__dict__)
+        tops = vars(topologies)
+        topology_graph = eval(d.pop('topology_graph'), tops)
 
-        key = cls._generate_key(bbs, topology)
+        key = cls._get_key(cls, bbs, topology_graph, use_cache)
         if key in cls._cache and use_cache:
             return cls.cache[key]
 
         obj = cls.__new__(cls)
 
-        (conf_id, mol_block), *confs = d.pop('conformers')
-        obj._mol = rdkit.MolFromMolBlock(
-            molBlock=mol_block,
+        mol = remake(rdkit.MolFromMolBlock(
+            molBlock=d.pop('mol_block'),
             sanitize=False,
             removeHs=False
-        )
-        obj._mol.GetConformer().SetId(conf_id)
+        ))
 
-        for conf_id, mol_block in confs:
-            conf_mol = rdkit.MolFromMolBlock(
-                molBlock=mol_block,
-                sanitize=False,
-                removeHs=False
-            )
-            conf = conf_mol.GetConformer()
-            conf.SetId(conf_id)
-            obj._mol.AddConformer(conf)
-
-        obj.topology = topology
+        obj.topology_graph = topology_graph
         obj.bb_counter = bb_counter
         obj.bonds_made = d.pop('bonds_made')
         obj._key = key
         obj.building_blocks = bbs
+        obj._position_matrix = mol.GetConformer().GetPositions().T
+        obj.atoms = eval(d.pop('atoms'), vars(elements))
+
+        obj.bonds = tuple(
+            elements.Bond(
+                obj.atoms[b.GetBeginAtomIdx()],
+                obj.atoms[b.GetEndAtomIdx()],
+                b.GetBondTypeAsDouble()
+            )
+            for b in mol.GetBonds()
+        )
 
         # Globals for eval.
         g = {'FunctionalGroup': FunctionalGroup}
@@ -525,16 +339,10 @@ class ConstructedMolecule(Molecule):
 
         return obj
 
-    @classmethod
-    def _generate_key(
-        cls,
-        building_blocks,
-        topology,
-        bb_conformers,
-        use_cache
-    ):
+    @staticmethod
+    def _get_key(self, building_blocks, topology_graph, use_cache):
         """
-        Generates the key used for caching the molecule.
+        Get the key used for caching the molecule.
 
         Parameters
         ----------
@@ -546,15 +354,9 @@ class ConstructedMolecule(Molecule):
             block, even if multiples of that building block join up to
             form the :class:`ConstructedMolecule`.
 
-        topology : :class:`.Topology`
-            Defines the topology of the :class:`ConstructedMolecule`
-            and constructs it.
-
-        bb_conformers : :class:`list` of :class:`int`
-            The ids of the building block conformers to be used. Must
-            be equal in length to `building_blocks` and orders must
-            correspond. If ``None``, then ``-1`` is used for all
-            building blocks.
+        topology_graph : :class:`.TopologyGraph`
+            Defines the topology graph of the
+            :class:`ConstructedMolecule` and constructs it.
 
         use_cache : :class:`bool`
             This argument is ignored but included to be maintain
@@ -562,15 +364,15 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        bb_keys = frozenset(x.key for x in building_blocks)
-        return bb_keys, repr(topology)
+        bb_keys = frozenset(x._key for x in building_blocks)
+        return bb_keys, repr(topology_graph)
 
     def __str__(self):
         return (
             f'{self.__class__.__name__}'
             '(building_blocks='
             f'{[str(x) for x in self.building_blocks]}, '
-            f'topology={self.topology!r})'
+            f'topology_graph={self.topology_graph!r})'
         )
 
     def __repr__(self):

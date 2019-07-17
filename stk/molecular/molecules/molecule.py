@@ -37,7 +37,7 @@ class _Cached(type):
 
 class Molecule(metaclass=_Cached):
     """
-    The most basic class representing molecules.
+    A base class for representing molecules.
 
     This class defines the operations which any class
     describing molecules should inherit or may find useful. Examples of
@@ -54,8 +54,12 @@ class Molecule(metaclass=_Cached):
         The bonds of the molecule.
 
     _cache : :class:`dict`
-        This is a class attribute. It maps :attr:`_key` to the
+        This is a class attribute. It maps a :attr:`_key` to the
         :class:`.Molecule` instance with that :attr:`_key`.
+
+    _position_matrix : :class:`numpy.ndarray`
+        A ``(3, n)`` matrix holding the position of every atom in the
+        molecule.
 
     _key : :class:`object`
         A hashable :class:`object`. This attribute will be the same
@@ -63,9 +67,6 @@ class Molecule(metaclass=_Cached):
         A private method :meth:`_get_key` must be defined for
         each subclass of :class:`.Molecule` and it will be used to
         generate the :attr:`_key`.
-
-    _conformers : :class:`list` of :class:`numpy.ndarray`
-        The position matrices of the conformers.
 
     Methods
     -------
@@ -96,7 +97,7 @@ class Molecule(metaclass=_Cached):
 
     subclasses = {}
 
-    def __init__(self, atoms, bonds):
+    def __init__(self, atoms, bonds, position_matrix):
         """
         Initialize a :class:`Molecule`.
 
@@ -108,11 +109,15 @@ class Molecule(metaclass=_Cached):
         bonds : :class:`tuple` of :class:`.Bond`
             The bonds of the molecule.
 
+        position_matrix : :class:`numpy.ndarray`
+            A ``(n, 3)`` matrix holding the position of every atom in
+            the :class:`.Molecule`.
+
         """
 
         self.atoms = atoms
         self.bonds = bonds
-        self._conformers = []
+        self._position_matrix = position_matrix.T
 
     @classmethod
     def _init_from_dict(self, mol_dict, use_cache=False):
@@ -155,7 +160,7 @@ class Molecule(metaclass=_Cached):
         cls._cache = {}
         super().__init_subclass__(**kwargs)
 
-    def apply_displacement(self, displacement, conformer_id=0):
+    def apply_displacement(self, displacement):
         """
         Shift the molecule by `displacement`.
 
@@ -164,9 +169,6 @@ class Molecule(metaclass=_Cached):
         displacement : :class:`numpy.ndarray`
             A displacement vector applied to the molecule.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
-
         Returns
         -------
         :class:`.Molecule`
@@ -174,19 +176,10 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        conf = self._conformers[conformer_id]
-        self._conformers[conformer_id] = (
-            conf + displacement[:, np.newaxis]
-        )
+        self._position_matrix += displacement[:, np.newaxis]
         return self
 
-    def apply_rotation_about_axis(
-        self,
-        theta,
-        axis,
-        origin,
-        conformer_id=0
-    ):
+    def apply_rotation_about_axis(self, theta, axis, origin):
         """
         Rotate the molecule by `theta` about `axis` on the `origin`.
 
@@ -201,9 +194,6 @@ class Molecule(metaclass=_Cached):
         origin : :class:`numpy.ndarray`
             The origin about which the rotation happens.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
-
         Returns
         -------
         :class:`.Molecule`
@@ -211,26 +201,19 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        # Set the origin of the rotation to the origin.
-        self.apply_displacement(-origin, conformer_id)
-        # Get the rotation matrix.
+        # Set the origin of the rotation to "origin".
+        self.apply_displacement(-origin)
         rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
+
         # Apply the rotation matrix on the position matrix, to get the
         # new position matrix.
-        self._conformers[conformer_id] = (
-            rot_mat @ self._conformers[conformer_id]
-        )
+        self._position_matrix = rot_mat @ self._position_matrix
+
         # Return the centroid of the molecule to the original position.
-        self.apply_displacement(origin, conformer_id)
+        self.apply_displacement(origin)
         return self
 
-    def apply_rotation_between_vectors(
-        self,
-        start,
-        target,
-        origin,
-        conformer_id=0
-    ):
+    def apply_rotation_between_vectors(self, start, target, origin):
         """
         Rotate the molecule by a rotation from `start` to `target`.
 
@@ -262,9 +245,6 @@ class Molecule(metaclass=_Cached):
         origin : :class:`numpy.ndarray`
             The point about which the rotation occurs.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
-
         Returns
         -------
         :class:`.Molecule`
@@ -276,20 +256,16 @@ class Molecule(metaclass=_Cached):
         start = normalize_vector(start)
         target = normalize_vector(target)
 
-        # Set the origin to the origin.
-        self.apply_displacement(-origin, conformer_id)
-
-        # Get the rotation matrix.
+        # Set the origin of the rotation to "origin".
+        self.apply_displacement(-origin)
         rot_mat = rotation_matrix(start, target)
 
         # Apply the rotation matrix to the atomic positions to yield
         # the new atomic positions.
-        self._conformers[conformer_id] = (
-            rot_mat @ self._conformers[conformer_id]
-        )
+        self._position_matrix = rot_mat @ self._position_matrix
 
         # Restore original position.
-        self.apply_displacement(origin, conformer_id)
+        self.apply_displacement(origin)
         return self
 
     def apply_rotation_to_minimize_theta(
@@ -297,8 +273,7 @@ class Molecule(metaclass=_Cached):
         start,
         target,
         axis,
-        origin,
-        conformer_id=0
+        origin
     ):
         """
         Rotates the molecule to minimize angle between vectors.
@@ -321,9 +296,6 @@ class Molecule(metaclass=_Cached):
         origin : :class:`numpy.ndarray`
             The origin about which the rotation happens.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
-
         Returns
         -------
         :class:`.Molecule`
@@ -331,12 +303,12 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        # If the vector being rotated is not finite exit. This is
+        # If the vector being rotated is not finite, exit. This is
         # probably due to a planar molecule.
         if not all(np.isfinite(x) for x in start):
             return self
 
-        self.apply_displacement(-origin, conformer_id)
+        self.apply_displacement(-origin)
 
         # 1. First transform the problem.
         # 2. The rotation axis is set equal to the z-axis.
@@ -352,7 +324,7 @@ class Molecule(metaclass=_Cached):
         # If the `tstart` vector is 0 after these transformations it
         # means that it is parallel to the rotation axis, stop.
         if np.allclose(tstart, [0, 0, 0], 1e-8):
-            self.apply_displacement(origin, conformer_id)
+            self.apply_displacement(origin)
             return self
 
         tend = np.dot(rotmat, target)
@@ -371,13 +343,11 @@ class Molecule(metaclass=_Cached):
             angle *= -1
 
         rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
-        self._conformers[conformer_id] = (
-            rot_mat @ self._conformers[conformer_id]
-        )
-        self.apply_displacement(origin, conformer_id)
+        self._position_matrix = rot_mat @ self._position_matrix
+        self.apply_displacement(origin)
         return self
 
-    def get_atom_coords(self, atom_ids=None, conformer_id=0):
+    def get_atom_coords(self, atom_ids=None):
         """
         Yield the coordinates of atoms.
 
@@ -387,9 +357,6 @@ class Molecule(metaclass=_Cached):
             The ids of the atoms whose coordinates are desired.
             If ``None``, then the coordinates of all atoms will be
             yielded.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be used.
 
         Yields
         ------
@@ -404,11 +371,11 @@ class Molecule(metaclass=_Cached):
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        coords = self._conformers[conformer_id][:, atom_ids].T
+        coords = self._position_matrix[:, atom_ids].T
         for atom_coords in coords:
             yield atom_coords
 
-    def get_atom_distance(self, atom1_id, atom2_id, conformer_id=0):
+    def get_atom_distance(self, atom1_id, atom2_id):
         """
         Return the distance between 2 atoms.
 
@@ -423,9 +390,6 @@ class Molecule(metaclass=_Cached):
         atom2_id : :class:`int`
             The id of the second atom.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be used.
-
         Returns
         -------
         :class:`float`
@@ -433,10 +397,13 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        conf = self._conformers[conformer_id]
-        return float(euclidean(conf[:, atom1_id], conf[:, atom2_id]))
+        distance = euclidean(
+            u=self._position_matrix[:, atom1_id],
+            v=self._position_matrix[:, atom2_id]
+        )
+        return float(distance)
 
-    def get_center_of_mass(self, atom_ids=None, conformer_id=0):
+    def get_center_of_mass(self, atom_ids=None):
         """
         Return the centre of mass of a group of atoms.
 
@@ -445,9 +412,6 @@ class Molecule(metaclass=_Cached):
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should be used to calculate the
             center of mass. If ``None``, then all atoms will be used.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
 
         Returns
         -------
@@ -469,14 +433,14 @@ class Molecule(metaclass=_Cached):
 
         center = 0
         total_mass = 0.
-        coords = self.get_atom_coords(atom_ids, conformer_id)
+        coords = self.get_atom_coords(atom_ids)
         for atom_id, coord in zip(atom_ids, coords):
             mass = self.atoms[atom_id].mass
             total_mass += mass
             center += mass*coord
         return np.divide(center, total_mass)
 
-    def get_centroid(self, atom_ids=None, conformer_id=0):
+    def get_centroid(self, atom_ids=None):
         """
         Return the centroid of a group of atoms.
 
@@ -485,9 +449,6 @@ class Molecule(metaclass=_Cached):
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which are used to calculate the
             centroid. If ``None``, then all atoms will be used.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be used.
 
         Returns
         -------
@@ -501,10 +462,10 @@ class Molecule(metaclass=_Cached):
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        s = self._conformers[conformer_id][:, atom_ids].sum(axis=1)
+        s = self._position_matrix[:, atom_ids].sum(axis=1)
         return s / len(atom_ids)
 
-    def get_direction(self, atom_ids=None, conformer_id=0):
+    def get_direction(self, atom_ids=None):
         """
         Return a vector of best fit through the molecule's atoms.
 
@@ -513,9 +474,6 @@ class Molecule(metaclass=_Cached):
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should be used to calculate the
             vector. If ``None``, then all atoms will be used.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be used.
 
         Returns
         -------
@@ -529,12 +487,12 @@ class Molecule(metaclass=_Cached):
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        pos = self._conformers[conformer_id][:, atom_ids].T
+        pos = self._position_matrix[:, atom_ids].T
         return normalize_vector(
             np.linalg.svd(pos - pos.mean(axis=0))[-1][0]
         )
 
-    def get_maximum_diameter(self, atom_ids=None, conformer_id=0):
+    def get_maximum_diameter(self, atom_ids=None):
         """
         Get the maximum diameter in the molecule.
 
@@ -548,9 +506,6 @@ class Molecule(metaclass=_Cached):
             maximum diamater. If ``None`` then all atoms in the
             molecule are considered.
 
-        conformer_id : :class:`int`
-            The id of the conformer to use.
-
         Returns
         -------
         :class:`float`
@@ -563,10 +518,10 @@ class Molecule(metaclass=_Cached):
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        coords = self._conformers[conformer_id][:, atom_ids]
+        coords = self._position_matrix[:, atom_ids]
         return float(euclidean(coords.min(axis=1), coords.max(axis=1)))
 
-    def get_plane_normal(self, atom_ids=None, conformer_id=0):
+    def get_plane_normal(self, atom_ids=None):
         """
         Return the normal to the plane of best fit.
 
@@ -575,9 +530,6 @@ class Molecule(metaclass=_Cached):
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should be used to calculate the
             plane. If ``None``, then all atoms will be used.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be used.
 
         Returns
         -------
@@ -591,18 +543,13 @@ class Molecule(metaclass=_Cached):
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        pos = self._conformers[conformer_id][:, atom_ids].T
-        centroid = self.get_centroid(atom_ids, conformer_id)
+        pos = self._position_matrix[:, atom_ids].T
+        centroid = self.get_centroid(atom_ids)
         return np.linalg.svd(pos - centroid)[-1][2, :]
 
-    def get_position_matrix(self, conformer_id=0):
+    def get_position_matrix(self):
         """
-        Return a matrix holding the atomic positions of a conformer.
-
-        Parameters
-        ----------
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
+        Return a matrix holding the atomic positions.
 
         Returns
         -------
@@ -612,9 +559,37 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        return self._conformers[conformer_id].T
+        return self._position_matrix.T
 
-    def set_centroid(self, position, atom_ids=None, conformer_id=0):
+    def is_identical(self, other):
+        """
+        Check if `other` is identical to `self`.
+
+        Identical means that the two molecules are treated in the same
+        way by every ``stk`` operation.
+
+        Identical molecules do not have to have the same atomic
+        positions, but must have the same atoms, bonds and charges.
+
+        Parameters
+        ----------
+        other : :class:`Molecule`
+            The molecule to check.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `other` is an identical molecule, from
+            an ``stk`` perspective.
+
+        """
+
+        return (
+            self.__class__ is other.__class__
+            and self._key == other._key
+        )
+
+    def set_centroid(self, position, atom_ids=None):
         """
         Set the centroid of the molecule to `position`.
 
@@ -628,9 +603,6 @@ class Molecule(metaclass=_Cached):
             The ids of atoms which should have their centroid set to
             `position`. If ``None`` then all atoms are used.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be used.
-
         Returns
         -------
         :class:`Molecule`
@@ -638,14 +610,11 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        centroid = self.get_centroid(
-            atom_ids=atom_ids,
-            conformer_id=conformer_id
-        )
-        self.apply_displacement(position-centroid, conformer_id)
+        centroid = self.get_centroid(atom_ids=atom_ids)
+        self.apply_displacement(position-centroid)
         return self
 
-    def set_position_matrix(self, position_matrix, conformer_id=0):
+    def set_position_matrix(self, position_matrix):
         """
         Set the molecule's coordinates to those in `position_matrix`.
 
@@ -655,10 +624,6 @@ class Molecule(metaclass=_Cached):
             A position matrix of the molecule. The shape of the matrix
             is ``(n, 3)``.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be used. If ``None`` a new
-            conformer is added.
-
         Returns
         -------
         :class:`Molecule`
@@ -666,10 +631,7 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        if conformer_id is None:
-            self._conformers.append(position_matrix.T)
-        else:
-            self._conformers[conformer_id] = position_matrix.T
+        self._position_matrix = position_matrix.T
         return self
 
     def dump(self, path, include_attrs=None):
@@ -733,7 +695,7 @@ class Molecule(metaclass=_Cached):
 
         return cls._init_from_dict(mol_dict, use_cache=use_cache)
 
-    def _to_mdl_mol_block(self, atom_ids=None, conformer_id=0):
+    def _to_mdl_mol_block(self, atom_ids=None):
         """
         Return a V3000 mol block of the molecule.
 
@@ -742,9 +704,6 @@ class Molecule(metaclass=_Cached):
         atom_ids : :class:`iterable` of :class:`int`, optional
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
 
         Returns
         -------
@@ -756,14 +715,13 @@ class Molecule(metaclass=_Cached):
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
 
-        conf = self._conformers[conformer_id]
         atom_lines = []
         # This set gets used by bonds.
         atoms = set()
         for i, atom_id in enumerate(atom_ids, 1):
             atoms.add(atom_id)
 
-            x, y, z = conf[:, atom_id]
+            x, y, z = self._position_matrix[:, atom_id]
             atom = self.atoms[atom_id]
             symbol = atom.__class__.__name__
             charge = atom.charge
@@ -837,11 +795,10 @@ class Molecule(metaclass=_Cached):
             )
 
         mol = mol.GetMol()
-        for conf in self._conformers:
-            rdkit_conf = rdkit.Conformer(len(self.atoms))
-            for atom_id, atom_coord in enumerate(conf.T):
-                rdkit_conf.SetAtomPosition(atom_id, atom_coord)
-            mol.AddConformer(rdkit_conf)
+        rdkit_conf = rdkit.Conformer(len(self.atoms))
+        for atom_id, atom_coord in enumerate(self._position_matrix.T):
+            rdkit_conf.SetAtomPosition(atom_id, atom_coord)
+        mol.AddConformer(rdkit_conf)
         return mol
 
     def update_cache(self):
@@ -851,10 +808,10 @@ class Molecule(metaclass=_Cached):
         If there is no identical molecule in the cache, then this
         molecule is added.
 
-        Using ``multiprocessing`` returns modified copies of molecules.
-        In order to ensure that the cached molecules have
-        their attributes updated to the values of the copies, this
-        method must be run on the copies.
+        When using multiprocessing, modified copies of the original
+        molecules are created. In order to ensure that the cached
+        molecules have their attributes updated to the values of the
+        copies, this method must be run on the copies.
 
         Returns
         -------
@@ -868,7 +825,7 @@ class Molecule(metaclass=_Cached):
         else:
             self.__class__._cache[self._key] = self
 
-    def update_from_rdkit_mol(self, mol, conformer_id=0):
+    def update_from_rdkit_mol(self, mol):
         """
         Updates the structure to match an :mod:`rdkit` molecule.
 
@@ -876,10 +833,6 @@ class Molecule(metaclass=_Cached):
         ----------
         mol : :class:`rdkit.Mol`
             The :mod:`rdkit` molecule to use for the structure update.
-
-        conformer_id : :class:`int`
-            The id of the conformer to update. If ``None`` a new
-            conformer is added.
 
         Returns
         -------
@@ -889,10 +842,10 @@ class Molecule(metaclass=_Cached):
         """
 
         pos_mat = mol.GetConformer().GetPositions()
-        self.set_position_matrix(pos_mat, conformer_id=conformer_id)
+        self.set_position_matrix(pos_mat)
         return self
 
-    def update_from_file(self, path, conformer_id=0):
+    def update_from_file(self, path):
         """
         Update the molecular structure from a file.
 
@@ -907,11 +860,7 @@ class Molecule(metaclass=_Cached):
         ----------
         path : :class:`str`
             The path to a molecular structure file holding updated
-            coordinates for the :class:`.Moleucle`.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to update. If ``None`` a new
-            conformer will be added.
+            coordinates for the :class:`.Molecule`.
 
         Returns
         -------
@@ -928,10 +877,10 @@ class Molecule(metaclass=_Cached):
             '.coord': self._update_from_turbomole
         }
         _, ext = os.path.splitext(path)
-        update_fns[ext](path=path, conformer_id=conformer_id)
+        update_fns[ext](path=path)
         return self
 
-    def _update_from_mae(self, path, conformer_id=0):
+    def _update_from_mae(self, path):
         """
         Update the molecular structure to match an ``.mae`` file.
 
@@ -941,22 +890,15 @@ class Molecule(metaclass=_Cached):
             The full path of the ``.mae`` file from which the structure
             should be updated.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be updated. If ``None`` a new
-            conformer will be added.
-
         Returns
         -------
         None : :class:`NoneType`
 
         """
 
-        self.update_from_rdkit_mol(
-            mol=mol_from_mae_file(path),
-            conformer_id=conformer_id
-        )
+        self.update_from_rdkit_mol(mol_from_mae_file(path))
 
-    def _update_from_mol(self, path, conformer_id=0):
+    def _update_from_mol(self, path):
         """
         Update the molecular structure to match an ``.mol`` file.
 
@@ -965,10 +907,6 @@ class Molecule(metaclass=_Cached):
         path : :class:`str`
             The full path of the ``.mol`` file from which the structure
             should be updated.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be updated. If ``None`` a new
-            conformer will be added.
 
         Returns
         -------
@@ -983,9 +921,9 @@ class Molecule(metaclass=_Cached):
                 removeHs=False
             )
         )
-        self.update_from_rdkit_mol(mol=mol, conformer_id=conformer_id)
+        self.update_from_rdkit_mol(mol=mol)
 
-    def _update_from_xyz(self, path, conformer_id=0):
+    def _update_from_xyz(self, path):
         """
         Update the molecular structure to match a ``.xyz`` file.
 
@@ -994,10 +932,6 @@ class Molecule(metaclass=_Cached):
         path : :class:`str`
             The full path of the ``.mol`` file from which the structure
             should be updated.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be updated. If ``None`` a
-            new conformer will be added.
 
         Returns
         -------
@@ -1049,9 +983,9 @@ class Molecule(metaclass=_Cached):
 
         # Update the structure.
         new_coords = np.array(new_coords)
-        self.set_position_matrix(new_coords, conformer_id=conformer_id)
+        self.set_position_matrix(new_coords)
 
-    def _update_from_turbomole(self, path, conformer_id=0):
+    def _update_from_turbomole(self, path):
         """
         Update the structure from a Turbomole ``.coord`` file.
 
@@ -1062,10 +996,6 @@ class Molecule(metaclass=_Cached):
         path : :class:`str`
             The full path of the ``.coord`` file from which the
             structure should be updated.
-
-        conformer_id : :class:`int`, optional
-            The id of the conformer to be updated. If ``None`` a new
-            conformer will be added.
 
         Returns
         -------
@@ -1118,9 +1048,9 @@ class Molecule(metaclass=_Cached):
 
         # Update the structure.
         new_coords = np.array(new_coords)
-        self.set_position_matrix(new_coords, conformer_id=conformer_id)
+        self.set_position_matrix(new_coords)
 
-    def write(self, path, atom_ids=None, conformer_id=0):
+    def write(self, path, atom_ids=None):
         """
         Write a molecular structure file of the molecule.
 
@@ -1140,9 +1070,6 @@ class Molecule(metaclass=_Cached):
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
 
-        conformer_id : :class:`int`, optional
-            The id of the conformer to use.
-
         Returns
         -------
         None : :class:`NoneType`
@@ -1158,9 +1085,9 @@ class Molecule(metaclass=_Cached):
 
         _, ext = os.path.splitext(path)
         write_func = write_funcs[ext]
-        write_func(path, atom_ids, conformer_id)
+        write_func(path, atom_ids)
 
-    def _write_mdl_mol_file(self, path, atom_ids, conformer_id):
+    def _write_mdl_mol_file(self, path, atom_ids):
         """
         Write a V3000 ``.mol`` file of the molecule.
 
@@ -1176,9 +1103,6 @@ class Molecule(metaclass=_Cached):
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
 
-        conformer_id : :class:`int`
-            The id of the conformer to use.
-
         Returns
         -------
         None : :class:`NoneType`
@@ -1186,9 +1110,9 @@ class Molecule(metaclass=_Cached):
         """
 
         with open(path, 'w') as f:
-            f.write(self._to_mdl_mol_block(atom_ids, conformer_id))
+            f.write(self._to_mdl_mol_block(atom_ids))
 
-    def _write_xyz_file(self, path, atom_ids, conformer_id):
+    def _write_xyz_file(self, path, atom_ids):
         """
         Write a ``.xyz`` file of the molecule.
 
@@ -1204,9 +1128,6 @@ class Molecule(metaclass=_Cached):
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
 
-        conformer_id : :class:`int`
-            The id of the conformer to use.
-
         Returns
         -------
         None : :class:`NoneType`
@@ -1216,10 +1137,9 @@ class Molecule(metaclass=_Cached):
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
 
-        conf = self._conformers[conformer_id]
         content = [0]
         for i, atom_id in enumerate(atom_ids, 1):
-            x, y, z = conf[:, atom_id]
+            x, y, z = self._position_matrix[:, atom_id]
             symbol = self.atoms[atom_id].__class__.__name__
             content.append(f'{symbol} {x:f} {y:f} {z:f}\n')
         # Set first line to the atom_count.
@@ -1228,7 +1148,7 @@ class Molecule(metaclass=_Cached):
         with open(path, 'w') as xyz:
             xyz.write(''.join(content))
 
-    def _write_pdb_file(self, path, atom_ids, conformer_id):
+    def _write_pdb_file(self, path, atom_ids):
         """
         Write a ``.pdb`` file of the molecule.
 
@@ -1243,9 +1163,6 @@ class Molecule(metaclass=_Cached):
         atom_ids : :class:`iterable` of :class:`int`
             The atom ids of atoms to write. If ``None`` then all atoms
             are written.
-
-        conformer_id : :class:`int`
-            The id of the conformer to use.
 
         Returns
         -------
@@ -1267,7 +1184,7 @@ class Molecule(metaclass=_Cached):
         occupancy = '1.00'
         temp_factor = '0.00'
 
-        conf = self._conformers[conformer_id]
+        coords = self._position_matrix
         # This set will be used by bonds.
         atoms = set()
         for atom in atom_ids:
@@ -1279,7 +1196,7 @@ class Molecule(metaclass=_Cached):
             name = f'{element}{atom_counts[element]}'
             # Make sure the coords are no more than 8 columns wide
             # each.
-            x, y, z = (f'{i}'[:8] for i in conf[:, atom])
+            x, y, z = (f'{i}'[:8] for i in coords[:, atom])
             lines.append(
                 f'{hetatm:<6}{serial:>5} {name:<4}'
                 f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'

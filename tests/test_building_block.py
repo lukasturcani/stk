@@ -115,7 +115,11 @@ def test_dump_and_load(tmp_amine2):
     tmp_amine2.test_attr1 = 'something'
     tmp_amine2.test_attr2 = 12
     tmp_amine2.test_attr3 = ['12', 'something', 21]
+    tmp_amine2.test_attr4 = 'skip'
     include_attrs = ['test_attr1', 'test_attr2', 'test_attr3']
+
+    # Add some custom atom properties.
+    tmp_amine2.atoms[0].some_prop = 'custom atom prop'
 
     tmp_amine2.dump(path, include_attrs)
     mol2 = stk.Molecule.load(path)
@@ -126,6 +130,9 @@ def test_dump_and_load(tmp_amine2):
     assert tmp_amine2.test_attr1 == mol2.test_attr1
     assert tmp_amine2.test_attr2 == mol2.test_attr2
     assert tmp_amine2.test_attr3 == mol2.test_attr3
+    assert not hasattr(mol2, 'test_attr4')
+    assert vars(tmp_amine2.atoms[0]) == vars(mol2.atoms[0])
+    assert vars(tmp_amine2.atoms[1]) == vars(mol2.atoms[1])
 
     mol3 = stk.Molecule.load(path, use_cache=True)
     assert mol3 is not mol2

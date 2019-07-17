@@ -46,6 +46,9 @@ class Atom:
         The id of the atom. Should be equal to its index in
         :attr:`.Molecule.atoms`.
 
+    charge : :class:`int`
+        The formal charge of the atom.
+
     _elements : :class:`dict`
         Maps an atomic number to the class for that element.
 
@@ -56,16 +59,42 @@ class Atom:
     def __init_subclass__(cls, **kwargs):
         cls._elements[cls.atomic_number] = cls
 
-    def __init__(self, id, atomic_number, charge=0):
+    def __init__(self, id, atomic_number, charge=0, **kwargs):
+        """
+        Initialize an :class:`Atom`.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the atom.
+
+        atomic_number : :class:`int`
+            The atomic number.
+
+        charge : :class:`int`
+            The formal charge.
+
+        **kwargs : :class:`object`
+            Additional attributes to be added to the atom.
+
+        """
+
         self.id = id
         self.charge = charge
         self.__class__ = self._elements[atomic_number]
+        for attr, val in kwargs.items():
+            setattr(self, attr, val)
 
     def __repr__(self):
         charge = f', charge={self.charge}' if self.charge != 0 else ''
+        mandatory = {'charge', 'id'}
+        attrs = ', '.join(
+            f'{attr}={val}' for attr, val in vars(self).items()
+            if attr not in mandatory and not attr.startswith('_')
+        )
         return (
             f'{self.__class__.__name__}'
-            f'({self.id}{charge})'
+            f'({self.id}{charge}{attrs})'
         )
 
     def __str__(self):
@@ -75,8 +104,8 @@ class Atom:
 class _Atom(Atom):
     atomic_number = float('nan')
 
-    def __init__(self, id, charge=0):
-        super().__init__(id, self.atomic_number, charge)
+    def __init__(self, id, charge=0, **kwargs):
+        super().__init__(id, self.atomic_number, charge, **kwargs)
 
 
 class H(_Atom):
