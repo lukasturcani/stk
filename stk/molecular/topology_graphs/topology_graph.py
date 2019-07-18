@@ -1,10 +1,10 @@
 """
-Defines the base :class:`Topology` type.
+Defines :class:`.TopologyGraph` and related classes.
 
-.. _`adding topologies`:
+.. _`adding topology graphs`:
 
-Extending stk: Adding new topologies.
--------------------------------------
+Extending ``stk``: Adding new topology graphs.
+----------------------------------------------
 
 General
 .......
@@ -78,125 +78,56 @@ topology is at the origin.
 
 """
 
-from inspect import signature
-from collections import Counter
 import numpy as np
 from functools import wraps
 
 from ..functional_groups import Reactor
 
 
-class TopologyMeta(type):
+class VertexPosition:
     """
-    Makes a repr of an instance, based initialization arguments used.
-
-    """
-
-    def __call__(self, *args, **kwargs):
-
-        # Get the arguments, keyword arguments and defulat initialized
-        # arguments used to make an instance of Topology.
-        sig = signature(self.__init__).bind_partial(self,
-                                                    *args, **kwargs)
-        sig.apply_defaults()
-        sig = dict(sig.arguments)
-        sig.pop('self')
-        # Create the Topology instance.
-        obj = super().__call__(*args, **kwargs)
-        # Use the arguments the object was initialized with to make
-        # a repr of the object and place it in the `repr` attribute.
-        # The __repr__() function in Topology will then just return
-        # this attribute.
-        c = ', '.join(
-            f'{key!s}={value!r}' for key, value in sorted(sig.items())
-        )
-        obj._repr = f'{self.__name__}({c})'
-        return obj
-
-
-class Topology(metaclass=TopologyMeta):
-    """
-    Constructs :class:`.ConstructedMolecule` from building blocks.
-
-    More accurately, child classes of :class:`Topology` take care of
-    constructing :class:`.ConstructedMolecule` from building blocks.
-
-    This class directly defines any operations and attributes that are
-    needed by any topology during construction. However, this class is
-    not used directly. It is intended to be inherited. All
-    :attr:`.ConstructedMolecule.topology` attributes hold an instance
-    of a :class:`Topology` child class. Child classes of
-    :class:`Topology` define operations specific to that one topology.
-    For example, each child class must define a :meth:`join_mols`,
-    which creates bonds between the building blocks of a
-    :class:`.ConstructedMolecule`. The way in which this is done will
-    depend on what kind of molecules are being constructed. In
-    addition, each child class must define methods which place the
-    building blocks in appropriate positions.
 
     Attributes
     ----------
-    _del_atoms : :class:`bool`
-        Toggles whether deleter atoms are deleted by
-        :meth:`.Reactor.result`.
-
-    _reactor : :class:`.Reactor`
-        The reactor which performs the reactions.
-
-    _track_fgs : :class:`bool`
-        Toggles whether functional groups yielded by
-        :meth:`bonded_fgs` are automatically added into
-        :attr:`.Reactor.func_groups`.
-
-    Methods
-    -------
-    :meth:`construct`
+    func_group : :class:`.FunctionalGroup`
+        The functional group placed on the :class:`.VertexPosition`.
 
     """
 
-    def __init__(self, del_atoms=True, track_fgs=True):
-        self._del_atoms = del_atoms
-        self._track_fgs = track_fgs
-
-    def construct(self, mol):
-        raise NotImplementedError()
+    def __init__(self):
+        self.func_group = None
 
     def __str__(self):
         return repr(self)
 
     def __repr__(self):
-        # The `_repr` attribute is made in the TopologyMeta __call__()
-        # method, when the Topology object is instantiated.
-        return self._repr
-
-    def __eq__(self, other):
-        return repr(self) == repr(other)
-
-    def __hash__(self):
-        return id(self)
-
-
-class VertexPosition:
-    def __init__(self):
-        self.func_group = None
+        return f'VertexPosition()'
 
 
 class Vertex:
     """
+    Represents a vertex of a :class:`.TopologyGraph`.
+
+    Attributes
+    ----------
+    positions : :class:`tuple` of :class:`.VertexPosition`
+
+    _coord : :class:`numpy.ndarray`
+        The position of the vertex.
 
     """
 
     def __init__(self, x, y, z, degree):
         self._coord = np.array([x, y, z])
-        self.positions = [VertexPosition() for i in range(degree)]
+        self.positions = tuple(VertexPosition() for i in range(degree))
 
     @staticmethod
     def _add_vertex_position_assignment(fn):
 
         @wraps(fn)
-        def inner(self, bb, conformer_id):
-            r = fn(self, bb, conformer_id)
-            self._assign_vertex_positions(bb, conformer_id)
+        def inner(self, building_block):
+            r = fn(self, building_block)
+            self._assign_vertex_positions(building_block)
             return r
 
         return inner
@@ -205,10 +136,10 @@ class Vertex:
     def _add_position_restoration(fn):
 
         @wraps(fn)
-        def inner(self, bb, conformer_id):
-            pos_mat = bb.get_position_matrix(conformer_id=conformer_id)
-            r = fn(self, bb, conformer_id)
-            bb.set_position_matrix(pos_mat, conformer_id)
+        def inner(self, building_block):
+            pos_mat = building_block.get_position_matrix()
+            r = fn(self, building_block)
+            building_block.set_position_matrix(pos_mat)
             return r
 
         return inner
@@ -225,29 +156,125 @@ class Vertex:
         self._coord *= scale
         return self
 
-    def place_building_block(self, bb, conformer_id):
+    def place_building_block(self, building_block):
+        """
+        Place a building block molecule on the :class:`.Vertex`.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is to be placed on the
+            vertex.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method, it needs to be implemented in a
+            subclass.
+
+        """
+
         raise NotImplementedError()
 
-    def _assign_vertex_positions(self, bb, conformer_id):
+    def _assign_vertex_positions(self, building_block):
+        """
+        Assign
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is needs to have
+            functional groups assigned to
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method, it needs to be implemented in a
+            subclass.
+
+        """
+
         raise NotImplementedError()
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        x, y, z = self._coord
+        return f'Vertex({x}, {y}, {z}, degree={self.degree})'
 
 
 class Edge:
+    """
+    Represents the edge of a topology graph.
+
+    Attributes
+    ----------
+
+    Methods
+    -------
+    :meth:`get_bonded_fgs`
+
+    """
+
     def __init__(self, *vertex_positions):
         self._vertex_positions = vertex_positions
 
     def get_bonded_fgs(self):
-        return [p.func_group for p in self._vertex_positions]
+        """
+        Get the functional groups connected by the edge.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.FunctionalGroup`
+            The functional groups connected by the edge.
+
+        """
+
+        return tuple(p.func_group for p in self._vertex_positions)
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return f'Edge()'
 
 
-class TopologyGraph(Topology):
+class TopologyGraph:
     """
+    A base class for topology graphs of :class:`.ConstructedMolecule`.
+
+    Attributes
+    ----------
+    vertices : :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`.Edge`
+        The edges which make up the topology graph.
+
+    Methods
+    -------
+    :meth:`__init__`
+    :meth:`construct`
 
     """
 
     def __init__(self, vertices, edges):
-        self._vertices = vertices
-        self._edges = edges
+        """
+        Initialize an instance of :class:`.TopologyGraph`.
+
+        Parameters
+        ----------
+        vertices : :class:`.Vertex`
+            The vertices which make up the graph.
+
+        edges : :class:`.Edge`
+            The edges which make up the graph.
+
+        """
+
+        self.vertices = vertices
+        self.edges = edges
 
     def construct(self, mol):
         """
@@ -266,9 +293,6 @@ class TopologyGraph(Topology):
         """
 
         vertices, edges = self._clone_vertices_and_edges()
-
-        mol.bonds_made = 0
-        mol.bb_counter = Counter()
 
         self._reactor = Reactor()
         self._place_building_blocks(mol, vertices)
@@ -332,8 +356,15 @@ class TopologyGraph(Topology):
     def _get_bb_map(self, mol):
         raise NotImplementedError()
 
-    def _get_conformer_map(self, mol):
-        raise NotImplementedError()
-
     def _clean_up(self, mol):
         mol._conformers[-1] = mol.conformers[-1].T
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        attrs = ', '.join(
+            f'{attr}={val}' for attr, val in vars(self)
+            if not attr.startswith('_')
+        )
+        return f'{self.__class__.__name__}({attrs})'
