@@ -126,13 +126,32 @@ def test_get_bonder_plane(tmp_amine4):
         assert np.allclose(abs(product-d), 0.5, 1e-6)
 
 
-def test_get_bonder_plane_normal(tmp_amine2):
-    coords = tmp_amine2.get_position_matrix()
-    coords[:, 2] = 0
-    tmp_amine2.set_position_matrix(coords)
+def test_get_bonder_plane_normal(tmp_amine4):
+    bonder_ids = list(tmp_amine4.get_bonder_ids())
+    other_ids = [
+        id_ for id_ in range(len(tmp_amine4.atoms))
+        if id_ not in bonder_ids
+    ]
+    coords = tmp_amine4.get_position_matrix()
+    coords[bonder_ids[0]] = [0, -1, 0]
+    coords[bonder_ids[1]] = [-400, 0, 0]
+    coords[bonder_ids[2]] = [0, 1, 1]
+    coords[bonder_ids[3]] = [0, 1, -1]
+    # Set the centroid of the molecule so that the plane normal
+    # has a positive direction.
+    coords[other_ids, 0] = 10
+    coords[other_ids, 1] = 10
+    tmp_amine4.set_position_matrix(coords)
     assert np.allclose(
-        a=tmp_amine2.get_plane_normal(),
-        b=[0, 0, 1],
+        a=tmp_amine4.get_plane_normal(fg_ids=[0, 2, 3]),
+        b=[1, 0, 0],
+        atol=1e-6
+    )
+
+    # When using all fgs the plane should be at a 90 degree rotation.
+    assert np.allcose(
+        a=tmp_amine4.get_plane_normal(),
+        b=[0, 1, 0],
         atol=1e-6
     )
 
