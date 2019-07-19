@@ -176,20 +176,30 @@ def test_get_bonder_distances(tmp_amine4):
     assert i == 4
 
 
-def test_get_bonder_direction_vectors(tmp_aldehyde3):
-    pos_mat = tmp_aldehyde3.get_position_matrix()
+def test_get_bonder_direction_vectors(tmp_amine4):
+    pos_mat = tmp_amine4.get_position_matrix()
     # Set the coordinate of each bonder to the id of the fg.
-    for fg in tmp_aldehyde3.func_groups:
+    for fg in tmp_amine4.func_groups:
         for bonder in fg.bonder_ids:
-            pos_mat[bonder, :] = [fg.id, fg.id, fg.id]
-    tmp_aldehyde3.set_position_matrix(pos_mat)
+            pos_mat[bonder] = [fg.id, fg.id, fg.id]
+    tmp_amine4.set_position_matrix(pos_mat)
 
-    dir_vectors = tmp_aldehyde3.get_bonder_direction_vectors()
+    dir_vectors = tmp_amine4.get_bonder_direction_vectors()
     for i, (id1, id2, v) in enumerate(dir_vectors):
         # Calculate the expected direction vector based on ids.
         d = stk.normalize_vector(np.array([id2]*3) - np.array([id1]*3))
         assert np.allclose(d, v, atol=1e-8)
-    assert i == 2
+    assert i == 5
+
+    # Test explicitly setting fg_ids.
+    dir_vectors = tmp_amine4.get_bonder_direction_vectors(
+        fg_ids=[0, 4]
+    )
+    for i, (id1, id2, v) in enumerate(dir_vectors):
+        # Calculate the expected direction vector based on ids.
+        d = stk.normalize_vector(np.array([id2]*3) - np.array([id1]*3))
+        assert np.allclose(d, v, atol=1e-8)
+    assert i == 0
 
 
 def test_get_centroid_centroid_direction_vector(aldehyde3):
