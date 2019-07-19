@@ -156,17 +156,24 @@ def test_get_bonder_plane_normal(tmp_amine4):
     )
 
 
-def test_get_bonder_distances(tmp_amine2):
-    coords = tmp_amine2.get_position_matrix()
-    atoms0 = tmp_amine2.func_groups[0].bonder_ids
-    coords[atoms0, :] = np.zeros((len(atoms0), 3))
+def test_get_bonder_distances(tmp_amine4):
+    # Place all bonders on a line.
+    coords = tmp_amine4.get_position_matrix()
+    for bonder_id in tmp_amine4.get_bonder_ids():
+        coords[bonder_id] = [bonder_id, 0, 0]
+    tmp_amine4.set_position_matrix(coords)
 
-    atoms1 = tmp_amine2.func_groups[1].bonder_ids
-    coords[atoms1, :] = np.zeros((len(atoms1), 3))
-    coords[atoms1, 0] = np.ones((len(atoms1, )))
+    # Test default behaviour.
+    distances = tmp_amine4.get_bonder_distances()
+    for i, (fg1, fg2, distance) in enumerate(distances):
+        assert abs(distance - abs(fg1 - fg2)) < 1e-6
+    assert i == 5
 
-    for fg1, fg2, distance in tmp_amine2.get_bonder_distances():
-        assert abs(distance - 1) < 1e-6
+    # Test explicilty setting fg_ids.
+    distances = tmp_amine4.get_bonder_distances(fg_ids=[0, 2, 3])
+    for i, (fg1, fg2, distance) in enumerate(distances):
+        assert abs(distance - abs(fg1 - fg2)) < 1e-6
+    assert i == 4
 
 
 def test_get_bonder_direction_vectors(tmp_aldehyde3):
