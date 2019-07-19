@@ -687,7 +687,7 @@ class Molecule(metaclass=_Cached):
         """
 
         with open(path, 'w') as f:
-            json.dump(self._to_dict(include_attrs), f, indent=4)
+            json.dump(self.to_dict(include_attrs), f, indent=4)
 
     def _get_key(*args, **kwargs):
         raise NotImplementedError()
@@ -724,7 +724,7 @@ class Molecule(metaclass=_Cached):
         with open(path, 'r') as f:
             mol_dict = json.load(f)
 
-        return cls._init_from_dict(mol_dict, use_cache=use_cache)
+        return cls.init_from_dict(mol_dict, use_cache=use_cache)
 
     def _to_mdl_mol_block(self, atom_ids=None):
         """

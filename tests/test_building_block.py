@@ -932,7 +932,7 @@ def test_get_centroid_centroid_direction_vector(amine4):
     fg_ids = [0, 2]
     c1 = amine4.get_centroid(atom_ids=amine4.get_bonder_ids(fg_ids))
     assert np.allclose(
-        a=stk.normalize_vbector(c2-c2),
+        a=stk.normalize_vector(c2-c2),
         b=amine4.get_centroid_centroid_direction_vector(fg_ids=fg_ids),
         atol=1e-8
     )

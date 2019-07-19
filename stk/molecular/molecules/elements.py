@@ -89,12 +89,12 @@ class Atom:
         charge = f', charge={self.charge}' if self.charge != 0 else ''
         mandatory = {'charge', 'id'}
         attrs = ', '.join(
-            f'{attr}={val}' for attr, val in vars(self).items()
+            f'{attr}={val!r}' for attr, val in vars(self).items()
             if attr not in mandatory and not attr.startswith('_')
         )
         return (
             f'{self.__class__.__name__}'
-            f'({self.id}{charge}{attrs})'
+            f'({self.id}{charge}{", " if attrs else ""}{attrs})'
         )
 
     def __str__(self):
