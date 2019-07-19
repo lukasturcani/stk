@@ -745,8 +745,7 @@ def test_get_bonder_plane_normal(tmp_amine4):
     coords[bonder_ids[3]] = [1, -1, 0]
     # Set the centroid of the molecule so that the plane normal
     # has a positive direction.
-    coords[other_ids, 0] = 10
-    coords[other_ids, 1] = 10
+    coords[other_ids, 2] = 10
     tmp_amine4.set_position_matrix(coords)
     assert np.allclose(
         a=tmp_amine4.get_bonder_plane_normal(),
