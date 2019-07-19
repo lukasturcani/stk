@@ -6,35 +6,97 @@ if not os.path.exists('building_block_tests_output'):
     os.mkdir('building_block_tests_output')
 
 
-def test_init(amine2):
-    assert len(amine2.func_groups) == 2
-    assert amine2.func_groups[0].info.name == 'amine'
-    assert len(amine2.atoms) == 15
-    assert len(amine2.bonds) == 14
+def test_init():
+    assert False
 
 
-def test_get_bonder_ids(amine2):
-    bonder_ids = []
-    for func_group in amine2.func_groups:
-        for bonder_id in func_group.bonder_ids:
-            bonder_ids.append(bonder_id)
+def test_init_from_random_file():
+    assert False
 
-    bonder_ids2 = list(amine2.get_bonder_ids())
-    assert len(bonder_ids2) == len(bonder_ids)
 
-    s = set(bonder_ids)
-    for bonder_id in bonder_ids2:
-        assert bonder_id in s
+def test_init_from_smiles():
+    mol0 = stk.BuildingBlock.init_from_smiles('NCCCN', ['amine'])
+    mol1 = stk.BuildingBlock.init_from_smiles('NCCCN', ['amine'])
+    assert mol0 is not mol1
+
+    mol2 = stk.BuildingBlock.init_from_smiles(
+        smiles='NCCCN',
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    mol3 = stk.BuildingBlock.init_from_smiles(
+        smiles='NCCCN',
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol0 is not mol2 and mol1 is not mol2
+    assert mol2 is mol3
+
+    mol4 = stk.BuildingBlock.init_from_smiles(
+        smiles='NCCCN',
+        functional_groups=['aldehyde'],
+        use_cache=True
+    )
+    assert mol3 is not mol4
+
+
+def test_get_bonder_ids(aldehyde3):
+    # Make sure that by default all bonder ids are yielded.
+    all_ids = []
+    for func_group in aldehyde3.func_groups:
+        all_ids.extend(func_group.bonder_ids)
+    all_ids.sort()
+    default_ids = sorted(aldehyde3.get_bonder_ids())
+    assert default_ids == all_ids
+
+    # Make sure that providing all fg ids explicitly is the same
+    # as default behaviour.
+    fg_ids = range(len(aldehyde3.func_groups))
+    explicit_ids = sorted(aldehyde3.get_bonder_ids(fg_ids=fg_ids))
+    assert default_ids == explicit_ids
+
+    # Make sure when providing a subset of fg ids, only those are
+    # returned.
+    subset_ids = []
+    fgs = [aldehyde3.func_groups[0], aldehyde3.func_groups[2]]
+    for func_group in fgs:
+        subset_ids.extend(func_group.bonder_ids)
+    subset_ids.sort()
+
+    returned_subset_ids = sorted(
+        aldehyde3.get_bonder_ids(fg_ids=[0, 2])
+    )
+    assert returned_subset_ids == subset_ids
 
 
 def test_get_bonder_centroids(tmp_aldehyde3):
-    coords = np.zeros((len(tmp_aldehyde3.atoms), 3))
+    # Set the position of all bonder atoms to (0, 0, 0).
+    bonder_ids = list(tmp_aldehyde3.get_bonder_ids())
+    coords = tmp_aldehyde3.get_position_matrix()
+    coords[bonder_ids, :] = np.zeros((len(bonder_ids), 3))
     tmp_aldehyde3.set_position_matrix(coords)
-
+    # Check that the bonder centroids are all at (0, 0, 0).
     for i, centroid in enumerate(tmp_aldehyde3.get_bonder_centroids()):
-        assert len(centroid) == 3
-        assert sum(centroid) < 1e-6
+        assert np.allclose(centroid, [0, 0, 0], 1e-6)
     assert i == 2
+
+    # Set the position of the bonder atoms in functional groups 1 and 2
+    # to (1, 1, 1).
+    fg_ids = [1, 2]
+    bonder_ids = list(tmp_aldehyde3.get_bonder_ids(fg_ids=fg_ids))
+    coords[bonder_ids, :] = np.ones((len(bonder_ids), 3))
+    tmp_aldehyde3.set_position_matrix(coords)
+    # Check that the bonder centroids of functional groups 1 and 2 are
+    # at (1, 1, 1).
+    centroids = tmp_aldehyde3.get_bonder_centroids(fg_ids=[1, 2])
+    for i, centroid in enumerate(centroids):
+        assert np.allclose(centroid, [1, 1, 1], 1e-6)
+    assert i == 1
+    # Check that the bonder centroid of functional group 0 is still at
+    # (0, 0, 0).
+    for i, centroid in tmp_aldehyde3.get_bonder_centroids(fg_ids=[0]):
+        assert np.allclose(centroid, [0, 0, 0], 1e-6)
+    assert i == 0
 
 
 def test_get_bonder_plane(amine3):
@@ -138,32 +200,6 @@ def test_dump_and_load(tmp_amine2):
     assert mol3 is not mol2
     mol4 = stk.Molecule.load(path, use_cache=True)
     assert mol3 is mol4
-
-
-def test_caching():
-    mol0 = stk.BuildingBlock.init_from_smiles('NCCCN', ['amine'])
-    mol1 = stk.BuildingBlock.init_from_smiles('NCCCN', ['amine'])
-    assert mol0 is not mol1
-
-    mol2 = stk.BuildingBlock.init_from_smiles(
-        smiles='NCCCN',
-        functional_groups=['amine'],
-        use_cache=True
-    )
-    mol3 = stk.BuildingBlock.init_from_smiles(
-        smiles='NCCCN',
-        functional_groups=['amine'],
-        use_cache=True
-    )
-    assert mol0 is not mol2 and mol1 is not mol2
-    assert mol2 is mol3
-
-    mol4 = stk.BuildingBlock.init_from_smiles(
-        smiles='NCCCN',
-        functional_groups=['aldehyde'],
-        use_cache=True
-    )
-    assert mol3 is not mol4
 
 
 def test_shift_fgs(amine4):

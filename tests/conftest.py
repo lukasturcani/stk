@@ -201,6 +201,14 @@ def amine4():
     )
 
 
+@pytest.fixture
+def tmp_amine4():
+    return stk.BuildingBlock.init_from_smiles(
+        smiles='NCC(CN)(CN)CN',
+        functional_groups=['amine']
+    )
+
+
 @pytest.fixture(scope='session')
 def aldehyde4():
     return stk.BuildingBlock.init_from_smiles(

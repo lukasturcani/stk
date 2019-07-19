@@ -62,7 +62,7 @@ class BuildingBlock(Molecule):
     Methods
     -------
     :meth:`__init__`
-    :meth:`init_random`
+    :meth:`init_from_random_file`
     :meth:`init_from_smiles`
     :meth:`get_bonder_ids`
     :meth:`get_bonder_centroids`
@@ -200,24 +200,24 @@ class BuildingBlock(Molecule):
         ))
 
     @classmethod
-    def init_random(
+    def init_from_random_file(
         cls,
-        db,
+        file_glob,
         functional_groups=None,
         use_cache=False
     ):
         """
-        Pick a random file from `db` to initialize from.
+        Pick a random file from `file_glob` to initialize from.
 
         Parameters
         ----------
-        db : :class:`str`
-            A path to a database of molecular files.
+        file_glob : :class:`str`
+            A glob selecting files, one of which is used to initialize
+            a :class:`.BuildingBlock` at random.
 
         functional_groups : :class`list` of :class:`str`, optional
-            The name of a functional groups which the molecules in `db`
-            have. By default it is assumed the name is present in the
-            path of the files.
+            The names of a functional groups which the molecule
+            selected from the `file_glob` should have.
 
         use_cache : :class:`bool`, optional
             If ``True``, a new :class:`.BuildingBlock` will
@@ -229,30 +229,30 @@ class BuildingBlock(Molecule):
         Returns
         -------
         :class:`BuildingBlock`
-            A random molecule from `db`.
+            A random molecule from `file_glob`.
 
         Raises
         ------
         :class:`RuntimeError`
-            If no files in `db` could be initialized from.
+            If no files in `file_glob` could be initialized from.
 
         """
 
-        files = glob(os.path.join(db, '*'))
-        np.random.shuffle(files)
+        files = glob(file_glob)
+        np.random.shuffle(file_glob)
 
-        for molfile in files:
+        for mol_file in files:
             try:
-                return cls(molfile, functional_groups, use_cache)
+                return cls(mol_file, functional_groups, use_cache)
 
             except Exception:
                 msg = (
                     'Could not initialize '
-                    f'{cls.__name__} from {molfile}.'
+                    f'{cls.__name__} from {mol_file}.'
                 )
                 logger.warning(msg)
         raise RuntimeError(
-            f'No files in "{db}" could be initialized from.'
+            f'No files in "{file_glob}" could be initialized from.'
         )
 
     @classmethod
