@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import stk
+import itertools as it
 
 if not os.path.exists('building_block_tests_output'):
     os.mkdir('building_block_tests_output')
@@ -99,11 +100,30 @@ def test_get_bonder_centroids(tmp_aldehyde3):
     assert i == 0
 
 
-def test_get_bonder_plane(amine3):
-    a, b, c, d = amine3.get_bonder_plane()
-    for x, y, z in amine3.get_bonder_centroids():
+def test_get_bonder_plane(tmp_amine4):
+    # First check that when 3 fgs are used, the bonder centroids all
+    # sit on the plane.
+    for fg_ids in it.combinations(range(4), 3):
+        a, b, c, d = tmp_amine4.get_bonder_plane(fg_ids=fg_ids)
+        for x, y, z in tmp_amine4.get_bonder_centroids(fg_ids=fg_ids):
+            product = a*x + b*y + c*z
+            assert abs(product-d) < 1e-6
+
+    # When 4 are used make sure that a best fit plane is produced.
+    # Ensure that centroids are placed such that best fit plane is a
+    # distance of 0.5 away from all centroids.
+    coords = tmp_amine4.get_position_matrix()
+    bonder_ids = list(tmp_amine4.get_bonder_ids())
+    coords[bonder_ids[0]] = [np.sqrt(2), 0, 0]
+    coords[bonder_ids[1]] = [0, 0, np.sqrt(2)]
+    coords[bonder_ids[2]] = [1, -1, 0]
+    coords[bonder_ids[3]] = [1, 1, 0]
+    tmp_amine4.set_position_matrix(coords)
+
+    a, b, c, d = tmp_amine4.get_bonder_plane()
+    for x, y, z in tmp_amine4.get_bonder_centroids():
         product = a*x + b*y + c*z
-        assert abs(product-d) < 1e-6
+        assert np.allclose(abs(product-d), 0.5, 1e-6)
 
 
 def test_get_bonder_plane_normal(tmp_amine2):
