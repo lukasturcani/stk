@@ -60,7 +60,7 @@ class ConstructedMolecule(Molecule):
         will have a :attr:`building_block_id` of either
         ``0``or ``1``.
 
-    building_blocks : :class:`dict`
+    bb_map : :class:`dict`
         Maps the building blocks used for construction, which can be
         either :class:`.BuildingBlock` or
         :class:`.ConstructedMolecule`, to the
@@ -69,7 +69,7 @@ class ConstructedMolecule(Molecule):
 
         .. code-block:: python
 
-            building_blocks = {
+            bb_map = {
                 BuildingBlock(...): [Vertex(...), Vertex(...)],
                 BuildingBlock(...): [
                     Vertex(...),
@@ -104,6 +104,7 @@ class ConstructedMolecule(Molecule):
     Methods
     -------
     :meth:`__init__`
+    :meth:`to_dict`
 
     Examples
     --------
@@ -163,7 +164,10 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        self.building_blocks = building_blocks
+        if bb_map is None:
+            raise NotImplementedError()
+
+        self.bb_map = bb_map
         self.topology_graph = topology_graph
         self.atoms = []
         self.bonds = []
@@ -205,37 +209,36 @@ class ConstructedMolecule(Molecule):
         for id_, func_group in enumerate(self.func_groups):
             func_group.id = id_
 
-    def _to_dict(self, include_attrs=None):
+    def to_dict(self, include_attrs=None):
         """
         Return a :class:`dict` representation of the molecule.
-
-        The representation has the form
-
-        .. code-block:: python
-
-            {
-                'class' : 'ConstructedMolecule',
-                'mol_block' : '''A string holding the V3000 mol
-                                 block of the molecule.''',
-                'building_blocks' : {
-                    bb1._to_dict(): [],
-                    bb2._to_dict(): []
-                },
-                'topology_graph' : 'Copolymer(repeating_unit="AB")',
-                'atoms': [H(0), N(1), ... ],
-            }
 
         Parameters
         ----------
         include_attrs : :class:`list` of :class:`str`, optional
-            The names of attributes of the molecule to be added to
-            the :class:`dict`. Each attribute is saved as a string
-            using :func:`repr`.
+            The names of additional attributes of the molecule to be
+            added to the :class:`dict`. Each attribute is saved as a
+            string using :func:`repr`.
 
         Returns
         -------
         :class:`dict`
-            A :class:`dict` which represents the molecule.
+            A :class:`dict` which represents the molecule. It has
+            the form
+
+            .. code-block:: python
+
+                {
+                    'class' : 'ConstructedMolecule',
+                    'mol_block' : '''A string holding the V3000 mol
+                                     block of the molecule.''',
+                    'building_blocks' : {
+                        bb1.to_dict(): [],
+                        bb2.to_dict(): []
+                    },
+                    'topology_graph' : 'Linear(repeating_unit="AB")',
+                    'atoms': [H(0), N(1), ... ],
+                }
 
         """
 
@@ -266,24 +269,25 @@ class ConstructedMolecule(Molecule):
     @classmethod
     def _init_from_dict(cls, mol_dict, use_cache):
         """
-        Initialize from a :class:`dict` representation.
+        Intialize from a :class:`dict` representation.
 
         Parameters
         ----------
         mol_dict : :class:`dict`
-            A dictionary holding the attribute data of the molecule.
+            A :class:`dict` representation of a molecule generated
+            by :meth:`to_dict`.
 
         use_cache : :class:`bool`
-            If ``True``, a new :class:`.ConstructedMolecule` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`ConstructedMolecule` does
-            not yet exist the created one will be added to the cache.
+            If ``True``, a new instance will not be made if a cached
+            and identical one already exists, the one which already
+            exists will be returned. If ``True`` and a cached,
+            identical instance does not yet exist the created one will
+            be added to the cache.
 
         Returns
         -------
         :class:`ConstructedMolecule`
-            The molecule.
+            The molecule described by `mol_dict`.
 
         """
 

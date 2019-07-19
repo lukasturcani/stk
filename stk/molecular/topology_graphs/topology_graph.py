@@ -84,50 +84,36 @@ from functools import wraps
 from ..functional_groups import Reactor
 
 
-class FGPosition:
-    """
-
-    Attributes
-    ----------
-    func_group : :class:`.FunctionalGroup`
-        The functional group placed on the :class:`.VertexPosition`.
-
-    """
-
-    def __init__(self):
-        self.func_group = None
-
-    def __str__(self):
-        return repr(self)
-
-    def __repr__(self):
-        return f'FGPosition()'
-
-
 class Vertex:
     """
     Represents a vertex of a :class:`.TopologyGraph`.
 
     Attributes
     ----------
-    positions : :class:`tuple` of :class:`.VertexPosition`
-
     _coord : :class:`numpy.ndarray`
         The position of the vertex.
+
+    _edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
+
+    Methods
+    -------
+    :meth:`get_position`
+    :meth:`clone`
 
     """
 
     def __init__(self, x, y, z, degree):
         self._coord = np.array([x, y, z])
-        self.positions = tuple(FGPosition() for i in range(degree))
+        self._edges = []
 
     @staticmethod
-    def _add_fg_position_assignment(fn):
+    def _add_func_group_assignment(fn):
 
         @wraps(fn)
         def inner(self, building_block):
             r = fn(self, building_block)
-            self._assign_fg_positions(building_block)
+            self._assign_func_groups_to_edges(building_block)
             return r
 
         return inner
@@ -145,7 +131,7 @@ class Vertex:
         return inner
 
     def __init_subclass__(cls, **kwargs):
-        cls.place_building_block = cls._add_fg_position_assignment(
+        cls.place_building_block = cls._add_func_group_assignment(
             cls.place_building_block
         )
         cls.place_building_block = cls._add_position_restoration(
@@ -155,6 +141,19 @@ class Vertex:
     def apply_scale(self, scale):
         self._coord *= scale
         return self
+
+    def get_position(self):
+        """
+        Return the position of the :class:`Vertex`.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The position of the :class:`Vertex`.
+
+        """
+
+        return np.array(self._coord)
 
     def place_building_block(self, building_block):
         """
@@ -176,7 +175,7 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def _assign_fg_positions(self, building_block):
+    def _assign_func_groups_to_edges(self, building_block):
         """
         Assign
 
@@ -210,17 +209,43 @@ class Edge:
 
     Attributes
     ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which the :class:`Edge` connects.
+
+    _func_groups : :class:`list` of :class:`.FunctionalGroup`
+        The functional groups which the edge connects.
+
+    _coord : :class:`numpy.ndarray`
+        The position of the edge. It is the centroid the
+        :attr:`_vertices`.
 
     Methods
     -------
-    :meth:`get_bonded_fgs`
+    :meth:`get_func_groups`
 
     """
 
-    def __init__(self, *fg_positions):
-        self._fg_positions = fg_positions
+    def __init__(self, *vertices):
+        """
+        Initialize an :class:`Edge`.
 
-    def get_bonded_fgs(self):
+        Parameters
+        ----------
+        *vertices : :class:`.Vertex`
+            The vertices which the :class:`Edge` connects.
+
+        """
+
+        self.vertices = vertices
+        self._func_groups = []
+
+        self._coord = 0
+        for i, vertex in enumerate(vertices, 1):
+            vertex._edges.append(self)
+            self._coord += vertex.get_position()
+        self._coord = self._coord / i
+
+    def get_func_groups(self):
         """
         Get the functional groups connected by the edge.
 
@@ -231,7 +256,7 @@ class Edge:
 
         """
 
-        return tuple(p.func_group for p in self._vertex_positions)
+        return tuple(self._func_groups)
 
     def __str__(self):
         return repr(self)
@@ -316,33 +341,28 @@ class TopologyGraph:
         raise NotImplementedError()
 
     def _clone_vertices_and_edges(self, mol):
-        vertices = [vertex.clone() for vertex in self._vertices]
-        positions = {}
-        for clone, vertex in zip(vertices, self._vertices):
-            for cp, vp in zip(clone.positions, vertex.positions):
-                positions[vp] = cp
-
+        vertex_clones = {
+            vertex: vertex.clone() for vertex in self.vertices
+        }
         edges = []
-        for edge in self._edges:
-            positions = (positions[p] for p in edge.positions)
-            edges.append(Edge(*positions))
-
-        return vertices, edges
+        for edge in self.edges:
+            vertices = (
+                vertex_clones[vertex] for vertex in edge.vertices
+            )
+            edges.append(Edge(*vertices))
+        return list(vertex_clones.values()), edges
 
     def _prepare(self, mol):
-        mol._conformers.append([])
+        return
 
     def _place_building_blocks(self, mol, vertices):
-        bb_map = self._get_bb_map(mol)
-        conformer_map = self._get_conformer_map(mol)
-        scale = self._get_scale(mol, bb_map, conformer_map)
+        scale = self._get_scale(mol, mol.bb_map)
         for vertex in vertices:
             vertex.apply_scale(scale)
 
         for vertex in vertices:
-            bb = bb_map[vertex]
-            conformer_id = conformer_map[vertex]
-            coords = vertex.place_building_block(bb, conformer_id)
+            bb = mol.bb_map[vertex]
+            coords = vertex.place_building_block(bb)
             mol._conformers[-1].extend(coords)
 
             if len(mol._conformers) == 1:
@@ -351,10 +371,7 @@ class TopologyGraph:
 
     def _get_bonded_fgs(self, mol, edges):
         for edge in edges:
-            yield edge.get_bonded_fgs()
-
-    def _get_bb_map(self, mol):
-        raise NotImplementedError()
+            yield edge.get_func_groups()
 
     def _clean_up(self, mol):
         mol._conformers[-1] = mol.conformers[-1].T
