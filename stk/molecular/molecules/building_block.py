@@ -117,6 +117,13 @@ class BuildingBlock(Molecule):
                 1. A path to a molecular structure file.
                 2. A :class:`rdkit.Mol` object.
 
+            Supported file types are:
+
+                #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
+                #. ``.mae`` - Maestro file
+                #. ``.pdb`` - PDB file
+                #. ``.mol2`` - SYBYL MOL2 file
+
         functional_groups : :class:`list` of :class:`str`, optional
             The names of the functional groups which are to have atoms
             tagged. If ``None``, a functional group name found in the
@@ -213,7 +220,7 @@ class BuildingBlock(Molecule):
         Parameters
         ----------
         file_glob : :class:`str`
-            A glob selecting files, one of which is used to initialize
+            A glob specifying files, one of which is used to initialize
             a :class:`.BuildingBlock` at random.
 
         functional_groups : :class`list` of :class:`str`, optional

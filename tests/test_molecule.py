@@ -225,6 +225,9 @@ def test_is_identical(amine2, amine2_conf1, amine2_alt1):
     assert not amine2.is_identical(amine2_alt1)
     assert not amine2_conf1.is_identical(amine2_alt1)
 
+    # Needs to be done for ConstructedMolecule too.
+    assert False
+
 
 def test_set_centroid(tmp_amine2):
     tmp_amine2.set_centroid([12, 13, 15])

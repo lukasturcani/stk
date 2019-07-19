@@ -9,11 +9,58 @@ if not os.path.exists('building_block_tests_output'):
     os.mkdir('building_block_tests_output')
 
 
-def test_init():
+def test_init_mol():
+    # Test that all values are initialized correctly.
+    assert False
+
+    # Test that caching works.
+    assert False
+
+    # Make sure charged molecules are handled correctly.
+    assert False
+
+
+def test_init_mae():
+    # Test that all values are initialized correctly.
+    assert False
+
+    # Test that caching works.
+    assert False
+
+    # Make sure charged molecules are handled correctly.
+    assert False
+
+
+def test_init_pdb():
+    # Test that all values are initialized correctly.
+    assert False
+
+    # Test that caching works.
+    assert False
+
+    # Make sure charged molecules are handled correctly.
+    assert False
+
+
+def test_init_mol2():
+    # Test that all values are initialized correctly.
+    assert False
+
+    # Test that caching works.
+    assert False
+
+    # Make sure charged molecules are handled correctly.
     assert False
 
 
 def test_init_from_random_file():
+    # Test that all values are initialized correctly.
+    assert False
+
+    # Test that caching works.
+    assert False
+
+    # Make sure charged molecules are handled correctly.
     assert False
 
 

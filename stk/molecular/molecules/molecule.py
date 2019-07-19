@@ -1111,7 +1111,7 @@ class Molecule(metaclass=_Cached):
         This function will write the format based on the extension
         of `path`.
 
-        #. ``.mol``, ``.sdf`` - MDL V3000 file
+        #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
         #. ``.xyz`` - XYZ file
         #. ``.pdb`` - PDB file
 
