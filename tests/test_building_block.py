@@ -4,6 +4,7 @@ import stk
 import itertools as it
 from collections import Counter
 from os.path import join
+import rdkit.Chem.AllChem as rdkit
 
 
 if not os.path.exists('building_block_tests_output'):
@@ -11,14 +12,129 @@ if not os.path.exists('building_block_tests_output'):
 
 
 def test_init_rdkit():
+    rdkit_mol = rdkit.AddHs(rdkit.MolFromSmiles('NCCCN'))
+    mol0 = stk.BuildingBlock(rdkit_mol, ['amine'])
     # Test that all values are initialized correctly.
-    assert False
+    assert len(mol0.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol0.atoms) == 15
+    assert len(mol0.bonds) == 14
 
-    # Test that caching works.
-    assert False
+    atom_count = {
+        (stk.H, 0): 10,
+        (stk.N, 0): 2,
+        (stk.C, 0): 3
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol0.atoms
+    )
 
-    # Make sure charged molecules are handled correctly.
-    assert False
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol0.bonds
+    )
+
+    # Test that caching is working properly.
+    mol1 = stk.BuildingBlock(rdkit_mol, ['amine'])
+    assert mol0 is not mol1
+
+    mol2 = stk.BuildingBlock(
+        mol=rdkit_mol,
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    mol3 = stk.BuildingBlock(
+        mol=rdkit_mol,
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol0 is not mol2 and mol1 is not mol2
+    assert mol2 is mol3
+
+    mol4 = stk.BuildingBlock(
+        mol=rdkit_mol,
+        functional_groups=['aldehyde'],
+        use_cache=True
+    )
+    assert mol3 is not mol4
+
+    # Make sure that charged molecules are handled correctly.
+    negative_carbon = rdkit.AddHs(rdkit.MolFromSmiles('NC[C-]CN'))
+    mol5 = stk.BuildingBlock(
+        mol=negative_carbon,
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol5 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol5.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol5.atoms) == 14
+    assert len(mol5.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 2,
+        (stk.C, -1): 1,
+        (stk.N, 0): 2,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol5.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 5
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol5.bonds
+    )
+
+    negative_nitrogen = rdkit.AddHs(rdkit.MolFromSmiles('[N-]CCCN'))
+    mol6 = stk.BuildingBlock(
+        mol=negative_nitrogen,
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol6 is not mol5 and mol6 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol6.func_groups) == 1
+    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol6.atoms) == 14
+    assert len(mol6.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 3,
+        (stk.N, 0): 1,
+        (stk.N, -1): 1,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol6.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol6.bonds
+    )
 
 
 def test_init_mol(bb_dir):
