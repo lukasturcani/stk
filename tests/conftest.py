@@ -332,6 +332,11 @@ def mae_path():
 
 
 @pytest.fixture(scope='session')
+def bb_dir():
+    return join('..', 'data', 'building_block_init')
+
+
+@pytest.fixture(scope='session')
 def population():
     return stk.Population(*(
         stk.BuildingBlock.init_from_smiles('C'*i)

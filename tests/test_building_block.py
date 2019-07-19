@@ -3,13 +3,14 @@ import numpy as np
 import stk
 import itertools as it
 from collections import Counter
+from os.path import join
 
 
 if not os.path.exists('building_block_tests_output'):
     os.mkdir('building_block_tests_output')
 
 
-def test_init_mol():
+def test_init_rdkit():
     # Test that all values are initialized correctly.
     assert False
 
@@ -20,48 +21,625 @@ def test_init_mol():
     assert False
 
 
-def test_init_mae():
+def test_init_mol(bb_dir):
+    mol0 = stk.BuildingBlock(join(bb_dir, 'neutral.mol'), ['amine'])
     # Test that all values are initialized correctly.
-    assert False
+    assert len(mol0.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol0.atoms) == 15
+    assert len(mol0.bonds) == 14
 
-    # Test that caching works.
-    assert False
+    atom_count = {
+        (stk.H, 0): 10,
+        (stk.N, 0): 2,
+        (stk.C, 0): 3
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol0.atoms
+    )
 
-    # Make sure charged molecules are handled correctly.
-    assert False
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol0.bonds
+    )
 
+    # Test that caching is working properly.
+    mol1 = stk.BuildingBlock(join(bb_dir, 'neutral.mol'), ['amine'])
+    assert mol0 is not mol1
 
-def test_init_pdb():
+    mol2 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.mol'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    mol3 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.mol'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol0 is not mol2 and mol1 is not mol2
+    assert mol2 is mol3
+
+    mol4 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.mol'),
+        functional_groups=['aldehyde'],
+        use_cache=True
+    )
+    assert mol3 is not mol4
+
+    # Make sure that charged molecules are handled correctly.
+    mol5 = stk.BuildingBlock(
+        mol=join(bb_dir, 'negative_carbon.mol'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol5 is not mol0
     # Test that all values are initialized correctly.
-    assert False
+    assert len(mol5.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol5.atoms) == 14
+    assert len(mol5.bonds) == 13
 
-    # Test that caching works.
-    assert False
+    atom_count = {
+        (stk.C, 0): 2,
+        (stk.C, -1): 1,
+        (stk.N, 0): 2,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol5.atoms
+    )
 
-    # Make sure charged molecules are handled correctly.
-    assert False
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 5
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol5.bonds
+    )
 
-
-def test_init_mol2():
+    mol6 = stk.BuildingBlock(
+        mol=join(bb_dir, 'negative_nitrogen.mol'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol6 is not mol5 and mol6 is not mol0
     # Test that all values are initialized correctly.
-    assert False
+    assert len(mol6.func_groups) == 1
+    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol6.atoms) == 14
+    assert len(mol6.bonds) == 13
 
-    # Test that caching works.
-    assert False
+    atom_count = {
+        (stk.C, 0): 3,
+        (stk.N, 0): 1,
+        (stk.N, -1): 1,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol6.atoms
+    )
 
-    # Make sure charged molecules are handled correctly.
-    assert False
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol6.bonds
+    )
 
 
-def test_init_from_random_file():
+def test_init_mae(bb_dir):
+    mol0 = stk.BuildingBlock(join(bb_dir, 'neutral.mae'), ['amine'])
     # Test that all values are initialized correctly.
-    assert False
+    assert len(mol0.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol0.atoms) == 15
+    assert len(mol0.bonds) == 14
 
-    # Test that caching works.
-    assert False
+    atom_count = {
+        (stk.H, 0): 10,
+        (stk.N, 0): 2,
+        (stk.C, 0): 3
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol0.atoms
+    )
 
-    # Make sure charged molecules are handled correctly.
-    assert False
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol0.bonds
+    )
+
+    # Test that caching is working properly.
+    mol1 = stk.BuildingBlock(join(bb_dir, 'neutral.mae'), ['amine'])
+    assert mol0 is not mol1
+
+    mol2 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.mae'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    mol3 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.mae'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol0 is not mol2 and mol1 is not mol2
+    assert mol2 is mol3
+
+    mol4 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.mae'),
+        functional_groups=['aldehyde'],
+        use_cache=True
+    )
+    assert mol3 is not mol4
+
+    # Make sure that charged molecules are handled correctly.
+    mol5 = stk.BuildingBlock(
+        mol=join(bb_dir, 'negative_carbon.mae'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol5 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol5.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol5.atoms) == 14
+    assert len(mol5.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 2,
+        (stk.C, -1): 1,
+        (stk.N, 0): 2,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol5.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 5
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol5.bonds
+    )
+
+    mol6 = stk.BuildingBlock(
+        mol=join(bb_dir, 'negative_nitrogen.mae'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol6 is not mol5 and mol6 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol6.func_groups) == 1
+    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol6.atoms) == 14
+    assert len(mol6.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 3,
+        (stk.N, 0): 1,
+        (stk.N, -1): 1,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol6.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol6.bonds
+    )
+
+
+def test_init_pdb(bb_dir):
+    mol0 = stk.BuildingBlock(join(bb_dir, 'neutral.pdb'), ['amine'])
+    # Test that all values are initialized correctly.
+    assert len(mol0.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol0.atoms) == 15
+    assert len(mol0.bonds) == 14
+
+    atom_count = {
+        (stk.H, 0): 10,
+        (stk.N, 0): 2,
+        (stk.C, 0): 3
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol0.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol0.bonds
+    )
+
+    # Test that caching is working properly.
+    mol1 = stk.BuildingBlock(join(bb_dir, 'neutral.pdb'), ['amine'])
+    assert mol0 is not mol1
+
+    mol2 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.pdb'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    mol3 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.pdb'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol0 is not mol2 and mol1 is not mol2
+    assert mol2 is mol3
+
+    mol4 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.pdb'),
+        functional_groups=['aldehyde'],
+        use_cache=True
+    )
+    assert mol3 is not mol4
+
+    # Make sure that charged molecules are handled correctly.
+    mol5 = stk.BuildingBlock(
+        mol=join(bb_dir, 'negative_carbon.pdb'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol5 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol5.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol5.atoms) == 14
+    assert len(mol5.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 2,
+        (stk.C, -1): 1,
+        (stk.N, 0): 2,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol5.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 5
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol5.bonds
+    )
+
+    mol6 = stk.BuildingBlock(
+        mol=join(bb_dir, 'negative_nitrogen.pdb'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol6 is not mol5 and mol6 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol6.func_groups) == 1
+    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol6.atoms) == 14
+    assert len(mol6.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 3,
+        (stk.N, 0): 1,
+        (stk.N, -1): 1,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol6.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol6.bonds
+    )
+
+
+def test_init_mol2(bb_dir):
+    mol0 = stk.BuildingBlock(join(bb_dir, 'neutral.mol2'), ['amine'])
+    # Test that all values are initialized correctly.
+    assert len(mol0.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol0.atoms) == 15
+    assert len(mol0.bonds) == 14
+
+    atom_count = {
+        (stk.H, 0): 10,
+        (stk.N, 0): 2,
+        (stk.C, 0): 3
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol0.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol0.bonds
+    )
+
+    # Test that caching is working properly.
+    mol1 = stk.BuildingBlock(join(bb_dir, 'neutral.mol2'), ['amine'])
+    assert mol0 is not mol1
+
+    mol2 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.mol2'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    mol3 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.mol2'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol0 is not mol2 and mol1 is not mol2
+    assert mol2 is mol3
+
+    mol4 = stk.BuildingBlock(
+        mol=join(bb_dir, 'neutral.mol2'),
+        functional_groups=['aldehyde'],
+        use_cache=True
+    )
+    assert mol3 is not mol4
+
+    # Make sure that charged molecules are handled correctly.
+    mol5 = stk.BuildingBlock(
+        mol=join(bb_dir, 'negative_carbon.mol2'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol5 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol5.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol5.atoms) == 14
+    assert len(mol5.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 2,
+        (stk.C, -1): 1,
+        (stk.N, 0): 2,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol5.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 5
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol5.bonds
+    )
+
+    mol6 = stk.BuildingBlock(
+        mol=join(bb_dir, 'negative_nitrogen.mol2'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol6 is not mol5 and mol6 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol6.func_groups) == 1
+    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol6.atoms) == 14
+    assert len(mol6.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 3,
+        (stk.N, 0): 1,
+        (stk.N, -1): 1,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol6.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol6.bonds
+    )
+
+
+def test_init_from_random_file(bb_dir):
+    mol0 = stk.BuildingBlock.init_from_random_file(
+        file_glob=join(bb_dir, 'neutral.mol'),
+        functional_groups=['amine']
+    )
+    # Test that all values are initialized correctly.
+    assert len(mol0.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol0.atoms) == 15
+    assert len(mol0.bonds) == 14
+
+    atom_count = {
+        (stk.H, 0): 10,
+        (stk.N, 0): 2,
+        (stk.C, 0): 3
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol0.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol0.bonds
+    )
+
+    # Test that caching is working properly.
+    mol1 = stk.BuildingBlock.init_from_random_file(
+        file_glob=join(bb_dir, 'neutral.mol'),
+        functional_groups=['amine']
+    )
+    assert mol0 is not mol1
+
+    mol2 = stk.BuildingBlock(
+        file_glob=join(bb_dir, 'neutral.mol'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    mol3 = stk.BuildingBlock.init_from_random_file(
+        file_glob=join(bb_dir, 'neutral.mol'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol0 is not mol2 and mol1 is not mol2
+    assert mol2 is mol3
+
+    mol4 = stk.BuildingBlock.init_from_random_file(
+        file_glob=join(bb_dir, 'neutral.mol'),
+        functional_groups=['aldehyde'],
+        use_cache=True
+    )
+    assert mol3 is not mol4
+
+    # Make sure that charged molecules are handled correctly.
+    mol5 = stk.BuildingBlock.init_from_random_file(
+        file_glob=join(bb_dir, 'negative_carbon.mol'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol5 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol5.func_groups) == 2
+    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol5.atoms) == 14
+    assert len(mol5.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 2,
+        (stk.C, -1): 1,
+        (stk.N, 0): 2,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol5.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 5
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol5.bonds
+    )
+
+    mol6 = stk.BuildingBlock.init_from_random_file(
+        file_glob=join(bb_dir, 'negative_nitrogen.mol'),
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol6 is not mol5 and mol6 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol6.func_groups) == 1
+    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    assert sum(1 for _ in fg_types) == 1
+    assert len(mol6.atoms) == 14
+    assert len(mol6.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 3,
+        (stk.N, 0): 1,
+        (stk.N, -1): 1,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol6.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol6.bonds
+    )
 
 
 def test_init_from_smiles():
