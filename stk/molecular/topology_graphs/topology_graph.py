@@ -84,7 +84,7 @@ from functools import wraps
 from ..functional_groups import Reactor
 
 
-class VertexPosition:
+class FGPosition:
     """
 
     Attributes
@@ -101,7 +101,7 @@ class VertexPosition:
         return repr(self)
 
     def __repr__(self):
-        return f'VertexPosition()'
+        return f'FGPosition()'
 
 
 class Vertex:
@@ -119,15 +119,15 @@ class Vertex:
 
     def __init__(self, x, y, z, degree):
         self._coord = np.array([x, y, z])
-        self.positions = tuple(VertexPosition() for i in range(degree))
+        self.positions = tuple(FGPosition() for i in range(degree))
 
     @staticmethod
-    def _add_vertex_position_assignment(fn):
+    def _add_fg_position_assignment(fn):
 
         @wraps(fn)
         def inner(self, building_block):
             r = fn(self, building_block)
-            self._assign_vertex_positions(building_block)
+            self._assign_fg_positions(building_block)
             return r
 
         return inner
@@ -145,7 +145,7 @@ class Vertex:
         return inner
 
     def __init_subclass__(cls, **kwargs):
-        cls.place_building_block = cls._add_vertex_position_assignment(
+        cls.place_building_block = cls._add_fg_position_assignment(
             cls.place_building_block
         )
         cls.place_building_block = cls._add_position_restoration(
@@ -176,7 +176,7 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def _assign_vertex_positions(self, building_block):
+    def _assign_fg_positions(self, building_block):
         """
         Assign
 
@@ -217,8 +217,8 @@ class Edge:
 
     """
 
-    def __init__(self, *vertex_positions):
-        self._vertex_positions = vertex_positions
+    def __init__(self, *fg_positions):
+        self._fg_positions = fg_positions
 
     def get_bonded_fgs(self):
         """

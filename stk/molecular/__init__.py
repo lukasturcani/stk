@@ -1,9 +1,9 @@
-from .topologies import (
+from .topology_graphs import (
     cof,
     macrocycle,
     polymer,
     rotaxane
 )
-from .topologies.base import Topology, Vertex, Edge
+from .topology_graphs.topology_graph import *
 from .functional_groups import *
 from .molecules import *

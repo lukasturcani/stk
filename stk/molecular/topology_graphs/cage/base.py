@@ -3,11 +3,13 @@ from scipy.spatial.distance import euclidean
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
-from ..base import Topology
-from ....utilities import (centroid,
-                           vector_theta,
-                           add_fragment_props,
-                           normalize_vector)
+from ..topology_graph import TopologyGraph
+from ....utilities import (
+    centroid,
+    vector_theta,
+    add_fragment_props,
+    normalize_vector
+)
 
 
 class Vertex:
@@ -524,7 +526,7 @@ class Edge(Vertex):
         return repr(self)
 
 
-class CageTopology(Topology):
+class CageTopology(TopologyGraph):
     """
     An abstract base class for cage topologies.
 

@@ -6,11 +6,11 @@ Defines macrocycle topologies.
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
-from .base import Topology
+from .topology_graph import TopologyGraph
 from ...utilities import dedupe, add_fragment_props
 
 
-class Cyclic(Topology):
+class Cyclic(TopologyGraph):
     """
     Represents cyclic polymers forming a :class:`.Macrocycle`.
 

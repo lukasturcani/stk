@@ -7,11 +7,11 @@ Defines rotaxane topologies.
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
-from .base import Topology
+from .topology_graph import TopologyGraph
 from ...utilities import dedupe, add_fragment_props
 
 
-class NRotaxane(Topology):
+class NRotaxane(TopologyGraph):
     """
     Represents the topology of [n]rotaxanes.
 

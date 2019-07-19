@@ -9,7 +9,7 @@ from collections import Counter
 
 from . import elements
 from .molecule import Molecule
-from .. import topologies
+from .. import topology_graphs
 from ..functional_groups import FunctionalGroup
 from ...utilities import remake
 
@@ -296,7 +296,7 @@ class ConstructedMolecule(Molecule):
             for key, val in d.pop('bb_counter')
         })
         bbs = list(bb_counter)
-        tops = vars(topologies)
+        tops = vars(topology_graphs)
         topology_graph = eval(d.pop('topology_graph'), tops)
 
         key = cls._get_key(cls, bbs, topology_graph, use_cache)

@@ -72,10 +72,12 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 import itertools as it
 
-from .base import Topology
-from ...utilities import (PeriodicBond,
-                          add_fragment_props,
-                          normalize_vector)
+from .topology_graph import TopologyGraph
+from ...utilities import (
+    PeriodicBond,
+    add_fragment_props,
+    normalize_vector
+)
 
 
 class Vertex:
@@ -513,7 +515,7 @@ def linker_cof_scale_func(mol):
     return bb_size(mol) * nice_number
 
 
-class COFLattice(Topology):
+class COFLattice(TopologyGraph):
     """
     A base class for periodic topologies.
 

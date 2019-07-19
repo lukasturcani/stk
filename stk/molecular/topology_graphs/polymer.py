@@ -6,7 +6,7 @@ Defines :class:`.Polymer` topologies.
 import numpy as np
 import logging
 
-from .base import TopologyGraph, Vertex, Edge
+from .topology_graph import TopologyGraph, Vertex, Edge
 
 
 logger = logging.getLogger(__name__)
