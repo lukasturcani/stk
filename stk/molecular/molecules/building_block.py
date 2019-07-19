@@ -86,12 +86,6 @@ class BuildingBlock(Molecule):
             removeHs=False
         ),
 
-        '.mol2': partial(
-            rdkit.MolFromMol2File,
-            sanitize=False,
-            removeHs=False
-        ),
-
         '.pdb': partial(
             rdkit.MolFromPDBFile,
             sanitize=False,
@@ -115,14 +109,13 @@ class BuildingBlock(Molecule):
 
                 #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
                 #. ``.pdb`` - PDB file
-                #. ``.mol2`` - SYBYL MOL2 file
 
         functional_groups : :class:`list` of :class:`str`, optional
             The names of the functional groups which are to have atoms
             tagged. If ``None``, a functional group name found in the
-            path `file`  is used. If no functional groups are provided
+            path is used. If no functional groups are provided
             to this parameter and the name of one is not present in
-            `file`, no tagging is done.
+            the path, no tagging is done.
 
         use_cache : :class:`bool`, optional
             If ``True``, a new :class:`.BuildingBlock` will
@@ -133,7 +126,7 @@ class BuildingBlock(Molecule):
 
         Raises
         ------
-        :class:`TypeError`
+        :class:`ValueError`
             If the file type cannot be used for initialization.
 
         """
@@ -143,27 +136,13 @@ class BuildingBlock(Molecule):
                 _, ext = os.path.splitext(mol)
 
                 if ext not in self._init_funcs:
-                    raise TypeError(
+                    raise ValueError(
                         f'Unable to initialize from "{ext}" files.'
                     )
                 rdkit_mol = remake(self._init_funcs[ext](mol))
 
-            else:
-                rdkit_mol = remake(
-                    rdkit.MolFromMolBlock(
-                        molBlock=mol,
-                        removeHs=False,
-                        sanitize=False
-                    )
-                )
-
         elif isinstance(mol, rdkit.Mol):
             rdkit_mol = remake(mol)
-
-        # Update the property cache of each atom. This updates things
-        # like valence.
-        for atom in rdkit_mol.GetAtoms():
-            atom.UpdatePropertyCache()
 
         atoms = tuple(
             Atom(a.GetIdx(), a.GetAtomicNum(), a.GetFormalCharge())
@@ -212,8 +191,12 @@ class BuildingBlock(Molecule):
             a :class:`.BuildingBlock` at random.
 
         functional_groups : :class`list` of :class:`str`, optional
-            The names of a functional groups which the molecule
-            selected from the `file_glob` should have.
+            The names of the functional groups which are to have atoms
+            tagged. If ``None``, a functional group name found in the
+            path of the selected file path is used. If no functional
+            groups are provided to this parameter and the name of one
+            is not present in the selected file path, no tagging is
+            done.
 
         use_cache : :class:`bool`, optional
             If ``True``, a new :class:`.BuildingBlock` will
@@ -272,8 +255,7 @@ class BuildingBlock(Molecule):
 
         functional_groups : :class:`list` of :class:`str`, optional
             The name of the functional groups which are to have atoms
-            tagged. If no functional groups are provided to this
-            parameter, no tagging is done.
+            tagged. If ``None``, no tagging is done.
 
         random_seed : :class:`int`, optional
             Random seed passed to :func:`rdkit.ETKDG`
@@ -810,11 +792,15 @@ class BuildingBlock(Molecule):
         Parameters
         ----------
         mol : :class:`str` or :class:`rdkit.Mol`
-            Can be one of 3 things:
+            Can be one of 2 things:
 
                 1. A path to a molecular structure file.
                 2. A :class:`rdkit.Mol` object.
-                3. V3000 MDL Mol block.
+
+            Supported file types are:
+
+                #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
+                #. ``.pdb`` - PDB file
 
         functional_groups : :class:`list` of :class:`str`
             The names of the functional groups which are to have atoms
@@ -838,7 +824,7 @@ class BuildingBlock(Molecule):
 
         Raises
         ------
-        :class:`TypeError`
+        :class:`ValueError`
             If the there is file type cannot be used for
             initialization.
 
@@ -849,22 +835,13 @@ class BuildingBlock(Molecule):
                 _, ext = os.path.splitext(mol)
 
                 if ext not in self._init_funcs:
-                    raise TypeError(
+                    raise ValueError(
                         f'Unable to initialize from "{ext}" files.'
                     )
-                mol = remake(self._init_funcs[ext](mol))
-
-            else:
-                mol = remake(
-                    rdkit.MolFromMolBlock(
-                        molBlock=mol,
-                        removeHs=False,
-                        sanitize=False
-                    )
-                )
+                rdkit_mol = remake(self._init_funcs[ext](mol))
 
         elif isinstance(mol, rdkit.Mol):
-            mol = remake(mol)
+            rdkit_mol = remake(mol)
 
         if functional_groups is None:
             if isinstance(mol, str) and os.path.exists(mol):
@@ -875,7 +852,7 @@ class BuildingBlock(Molecule):
                 functional_groups = []
 
         functional_groups = sorted(functional_groups)
-        return (*functional_groups, rdkit.MolToInchi(mol))
+        return (*functional_groups, rdkit.MolToInchi(rdkit_mol))
 
     def shift_fgs(self, new_ids, shift):
         """
