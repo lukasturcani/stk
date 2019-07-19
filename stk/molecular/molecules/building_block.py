@@ -72,6 +72,7 @@ class BuildingBlock(Molecule):
     :meth:`get_bonder_direction_vectors`
     :meth:`get_centroid_centroid_direction_vector`
     :meth:`get_functional_groups`
+    :meth:`to_dict`
     :meth:`shift_fgs`
 
     """
@@ -328,12 +329,13 @@ class BuildingBlock(Molecule):
     @classmethod
     def _init_from_dict(cls, mol_dict, use_cache):
         """
-        Use a :class:`dict` for initialization.
+        Intialize from a :class:`dict` representation.
 
         Parameters
         ----------
         mol_dict : :class:`dict`
-            A dictionary holding the attribute data of the molecule.
+            A :class:`dict` representation of a molecule generated
+            by :meth:`to_dict`.
 
         use_cache : :class:`bool`
             If ``True``, a new instance will not be made if a cached
@@ -344,7 +346,8 @@ class BuildingBlock(Molecule):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`BuildingBlock`
+            The molecule described by `mol_dict`.
 
         """
 
@@ -758,33 +761,32 @@ class BuildingBlock(Molecule):
 
         return func_groups
 
-    def _to_dict(self, include_attrs=None):
+    def to_dict(self, include_attrs=None):
         """
         Return a :class:`dict` representation of the molecule.
-
-        The representation has the following form:
-
-        .. code-block:: python
-
-            {
-                'class' : 'BuildingBlock',
-                'func_groups': ['amine', 'aldehyde'],
-                'mol_block' : '''A string holding the V3000 mol
-                                 block of the molecule.''',
-                'atoms': [H(0), N(1), ...],
-            }
 
         Parameters
         ----------
         include_attrs : :class:`list` of :class:`str`, optional
-            The names of attributes of the molecule to be added to
-            the :class:`dict`. Each attribute is saved as a string
-            using :func:`repr`.
+            The names of additional attributes of the molecule to be
+            added to the :class:`dict`. Each attribute is saved as a
+            string using :func:`repr`.
 
         Returns
         -------
         :class:`dict`
-            A :class:`dict` which represents the molecule.
+            A :class:`dict` which represents the molecule. It has
+            the form
+
+            .. code-block:: python
+
+                {
+                    'class' : 'BuildingBlock',
+                    'func_groups': ['amine', 'aldehyde'],
+                    'mol_block' : '''A string holding the V3000 mol
+                                     block of the molecule.''',
+                    'atoms': [H(0), N(1), ...],
+                }
 
         """
 
