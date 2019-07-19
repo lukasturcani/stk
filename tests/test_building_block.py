@@ -68,7 +68,8 @@ def test_init_from_smiles():
     mol0 = stk.BuildingBlock.init_from_smiles('NCCCN', ['amine'])
     # Test that all values are initialized correctly.
     assert len(mol0.func_groups) == 2
-    assert len(mol0.func_group_infos) == 1
+    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    assert sum(1 for _ in fg_types) == 1
     assert len(mol0.atoms) == 15
     assert len(mol0.bonds) == 14
 
@@ -125,7 +126,8 @@ def test_init_from_smiles():
     assert mol5 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol5.func_groups) == 2
-    assert len(mol5.func_group_infos) == 1
+    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    assert sum(1 for _ in fg_types) == 1
     assert len(mol5.atoms) == 14
     assert len(mol5.bonds) == 13
 
@@ -158,7 +160,8 @@ def test_init_from_smiles():
     assert mol6 is not mol5 and mol6 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol6.func_groups) == 1
-    assert len(mol6.func_group_infos) == 1
+    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    assert sum(1 for _ in fg_types) == 1
     assert len(mol6.atoms) == 14
     assert len(mol6.bonds) == 13
 

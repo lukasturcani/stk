@@ -51,9 +51,6 @@ class BuildingBlock(Molecule):
         The functional groups present in the molecule. The
         :attr:`.FunctionalGroup.id` is equal to the index.
 
-    func_group_infos : :class:`tuple` of :class:`.FGInfo`
-        The functional group types present in the molecule.
-
     _key : :class:`object`
         Extends :class:`.Molecule._key`. :class:`BuildingBlock`
         molecules with the same structure and with the same functional
@@ -201,11 +198,6 @@ class BuildingBlock(Molecule):
         self.func_groups = tuple(
             self.get_functional_groups(functional_groups)
         )
-
-        self.func_group_infos = tuple(dedupe(
-            iterable=(fg.info for fg in self.func_groups),
-            key=lambda info: info.name
-        ))
 
     @classmethod
     def init_from_random_file(
@@ -800,10 +792,10 @@ class BuildingBlock(Molecule):
         if include_attrs is None:
             include_attrs = []
 
-        fg_names = [info.name for info in self.func_group_infos]
+        fgs = list(dedupe(fg.info.name for fg in self.func_groups))
         d = {
             'class': self.__class__.__name__,
-            'func_groups': fg_names,
+            'func_groups': fgs,
             'mol_block': self._to_mdl_mol_block(),
             'atoms': repr(self.atoms)
         }
