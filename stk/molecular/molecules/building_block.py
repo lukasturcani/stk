@@ -23,7 +23,6 @@ from ...utilities import (
     flatten,
     normalize_vector,
     vector_theta,
-    mol_from_mae_file,
     remake,
     dedupe
 )
@@ -93,8 +92,6 @@ class BuildingBlock(Molecule):
             removeHs=False
         ),
 
-        '.mae': mol_from_mae_file,
-
         '.pdb': partial(
             rdkit.MolFromPDBFile,
             sanitize=False,
@@ -117,7 +114,6 @@ class BuildingBlock(Molecule):
             Supported file types are:
 
                 #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
-                #. ``.mae`` - Maestro file
                 #. ``.pdb`` - PDB file
                 #. ``.mol2`` - SYBYL MOL2 file
 
