@@ -77,14 +77,14 @@ def test_init_rdkit():
     assert len(mol5.func_groups) == 2
     fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol5.atoms) == 14
-    assert len(mol5.bonds) == 13
+    assert len(mol5.atoms) == 13
+    assert len(mol5.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 2,
         (stk.C, -1): 1,
         (stk.N, 0): 2,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol5.atoms
@@ -94,7 +94,7 @@ def test_init_rdkit():
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
         frozenset({stk.H, stk.N}): 4,
-        frozenset({stk.H, stk.C}): 5
+        frozenset({stk.H, stk.C}): 4
     }
     assert expected_bonds == Counter(
         frozenset({b.atom1.__class__, b.atom2.__class__})
@@ -112,14 +112,14 @@ def test_init_rdkit():
     assert len(mol6.func_groups) == 1
     fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol6.atoms) == 14
-    assert len(mol6.bonds) == 13
+    assert len(mol6.atoms) == 13
+    assert len(mol6.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 3,
         (stk.N, 0): 1,
         (stk.N, -1): 1,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol6.atoms
@@ -128,7 +128,7 @@ def test_init_rdkit():
     expected_bonds = {
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
-        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.N}): 2,
         frozenset({stk.H, stk.C}): 6
     }
     assert expected_bonds == Counter(
@@ -201,14 +201,14 @@ def test_init_mol(bb_dir):
     assert len(mol5.func_groups) == 2
     fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol5.atoms) == 14
-    assert len(mol5.bonds) == 13
+    assert len(mol5.atoms) == 13
+    assert len(mol5.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 2,
         (stk.C, -1): 1,
         (stk.N, 0): 2,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol5.atoms
@@ -218,7 +218,7 @@ def test_init_mol(bb_dir):
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
         frozenset({stk.H, stk.N}): 4,
-        frozenset({stk.H, stk.C}): 5
+        frozenset({stk.H, stk.C}): 4
     }
     assert expected_bonds == Counter(
         frozenset({b.atom1.__class__, b.atom2.__class__})
@@ -235,14 +235,14 @@ def test_init_mol(bb_dir):
     assert len(mol6.func_groups) == 1
     fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol6.atoms) == 14
-    assert len(mol6.bonds) == 13
+    assert len(mol6.atoms) == 13
+    assert len(mol6.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 3,
         (stk.N, 0): 1,
         (stk.N, -1): 1,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol6.atoms
@@ -251,7 +251,7 @@ def test_init_mol(bb_dir):
     expected_bonds = {
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
-        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.N}): 2,
         frozenset({stk.H, stk.C}): 6
     }
     assert expected_bonds == Counter(
@@ -324,14 +324,14 @@ def test_init_mae(bb_dir):
     assert len(mol5.func_groups) == 2
     fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol5.atoms) == 14
-    assert len(mol5.bonds) == 13
+    assert len(mol5.atoms) == 13
+    assert len(mol5.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 2,
         (stk.C, -1): 1,
         (stk.N, 0): 2,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol5.atoms
@@ -341,7 +341,7 @@ def test_init_mae(bb_dir):
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
         frozenset({stk.H, stk.N}): 4,
-        frozenset({stk.H, stk.C}): 5
+        frozenset({stk.H, stk.C}): 4
     }
     assert expected_bonds == Counter(
         frozenset({b.atom1.__class__, b.atom2.__class__})
@@ -358,14 +358,14 @@ def test_init_mae(bb_dir):
     assert len(mol6.func_groups) == 1
     fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol6.atoms) == 14
-    assert len(mol6.bonds) == 13
+    assert len(mol6.atoms) == 13
+    assert len(mol6.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 3,
         (stk.N, 0): 1,
         (stk.N, -1): 1,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol6.atoms
@@ -374,7 +374,7 @@ def test_init_mae(bb_dir):
     expected_bonds = {
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
-        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.N}): 2,
         frozenset({stk.H, stk.C}): 6
     }
     assert expected_bonds == Counter(
@@ -447,14 +447,14 @@ def test_init_pdb(bb_dir):
     assert len(mol5.func_groups) == 2
     fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol5.atoms) == 14
-    assert len(mol5.bonds) == 13
+    assert len(mol5.atoms) == 13
+    assert len(mol5.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 2,
         (stk.C, -1): 1,
         (stk.N, 0): 2,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol5.atoms
@@ -464,7 +464,7 @@ def test_init_pdb(bb_dir):
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
         frozenset({stk.H, stk.N}): 4,
-        frozenset({stk.H, stk.C}): 5
+        frozenset({stk.H, stk.C}): 4
     }
     assert expected_bonds == Counter(
         frozenset({b.atom1.__class__, b.atom2.__class__})
@@ -481,14 +481,14 @@ def test_init_pdb(bb_dir):
     assert len(mol6.func_groups) == 1
     fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol6.atoms) == 14
-    assert len(mol6.bonds) == 13
+    assert len(mol6.atoms) == 13
+    assert len(mol6.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 3,
         (stk.N, 0): 1,
         (stk.N, -1): 1,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol6.atoms
@@ -497,7 +497,7 @@ def test_init_pdb(bb_dir):
     expected_bonds = {
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
-        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.N}): 2,
         frozenset({stk.H, stk.C}): 6
     }
     assert expected_bonds == Counter(
@@ -570,14 +570,14 @@ def test_init_mol2(bb_dir):
     assert len(mol5.func_groups) == 2
     fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol5.atoms) == 14
-    assert len(mol5.bonds) == 13
+    assert len(mol5.atoms) == 13
+    assert len(mol5.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 2,
         (stk.C, -1): 1,
         (stk.N, 0): 2,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol5.atoms
@@ -587,7 +587,7 @@ def test_init_mol2(bb_dir):
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
         frozenset({stk.H, stk.N}): 4,
-        frozenset({stk.H, stk.C}): 5
+        frozenset({stk.H, stk.C}): 4
     }
     assert expected_bonds == Counter(
         frozenset({b.atom1.__class__, b.atom2.__class__})
@@ -604,14 +604,14 @@ def test_init_mol2(bb_dir):
     assert len(mol6.func_groups) == 1
     fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol6.atoms) == 14
-    assert len(mol6.bonds) == 13
+    assert len(mol6.atoms) == 13
+    assert len(mol6.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 3,
         (stk.N, 0): 1,
         (stk.N, -1): 1,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol6.atoms
@@ -620,7 +620,7 @@ def test_init_mol2(bb_dir):
     expected_bonds = {
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
-        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.N}): 2,
         frozenset({stk.H, stk.C}): 6
     }
     assert expected_bonds == Counter(

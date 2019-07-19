@@ -264,20 +264,20 @@ def cycle():
     )
 
 
-@pytest.fixture(scope='session')
-def polymer(amine2, aldehyde2):
-    return stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde2],
-        topology=stk.polymer.Linear('AB', [0, 0], 3)
-    )
-
-
-@pytest.fixture
-def tmp_polymer(amine2, aldehyde2):
-    return stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde2],
-        topology=stk.polymer.Linear('AB', [0, 0], 3)
-    )
+# @pytest.fixture(scope='session')
+# def polymer(amine2, aldehyde2):
+#     return stk.ConstructedMolecule(
+#         building_blocks=[amine2, aldehyde2],
+#         topology=stk.polymer.Linear('AB', [0, 0], 3)
+#     )
+#
+#
+# @pytest.fixture
+# def tmp_polymer(amine2, aldehyde2):
+#     return stk.ConstructedMolecule(
+#         building_blocks=[amine2, aldehyde2],
+#         topology=stk.polymer.Linear('AB', [0, 0], 3)
+#     )
 
 
 # @pytest.fixture(scope='session')
@@ -285,8 +285,8 @@ def tmp_polymer(amine2, aldehyde2):
 #     m = stk.Molecule.load(join('..', 'data', 'cc3.json'))
 #     m.name = 'cc3'
 #     return m
-#
-#
+
+
 # @pytest.fixture
 # def tmp_cc3():
 #     m = stk.Molecule.load(join('..', 'data', 'cc3.json'))
@@ -336,14 +336,14 @@ def bb_dir():
     return join('..', 'data', 'building_block_init')
 
 
-@pytest.fixture(scope='session')
-def population():
-    return stk.Population(*(
-        stk.BuildingBlock.init_from_smiles('C'*i)
-        for i in range(1, 12)
-    ))
+# @pytest.fixture(scope='session')
+# def population():
+#     return stk.Population(*(
+#         stk.BuildingBlock.init_from_smiles('C'*i)
+#         for i in range(1, 12)
+#     ))
 
 
-@pytest.fixture(scope='session')
-def ga_input():
-    return stk.GAInput(join('..', 'data', 'inputfile.py'))
+# @pytest.fixture(scope='session')
+# def ga_input():
+#     return stk.GAInput(join('..', 'data', 'inputfile.py'))
