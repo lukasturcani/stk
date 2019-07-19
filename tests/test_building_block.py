@@ -711,20 +711,25 @@ def test_get_bonder_plane(tmp_amine4):
             assert abs(product-d) < 1e-6
 
     # When 4 are used make sure that a best fit plane is produced.
-    # Ensure that centroids are placed such that best fit plane is a
-    # distance of 0.5 away from all centroids.
-    coords = tmp_amine4.get_position_matrix()
+    # Ensure that centroids are placed such that the plane of best fit
+    # Goes through two of the centroids and is equidistant from the
+    # other two.
     bonder_ids = list(tmp_amine4.get_bonder_ids())
-    coords[bonder_ids[0]] = [np.sqrt(2), 0, 0]
-    coords[bonder_ids[1]] = [0, 0, np.sqrt(2)]
-    coords[bonder_ids[2]] = [1, -1, 0]
-    coords[bonder_ids[3]] = [1, 1, 0]
+    coords = tmp_amine4.get_position_matrix()
+    coords[bonder_ids[0]] = [1, 1, 0]
+    coords[bonder_ids[1]] = [0, 0, 0.5]
+    coords[bonder_ids[2]] = [0, 0, -0.5]
+    coords[bonder_ids[3]] = [1, -1, 0]
     tmp_amine4.set_position_matrix(coords)
 
     a, b, c, d = tmp_amine4.get_bonder_plane()
-    for x, y, z in tmp_amine4.get_bonder_centroids():
+    for x, y, z in tmp_amine4.get_bonder_centroids(fg_ids=[0, 3]):
         product = a*x + b*y + c*z
-        assert np.allclose(abs(product-d), 0.5, 1e-6)
+        assert abs(product-d) < 1e-6
+
+    for x, y, z in tmp_amine4.get_bonder_centroids(fg_ids=[1, 2]):
+        product = a*x + b*y + c*z
+        assert abs(0.5 - abs(product-d)) < 1e-6
 
 
 def test_get_bonder_plane_normal(tmp_amine4):
@@ -750,7 +755,7 @@ def test_get_bonder_plane_normal(tmp_amine4):
     )
 
     # When using all fgs the plane should be at a 90 degree rotation.
-    assert np.allcose(
+    assert np.allclose(
         a=tmp_amine4.get_bonder_plane_normal(),
         b=[0, 1, 0],
         atol=1e-6
