@@ -125,7 +125,7 @@ def test_get_center_of_mass(tmp_amine2):
 
     new_coords = tmp_amine2.get_position_matrix()
     atom_ids = [0, 2, 4]
-    new_coords[atom_ids] = np.ones((len(atom_ids, 3)))
+    new_coords[atom_ids] = np.ones((len(atom_ids), 3))
     tmp_amine2.set_position_matrix(new_coords)
     assert not all(tmp_amine2.get_center_of_mass() == [1, 1, 1])
     assert all(tmp_amine2.get_center_of_mass(atom_ids) == [1, 1, 1])
@@ -305,7 +305,7 @@ def test_update_from_xyz(tmp_amine2, amine2_conf1):
 
 def test_write_pdb(amine2):
     path = join(test_dir, 'test_write.pdb')
-    amine2.write(path=path, conformer_id=1)
+    amine2.write(path=path)
     bb = stk.BuildingBlock(path)
 
     assert np.allclose(
@@ -318,7 +318,7 @@ def test_write_pdb(amine2):
 def test_to_rdkit_mol(tmp_amine2):
     tmp_amine2.atoms[0].charge = 12
     mol = tmp_amine2.to_rdkit_mol()
-    assert mol.GetNumConformers() == 2
+    assert mol.GetNumConformers() == 1
     assert mol.GetAtomWithIdx(0).GetFormalCharge() == 12
     assert mol.GetNumAtoms() == len(tmp_amine2.atoms)
     for atom, rdkit_atom in zip(tmp_amine2.atoms, mol.GetAtoms()):

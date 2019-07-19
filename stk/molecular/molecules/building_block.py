@@ -166,7 +166,7 @@ class BuildingBlock(Molecule):
             atom.UpdatePropertyCache()
 
         atoms = tuple(
-            Atom(a.GetIdx(), a.GetAtomicNum())
+            Atom(a.GetIdx(), a.GetAtomicNum(), a.GetFormalCharge())
             for a in rdkit_mol.GetAtoms()
         )
         bonds = tuple(
@@ -235,7 +235,7 @@ class BuildingBlock(Molecule):
         """
 
         files = glob(file_glob)
-        np.random.shuffle(file_glob)
+        np.random.shuffle(files)
 
         for mol_file in files:
             try:

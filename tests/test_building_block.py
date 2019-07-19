@@ -13,6 +13,8 @@ if not os.path.exists('building_block_tests_output'):
 
 def test_init_rdkit():
     rdkit_mol = rdkit.AddHs(rdkit.MolFromSmiles('NCCCN'))
+    rdkit.EmbedMolecule(rdkit_mol, rdkit.ETKDGv2())
+
     mol0 = stk.BuildingBlock(rdkit_mol, ['amine'])
     # Test that all values are initialized correctly.
     assert len(mol0.func_groups) == 2
@@ -67,6 +69,8 @@ def test_init_rdkit():
 
     # Make sure that charged molecules are handled correctly.
     negative_carbon = rdkit.AddHs(rdkit.MolFromSmiles('NC[C-]CN'))
+    rdkit.EmbedMolecule(negative_carbon, rdkit.ETKDGv2())
+
     mol5 = stk.BuildingBlock(
         mol=negative_carbon,
         functional_groups=['amine'],
@@ -102,6 +106,8 @@ def test_init_rdkit():
     )
 
     negative_nitrogen = rdkit.AddHs(rdkit.MolFromSmiles('[N-]CCCN'))
+    rdkit.EmbedMolecule(negative_nitrogen, rdkit.ETKDGv2())
+
     mol6 = stk.BuildingBlock(
         mol=negative_nitrogen,
         functional_groups=['amine'],
@@ -545,7 +551,7 @@ def test_init_from_random_file(bb_dir):
     )
     assert mol0 is not mol1
 
-    mol2 = stk.BuildingBlock(
+    mol2 = stk.BuildingBlock.init_from_random_file(
         file_glob=join(bb_dir, 'neutral.mol'),
         functional_groups=['amine'],
         use_cache=True
@@ -576,14 +582,14 @@ def test_init_from_random_file(bb_dir):
     assert len(mol5.func_groups) == 2
     fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol5.atoms) == 14
-    assert len(mol5.bonds) == 13
+    assert len(mol5.atoms) == 13
+    assert len(mol5.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 2,
         (stk.C, -1): 1,
         (stk.N, 0): 2,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol5.atoms
@@ -593,7 +599,7 @@ def test_init_from_random_file(bb_dir):
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
         frozenset({stk.H, stk.N}): 4,
-        frozenset({stk.H, stk.C}): 5
+        frozenset({stk.H, stk.C}): 4
     }
     assert expected_bonds == Counter(
         frozenset({b.atom1.__class__, b.atom2.__class__})
@@ -610,14 +616,14 @@ def test_init_from_random_file(bb_dir):
     assert len(mol6.func_groups) == 1
     fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol6.atoms) == 14
-    assert len(mol6.bonds) == 13
+    assert len(mol6.atoms) == 13
+    assert len(mol6.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 3,
         (stk.N, 0): 1,
         (stk.N, -1): 1,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol6.atoms
@@ -626,7 +632,7 @@ def test_init_from_random_file(bb_dir):
     expected_bonds = {
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
-        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.N}): 2,
         frozenset({stk.H, stk.C}): 6
     }
     assert expected_bonds == Counter(
@@ -699,14 +705,14 @@ def test_init_from_smiles():
     assert len(mol5.func_groups) == 2
     fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol5.atoms) == 14
-    assert len(mol5.bonds) == 13
+    assert len(mol5.atoms) == 13
+    assert len(mol5.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 2,
         (stk.C, -1): 1,
         (stk.N, 0): 2,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol5.atoms
@@ -716,7 +722,7 @@ def test_init_from_smiles():
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
         frozenset({stk.H, stk.N}): 4,
-        frozenset({stk.H, stk.C}): 5
+        frozenset({stk.H, stk.C}): 4,
     }
     assert expected_bonds == Counter(
         frozenset({b.atom1.__class__, b.atom2.__class__})
@@ -733,14 +739,14 @@ def test_init_from_smiles():
     assert len(mol6.func_groups) == 1
     fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
-    assert len(mol6.atoms) == 14
-    assert len(mol6.bonds) == 13
+    assert len(mol6.atoms) == 13
+    assert len(mol6.bonds) == 12
 
     atom_count = {
         (stk.C, 0): 3,
         (stk.N, 0): 1,
         (stk.N, -1): 1,
-        (stk.H, 0): 9,
+        (stk.H, 0): 8,
     }
     assert atom_count == Counter(
         (a.__class__, a.charge) for a in mol6.atoms
@@ -749,7 +755,7 @@ def test_init_from_smiles():
     expected_bonds = {
         frozenset({stk.N, stk.C}): 2,
         frozenset({stk.C}): 2,
-        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.N}): 2,
         frozenset({stk.H, stk.C}): 6
     }
     assert expected_bonds == Counter(
@@ -812,7 +818,8 @@ def test_get_bonder_centroids(tmp_aldehyde3):
     assert i == 1
     # Check that the bonder centroid of functional group 0 is still at
     # (0, 0, 0).
-    for i, centroid in tmp_aldehyde3.get_bonder_centroids(fg_ids=[0]):
+    centroids = tmp_aldehyde3.get_bonder_centroids(fg_ids=[0])
+    for i, centroid in enumerate(centroids):
         assert np.allclose(centroid, [0, 0, 0], 1e-6)
     assert i == 0
 
@@ -860,14 +867,14 @@ def test_get_bonder_plane_normal(tmp_amine4):
     coords[other_ids, 1] = 10
     tmp_amine4.set_position_matrix(coords)
     assert np.allclose(
-        a=tmp_amine4.get_plane_normal(fg_ids=[0, 2, 3]),
+        a=tmp_amine4.get_bonder_plane_normal(fg_ids=[0, 2, 3]),
         b=[1, 0, 0],
         atol=1e-6
     )
 
     # When using all fgs the plane should be at a 90 degree rotation.
     assert np.allcose(
-        a=tmp_amine4.get_plane_normal(),
+        a=tmp_amine4.get_bonder_plane_normal(),
         b=[0, 1, 0],
         atol=1e-6
     )
@@ -883,14 +890,18 @@ def test_get_bonder_distances(tmp_amine4):
     # Test default behaviour.
     distances = tmp_amine4.get_bonder_distances()
     for i, (fg1, fg2, distance) in enumerate(distances):
-        assert abs(distance - abs(fg1 - fg2)) < 1e-6
+        coord1 = tmp_amine4.func_groups[fg1].bonder_ids[0]
+        coord2 = tmp_amine4.func_groups[fg2].bonder_ids[0]
+        assert abs(distance - abs(coord1 - coord2)) < 1e-6
     assert i == 5
 
     # Test explicilty setting fg_ids.
     distances = tmp_amine4.get_bonder_distances(fg_ids=[0, 2, 3])
     for i, (fg1, fg2, distance) in enumerate(distances):
-        assert abs(distance - abs(fg1 - fg2)) < 1e-6
-    assert i == 4
+        coord1 = tmp_amine4.func_groups[fg1].bonder_ids[0]
+        coord2 = tmp_amine4.func_groups[fg2].bonder_ids[0]
+        assert abs(distance - abs(coord1 - coord2)) < 1e-6
+    assert i == 2
 
 
 def test_get_bonder_direction_vectors(tmp_amine4):
@@ -910,7 +921,7 @@ def test_get_bonder_direction_vectors(tmp_amine4):
 
     # Test explicitly setting fg_ids.
     dir_vectors = tmp_amine4.get_bonder_direction_vectors(
-        fg_ids=[0, 4]
+        fg_ids=[0, 3]
     )
     for i, (id1, id2, v) in enumerate(dir_vectors):
         # Calculate the expected direction vector based on ids.
@@ -932,7 +943,7 @@ def test_get_centroid_centroid_direction_vector(amine4):
     fg_ids = [0, 2]
     c1 = amine4.get_centroid(atom_ids=amine4.get_bonder_ids(fg_ids))
     assert np.allclose(
-        a=stk.normalize_vector(c2-c2),
+        a=stk.normalize_vector(c2-c1),
         b=amine4.get_centroid_centroid_direction_vector(fg_ids=fg_ids),
         atol=1e-8
     )
