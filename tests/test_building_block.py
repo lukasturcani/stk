@@ -739,25 +739,18 @@ def test_get_bonder_plane_normal(tmp_amine4):
         if id_ not in bonder_ids
     ]
     coords = tmp_amine4.get_position_matrix()
-    coords[bonder_ids[0]] = [0, -1, 0]
-    coords[bonder_ids[1]] = [-400, 0, 0]
-    coords[bonder_ids[2]] = [0, 1, 1]
-    coords[bonder_ids[3]] = [0, 1, -1]
+    coords[bonder_ids[0]] = [1, 1, 0]
+    coords[bonder_ids[1]] = [0, 0, 0.5]
+    coords[bonder_ids[2]] = [0, 0, -0.5]
+    coords[bonder_ids[3]] = [1, -1, 0]
     # Set the centroid of the molecule so that the plane normal
     # has a positive direction.
     coords[other_ids, 0] = 10
     coords[other_ids, 1] = 10
     tmp_amine4.set_position_matrix(coords)
     assert np.allclose(
-        a=tmp_amine4.get_bonder_plane_normal(fg_ids=[0, 2, 3]),
-        b=[1, 0, 0],
-        atol=1e-6
-    )
-
-    # When using all fgs the plane should be at a 90 degree rotation.
-    assert np.allclose(
         a=tmp_amine4.get_bonder_plane_normal(),
-        b=[0, 1, 0],
+        b=[0, 0, 1],
         atol=1e-6
     )
 
@@ -812,21 +805,37 @@ def test_get_bonder_direction_vectors(tmp_amine4):
     assert i == 0
 
 
-def test_get_centroid_centroid_direction_vector(amine4):
-    c1 = amine4.get_centroid(atom_ids=amine4.get_bonder_ids())
-    c2 = amine4.get_centroid()
+def test_get_centroid_centroid_direction_vector(tmp_amine4):
+    bonder_ids = list(tmp_amine4.get_bonder_ids())
+    other_ids = [
+        id_ for id_ in range(len(tmp_amine4.atoms))
+        if id_ not in bonder_ids
+    ]
+    coords = tmp_amine4.get_position_matrix()
+    for bonder_id in bonder_ids:
+        coords[bonder_id] = [10, 0, 0]
+
+    coords[other_ids] = np.zeros((len(other_ids), 3))
+    tmp_amine4.set_position_matrix(coords)
+
     assert np.allclose(
-        a=stk.normalize_vector(c2-c1),
-        b=amine4.get_centroid_centroid_direction_vector(),
+        a=tmp_amine4.get_centroid_centroid_direction_vector(),
+        b=[-1, 0, 0],
         atol=1e-8
     )
 
     # Test explicitly setting the fg_ids.
     fg_ids = [0, 2]
-    c1 = amine4.get_centroid(atom_ids=amine4.get_bonder_ids(fg_ids))
+    for bonder_id in tmp_amine4.get_bonder_ids(fg_ids=fg_ids):
+        coords[bonder_id] = [-100, 0, 0]
+    tmp_amine4.set_position_matrix(coords)
+
+    dir_vector = tmp_amine4.get_centroid_centroid_direction_vector(
+        fg_ids=fg_ids
+    )
     assert np.allclose(
-        a=stk.normalize_vector(c2-c1),
-        b=amine4.get_centroid_centroid_direction_vector(fg_ids=fg_ids),
+        a=dir_vector,
+        b=[1, 0, 0],
         atol=1e-8
     )
 

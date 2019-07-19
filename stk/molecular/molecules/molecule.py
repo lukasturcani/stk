@@ -208,8 +208,8 @@ class Molecule(metaclass=_Cached):
         """
 
         self._position_matrix = (
-            self._position_matrix + displacement[:, np.newaxis]
-        )
+            self._position_matrix.T + displacement
+        ).T
         return self
 
     def apply_rotation_about_axis(self, theta, axis, origin):
@@ -664,7 +664,7 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        self._position_matrix = position_matrix.T
+        self._position_matrix = np.array(position_matrix.T)
         return self
 
     def dump(self, path, include_attrs=None):
