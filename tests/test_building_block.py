@@ -2,6 +2,8 @@ import os
 import numpy as np
 import stk
 import itertools as it
+from collections import Counter
+
 
 if not os.path.exists('building_block_tests_output'):
     os.mkdir('building_block_tests_output')
@@ -17,6 +19,33 @@ def test_init_from_random_file():
 
 def test_init_from_smiles():
     mol0 = stk.BuildingBlock.init_from_smiles('NCCCN', ['amine'])
+    # Test that all values are initialized correctly.
+    assert len(mol0.func_groups) == 2
+    assert len(mol0.func_group_infos) == 1
+    assert len(mol0.atoms) == 15
+    assert len(mol0.bonds) == 14
+
+    atom_count = {
+        (stk.H, 0): 10,
+        (stk.N, 0): 2,
+        (stk.C, 0): 3
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol0.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol0.bonds
+    )
+
+    # Test that caching is working properly.
     mol1 = stk.BuildingBlock.init_from_smiles('NCCCN', ['amine'])
     assert mol0 is not mol1
 
@@ -39,6 +68,73 @@ def test_init_from_smiles():
         use_cache=True
     )
     assert mol3 is not mol4
+
+    # Make sure that charged molecules are handled correctly.
+    mol5 = stk.BuildingBlock.init_from_smiles(
+        smiles='NC[C-]CN',
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol5 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol5.func_groups) == 2
+    assert len(mol5.func_group_infos) == 1
+    assert len(mol5.atoms) == 14
+    assert len(mol5.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 2,
+        (stk.C, -1): 1,
+        (stk.N, 0): 2,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol5.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 4,
+        frozenset({stk.H, stk.C}): 5
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol5.bonds
+    )
+
+    mol6 = stk.BuildingBlock.init_from_smiles(
+        smiles='[N-]CCCN',
+        functional_groups=['amine'],
+        use_cache=True
+    )
+    assert mol6 is not mol5 and mol6 is not mol0
+    # Test that all values are initialized correctly.
+    assert len(mol6.func_groups) == 1
+    assert len(mol6.func_group_infos) == 1
+    assert len(mol6.atoms) == 14
+    assert len(mol6.bonds) == 13
+
+    atom_count = {
+        (stk.C, 0): 3,
+        (stk.N, 0): 1,
+        (stk.N, -1): 1,
+        (stk.H, 0): 9,
+    }
+    assert atom_count == Counter(
+        (a.__class__, a.charge) for a in mol6.atoms
+    )
+
+    expected_bonds = {
+        frozenset({stk.N, stk.C}): 2,
+        frozenset({stk.C}): 2,
+        frozenset({stk.H, stk.N}): 3,
+        frozenset({stk.H, stk.C}): 6
+    }
+    assert expected_bonds == Counter(
+        frozenset({b.atom1.__class__, b.atom2.__class__})
+        for b in mol6.bonds
+    )
 
 
 def test_get_bonder_ids(aldehyde3):
@@ -202,12 +298,21 @@ def test_get_bonder_direction_vectors(tmp_amine4):
     assert i == 0
 
 
-def test_get_centroid_centroid_direction_vector(aldehyde3):
-    c1 = aldehyde3.get_centroid(atom_ids=aldehyde3.get_bonder_ids())
-    c2 = aldehyde3.get_centroid()
+def test_get_centroid_centroid_direction_vector(amine4):
+    c1 = amine4.get_centroid(atom_ids=amine4.get_bonder_ids())
+    c2 = amine4.get_centroid()
     assert np.allclose(
         a=stk.normalize_vector(c2-c1),
-        b=aldehyde3.get_centroid_centroid_direction_vector(),
+        b=amine4.get_centroid_centroid_direction_vector(),
+        atol=1e-8
+    )
+
+    # Test explicitly setting the fg_ids.
+    fg_ids = [0, 2]
+    c1 = amine4.get_centroid(atom_ids=amine4.get_bonder_ids(fg_ids))
+    assert np.allclose(
+        a=stk.normalize_vbector(c2-c2),
+        b=amine4.get_centroid_centroid_direction_vector(fg_ids=fg_ids),
         atol=1e-8
     )
 
@@ -249,8 +354,8 @@ def test_dump_and_load(tmp_amine2):
     assert tmp_amine2.test_attr2 == mol2.test_attr2
     assert tmp_amine2.test_attr3 == mol2.test_attr3
     assert not hasattr(mol2, 'test_attr4')
-    assert vars(tmp_amine2.atoms[0]) == vars(mol2.atoms[0])
-    assert vars(tmp_amine2.atoms[1]) == vars(mol2.atoms[1])
+    for a1, a2 in zip(tmp_amine2.atoms, mol2.atoms):
+        assert vars(a1) == vars(a2)
 
     mol3 = stk.Molecule.load(path, use_cache=True)
     assert mol3 is not mol2
