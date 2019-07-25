@@ -834,7 +834,7 @@ class Molecule(metaclass=_Cached):
         mol.AddConformer(rdkit_conf)
         return mol
 
-    def to_dict(self, include_attrs):
+    def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """
         Return a :class:`dict` representation of the molecule.
 
@@ -847,6 +847,10 @@ class Molecule(metaclass=_Cached):
             The names of additional attributes of the molecule to be
             added to the :class:`dict`. Each attribute is saved as a
             string using :func:`repr`.
+
+        ignore_missing_attrs : :class:`bool`, optional
+            If ``False`` and an attribute in `include_attrs` is not
+            held by the :class:`Molecule`, an error will be raised.
 
         Raises
         ------
