@@ -50,9 +50,9 @@ from functools import partial
 import numpy as np
 from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
-import rdkit.Geometry.rdGeometry as rdkit_geo
 from collections import Counter
-from ..utilities import AtomicPeriodicBond, flatten
+
+from .molecule.elements import Bond, PeriodicBond
 
 
 class ReactionKey:
@@ -242,6 +242,7 @@ class FunctionalGroup:
 
     Methods
     -------
+    :meth:`clone`
     :meth:`get_atom_ids`
     :meth:`get_bonder_ids`
     :meth:`get_deleter_ids`
@@ -286,116 +287,36 @@ class FunctionalGroup:
         else:
             self.info = info
 
-    def shifted_fg(self, id, shift):
+    def clone(self, atom_map=None):
         """
         Create a new :class:`FunctionalGroup` with shifted ids.
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the new functional group.
-
-        shift : :class:`int`
-            The number to shift the atom ids by.
+        atom_map : :class:`dict`, optional
+            If the clone should hold different :class:`.Atom`
+            instances, then a :class:`dict` should be provided which
+            maps atoms in the current :class:`.FunctionalGroup` to the
+            atoms which should be used in the clone. Only atoms which
+            need to be remapped need to be present in the `atom_map`.
 
         Returns
         -------
         :class:`FunctionalGroup`
-            A :class:`FunctionalGroup` with all the atom ids atoms
-            shifted upward by `shift`.
+            A clone.
 
         """
 
-        atom_ids = tuple(id + shift for id in self.atom_ids)
-        bonder_ids = tuple(id + shift for id in self.bonder_ids)
-        deleter_ids = tuple(id + shift for id in self.deleter_ids)
+        if atom_map is None:
+            atom_map = {}
 
         return self.__class__(
-            id=id,
-            atom_ids=atom_ids,
-            bonder_ids=bonder_ids,
-            deleter_ids=deleter_ids,
+            id=self.id,
+            atoms=tuple(atom_map.get(a, a) for a in self.atoms),
+            bonders=tuple(atom_map.get(a, a) for a in self.bonders),
+            deleters=tuple(atom_map.get(a, a)for a in self.deleters),
             info=self.info
         )
-
-    def remove_deleters(self, deleters):
-        """
-        Update and remove atom ids based on `deleters`.
-
-        For each deleter atom that is smaller than an atom id, the
-        atom id is decreased by 1. If the atom id is equal to a
-        `deleters` atom id, it is removed.
-
-        Parameters
-        ----------
-        deleters : :class:`list` of :class:`int`
-            Ids of atoms which are being removed from the molecule.
-            Must be sorted in ascending order.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self.atom_ids = self._remove_deleters(self.atom_ids,
-                                              deleters)
-
-        self.bonder_ids = self._remove_deleters(self.bonder_ids,
-                                                deleters)
-
-        self.deleter_ids = self._remove_deleters(self.deleter_ids,
-                                                 deleters)
-
-    def _remove_deleters(self, atom_ids, deleters):
-        """
-        Update and remove atom ids based on `deleters`.
-
-        For each deleter atom that is smaller than an atom id, the
-        atom id is decreased by 1. If the atom id is equal to a
-        `deleters` atom id, it is removed.
-
-        Parameters
-        ----------
-        atom_ids : :class:`tuple` of :class:`int`
-            The atom ids which need to be updated.
-
-        deleters : :class:`list` of :class:`int`
-            The ids of atoms which are being removed. Must be sorted in
-            ascending order.
-
-        Returns
-        -------
-        :class:`tuple` of :class:`int`
-            The atom ids in `atom_ids` after the update.
-
-        """
-
-        # Map each atom id to the number of smaller deleter ids.
-        # If the atom id is to be deleted, map to None.
-        id_changes = {atom_id: 0 for atom_id in atom_ids}
-
-        for atom_id in atom_ids:
-            for deleter in deleters:
-                if atom_id > deleter:
-                    id_changes[atom_id] += 1
-                elif atom_id == deleter:
-                    id_changes[atom_id] = None
-                # Because the deleters are sorted, there will be no
-                # more deleters which are smaller than atom_id.
-                if atom_id < deleter:
-                    break
-
-        # Apply the id changes to the original atom ids.
-        new_atom_ids = []
-        for atom_id in atom_ids:
-            change = id_changes[atom_id]
-            if change is None:
-                continue
-            else:
-                new_atom_ids.append(atom_id - change)
-
-        return tuple(new_atom_ids)
 
     def __repr__(self):
         return (
@@ -414,80 +335,47 @@ class Reactor:
     """
     Performs reactions between functional groups of a molecule.
 
-    This class is responsible for reacting the functional groups in a
-    molecule during construction. First, an instance of this class is
-    initialized with a :class:`rdkit.Mol`. This is the molecule which
-    is going to have atom and bonds added and removed.
+    The :class:`Reactor` is initialized with the
+    :class:`.ConstructedMolecule` instance on which it will perform
+    reactions.
 
     .. code-block:: python
 
-        mol = rdkit.MolFromMolFile(...)
         reactor = Reactor(mol)
 
-    We force the molecule to have atoms and bonds add or removed
-    between certain functional groups by using the :meth:`react`
-    method.
+    The :class:`Reactor` registers which functional groups need to have
+    reactions performed with :meth:`add_reaction`
 
     .. code-block:: python
 
-        # Represents a functional group found in mol.
-        fg1 = FunctionalGroup(id=0,
-                              atom_ids=[1, 34, 3],
-                              bonder_ids=[1],
-                              deleter_ids=[34, 3],
-                              info=FGInfo('amine')
-        )
+        fg1, fg2, fg3, fg4, fg5, fg6, fg7 = mol.func_groups
 
-        # Represents another functional group found in mol.
-        fg2 = FunctionalGroup(id=1,
-                              atom_ids=[10, 2, 12],
-                              bonder_ids=[12],
-                              deleter_ids=[2, 10],
-                              info=FGInfo('aldehyde')
-        )
+        # Register a reaction between the atoms in fg1 and fg2.
+        reactor.add_reaction(fg1, fg2)
 
-        # Carry out a reaction between the atoms in fg1 and fg2.
-        reactor.react(fg1, fg2)
-
-        # Lets assume there a further functional groups in mol that
-        # we wish to react.
-        fg3 = FunctionalGroup(...)
-        fg4 = FunctionalGroup(...)
-        fg5 = FunctionalGroup(...)
-        fg6 = FunctionalGroup(...)
-        fg7 = FunctionalGroup(...)
-
-        reactor.react(fg3, fg4)
+        # Register a reaction between atoms in fg3 and fg4.
+        reactor.add_reaction(fg3, fg4)
 
         # Some reactions can take multiple functional groups.
         # You can put in as many functional groups as you like, given
         # an appropriate reaction is defined.
-        reactor.react(fg5, fg6, fg7)
+        reactor.add_reaction(fg5, fg6, fg7)
 
-    Once we are done carrying out reactions on the molecule we can
-    get the resulting molecule.
+    Once all the reactions have been registered, they are perfomed
+    in a single step
 
     .. code-block:: python
 
-        # product is an rdkit molecule, with the earlier reactions
-        # carried out and all deleter atoms removed.
-        product = reactor.result(del_atoms=True)
-
-    Note that after :meth:`result` is run, all :class:`FunctionalGroup`
-    instances which were passed to :meth:`react` have their atom ids
-    updated to account for any atoms which have been deleted. If
-    there are functional groups which were not reacted, but have
-    atom ids which should be updated, they should be added to
-    :attr:`func_groups`.
+        bonds_made = reactor.finalize()
 
     An obvious question given this tutorial, is what reaction does
     :meth:`react` carry out? This is documented by :meth:`react`.
-    However, react in most cases, will carry out a default reaction,
-    which adds a bond between the bonder atoms of two functional
-    groups. The bond order of the added bond is single by default but
-    can be modified by editing :attr:`bond_orders`. Here you will
-    specify the :class:`ReactionKey` for a reaction and what bond order
-    you want that reaction to use.
+    However, :meth:`react` in most cases, will carry out a default
+    reaction, which adds a bond between the bonder atoms of two
+    functional groups. The bond order of the added bond is single by
+    default but can be modified by editing :attr:`_bond_orders`. Here
+    you will specify the :class:`ReactionKey` for a reaction and what
+    bond order you want that reaction to use.
 
     For some reactions you may wish to forgo the default reaction and
     do something more complex. This is neccessary because some
@@ -502,145 +390,85 @@ class Reactor:
     The method will need take some :class:`FunctionalGroup` instances
     as arguments. These are the functional groups which react. Within
     the method itself, the attribute :attr:`bonds_made` must be
-    incremented by the number of bonds added by the reaction. Beyond
-    that, the method should operate :attr:`emol` and add and remove
-    bonds from it as necessary. If the method adds atoms to
-    :attr:`emol` it should update :attr:`new_atom_coords`.
+    incremented by the number of bonds added by the reaction.
 
-    Once the method is defined, :attr:`custom_reactions` needs to
+    Once the method is defined, :attr:`_custom_reactions` needs to
     be updated.
 
     Attributes
     ----------
-    bond_orders : :class:`dict`
+    _bond_orders : :class:`dict`
         When the default reaction is performed by :meth:`react`,
         if the bond added between the two functional groups is not
         single, the desired bond order should be placed in this
         dictionary. The dictionary maps the reaction's
         :class:`ReactionKey` to the desired bond order.
 
-    custom_reactions : :class:`dict`
+    _custom_reactions : :class:`dict`
         Maps a :class:`ReactionKey` for a given reaction to a custom
         method which carries out the reaction. This means that
         :meth:`react` will use that method for carrying out that
         reaction instead.
 
-    periodic_custom_reactions : :class:`dict`
+    _periodic_custom_reactions : :class:`dict`
         Maps a :class:`ReactionKey` for a given reaction to a custom
         method which carries out the reaction. This means that
         :meth:`periodic_react` will use that method for carrying out
         that reaction instead.
 
-    mol : :class:`rdkit.Mol`
-        The molecule on which the reactor adds and removes atoms and
-        bonds.
-
-    emol : :class:`rdkit.EditableMol`
-        An editable version of :attr:`mol`. Used for adding and
-        removing atoms and bonds.
-
-    periodic_bonds : :class:`list` of :class:`.AtomicPeriodicBond`
-        The periodic bonds added by the reactor.
+    _mol : :class:`.ConstructedMolecule`
+        The molecule from which the :class:`Reactor` adds and removes
+        atoms and bonds.
 
     bonds_made : :class:`int`
         The number of bonds added.
 
-    new_atom_coords : :class:`list` of :class:`tuple`
-        When a new atom is added by the reactor, its desired
-        desired coordinates are placed here. The :class:`list`
-        has the form
+    _deleter_atoms : :class:`set` of :class:`int`
+        The atoms which are to be removed.
 
-        .. code-block:: python
+    _deleter_bonds : :class:`set` of :class:`int`
+        The bonds which are to be removed.
 
-            new_atom_coords = [
-                (32, np.array([12.1, 3.5, 0.1])),
-                (41, np.array([13.1, -42.1, 2.]))
-            ]
-
-        where the first element of each tuple is the atom id of a
-        newly added atom and the second element is a
-        :class:`numpy.ndarray` holding its desired coordinate.
-
-    deleters : :class:`list` of :class:`int`
-        The ids of atoms which are to be removed.
-
-    func_groups : :class:`list` of :class:`FunctionalGroup`
+    _func_groups : :class:`list` of :class:`.FunctionalGroup`
         The functional groups which the reactor keeps up to date.
+
+    Methods
+    -------
+    :meth:`__init__`
+    :meth:`add_reaction`
+    :meth:`add_periodic_reaction`
+    :meth:`finalize`
 
     """
 
-    double = rdkit.rdchem.BondType.DOUBLE
-    triple = rdkit.rdchem.BondType.TRIPLE
     bond_orders = {
-        ReactionKey('amine', 'aldehyde'): double,
-        ReactionKey('amide', 'aldehyde'): double,
-        ReactionKey('nitrile', 'aldehyde'): double,
-        ReactionKey('amide', 'amine'): double,
-        ReactionKey('terminal_alkene', 'terminal_alkene'): double,
-        ReactionKey('alkyne2', 'alkyne2'): triple
+        ReactionKey('amine', 'aldehyde'): 2,
+        ReactionKey('amide', 'aldehyde'): 2,
+        ReactionKey('nitrile', 'aldehyde'): 2,
+        ReactionKey('amide', 'amine'): 2,
+        ReactionKey('terminal_alkene', 'terminal_alkene'): 2,
+        ReactionKey('alkyne2', 'alkyne2'): 3
     }
 
-    def __init__(self, mol=None):
+    def __init__(self, mol):
         """
         Initialize a :class:`Reactor`.
 
         Parameters
         ----------
-        mol : :class:`rdkit.Mol`, optional
+        mol : :class:`.ConstructedMolecule
             The molecule on which the reactor adds and removes atoms
             and bonds.
 
         """
 
-        self.custom_reactions = {
-
-            ReactionKey('boronic_acid', 'diol'):
-                self.boronic_acid_with_diol,
-
-            ReactionKey('diol', 'difluorene'):
-                partial(self.diol_with_dihalogen,
-                        dihalogen='difluorene'),
-
-            ReactionKey('diol', 'dibromine'):
-                partial(self.diol_with_dihalogen,
-                        dihalogen='dibromine'),
-
-            ReactionKey('ring_amine', 'ring_amine'):
-                self.ring_amine_with_ring_amine
-
-        }
-
-        self.periodic_custom_reactions = {}
-
-        if mol is not None:
-            self.set_molecule(mol)
-
-        self.periodic_bonds = []
         self.bonds_made = 0
-        self.new_atom_coords = []
-        self.deleters = []
-        self.func_groups = []
+        self._mol = mol
+        self._deleter_atoms = set()
+        self._deleter_bonds = set()
+        self._func_groups = []
 
-    def set_molecule(self, mol):
-        """
-        Update :attr:`mol` and :attr:`emol`.
-
-        Parameters
-        ----------
-        mol : :class:`rdkit.Mol`, optional
-            The molecule on which the reactor adds and removes atoms
-            and bonds.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self.mol = mol
-        self.emol = rdkit.EditableMol(mol)
-
-    def react(self, *fgs, track_fgs=True):
+    def add_reaction(self, *fgs):
         """
         Creates bonds between functional groups.
 
@@ -648,21 +476,17 @@ class Reactor:
         the `*fgs` argument and checks which functional groups are
         involved in the reaction. If the functional groups are handled
         by one of the custom reactions specified in
-        :attr:`custom_reactions` then that function is executed.
+        :attr:`_custom_reactions` then that function is executed.
 
         In all other cases the function is assumed to have received two
         functional groups to react. In these functional groups, the
         bonder atoms have a bond added. The bond is single,
-        unless otherwise specified in :attr:`bond_orders`.
+        unless otherwise specified in :attr:`_bond_orders`.
 
         Parameters
         ----------
         *fgs : :class:`FunctionalGroup`
             The functional groups to react.
-
-        track_fgs : :class:`bool`, optional
-            Toggles if functional groups are added to
-            :attr:`func_groups`.
 
         Returns
         -------
@@ -670,42 +494,36 @@ class Reactor:
 
         """
 
-        self.deleters.extend(flatten(fg.deleter_ids for fg in fgs))
-        if track_fgs:
-            self.func_groups.extend(fgs)
+        self._deleter_atoms.update(
+            atom for fg in fgs for atom in fg.deleter_atoms
+        )
 
         names = (fg.info.name for fg in fgs)
         reaction_key = ReactionKey(*names)
-        if reaction_key in self.custom_reactions:
-            return self.custom_reactions[reaction_key](*fgs)
+        if reaction_key in self._custom_reactions:
+            return self._custom_reactions[reaction_key](*fgs)
 
-        bond = self.bond_orders.get(reaction_key,
-                                    rdkit.rdchem.BondType.SINGLE)
+        bond = self._bond_orders.get(reaction_key, 1)
         fg1, fg2 = fgs
-        self.emol.AddBond(fg1.bonder_ids[0], fg2.bonder_ids[0], bond)
+        self.mol.bonds.append(
+            Bond(fg1.bonders[0], fg2.bonders[0], bond)
+        )
         self.bonds_made += 1
 
-    def periodic_react(self, direction, *fgs, track_fgs=True):
+    def add_periodic_reaction(self, direction, *fgs):
         """
-        Like :func:`react` but returns periodic bonds.
-
-        As periodic bonds are returned, no bonds are added to
-        :attr:`emol`.
+        Like :func:`add_reaction` but adds :class:`.PeriodicBond`.
 
         Parameters
         ----------
         direction : :class:`list` of :class:`int`
-            A 3 member list describing the axes along which the created
-            bonds are periodic. For example, ``[1, 0, 0]`` means that
-            the bonds are periodic along the x axis in the positive
-            direction.
+            A 3 member :class:`list` describing the axes along which
+            the created bonds are periodic. For example, ``[1, 0, 0]``
+            means that he bonds are periodic along the x axis in the
+            positive direction.
 
         *fgs : :class:`FunctionalGroup`
             The functional groups to react.
-
-        track_fgs : :class:`bool`, optional
-            Toggles if functional groups are added to
-            :attr:`func_groups`.
 
         Returns
         -------
@@ -713,9 +531,9 @@ class Reactor:
 
         """
 
-        self.deleters.extend(flatten(fg.deleter_ids for fg in fgs))
-        if track_fgs:
-            self.func_groups.extend(fgs)
+        self._deleter_atoms.update(
+            atom for fg in fgs for atom in fg.deleter_atoms
+        )
 
         names = (fg.info.name for fg in fgs)
         reaction_key = ReactionKey(*names)
@@ -723,64 +541,37 @@ class Reactor:
             rxn_fn = self.periodic_custom_reactions[reaction_key]
             return rxn_fn(direction, *fgs)
 
-        bond = self.bond_orders.get(reaction_key,
-                                    rdkit.rdchem.BondType.SINGLE)
+        bond = self.bond_orders.get(reaction_key, 1)
 
         # Make sure the direction of the periodic bond is maintained.
         fg1, fg2 = fgs
-        self.periodic_bonds.append(
-            AtomicPeriodicBond(fg1.bonder_ids[0],
-                               fg2.bonder_ids[0],
-                               bond,
-                               direction)
+        self.mol.bonds.append(
+            PeriodicBond(
+                atom1=fg1.bonders[0],
+                atom2=fg2.bonders[0],
+                order=bond,
+                direction=direction
+            )
         )
         self.bonds_made += 1
 
-    def result(self, del_atoms):
+    def finalize(self):
         """
-        Creates the molecule after all reactions have been done.
-
-        This method will also update all the functional groups
-        passed with :meth:`react` calls. It will update the atom
-        ids to account for the fact that atoms have been deleted.
-
-        Parameters
-        ----------
-        del_atoms : :class:`bool`
-            Toggles if deleter atoms should be removed from the
-            product molecule.
+        Finish performing reactions.
 
         Returns
         -------
-        :class:`rdkit.Mol`
-            The product molecule.
+        :class:`int`
+            The number of bonds added.
 
         """
 
-        # If new atoms were added, update the positions in the
-        # conformer.
-        if self.new_atom_coords:
-            self.mol = self.emol.GetMol()
-            conf = self.mol.GetConformer()
-            for atom_id, coord in self.new_atom_coords:
-                point3d = rdkit_geo.Point3D(*coord)
-                conf.SetAtomPosition(atom_id, point3d)
-            self.emol = rdkit.EditableMol(self.mol)
+        self.mol.atoms = [
+            atom for atom in self.mol.atoms
+            if atom not in self._deleter_atoms
+        ]
 
-        if del_atoms:
-            # Needs to be sorted for fg.remove_deleters.
-            deleters = sorted(self.deleters)
-
-            # Go in reverse order else atom ids change during loop.
-            for atom_id in reversed(deleters):
-                self.emol.RemoveAtom(atom_id)
-
-            # Update all the functional groups to account for the fact
-            # that atoms have been removed.
-            for fg in self.func_groups:
-                fg.remove_deleters(deleters)
-
-        return self.emol.GetMol()
+        return self.bonds_made
 
     def diol_with_dihalogen(self, fg1, fg2, dihalogen):
         """
@@ -795,8 +586,8 @@ class Reactor:
             A functional group which undergoes the reaction.
 
         halogen : :class:`str`
-            The name of the dihalogen functional group to use. For example,
-            ``'dibromine'`` or ``'difluorene'``.
+            The name of the dihalogen functional group to use. For
+            example, ``'dibromine'`` or ``'difluorene'``.
 
         Returns
         -------
@@ -949,6 +740,24 @@ class Reactor:
         self.emol.AddBond(nc_joiner2, nc2h2, single)
 
         self.bonds_made += 6
+
+    _custom_reactions = {
+
+        ReactionKey('boronic_acid', 'diol'):
+            boronic_acid_with_diol,
+
+        ReactionKey('diol', 'difluorene'):
+            partial(diol_with_dihalogen, dihalogen='difluorene'),
+
+        ReactionKey('diol', 'dibromine'):
+            partial(diol_with_dihalogen, dihalogen='dibromine'),
+
+        ReactionKey('ring_amine', 'ring_amine'):
+            ring_amine_with_ring_amine
+
+    }
+
+    _periodic_custom_reactions = {}
 
 
 functional_groups = (

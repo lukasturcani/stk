@@ -360,7 +360,7 @@ class Linear(TopologyGraph):
 
         """
 
-        raise NotImplementedError()
+        raise NotImplementedError('TODO')
 
     def _get_scale(self, mol):
         """

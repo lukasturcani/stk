@@ -461,7 +461,7 @@ class TopologyGraph:
         reactor = Reactor(mol)
         for fgs in self._get_bonded_fgs(mol, edge_clones):
             reactor.add_reaction(*fgs)
-        mol.bonds_made = reactor.react()
+        mol.bonds_made = reactor.finalize()
 
         self._clean_up(mol)
 
@@ -636,11 +636,18 @@ class TopologyGraph:
                 coords = clone.place_building_block(bb)
                 mol._position_matrix.extend(coords)
 
+                atom_map = {}
                 for atom in bb.atoms:
                     atom_clone = atom.clone()
+                    atom_clone.id = len(mol.atoms)
+                    atom_map[atom] = atom_clone
                     atom_clone.building_block = bb
                     atom_clone.building_block_id = counter[bb]
                     mol.atoms.append(atom_clone)
+
+                mol.func_groups.extend(
+                    fg.clone(atom_map) for fg in bb.func_groups
+                )
 
                 mol.bonds.extend(b.clone() for b in bb.bonds)
                 counter.update(bb)
@@ -654,6 +661,8 @@ class TopologyGraph:
 
     def _clean_up(self, mol):
         mol._position_matrix = mol._position_matrix.T
+        for i, atom in enumerate(self.atoms):
+            atom.id = i
 
     def __str__(self):
         return repr(self)
