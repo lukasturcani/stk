@@ -505,7 +505,7 @@ class Reactor:
 
         bond = self._bond_orders.get(reaction_key, 1)
         fg1, fg2 = fgs
-        self.mol.bonds.append(
+        self._mol.bonds.append(
             Bond(fg1.bonders[0], fg2.bonders[0], bond)
         )
         self.bonds_made += 1
@@ -545,7 +545,7 @@ class Reactor:
 
         # Make sure the direction of the periodic bond is maintained.
         fg1, fg2 = fgs
-        self.mol.bonds.append(
+        self._mol.bonds.append(
             PeriodicBond(
                 atom1=fg1.bonders[0],
                 atom2=fg2.bonders[0],
@@ -566,14 +566,14 @@ class Reactor:
 
         """
 
-        self.mol.atoms = [
-            atom for atom in self.mol.atoms
+        self._mol.atoms = [
+            atom for atom in self._mol.atoms
             if atom not in self._deleter_atoms
         ]
 
         return self.bonds_made
 
-    def diol_with_dihalogen(self, fg1, fg2, dihalogen):
+    def _diol_with_dihalogen(self, fg1, fg2, dihalogen):
         """
         Creates bonds between functional groups.
 
@@ -595,18 +595,13 @@ class Reactor:
 
         """
 
-        conf = self.mol.GetConformer()
-        bond = rdkit.rdchem.BondType.SINGLE
-
         diol = fg1 if fg1.info.name == 'diol' else fg2
         dihalogen = fg2 if diol is fg1 else fg1
 
         distances = []
-        for carbon in dihalogen.bonder_ids:
-            c_coord = np.array([*conf.GetAtomPosition(carbon)])
-            for oxygen in diol.bonder_ids:
-                o_coord = np.array([*conf.GetAtomPosition(oxygen)])
-                d = euclidean(c_coord, o_coord)
+        for carbon in dihalogen.get_bonder_ids():
+            for oxygen in diol.get_bonder_ids():
+                d = self._mol.get_atom_distance(carbon, oxygen)
                 distances.append((d, carbon, oxygen))
         distances.sort()
 
@@ -620,11 +615,11 @@ class Reactor:
 
         (c1, o1), (c2, o2), *_ = deduped_pairs
         assert c1 != c2 and o1 != o2
-        self.emol.AddBond(c1, o1, bond)
-        self.emol.AddBond(c2, o2, bond)
+        self._mol.bonds.append(Bond(c1, o1, 1))
+        self._mol.bonds.append(Bond(c2, o2, 1))
         self.bonds_made += 2
 
-    def boronic_acid_with_diol(self, fg1, fg2):
+    def _boronic_acid_with_diol(self, fg1, fg2):
         """
         Creates bonds between functional groups.
 
@@ -652,7 +647,7 @@ class Reactor:
         self.emol.AddBond(boron_atom, diol.bonder_ids[1], bond)
         self.bonds_made += 2
 
-    def ring_amine_with_ring_amine(self, fg1, fg2):
+    def _ring_amine_with_ring_amine(self, fg1, fg2):
         """
         Creates bonds between functional groups.
 
@@ -670,15 +665,23 @@ class Reactor:
 
         """
 
-        c1 = next(a for a in fg1.bonder_ids
-                  if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 6)
-        n1 = next(a for a in fg1.bonder_ids
-                  if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 7)
+        c1 = next(
+            a for a in fg1.bonder_ids
+            if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 6
+        )
+        n1 = next(
+            a for a in fg1.bonder_ids
+            if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 7
+        )
 
-        c2 = next(a for a in fg2.bonder_ids
-                  if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 6)
-        n2 = next(a for a in fg2.bonder_ids
-                  if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 7)
+        c2 = next(
+            a for a in fg2.bonder_ids
+            if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 6
+        )
+        n2 = next(
+            a for a in fg2.bonder_ids
+            if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 7
+        )
 
         conf = self.mol.GetConformer()
         n1_pos = np.array([*conf.GetAtomPosition(n1)])
