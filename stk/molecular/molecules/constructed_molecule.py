@@ -60,16 +60,16 @@ class ConstructedMolecule(Molecule):
         will have a :attr:`building_block_id` of either
         ``0``or ``1``.
 
-    bb_map : :class:`dict`
-        Maps the building blocks used for construction, which can be
-        either :class:`.BuildingBlock` or
+    building_block_vertices : :class:`dict`
+        Maps the :class:`.Molecule` instances used for construction,
+        which can be either :class:`.BuildingBlock` or
         :class:`.ConstructedMolecule`, to the
         :class:`~.topologies.base.Vertex` objects they are placed on
         during construction. The :class:`dict` has the form
 
         .. code-block:: python
 
-            bb_map = {
+            building_block_vertices = {
                 BuildingBlock(...): [Vertex(...), Vertex(...)],
                 BuildingBlock(...): [
                     Vertex(...),
@@ -83,7 +83,7 @@ class ConstructedMolecule(Molecule):
         can be mapped to multiple :class:`~.topologies.base.Vertex`
         objects.
 
-    bb_counter : :class:`collections.Counter`
+    building_block_counter : :class:`collections.Counter`
         A counter keeping track of how many times each building block
         molecule appears in the :class:`ConstructedMolecule`.
 
@@ -115,7 +115,7 @@ class ConstructedMolecule(Molecule):
         self,
         building_blocks,
         topology_graph,
-        bb_map=None,
+        building_block_vertices=None,
         use_cache=False
     ):
         """
@@ -123,7 +123,7 @@ class ConstructedMolecule(Molecule):
 
         Parameters
         ---------
-        building_blocks : :class:`list` of :class:`.BuildingBlock`
+        building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
             represent the building block molecules used for
@@ -135,25 +135,16 @@ class ConstructedMolecule(Molecule):
             Defines the topology graph of the
             :class:`ConstructedMolecule` and constructs it.
 
-        bb_map : :class:`dict`, optional
-            Maps each building block molecule in `building_blocks`
-            to the :class:`~.topologies.base.Vertex` objects it is
-            placed on during construction.
-            :class:`~.topologies.base.Vertex` objects are held in
-            :attr:`.TopologyGraph.vertices`.
-
-            .. code-block:: python
-
-                bb1 = BuildingBlock(...)
-                bb2 = BuildingBlock(...)
-                bb3 = ConstructedMolecule(...)
-                # Use some real TopologyGraph child class here.
-                topology_graph = TopologyGraphChildClass(...)
-                bb_map = {
-                    bb1: topology_graph.vertices[0:2],
-                    bb2: topology_graph.vertices[2:3],
-                    bb3: topology_graph.vertices[3:]
-                }
+        building_block_vertices : :class:`dict`, optional
+            Maps the :class:`.Molecule` in  `building_blocks` to the
+            :class:`~.topologies.base.Vertex` in `topology_graph`.
+            Each :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` can be mapped to multiple
+            :class:`~.topologies.base.Vertex` objects. See the
+            examples section in the :class:`.ConstructedMolecule`
+            class docstring to help understand how this parameter
+            is used. If ``None``, building block molecules will be
+            assigned to vertices at random.
 
         use_cache : :class:`bool`, optional
             If ``True``, a new :class:`.ConstructedMolecule` will
@@ -164,10 +155,10 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        if bb_map is None:
-            raise NotImplementedError()
-
-        self.bb_map = bb_map
+        # If building_block_vertices is "None" then
+        # topology_graph.construct() is responsible for creating the
+        # dict.
+        self.building_block_vertices = building_block_vertices
         self.topology_graph = topology_graph
         self.atoms = []
         self.bonds = []
@@ -209,7 +200,7 @@ class ConstructedMolecule(Molecule):
         for id_, func_group in enumerate(self.func_groups):
             func_group.id = id_
 
-    def to_dict(self, include_attrs=None):
+    def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """
         Return a :class:`dict` representation of the molecule.
 
@@ -218,44 +209,41 @@ class ConstructedMolecule(Molecule):
         include_attrs : :class:`list` of :class:`str`, optional
             The names of additional attributes of the molecule to be
             added to the :class:`dict`. Each attribute is saved as a
-            string using :func:`repr`.
+            string using :func:`repr`. These attributes are also
+            passed down recursively to the building block molecules.
+
+        ignore_missing_attrs : :class:`bool`, optional
+            If ``False`` and an attribute in `include_attrs` is not
+            held by the :class:`ConstructedMolecule`, an error will be
+            raised.
 
         Returns
         -------
         :class:`dict`
-            A :class:`dict` which represents the molecule. It has
-            the form
-
-            .. code-block:: python
-
-                {
-                    'class' : 'ConstructedMolecule',
-                    'mol_block' : '''A string holding the V3000 mol
-                                     block of the molecule.''',
-                    'building_blocks' : {
-                        bb1.to_dict(): [],
-                        bb2.to_dict(): []
-                    },
-                    'topology_graph' : 'Linear(repeating_unit="AB")',
-                    'atoms': [H(0), N(1), ... ],
-                }
+            A :class:`dict` which represents the molecule.
 
         """
 
         if include_attrs is None:
             include_attrs = []
 
+        bb_counter = []
+        building_blocks = []
+        building_block_vertices = []
+        for i, bb in enumerate(self.building_block_vertices):
+            bb_counter.append((i, self.bb_counter[bb]))
+            building_blocks.append(bb.to_dict(include_attrs, True))
+            building_block_vertices[i] = [
+                repr(v) for v in self.building_block_vertices[bb]
+            ]
+
         d = {
-            'bb_counter': [
-                (key._to_dict(), val)
-                for key, val in self.bb_counter.items()
-            ],
+            'building_blocks': building_blocks,
+            'building_block_vertices': building_block_vertices,
+            'building_block_counter': bb_counter,
             'bonds_made': self.bonds_made,
             'class': self.__class__.__name__,
             'mol_block': self._to_mdl_mol_block(),
-            'building_blocks': [
-                x._to_dict() for x in self.building_blocks
-            ],
             'topology_graph': repr(self.topology_graph),
             'func_groups': repr(self.func_groups),
             'atoms': repr(self.atoms),
@@ -292,17 +280,13 @@ class ConstructedMolecule(Molecule):
         """
 
         d = dict(mol_dict)
-        d.pop('building_blocks')
-        d.pop('class')
-
-        bb_counter = Counter({
-            Molecule._init_from_dict(key, use_cache=use_cache): val
-            for key, val in d.pop('bb_counter')
-        })
-        bbs = list(bb_counter)
         tops = vars(topology_graphs)
         topology_graph = eval(d.pop('topology_graph'), tops)
 
+        bbs = [
+            Molecule.init_from_dict(bb_dict, use_cache)
+            for bb_dict in d.pop('building_blocks')
+        ]
         key = cls._get_key(cls, bbs, topology_graph, use_cache)
         if key in cls._cache and use_cache:
             return cls.cache[key]
@@ -315,11 +299,20 @@ class ConstructedMolecule(Molecule):
             removeHs=False
         ))
 
+        obj.building_block_counter = Counter()
+        obj.building_block_vertices = {}
+
+        counter = d.pop('bb_counter')
+        vertices = d.pop('building_block_vertices')
+        for i, bb in enumerate(bbs):
+            obj.building_block_counter[bb] = counter[i]
+            obj.building_block_vertices[bb] = [
+                eval(v, tops) for v in vertices[i]
+            ]
+
         obj.topology_graph = topology_graph
-        obj.bb_counter = bb_counter
         obj.bonds_made = d.pop('bonds_made')
         obj._key = key
-        obj.building_blocks = bbs
         obj._position_matrix = mol.GetConformer().GetPositions().T
         obj.atoms = eval(d.pop('atoms'), vars(elements))
 
@@ -338,6 +331,7 @@ class ConstructedMolecule(Molecule):
         if use_cache:
             cls._cache[key] = obj
 
+        d.pop('class')
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
 

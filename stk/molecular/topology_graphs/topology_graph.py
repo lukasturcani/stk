@@ -80,6 +80,7 @@ topology is at the origin.
 
 import numpy as np
 from functools import wraps
+import re
 
 from ..functional_groups import Reactor
 
@@ -98,8 +99,10 @@ class Vertex:
 
     Methods
     -------
-    :meth:`get_position`
+    :meth:`apply_scale`
     :meth:`clone`
+    :meth:`get_position`
+    :meth:`place_building_block`
 
     """
 
@@ -109,6 +112,23 @@ class Vertex:
 
     @staticmethod
     def _add_func_group_assignment(fn):
+        """
+        Add :meth:`_add_func_group_assignment` to `fn`.
+
+        Parameters
+        ----------
+        fn : :class:`callable`
+            A :class:`callable` which is to perform
+            :meth:`_add_func_group_assignment` after it is called.
+            Usually :meth:`place_building_block`.
+
+        Returns
+        -------
+        :class:`callable`
+            A new :class:`callable` which runs
+            :meth:`_add_func_group_assignment` after `fn`.
+
+        """
 
         @wraps(fn)
         def inner(self, building_block):
@@ -120,6 +140,24 @@ class Vertex:
 
     @staticmethod
     def _add_position_restoration(fn):
+        """
+        Add building block position restoration after `fn` is called.
+
+        Parameters
+        ----------
+        fn : :class:`callable`
+            A :class:`callable` which is to restore the original
+            coordinates of a building block passed to `fn` after
+            `fn` is called. Usually :meth:`place_building_block`.
+
+        Returns
+        -------
+        :class:`callable`
+            A new :class:`callable` which restores the original
+            coordinates of a building block passed to `fn` after `fn`
+            is called.
+
+        """
 
         @wraps(fn)
         def inner(self, building_block):
@@ -139,6 +177,24 @@ class Vertex:
         )
 
     def apply_scale(self, scale):
+        """
+        Scale the position of the :class:`.Vertex` by `scale`.
+
+        Parameters
+        ----------
+        scale : :class:`float` or :class:`list`of :class:`float`
+            The value by which the position of the :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
+
+        Returns
+        -------
+        :class:`Vertex`
+            The vertex is returned.
+
+        """
+
         self._coord *= scale
         return self
 
@@ -200,7 +256,14 @@ class Vertex:
 
     def __repr__(self):
         x, y, z = self._coord
-        return f'Vertex({x}, {y}, {z}, degree={self.degree})'
+        cls_name = (
+            f'{__package__}.{__name__}.{self.__class__.__name__}'
+        )
+        # Make sure that the name has all the topology_graph submodule
+        # names.
+        p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
+        cls_name = p.findall(cls_name)
+        return f'{cls_name}({x}, {y}, {z}, degree={self.degree})'
 
 
 class Edge:

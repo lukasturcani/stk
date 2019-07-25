@@ -12,7 +12,7 @@ from .topology_graph import TopologyGraph, Vertex, Edge
 logger = logging.getLogger(__name__)
 
 
-class _LinearVertex(Vertex):
+class LinearVertex(Vertex):
     def __init__(self, x, y, z, degree, direction):
         self._direction = np.array([direction, 0, 0])
         super().__init__(x, y, z, degree)
@@ -56,7 +56,7 @@ class _LinearVertex(Vertex):
         self._positions[1].func_group = fg2
 
 
-class _TerminalVertex(_LinearVertex):
+class TerminalVertex(LinearVertex):
 
     def __init__(self, x, y, z, direction):
         super().__init__(x, y, z, 1, direction)
@@ -97,11 +97,11 @@ class _TerminalVertex(_LinearVertex):
         self._positions[0].func_group = fg1
 
 
-class _HeadVertex(_TerminalVertex):
+class HeadVertex(TerminalVertex):
     _cap_direction = [-1, 0, 0]
 
 
-class _TailVertex(_TerminalVertex):
+class TailVertex(TerminalVertex):
     _cap_direction = [1, 0, 0]
 
 
