@@ -73,11 +73,7 @@ from scipy.spatial.distance import euclidean
 import itertools as it
 
 from .topology_graph import TopologyGraph
-from ...utilities import (
-    PeriodicBond,
-    add_fragment_props,
-    normalize_vector
-)
+from ...utilities import normalize_vector
 
 
 class Vertex:

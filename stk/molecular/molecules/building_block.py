@@ -13,8 +13,8 @@ from glob import glob
 from functools import partial
 from scipy.spatial.distance import euclidean
 
-from . import elements
-from .elements import Atom, Bond
+from .. import elements
+from ..elements import Atom, Bond
 from .molecule import Molecule
 from ..functional_groups import FunctionalGroup
 from ..functional_groups import functional_group_infos as fg_infos

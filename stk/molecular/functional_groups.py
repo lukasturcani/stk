@@ -50,8 +50,8 @@ from functools import partial
 import numpy as np
 from collections import Counter
 
-from .molecule import elements
-from .molecule.elements import Bond, PeriodicBond
+from . import elements
+from .elements import Bond, PeriodicBond
 
 
 class ReactionKey:

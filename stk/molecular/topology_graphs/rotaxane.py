@@ -8,7 +8,7 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
 from .topology_graph import TopologyGraph
-from ...utilities import dedupe, add_fragment_props
+from ...utilities import dedupe
 
 
 class NRotaxane(TopologyGraph):
