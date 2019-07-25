@@ -5,6 +5,7 @@ Defines :class:`.Polymer` topologies.
 
 import logging
 import re
+from collections import defaultdict
 
 from .topology_graph import TopologyGraph, Vertex, Edge
 
@@ -80,37 +81,37 @@ class LinearVertex(Vertex):
             position=self._coord,
             atom_ids=building_block.get_bonder_ids(fg_ids=(0, 1))
         )
-        bonder_vector = next(
+        *_, bonder_vector = next(
             building_block.get_bonder_direction_vectors(
                 fg_ids=(0, 1)
             )
         )
         building_block.apply_rotation_between_vectors(
             start=bonder_vector,
-            end=self._direction,
+            target=[self._direction, 0, 0],
             origin=self._coord
         )
         return building_block.get_position_matrix()
 
     def _assign_func_groups_to_edges(self, building_block):
         fg1, fg2 = sorted(
-            iterable=building_block.func_groups,
+            building_block.func_groups,
             key=lambda fg: building_block.get_centroid(
                 atom_ids=fg.get_bonder_ids()
             )[0]
         )
-        self._edges[0].assign_func_group(fg1)
-        self._edges[1].assign_func_group(fg2)
+        self.edges[0].assign_func_group(fg1)
+        self.edges[1].assign_func_group(fg2)
 
     def __repr__(self):
         x, y, z = self._coord
         cls_name = (
-            f'{__package__}.{__name__}.{self.__class__.__name__}'
+            f'{__name__}.{self.__class__.__name__}'
         )
         # Make sure that the name has all the topology_graph submodule
         # names.
         p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
-        cls_name = p.findall(cls_name)
+        cls_name = p.findall(cls_name)[0]
         return (
             f'{cls_name}({x}, {y}, {z}, direction={self._direction})'
         )
@@ -172,7 +173,7 @@ class TerminalVertex(LinearVertex):
         )
         building_block.apply_rotation_between_vectors(
             start=centroid_vector,
-            end=self._cap_direction,
+            target=[self._cap_direction, 0, 0],
             origin=self._coord
         )
         return building_block.get_position_matrix()
@@ -183,7 +184,7 @@ class TerminalVertex(LinearVertex):
 
         Each :class:`.FunctionalGroup` of the `building_block` needs
         to be assigned to one of the :class:`.Edge` instances in
-        :attr:`_edges`.
+        :attr:`edges`.
 
         Parameters
         ----------
@@ -195,19 +196,30 @@ class TerminalVertex(LinearVertex):
         -------
         None : :class:`NoneType`
 
+        Raises
+        ------
+        :class:`ValueError`
+            If `building_block` does not have one or two functional
+            groups.
+
         """
 
-        if len(building_block.func_groups) != 1:
+        if len(building_block.func_groups) == 2:
             fg2, fg1 = sorted(
-                iterable=building_block.func_groups,
+                building_block.func_groups,
                 key=lambda fg: building_block.get_centroid(
                     atom_ids=fg.get_bonder_ids()
                 )[0]
             )
-        else:
+        elif len(building_block.func_groups) == 1:
             fg1 = building_block.func_groups[0]
+        else:
+            raise ValueError(
+                'The building block of a polymer '
+                'must have 1 or 2 functional groups.'
+            )
 
-        self._positions[0].func_group = fg1
+        self.edges[0].assign_func_group(fg1)
 
 
 class HeadVertex(TerminalVertex):
@@ -322,16 +334,54 @@ class Linear(TopologyGraph):
                 x=i, y=0, z=0, direction=direction
             )
             vertices.append(v)
-            p1 = vertices[i-1].positions[-1]
-            p2 = vertices[i].positions[0]
-            edges.append(Edge(p1, p2))
+            edges.append(Edge(vertices[i-1], vertices[i]))
 
         vertices.append(TailVertex(len(vertices), 0, 0, tail))
-        p1 = vertices[-2].positions[-1]
-        p2 = vertices[-1].positions[0]
-        edges.append(Edge(p1, p2))
+        edges.append(Edge(vertices[-2], vertices[-1]))
 
         super().__init__(vertices, edges, processes)
+
+    def _assign_building_blocks_to_vertices(
+        self,
+        mol,
+        building_blocks
+    ):
+        """
+        Assign `building_blocks` to :attr:`vertices`.
+
+        Note
+        ----
+        This method will modify
+        :attr:`.ConstructedMolecule.building_block_vertices`.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` instance being
+            constructed.
+
+        building_blocks : :class:`list` of :class:`.Molecule`
+            The :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` instances which
+            represent the building block molecules used for
+            construction. Only one instance is present per building
+            block molecule, even if multiples of that building block
+            join up to form the :class:`ConstructedMolecule`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        mol.building_block_vertices = defaultdict(list)
+        polymer = self.repeating_unit*self.n
+        bb_map = {
+            letter: bb for letter, bb in zip(polymer, building_blocks)
+        }
+        for letter, vertex in zip(polymer, self.vertices):
+            bb = bb_map[letter]
+            mol.building_block_vertices[bb].append(vertex)
 
     def _clean_up(self, mol):
         """

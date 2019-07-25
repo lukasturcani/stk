@@ -14,7 +14,8 @@ from functools import partial
 from scipy.spatial.distance import euclidean
 
 from .. import elements
-from ..elements import Atom, Bond
+from ..elements import Atom
+from ..bonds import Bond
 from .molecule import Molecule
 from ..functional_groups import FunctionalGroup
 from ..functional_groups import functional_group_infos as fg_infos
@@ -364,8 +365,7 @@ class BuildingBlock(Molecule):
             fg_ids = range(len(self.func_groups))
 
         for fg_id in fg_ids:
-            for atom_id in self.func_groups[fg_id].bonder_ids:
-                yield atom_id
+            yield from self.func_groups[fg_id].get_bonder_ids()
 
     def get_bonder_centroids(self, fg_ids=None):
         """
@@ -397,7 +397,7 @@ class BuildingBlock(Molecule):
 
         for fg_id in fg_ids:
             yield self.get_centroid(
-                atom_ids=self.func_groups[fg_id].bonder_ids
+                atom_ids=self.func_groups[fg_id].get_bonder_ids()
             )
 
     def get_bonder_plane(self, fg_ids=None):
@@ -456,7 +456,7 @@ class BuildingBlock(Molecule):
             fg_ids = list(fg_ids)
 
         centroid = self.get_centroid(
-            atom_ids=self.func_groups[fg_ids[0]].bonder_ids
+            atom_ids=self.func_groups[fg_ids[0]].get_bonder_ids()
         )
         normal = self.get_bonder_plane_normal(
             fg_ids=fg_ids
@@ -552,7 +552,7 @@ class BuildingBlock(Molecule):
         # Iterator yielding tuples of form (fg_id, bonder_centroid)
         centroids = ((
             i, self.get_centroid(
-                atom_ids=self.func_groups[i].bonder_ids
+                atom_ids=self.func_groups[i].get_bonder_ids()
             ))
             for i in fg_ids
         )
@@ -598,7 +598,7 @@ class BuildingBlock(Molecule):
         # Iterator yielding tuples of form (fg_id, bonder_centroid)
         centroids = ((
             i, self.get_centroid(
-                atom_ids=self.func_groups[i].bonder_ids
+                atom_ids=self.func_groups[i].get_bonder_ids()
             ))
             for i in fg_ids
         )

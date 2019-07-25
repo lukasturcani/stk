@@ -51,7 +51,7 @@ import numpy as np
 from collections import Counter
 
 from . import elements
-from .elements import Bond, PeriodicBond
+from .bonds import Bond, PeriodicBond
 
 
 class ReactionKey:
@@ -478,7 +478,7 @@ class Reactor:
 
     """
 
-    bond_orders = {
+    _bond_orders = {
         ReactionKey('amine', 'aldehyde'): 2,
         ReactionKey('amide', 'aldehyde'): 2,
         ReactionKey('nitrile', 'aldehyde'): 2,

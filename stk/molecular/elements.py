@@ -23,6 +23,11 @@ class Atom:
     _elements : :class:`dict`
         Maps an atomic number to the class for that element.
 
+    Methods
+    -------
+    :meth:`__init__`
+    :meth:`clone`
+
     """
 
     _elements = {}
@@ -70,6 +75,23 @@ class Atom:
 
     def __str__(self):
         return repr(self)
+
+    def clone(self):
+        """
+        Clone the atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            A clone.
+
+        """
+
+        obj = self.__class__.__new__(self.__class__)
+        for attr, val in vars(self).items():
+            if not attr.startswith('_'):
+                setattr(obj, attr, val)
+        return obj
 
 
 class _Atom(Atom):

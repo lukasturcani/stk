@@ -11,7 +11,7 @@ from . import elements
 from .molecule import Molecule
 from .. import topology_graphs
 from ..functional_groups import FunctionalGroup
-from ...utilities import remake
+from ...utilities import remake, dedupe
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +122,7 @@ class ConstructedMolecule(Molecule):
         Initialize a :class:`ConstructedMolecule` instance.
 
         Parameters
-        ---------
+        ----------
         building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
@@ -184,9 +184,12 @@ class ConstructedMolecule(Molecule):
 
             bb_blocks = []
             for i, bb in enumerate(building_blocks):
+                func_groups = list(dedupe(
+                    fg.info.name for fg in bb.func_groups
+                ))
                 bb_blocks.append(
                     f'{bb.__class__.__name__} '
-                    f'{[info.name for info in bb.func_group_infos]}\n'
+                    f'{func_groups}\n'
                     f'{bb._to_mdl_mol_block()}'
                 )
 
@@ -339,27 +342,47 @@ class ConstructedMolecule(Molecule):
         return obj
 
     @staticmethod
-    def _get_key(self, building_blocks, topology_graph, use_cache):
+    def _get_key(
+        self,
+        building_blocks,
+        topology_graph,
+        building_block_vertices=None,
+        use_cache=False
+    ):
         """
         Get the key used for caching the molecule.
 
         Parameters
         ----------
-        building_blocks : :class:`list` of :class:`.BuildingBlock`
-            The :class:`.BuildingBlock` instances which
-            represent the building block molecules of the
-            :class:`ConstructedMolecule`. Only one
-            :class:`.BuildingBlock` instance is present per building
-            block, even if multiples of that building block join up to
-            form the :class:`ConstructedMolecule`.
+        building_blocks : :class:`list` of :class:`.Molecule`
+            The :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` instances which
+            represent the building block molecules used for
+            construction. Only one instance is present per building
+            block molecule, even if multiples of that building block
+            join up to form the :class:`ConstructedMolecule`.
 
-        topology_graph : :class:`.TopologyGraph`
+        topolog_graph : :class:`.TopologyGraph`
             Defines the topology graph of the
             :class:`ConstructedMolecule` and constructs it.
 
-        use_cache : :class:`bool`
-            This argument is ignored but included to be maintain
-            compatiblity the the :meth:`__init__` signature.
+        building_block_vertices : :class:`dict`, optional
+            Maps the :class:`.Molecule` in  `building_blocks` to the
+            :class:`~.topologies.base.Vertex` in `topology_graph`.
+            Each :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` can be mapped to multiple
+            :class:`~.topologies.base.Vertex` objects. See the
+            examples section in the :class:`.ConstructedMolecule`
+            class docstring to help understand how this parameter
+            is used. If ``None``, building block molecules will be
+            assigned to vertices at random.
+
+        use_cache : :class:`bool`, optional
+            If ``True``, a new :class:`.ConstructedMolecule` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`ConstructedMolecule` does
+            not yet exist the created one will be added to the cache.
 
         """
 

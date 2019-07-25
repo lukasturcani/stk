@@ -91,11 +91,11 @@ class Vertex:
 
     Attributes
     ----------
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
+
     _coord : :class:`numpy.ndarray`
         The position of the vertex.
-
-    _edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
 
     Methods
     -------
@@ -108,8 +108,8 @@ class Vertex:
     """
 
     def __init__(self, x, y, z):
-        self._coord = np.array([x, y, z])
-        self._edges = []
+        self._coord = np.array([x, y, z], dtype=np.dtype('float64'))
+        self.edges = []
 
     @staticmethod
     def _add_func_group_assignment(fn):
@@ -211,8 +211,9 @@ class Vertex:
 
         """
 
-        clone = self.__class__(*self._coord)
-        clone._edges = list(self._edges)
+        clone = self.__class__.__new__(self.__class__)
+        clone._coord = np.array(self._coord)
+        clone.edges = list(self.edges)
         return clone
 
     def get_position(self):
@@ -260,7 +261,7 @@ class Vertex:
 
         Each :class:`.FunctionalGroup` of the `building_block` needs
         to be assigned to one of the :class:`.Edge` instances in
-        :attr:`_edges`.
+        :attr:`edges`.
 
         Parameters
         ----------
@@ -288,12 +289,12 @@ class Vertex:
     def __repr__(self):
         x, y, z = self._coord
         cls_name = (
-            f'{__package__}.{__name__}.{self.__class__.__name__}'
+            f'{__name__}.{self.__class__.__name__}'
         )
         # Make sure that the name has all the topology_graph submodule
         # names.
         p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
-        cls_name = p.findall(cls_name)
+        cls_name = p.findall(cls_name)[0]
         return f'{cls_name}({x}, {y}, {z})'
 
 
@@ -337,7 +338,7 @@ class Edge:
 
         self._coord = 0
         for i, vertex in enumerate(vertices, 1):
-            vertex._edges.append(self)
+            vertex.edges.append(self)
             self._coord += vertex.get_position()
         self._coord = self._coord / i
 
@@ -376,7 +377,8 @@ class Edge:
         return repr(self)
 
     def __repr__(self):
-        return f'Edge()'
+        vertices = ', '.join(repr(v) for v in self.vertices)
+        return f'Edge({vertices})'
 
 
 class TopologyGraph:
@@ -652,7 +654,7 @@ class TopologyGraph:
                 )
 
                 mol.bonds.extend(b.clone() for b in bb.bonds)
-                counter.update(bb)
+                counter.update([bb])
 
     def _place_building_blocks_parallel(self, mol, vertices):
         raise NotImplementedError()
@@ -671,14 +673,14 @@ class TopologyGraph:
 
     def __repr__(self):
         attrs = ', '.join(
-            f'{attr}={val}' for attr, val in vars(self)
+            f'{attr}={val!r}' for attr, val in vars(self).items()
             if not attr.startswith('_')
         )
         cls_name = (
-            f'{__package__}.{__name__}.{self.__class__.__name__}'
+            f'{__name__}.{self.__class__.__name__}'
         )
         # Make sure that the name has all the topology_graph submodule
         # names.
         p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
-        cls_name = p.findall(cls_name)
+        cls_name = p.findall(cls_name)[0]
         return f'{cls_name}({attrs})'

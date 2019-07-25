@@ -13,6 +13,11 @@ class Bond:
     order : :class:`int`
         The bond order.
 
+    Methods
+    -------
+    :meth:`__init__`
+    :meth:`clone`
+
     """
 
     def __init__(self, atom1, atom2, order):
@@ -35,6 +40,23 @@ class Bond:
         self.atom1 = atom1
         self.atom2 = atom2
         self.order = order
+
+    def clone(self):
+        """
+        Clone the bond.
+
+        Returns
+        -------
+        :class:`.Bond`
+            A clone of the bond.
+
+        """
+
+        obj = self.__class__.__new__(self.__class__)
+        for attr, val in vars(self).items():
+            if not attr.startswith('_'):
+                setattr(obj, attr, val)
+        return obj
 
     def __repr__(self):
         cls_name = self.__class__.__name__
