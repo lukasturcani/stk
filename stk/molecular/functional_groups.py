@@ -48,7 +48,6 @@ See :class:`Reactor`.
 
 from functools import partial
 import numpy as np
-import rdkit.Chem.AllChem as rdkit
 from collections import Counter
 
 from .molecule import elements
