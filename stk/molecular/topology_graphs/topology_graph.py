@@ -441,19 +441,16 @@ class TopologyGraph:
                 building_blocks=building_blocks
             )
 
-        vertices, edges = self._clone_vertices_and_edges()
+        vertex_clones = self._clone_vertices()
+        edge_clones = self._clone_edges(vertex_clones)
 
-        reactor = Reactor()
-        self._place_building_blocks(mol, vertices)
         self._prepare(mol)
+        self._place_building_blocks(mol, vertex_clones)
 
-        self._reactor.set_molecule(mol.mol)
-        mol.func_groups = self._reactor.func_groups
-
-        for fgs in self._get_bonded_fgs(mol, edges):
-            reactor.react(*fgs, track_fgs=self._track_fgs)
-        mol.mol = reactor.result(self._del_atoms)
-        mol.bonds_made = reactor.bonds_made
+        reactor = Reactor(mol)
+        for fgs in self._get_bonded_fgs(mol, edge_clones):
+            reactor.add_reaction(*fgs)
+        mol.bonds_made = reactor.react()
 
         self._clean_up(mol)
 
@@ -523,18 +520,26 @@ class TopologyGraph:
         Returns
         -------
         :class:`dict`
-            A mapping from the original vertices to the clones.
+            A mapping from the original :attr:`vertices` to the clones.
 
         """
 
-        return {
-            vertex: vertex.clone() for vertex in self.vertices
-        }
+        return {vertex: vertex.clone() for vertex in self.vertices}
 
     def _clone_edges(self, vertex_clones):
         """
         Create clones of :attr:`edges`.
 
+        Parameters
+        ----------
+        vertex_clones : :class:`dict`
+            A mapping from the original :attr:`vertices` to the
+            clones.
+
+        Returns
+        -------
+        :class:`list` of :class:`.Edge`
+            The cloned :attr:`edges`.
 
         """
 
