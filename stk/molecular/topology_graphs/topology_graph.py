@@ -206,14 +206,14 @@ class Vertex:
         Returns
         -------
         :class:`Vertex`
-            A clone with the same position and connected to the same
+            A clone with the same position but not connected to any
             :class:`.Edge` objects.
 
         """
 
         clone = self.__class__.__new__(self.__class__)
         clone._coord = np.array(self._coord)
-        clone.edges = list(self.edges)
+        clone.edges = []
         return clone
 
     def get_position(self):

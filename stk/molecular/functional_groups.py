@@ -532,7 +532,7 @@ class Reactor:
         """
 
         self._deleter_atoms.update(
-            atom for fg in fgs for atom in fg.deleter_atoms
+            atom for fg in fgs for atom in fg.deleters
         )
 
         names = (fg.info.name for fg in fgs)
@@ -569,7 +569,7 @@ class Reactor:
         """
 
         self._deleter_atoms.update(
-            atom for fg in fgs for atom in fg.deleter_atoms
+            atom for fg in fgs for atom in fg.deleters
         )
 
         names = (fg.info.name for fg in fgs)
