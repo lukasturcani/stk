@@ -106,7 +106,7 @@ class Vertex:
 
     """
 
-    def __init__(self, x, y, z, degree):
+    def __init__(self, x, y, z):
         self._coord = np.array([x, y, z])
         self._edges = []
 
@@ -198,6 +198,22 @@ class Vertex:
         self._coord *= scale
         return self
 
+    def clone(self):
+        """
+        Create a clone of the instance.
+
+        Returns
+        -------
+        :class:`Vertex`
+            A clone with the same position and connected to the same
+            :class:`.Edge` objects.
+
+        """
+
+        clone = self.__class__(*self._coord)
+        clone._edges = self._edges
+        return clone
+
     def get_position(self):
         """
         Return the position of the :class:`Vertex`.
@@ -233,7 +249,11 @@ class Vertex:
 
     def _assign_func_groups_to_edges(self, building_block):
         """
-        Assign
+        Assign functional groups to edges.
+
+        Each :class:`.FunctionalGroup` of the `building_block` needs
+        to be assigned to one of the :class:`.Edge` instances in
+        :attr:`_edges`.
 
         Parameters
         ----------
@@ -263,7 +283,7 @@ class Vertex:
         # names.
         p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
         cls_name = p.findall(cls_name)
-        return f'{cls_name}({x}, {y}, {z}, degree={self.degree})'
+        return f'{cls_name}({x}, {y}, {z})'
 
 
 class Edge:
@@ -321,6 +341,24 @@ class Edge:
 
         return tuple(self._func_groups)
 
+    def assign_func_group(self, func_group):
+        """
+        Assign `func_group` to be connected by this edge.
+
+        Parameters
+        ----------
+        func_group : :class:`.FunctionalGroup`
+            The functional group to be assigned to the edge.
+
+        Returns
+        -------
+        :class:`Edge`
+            The edge is returned.
+
+        """
+
+        self._func_groups.append(func_group)
+
     def __str__(self):
         return repr(self)
 
@@ -340,6 +378,10 @@ class TopologyGraph:
     edges : :class:`.Edge`
         The edges which make up the topology graph.
 
+    processes : :class:`int`
+        The number of parallel processes to create during
+        :meth:`construct`.
+
     Methods
     -------
     :meth:`__init__`
@@ -347,7 +389,7 @@ class TopologyGraph:
 
     """
 
-    def __init__(self, vertices, edges):
+    def __init__(self, vertices, edges, processes=1):
         """
         Initialize an instance of :class:`.TopologyGraph`.
 
@@ -359,12 +401,17 @@ class TopologyGraph:
         edges : :class:`.Edge`
             The edges which make up the graph.
 
+        processes : :class:`int`, optional
+            The number of parallel processes to create during
+            :meth:`construct`.
+
         """
 
         self.vertices = vertices
         self.edges = edges
+        self.processes = processes
 
-    def construct(self, mol):
+    def construct(self, mol, building_blocks):
         """
         Construct a :class:`.ConstructedMolecule` conformer.
 
@@ -374,15 +421,29 @@ class TopologyGraph:
             The :class:`.ConstructedMolecule` instance which needs to
             be constructed.
 
+        building_blocks : :class:`list` of :class:`.Molecule`
+            The :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` instances which
+            represent the building block molecules used for
+            construction. Only one instance is present per building
+            block molecule, even if multiples of that building block
+            join up to form the :class:`ConstructedMolecule`.
+
         Returns
         -------
         None : :class:`NoneType`
 
         """
 
+        if mol.building_block_vertices is None:
+            self._assign_building_blocks_to_vertices(
+                mol=mol,
+                building_blocks=building_blocks
+            )
+
         vertices, edges = self._clone_vertices_and_edges()
 
-        self._reactor = Reactor()
+        reactor = Reactor()
         self._place_building_blocks(mol, vertices)
         self._prepare(mol)
 
@@ -390,54 +451,179 @@ class TopologyGraph:
         mol.func_groups = self._reactor.func_groups
 
         for fgs in self._get_bonded_fgs(mol, edges):
-            self._reactor.react(*fgs, track_fgs=self._track_fgs)
-        mol.mol = self._reactor.result(self._del_atoms)
-        mol.bonds_made = self._reactor.bonds_made
+            reactor.react(*fgs, track_fgs=self._track_fgs)
+        mol.mol = reactor.result(self._del_atoms)
+        mol.bonds_made = reactor.bonds_made
 
         self._clean_up(mol)
 
-        # Reactor can't be pickled because it contains an EditableMol,
-        # which can't be pickled.
-        self._reactor = None
+    def _assign_building_blocks_to_vertices(
+        self,
+        mol,
+        building_blocks
+    ):
+        """
+        Assign `building_blocks` to :attr:`vertices`.
 
-    def _get_scale(self, mol, bb_map, conformer_map):
+        Note
+        ----
+        This method will modify
+        :attr:`.ConstructedMolecule.building_block_vertices`.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` instance being
+            constructed.
+
+        building_blocks : :class:`list` of :class:`.Molecule`
+            The :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` instances which
+            represent the building block molecules used for
+            construction. Only one instance is present per building
+            block molecule, even if multiples of that building block
+            join up to form the :class:`ConstructedMolecule`.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method which needs to be implemented in
+            a subclass.
+
+        """
+
         raise NotImplementedError()
 
-    def _clone_vertices_and_edges(self, mol):
-        vertex_clones = {
+    def _get_scale(self, mol):
+        """
+        Get the scale used for the positions of :attr:`vertices`.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        raise NotImplementedError()
+
+    def _clone_vertices(self):
+        """
+        Create clones of :attr:`vertices`.
+
+        Clones are necessary so that multiple :meth:`construct`
+        calls can be done asynchronously and so that the state of the
+        original :class:`.Vertex` objects is not
+        changed by the construction process.
+
+        Returns
+        -------
+        :class:`dict`
+            A mapping from the original vertices to the clones.
+
+        """
+
+        return {
             vertex: vertex.clone() for vertex in self.vertices
         }
+
+    def _clone_edges(self, vertex_clones):
+        """
+        Create clones of :attr:`edges`.
+
+
+        """
+
         edges = []
         for edge in self.edges:
             vertices = (
                 vertex_clones[vertex] for vertex in edge.vertices
             )
             edges.append(Edge(*vertices))
-        return list(vertex_clones.values()), edges
+        return edges
 
     def _prepare(self, mol):
+        """
+        Do preprocessing on `mol` before construction.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         return
 
-    def _place_building_blocks(self, mol, vertices):
-        scale = self._get_scale(mol, mol.bb_map)
-        for vertex in vertices:
+    def _place_building_blocks(self, mol, vertex_clones):
+        """
+        Places building blocks in `mol` on :attr:`vertices`.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
+        vertex_clones : :class:`dict`
+            A mapping from :attr:`vertices` to their clones being used
+            for a particular :meth:`construct` call.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if self.processes == 1:
+            return self._place_building_blocks_serial(
+                mol=mol,
+                vertex_clones=vertex_clones
+            )
+        else:
+            return self._place_building_blocks_parallel(
+                mol=mol,
+                vertex_clones=vertex_clones
+            )
+
+    def _place_building_blocks_serial(self, mol, vertex_clones):
+        scale = self._get_scale(mol)
+        for vertex in vertex_clones.values():
             vertex.apply_scale(scale)
 
-        for vertex in vertices:
-            bb = mol.bb_map[vertex]
-            coords = vertex.place_building_block(bb)
-            mol._conformers[-1].extend(coords)
+        # Use a shorter alias.
+        counter = mol.building_block_counter
+        for bb, vertices in mol.building_block_vertices.items():
+            for vertex in vertices:
+                clone = vertex_clones[vertex]
+                coords = clone.place_building_block(bb)
+                mol._position_matrix.extend(coords)
 
-            if len(mol._conformers) == 1:
-                mol.atoms.extend(a.clone() for a in bb.atoms)
+                for atom in bb.atoms:
+                    atom_clone = atom.clone()
+                    atom_clone.building_block = bb
+                    atom_clone.building_block_id = counter[bb]
+                    mol.atoms.append(atom_clone)
+
                 mol.bonds.extend(b.clone() for b in bb.bonds)
+                counter.update(bb)
+
+    def _place_building_blocks_parallel(self, mol, vertices):
+        raise NotImplementedError()
 
     def _get_bonded_fgs(self, mol, edges):
         for edge in edges:
             yield edge.get_func_groups()
 
     def _clean_up(self, mol):
-        mol._conformers[-1] = mol.conformers[-1].T
+        mol._position_matrix = mol._position_matrix.T
 
     def __str__(self):
         return repr(self)

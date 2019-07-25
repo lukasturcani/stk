@@ -164,10 +164,11 @@ class ConstructedMolecule(Molecule):
         self.bonds = []
         self.bonds_made = 0
         self.func_groups = []
-        self.bb_counter = Counter()
+        self.building_block_counter = Counter()
+        self._position_matrix = []
 
         try:
-            topology_graph.construct(self)
+            topology_graph.construct(self, building_blocks)
 
         except Exception as ex:
             errormsg = (
