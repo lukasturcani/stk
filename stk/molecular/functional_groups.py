@@ -228,21 +228,27 @@ class FunctionalGroup:
     id : :class:`int`
         The id of the functional group.
 
-    atom_ids : :class:`tuple` of :class:`int`
-        The ids of atoms in the functional group.
+    atoms : :class:`tuple` of :class:`.Atom`
+        The atoms in the functional group.
 
-    bonder_ids : :class:`tuple` of :class:`int`
-        The ids of bonder atoms in the functional group.
+    bonders : :class:`tuple` of :class:`.Atom`
+        The bonder atoms in the functional group.
 
-    deleter_ids : :class:`tuple` of :class:`int`
-        The ids of deleter atoms in the functional group.
+    deleters : :class:`tuple` of :class:`.Atom`
+        The deleter atoms in the functional group.
 
     info : :class:`FGInfo`
         The :class:`FGInfo` of the functional group type.
 
+    Methods
+    -------
+    :meth:`get_atom_ids`
+    :meth:`get_bonder_ids`
+    :meth:`get_deleter_ids`
+
     """
 
-    def __init__(self, id, atom_ids, bonder_ids, deleter_ids, info):
+    def __init__(self, id, atoms, bonders, deleters, info):
         """
         Initialize a functional group.
 
@@ -251,14 +257,14 @@ class FunctionalGroup:
         id : :class:`int`
             The id of the functional group.
 
-        atom_ids : :class:`tuple` of :class:`int`
-            The ids of atoms in the functional group.
+        atoms : :class:`tuple` of :class:`.Atom`
+            The atoms in the functional group.
 
-        bonder_ids : :class:`tuple` of :class:`int`
-            The ids of bonder atoms in the functional group.
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms in the functional group.
 
-        deleter_ids : :class:`tuple` of :class:`int`
-            The ids of deleter atoms in the functional group.
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms in the functional group.
 
         info : :class:`FGInfo` or :class:`str`
             The :class:`FGInfo` of the functional group to which the
@@ -268,13 +274,15 @@ class FunctionalGroup:
         """
 
         self.id = id
-        self.atom_ids = atom_ids
-        self.bonder_ids = bonder_ids
-        self.deleter_ids = deleter_ids
+        self.atoms = atoms
+        self.bonders = bonders
+        self.deleters = deleters
 
         if isinstance(info, str):
-            self.info = next(fg_info for fg_info in functional_groups
-                             if fg_info.name == info)
+            self.info = next(
+                fg_info for fg_info in functional_groups
+                if fg_info.name == info
+            )
         else:
             self.info = info
 
@@ -302,11 +310,13 @@ class FunctionalGroup:
         bonder_ids = tuple(id + shift for id in self.bonder_ids)
         deleter_ids = tuple(id + shift for id in self.deleter_ids)
 
-        return self.__class__(id=id,
-                              atom_ids=atom_ids,
-                              bonder_ids=bonder_ids,
-                              deleter_ids=deleter_ids,
-                              info=self.info)
+        return self.__class__(
+            id=id,
+            atom_ids=atom_ids,
+            bonder_ids=bonder_ids,
+            deleter_ids=deleter_ids,
+            info=self.info
+        )
 
     def remove_deleters(self, deleters):
         """
@@ -387,22 +397,14 @@ class FunctionalGroup:
 
         return tuple(new_atom_ids)
 
-    def __eq__(self, other):
-        return (self.id == other.id and
-                self.atom_ids == other.atom_ids and
-                self.bonder_ids == other.bonder_ids and
-                self.deleter_ids == other.deleter_ids and
-                self.info == other.info)
-
-    def __hash__(self):
-        return id(self)
-
     def __repr__(self):
-        return (f"FunctionalGroup(id={self.id!r}, "
-                f"atom_ids={self.atom_ids!r}, "
-                f"bonder_ids={self.bonder_ids!r}, "
-                f"deleter_ids={self.deleter_ids!r}, "
-                f"info={self.info.name!r})")
+        return (
+            f"FunctionalGroup(id={self.id!r}, "
+            f"atoms={self.atoms!r}, "
+            f"bonders={self.bonders!r}, "
+            f"deleters={self.deleters!r}, "
+            f"info={self.info.name!r})"
+        )
 
     def __str__(self):
         return repr(self)

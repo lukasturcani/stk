@@ -211,7 +211,7 @@ class Vertex:
         """
 
         clone = self.__class__(*self._coord)
-        clone._edges = self._edges
+        clone._edges = list(self._edges)
         return clone
 
     def get_position(self):
@@ -229,13 +229,19 @@ class Vertex:
 
     def place_building_block(self, building_block):
         """
-        Place a building block molecule on the :class:`.Vertex`.
+        Place `building_block` on the :class:`.Vertex`.
 
         Parameters
         ----------
         building_block : :class:`.Molecule`
             The building block molecule which is to be placed on the
             vertex.
+
+        Returns
+        -------
+        :class:`numpy.nadarray`
+            The position matrix of `building_block` after being
+            placed.
 
         Raises
         ------
@@ -260,6 +266,10 @@ class Vertex:
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to
+
+        Returns
+        -------
+        None : :class:`NoneType`
 
         Raises
         ------
@@ -304,6 +314,7 @@ class Edge:
 
     Methods
     -------
+    :meth:`assign_func_group`
     :meth:`get_func_groups`
 
     """
@@ -481,6 +492,10 @@ class TopologyGraph:
             block molecule, even if multiples of that building block
             join up to form the :class:`ConstructedMolecule`.
 
+        Returns
+        -------
+        None : :class:`NoneType`
+
         Raises
         ------
         :class:`NotImplementedError`
@@ -502,7 +517,17 @@ class TopologyGraph:
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`float` or :class:`list` of :class:`float`
+            The value by which the position of each :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
 
         """
 
@@ -570,7 +595,7 @@ class TopologyGraph:
 
     def _place_building_blocks(self, mol, vertex_clones):
         """
-        Places building blocks in `mol` on :attr:`vertices`.
+        Place building blocks in `mol` on :attr:`vertices`.
 
         Parameters
         ----------
@@ -638,4 +663,11 @@ class TopologyGraph:
             f'{attr}={val}' for attr, val in vars(self)
             if not attr.startswith('_')
         )
-        return f'{self.__class__.__name__}({attrs})'
+        cls_name = (
+            f'{__package__}.{__name__}.{self.__class__.__name__}'
+        )
+        # Make sure that the name has all the topology_graph submodule
+        # names.
+        p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
+        cls_name = p.findall(cls_name)
+        return f'{cls_name}({attrs})'

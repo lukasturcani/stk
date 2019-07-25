@@ -727,11 +727,12 @@ class BuildingBlock(Molecule):
 
             for atom_ids in zip(fg_atoms, bonder_atoms, deleter_atoms):
                 fg, bonders, deleters = atom_ids
+                deleters = tuple(self.atoms[id_] for id_ in deleters)
                 fg = FunctionalGroup(
                     id=len(func_groups),
-                    atom_ids=fg,
-                    bonder_ids=tuple(bonders),
-                    deleter_ids=tuple(deleters),
+                    atoms=tuple(self.atoms[id_] for id_ in fg),
+                    bonders=tuple(self.atoms[id_] for id_ in bonders),
+                    deleters=deleters,
                     info=fg_info
                 )
                 func_groups.append(fg)
