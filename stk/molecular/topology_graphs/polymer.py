@@ -263,7 +263,14 @@ class Linear(TopologyGraph):
 
     """
 
-    def __init__(self, repeating_unit, orientation, n, ends='fg'):
+    def __init__(
+        self,
+        repeating_unit,
+        orientation,
+        n,
+        ends='fg',
+        processes=1
+    ):
         """
         Initialize a :class:`Linear` instance.
 
@@ -296,6 +303,10 @@ class Linear(TopologyGraph):
             polymer are converted into hydrogem atoms. If ``'fg'`` they
             are kept as the original functional group.
 
+        processes : :class:`int`, optional
+            The number of parallel processes to create during
+            :meth:`construct`.
+
         """
 
         self.repeating_unit = repeating_unit
@@ -320,7 +331,7 @@ class Linear(TopologyGraph):
         p2 = vertices[-1].positions[0]
         edges.append(Edge(p1, p2))
 
-        super().__init__(vertices, edges)
+        super().__init__(vertices, edges, processes)
 
     def _clean_up(self, mol):
         """

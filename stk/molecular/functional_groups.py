@@ -48,10 +48,10 @@ See :class:`Reactor`.
 
 from functools import partial
 import numpy as np
-from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
 from collections import Counter
 
+from .molecule import elements
 from .molecule.elements import Bond, PeriodicBond
 
 
@@ -318,6 +318,44 @@ class FunctionalGroup:
             info=self.info
         )
 
+    def get_atom_ids(self):
+        """
+        Get the ids of :attr:`atoms`.
+
+        Returns
+        -------
+        :class:`generator` of :class:`int`
+            The ids of :attr:`atoms`.
+
+        """
+
+        return (a.id for a in self.atoms)
+
+    def get_bonder_ids(self):
+        """
+        Get the ids of :attr:`bonders`.
+
+        Returns
+        -------
+        :class:`generator` of :class:`int`
+            The ids of :attr:`bonders`.
+
+        """
+        return (a.id for a in self.bonders)
+
+    def get_deleter_ids(self):
+        """
+        Get the ids of :attr:`deleters`.
+
+        Returns
+        -------
+        :class:`generator` of :class:`int`
+            The ids of :attr:`deleters`.
+
+        """
+
+        return (a.id for a in self.deleters)
+
     def __repr__(self):
         return (
             f"FunctionalGroup(id={self.id!r}, "
@@ -537,8 +575,8 @@ class Reactor:
 
         names = (fg.info.name for fg in fgs)
         reaction_key = ReactionKey(*names)
-        if reaction_key in self.periodic_custom_reactions:
-            rxn_fn = self.periodic_custom_reactions[reaction_key]
+        if reaction_key in self._periodic_custom_reactions:
+            rxn_fn = self._periodic_custom_reactions[reaction_key]
             return rxn_fn(direction, *fgs)
 
         bond = self.bond_orders.get(reaction_key, 1)
@@ -637,14 +675,12 @@ class Reactor:
 
         """
 
-        bond = rdkit.rdchem.BondType.SINGLE
-
         boron = fg1 if fg1.info.name == 'boronic_acid' else fg2
         diol = fg2 if boron is fg1 else fg1
 
-        boron_atom = boron.bonder_ids[0]
-        self.emol.AddBond(boron_atom, diol.bonder_ids[0], bond)
-        self.emol.AddBond(boron_atom, diol.bonder_ids[1], bond)
+        boron_atom = boron.bonders[0]
+        self._mol.append(Bond(boron_atom, diol.bonders[0], 1))
+        self._mol.append(Bond(boron_atom, diol.bonders[1], 1))
         self.bonds_made += 2
 
     def _ring_amine_with_ring_amine(self, fg1, fg2):
@@ -665,98 +701,90 @@ class Reactor:
 
         """
 
-        c1 = next(
-            a for a in fg1.bonder_ids
-            if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 6
-        )
-        n1 = next(
-            a for a in fg1.bonder_ids
-            if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 7
-        )
+        c1 = next(a for a in fg1.bonders if a.atomic_number == 6)
+        n1 = next(a for a in fg1.bonders if a.atomic_number == 7)
 
-        c2 = next(
-            a for a in fg2.bonder_ids
-            if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 6
-        )
-        n2 = next(
-            a for a in fg2.bonder_ids
-            if self.mol.GetAtomWithIdx(a).GetAtomicNum() == 7
-        )
+        c2 = next(a for a in fg2.bonders if a.atomic_number == 6)
+        n2 = next(a for a in fg2.bonders if a.atomic_number == 7)
 
-        conf = self.mol.GetConformer()
-        n1_pos = np.array([*conf.GetAtomPosition(n1)])
-        n2_pos = np.array([*conf.GetAtomPosition(n2)])
+        coords = self._mol.get_atom_coords(atom_ids=(c1, n1, c2, n2))
+        n1_coord, n2_coord, c1_coord, c2_coord = coords
 
-        c1_pos = np.array([*conf.GetAtomPosition(c1)])
-        c2_pos = np.array([*conf.GetAtomPosition(c2)])
+        n_joiner = elements.C(len(self._mol.atoms))
+        self._mol.atoms.append(n_joiner)
+        n_joiner_coord = (n1_coord + n2_coord) / 2
+        self._mol._position_matrix.append(n_joiner_coord)
 
-        n_joiner = self.emol.AddAtom(rdkit.Atom(6))
-        n_joiner_pos = (n1_pos + n2_pos) / 2
-        self.new_atom_coords.append((n_joiner, n_joiner_pos))
+        nh1 = elements.H(len(self._mol.atoms))
+        self._mol.atoms.append(nh1)
+        nh1_coord = n_joiner_coord + np.array([0, 0, 1])
+        self._mol._position_matrix.append(nh1_coord)
 
-        nh1 = self.emol.AddAtom(rdkit.Atom(1))
-        nh1_pos = n_joiner_pos + np.array([0, 0, 1])
-        self.new_atom_coords.append((nh1, nh1_pos))
+        nh2 = elements.H(len(self._mol.atoms))
+        self._mol.atoms.append(nh2)
+        nh2_coord = n_joiner_coord + np.array([0, 0, -1])
+        self._mol._position_matrix.append(nh2_coord)
 
-        nh2 = self.emol.AddAtom(rdkit.Atom(1))
-        nh2_pos = n_joiner_pos + np.array([0, 0, -1])
-        self.new_atom_coords.append((nh2, nh2_pos))
+        nc_joiner1 = elements.C(len(self._mol.atoms))
+        self._mol.atoms.append(nc_joiner1)
+        nc_joiner1_coord = (c1_coord + n2_coord) / 2
+        self._mol._position_matrix.append(nc_joiner1_coord)
 
-        nc_joiner1 = self.emol.AddAtom(rdkit.Atom(6))
-        nc_joiner1_pos = (c1_pos + n2_pos) / 2
-        self.new_atom_coords.append((nc_joiner1, nc_joiner1_pos))
+        nc1h1 = elements.H(len(self._mol.atoms))
+        self._mol.atoms.append(nc1h1)
+        nc1h1_coord = nc_joiner1_coord + np.array([0, 0, 1])
+        self._mol._position_matrix.append(nc1h1_coord)
 
-        nc1h1 = self.emol.AddAtom(rdkit.Atom(1))
-        nc1h1_pos = nc_joiner1_pos + np.array([0, 0, 1])
-        self.new_atom_coords.append((nc1h1, nc1h1_pos))
+        nc1h2 = elements.H(len(self._mol.atoms))
+        self._mol.atoms.append(nc1h2)
+        nc1h2_coord = nc_joiner1_coord + np.array([0, 0, -1])
+        self._mol._position_matrix.append(nc1h2_coord)
 
-        nc1h2 = self.emol.AddAtom(rdkit.Atom(1))
-        nc1h2_pos = nc_joiner1_pos + np.array([0, 0, -1])
-        self.new_atom_coords.append((nc1h2, nc1h2_pos))
+        nc_joiner2 = elements.C(len(self._mol.atoms))
+        self._mol.atoms.append(nc_joiner2)
+        nc_joiner2_coord = (c2_coord + n1_coord) / 2
+        self._mol._position_matrix.append(nc_joiner2_coord)
 
-        nc_joiner2 = self.emol.AddAtom(rdkit.Atom(6))
-        nc_joiner2_pos = (c2_pos + n1_pos) / 2
-        self.new_atom_coords.append((nc_joiner2, nc_joiner2_pos))
+        nc2h1 = elements.H(len(self._mol.atoms))
+        self._mol.atoms.append(nc2h1)
+        nc2h1_coord = nc_joiner2_coord + np.array([0, 0, 1])
+        self._mol._position_matrix.append(nc2h1_coord)
 
-        nc2h1 = self.emol.AddAtom(rdkit.Atom(1))
-        nc2h1_pos = nc_joiner2_pos + np.array([0, 0, 1])
-        self.new_atom_coords.append((nc2h1, nc2h1_pos))
+        nc2h2 = elements.H(len(self._mol.atoms))
+        self._mol.atoms.append(nc2h2)
+        nc2h2_coord = nc_joiner2_coord + np.array([0, 0, -1])
+        self._mol._position_matrix.append(nc2h2_coord)
 
-        nc2h2 = self.emol.AddAtom(rdkit.Atom(1))
-        nc2h2_pos = nc_joiner2_pos + np.array([0, 0, -1])
-        self.new_atom_coords.append((nc2h2, nc2h2_pos))
+        self._mol.bonds.append(Bond(n1, n_joiner, 1))
+        self._mol.bonds.append(Bond(n2, n_joiner, 1))
+        self._mol.bonds.append(Bond(n_joiner, nh1, 1))
+        self._mol.bonds.append(Bond(n_joiner, nh2, 1))
 
-        single = rdkit.rdchem.BondType.SINGLE
-        self.emol.AddBond(n1, n_joiner, single)
-        self.emol.AddBond(n2, n_joiner, single)
-        self.emol.AddBond(n_joiner, nh1, single)
-        self.emol.AddBond(n_joiner, nh2, single)
+        self._mol.bonds.append(Bond(c1, nc_joiner1, 1))
+        self._mol.bonds.append(Bond(n2, nc_joiner1, 1))
+        self._mol.bonds.append(Bond(nc_joiner1, nc1h1, 1))
+        self._mol.bonds.append(Bond(nc_joiner1, nc1h2, 1))
 
-        self.emol.AddBond(c1, nc_joiner1, single)
-        self.emol.AddBond(n2, nc_joiner1, single)
-        self.emol.AddBond(nc_joiner1, nc1h1, single)
-        self.emol.AddBond(nc_joiner1, nc1h2, single)
+        self._mol.bonds.append(Bond(c2, nc_joiner2, 1))
+        self._mol.bonds.append(Bond(n1, nc_joiner2, 1))
+        self._mol.bonds.append(Bond(nc_joiner2, nc2h1, 1))
+        self._mol.bonds.append(Bond(nc_joiner2, nc2h2, 1))
 
-        self.emol.AddBond(c2, nc_joiner2, single)
-        self.emol.AddBond(n1, nc_joiner2, single)
-        self.emol.AddBond(nc_joiner2, nc2h1, single)
-        self.emol.AddBond(nc_joiner2, nc2h2, single)
-
-        self.bonds_made += 6
+        self.bonds_made += 12
 
     _custom_reactions = {
 
         ReactionKey('boronic_acid', 'diol'):
-            boronic_acid_with_diol,
+            _boronic_acid_with_diol,
 
         ReactionKey('diol', 'difluorene'):
-            partial(diol_with_dihalogen, dihalogen='difluorene'),
+            partial(_diol_with_dihalogen, dihalogen='difluorene'),
 
         ReactionKey('diol', 'dibromine'):
-            partial(diol_with_dihalogen, dihalogen='dibromine'),
+            partial(_diol_with_dihalogen, dihalogen='dibromine'),
 
         ReactionKey('ring_amine', 'ring_amine'):
-            ring_amine_with_ring_amine
+            _ring_amine_with_ring_amine
 
     }
 

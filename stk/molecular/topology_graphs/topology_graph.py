@@ -99,6 +99,7 @@ class Vertex:
 
     Methods
     -------
+    :meth:`__init__`
     :meth:`apply_scale`
     :meth:`clone`
     :meth:`get_position`
@@ -314,6 +315,7 @@ class Edge:
 
     Methods
     -------
+    :meth:`__init__`
     :meth:`assign_func_group`
     :meth:`get_func_groups`
 
@@ -400,7 +402,7 @@ class TopologyGraph:
 
     """
 
-    def __init__(self, vertices, edges, processes=1):
+    def __init__(self, vertices, edges, processes):
         """
         Initialize an instance of :class:`.TopologyGraph`.
 
