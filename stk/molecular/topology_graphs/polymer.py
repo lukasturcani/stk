@@ -116,6 +116,9 @@ class LinearVertex(Vertex):
             f'{cls_name}({x}, {y}, {z}, direction={self._direction})'
         )
 
+    def __init_subclass__(cls):
+        return
+
 
 class TerminalVertex(LinearVertex):
     """
@@ -421,7 +424,19 @@ class Linear(TopologyGraph):
 
         """
 
-        raise NotImplementedError('TODO')
+        deleter_ids = set()
+        deleter_ids.update(mol.func_groups[0].get_atom_ids())
+        deleter_ids.update(mol.func_groups[-1].get_atom_ids())
+        mol.atoms = [a for a in mol.atoms if a.id not in deleter_ids]
+        mol.bonds = [
+            b for b in mol.bonds
+            if b.atom1 not in deleter_ids
+            and b.atom2 not in deleter_ids
+        ]
+        mol._position_matrix = [
+            row for i, row in enumerate(mol._position_matrix)
+            if i not in deleter_ids
+        ]
 
     def _get_scale(self, mol):
         """

@@ -460,8 +460,8 @@ class Reactor:
     bonds_made : :class:`int`
         The number of bonds added.
 
-    _deleter_atoms : :class:`set` of :class:`int`
-        The atoms which are to be removed.
+    _deleter_ids : :class:`set` of :class:`int`
+        The ids atoms which are to be removed.
 
     _deleter_bonds : :class:`set` of :class:`int`
         The bonds which are to be removed.
@@ -501,7 +501,7 @@ class Reactor:
 
         self.bonds_made = 0
         self._mol = mol
-        self._deleter_atoms = set()
+        self._deleter_ids = set()
         self._deleter_bonds = set()
         self._func_groups = []
 
@@ -531,14 +531,14 @@ class Reactor:
 
         """
 
-        self._deleter_atoms.update(
-            atom for fg in fgs for atom in fg.deleters
-        )
+        for fg in fgs:
+            self._deleter_ids.update(fg.get_deleter_ids())
+            fg.deleters = ()
 
         names = (fg.info.name for fg in fgs)
         reaction_key = ReactionKey(*names)
         if reaction_key in self._custom_reactions:
-            return self._custom_reactions[reaction_key](*fgs)
+            return self._custom_reactions[reaction_key](self, *fgs)
 
         bond = self._bond_orders.get(reaction_key, 1)
         fg1, fg2 = fgs
@@ -568,17 +568,17 @@ class Reactor:
 
         """
 
-        self._deleter_atoms.update(
-            atom for fg in fgs for atom in fg.deleters
-        )
+        for fg in fgs:
+            self._deleter_ids.update(fg.get_deleter_ids())
+            fg.deleters = ()
 
         names = (fg.info.name for fg in fgs)
         reaction_key = ReactionKey(*names)
         if reaction_key in self._periodic_custom_reactions:
             rxn_fn = self._periodic_custom_reactions[reaction_key]
-            return rxn_fn(direction, *fgs)
+            return rxn_fn(self, direction, *fgs)
 
-        bond = self.bond_orders.get(reaction_key, 1)
+        bond = self._bond_orders.get(reaction_key, 1)
 
         # Make sure the direction of the periodic bond is maintained.
         fg1, fg2 = fgs
@@ -605,7 +605,16 @@ class Reactor:
 
         self._mol.atoms = [
             atom for atom in self._mol.atoms
-            if atom not in self._deleter_atoms
+            if atom.id not in self._deleter_ids
+        ]
+        self._mol.bonds = [
+            bond for bond in self._mol.bonds
+            if bond.atom1.id not in self._deleter_ids
+            and bond.atom2.id not in self._deleter_ids
+        ]
+        self._mol._position_matrix = [
+            row for i, row in enumerate(self._mol._position_matrix)
+            if i not in self._deleter_ids
         ]
 
         return self.bonds_made
@@ -678,8 +687,8 @@ class Reactor:
         diol = fg2 if boron is fg1 else fg1
 
         boron_atom = boron.bonders[0]
-        self._mol.append(Bond(boron_atom, diol.bonders[0], 1))
-        self._mol.append(Bond(boron_atom, diol.bonders[1], 1))
+        self._mol.bonds.append(Bond(boron_atom, diol.bonders[0], 1))
+        self._mol.bonds.append(Bond(boron_atom, diol.bonders[1], 1))
         self.bonds_made += 2
 
     def _ring_amine_with_ring_amine(self, fg1, fg2):

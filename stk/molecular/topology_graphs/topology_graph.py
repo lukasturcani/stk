@@ -657,15 +657,15 @@ class TopologyGraph:
                 counter.update([bb])
 
     def _place_building_blocks_parallel(self, mol, vertices):
-        raise NotImplementedError()
+        raise NotImplementedError('TODO')
 
     def _get_bonded_fgs(self, mol, edges):
         for edge in edges:
             yield edge.get_func_groups()
 
     def _clean_up(self, mol):
-        mol._position_matrix = mol._position_matrix.T
-        for i, atom in enumerate(self.atoms):
+        mol._position_matrix = np.array(mol._position_matrix).T
+        for i, atom in enumerate(mol.atoms):
             atom.id = i
 
     def __str__(self):
