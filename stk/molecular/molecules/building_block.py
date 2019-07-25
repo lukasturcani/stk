@@ -738,7 +738,7 @@ class BuildingBlock(Molecule):
 
         return func_groups
 
-    def to_dict(self, include_attrs=None):
+    def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """
         Return a :class:`dict` representation of the molecule.
 
@@ -748,6 +748,11 @@ class BuildingBlock(Molecule):
             The names of additional attributes of the molecule to be
             added to the :class:`dict`. Each attribute is saved as a
             string using :func:`repr`.
+
+        ignore_missing_attrs : :class:`bool`, optional
+            If ``False`` and an attribute in `include_attrs` is not
+            held by the :class:`BuildingBlock`, an error will be
+            raised.
 
         Returns
         -------
@@ -778,9 +783,17 @@ class BuildingBlock(Molecule):
             'atoms': repr(self.atoms)
         }
 
-        d.update(
-            {attr: repr(getattr(self, attr)) for attr in include_attrs}
-        )
+        if ignore_missing_attrs:
+            d.update({
+                attr: repr(getattr(self, attr))
+                for attr in include_attrs
+                if hasattr(self, attr)
+            })
+        else:
+            d.update({
+                attr: repr(getattr(self, attr))
+                for attr in include_attrs
+            })
 
         return d
 
