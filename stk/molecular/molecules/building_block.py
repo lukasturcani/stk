@@ -18,7 +18,7 @@ from ..elements import Atom
 from ..bonds import Bond
 from .molecule import Molecule
 from ..functional_groups import FunctionalGroup
-from ..functional_groups import functional_group_infos as fg_infos
+from ..functional_groups import functional_group_types as fg_types
 from ..functional_groups import functional_groups as fgs
 from ...utilities import (
     flatten,
@@ -49,7 +49,7 @@ class BuildingBlock(Molecule):
 
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
         The functional groups present in the molecule. The
-        :attr:`.FunctionalGroup.id` is equal to the index.
+        id of a :class:`.FunctionalGroup` is its index.
 
     _key : :class:`object`
         Extends :class:`.Molecule._key`. :class:`BuildingBlock`
@@ -688,16 +688,16 @@ class BuildingBlock(Molecule):
         rdkit.SanitizeMol(mol)
         func_groups = []
         for fg_name in fg_names:
-            fg_info = fg_infos[fg_name]
+            fg_type = fg_types[fg_name]
 
             # Find all fg atoms.
-            fg_query = rdkit.MolFromSmarts(fg_info.fg_smarts)
+            fg_query = rdkit.MolFromSmarts(fg_type.fg_smarts)
             fg_atoms = mol.GetSubstructMatches(fg_query)
 
             # Find all bonder atoms.
             bonder_atoms = [[] for i in range(len(fg_atoms))]
 
-            for match in fg_info.bonder_smarts:
+            for match in fg_type.bonder_smarts:
                 query = rdkit.MolFromSmarts(match.smarts)
                 atoms = set(flatten(mol.GetSubstructMatches(query)))
 
@@ -712,7 +712,7 @@ class BuildingBlock(Molecule):
 
             # Find all deleter atoms.
             deleter_atoms = [[] for i in range(len(fg_atoms))]
-            for match in fg_info.del_smarts:
+            for match in fg_type.del_smarts:
                 query = rdkit.MolFromSmarts(match.smarts)
                 atoms = set(flatten(mol.GetSubstructMatches(query)))
 
@@ -729,11 +729,10 @@ class BuildingBlock(Molecule):
                 fg, bonders, deleters = atom_ids
                 deleters = tuple(self.atoms[id_] for id_ in deleters)
                 fg = FunctionalGroup(
-                    id=len(func_groups),
                     atoms=tuple(self.atoms[id_] for id_ in fg),
                     bonders=tuple(self.atoms[id_] for id_ in bonders),
                     deleters=deleters,
-                    info=fg_info
+                    fg_type=fg_type
                 )
                 func_groups.append(fg)
 
@@ -776,7 +775,7 @@ class BuildingBlock(Molecule):
         if include_attrs is None:
             include_attrs = []
 
-        fgs = list(dedupe(fg.info.name for fg in self.func_groups))
+        fgs = list(dedupe(fg.fg_type.name for fg in self.func_groups))
         d = {
             'class': self.__class__.__name__,
             'func_groups': fgs,

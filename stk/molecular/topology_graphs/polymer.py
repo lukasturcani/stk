@@ -28,6 +28,7 @@ class LinearVertex(Vertex):
     Methods
     -------
     :meth:`__init__`
+    :meth:`assign_func_groups_to_edges`
     :meth:`clone`
     :meth:`place_building_block`
 
@@ -124,15 +125,36 @@ class LinearVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def _assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(self, building_block, fg_map):
+        """
+        Assign functional groups to edges.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is needs to have
+            functional groups assigned to
+
+        fg_map : :class:`dict`
+            A mapping from :class:`.FunctionalGroup` instances in
+            `building_block` to the equivalent
+            :class:`.FunctionalGroup` instances in the molecule being
+            constructed.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         fg1, fg2 = sorted(
             building_block.func_groups,
             key=lambda fg: building_block.get_centroid(
                 atom_ids=fg.get_bonder_ids()
             )[0]
         )
-        self.edges[0].assign_func_group(fg1)
-        self.edges[1].assign_func_group(fg2)
+        self.edges[0].assign_func_group(fg_map[fg1])
+        self.edges[1].assign_func_group(fg_map[fg2])
 
     def __repr__(self):
         x, y, z = self._coord
@@ -161,10 +183,12 @@ class TerminalVertex(LinearVertex):
         The direction to use if the building block placed on the
         vertex only has 1 :class:`.FunctionalGroup`.
 
-    """
+    Methods
+    -------
+    :meth:`assign_func_groups_to_edges`
+    :meth:`place_building_block`
 
-    def __init__(self, x, y, z, direction):
-        super().__init__(x, y, z, direction)
+    """
 
     def place_building_block(self, building_block):
         """
@@ -193,7 +217,7 @@ class TerminalVertex(LinearVertex):
         """
 
         if len(building_block.func_groups) != 1:
-            return super()._place_building_block(building_block)
+            return super().place_building_block(building_block)
 
         building_block.set_centroid(
             position=self._coord,
@@ -209,19 +233,21 @@ class TerminalVertex(LinearVertex):
         )
         return building_block.get_position_matrix()
 
-    def _assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(self, building_block, fg_map):
         """
         Assign functional groups to edges.
-
-        Each :class:`.FunctionalGroup` of the `building_block` needs
-        to be assigned to one of the :class:`.Edge` instances in
-        :attr:`edges`.
 
         Parameters
         ----------
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to
+
+        fg_map : :class:`dict`
+            A mapping from :class:`.FunctionalGroup` instances in
+            `building_block` to the equivalent
+            :class:`.FunctionalGroup` instances in the molecule being
+            constructed.
 
         Returns
         -------
@@ -250,7 +276,7 @@ class TerminalVertex(LinearVertex):
                 'must have 1 or 2 functional groups.'
             )
 
-        self.edges[0].assign_func_group(fg1)
+        self.edges[0].assign_func_group(fg_map[fg1])
 
 
 class HeadVertex(TerminalVertex):

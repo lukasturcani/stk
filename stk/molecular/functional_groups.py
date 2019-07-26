@@ -10,10 +10,10 @@ Extending stk: Adding  more functional groups.
 ----------------------------------------------
 
 If ``stk`` is to incorporate a new functional group, a new
-:class:`FGInfo` instance should be added to
+:class:`FGType` instance should be added to
 :data:`functional_groups`, which is defined in this module.
 
-Adding a new :class:`FGInfo` instance to :data:`functional_groups` will
+Adding a new :class:`FGType` instance to :data:`functional_groups` will
 allow :meth:`.Topology.construct` to connect the functional group to
 all others during construction. In most cases, nothing except adding
 this instance should be necessary in order to incorporate new
@@ -94,7 +94,7 @@ class ReactionKey:
         fg_names = ', '.join(repr(name) for name, count in self.key
                              for i in range(count))
 
-        return f'FGInfo({fg_names})'
+        return f'FGType({fg_names})'
 
     def __str__(self):
         return repr(self)
@@ -131,9 +131,9 @@ class Match:
         return repr(self)
 
 
-class FGInfo:
+class FGType:
     """
-    Contains key information about functional groups.
+    Contains information about types of functional groups.
 
     The point of this class is to register which atoms of a functional
     group form bonds, and which are deleted during construction of
@@ -179,7 +179,7 @@ class FGInfo:
 
     def __init__(self, name, fg_smarts, bonder_smarts, del_smarts):
         """
-        Initializes a :class:`FGInfo` instnace.
+        Initializes a :class:`FGType` instnace.
 
         Parameters
         ---------
@@ -202,20 +202,18 @@ class FGInfo:
         self.bonder_smarts = bonder_smarts
         self.del_smarts = del_smarts
 
-    def __eq__(self, other):
-        return (self.name == other.name and
-                self.fg_smarts == other.fg_smarts and
-                self.bonder_smarts == other.bonder_smarts and
-                self.del_smarts == other.del_smarts)
-
     def __repr__(self):
-        return (f'FGInfo(name={self.name!r}, '
-                f'fg_smarts={self.fg_smarts!r}, '
-                f'bonder_smarts={self.bonder_smarts!r}, '
-                f'del_smarts={self.del_smarts!r})')
+        return (
+            f'FGType(\n'
+            f'    name={self.name!r},\n'
+            f'    fg_smarts={self.fg_smarts!r},\n'
+            f'    bonder_smarts={self.bonder_smarts!r},\n'
+            f'    del_smarts={self.del_smarts!r}\n'
+            ')'
+        )
 
     def __str__(self):
-        return f'FGInfo({self.name!r})'
+        return f'FGType({self.name!r})'
 
 
 class FunctionalGroup:
@@ -233,8 +231,8 @@ class FunctionalGroup:
     deleters : :class:`tuple` of :class:`.Atom`
         The deleter atoms in the functional group.
 
-    info : :class:`FGInfo`
-        The :class:`FGInfo` of the functional group type.
+    type : :class:`FGType`
+        The :class:`FGType` of the functional group type.
 
     Methods
     -------
@@ -245,7 +243,7 @@ class FunctionalGroup:
 
     """
 
-    def __init__(self, atoms, bonders, deleters, info):
+    def __init__(self, atoms, bonders, deleters, fg_type):
         """
         Initialize a functional group.
 
@@ -260,10 +258,10 @@ class FunctionalGroup:
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms in the functional group.
 
-        info : :class:`FGInfo` or :class:`str`
-            The :class:`FGInfo` of the functional group to which the
+        fg_type : :class:`FGType` or :class:`str`
+            The :class:`FGType` of the functional group to which the
             functional group belongs. Can also be the name of the
-            :class:`FGInfo`.
+            :class:`FGType`.
 
         """
 
@@ -271,13 +269,13 @@ class FunctionalGroup:
         self.bonders = bonders
         self.deleters = deleters
 
-        if isinstance(info, str):
-            self.info = next(
-                fg_info for fg_info in functional_groups
-                if fg_info.name == info
+        if isinstance(fg_type, str):
+            self.fg_type = next(
+                fg_type for fg_type in functional_groups
+                if fg_type.name == fg_type
             )
         else:
-            self.info = info
+            self.fg_type = fg_type
 
     def clone(self, atom_map=None):
         """
@@ -306,7 +304,7 @@ class FunctionalGroup:
             atoms=tuple(atom_map.get(a, a) for a in self.atoms),
             bonders=tuple(atom_map.get(a, a) for a in self.bonders),
             deleters=tuple(atom_map.get(a, a)for a in self.deleters),
-            info=self.info
+            fg_type=self.fg_type
         )
 
     def get_atom_ids(self):
@@ -353,11 +351,21 @@ class FunctionalGroup:
             f'atoms={self.atoms!r}, '
             f'bonders={self.bonders!r}, '
             f'deleters={self.deleters!r}, '
-            f'info={self.info.name!r})'
+            f'fg_type={self.fg_type.name!r})'
         )
 
     def __str__(self):
-        return repr(self)
+        atoms = ', '.join(str(atom) for atom in self.atoms)
+        bonders = ', '.join(str(atom) for atom in self.bonders)
+        deleters = ', '.join(str(atom) for atom in self.deleters)
+        return (
+            f'FunctionalGroup(\n'
+            f'    atoms=({atoms}), \n'
+            f'    bonders=({bonders}), \n'
+            f'    deleters=({deleters}), \n'
+            f'    fg_type={self.fg_type.name!r}\n'
+            ')'
+        )
 
 
 class Reactor:
@@ -527,7 +535,7 @@ class Reactor:
             self._deleter_ids.update(fg.get_deleter_ids())
             fg.deleters = ()
 
-        names = (fg.info.name for fg in fgs)
+        names = (fg.fg_type.name for fg in fgs)
         reaction_key = ReactionKey(*names)
         if reaction_key in self._custom_reactions:
             return self._custom_reactions[reaction_key](self, *fgs)
@@ -564,7 +572,7 @@ class Reactor:
             self._deleter_ids.update(fg.get_deleter_ids())
             fg.deleters = ()
 
-        names = (fg.info.name for fg in fgs)
+        names = (fg.fg_type.name for fg in fgs)
         reaction_key = ReactionKey(*names)
         if reaction_key in self._periodic_custom_reactions:
             rxn_fn = self._periodic_custom_reactions[reaction_key]
@@ -633,7 +641,7 @@ class Reactor:
 
         """
 
-        diol = fg1 if fg1.info.name == 'diol' else fg2
+        diol = fg1 if fg1.fg_type.name == 'diol' else fg2
         dihalogen = fg2 if diol is fg1 else fg1
 
         distances = []
@@ -675,7 +683,7 @@ class Reactor:
 
         """
 
-        boron = fg1 if fg1.info.name == 'boronic_acid' else fg2
+        boron = fg1 if fg1.fg_type.name == 'boronic_acid' else fg2
         diol = fg2 if boron is fg1 else fg1
 
         boron_atom = boron.bonders[0]
@@ -793,24 +801,24 @@ class Reactor:
 
 functional_groups = (
 
-    FGInfo(name="amine",
+    FGType(name="amine",
            fg_smarts="[N]([H])[H]",
            bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
            del_smarts=[Match(smarts="[$([H][N][H])]", n=2)]),
 
-    FGInfo(name="aldehyde",
+    FGType(name="aldehyde",
            fg_smarts="[C](=[O])[H]",
            bonder_smarts=[Match(smarts="[$([C](=[O])[H])]", n=1)],
            del_smarts=[Match(smarts="[$([O]=[C][H])]", n=1)]),
 
-    FGInfo(name="carboxylic_acid",
+    FGType(name="carboxylic_acid",
            fg_smarts="[C](=[O])[O][H]",
            bonder_smarts=[Match(smarts="[$([C](=[O])[O][H])]", n=1)],
            del_smarts=[Match(smarts="[$([H][O][C](=[O]))]", n=1),
                        Match(smarts="[$([O]([H])[C](=[O]))]", n=1)]),
 
 
-    FGInfo(name="amide",
+    FGType(name="amide",
            fg_smarts="[C](=[O])[N]([H])[H]",
            bonder_smarts=[
                 Match(smarts="[$([C](=[O])[N]([H])[H])]", n=1)
@@ -820,44 +828,44 @@ functional_groups = (
                 Match(smarts="[$([H][N]([H])[C](=[O]))]", n=2)
            ]),
 
-    FGInfo(name="thioacid",
+    FGType(name="thioacid",
            fg_smarts="[C](=[O])[S][H]",
            bonder_smarts=[Match(smarts="[$([C](=[O])[S][H])]", n=1)],
            del_smarts=[Match(smarts="[$([H][S][C](=[O]))]", n=1),
                        Match(smarts="[$([S]([H])[C](=[O]))]", n=1)]),
 
-    FGInfo(name="alcohol",
+    FGType(name="alcohol",
            fg_smarts="[O][H]",
            bonder_smarts=[Match(smarts="[$([O][H])]", n=1)],
            del_smarts=[Match(smarts="[$([H][O])]", n=1)]),
 
-    FGInfo(name="thiol",
+    FGType(name="thiol",
            fg_smarts="[S][H]",
            bonder_smarts=[Match(smarts="[$([S][H])]", n=1)],
            del_smarts=[Match(smarts="[$([H][S])]", n=1)]),
 
-    FGInfo(name="bromine",
+    FGType(name="bromine",
            fg_smarts="*[Br]",
            bonder_smarts=[Match(smarts="[$(*[Br])]", n=1)],
            del_smarts=[Match(smarts="[$([Br]*)]", n=1)]),
 
-    FGInfo(name="iodine",
+    FGType(name="iodine",
            fg_smarts="*[I]",
            bonder_smarts=[Match(smarts="[$(*[I])]", n=1)],
            del_smarts=[Match(smarts="[$([I]*)]", n=1)]),
 
-    FGInfo(name='alkyne',
+    FGType(name='alkyne',
            fg_smarts='[C]#[C][H]',
            bonder_smarts=[Match(smarts='[$([C]([H])#[C])]', n=1)],
            del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1)]),
 
-    FGInfo(name='terminal_alkene',
+    FGType(name='terminal_alkene',
            fg_smarts='[C]=[C]([H])[H]',
            bonder_smarts=[Match(smarts='[$([C]=[C]([H])[H])]', n=1)],
            del_smarts=[Match(smarts='[$([H][C]([H])=[C])]', n=2),
                        Match(smarts='[$([C](=[C])([H])[H])]', n=1)]),
 
-    FGInfo(name='boronic_acid',
+    FGType(name='boronic_acid',
            fg_smarts='[B]([O][H])[O][H]',
            bonder_smarts=[Match(smarts='[$([B]([O][H])[O][H])]', n=1)],
            del_smarts=[Match(smarts='[$([O]([H])[B][O][H])]', n=2),
@@ -865,19 +873,19 @@ functional_groups = (
 
     # This amine functional group only deletes one of the
     # hydrogen atoms when a bond is formed.
-    FGInfo(name="amine2",
+    FGType(name="amine2",
            fg_smarts="[N]([H])[H]",
            bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
            del_smarts=[Match(smarts="[$([H][N][H])]", n=1)]),
 
-    FGInfo(name="secondary_amine",
+    FGType(name="secondary_amine",
            fg_smarts="[H][N]([#6])[#6]",
            bonder_smarts=[
                 Match(smarts="[$([N]([H])([#6])[#6])]", n=1)
            ],
            del_smarts=[Match(smarts="[$([H][N]([#6])[#6])]", n=1)]),
 
-    FGInfo(name='diol',
+    FGType(name='diol',
            fg_smarts='[H][O][#6]~[#6][O][H]',
            bonder_smarts=[
                Match(smarts='[$([O]([H])[#6]~[#6][O][H])]', n=2)
@@ -886,25 +894,25 @@ functional_groups = (
                Match(smarts='[$([H][O][#6]~[#6][O][H])]', n=2)
            ]),
 
-    FGInfo(name='difluorene',
+    FGType(name='difluorene',
            fg_smarts='[F][#6]~[#6][F]',
            bonder_smarts=[Match(smarts='[$([#6]([F])~[#6][F])]', n=2)],
            del_smarts=[Match(smarts='[$([F][#6]~[#6][F])]', n=2)]),
 
-    FGInfo(name='dibromine',
+    FGType(name='dibromine',
            fg_smarts='[Br][#6]~[#6][Br]',
            bonder_smarts=[
                Match(smarts='[$([#6]([Br])~[#6][Br])]', n=2)
            ],
            del_smarts=[Match(smarts='[$([Br][#6]~[#6][Br])]', n=2)]),
 
-    FGInfo(name='alkyne2',
+    FGType(name='alkyne2',
            fg_smarts='[C]#[C][H]',
            bonder_smarts=[Match(smarts='[$([C]#[C][H])]', n=1)],
            del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1),
                        Match(smarts='[$([C](#[C])[H])]', n=1)]),
 
-    FGInfo(name='ring_amine',
+    FGType(name='ring_amine',
            fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
            bonder_smarts=[
                Match(
@@ -929,4 +937,4 @@ functional_groups = (
 
     )
 
-functional_group_infos = {fg.name: fg for fg in functional_groups}
+functional_group_types = {fg.name: fg for fg in functional_groups}

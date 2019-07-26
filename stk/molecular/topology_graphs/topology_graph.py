@@ -79,7 +79,6 @@ topology is at the origin.
 """
 
 import numpy as np
-from functools import wraps
 import re
 
 from ..functional_groups import Reactor
@@ -101,6 +100,7 @@ class Vertex:
     -------
     :meth:`__init__`
     :meth:`apply_scale`
+    :meth:`assign_func_groups_to_edges`
     :meth:`clone`
     :meth:`get_position`
     :meth:`place_building_block`
@@ -126,80 +126,6 @@ class Vertex:
 
         self._coord = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
-
-    @staticmethod
-    def _add_func_group_assignment(fn):
-        """
-        Add :meth:`_add_func_group_assignment` to `fn`.
-
-        Parameters
-        ----------
-        fn : :class:`callable`
-            A :class:`callable` which is to perform
-            :meth:`_add_func_group_assignment` after it is called.
-            Usually :meth:`place_building_block`.
-
-        Returns
-        -------
-        :class:`callable`
-            A new :class:`callable` which runs
-            :meth:`_add_func_group_assignment` after `fn`.
-
-        """
-
-        @wraps(fn)
-        def inner(self, building_block):
-            r = fn(self, building_block)
-            self._assign_func_groups_to_edges(building_block)
-            return r
-
-        return inner
-
-    @staticmethod
-    def _add_position_restoration(fn):
-        """
-        Add building block position restoration after `fn` is called.
-
-        Parameters
-        ----------
-        fn : :class:`callable`
-            A :class:`callable` which is to restore the original
-            coordinates of a building block passed to `fn` after
-            `fn` is called. Usually :meth:`place_building_block`.
-
-        Returns
-        -------
-        :class:`callable`
-            A new :class:`callable` which restores the original
-            coordinates of a building block passed to `fn` after `fn`
-            is called.
-
-        """
-
-        @wraps(fn)
-        def inner(self, building_block):
-            pos_mat = building_block.get_position_matrix()
-            r = fn(self, building_block)
-            building_block.set_position_matrix(pos_mat)
-            return r
-
-        return inner
-
-    def __init_subclass__(cls, **kwargs):
-
-        # Make sure decorators are only applied once.
-        if hasattr(cls.place_building_block, '__wrapped__'):
-            return
-
-        # Save the undecorated function.
-        cls._place_building_block = cls.place_building_block
-
-        cls.place_building_block = cls._add_func_group_assignment(
-            cls.place_building_block
-        )
-        cls.place_building_block = cls._add_position_restoration(
-            cls.place_building_block
-        )
 
     def apply_scale(self, scale):
         """
@@ -279,19 +205,29 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def _assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(self, building_block, fg_map):
         """
         Assign functional groups to edges.
 
         Each :class:`.FunctionalGroup` of the `building_block` needs
-        to be assigned to one of the :class:`.Edge` instances in
-        :attr:`edges`.
+        to be associated with one of the :class:`.Edge` instances in
+        :attr:`edges`. Then, using `fg_map`, the
+        :class:`FunctionalGroup` instances in the molecule being
+        constructed need to be assigned to those edges. This is
+        because bonds need to be formed between functional groups of
+        the molecule being constructed, not the `building_block`.
 
         Parameters
         ----------
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to
+
+        fg_map : :class:`dict`
+            A mapping from :class:`.FunctionalGroup` instances in
+            `building_block` to the equivalent
+            :class:`.FunctionalGroup` instances in the molecule being
+            constructed.
 
         Returns
         -------
@@ -488,6 +424,7 @@ class TopologyGraph:
 
         reactor = Reactor(mol)
         for fgs in self._get_bonded_fgs(mol, edge_clones):
+            print(*fgs, sep='\n')
             reactor.add_reaction(*fgs)
         mol.bonds_made = reactor.finalize()
 
@@ -659,24 +596,44 @@ class TopologyGraph:
         # Use a shorter alias.
         counter = mol.building_block_counter
         for bb, vertices in mol.building_block_vertices.items():
+            original_coords = bb.get_position_matrix()
+
             for vertex in vertices:
-                clone = vertex_clones[vertex]
-                coords = clone.place_building_block(bb)
+                # Use a clone of the vertex for positioning so that
+                # state of the originals is not changed.
+                vertex_clone = vertex_clones[vertex]
+                # Get the coordinates of the building block when
+                # placed on the vertex clone.
+                coords = vertex_clone.place_building_block(bb)
+                # Add the coordinates to the constructed molecule.
                 mol._position_matrix.extend(coords)
 
+                # Create a map from each atom in the building block to
+                # a clone of that atom in the constructed molecule.
                 atom_map = {}
                 for atom in bb.atoms:
                     atom_clone = atom.clone()
                     atom_clone.id = len(mol.atoms)
                     atom_map[atom] = atom_clone
+
                     atom_clone.building_block = bb
                     atom_clone.building_block_id = counter[bb]
+
                     mol.atoms.append(atom_clone)
 
-                mol.func_groups.extend(
-                    fg.clone(atom_map) for fg in bb.func_groups
-                )
+                # Create a map from each functional group in the
+                # building block to a clone of that functional group
+                # in the constructed molecule.
+                fg_map = {
+                    fg: fg.clone(atom_map) for fg in bb.func_groups
+                }
+                mol.func_groups.extend(fg_map.values())
 
+                # Assign the functional groups in the contructed
+                # molecule to edges in the topology graph.
+                vertex_clone.assign_func_groups_to_edges(bb, fg_map)
+
+                bb.set_position_matrix(original_coords)
                 mol.bonds.extend(b.clone(atom_map) for b in bb.bonds)
                 counter.update([bb])
 
