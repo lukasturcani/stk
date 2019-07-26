@@ -645,7 +645,7 @@ def test_get_bonder_ids(aldehyde3):
     # Make sure that by default all bonder ids are yielded.
     all_ids = []
     for func_group in aldehyde3.func_groups:
-        all_ids.extend(func_group.bonder_ids)
+        all_ids.extend(func_group.get_bonder_ids())
     all_ids.sort()
     default_ids = sorted(aldehyde3.get_bonder_ids())
     assert default_ids == all_ids
@@ -661,7 +661,7 @@ def test_get_bonder_ids(aldehyde3):
     subset_ids = []
     fgs = [aldehyde3.func_groups[0], aldehyde3.func_groups[2]]
     for func_group in fgs:
-        subset_ids.extend(func_group.bonder_ids)
+        subset_ids.extend(func_group.get_bonder_ids())
     subset_ids.sort()
 
     returned_subset_ids = sorted(
@@ -764,16 +764,16 @@ def test_get_bonder_distances(tmp_amine4):
     # Test default behaviour.
     distances = tmp_amine4.get_bonder_distances()
     for i, (fg1, fg2, distance) in enumerate(distances):
-        coord1 = tmp_amine4.func_groups[fg1].bonder_ids[0]
-        coord2 = tmp_amine4.func_groups[fg2].bonder_ids[0]
+        coord1 = tmp_amine4.func_groups[fg1].bonders[0].id
+        coord2 = tmp_amine4.func_groups[fg2].bonders[0].id
         assert abs(distance - abs(coord1 - coord2)) < 1e-6
     assert i == 5
 
     # Test explicilty setting fg_ids.
     distances = tmp_amine4.get_bonder_distances(fg_ids=[0, 2, 3])
     for i, (fg1, fg2, distance) in enumerate(distances):
-        coord1 = tmp_amine4.func_groups[fg1].bonder_ids[0]
-        coord2 = tmp_amine4.func_groups[fg2].bonder_ids[0]
+        coord1 = tmp_amine4.func_groups[fg1].bonders[0].id
+        coord2 = tmp_amine4.func_groups[fg2].bonders[0].id
         assert abs(distance - abs(coord1 - coord2)) < 1e-6
     assert i == 2
 
@@ -782,7 +782,7 @@ def test_get_bonder_direction_vectors(tmp_amine4):
     pos_mat = tmp_amine4.get_position_matrix()
     # Set the coordinate of each bonder to the id of the fg.
     for fg in tmp_amine4.func_groups:
-        for bonder in fg.bonder_ids:
+        for bonder in fg.get_bonder_ids():
             pos_mat[bonder] = [fg.id, fg.id, fg.id]
     tmp_amine4.set_position_matrix(pos_mat)
 
@@ -842,13 +842,13 @@ def test_get_centroid_centroid_direction_vector(tmp_amine4):
 def test_get_functional_groups(amine2):
     amines = amine2.get_functional_groups(['amine'])
 
-    assert amines[0].atom_ids == (0, 5, 6)
-    assert amines[0].bonder_ids == (0, )
-    assert amines[0].deleter_ids == (5, 6)
+    assert tuple(amines[0].get_atom_ids()) == (0, 5, 6)
+    assert tuple(amines[0].get_bonder_ids()) == (0, )
+    assert tuple(amines[0].get_deleter_ids()) == (5, 6)
 
-    assert amines[1].atom_ids == (4, 13, 14)
-    assert amines[1].bonder_ids == (4, )
-    assert amines[1].deleter_ids == (13, 14)
+    assert tuple(amines[1].get_atom_ids()) == (4, 13, 14)
+    assert tuple(amines[1].get_bonder_ids()) == (4, )
+    assert tuple(amines[1].get_deleter_ids()) == (13, 14)
 
     aldehydes = amine2.get_functional_groups(['aldehyde'])
     assert not aldehydes
@@ -870,7 +870,15 @@ def test_dump_and_load(tmp_amine2):
     mol2 = stk.Molecule.load(path)
 
     assert tmp_amine2 is not mol2
-    assert mol2.func_groups == tmp_amine2.func_groups
+
+    fgs = it.zip_longest(mol2.func_groups, tmp_amine2.func_groups)
+    for fg1, fg2 in fgs:
+        atoms = it.zip_longest(fg1.atoms, fg2.atoms)
+        bonders = it.zip_longest(fg1.bonders, fg2.bonders)
+        deleters = it.zip_longest(fg1.deleters, fg2.deleters)
+        for a1, a2 in it.chain(atoms, bonders, deleters):
+            assert a1.__class__ is a2.__class__
+            assert a1.id == a2.id
 
     assert tmp_amine2.test_attr1 == mol2.test_attr1
     assert tmp_amine2.test_attr2 == mol2.test_attr2
@@ -883,21 +891,3 @@ def test_dump_and_load(tmp_amine2):
     assert mol3 is not mol2
     mol4 = stk.Molecule.load(path, use_cache=True)
     assert mol3 is mol4
-
-
-def test_shift_fgs(amine4):
-    ids = [10, 20, 30, 40]
-    shifted = amine4.shift_fgs(ids, 32)
-
-    for i, (fg1, fg2) in enumerate(zip(amine4.func_groups, shifted)):
-        assert fg1 is not fg2
-        assert fg2.id == ids[i]
-
-        for a1, a2 in zip(fg1.atom_ids, fg2.atom_ids):
-            assert a1 + 32 == a2
-
-        for a1, a2 in zip(fg1.bonder_ids, fg2.bonder_ids):
-            assert a1 + 32 == a2
-
-        for a1, a2 in zip(fg1.deleter_ids, fg2.deleter_ids):
-            assert a1 + 32 == a2
