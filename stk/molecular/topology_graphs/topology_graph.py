@@ -170,6 +170,14 @@ class Vertex:
         return inner
 
     def __init_subclass__(cls, **kwargs):
+
+        # Make sure decorators are only applied once.
+        if hasattr(cls.place_building_block, '__wrapped__'):
+            return
+
+        # Save the undecorated function.
+        cls._place_building_block = cls.place_building_block
+
         cls.place_building_block = cls._add_func_group_assignment(
             cls.place_building_block
         )
@@ -393,7 +401,7 @@ class TopologyGraph:
     edges : :class:`.Edge`
         The edges which make up the topology graph.
 
-    processes : :class:`int`
+    _processes : :class:`int`
         The number of parallel processes to create during
         :meth:`construct`.
 
@@ -424,7 +432,7 @@ class TopologyGraph:
 
         self.vertices = vertices
         self.edges = edges
-        self.processes = processes
+        self._processes = processes
 
     def construct(self, mol, building_blocks):
         """
@@ -616,7 +624,7 @@ class TopologyGraph:
 
         """
 
-        if self.processes == 1:
+        if self._processes == 1:
             return self._place_building_blocks_serial(
                 mol=mol,
                 vertex_clones=vertex_clones

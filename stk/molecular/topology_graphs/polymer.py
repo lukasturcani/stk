@@ -81,11 +81,11 @@ class LinearVertex(Vertex):
             position=self._coord,
             atom_ids=building_block.get_bonder_ids(fg_ids=(0, 1))
         )
-        *_, bonder_vector = next(
+        bonder_vector = next(
             building_block.get_bonder_direction_vectors(
                 fg_ids=(0, 1)
             )
-        )
+        )[-1]
         building_block.apply_rotation_between_vectors(
             start=bonder_vector,
             target=[self._direction, 0, 0],
@@ -115,9 +115,6 @@ class LinearVertex(Vertex):
         return (
             f'{cls_name}({x}, {y}, {z}, direction={self._direction})'
         )
-
-    def __init_subclass__(cls):
-        return
 
 
 class TerminalVertex(LinearVertex):
@@ -165,7 +162,7 @@ class TerminalVertex(LinearVertex):
         """
 
         if len(building_block.func_groups) != 1:
-            return super().place_building_block(building_block)
+            return super()._place_building_block(building_block)
 
         building_block.set_centroid(
             position=self._coord,
@@ -431,7 +428,7 @@ class Linear(TopologyGraph):
         mol.bonds = [
             b for b in mol.bonds
             if b.atom1 not in deleter_ids
-            and b.atom2 not in deleter_ids
+            or b.atom2 not in deleter_ids
         ]
         mol._position_matrix = [
             row for i, row in enumerate(mol._position_matrix)
