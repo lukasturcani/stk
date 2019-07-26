@@ -41,9 +41,18 @@ class Bond:
         self.atom2 = atom2
         self.order = order
 
-    def clone(self):
+    def clone(self, atom_map=None):
         """
         Clone the bond.
+
+        Parameters
+        ----------
+        atom_map : :class:`dict`, optional
+            If the clone should hold different :class:`.Atom`
+            instances, then a :class:`dict` should be provided which
+            maps atoms in the current :class:`.Bond` to the
+            atoms which should be used in the clone. Only atoms which
+            need to be remapped need to be present in the `atom_map`.
 
         Returns
         -------
@@ -52,10 +61,15 @@ class Bond:
 
         """
 
+        if atom_map is None:
+            atom_map = {}
+
         obj = self.__class__.__new__(self.__class__)
         for attr, val in vars(self).items():
             if not attr.startswith('_'):
                 setattr(obj, attr, val)
+        obj.atom1 = atom_map.get(obj.atom1, obj.atom1)
+        obj.atom2 = atom_map.get(obj.atom2, obj.atom2)
         return obj
 
     def __repr__(self):

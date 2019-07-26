@@ -108,6 +108,22 @@ class Vertex:
     """
 
     def __init__(self, x, y, z):
+        """
+        Initialize a :class:`.Vertex`.
+
+        Parameters
+        ----------
+        x : :class:`float`
+            The x coordinate.
+
+        y : :class:`float`
+            The y coordinate.
+
+        z : :class:`float`
+            The z coordinate.
+
+        """
+
         self._coord = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
 
@@ -661,7 +677,7 @@ class TopologyGraph:
                     fg.clone(atom_map) for fg in bb.func_groups
                 )
 
-                mol.bonds.extend(b.clone() for b in bb.bonds)
+                mol.bonds.extend(b.clone(atom_map) for b in bb.bonds)
                 counter.update([bb])
 
     def _place_building_blocks_parallel(self, mol, vertices):

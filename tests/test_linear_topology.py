@@ -1,9 +1,57 @@
 import os
 import stk
+import numpy as np
 
 test_dir = 'linear_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
+
+
+def test_linear_vertex(tmp_amine2):
+    t = stk.polymer.Linear(
+        repeating_unit='AB',
+        orientation=[0, 0],
+        n=3
+    )
+    v1, v2 = t.vertices[2:4]
+
+    initial_coords = tmp_amine2.get_position_matrix()
+    new_coords = v1.place_building_block(tmp_amine2)
+    assert np.allclose(
+        a=tmp_amine2.get_position_matrix(),
+        b=initial_coords,
+        atol=1e-8
+    )
+    v1._place_building_block(tmp_amine2)
+    assert np.allclose(
+        a=tmp_amine2.get_centroid(tmp_amine2.get_bonder_ids()),
+        b=v1.get_position(),
+        atol=1e-6
+    )
+    assert np.allclose(
+        a=new_coords,
+        b=tmp_amine2.get_position_matrix(),
+        atol=1e-6
+    )
+
+    initial_coords = tmp_amine2.get_position_matrix()
+    new_coords = v2.place_building_block(tmp_amine2)
+    assert np.allclose(
+        a=tmp_amine2.get_position_matrix(),
+        b=initial_coords,
+        atol=1e-8
+    )
+    v2._place_building_block(tmp_amine2)
+    assert np.allclose(
+        a=tmp_amine2.get_centroid(tmp_amine2.get_bonder_ids()),
+        b=v2.get_position(),
+        atol=1e-6
+    )
+    assert np.allclose(
+        a=new_coords,
+        b=tmp_amine2.get_position_matrix(),
+        atol=1e-6
+    )
 
 
 def test_construction(amine2, aldehyde2, boronic_acid2, diol2):

@@ -20,15 +20,42 @@ class LinearVertex(Vertex):
 
     Attributes
     ----------
-    _direction : :class:`int`
-        Can be ``1``or ``-1`` to signify if the building block placed
-        on the vertex should be placed parallel or anti-parallel
-        to the chain.
+    _orientation : :class:`float`
+        Can be any number from ``0`` to ``1``, both inclusive. It
+        specifies the probability the building block placed on the
+        vertex will have its orientation along the chain flipped.
+
+    Methods
+    -------
+    :meth:`__init__`
+    :meth:`clone`
+    :meth:`place_building_block`
 
     """
 
-    def __init__(self, x, y, z, direction):
-        self._direction = direction
+    def __init__(self, x, y, z, orientation):
+        """
+        Initialize a :class:`.LinearVertex`.
+
+        Parameters
+        ----------
+        x : :class:`float`
+            The x coordinate.
+
+        y : :class:`float`
+            The y coordinate.
+
+        z : :class:`float`
+            The z coordinate.
+
+        orientation : :class:`float`
+            Can be any number from ``0`` to ``1``, both inclusive. It
+            specifies the probability the building block placed on the
+            vertex will have its orientation along the chain flipped.
+
+        """
+
+        self._orientation = orientation
         super().__init__(x, y, z)
 
     def clone(self):
@@ -38,13 +65,13 @@ class LinearVertex(Vertex):
         Returns
         -------
         :class:`LinearVertex`
-            A clone with the same position and direction and connected
-            to the same :class:`.Edge` objects.
+            A clone with the same position and orientation and
+            connected to the same :class:`.Edge` objects.
 
         """
 
         clone = super().clone()
-        clone._direction = self._direction
+        clone._orientation = self._orientation
         return clone
 
     def place_building_block(self, building_block):
@@ -88,7 +115,7 @@ class LinearVertex(Vertex):
             )
         )[-1]
 
-        p = [1-self._direction, self._direction]
+        p = [1-self._orientation, self._orientation]
         direction = np.random.choice([1, -1], p=p)
         building_block.apply_rotation_between_vectors(
             start=bonder_vector,
@@ -117,7 +144,7 @@ class LinearVertex(Vertex):
         p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
         cls_name = p.findall(cls_name)[0]
         return (
-            f'{cls_name}({x}, {y}, {z}, direction={self._direction})'
+            f'{cls_name}({x}, {y}, {z}, direction={self._orientation})'
         )
 
 
@@ -299,15 +326,15 @@ class Linear(TopologyGraph):
             :meth:`.ConstructedMolecule.__init__`.
 
         orientation : :class:`tuple` of :class:`float`
-            For each character in the repeating unit, a value between ``0``
-            and ``1`` (both inclusive) must be given in a :class:`list`. It
-            indicates the probability that each monomer will have its
-            orientation along the chain flipped. If ``0`` then the
-            monomer is guaranteed to not flip. If ``1`` it is
-            guaranteed to flip. This allows the user to create
-            head-to-head or head-to-tail chains, as well as chain with
-            a preference for head-to-head or head-to-tail if a number
-            between ``0`` and ``1`` is chosen.
+            For each character in the repeating unit, a value
+            between ``0`` and ``1`` (both inclusive) must be given in
+            a :class:`list`. It indicates the probability that each
+            monomer will have its orientation along the chain flipped.
+            If ``0`` then the monomer is guaranteed to not flip. If
+            ``1`` it is guaranteed to flip. This allows the user to
+            create head-to-head or head-to-tail chains, as well as
+            chain with a preference for head-to-head or head-to-tail if
+            a number between ``0`` and ``1`` is chosen.
 
         n : :class:`int`
             The number of repeating units which are used to make the
@@ -333,9 +360,9 @@ class Linear(TopologyGraph):
         head, *body, tail = orientation*n
         vertices = [HeadVertex(0, 0, 0, head)]
         edges = []
-        for i, direction in enumerate(body, 1):
+        for i, orientation in enumerate(body, 1):
             v = LinearVertex(
-                x=i, y=0, z=0, direction=direction
+                x=i, y=0, z=0, orientation=orientation
             )
             vertices.append(v)
             edges.append(Edge(vertices[i-1], vertices[i]))

@@ -592,7 +592,7 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        return self._position_matrix.T
+        return np.array(self._position_matrix.T)
 
     def is_identical(self, other):
         """
@@ -779,7 +779,8 @@ class Molecule(metaclass=_Cached):
                     bond_id = len(bond_lines)
 
                 bond_lines.append(
-                    f'M  V30 {bond_id+1} {bond.order} {a1+1} {a2+1}\n'
+                    f'M  V30 {bond_id+1} '
+                    f'{int(bond.order)} {a1+1} {a2+1}\n'
                 )
 
         num_bonds = len(bond_lines)

@@ -224,9 +224,6 @@ class FunctionalGroup:
 
     Attributes
     ----------
-    id : :class:`int`
-        The id of the functional group.
-
     atoms : :class:`tuple` of :class:`.Atom`
         The atoms in the functional group.
 
@@ -248,15 +245,12 @@ class FunctionalGroup:
 
     """
 
-    def __init__(self, id, atoms, bonders, deleters, info):
+    def __init__(self, atoms, bonders, deleters, info):
         """
         Initialize a functional group.
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the functional group.
-
         atoms : :class:`tuple` of :class:`.Atom`
             The atoms in the functional group.
 
@@ -273,7 +267,6 @@ class FunctionalGroup:
 
         """
 
-        self.id = id
         self.atoms = atoms
         self.bonders = bonders
         self.deleters = deleters
@@ -310,7 +303,6 @@ class FunctionalGroup:
             atom_map = {}
 
         return self.__class__(
-            id=self.id,
             atoms=tuple(atom_map.get(a, a) for a in self.atoms),
             bonders=tuple(atom_map.get(a, a) for a in self.bonders),
             deleters=tuple(atom_map.get(a, a)for a in self.deleters),
@@ -357,11 +349,11 @@ class FunctionalGroup:
 
     def __repr__(self):
         return (
-            f"FunctionalGroup(id={self.id!r}, "
-            f"atoms={self.atoms!r}, "
-            f"bonders={self.bonders!r}, "
-            f"deleters={self.deleters!r}, "
-            f"info={self.info.name!r})"
+            f'FunctionalGroup('
+            f'atoms={self.atoms!r}, '
+            f'bonders={self.bonders!r}, '
+            f'deleters={self.deleters!r}, '
+            f'info={self.info.name!r})'
         )
 
     def __str__(self):
