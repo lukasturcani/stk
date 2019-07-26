@@ -347,11 +347,12 @@ class FunctionalGroup:
 
     def __repr__(self):
         return (
-            f'FunctionalGroup('
-            f'atoms={self.atoms!r}, '
-            f'bonders={self.bonders!r}, '
-            f'deleters={self.deleters!r}, '
-            f'fg_type={self.fg_type.name!r})'
+            f'FunctionalGroup(\n'
+            f'    atoms={self.atoms!r},\n'
+            f'    bonders={self.bonders!r},\n'
+            f'    deleters={self.deleters!r},\n'
+            f'    fg_type={self.fg_type.name!r}\n'
+            ')'
         )
 
     def __str__(self):

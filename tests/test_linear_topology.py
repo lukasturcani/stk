@@ -15,14 +15,7 @@ def test_linear_vertex(tmp_amine2):
     )
     v1, v2 = t.vertices[2:4]
 
-    initial_coords = tmp_amine2.get_position_matrix()
     new_coords = v1.place_building_block(tmp_amine2)
-    assert np.allclose(
-        a=tmp_amine2.get_position_matrix(),
-        b=initial_coords,
-        atol=1e-8
-    )
-    v1._place_building_block(tmp_amine2)
     assert np.allclose(
         a=tmp_amine2.get_centroid(tmp_amine2.get_bonder_ids()),
         b=v1.get_position(),
@@ -34,14 +27,7 @@ def test_linear_vertex(tmp_amine2):
         atol=1e-6
     )
 
-    initial_coords = tmp_amine2.get_position_matrix()
     new_coords = v2.place_building_block(tmp_amine2)
-    assert np.allclose(
-        a=tmp_amine2.get_position_matrix(),
-        b=initial_coords,
-        atol=1e-8
-    )
-    v2._place_building_block(tmp_amine2)
     assert np.allclose(
         a=tmp_amine2.get_centroid(tmp_amine2.get_bonder_ids()),
         b=v2.get_position(),

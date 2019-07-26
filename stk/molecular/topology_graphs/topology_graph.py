@@ -424,7 +424,6 @@ class TopologyGraph:
 
         reactor = Reactor(mol)
         for fgs in self._get_bonded_fgs(mol, edge_clones):
-            print(*fgs, sep='\n')
             reactor.add_reaction(*fgs)
         mol.bonds_made = reactor.finalize()
 

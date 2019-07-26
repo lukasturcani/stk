@@ -59,8 +59,9 @@ class BuildingBlock(Molecule):
     Methods
     -------
     :meth:`__init__`
+    :meth:`init_from_file`
     :meth:`init_from_random_file`
-    :meth:`init_from_smiles`
+    :meth:`init_from_rdkit_mol`
     :meth:`get_bonder_ids`
     :meth:`get_bonder_centroids`
     :meth:`get_bonder_plane`
@@ -70,7 +71,6 @@ class BuildingBlock(Molecule):
     :meth:`get_centroid_centroid_direction_vector`
     :meth:`get_functional_groups`
     :meth:`to_dict`
-    :meth:`shift_fgs`
 
     """
 
@@ -94,150 +94,8 @@ class BuildingBlock(Molecule):
         ),
     }
 
-    def __init__(self, mol, functional_groups=None, use_cache=False):
-        """
-        Initialize a :class:`BuildingBlock` instance.
-
-        Parameters
-        ----------
-        mol : :class:`str` or :class:`rdkit.Mol`
-            Can be one of 2 things:
-
-                1. A path to a molecular structure file.
-                2. A :class:`rdkit.Mol` object.
-
-            Supported file types are:
-
-                #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
-                #. ``.pdb`` - PDB file
-
-        functional_groups : :class:`list` of :class:`str`, optional
-            The names of the functional groups which are to have atoms
-            tagged. If ``None``, a functional group name found in the
-            path is used. If no functional groups are provided
-            to this parameter and the name of one is not present in
-            the path, no tagging is done.
-
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`BuildingBlock` does not
-            yet exist the created one will be added to the cache.
-
-        Raises
-        ------
-        :class:`ValueError`
-            If the file type cannot be used for initialization.
-
-        """
-
-        if isinstance(mol, str):
-            if os.path.exists(mol):
-                _, ext = os.path.splitext(mol)
-
-                if ext not in self._init_funcs:
-                    raise ValueError(
-                        f'Unable to initialize from "{ext}" files.'
-                    )
-                rdkit_mol = remake(self._init_funcs[ext](mol))
-
-        elif isinstance(mol, rdkit.Mol):
-            rdkit_mol = remake(mol)
-
-        atoms = tuple(
-            Atom(a.GetIdx(), a.GetAtomicNum(), a.GetFormalCharge())
-            for a in rdkit_mol.GetAtoms()
-        )
-        bonds = tuple(
-            Bond(
-                atoms[b.GetBeginAtomIdx()],
-                atoms[b.GetEndAtomIdx()],
-                b.GetBondTypeAsDouble()
-            )
-            for b in rdkit_mol.GetBonds()
-        )
-
-        position_matrix = rdkit_mol.GetConformer().GetPositions()
-        super().__init__(atoms, bonds, position_matrix)
-
-        # If no functional group names passed, check if any functional
-        # group names appear in the file path.
-        if functional_groups is None:
-            if isinstance(mol, str) and os.path.exists(mol):
-                functional_groups = [
-                    fg.name for fg in fgs if fg.name in mol
-                ]
-            else:
-                functional_groups = []
-
-        self.func_groups = tuple(
-            self.get_functional_groups(functional_groups)
-        )
-
-    @classmethod
-    def init_from_random_file(
-        cls,
-        file_glob,
-        functional_groups=None,
-        use_cache=False
-    ):
-        """
-        Pick a random file from `file_glob` to initialize from.
-
-        Parameters
-        ----------
-        file_glob : :class:`str`
-            A glob specifying files, one of which is used to initialize
-            a :class:`.BuildingBlock` at random.
-
-        functional_groups : :class`list` of :class:`str`, optional
-            The names of the functional groups which are to have atoms
-            tagged. If ``None``, a functional group name found in the
-            path of the selected file path is used. If no functional
-            groups are provided to this parameter and the name of one
-            is not present in the selected file path, no tagging is
-            done.
-
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`BuildingBlock` does not
-            yet exist the created one will be added to the cache.
-
-        Returns
-        -------
-        :class:`BuildingBlock`
-            A random molecule from `file_glob`.
-
-        Raises
-        ------
-        :class:`RuntimeError`
-            If no files in `file_glob` could be initialized from.
-
-        """
-
-        files = glob(file_glob)
-        np.random.shuffle(files)
-
-        for mol_file in files:
-            try:
-                return cls(mol_file, functional_groups, use_cache)
-
-            except Exception:
-                msg = (
-                    'Could not initialize '
-                    f'{cls.__name__} from {mol_file}.'
-                )
-                logger.warning(msg)
-        raise RuntimeError(
-            f'No files in "{file_glob}" could be initialized from.'
-        )
-
-    @classmethod
-    def init_from_smiles(
-        cls,
+    def __init__(
+        self,
         smiles,
         functional_groups=None,
         random_seed=4,
@@ -246,7 +104,9 @@ class BuildingBlock(Molecule):
         """
         Initialize from a SMILES string.
 
-        The structure of the molecule is embedded using
+        Note
+        ----
+        The molecule is given 3D coordinates using
         :func:`rdkit.ETKDGv2()`.
 
         Parameters
@@ -254,12 +114,13 @@ class BuildingBlock(Molecule):
         smiles : :class:`str`
             A SMILES string of the molecule.
 
-        functional_groups : :class:`list` of :class:`str`, optional
-            The name of the functional groups which are to have atoms
-            tagged. If ``None``, no tagging is done.
+        functional_groups : :class:`iterable` of :class:`str`, optional
+            The names of the functional group types which are to be
+            added to :attr:`func_groups`. If ``None`, then no
+            functional groups are added.
 
         random_seed : :class:`int`, optional
-            Random seed passed to :func:`rdkit.ETKDG`
+            Random seed passed to :func:`rdkit.ETKDGv2`
 
         use_cache : :class:`bool`, optional
             If ``True``, a new :class:`.BuildingBlock` will
@@ -267,12 +128,6 @@ class BuildingBlock(Molecule):
             the one which already exists will be returned. If ``True``
             and a cached, identical :class:`BuildingBlock` does not
             yet exist the created one will be added to the cache.
-
-        Returns
-        -------
-        :class:`BuildingBlock`
-            A :class:`BuildingBlock` instance of the molecule in
-            `smiles`.
 
         """
 
@@ -298,10 +153,224 @@ class BuildingBlock(Molecule):
             )
             logger.warning(msg)
 
-        return cls(
+        return self._init_from_rdkit_mol(
+            mol=mol,
+            functional_groups=functional_groups
+        )
+
+    @classmethod
+    def init_from_file(
+        cls,
+        path,
+        functional_groups=None,
+        use_cache=False
+    ):
+        """
+        Initialize a :class:`BuildingBlock` from a file.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The path to a molecular structure file. Supported file
+            types are:
+
+                #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
+                #. ``.pdb`` - PDB file
+
+        functional_groups : :class:`iterable` of :class:`str`, optional
+            The names of the functional group types which are to be
+            added to :attr:`func_groups`. If ``None`, then no
+            functional groups are added.
+
+        use_cache : :class:`bool`, optional
+            If ``True``, a new :class:`.BuildingBlock` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`BuildingBlock` does not
+            yet exist the created one will be added to the cache.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If the file type cannot be used for initialization.
+
+        """
+
+        if os.path.exists(path):
+            _, ext = os.path.splitext(path)
+
+            if ext not in cls._init_funcs:
+                raise ValueError(
+                    f'Unable to initialize from "{ext}" files.'
+                )
+            mol = remake(cls._init_funcs[ext](path))
+
+        # If no functional group names passed, check if any functional
+        # group names appear in the file path.
+        if functional_groups is None:
+            functional_groups = tuple(
+                fg.name for fg in fgs if fg.name in path
+            )
+
+        return cls.init_from_rdkit_mol(
             mol=mol,
             functional_groups=functional_groups,
             use_cache=use_cache
+        )
+
+    @classmethod
+    def init_from_random_file(
+        cls,
+        file_glob,
+        functional_groups=None,
+        use_cache=False
+    ):
+        """
+        Pick a random file from `file_glob` to initialize from.
+
+        Parameters
+        ----------
+        file_glob : :class:`str`
+            A glob specifying files, one of which is used to initialize
+            a :class:`.BuildingBlock` at random.
+
+        functional_groups : :class:`iterable` of :class:`str`, optional
+            The names of the functional group types which are to be
+            added to :attr:`func_groups`. If ``None`, then no
+            functional groups are added.
+
+        use_cache : :class:`bool`, optional
+            If ``True``, a new :class:`.BuildingBlock` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`BuildingBlock` does not
+            yet exist the created one will be added to the cache.
+
+        Returns
+        -------
+        :class:`BuildingBlock`
+            A random molecule from `file_glob`.
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If no files in `file_glob` could be initialized from.
+
+        """
+
+        files = glob(file_glob)
+        np.random.shuffle(files)
+
+        for path in files:
+            try:
+                return cls.init_from_file(
+                    path=path,
+                    functional_groups=functional_groups,
+                    use_cache=use_cache
+                )
+
+            except Exception:
+                msg = (
+                    'Could not initialize '
+                    f'{cls.__name__} from {path}.'
+                )
+                logger.warning(msg)
+        raise RuntimeError(
+            f'No files in "{file_glob}" could be initialized from.'
+        )
+
+    @classmethod
+    def init_from_rdkit_mol(
+        cls,
+        mol,
+        functional_groups=None,
+        use_cache=False
+    ):
+        """
+        Initialize from an :mod:`rdkit` molecule.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Mol`
+            The molecule.
+
+        functional_groups : :class:`iterable` of :class:`str`, optional
+            The names of the functional group types which are to be
+            added to :attr:`func_groups`. If ``None`, then no
+            functional groups are added.
+
+        use_cache : :class:`bool`, optional
+            If ``True``, a new :class:`.BuildingBlock` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`BuildingBlock` does not
+            yet exist the created one will be added to the cache.
+
+        Returns
+        -------
+        :class:`BuildingBlock`
+            The molecule.
+
+        """
+
+        key = cls._get_key_from_rdkit_mol(mol, functional_groups)
+        if use_cache and key in cls._cache:
+            return cls._cache[key]
+
+        bb = cls.__new__(cls)
+        bb._key = key
+        cls._init_from_rdkit_mol(
+            self=bb,
+            mol=mol,
+            functional_groups=functional_groups
+        )
+
+        if use_cache:
+            cls._cache[key] = bb
+
+        return bb
+
+    def _init_from_rdkit_mol(self, mol, functional_groups):
+        """
+        Initialize from an :mod:`rdkit` molecule.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Mol`
+            The molecule.
+
+        functional_groups : :class:`iterable` of :class:`str`
+            The names of the functional group types which are to be
+            added to :attr:`func_groups`. If ``None`, then no
+            functional groups are added.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        if functional_groups is None:
+            functional_groups = ()
+
+        atoms = tuple(
+            Atom(a.GetIdx(), a.GetAtomicNum(), a.GetFormalCharge())
+            for a in mol.GetAtoms()
+        )
+        bonds = tuple(
+            Bond(
+                atoms[b.GetBeginAtomIdx()],
+                atoms[b.GetEndAtomIdx()],
+                b.GetBondTypeAsDouble()
+            )
+            for b in mol.GetBonds()
+        )
+        position_matrix = mol.GetConformer().GetPositions()
+
+        super().__init__(atoms, bonds, position_matrix)
+
+        self.func_groups = tuple(
+            self.get_functional_groups(functional_groups)
         )
 
     @classmethod
@@ -337,7 +406,11 @@ class BuildingBlock(Molecule):
             removeHs=False,
             sanitize=False
         ))
-        obj = cls(rdkit_mol, d.pop('func_groups'), use_cache)
+        obj = cls.init_from_rdkit_mol(
+            mol=rdkit_mol,
+            functional_groups=d.pop('func_groups'),
+            use_cache=use_cache
+        )
         obj.atoms = eval(d.pop('atoms'), vars(elements))
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
@@ -666,7 +739,7 @@ class BuildingBlock(Molecule):
 
         Parameters
         ----------
-        fg_names : :class:`list` of :class:`str`
+        fg_names : :class:`iterable` of :class:`str`
             The names of the functional groups which are to be found
             within the molecule.
 
@@ -798,33 +871,34 @@ class BuildingBlock(Molecule):
         return d
 
     @staticmethod
-    def _get_key(self, mol, functional_groups, use_cache):
+    def _get_key(
+        self,
+        smiles,
+        functional_groups,
+        random_seed,
+        use_cache
+    ):
         """
         Get the key used for caching the molecule.
 
         Parameters
         ----------
-        mol : :class:`str` or :class:`rdkit.Mol`
-            Can be one of 2 things:
+        smiles : :class:`str`
+            A SMILES string of the molecule.
 
-                1. A path to a molecular structure file.
-                2. A :class:`rdkit.Mol` object.
+        functional_groups : :class:`list` of :class:`str`, optional
+            The name of the functional groups which are to have atoms
+            tagged. If ``None``, no tagging is done.
 
-            Supported file types are:
+        random_seed : :class:`int`, optional
+            Random seed passed to :func:`rdkit.ETKDGv2`
 
-                #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
-                #. ``.pdb`` - PDB file
-
-        functional_groups : :class:`list` of :class:`str`
-            The names of the functional groups which are to have atoms
-            tagged. If ``None``, a functional group name found in the
-            path `file`  is used. If no functional groups are provided
-            to this parameter and the name of one is not present in
-            `file`, no tagging is done.
-
-        use_cache : :class:`bool`
-            This argument is ignored but included to be maintain
-            compatiblity the the :meth:`__init__` signature.
+        use_cache : :class:`bool`, optional
+            If ``True``, a new :class:`.BuildingBlock` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`BuildingBlock` does not
+            yet exist the created one will be added to the cache.
 
         Returns
         -------
@@ -843,55 +917,22 @@ class BuildingBlock(Molecule):
 
         """
 
-        if isinstance(mol, str):
-            if os.path.exists(mol):
-                _, ext = os.path.splitext(mol)
+        mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+        return self._get_key_from_rdkit_mol(mol, functional_groups)
 
-                if ext not in self._init_funcs:
-                    raise ValueError(
-                        f'Unable to initialize from "{ext}" files.'
-                    )
-                rdkit_mol = remake(self._init_funcs[ext](mol))
-
-        elif isinstance(mol, rdkit.Mol):
-            rdkit_mol = remake(mol)
-
+    @staticmethod
+    def _get_key_from_rdkit_mol(mol, functional_groups):
         if functional_groups is None:
-            if isinstance(mol, str) and os.path.exists(mol):
-                functional_groups = [
-                    fg.name for fg in fgs if fg.name in mol
-                ]
-            else:
-                functional_groups = []
-
+            functional_groups = ()
         functional_groups = sorted(functional_groups)
-        return (*functional_groups, rdkit.MolToInchi(rdkit_mol))
-
-    def shift_fgs(self, new_ids, shift):
-        """
-        Yield new functional groups with atomic ids shifted.
-
-        Parameters
-        ----------
-        new_ids : :class:`iterable` of :class:`int`
-            The ids assigned to the new functional groups.
-
-        shift : :class:`int`
-            The number to shift each atom id by.
-
-        Yields
-        ------
-        :class:`.FunctionalGroup`
-            A functional group from :attr:`~BuildingBlock.func_groups`
-            with atomic ids shifted by `shift`.
-
-        """
-
-        for id, fg in zip(new_ids, self.func_groups):
-            yield fg.shifted_fg(id=id, shift=shift)
+        return (*functional_groups, rdkit.MolToInchi(mol))
 
     def __str__(self):
-        return f'{self.__class__.__name__} {list(self._key)}'
+        smiles = rdkit.MolToSmiles(rdkit.RemoveHs(self.to_rdkit_mol()))
+        func_groups = list(dedupe(
+            fg.fg_type.name for fg in self.func_groups
+        ))
+        return f'{self.__class__.__name__}({smiles!r}, {func_groups})'
 
     def __repr__(self):
         return str(self)
