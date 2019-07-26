@@ -262,21 +262,25 @@ class TerminalVertex(LinearVertex):
         """
 
         if len(building_block.func_groups) == 2:
-            fg2, fg1 = sorted(
+            fgs = sorted(
                 building_block.func_groups,
                 key=lambda fg: building_block.get_centroid(
                     atom_ids=fg.get_bonder_ids()
                 )[0]
             )
+            fg_index = 0 if self._cap_direction == 1 else -1
+            fg = fgs[fg_index]
+
         elif len(building_block.func_groups) == 1:
-            fg1 = building_block.func_groups[0]
+            fg = building_block.func_groups[0]
+
         else:
             raise ValueError(
                 'The building block of a polymer '
                 'must have 1 or 2 functional groups.'
             )
 
-        self.edges[0].assign_func_group(fg_map[fg1])
+        self.edges[0].assign_func_group(fg_map[fg])
 
 
 class HeadVertex(TerminalVertex):
