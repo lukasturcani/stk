@@ -42,100 +42,64 @@ def pytest_generate_tests(metafunc):
 
 @pytest.fixture(scope='session')
 def amine2():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='NCCCN',
-        functional_groups=['amine']
-    )
+    return stk.BuildingBlock('NCCCN', ['amine'])
 
 
 @pytest.fixture
 def tmp_amine2():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='NCCCN',
-        functional_groups=['amine']
-    )
+    return stk.BuildingBlock('NCCCN', ['amine'])
 
 
 @pytest.fixture
 def amine2_conf1():
-    amine2 = stk.BuildingBlock.init_from_smiles(
-        smiles='NCCCN',
-        functional_groups=['amine']
-    )
+    amine2 = stk.BuildingBlock('NCCCN', ['amine'])
     amine2.set_position_matrix(amine2.get_position_matrix()*3)
     return amine2
 
 
 @pytest.fixture(scope='session')
 def amine2_alt1():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='NCNCN',
-        functional_groups=['amine']
-    )
+    return stk.BuildingBlock('NCNCN', ['amine'])
 
 
 @pytest.fixture(scope='session')
 def amine2_alt2():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='NC[Si]CN',
-        functional_groups=['amine']
-    )
+    return stk.BuildingBlock('NC[Si]CN', ['amine'])
 
 
 @pytest.fixture(scope='session')
 def amine2_alt3():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='NC(Cl)CN',
-        functional_groups=['amine']
-    )
+    return stk.BuildingBlock('NC(Cl)CN', ['amine'])
 
 
 @pytest.fixture(scope='session')
 def aldehyde2():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='O=CCC=O',
-        functional_groups=['aldehyde']
-    )
+    return stk.BuildingBlock('O=CCC=O', ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
 def boronic_acid2():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='OB(O)c1ccc(B(O)O)nc1',
-        functional_groups=['boronic_acid']
-    )
+    return stk.BuildingBlock('OB(O)c1ccc(B(O)O)nc1', ['boronic_acid'])
 
 
 @pytest.fixture
 def tmp_bromine2():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='[Br]CCC[Br]',
-        functional_groups=['bromine']
-    )
+    return stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
 
 
 @pytest.fixture
 def tmp_bromine2_alt1():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='[Br]CNC[Br]',
-        functional_groups=['bromine']
-    )
+    return stk.BuildingBlock('[Br]CNC[Br]', ['bromine'])
 
 
 @pytest.fixture(scope='session')
 def diol2():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='Oc1cc2cc(O)c(O)nc2cc1O',
-        functional_groups=['diol']
-    )
+    return stk.BuildingBlock('Oc1cc2cc(O)c(O)nc2cc1O', ['diol'])
 
 
 @pytest.fixture(scope='session')
 def amine3():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='NCC(CN)CN',
-        functional_groups=['amine']
-    )
+    return stk.BuildingBlock('NCC(CN)CN', ['amine'])
 
 
 @pytest.fixture(scope='session')
@@ -148,94 +112,64 @@ def ring_amine():
 
 @pytest.fixture(scope='session')
 def aldehyde3():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='O=CC(C=O)C=O',
-        functional_groups=['aldehyde']
-    )
+    return stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
 
 
 @pytest.fixture
 def tmp_aldehyde3():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='O=CC(C=O)C=O',
-        functional_groups=['aldehyde']
-    )
+    return stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
 def aldehyde3_alt1():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='O=CN(C=O)C=O',
-        functional_groups=['aldehyde']
-    )
+    return stk.BuildingBlock('O=CN(C=O)C=O', ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
 def aldehyde3_alt2():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='O=C[Si](C=O)C=O',
-        functional_groups=['aldehyde']
-    )
+    return stk.BuildingBlock('O=C[Si](C=O)C=O', ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
 def aldehyde3_alt3():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='O=CC(Cl)C(C=O)C=O',
-        functional_groups=['aldehyde']
-    )
+    return stk.BuildingBlock('O=CC(Cl)C(C=O)C=O', ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
 def boronic_acid4():
-    return stk.BuildingBlock(
-        mol=join('..', 'data', 'boronic_acid.sdf')
+    return stk.BuildingBlock.init_from_file(
+        path=join('..', 'data', 'boronic_acid.sdf')
     )
 
 
 @pytest.fixture(scope='session')
 def amine4():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='NCC(CN)(CN)CN',
-        functional_groups=['amine']
-    )
+    return stk.BuildingBlock('NCC(CN)(CN)CN', ['amine'])
 
 
 @pytest.fixture
 def tmp_amine4():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='NCC(CN)(CN)CN',
-        functional_groups=['amine']
-    )
+    return stk.BuildingBlock('NCC(CN)(CN)CN', ['amine'])
 
 
 @pytest.fixture(scope='session')
 def aldehyde4():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='O=CC(C=O)(C=O)C=O',
-        functional_groups=['aldehyde']
-    )
+    return stk.BuildingBlock('O=CC(C=O)(C=O)C=O', ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
 def aldehyde4_alt1():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='O=CC(OC=O)(C=O)C=O',
-        functional_groups=['aldehyde']
-    )
+    return stk.BuildingBlock('O=CC(OC=O)(C=O)C=O', ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
 def difluorene2():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='Fc1c(F)cc(F)c(F)c1',
-        functional_groups=['difluorene']
-    )
+    return stk.BuildingBlock('Fc1c(F)cc(F)c(F)c1', ['difluorene'])
 
 
 @pytest.fixture(scope='session')
 def difluorene_dibromine():
-    return stk.BuildingBlock.init_from_smiles(
+    return stk.BuildingBlock(
         smiles='Fc1c(F)cc(Br)c(Br)c1',
         functional_groups=['difluorene', 'dibromine']
     )
@@ -243,7 +177,7 @@ def difluorene_dibromine():
 
 @pytest.fixture(scope='session')
 def aldehyde5():
-    return stk.BuildingBlock.init_from_smiles(
+    return stk.BuildingBlock(
         smiles='O=C[C-]1C(C=O)=C(C=O)C(C=O)=C1C=O',
         functional_groups=['aldehyde']
     )
@@ -251,7 +185,7 @@ def aldehyde5():
 
 @pytest.fixture(scope='session')
 def aldehyde6():
-    return stk.BuildingBlock.init_from_smiles(
+    return stk.BuildingBlock(
         smiles='O=CC(C=O)(C=O)C(C=O)(C=O)C=O',
         functional_groups=['aldehyde']
     )
@@ -259,9 +193,7 @@ def aldehyde6():
 
 @pytest.fixture(scope='session')
 def cycle():
-    return stk.BuildingBlock.init_from_smiles(
-        smiles='CCCC1CCCCCCCCC1'
-    )
+    return stk.BuildingBlock('CCCC1CCCCCCCCC1')
 
 
 # @pytest.fixture(scope='session')
@@ -296,33 +228,15 @@ def cycle():
 
 @pytest.fixture(scope='session')
 def c60():
-    return stk.BuildingBlock(join('..', 'data', 'c60.pdb'))
+    return stk.BuildingBlock.init_from_file(
+        path=join('..', 'data', 'c60.pdb')
+    )
 
 
 @pytest.fixture(scope='session')
 def chained_c60():
-    return stk.BuildingBlock(join('..', 'data', 'chained_c60.mol'))
-
-
-@pytest.fixture(scope='session')
-def fg():
-    return stk.FunctionalGroup(
-        id=0,
-        atom_ids=[10, 3, 1, 4, 43, 5, 32, 55],
-        bonder_ids=[3, 32, 10],
-        deleter_ids=[1, 55, 5],
-        info=stk.functional_groups[0]
-    )
-
-
-@pytest.fixture
-def tmp_fg():
-    return stk.FunctionalGroup(
-        id=0,
-        atom_ids=[10, 3, 1, 4, 43, 5, 32, 55],
-        bonder_ids=[3, 32, 10],
-        deleter_ids=[1, 55, 5],
-        info=stk.functional_groups[0]
+    return stk.BuildingBlock.init_from_file(
+        path=join('..', 'data', 'chained_c60.mol')
     )
 
 
