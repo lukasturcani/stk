@@ -74,10 +74,21 @@ class Bond:
 
     def __repr__(self):
         cls_name = self.__class__.__name__
-        return f'{cls_name}({self.atom1}, {self.atom2}, {self.order})'
+        if isinstance(self.order, float) and self.order.is_integer():
+            self.order = int(self.order)
+
+        return (
+            f'{cls_name}({self.atom1!r}, {self.atom2!r}, {self.order})'
+        )
 
     def __str__(self):
-        return repr(self)
+        cls_name = self.__class__.__name__
+        if isinstance(self.order, float) and self.order.is_integer():
+            self.order = int(self.order)
+
+        return (
+            f'{cls_name}({self.atom1}, {self.atom2}, {self.order})'
+        )
 
 
 class PeriodicBond(Bond):
