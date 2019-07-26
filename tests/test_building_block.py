@@ -15,10 +15,10 @@ def test_init_rdkit():
     rdkit_mol = rdkit.AddHs(rdkit.MolFromSmiles('NCCCN'))
     rdkit.EmbedMolecule(rdkit_mol, rdkit.ETKDGv2())
 
-    mol0 = stk.BuildingBlock(rdkit_mol, ['amine'])
+    mol0 = stk.BuildingBlock.init_from_rdkit_mol(rdkit_mol, ['amine'])
     # Test that all values are initialized correctly.
     assert len(mol0.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol0.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol0.atoms) == 15
     assert len(mol0.bonds) == 14
@@ -44,15 +44,15 @@ def test_init_rdkit():
     )
 
     # Test that caching is working properly.
-    mol1 = stk.BuildingBlock(rdkit_mol, ['amine'])
+    mol1 = stk.BuildingBlock.init_from_rdkit_mol(rdkit_mol, ['amine'])
     assert mol0 is not mol1
 
-    mol2 = stk.BuildingBlock(
+    mol2 = stk.BuildingBlock.init_from_rdkit_mol(
         mol=rdkit_mol,
         functional_groups=['amine'],
         use_cache=True
     )
-    mol3 = stk.BuildingBlock(
+    mol3 = stk.BuildingBlock.init_from_rdkit_mol(
         mol=rdkit_mol,
         functional_groups=['amine'],
         use_cache=True
@@ -60,7 +60,7 @@ def test_init_rdkit():
     assert mol0 is not mol2 and mol1 is not mol2
     assert mol2 is mol3
 
-    mol4 = stk.BuildingBlock(
+    mol4 = stk.BuildingBlock.init_from_rdkit_mol(
         mol=rdkit_mol,
         functional_groups=['aldehyde'],
         use_cache=True
@@ -71,7 +71,7 @@ def test_init_rdkit():
     negative_carbon = rdkit.AddHs(rdkit.MolFromSmiles('NC[C-]CN'))
     rdkit.EmbedMolecule(negative_carbon, rdkit.ETKDGv2())
 
-    mol5 = stk.BuildingBlock(
+    mol5 = stk.BuildingBlock.init_from_rdkit_mol(
         mol=negative_carbon,
         functional_groups=['amine'],
         use_cache=True
@@ -79,7 +79,7 @@ def test_init_rdkit():
     assert mol5 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol5.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol5.atoms) == 13
     assert len(mol5.bonds) == 12
@@ -108,7 +108,7 @@ def test_init_rdkit():
     negative_nitrogen = rdkit.AddHs(rdkit.MolFromSmiles('[N-]CCCN'))
     rdkit.EmbedMolecule(negative_nitrogen, rdkit.ETKDGv2())
 
-    mol6 = stk.BuildingBlock(
+    mol6 = stk.BuildingBlock.init_from_rdkit_mol(
         mol=negative_nitrogen,
         functional_groups=['amine'],
         use_cache=True
@@ -116,7 +116,7 @@ def test_init_rdkit():
     assert mol6 is not mol5 and mol6 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol6.func_groups) == 1
-    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol6.atoms) == 13
     assert len(mol6.bonds) == 12
@@ -144,10 +144,13 @@ def test_init_rdkit():
 
 
 def test_init_mol(bb_dir):
-    mol0 = stk.BuildingBlock(join(bb_dir, 'neutral.mol'), ['amine'])
+    mol0 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.mol'),
+        functional_groups=['amine']
+    )
     # Test that all values are initialized correctly.
     assert len(mol0.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol0.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol0.atoms) == 15
     assert len(mol0.bonds) == 14
@@ -173,39 +176,42 @@ def test_init_mol(bb_dir):
     )
 
     # Test that caching is working properly.
-    mol1 = stk.BuildingBlock(join(bb_dir, 'neutral.mol'), ['amine'])
+    mol1 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.mol'),
+        functional_groups=['amine']
+    )
     assert mol0 is not mol1
 
-    mol2 = stk.BuildingBlock(
-        mol=join(bb_dir, 'neutral.mol'),
+    mol2 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.mol'),
         functional_groups=['amine'],
         use_cache=True
     )
-    mol3 = stk.BuildingBlock(
-        mol=join(bb_dir, 'neutral.mol'),
+    mol3 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.mol'),
         functional_groups=['amine'],
         use_cache=True
     )
     assert mol0 is not mol2 and mol1 is not mol2
     assert mol2 is mol3
 
-    mol4 = stk.BuildingBlock(
-        mol=join(bb_dir, 'neutral.mol'),
+    mol4 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.mol'),
         functional_groups=['aldehyde'],
         use_cache=True
     )
     assert mol3 is not mol4
 
     # Make sure that charged molecules are handled correctly.
-    mol5 = stk.BuildingBlock(
-        mol=join(bb_dir, 'negative_carbon.mol'),
+    mol5 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'negative_carbon.mol'),
         functional_groups=['amine'],
         use_cache=True
     )
     assert mol5 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol5.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol5.atoms) == 13
     assert len(mol5.bonds) == 12
@@ -231,15 +237,15 @@ def test_init_mol(bb_dir):
         for b in mol5.bonds
     )
 
-    mol6 = stk.BuildingBlock(
-        mol=join(bb_dir, 'negative_nitrogen.mol'),
+    mol6 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'negative_nitrogen.mol'),
         functional_groups=['amine'],
         use_cache=True
     )
     assert mol6 is not mol5 and mol6 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol6.func_groups) == 1
-    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol6.atoms) == 13
     assert len(mol6.bonds) == 12
@@ -267,10 +273,13 @@ def test_init_mol(bb_dir):
 
 
 def test_init_pdb(bb_dir):
-    mol0 = stk.BuildingBlock(join(bb_dir, 'neutral.pdb'), ['amine'])
+    mol0 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.pdb'),
+        functional_groups=['amine']
+    )
     # Test that all values are initialized correctly.
     assert len(mol0.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol0.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol0.atoms) == 15
     assert len(mol0.bonds) == 14
@@ -296,39 +305,42 @@ def test_init_pdb(bb_dir):
     )
 
     # Test that caching is working properly.
-    mol1 = stk.BuildingBlock(join(bb_dir, 'neutral.pdb'), ['amine'])
+    mol1 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.pdb'),
+        functional_groups=['amine']
+    )
     assert mol0 is not mol1
 
-    mol2 = stk.BuildingBlock(
-        mol=join(bb_dir, 'neutral.pdb'),
+    mol2 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.pdb'),
         functional_groups=['amine'],
         use_cache=True
     )
-    mol3 = stk.BuildingBlock(
-        mol=join(bb_dir, 'neutral.pdb'),
+    mol3 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.pdb'),
         functional_groups=['amine'],
         use_cache=True
     )
     assert mol0 is not mol2 and mol1 is not mol2
     assert mol2 is mol3
 
-    mol4 = stk.BuildingBlock(
-        mol=join(bb_dir, 'neutral.pdb'),
+    mol4 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'neutral.pdb'),
         functional_groups=['aldehyde'],
         use_cache=True
     )
     assert mol3 is not mol4
 
     # Make sure that charged molecules are handled correctly.
-    mol5 = stk.BuildingBlock(
-        mol=join(bb_dir, 'negative_carbon.pdb'),
+    mol5 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'negative_carbon.pdb'),
         functional_groups=['amine'],
         use_cache=True
     )
     assert mol5 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol5.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol5.atoms) == 13
     assert len(mol5.bonds) == 12
@@ -354,15 +366,15 @@ def test_init_pdb(bb_dir):
         for b in mol5.bonds
     )
 
-    mol6 = stk.BuildingBlock(
-        mol=join(bb_dir, 'negative_nitrogen.pdb'),
+    mol6 = stk.BuildingBlock.init_from_file(
+        path=join(bb_dir, 'negative_nitrogen.pdb'),
         functional_groups=['amine'],
         use_cache=True
     )
     assert mol6 is not mol5 and mol6 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol6.func_groups) == 1
-    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol6.atoms) == 13
     assert len(mol6.bonds) == 12
@@ -396,7 +408,7 @@ def test_init_from_random_file(bb_dir):
     )
     # Test that all values are initialized correctly.
     assert len(mol0.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol0.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol0.atoms) == 15
     assert len(mol0.bonds) == 14
@@ -457,7 +469,7 @@ def test_init_from_random_file(bb_dir):
     assert mol5 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol5.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol5.atoms) == 13
     assert len(mol5.bonds) == 12
@@ -491,7 +503,7 @@ def test_init_from_random_file(bb_dir):
     assert mol6 is not mol5 and mol6 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol6.func_groups) == 1
-    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol6.atoms) == 13
     assert len(mol6.bonds) == 12
@@ -519,10 +531,10 @@ def test_init_from_random_file(bb_dir):
 
 
 def test_init_from_smiles():
-    mol0 = stk.BuildingBlock.init_from_smiles('NCCCN', ['amine'])
+    mol0 = stk.BuildingBlock('NCCCN', ['amine'])
     # Test that all values are initialized correctly.
     assert len(mol0.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol0.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol0.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol0.atoms) == 15
     assert len(mol0.bonds) == 14
@@ -548,15 +560,15 @@ def test_init_from_smiles():
     )
 
     # Test that caching is working properly.
-    mol1 = stk.BuildingBlock.init_from_smiles('NCCCN', ['amine'])
+    mol1 = stk.BuildingBlock('NCCCN', ['amine'])
     assert mol0 is not mol1
 
-    mol2 = stk.BuildingBlock.init_from_smiles(
+    mol2 = stk.BuildingBlock(
         smiles='NCCCN',
         functional_groups=['amine'],
         use_cache=True
     )
-    mol3 = stk.BuildingBlock.init_from_smiles(
+    mol3 = stk.BuildingBlock(
         smiles='NCCCN',
         functional_groups=['amine'],
         use_cache=True
@@ -564,7 +576,7 @@ def test_init_from_smiles():
     assert mol0 is not mol2 and mol1 is not mol2
     assert mol2 is mol3
 
-    mol4 = stk.BuildingBlock.init_from_smiles(
+    mol4 = stk.BuildingBlock(
         smiles='NCCCN',
         functional_groups=['aldehyde'],
         use_cache=True
@@ -572,7 +584,7 @@ def test_init_from_smiles():
     assert mol3 is not mol4
 
     # Make sure that charged molecules are handled correctly.
-    mol5 = stk.BuildingBlock.init_from_smiles(
+    mol5 = stk.BuildingBlock(
         smiles='NC[C-]CN',
         functional_groups=['amine'],
         use_cache=True
@@ -580,7 +592,7 @@ def test_init_from_smiles():
     assert mol5 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol5.func_groups) == 2
-    fg_types = stk.dedupe(fg.info.name for fg in mol5.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol5.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol5.atoms) == 13
     assert len(mol5.bonds) == 12
@@ -606,7 +618,7 @@ def test_init_from_smiles():
         for b in mol5.bonds
     )
 
-    mol6 = stk.BuildingBlock.init_from_smiles(
+    mol6 = stk.BuildingBlock(
         smiles='[N-]CCCN',
         functional_groups=['amine'],
         use_cache=True
@@ -614,7 +626,7 @@ def test_init_from_smiles():
     assert mol6 is not mol5 and mol6 is not mol0
     # Test that all values are initialized correctly.
     assert len(mol6.func_groups) == 1
-    fg_types = stk.dedupe(fg.info.name for fg in mol6.func_groups)
+    fg_types = stk.dedupe(fg.fg_type.name for fg in mol6.func_groups)
     assert sum(1 for _ in fg_types) == 1
     assert len(mol6.atoms) == 13
     assert len(mol6.bonds) == 12
@@ -781,9 +793,9 @@ def test_get_bonder_distances(tmp_amine4):
 def test_get_bonder_direction_vectors(tmp_amine4):
     pos_mat = tmp_amine4.get_position_matrix()
     # Set the coordinate of each bonder to the id of the fg.
-    for fg in tmp_amine4.func_groups:
+    for fg_id, fg in enumerate(tmp_amine4.func_groups):
         for bonder in fg.get_bonder_ids():
-            pos_mat[bonder] = [fg.id, fg.id, fg.id]
+            pos_mat[bonder] = [fg_id, fg_id, fg_id]
     tmp_amine4.set_position_matrix(pos_mat)
 
     dir_vectors = tmp_amine4.get_bonder_direction_vectors()

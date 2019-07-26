@@ -188,6 +188,7 @@ def test_get_plane_normal(tmp_amine2):
     coords = tmp_amine2.get_position_matrix()
     atom_ids = [1, 13]
     coords[atom_ids, 2] = 0
+    tmp_amine2.set_position_matrix(coords)
 
     assert not np.allclose(
         a=tmp_amine2.get_plane_normal(),
@@ -306,7 +307,7 @@ def test_update_from_xyz(tmp_amine2, amine2_conf1):
 def test_write_pdb(amine2):
     path = join(test_dir, 'test_write.pdb')
     amine2.write(path=path)
-    bb = stk.BuildingBlock(path)
+    bb = stk.BuildingBlock.init_from_file(path)
 
     assert np.allclose(
         a=amine2.get_position_matrix(),
