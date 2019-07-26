@@ -489,7 +489,7 @@ class Linear(TopologyGraph):
         mol.bonds = [
             b for b in mol.bonds
             if b.atom1 not in deleter_ids
-            or b.atom2 not in deleter_ids
+            and b.atom2 not in deleter_ids
         ]
         mol._position_matrix = [
             row for i, row in enumerate(mol._position_matrix)

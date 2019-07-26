@@ -626,7 +626,7 @@ class Reactor:
         self._mol.bonds = [
             bond for bond in self._mol.bonds
             if bond.atom1.id not in self._deleter_ids
-            or bond.atom2.id not in self._deleter_ids
+            and bond.atom2.id not in self._deleter_ids
         ]
         self._mol._position_matrix = [
             row for i, row in enumerate(self._mol._position_matrix)
