@@ -356,14 +356,26 @@ class FunctionalGroup:
         )
 
     def __str__(self):
-        atoms = ', '.join(str(atom) for atom in self.atoms)
-        bonders = ', '.join(str(atom) for atom in self.bonders)
-        deleters = ', '.join(str(atom) for atom in self.deleters)
+        atoms = list(self.atoms)
+        if len(atoms) == 1:
+            atoms.append('')
+        atoms = ', '.join(str(atom) for atom in atoms)
+
+        bonders = list(self.bonders)
+        if len(bonders) == 1:
+            bonders.append('')
+        bonders = ', '.join(str(atom) for atom in bonders)
+
+        deleters = list(self.deleters)
+        if len(deleters) == 1:
+            deleters.append('')
+        deleters = ', '.join(str(atom) for atom in deleters)
+
         return (
             f'FunctionalGroup(\n'
-            f'    atoms=({atoms}), \n'
-            f'    bonders=({bonders}), \n'
-            f'    deleters=({deleters}), \n'
+            f'    atoms=( {atoms} ), \n'
+            f'    bonders=( {bonders} ), \n'
+            f'    deleters=( {deleters} ), \n'
             f'    fg_type={self.fg_type.name!r}\n'
             ')'
         )
