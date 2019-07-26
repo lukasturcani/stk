@@ -166,7 +166,8 @@ class LinearVertex(Vertex):
         p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
         cls_name = p.findall(cls_name)[0]
         return (
-            f'{cls_name}({x}, {y}, {z}, direction={self._orientation})'
+            f'{cls_name}({x}, {y}, {z}, '
+            f'orientation={self._orientation})'
         )
 
 
@@ -328,22 +329,9 @@ class Linear(TopologyGraph):
         The number of repeating units which are used to make the
         polymer.
 
-    ends : :class:`str`
-        The string represents how the end groups of the polymer are
-        treated. If ``'h'`` the functional groups at the end of the
-        polymer are converted into hydrogem atoms. If ``'fg'`` they are
-        kept as the original functional group.
-
     """
 
-    def __init__(
-        self,
-        repeating_unit,
-        orientation,
-        n,
-        ends='fg',
-        processes=1
-    ):
+    def __init__(self, repeating_unit, orientation, n, processes=1):
         """
         Initialize a :class:`Linear` instance.
 
@@ -370,12 +358,6 @@ class Linear(TopologyGraph):
             The number of repeating units which are used to make the
             polymer.
 
-        ends : :class:`str`, optional
-            The string represents how the end groups of the polymer are
-            treated. If ``'h'`` the functional groups at the end of the
-            polymer are converted into hydrogem atoms. If ``'fg'`` they
-            are kept as the original functional group.
-
         processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
@@ -385,7 +367,6 @@ class Linear(TopologyGraph):
         self.repeating_unit = repeating_unit
         self.orientation = tuple(orientation)
         self.n = n
-        self.ends = ends
 
         head, *body, tail = orientation*n
         vertices = [HeadVertex(0, 0, 0, head)]
@@ -443,58 +424,6 @@ class Linear(TopologyGraph):
         for letter, vertex in zip(polymer, self.vertices):
             bb = bb_map[letter]
             mol.building_block_vertices[bb].append(vertex)
-
-    def _clean_up(self, mol):
-        """
-        Delete the atoms which are lost during construction.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        if self.ends == 'h':
-            self._hygrogen_ends(mol)
-
-        super()._clean_up(mol)
-
-    def _hygrogen_ends(self, mol):
-        """
-        Remove all deleter atoms and add hydrogens.
-
-        In polymers, you may want to replace the functional groups at
-        the ends with hydrogen atoms.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        deleter_ids = set()
-        deleter_ids.update(mol.func_groups[0].get_atom_ids())
-        deleter_ids.update(mol.func_groups[-1].get_atom_ids())
-        mol.atoms = [a for a in mol.atoms if a.id not in deleter_ids]
-        mol.bonds = [
-            b for b in mol.bonds
-            if b.atom1 not in deleter_ids
-            and b.atom2 not in deleter_ids
-        ]
-        mol._position_matrix = [
-            row for i, row in enumerate(mol._position_matrix)
-            if i not in deleter_ids
-        ]
 
     def _get_scale(self, mol):
         """

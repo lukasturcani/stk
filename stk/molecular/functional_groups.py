@@ -699,6 +699,13 @@ class Reactor:
 
         """
 
+        for fg in (fg1, fg2):
+            self._deleter_ids.update(fg.get_deleter_ids())
+            fg.atoms = tuple(
+                a for a in fg.atoms if a.id not in self._deleter_ids
+            )
+            fg.deleters = ()
+
         boron = fg1 if fg1.fg_type.name == 'boronic_acid' else fg2
         diol = fg2 if boron is fg1 else fg1
 
