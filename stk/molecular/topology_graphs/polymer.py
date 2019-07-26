@@ -6,6 +6,7 @@ Defines :class:`.Polymer` topologies.
 import logging
 import re
 from collections import defaultdict
+import numpy as np
 
 from .topology_graph import TopologyGraph, Vertex, Edge
 
@@ -86,9 +87,12 @@ class LinearVertex(Vertex):
                 fg_ids=(0, 1)
             )
         )[-1]
+
+        p = [1-self._direction, self._direction]
+        direction = np.random.choice([1, -1], p=p)
         building_block.apply_rotation_between_vectors(
             start=bonder_vector,
-            target=[self._direction, 0, 0],
+            target=[direction, 0, 0],
             origin=self._coord
         )
         return building_block.get_position_matrix()
