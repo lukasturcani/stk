@@ -470,8 +470,8 @@ class Reactor:
         The molecule from which the :class:`Reactor` adds and removes
         atoms and bonds.
 
-    bonds_made : :class:`int`
-        The number of bonds added.
+    _bonds_made : :class:`int`
+        The net number of bonds added.
 
     _deleter_ids : :class:`set` of :class:`int`
         The ids atoms which are to be removed.
@@ -512,7 +512,7 @@ class Reactor:
 
         """
 
-        self.bonds_made = 0
+        self._bonds_made = 0
         self._mol = mol
         self._deleter_ids = set()
         self._deleter_bonds = set()
@@ -544,21 +544,24 @@ class Reactor:
 
         """
 
-        for fg in fgs:
-            self._deleter_ids.update(fg.get_deleter_ids())
-            fg.deleters = ()
-
         names = (fg.fg_type.name for fg in fgs)
         reaction_key = ReactionKey(*names)
         if reaction_key in self._custom_reactions:
             return self._custom_reactions[reaction_key](self, *fgs)
+
+        for fg in fgs:
+            self._deleter_ids.update(fg.get_deleter_ids())
+            fg.atoms = tuple(
+                a for a in fg.atoms if a.id not in self._deleter_ids
+            )
+            fg.deleters = ()
 
         bond = self._bond_orders.get(reaction_key, 1)
         fg1, fg2 = fgs
         self._mol.bonds.append(
             Bond(fg1.bonders[0], fg2.bonders[0], bond)
         )
-        self.bonds_made += 1
+        self._bonds_made += 1
 
     def add_periodic_reaction(self, direction, *fgs):
         """
@@ -603,7 +606,7 @@ class Reactor:
                 direction=direction
             )
         )
-        self.bonds_made += 1
+        self._bonds_made += 1
 
     def finalize(self):
         """
@@ -630,7 +633,7 @@ class Reactor:
             if i not in self._deleter_ids
         ]
 
-        return self.bonds_made
+        return self._bonds_made
 
     def _diol_with_dihalogen(self, fg1, fg2, dihalogen):
         """
@@ -676,7 +679,7 @@ class Reactor:
         assert c1 != c2 and o1 != o2
         self._mol.bonds.append(Bond(c1, o1, 1))
         self._mol.bonds.append(Bond(c2, o2, 1))
-        self.bonds_made += 2
+        self._bonds_made += 2
 
     def _boronic_acid_with_diol(self, fg1, fg2):
         """
@@ -702,7 +705,7 @@ class Reactor:
         boron_atom = boron.bonders[0]
         self._mol.bonds.append(Bond(boron_atom, diol.bonders[0], 1))
         self._mol.bonds.append(Bond(boron_atom, diol.bonders[1], 1))
-        self.bonds_made += 2
+        self._bonds_made += 2
 
     def _ring_amine_with_ring_amine(self, fg1, fg2):
         """
@@ -791,7 +794,7 @@ class Reactor:
         self._mol.bonds.append(Bond(nc_joiner2, nc2h1, 1))
         self._mol.bonds.append(Bond(nc_joiner2, nc2h2, 1))
 
-        self.bonds_made += 12
+        self._bonds_made += 12
 
     _custom_reactions = {
 
