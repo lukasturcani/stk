@@ -24,7 +24,6 @@ from ...utilities import (
     flatten,
     normalize_vector,
     vector_theta,
-    remake,
     dedupe
 )
 
@@ -135,6 +134,7 @@ class BuildingBlock(Molecule):
             functional_groups = ()
 
         mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+        rdkit.Kekulize(mol)
 
         params = rdkit.ETKDGv2()
         params.randomSeed = random_seed
@@ -203,7 +203,8 @@ class BuildingBlock(Molecule):
                 raise ValueError(
                     f'Unable to initialize from "{ext}" files.'
                 )
-            mol = remake(cls._init_funcs[ext](path))
+            mol = cls._init_funcs[ext](path)
+            rdkit.Kekulize(mol)
 
         # If no functional group names passed, check if any functional
         # group names appear in the file path.
@@ -401,11 +402,11 @@ class BuildingBlock(Molecule):
         d = dict(mol_dict)
         d.pop('class')
         mol_block = d.pop('mol_block')
-        rdkit_mol = remake(rdkit.MolFromMolBlock(
+        rdkit_mol = rdkit.MolFromMolBlock(
             molBlock=mol_block,
             removeHs=False,
             sanitize=False
-        ))
+        )
         obj = cls.init_from_rdkit_mol(
             mol=rdkit_mol,
             functional_groups=d.pop('func_groups'),
