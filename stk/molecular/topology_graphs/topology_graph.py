@@ -164,8 +164,7 @@ class Vertex:
         Returns
         -------
         :class:`Vertex`
-            A clone with the same position but not connected to any
-            :class:`.Edge` objects.
+            The clone.
 
         """
 

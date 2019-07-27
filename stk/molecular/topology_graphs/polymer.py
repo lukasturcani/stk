@@ -58,19 +58,24 @@ class LinearVertex(Vertex):
         self._orientation = orientation
         super().__init__(x, y, z)
 
-    def clone(self):
+    def clone(self, clear_edges=False):
         """
         Create a clone of the instance.
 
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            If ``True`` the :attr:`edges` attribute of the clone will
+            be empty.
+
         Returns
         -------
-        :class:`LinearVertex`
-            A clone with the same position and orientation and
-            connected to the same :class:`.Edge` objects.
+        :class:`Vertex`
+            The clone.
 
         """
 
-        clone = super().clone()
+        clone = super().clone(clear_edges)
         clone._orientation = self._orientation
         return clone
 

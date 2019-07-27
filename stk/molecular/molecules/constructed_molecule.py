@@ -11,7 +11,7 @@ from . import elements
 from .molecule import Molecule
 from .. import topology_graphs
 from ..functional_groups import FunctionalGroup
-from ...utilities import remake, dedupe
+from ...utilities import remake
 
 logger = logging.getLogger(__name__)
 
@@ -184,12 +184,10 @@ class ConstructedMolecule(Molecule):
 
             bb_blocks = []
             for i, bb in enumerate(building_blocks):
-                func_groups = list(dedupe(
-                    fg.info.name for fg in bb.func_groups
-                ))
                 bb_blocks.append(
-                    f'{bb.__class__.__name__} '
-                    f'{func_groups}\n'
+                    f'{bb}\n\n'
+                    'MDL MOL BLOCK\n'
+                    '-------------\n'
                     f'{bb._to_mdl_mol_block()}'
                 )
 
