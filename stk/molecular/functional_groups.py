@@ -346,11 +346,30 @@ class FunctionalGroup:
         return (a.id for a in self.deleters)
 
     def __repr__(self):
+        atoms = list(self.atoms)
+        if len(atoms) == 1:
+            atoms.append('')
+        atoms = ', '.join(repr(atom) if atom else '' for atom in atoms)
+
+        bonders = list(self.bonders)
+        if len(bonders) == 1:
+            bonders.append('')
+        bonders = ', '.join(
+            repr(atom) if atom else '' for atom in bonders
+        )
+
+        deleters = list(self.deleters)
+        if len(deleters) == 1:
+            deleters.append('')
+        deleters = ', '.join(
+            repr(atom) if atom else '' for atom in deleters
+        )
+
         return (
             f'FunctionalGroup(\n'
-            f'    atoms={self.atoms!r},\n'
-            f'    bonders={self.bonders!r},\n'
-            f'    deleters={self.deleters!r},\n'
+            f'    atoms=( {atoms} ), \n'
+            f'    bonders=( {bonders} ), \n'
+            f'    deleters=( {deleters} ), \n'
             f'    fg_type={self.fg_type.name!r}\n'
             ')'
         )
