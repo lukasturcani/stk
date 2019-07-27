@@ -80,8 +80,10 @@ topology is at the origin.
 
 import numpy as np
 import re
+from collections import defaultdict
 
 from ..functional_groups import Reactor
+from ...utilities import vector_theta
 
 
 class Vertex:
@@ -149,9 +151,15 @@ class Vertex:
         self._coord *= scale
         return self
 
-    def clone(self):
+    def clone(self, clear_edges=False):
         """
         Create a clone of the instance.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            If ``True`` the :attr:`edges` attribute of the clone will
+            be empty.
 
         Returns
         -------
@@ -163,7 +171,7 @@ class Vertex:
 
         clone = self.__class__.__new__(self.__class__)
         clone._coord = np.array(self._coord)
-        clone.edges = []
+        clone.edges = [] if clear_edges else list(self.edges)
         return clone
 
     def get_position(self):
@@ -243,6 +251,79 @@ class Vertex:
 
         raise NotImplementedError()
 
+    def _get_edge_centroid(self, edge_ids=None):
+        """
+        Return the centroid of connected edges.
+
+        Parameters
+        ----------
+        edge_ids : :class:`iterable` of :class:`int`
+            The ids of edges which are used to calculate the centroid.
+            If ``None``, then all  the edges in :attr:`edges` are used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The centroid of the edges.
+
+        """
+
+        if edge_ids is None:
+            edge_ids = range(len(self.edges))
+
+        edge_positions = []
+        for i, edge_id in enumerate(edge_ids, 1):
+            edge_positions.append(self.edges[edge_id].get_position())
+        return np.sum(edge_positions, axis=0) / i
+
+    def _get_edge_plane_normal(self, edge_ids=None):
+        """
+        Get the normal to the plane on which the :attr:`edges` lie.
+
+        Parameters
+        ----------
+        edge_ids : :class:`iterable` of :class:`int`
+            The ids of edges which are used to calculate the plane.
+            If there are more than three, a plane of best fit across
+            edges is returned. If ``None``, then all  the edges in
+            :attr:`edges` are used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            A unit vector which describes the normal to the plane of
+            the edges.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If there are not at least 3 edges, which is necessary to
+            define a plane.
+
+        """
+
+        if edge_ids is None:
+            edge_ids = range(len(self.edges))
+        else:
+            # The iterable is used mutliple times.
+            edge_ids = list(edge_ids)
+
+        if len(edge_ids) < 3:
+            raise ValueError(
+                'At least 3 edges are necessary to create a plane.'
+            )
+
+        edge_positions = []
+        for i, edge_id in enumerate(edge_ids, 1):
+            edge_positions.append(self.edges[edge_id].get_position())
+        edge_positions = np.array(edge_positions)
+
+        centroid = np.sum(edge_positions, axis=0) / i
+        normal = np.linalg.svd(edge_positions - centroid)[-1][2, :]
+        if vector_theta(normal, centroid) > np.pi/2:
+            normal *= -1
+        return normal
+
     def __str__(self):
         return repr(self)
 
@@ -279,6 +360,7 @@ class Edge:
     :meth:`__init__`
     :meth:`assign_func_group`
     :meth:`get_func_groups`
+    :meth:`get_position`
 
     """
 
@@ -333,6 +415,19 @@ class Edge:
 
         self._func_groups.append(func_group)
 
+    def get_position(self):
+        """
+        Return the position of the :class:`Edge`.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The position of the :class:`Edge`.
+
+        """
+
+        return np.array(self._coord)
+
     def __str__(self):
         return repr(self)
 
@@ -347,10 +442,10 @@ class TopologyGraph:
 
     Attributes
     ----------
-    vertices : :class:`.Vertex`
+    vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
-    edges : :class:`.Edge`
+    edges : :class:`tuple` of :class:`.Edge`
         The edges which make up the topology graph.
 
     _processes : :class:`int`
@@ -370,10 +465,10 @@ class TopologyGraph:
 
         Parameters
         ----------
-        vertices : :class:`.Vertex`
+        vertices : :class:`tuple` of :class:`.Vertex`
             The vertices which make up the graph.
 
-        edges : :class:`.Edge`
+        edges : :class:`tuple` of :class:`.Edge`
             The edges which make up the graph.
 
         processes : :class:`int`, optional
@@ -411,6 +506,7 @@ class TopologyGraph:
         """
 
         if mol.building_block_vertices is None:
+            mol.building_block_vertices = defaultdict(list)
             self._assign_building_blocks_to_vertices(
                 mol=mol,
                 building_blocks=building_blocks
@@ -513,7 +609,10 @@ class TopologyGraph:
 
         """
 
-        return {vertex: vertex.clone() for vertex in self.vertices}
+        return {
+            vertex: vertex.clone(clear_edges=True)
+            for vertex in self.vertices
+        }
 
     def _clone_edges(self, vertex_clones):
         """

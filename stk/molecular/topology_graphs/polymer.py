@@ -5,7 +5,6 @@ Defines :class:`.Polymer` topologies.
 
 import logging
 import re
-from collections import defaultdict
 import numpy as np
 
 from .topology_graph import TopologyGraph, Vertex, Edge
@@ -381,7 +380,7 @@ class Linear(TopologyGraph):
         vertices.append(TailVertex(len(vertices), 0, 0, tail))
         edges.append(Edge(vertices[-2], vertices[-1]))
 
-        super().__init__(vertices, edges, processes)
+        super().__init__(tuple(vertices), tuple(edges), processes)
 
     def _assign_building_blocks_to_vertices(
         self,
@@ -416,7 +415,6 @@ class Linear(TopologyGraph):
 
         """
 
-        mol.building_block_vertices = defaultdict(list)
         polymer = self.repeating_unit*self.n
         bb_map = {
             letter: bb for letter, bb in zip(polymer, building_blocks)

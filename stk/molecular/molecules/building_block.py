@@ -510,12 +510,6 @@ class BuildingBlock(Molecule):
             scalar equation of the plane formed by the bonder
             centroids.
 
-        Raises
-        ------
-        :class:`RuntimeError`
-            If there are not at least 3 functional groups, which is
-            necessary to define a plane.
-
         References
         ----------
         https://tinyurl.com/okpqv6
@@ -564,7 +558,7 @@ class BuildingBlock(Molecule):
 
         Raises
         ------
-        :class:`RuntimeError`
+        :class:`ValueError`
             If there are not at least 3 functional groups, which is
             necessary to define a plane.
 
@@ -577,7 +571,7 @@ class BuildingBlock(Molecule):
             fg_ids = list(fg_ids)
 
         if len(fg_ids) < 3:
-            raise RuntimeError(
+            raise ValueError(
                 'At least 3 functional groups '
                 'are necessary to create a plane.'
             )
