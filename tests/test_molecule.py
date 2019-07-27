@@ -333,8 +333,9 @@ def test_to_rdkit_mol(tmp_amine2):
         assert rdkit_bond.GetEndAtomIdx() == bond.atom2.id
 
 
-def test_update_cache(amine2):
-    amine2.test_value = np.random.randint(5, 10)
-    amine2.update_cache()
-    cached_val = amine2.__class__._cache[amine2._key].test_value
-    assert cached_val == amine2.test_value
+def test_update_cache(tmp_amine2):
+    tmp_amine2.test_value = np.random.randint(5, 10)
+    tmp_amine2.update_cache()
+    cached = tmp_amine2.__class__._cache[tmp_amine2._key]
+    cached_val = cached.test_value
+    assert cached_val == tmp_amine2.test_value
