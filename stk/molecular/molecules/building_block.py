@@ -825,18 +825,7 @@ class BuildingBlock(Molecule):
         Returns
         -------
         :class:`dict`
-            A :class:`dict` which represents the molecule. It has
-            the form
-
-            .. code-block:: python
-
-                {
-                    'class' : 'BuildingBlock',
-                    'func_groups': ['amine', 'aldehyde'],
-                    'mol_block' : '''A string holding the V3000 mol
-                                     block of the molecule.''',
-                    'atoms': [H(0), N(1), ...],
-                }
+            A :class:`dict` which represents the molecule.
 
         """
 

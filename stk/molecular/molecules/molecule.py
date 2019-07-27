@@ -839,9 +839,6 @@ class Molecule(metaclass=_Cached):
         """
         Return a :class:`dict` representation of the molecule.
 
-        This is a virtual method which needs to be implemented by a
-        subclass.
-
         Parameters
         ----------
         include_attrs : :class:`list` of :class:`str`, optional
@@ -853,10 +850,16 @@ class Molecule(metaclass=_Cached):
             If ``False`` and an attribute in `include_attrs` is not
             held by the :class:`Molecule`, an error will be raised.
 
+        Returns
+        -------
+        :class:`dict`
+            A :class:`dict` representation of the molecule.
+
         Raises
         ------
         :class:`NotImplementedError`
-            This method needs to be implemented by a subclass.
+            This is a virtual method, which needs to be implemented by
+            a subclass.
 
         """
 
