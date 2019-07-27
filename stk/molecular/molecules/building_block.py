@@ -412,6 +412,14 @@ class BuildingBlock(Molecule):
             functional_groups=d.pop('func_groups'),
             use_cache=use_cache
         )
+
+        # If the cached molecule is to be returned, do not change the
+        # atoms or attributes.
+        if use_cache:
+            return obj
+
+        # If the cached is not being used, make sure to update all the
+        # atoms and attributes to those in the dict.
         obj.atoms = eval(d.pop('atoms'), vars(elements))
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
