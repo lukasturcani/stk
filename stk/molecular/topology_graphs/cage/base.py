@@ -1,5 +1,4 @@
 import numpy as np
-import rdkit.Chem.AllChem as rdkit
 from collections import defaultdict
 
 from ..topology_graph import TopologyGraph, Vertex
