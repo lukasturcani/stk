@@ -50,36 +50,35 @@ class Atom:
 
         import stk
 
-        # hydrogenAtom0 is an instance of the H class.
-        hydrogenAtom0 = stk.Atom(id=0, atomic_number=1)
+        # h0 is an instance of the H class.
+        h0 = stk.Atom(id=0, atomic_number=1)
 
-        # hydrogenAtom1 is also an instance of the H class.
-        hydrogenAtom1 = stk.H(id=1)
+        # h1 is also an instance of the H class.
+        h1 = stk.H(id=1)
 
     When the class correspnding to the element is used directly, the
     ``atomic_number``is not provided. Here are a few more examples.
 
     .. code-block:: python
 
-        # Both heliumAtom0 and heliumAtom1 are instances of the
-        # He class.
-        heliumAtom0 = stk.Atom(id=2, atomic_number=2)
-        heliumAtom1 = stk.He(id=3)
+        # Both he0 and he1 are instances of the He class.
+        he0 = stk.Atom(id=2, atomic_number=2)
+        he1 = stk.He(id=3)
 
-        # Both heliumAtom0 and heliumAtom1 are instances of the
+        # Both c0 and c1 are instances of the
         # C class.
-        carbonAtom0 = stk.Atom(id=4, atomic_number=6)
-        carbonAtom1 = stk.C(id=5)
+        c0 = stk.Atom(id=4, atomic_number=6)
+        c1 = stk.C(id=5)
 
     Each atom can be given additional attributes. For example
 
     .. code-block:: python
 
-        hydrogenAtom0.custom_attribute = 51
-        hydrgoenAtom0.other_attribute = 'something'
+        h0.custom_attribute = 51
+        h0.other_attribute = 'something'
 
-    If we run ``print(hydrogenAtom0)`` then ``H(0)`` will be
-    printed. However, if we run ``print(repr(hydrogenAtom0))``, then
+    If we run ``print(h0)`` then ``H(0)`` will be
+    printed. However, if we run ``print(repr(h0))``, then
     ``H(0, custom_attribute=51, other_attribute='something')`` will be
     printed.
 
@@ -88,9 +87,9 @@ class Atom:
 
     .. code-block:: python
 
-        h = stk.H(id=6, custom_attr1=123, other_attr2='thing')
-        h.custom_attr1  # Holds 123.
-        h.other_attr2  # Holds 'thing'.
+        h2 = stk.H(id=6, custom_attr1=123, other_attr2='thing')
+        h2.custom_attr1  # Holds 123.
+        h2.other_attr2  # Holds 'thing'.
 
     Providing the additional attributes to the initiializer is
     functionally equivalent to to assigning them to the object
