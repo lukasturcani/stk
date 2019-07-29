@@ -143,17 +143,31 @@ class FGType:
     :attr:`~.Molecule.atoms` of a :class:`.Molecule` into
     :class:`.FunctionalGroup` instances.
 
+    Attributes
+    ----------
+    name : :class:`str`
+        A name for the :class:`.FGType`. Helps with identification.
+
     """
 
-    __slots__ = ['_fg_smarts', '_bonder_smarts', '_del_smarts']
+    __slots__ = ['name', '_func_group', '_bonders', '_deleters']
 
-    def __init__(self, fg_smarts, bonder_smarts, del_smarts):
+    def __init__(
+        self,
+        name,
+        func_group_smarts,
+        bonder_smarts,
+        deleter_smarts
+    ):
         """
         Initialize a :class:`FGType` instance.
 
         Parameters
-        ---------
-        fg_smarts : :class:`str`
+        ----------
+        name : :class:`str`
+            A name for the :class:`.FGType`. Helps with identification.
+
+        func_group_smarts : :class:`str`
             A SMARTS string which matches all atoms in a functional
             group.
 
@@ -167,7 +181,7 @@ class FGType:
             needs to be repeated, is equal to number of atoms which
             need to be tagged.
 
-        del_smarts : :class:`list` of :class:`str`
+        deleter_smarts : :class:`list` of :class:`str`
             A :class:`list` of SMARTS strings, each of which matches a
             single atom in a functional group. The matched atom is
             added to :class:`.FunctionalGroup.deleters`. A SMARTS
@@ -179,105 +193,118 @@ class FGType:
 
         """
 
-        self._fg_smarts = fg_smarts
-        self._bonder_smarts = bonder_smarts
-        self._del_smarts = del_smarts
+        self.name = name
+        self._func_group = rdkit.MolFromSmarts(func_group_smarts)
+        self._bonders = [
+            rdkit.MolFromSmarts(smarts) for smarts in bonder_smarts
+        ]
+        self._deleters = [
+            rdkit.MolFromSmarts(smarts) for smarts in deleter_smarts
+        ]
 
     def get_functional_groups(self, mol):
         """
-        Yield functional groups of this type found in `mol`.
+        Yield the functional groups in `mol`.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
+            The molecule which is to have functional groups
+            identified.
 
         Yields
         ------
         :class:`.FunctionalGroup`
-            A :class:`list` holding a :class:`.FunctionalGroup``
-            instance for every matched functional group in the
-            molecule.
+            A :class:`.FunctionalGroup` instance for every matched
+            functional group in the `mol`.
 
         Examples
         --------
+        .. code-block:: python
+
+            import stk
+
+            mol = stk.BuildingBlock('NCCN')
+            amine = stk.FGType(
+                func_group_smarts='[N]([H])[H]',
+                bonder_smarts=['[$([N]([H])[H])]'],
+                deleter_smarts=['[$([H][N][H])]']*2
+            )
+
+            # Make mol use amine functional groups during construction
+            # of ConstructedMolecule.
+            mol.func_groups = tuple(amine.get_functional_groups(mol))
 
         """
 
-        # Ensure that given the same fg names in a different order,
-        # the atoms get assigned to the a functional group with the
-        # same id.
-        fg_names = sorted(fg_names)
+        rdkit_mol = mol.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_mol)
 
-        mol = self.to_rdkit_mol()
-        rdkit.SanitizeMol(mol)
-        func_groups = []
-        for fg_name in fg_names:
-            fg_type = fg_types[fg_name]
+        func_groups = mol.GetSubstructMatches(self._func_group)
 
-            # Find all fg atoms.
-            fg_query = rdkit.MolFromSmarts(fg_type.fg_smarts)
-            fg_atoms = mol.GetSubstructMatches(fg_query)
+        # All the bonder atoms, grouped by fg.
+        bonders = [[] for i in range(len(func_groups))]
 
-            # Find all bonder atoms.
-            bonder_atoms = [[] for i in range(len(fg_atoms))]
+        for bonder in self._bonders:
+            matches = set(flatten(
+                rdkit_mol.GetSubstructMatches(bonder)
+            ))
 
-            for match in fg_type.bonder_smarts:
-                query = rdkit.MolFromSmarts(match.smarts)
-                atoms = set(flatten(mol.GetSubstructMatches(query)))
+            for fg_id, fg in enumerate(func_groups):
+                for atom_id in fg:
+                    if atom_id in matches:
+                        bonders[fg_id].append(atom_id)
+                        break
 
-                # Get all the bonders grouped by fg.
-                bonders = [
-                    [aid for aid in fg if aid in atoms]
-                    for fg in fg_atoms
-                ]
+        # All the deleter atoms, grouped by fg.
+        deleters = [[] for i in range(len(func_groups))]
+        for deleter in self._deleters:
+            matches = set(flatten(
+                rdkit_mol.GetSubstructMatches(deleter)
+            ))
 
-                for fg_id, fg in enumerate(bonders):
-                    bonder_atoms[fg_id].extend(fg[:match.n])
+            for fg_id, fg in enumerate(func_groups):
+                for atom_id in fg:
+                    if atom_id in matches:
+                        deleters[fg_id].append(atom_id)
+                        break
 
-            # Find all deleter atoms.
-            deleter_atoms = [[] for i in range(len(fg_atoms))]
-            for match in fg_type.del_smarts:
-                query = rdkit.MolFromSmarts(match.smarts)
-                atoms = set(flatten(mol.GetSubstructMatches(query)))
-
-                # Get all deleters grouped by fg.
-                deleters = [
-                    [aid for aid in fg if aid in atoms]
-                    for fg in fg_atoms
-                ]
-
-                for fg_id, fg in enumerate(deleters):
-                    deleter_atoms[fg_id].extend(fg[:match.n])
-
-            for atom_ids in zip(fg_atoms, bonder_atoms, deleter_atoms):
-                fg, bonders, deleters = atom_ids
-                deleters = tuple(self.atoms[id_] for id_ in deleters)
-                fg = FunctionalGroup(
-                    atoms=tuple(self.atoms[id_] for id_ in fg),
-                    bonders=tuple(self.atoms[id_] for id_ in bonders),
-                    deleters=deleters,
-                    fg_type=fg_type
-                )
-                func_groups.append(fg)
-
-        return func_groups
+        for atom_ids in zip(func_groups, bonders, deleters):
+            fg, fg_bonders, fg_deleters = atom_ids
+            yield FunctionalGroup(
+                atoms=tuple(self.atoms[id_] for id_ in fg),
+                bonders=tuple(self.atoms[id_] for id_ in fg_bonders),
+                deleters=tuple(self.atoms[id_] for id_ in fg_deleters),
+                fg_type=self
+            )
 
     def __repr__(self):
+        func_group_smarts = rdkit.MolToSmarts(self._func_group)
+        bonder_smarts = [
+            rdkit.MolToSmarts(mol) for mol in self._bonders
+        ]
+        deleter_smarts = [
+            rdkit.MolToSmarts(mol) for mol in self._deleters
+        ]
         return (
             f'FGType(\n'
-            f'    fg_smarts={self._fg_smarts!r},\n'
-            f'    bonder_smarts={self._bonder_smarts!r},\n'
-            f'    del_smarts={self._del_smarts!r}\n'
+            f'    name={self.name!r}\n'
+            f'    func_group_smarts={func_group_smarts!r},\n'
+            f'    bonder_smarts={bonder_smarts!r},\n'
+            f'    deleter_smarts={deleter_smarts!r}\n'
             ')'
         )
 
     def __str__(self):
-        return repr(self)
+        return f'FGType({self.name})'
 
 
 class FunctionalGroup:
     """
-    Represents the functional group of a molecule.
+    Represents a functional group in a molecule.
+
+    Instances of this class should only by made by using
+    :class:`.FGType.get_functional_groups`.
 
     Attributes
     ----------
@@ -285,26 +312,24 @@ class FunctionalGroup:
         The atoms in the functional group.
 
     bonders : :class:`tuple` of :class:`.Atom`
-        The bonder atoms in the functional group.
+        The bonder atoms in the functional group. These are atoms which
+        have bonds added during the construction of a
+        :class:`.ConstructedMolecule`.
 
     deleters : :class:`tuple` of :class:`.Atom`
-        The deleter atoms in the functional group.
+        The deleter atoms in the functional group. These are atoms
+        which are deleted during construction of a
+        :class:`.ConstructedMolecule`.
 
-    type : :class:`FGType`
-        The :class:`FGType` of the functional group type.
-
-    Methods
-    -------
-    :meth:`clone`
-    :meth:`get_atom_ids`
-    :meth:`get_bonder_ids`
-    :meth:`get_deleter_ids`
+    fg_type : :class:`.FGType`
+        The :class:`.FGType` instance which created the
+        :class:`.FunctionalGroup`.
 
     """
 
-    def __init__(self, atoms, bonders, deleters, fg_type):
+    def __init__(self, atoms, bonders, deleters, fg_type=None):
         """
-        Initialize a functional group.
+        Initialize a :class:`.FunctionalGroup`.
 
         Parameters
         ----------
@@ -317,34 +342,26 @@ class FunctionalGroup:
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms in the functional group.
 
-        fg_type : :class:`FGType` or :class:`str`
-            The :class:`FGType` of the functional group to which the
-            functional group belongs. Can also be the name of the
-            :class:`FGType`.
+        fg_type : :class:`.FGType`
+            The :class:`.FGType` instance which created the
+            :class:`.FunctionalGroup`.
 
         """
 
         self.atoms = atoms
         self.bonders = bonders
         self.deleters = deleters
-
-        if isinstance(fg_type, str):
-            self.fg_type = next(
-                fg_type for fg_type in functional_groups
-                if fg_type.name == fg_type
-            )
-        else:
-            self.fg_type = fg_type
+        self.fg_type = fg_type
 
     def clone(self, atom_map=None):
         """
-        Create a new :class:`FunctionalGroup` with shifted ids.
+        Return a clone.
 
         Parameters
         ----------
         atom_map : :class:`dict`, optional
             If the clone should hold different :class:`.Atom`
-            instances, then a :class:`dict` should be provided which
+            instances, then a :class:`dict` should be provided, which
             maps atoms in the current :class:`.FunctionalGroup` to the
             atoms which should be used in the clone. Only atoms which
             need to be remapped need to be present in the `atom_map`.
@@ -429,7 +446,7 @@ class FunctionalGroup:
             f'    atoms=( {atoms} ), \n'
             f'    bonders=( {bonders} ), \n'
             f'    deleters=( {deleters} ), \n'
-            f'    fg_type={self.fg_type.name!r}\n'
+            f'    fg_type={self.fg_type.name}\n'
             ')'
         )
 
@@ -454,7 +471,7 @@ class FunctionalGroup:
             f'    atoms=( {atoms} ), \n'
             f'    bonders=( {bonders} ), \n'
             f'    deleters=( {deleters} ), \n'
-            f'    fg_type={self.fg_type.name!r}\n'
+            f'    fg_type={self.fg_type.name}\n'
             ')'
         )
 
