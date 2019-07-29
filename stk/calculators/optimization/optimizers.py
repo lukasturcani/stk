@@ -824,8 +824,8 @@ class XTB(Optimizer):
             if (polymer, conformer) not in in optimizer.incomplete:
                 break
 
-    See Also
-    --------
+    References
+    ----------
     .. [1] https://xtb-docs.readthedocs.io/en/latest/setup.html
 
     """

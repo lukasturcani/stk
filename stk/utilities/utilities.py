@@ -1041,9 +1041,9 @@ def is_valid_xtb_solvent(gfn_version, solvent):
     :class:`bool`
         ``True`` if solvent is valid.
 
-    See Also
-    --------
-    # https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+    References
+    ----------
+    .. [1] https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
     """
     if gfn_version == 0:

@@ -589,8 +589,8 @@ class XTBEnergy(EnergyCalculator):
         p_total_free_energy = xtb.total_energies[key]
         p_frequencies = xtb.frequencies[key]
 
-    See Also
-    --------
+    References
+    ----------
     .. [1] https://xtb-docs.readthedocs.io/en/latest/setup.html
 
     """
