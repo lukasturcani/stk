@@ -10,9 +10,9 @@ Extending stk: Adding more functional groups.
 ---------------------------------------------
 
 During initialization of a :class:`.BuildingBlock` instance, the
-names of a :class:`.FGType` instances are supplied. These are used to
+names of :class:`.FGType` instances are supplied. These are used to
 create the :class:`.FunctionalGroup` instances
-found in :class:`.BuildingBlock.func_groups` and therefore the ones
+found in :attr:`.BuildingBlock.func_groups` and therefore the ones
 used in the construction of :class:`.ConstructedMolecule` instances.
 If you want to be able to use a new :class:`.FGType` with building
 blocks in this way, simply add a new :class:`.FGType` instance to
@@ -66,8 +66,6 @@ class FGType:
 
     """
 
-    __slots__ = ['name', '_func_group', '_bonders', '_deleters']
-
     def __init__(
         self,
         name,
@@ -90,22 +88,18 @@ class FGType:
         bonder_smarts : :class:`list` of :class:`str`
             A :class:`list` of SMARTS strings, each of which matches a
             single atom in a functional group. The matched atom is
-            added to :class:`.FunctionalGroup.bonders`. A SMARTS
+            added to :attr:`.FunctionalGroup.bonders`. A SMARTS
             string needs to be repeated if a single functional group
-            has multiple equivalent atoms, each of which has bonds
-            created during construction. The number of times the string
-            needs to be repeated, is equal to number of atoms which
-            need to be tagged.
+            has multiple equivalent atoms, each of which appears in
+            the same :class:`.FunctionalGroup`.
 
         deleter_smarts : :class:`list` of :class:`str`
             A :class:`list` of SMARTS strings, each of which matches a
             single atom in a functional group. The matched atom is
-            added to :class:`.FunctionalGroup.deleters`. A SMARTS
+            added to :attr:`.FunctionalGroup.deleters`. A SMARTS
             string needs to be repeated if a single functional group
-            has multiple equivalent atoms, each of which is deleted
-            during construction. The number of times the string needs
-            to be repeated, is equal to number of atoms which need to
-            be tagged.
+            has multiple equivalent atoms, each of which appears in
+            the same :class:`.FunctionalGroup`.
 
         """
 
@@ -131,7 +125,7 @@ class FGType:
         Yields
         ------
         :class:`.FunctionalGroup`
-            A :class:`.FunctionalGroup` instance for every matched
+            A :class:`.FunctionalGroup` for every matched
             functional group in the `mol`.
 
         Examples
@@ -219,8 +213,8 @@ class FunctionalGroup:
     """
     Represents a functional group in a molecule.
 
-    Instances of this class should only by made by using
-    :class:`.FGType.get_functional_groups`.
+    Instances of this class should only be made via
+    :meth:`.FGType.get_functional_groups`.
 
     Attributes
     ----------
@@ -287,6 +281,26 @@ class FunctionalGroup:
         :class:`FunctionalGroup`
             A clone.
 
+        Examples
+        --------
+        .. code-block:: python
+
+            import stk
+
+            c0 = stk.C(0)
+            c1 = stk.C(1)
+            bb = stk.BuildingBlock('NCCN', ['amine'])
+            fg = bb.func_groups[0]
+
+            a0, a1 = fg.atoms[:2]
+            # fg_clone is a clone of fg, except that in all places
+            # fg holds a0 fg_clone holds c0 and in all places where
+            # fg holds a1, fg_clone holds c1.
+            fg_clone = fg.clone({
+                a0: c0
+                a1: c1
+            })
+
         """
 
         if atom_map is None:
@@ -301,41 +315,41 @@ class FunctionalGroup:
 
     def get_atom_ids(self):
         """
-        Get the ids of :attr:`atoms`.
+        Yield the ids of :attr:`atoms` in order.
 
-        Returns
-        -------
-        :class:`generator` of :class:`int`
-            The ids of :attr:`atoms`.
+        Yields
+        ------
+        :class:`int`
+            The id an :class:`.Atom` in :attr:`atoms`.
 
         """
 
-        return (a.id for a in self.atoms)
+        yield from (a.id for a in self.atoms)
 
     def get_bonder_ids(self):
         """
-        Get the ids of :attr:`bonders`.
+        Yield the ids of :attr:`bonders` in order.
 
-        Returns
-        -------
-        :class:`generator` of :class:`int`
-            The ids of :attr:`bonders`.
+        Yields
+        ------
+        :class:`int`
+            The id of an :class:`.Atom` in :attr:`bonders`.
 
         """
-        return (a.id for a in self.bonders)
+        yield from (a.id for a in self.bonders)
 
     def get_deleter_ids(self):
         """
-        Get the ids of :attr:`deleters`.
+        Yield the ids of :attr:`deleters` in order.
 
-        Returns
+        Yields
         -------
-        :class:`generator` of :class:`int`
-            The ids of :attr:`deleters`.
+        :class:`int`
+            The id of an :class:`.Atom` in :attr:`deleters`.
 
         """
 
-        return (a.id for a in self.deleters)
+        yield from (a.id for a in self.deleters)
 
     def __repr__(self):
         atoms = list(self.atoms)
