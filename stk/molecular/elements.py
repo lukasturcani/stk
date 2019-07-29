@@ -13,7 +13,7 @@ class Atom:
     A subclass is made for each element. The name of each subclass is
     the periodic table symbol of that element.
 
-    Atoms of a particular element can be made directly with this
+    Atoms of a particular element can be made with this
     class or with the subclass representing that element.
 
     Attributes
@@ -37,7 +37,7 @@ class Atom:
 
     Initialization of an :class:`.Atom` can happen in one of two ways.
     The atom can be initalized through the :class:`.Atom` class or
-    directly by through the class representing the element.
+    through the class representing the element.
 
     .. code-block:: python
 
@@ -50,7 +50,7 @@ class Atom:
         h1 = stk.H(id=1)
 
     When the class correspnding to the element is used directly, the
-    ``atomic_number``is not provided. Here are a few more examples.
+    ``atomic_number`` is not provided. Here are a few more examples.
 
     .. code-block:: python
 
@@ -72,7 +72,7 @@ class Atom:
         c0.custom_attribute = 51
         c0.other_attr = 'something'
 
-    We can initialize a :class:`.Atom` with additional, custom
+    We can initialize an :class:`.Atom` with additional, custom
     attributes direclty.
 
     .. code-block:: python
@@ -81,7 +81,7 @@ class Atom:
         h2.custom_attr1  # Holds 123.
         h2.other_attr2  # Holds 'thing'.
 
-    Providing the additional attributes to the initiializer is
+    Providing the additional attributes to the initializer is
     functionally equivalent to to assigning them to the object
     manually.
 
