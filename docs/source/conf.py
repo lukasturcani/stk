@@ -36,7 +36,6 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.napoleon']
 
 autodoc_default_options = {
-    'private-members': True,
     'special_members': True,
     'inherited-members': True,
     'show-inheritance': True

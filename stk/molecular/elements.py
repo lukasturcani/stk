@@ -109,7 +109,7 @@ class Atom:
     @staticmethod
     def _subclass_init(self, id, charge=0, **kwargs):
         """
-        The :meth:`__init__` method used for subclasses.
+        Initialize an atom of the element.
 
         Parameters
         ----------
