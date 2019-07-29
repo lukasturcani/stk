@@ -82,7 +82,7 @@ import numpy as np
 import re
 from collections import defaultdict
 
-from ..functional_groups import Reactor
+from ..reactor import Reactor
 from ...utilities import vector_theta
 
 
