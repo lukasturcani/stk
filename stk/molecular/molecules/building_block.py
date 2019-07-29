@@ -17,15 +17,8 @@ from .. import elements
 from ..elements import Atom
 from ..bonds import Bond
 from .molecule import Molecule
-from ..functional_groups import FunctionalGroup
-from ..functional_groups import functional_group_types as fg_types
-from ..functional_groups import functional_groups as fgs
-from ...utilities import (
-    flatten,
-    normalize_vector,
-    vector_theta,
-    dedupe
-)
+from ..functional_groups import fg_types
+from ...utilities import normalize_vector, vector_theta, dedupe
 
 
 logger = logging.getLogger(__name__)
@@ -33,19 +26,14 @@ logger = logging.getLogger(__name__)
 
 class BuildingBlock(Molecule):
     """
-    Represents the building blocks of a :class:`.ConstructedMolecule`.
+    Represents a building block of a :class:`.ConstructedMolecule`.
 
-    :class:`BuildingBlock` represents building block molecules, which
-    are either entire molecules or molecular fragments used for the
-    construction of a :class:`.ConstructedMolecule`.
+    A :class:`BuildingBlock` can represent either an entire molecule or
+    a molecular fragments used to construct a
+    :class:`.ConstructedMolecule`.
 
     Attributes
     ----------
-    _init_funcs : :class:`dict`
-        This is a class attribute. It maps file extensions to
-        functions which can be used to initialize
-        :class:`BuildingBlock` from that file type.
-
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
         The functional groups present in the molecule. The
         id of a :class:`.FunctionalGroup` is its index.
@@ -55,24 +43,10 @@ class BuildingBlock(Molecule):
         molecules with the same structure and with the same functional
         groups will have equal keys. Used for caching.
 
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`init_from_file`
-    :meth:`init_from_random_file`
-    :meth:`init_from_rdkit_mol`
-    :meth:`get_bonder_ids`
-    :meth:`get_bonder_centroids`
-    :meth:`get_bonder_plane`
-    :meth:`get_bonder_plane_normal`
-    :meth:`get_bonder_distances`
-    :meth:`get_bonder_direction_vectors`
-    :meth:`get_centroid_centroid_direction_vector`
-    :meth:`get_functional_groups`
-    :meth:`to_dict`
-
     """
 
+    # Maps file extensions to functions which can be used to
+    # create an rdkit molecule from that file type.
     _init_funcs = {
         '.mol': partial(
             rdkit.MolFromMolFile,
@@ -735,84 +709,6 @@ class BuildingBlock(Molecule):
 
         else:
             return normalize_vector(centroid - bonder_centroid)
-
-    def get_functional_groups(self, fg_names):
-        """
-        Find functional groups in the molecule.
-
-        Parameters
-        ----------
-        fg_names : :class:`iterable` of :class:`str`
-            The names of the functional groups which are to be found
-            within the molecule.
-
-        Returns
-        -------
-        :class:`list` of :class:`.FunctionalGroup`
-            A :class:`list` holding a :class:`.FunctionalGroup``
-            instance for every matched functional group in the
-            molecule.
-
-        """
-
-        # Ensure that given the same fg names in a different order,
-        # the atoms get assigned to the a functional group with the
-        # same id.
-        fg_names = sorted(fg_names)
-
-        mol = self.to_rdkit_mol()
-        rdkit.SanitizeMol(mol)
-        func_groups = []
-        for fg_name in fg_names:
-            fg_type = fg_types[fg_name]
-
-            # Find all fg atoms.
-            fg_query = rdkit.MolFromSmarts(fg_type.fg_smarts)
-            fg_atoms = mol.GetSubstructMatches(fg_query)
-
-            # Find all bonder atoms.
-            bonder_atoms = [[] for i in range(len(fg_atoms))]
-
-            for match in fg_type.bonder_smarts:
-                query = rdkit.MolFromSmarts(match.smarts)
-                atoms = set(flatten(mol.GetSubstructMatches(query)))
-
-                # Get all the bonders grouped by fg.
-                bonders = [
-                    [aid for aid in fg if aid in atoms]
-                    for fg in fg_atoms
-                ]
-
-                for fg_id, fg in enumerate(bonders):
-                    bonder_atoms[fg_id].extend(fg[:match.n])
-
-            # Find all deleter atoms.
-            deleter_atoms = [[] for i in range(len(fg_atoms))]
-            for match in fg_type.del_smarts:
-                query = rdkit.MolFromSmarts(match.smarts)
-                atoms = set(flatten(mol.GetSubstructMatches(query)))
-
-                # Get all deleters grouped by fg.
-                deleters = [
-                    [aid for aid in fg if aid in atoms]
-                    for fg in fg_atoms
-                ]
-
-                for fg_id, fg in enumerate(deleters):
-                    deleter_atoms[fg_id].extend(fg[:match.n])
-
-            for atom_ids in zip(fg_atoms, bonder_atoms, deleter_atoms):
-                fg, bonders, deleters = atom_ids
-                deleters = tuple(self.atoms[id_] for id_ in deleters)
-                fg = FunctionalGroup(
-                    atoms=tuple(self.atoms[id_] for id_ in fg),
-                    bonders=tuple(self.atoms[id_] for id_ in bonders),
-                    deleters=deleters,
-                    fg_type=fg_type
-                )
-                func_groups.append(fg)
-
-        return func_groups
 
     def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """

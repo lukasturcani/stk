@@ -1,7 +1,7 @@
 """
 Defines tools for dealing with functional groups and their reactions.
 
-See the documentation of :class:`Reactor` to see how reactions between
+See the documentation of :class:`.Reactor` to see how reactions between
 functional groups are performed.
 
 .. _`adding functional groups`:
@@ -14,8 +14,8 @@ If ``stk`` is to incorporate a new functional group, a new
 :data:`functional_groups`, which is defined in this module.
 
 Adding a new :class:`FGType` instance to :data:`functional_groups` will
-allow :meth:`.Topology.construct` to connect the functional group to
-all others during construction. In most cases, nothing except adding
+allow :meth:`.TopologyGraph.construct` to connect the functional group
+to all others during construction. In most cases, nothing except adding
 this instance should be necessary in order to incorporate new
 functional groups.
 
@@ -49,52 +49,85 @@ See :class:`Reactor`.
 from functools import partial
 import numpy as np
 from collections import Counter
+import rdkit.Chem.AllChem as rdkit
 
 from . import elements
 from .bonds import Bond, PeriodicBond
+from ..utilities import flatten
 
 
-class ReactionKey:
+class _ReactionKey:
     """
-    Used to create a key from a :class:`list` of fg names.
+    Represents a hash value of a collection of functional group names.
 
-    In effect, this creates a unique id for each reaction, given a
-    :class:`list` of functional groups involved in that reaction.
+    The functional group names indicate which functional groups are
+    involved in a reaction. The order in which the names are provided
+    does not change the hash value. The quantity of each functional
+    group name does change the hash value. Each name can be provided
+    multiple times. Adding the same name again will change the hash
+    value.
 
-    Attributes
-    ----------
-    key : :class:`tuple`
-        A unique key representing a reaction.
+    Examples
+    --------
+    The key is constant with respect to permutations
+
+
+    .. code-block:: python
+
+        key1 = _ReactionKey('amine', 'aldehyde', 'amine')
+        key2 = _ReactionKey('amine', 'amine', 'aldehyde')
+        key3 = _ReactionKey('aldehyde', 'amine', 'amine')
+
+        key1 == key2  # This is True.
+        key1 == key3  # This is True.
+        key2 == key3  # This is True.
+
+    The key changes if the number of functional groups changes
+
+    .. code-block:: python
+
+        key4 = _ReactionKey('amine', 'aldehyde')
+        key4 != key1  # This is True.
+
 
     """
 
     def __init__(self, *fg_names):
         """
-        Intializer.
+        Initialize a :class:`ReactionKey`.
 
         Parameters
         ----------
         *fg_names : :class:`str`
-            The names of functional groups involved in a reaction.
+            The names of functional groups involved in a reaction. If
+            multiples of a functional group are present in a reaction,
+            the name of the functional group must be present multiple
+            times.
 
         """
 
         c = Counter(fg_names)
-        self.key = tuple(
+        # _key is the hash value for the reaction. It should change
+        # if the different numbers of functional groups are present
+        # in the reaction, but it should not change if the order in
+        # which the functional groups are given changes.
+        self._key = tuple(
             sorted((key, value) for key, value in c.items())
         )
 
     def __eq__(self, other):
-        return self.key == other.key
+        return self._key == other._key
 
     def __hash__(self):
-        return hash(self.key)
+        return hash(self._key)
 
     def __repr__(self):
-        fg_names = ', '.join(repr(name) for name, count in self.key
-                             for i in range(count))
-
-        return f'FGType({fg_names})'
+        fg_names = ', '.join(
+            repr(name)
+            for name, count in self._key
+            for i in range(count)
+        )
+        return f'_ReactionKey({fg_names})'
 
     def __str__(self):
         return repr(self)
@@ -118,11 +151,28 @@ class Match:
     __slots__ = ['smarts', 'n']
 
     def __init__(self, smarts, n):
+        """
+        Initialize a :class:`Match`.
+
+        Parameters
+        ----------
+        smarts : :class:`str`
+            A SMARTS string which matches some atoms.
+
+        n : :class:`int`
+            The maximum number of atoms to be matched by :attr:`smarts`,
+            per functional group.
+
+        """
+
         self.smarts = smarts
         self.n = n
 
     def __eq__(self, other):
         return self.smarts == other.smarts and self.n == other.n
+
+    def __hash__(self):
+        return (self.smarts, self.n)
 
     def __repr__(self):
         return f'Match({self.smarts!r}, {self.n!r})'
@@ -133,27 +183,26 @@ class Match:
 
 class FGType:
     """
-    Contains information about types of functional groups.
+    Represents a :class:`.FunctionalGroup` type.
 
-    The point of this class is to register which atoms of a functional
-    group form bonds, and which are deleted during construction of
-    :class:`.ConstructedMolecule` instances.
+    Instances of this class are used to
 
     Attributes
     ----------
-    name : :class:`str`
-        The name of the functional group.
 
     fg_smarts : :class:`str`
-        A SMARTS string which matches the functional group.
+        A SMARTS string which matches al the atoms in the functional
+        group.
 
     bonder_smarts : :class:`list`
         A :class:`list` of the form
 
         .. code-block:: python
 
-            bonder_smarts = [Match(smarts='[$([N]([H])[H])]', n=1),
-                             Match(smarts='[$([H][N][H])]', n=1)]
+            bonder_smarts = [
+                Match(smarts='[$([N]([H])[H])]', n=1),
+                Match(smarts='[$([H][N][H])]', n=1)
+            ]
 
         Each string is SMARTS string which matches a bonder atom in the
         functional group. The number represents how many matched atoms
@@ -198,22 +247,97 @@ class FGType:
         """
 
         self.name = name
-        self.fg_smarts = fg_smarts
-        self.bonder_smarts = bonder_smarts
-        self.del_smarts = del_smarts
+        self._fg_smarts = fg_smarts
+        self._bonder_smarts = bonder_smarts
+        self._del_smarts = del_smarts
+
+    def get_functional_groups(self, mol):
+        """
+        Yield functional groups of this type found in `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+
+        Yields
+        ------
+        :class:`.FunctionalGroup`
+            A :class:`list` holding a :class:`.FunctionalGroup``
+            instance for every matched functional group in the
+            molecule.
+
+        """
+
+        # Ensure that given the same fg names in a different order,
+        # the atoms get assigned to the a functional group with the
+        # same id.
+        fg_names = sorted(fg_names)
+
+        mol = self.to_rdkit_mol()
+        rdkit.SanitizeMol(mol)
+        func_groups = []
+        for fg_name in fg_names:
+            fg_type = fg_types[fg_name]
+
+            # Find all fg atoms.
+            fg_query = rdkit.MolFromSmarts(fg_type.fg_smarts)
+            fg_atoms = mol.GetSubstructMatches(fg_query)
+
+            # Find all bonder atoms.
+            bonder_atoms = [[] for i in range(len(fg_atoms))]
+
+            for match in fg_type.bonder_smarts:
+                query = rdkit.MolFromSmarts(match.smarts)
+                atoms = set(flatten(mol.GetSubstructMatches(query)))
+
+                # Get all the bonders grouped by fg.
+                bonders = [
+                    [aid for aid in fg if aid in atoms]
+                    for fg in fg_atoms
+                ]
+
+                for fg_id, fg in enumerate(bonders):
+                    bonder_atoms[fg_id].extend(fg[:match.n])
+
+            # Find all deleter atoms.
+            deleter_atoms = [[] for i in range(len(fg_atoms))]
+            for match in fg_type.del_smarts:
+                query = rdkit.MolFromSmarts(match.smarts)
+                atoms = set(flatten(mol.GetSubstructMatches(query)))
+
+                # Get all deleters grouped by fg.
+                deleters = [
+                    [aid for aid in fg if aid in atoms]
+                    for fg in fg_atoms
+                ]
+
+                for fg_id, fg in enumerate(deleters):
+                    deleter_atoms[fg_id].extend(fg[:match.n])
+
+            for atom_ids in zip(fg_atoms, bonder_atoms, deleter_atoms):
+                fg, bonders, deleters = atom_ids
+                deleters = tuple(self.atoms[id_] for id_ in deleters)
+                fg = FunctionalGroup(
+                    atoms=tuple(self.atoms[id_] for id_ in fg),
+                    bonders=tuple(self.atoms[id_] for id_ in bonders),
+                    deleters=deleters,
+                    fg_type=fg_type
+                )
+                func_groups.append(fg)
+
+        return func_groups
 
     def __repr__(self):
         return (
             f'FGType(\n'
-            f'    name={self.name!r},\n'
-            f'    fg_smarts={self.fg_smarts!r},\n'
-            f'    bonder_smarts={self.bonder_smarts!r},\n'
-            f'    del_smarts={self.del_smarts!r}\n'
+            f'    fg_smarts={self._fg_smarts!r},\n'
+            f'    bonder_smarts={self._bonder_smarts!r},\n'
+            f'    del_smarts={self._del_smarts!r}\n'
             ')'
         )
 
     def __str__(self):
-        return f'FGType({self.name!r})'
+        return repr(self)
 
 
 class FunctionalGroup:
@@ -464,59 +588,20 @@ class Reactor:
     Once the method is defined, :attr:`_custom_reactions` needs to
     be updated.
 
-    Attributes
-    ----------
-    _bond_orders : :class:`dict`
-        When the default reaction is performed by :meth:`react`,
-        if the bond added between the two functional groups is not
-        single, the desired bond order should be placed in this
-        dictionary. The dictionary maps the reaction's
-        :class:`ReactionKey` to the desired bond order.
-
-    _custom_reactions : :class:`dict`
-        Maps a :class:`ReactionKey` for a given reaction to a custom
-        method which carries out the reaction. This means that
-        :meth:`react` will use that method for carrying out that
-        reaction instead.
-
-    _periodic_custom_reactions : :class:`dict`
-        Maps a :class:`ReactionKey` for a given reaction to a custom
-        method which carries out the reaction. This means that
-        :meth:`periodic_react` will use that method for carrying out
-        that reaction instead.
-
-    _mol : :class:`.ConstructedMolecule`
-        The molecule from which the :class:`Reactor` adds and removes
-        atoms and bonds.
-
-    _bonds_made : :class:`int`
-        The net number of bonds added.
-
-    _deleter_ids : :class:`set` of :class:`int`
-        The ids atoms which are to be removed.
-
-    _deleter_bonds : :class:`set` of :class:`int`
-        The bonds which are to be removed.
-
-    _func_groups : :class:`list` of :class:`.FunctionalGroup`
-        The functional groups which the reactor keeps up to date.
-
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`add_reaction`
-    :meth:`add_periodic_reaction`
-    :meth:`finalize`
-
     """
 
+    # When the default reaction is added by add_reaction(),
+    # if the bond added between the two functional groups is not
+    # single, the desired bond order should be placed in this
+    # dictionary. The dictionary maps the reaction's
+    # _ReactionKey to the desired bond order.
     _bond_orders = {
-        ReactionKey('amine', 'aldehyde'): 2,
-        ReactionKey('amide', 'aldehyde'): 2,
-        ReactionKey('nitrile', 'aldehyde'): 2,
-        ReactionKey('amide', 'amine'): 2,
-        ReactionKey('terminal_alkene', 'terminal_alkene'): 2,
-        ReactionKey('alkyne2', 'alkyne2'): 3
+        _ReactionKey('amine', 'aldehyde'): 2,
+        _ReactionKey('amide', 'aldehyde'): 2,
+        _ReactionKey('nitrile', 'aldehyde'): 2,
+        _ReactionKey('amide', 'amine'): 2,
+        _ReactionKey('terminal_alkene', 'terminal_alkene'): 2,
+        _ReactionKey('alkyne2', 'alkyne2'): 3
     }
 
     def __init__(self, mol):
@@ -531,11 +616,15 @@ class Reactor:
 
         """
 
+        # The net number of bonds added.
         self._bonds_made = 0
+        # The molecule from which atoms and bonds are added and
+        # removed.
         self._mol = mol
+        # The ids of atoms which are to be removed.
         self._deleter_ids = set()
+        # The ids of bonds which are to be removed.
         self._deleter_bonds = set()
-        self._func_groups = []
 
     def add_reaction(self, *fgs):
         """
@@ -564,7 +653,7 @@ class Reactor:
         """
 
         names = (fg.fg_type.name for fg in fgs)
-        reaction_key = ReactionKey(*names)
+        reaction_key = _ReactionKey(*names)
         if reaction_key in self._custom_reactions:
             return self._custom_reactions[reaction_key](self, *fgs)
 
@@ -608,7 +697,7 @@ class Reactor:
             fg.deleters = ()
 
         names = (fg.fg_type.name for fg in fgs)
-        reaction_key = ReactionKey(*names)
+        reaction_key = _ReactionKey(*names)
         if reaction_key in self._periodic_custom_reactions:
             rxn_fn = self._periodic_custom_reactions[reaction_key]
             return rxn_fn(self, direction, *fgs)
@@ -822,161 +911,195 @@ class Reactor:
 
         self._bonds_made += 12
 
+    # Maps a _ReactionKey for a given reaction to a custom
+    # method which carries out the reaction. This means that
+    # add_reaction will use that method for carrying out that
+    # reaction instead.
     _custom_reactions = {
 
-        ReactionKey('boronic_acid', 'diol'):
+        _ReactionKey('boronic_acid', 'diol'):
             _boronic_acid_with_diol,
 
-        ReactionKey('diol', 'difluorene'):
+        _ReactionKey('diol', 'difluorene'):
             partial(_diol_with_dihalogen, dihalogen='difluorene'),
 
-        ReactionKey('diol', 'dibromine'):
+        _ReactionKey('diol', 'dibromine'):
             partial(_diol_with_dihalogen, dihalogen='dibromine'),
 
-        ReactionKey('ring_amine', 'ring_amine'):
+        _ReactionKey('ring_amine', 'ring_amine'):
             _ring_amine_with_ring_amine
 
     }
 
+    # Maps a _ReactionKey for a given reaction to a custom
+    # method which carries out the reaction. This means that
+    # add_periodic_reaction() will use that method for carrying out
+    # that reaction instead.
     _periodic_custom_reactions = {}
 
 
-functional_groups = (
+fg_types = {
 
-    FGType(name="amine",
-           fg_smarts="[N]([H])[H]",
-           bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
-           del_smarts=[Match(smarts="[$([H][N][H])]", n=2)]),
+    'amine': FGType(
+        fg_smarts="[N]([H])[H]",
+        bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
+        del_smarts=[Match(smarts="[$([H][N][H])]", n=2)]
+    ),
 
-    FGType(name="aldehyde",
-           fg_smarts="[C](=[O])[H]",
-           bonder_smarts=[Match(smarts="[$([C](=[O])[H])]", n=1)],
-           del_smarts=[Match(smarts="[$([O]=[C][H])]", n=1)]),
+    'aldehyde': FGType(
+        fg_smarts="[C](=[O])[H]",
+        bonder_smarts=[Match(smarts="[$([C](=[O])[H])]", n=1)],
+        del_smarts=[Match(smarts="[$([O]=[C][H])]", n=1)]
+    ),
 
-    FGType(name="carboxylic_acid",
-           fg_smarts="[C](=[O])[O][H]",
-           bonder_smarts=[Match(smarts="[$([C](=[O])[O][H])]", n=1)],
-           del_smarts=[Match(smarts="[$([H][O][C](=[O]))]", n=1),
-                       Match(smarts="[$([O]([H])[C](=[O]))]", n=1)]),
+    'carboxylic_acid': FGType(
+        fg_smarts="[C](=[O])[O][H]",
+        bonder_smarts=[Match(smarts="[$([C](=[O])[O][H])]", n=1)],
+        del_smarts=[
+            Match(smarts="[$([H][O][C](=[O]))]", n=1),
+            Match(smarts="[$([O]([H])[C](=[O]))]", n=1)
+        ]
+    ),
 
+    'amide': FGType(
+        fg_smarts="[C](=[O])[N]([H])[H]",
+        bonder_smarts=[
+            Match(smarts="[$([C](=[O])[N]([H])[H])]", n=1)
+        ],
+        del_smarts=[
+            Match(smarts="[$([N]([H])([H])[C](=[O]))]", n=1),
+            Match(smarts="[$([H][N]([H])[C](=[O]))]", n=2)
+        ]
+    ),
 
-    FGType(name="amide",
-           fg_smarts="[C](=[O])[N]([H])[H]",
-           bonder_smarts=[
-                Match(smarts="[$([C](=[O])[N]([H])[H])]", n=1)
-           ],
-           del_smarts=[
-                Match(smarts="[$([N]([H])([H])[C](=[O]))]", n=1),
-                Match(smarts="[$([H][N]([H])[C](=[O]))]", n=2)
-           ]),
+    'thioacid': FGType(
+        fg_smarts="[C](=[O])[S][H]",
+        bonder_smarts=[Match(smarts="[$([C](=[O])[S][H])]", n=1)],
+        del_smarts=[
+            Match(smarts="[$([H][S][C](=[O]))]", n=1),
+            Match(smarts="[$([S]([H])[C](=[O]))]", n=1)
+        ]
+    ),
 
-    FGType(name="thioacid",
-           fg_smarts="[C](=[O])[S][H]",
-           bonder_smarts=[Match(smarts="[$([C](=[O])[S][H])]", n=1)],
-           del_smarts=[Match(smarts="[$([H][S][C](=[O]))]", n=1),
-                       Match(smarts="[$([S]([H])[C](=[O]))]", n=1)]),
+    'alcohol': FGType(
+        fg_smarts="[O][H]",
+        bonder_smarts=[Match(smarts="[$([O][H])]", n=1)],
+        del_smarts=[Match(smarts="[$([H][O])]", n=1)]
+    ),
 
-    FGType(name="alcohol",
-           fg_smarts="[O][H]",
-           bonder_smarts=[Match(smarts="[$([O][H])]", n=1)],
-           del_smarts=[Match(smarts="[$([H][O])]", n=1)]),
+    'thiol': FGType(
+        fg_smarts="[S][H]",
+        bonder_smarts=[Match(smarts="[$([S][H])]", n=1)],
+        del_smarts=[Match(smarts="[$([H][S])]", n=1)]
+    ),
 
-    FGType(name="thiol",
-           fg_smarts="[S][H]",
-           bonder_smarts=[Match(smarts="[$([S][H])]", n=1)],
-           del_smarts=[Match(smarts="[$([H][S])]", n=1)]),
+    'bromine': FGType(
+        fg_smarts="*[Br]",
+        bonder_smarts=[Match(smarts="[$(*[Br])]", n=1)],
+        del_smarts=[Match(smarts="[$([Br]*)]", n=1)]
+    ),
 
-    FGType(name="bromine",
-           fg_smarts="*[Br]",
-           bonder_smarts=[Match(smarts="[$(*[Br])]", n=1)],
-           del_smarts=[Match(smarts="[$([Br]*)]", n=1)]),
+    'iodine': FGType(
+        fg_smarts="*[I]",
+        bonder_smarts=[Match(smarts="[$(*[I])]", n=1)],
+        del_smarts=[Match(smarts="[$([I]*)]", n=1)]
+    ),
 
-    FGType(name="iodine",
-           fg_smarts="*[I]",
-           bonder_smarts=[Match(smarts="[$(*[I])]", n=1)],
-           del_smarts=[Match(smarts="[$([I]*)]", n=1)]),
+    'alkyne': FGType(
+        fg_smarts='[C]#[C][H]',
+        bonder_smarts=[Match(smarts='[$([C]([H])#[C])]', n=1)],
+        del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1)]
+    ),
 
-    FGType(name='alkyne',
-           fg_smarts='[C]#[C][H]',
-           bonder_smarts=[Match(smarts='[$([C]([H])#[C])]', n=1)],
-           del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1)]),
+    'terminal_alkene': FGType(
+        fg_smarts='[C]=[C]([H])[H]',
+        bonder_smarts=[Match(smarts='[$([C]=[C]([H])[H])]', n=1)],
+        del_smarts=[
+            Match(smarts='[$([H][C]([H])=[C])]', n=2),
+            Match(smarts='[$([C](=[C])([H])[H])]', n=1)
+        ]
+    ),
 
-    FGType(name='terminal_alkene',
-           fg_smarts='[C]=[C]([H])[H]',
-           bonder_smarts=[Match(smarts='[$([C]=[C]([H])[H])]', n=1)],
-           del_smarts=[Match(smarts='[$([H][C]([H])=[C])]', n=2),
-                       Match(smarts='[$([C](=[C])([H])[H])]', n=1)]),
-
-    FGType(name='boronic_acid',
-           fg_smarts='[B]([O][H])[O][H]',
-           bonder_smarts=[Match(smarts='[$([B]([O][H])[O][H])]', n=1)],
-           del_smarts=[Match(smarts='[$([O]([H])[B][O][H])]', n=2),
-                       Match(smarts='[$([H][O][B][O][H])]', n=2)]),
+    'boronic_acid': FGType(
+        fg_smarts='[B]([O][H])[O][H]',
+        bonder_smarts=[Match(smarts='[$([B]([O][H])[O][H])]', n=1)],
+        del_smarts=[
+            Match(smarts='[$([O]([H])[B][O][H])]', n=2),
+            Match(smarts='[$([H][O][B][O][H])]', n=2)
+        ]
+    ),
 
     # This amine functional group only deletes one of the
     # hydrogen atoms when a bond is formed.
-    FGType(name="amine2",
-           fg_smarts="[N]([H])[H]",
-           bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
-           del_smarts=[Match(smarts="[$([H][N][H])]", n=1)]),
+    'amine2': FGType(
+        fg_smarts="[N]([H])[H]",
+        bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
+        del_smarts=[Match(smarts="[$([H][N][H])]", n=1)]
+    ),
 
-    FGType(name="secondary_amine",
-           fg_smarts="[H][N]([#6])[#6]",
-           bonder_smarts=[
-                Match(smarts="[$([N]([H])([#6])[#6])]", n=1)
-           ],
-           del_smarts=[Match(smarts="[$([H][N]([#6])[#6])]", n=1)]),
+    'secondary_amine': FGType(
+        fg_smarts="[H][N]([#6])[#6]",
+        bonder_smarts=[
+            Match(smarts="[$([N]([H])([#6])[#6])]", n=1)
+        ],
+        del_smarts=[Match(smarts="[$([H][N]([#6])[#6])]", n=1)]
+    ),
 
-    FGType(name='diol',
-           fg_smarts='[H][O][#6]~[#6][O][H]',
-           bonder_smarts=[
-               Match(smarts='[$([O]([H])[#6]~[#6][O][H])]', n=2)
-           ],
-           del_smarts=[
-               Match(smarts='[$([H][O][#6]~[#6][O][H])]', n=2)
-           ]),
+    'diol': FGType(
+        fg_smarts='[H][O][#6]~[#6][O][H]',
+        bonder_smarts=[
+            Match(smarts='[$([O]([H])[#6]~[#6][O][H])]', n=2)
+        ],
+        del_smarts=[
+            Match(smarts='[$([H][O][#6]~[#6][O][H])]', n=2)
+        ]
+    ),
 
-    FGType(name='difluorene',
-           fg_smarts='[F][#6]~[#6][F]',
-           bonder_smarts=[Match(smarts='[$([#6]([F])~[#6][F])]', n=2)],
-           del_smarts=[Match(smarts='[$([F][#6]~[#6][F])]', n=2)]),
+    'difluorene': FGType(
+        fg_smarts='[F][#6]~[#6][F]',
+        bonder_smarts=[Match(smarts='[$([#6]([F])~[#6][F])]', n=2)],
+        del_smarts=[Match(smarts='[$([F][#6]~[#6][F])]', n=2)]
+    ),
 
-    FGType(name='dibromine',
-           fg_smarts='[Br][#6]~[#6][Br]',
-           bonder_smarts=[
-               Match(smarts='[$([#6]([Br])~[#6][Br])]', n=2)
-           ],
-           del_smarts=[Match(smarts='[$([Br][#6]~[#6][Br])]', n=2)]),
+    'dibromine': FGType(
+        fg_smarts='[Br][#6]~[#6][Br]',
+        bonder_smarts=[
+            Match(smarts='[$([#6]([Br])~[#6][Br])]', n=2)
+        ],
+        del_smarts=[Match(smarts='[$([Br][#6]~[#6][Br])]', n=2)]
+    ),
 
-    FGType(name='alkyne2',
-           fg_smarts='[C]#[C][H]',
-           bonder_smarts=[Match(smarts='[$([C]#[C][H])]', n=1)],
-           del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1),
-                       Match(smarts='[$([C](#[C])[H])]', n=1)]),
+    'alkyne2': FGType(
+        fg_smarts='[C]#[C][H]',
+        bonder_smarts=[Match(smarts='[$([C]#[C][H])]', n=1)],
+        del_smarts=[
+            Match(smarts='[$([H][C]#[C])]', n=1),
+            Match(smarts='[$([C](#[C])[H])]', n=1)
+        ]
+    ),
 
-    FGType(name='ring_amine',
-           fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
-           bonder_smarts=[
-               Match(
-                   smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6R1])]',
-                   n=1
-               ),
-               Match(
-                   smarts='[$([#6]([H])(~[#6R1])~[#6][N]([H])[H])]',
-                   n=1
-               ),
-            ],
-           del_smarts=[
-               Match(
-                   smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6R1])]',
-                   n=2
-               ),
-               Match(
-                   smarts='[$([H][#6](~[#6R1])~[#6][N]([H])[H])]',
-                   n=1
-               )
-           ])
+    'ring_amine': FGType(
+        fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
+        bonder_smarts=[
+            Match(
+                smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6R1])]',
+                n=1
+            ),
+            Match(
+                smarts='[$([#6]([H])(~[#6R1])~[#6][N]([H])[H])]',
+                n=1
+            ),
+        ],
+        del_smarts=[
+            Match(
+                smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6R1])]',
+                n=2
+            ),
+            Match(
+                smarts='[$([H][#6](~[#6R1])~[#6][N]([H])[H])]',
+                n=1
+            )
+        ]
+    ),
 
-    )
-
-functional_group_types = {fg.name: fg for fg in functional_groups}
+}
