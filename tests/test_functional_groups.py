@@ -75,19 +75,19 @@ def test_clone(aldehyde3, hydrogen, carbon):
 def test_get_atom_ids(aldehyde3):
     for fg in aldehyde3.func_groups:
         atoms = it.zip_longest(fg.get_atom_ids(), fg.atoms)
-        for atom, atom_id in atoms:
+        for atom_id, atom in atoms:
             assert atom.id == atom_id
 
 
 def test_get_bonder_ids(aldehyde3):
     for fg in aldehyde3.func_groups:
         bonders = it.zip_longest(fg.get_bonder_ids(), fg.bonders)
-        for bonder, bonder_id in bonders:
+        for bonder_id, bonder in bonders:
             assert bonder.id == bonder_id
 
 
 def test_get_deleter_ids(aldehyde3):
     for fg in aldehyde3.func_groups:
         deleters = it.zip_longest(fg.get_deleter_ids(), fg.deleters)
-        for deleter, deleter_id in deleters:
+        for deleter_id, deleter in deleters:
             assert deleter.id == deleter_id
