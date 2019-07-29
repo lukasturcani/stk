@@ -181,8 +181,7 @@ class Atom:
         )
 
     def __str__(self):
-        charge = f', charge={self.charge}' if self.charge != 0 else ''
-        return f'{self.__class__.__name__}({self.id}{charge})'
+        return f'{self.__class__.__name__}({self.id})'
 
     def clone(self):
         """

@@ -225,7 +225,7 @@ class PeriodicBond(Bond):
 
     """
 
-    def __init__(self, atom1, atom2, order, direction):
+    def __init__(self, atom1, atom2, order, direction, **kwargs):
         """
         Initialize a :class:`PeriodicBond`.
 
@@ -248,7 +248,15 @@ class PeriodicBond(Bond):
             not periodic across the y axis and is periodic across the z
             axis in the negative direction.
 
+        **kwargs : :class:`object`
+            Additional attributes to be added to the bond.
+
         """
 
-        super().__init__(atom1, atom2, order)
-        self.direction = direction
+        super().__init__(
+            atom1=atom1,
+            atom2=atom2,
+            order=order,
+            direction=direction,
+            **kwargs
+        )
