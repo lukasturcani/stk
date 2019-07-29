@@ -291,8 +291,8 @@ class FunctionalGroup:
             c1 = stk.C(1)
             bb = stk.BuildingBlock('NCCN', ['amine'])
             fg = bb.func_groups[0]
-
             a0, a1 = fg.atoms[:2]
+
             # fg_clone is a clone of fg, except that in all places
             # fg holds a0 fg_clone holds c0 and in all places where
             # fg holds a1, fg_clone holds c1.
