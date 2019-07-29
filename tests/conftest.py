@@ -40,6 +40,51 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize('xtb_path', [xtb_path])
 
 
+@pytest.fixture('session')
+def hydrogen():
+    return stk.H(1, -3, attr1='12', attr2=32, _attr3=12.2)
+
+
+@pytest.fixture('session')
+def carbon():
+    return stk.C(333, attr2=None, attr12='abc', _pattr=22.22)
+
+
+@pytest.fixture('session')
+def lithium():
+    return stk.Li(121, 2, alpha=232, beta='bvc', _gamma=4523)
+
+
+@pytest.fixture('session')
+def chlorine():
+    return stk.Cl(786, a=9, b='bbb', _c='yfg')
+
+
+@pytest.fixture('session')
+def bond(hydrogen, carbon):
+    return stk.Bond(
+        atom1=hydrogen,
+        atom2=carbon,
+        order=2,
+        attr1=1,
+        attr2='2',
+        _attr3=12.2
+    )
+
+
+@pytest.fixture('session')
+def periodic_bond(lithium, chlorine):
+    return stk.PeriodicBond(
+        atom1=lithium,
+        atom2=chlorine,
+        order=21,
+        direction=[1, 0, -1],
+        attr10=16,
+        attr20='26',
+        _attr30=126.2
+    )
+
+
 @pytest.fixture(scope='session')
 def amine2():
     return stk.BuildingBlock('NCCCN', ['amine'])
