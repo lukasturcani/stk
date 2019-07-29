@@ -9,15 +9,31 @@ functional groups are performed.
 Extending stk: Adding more functional groups.
 ---------------------------------------------
 
-If ``stk`` is to incorporate a new functional group, a new
-:class:`FGType` instance should be added to
-:data:`functional_groups`, which is defined in this module.
+During initialization of a :class:`.BuildingBlock` instance, the
+names of a :class:`.FGType` instances are supplied. These are used to
+create the :class:`.FunctionalGroup` instances
+found in :class:`.BuildingBlock.func_groups` and therefore the ones
+used in the construction of :class:`.ConstructedMolecule` instances.
+If you want to be able to use a new :class:`.FGType` with building
+blocks in this way, simply add a new :class:`.FGType` instance to
+:data:`fg_types`. This can be done in this file or externally.
+For example, if you want make ``stk`` use a new :class:`.FGType`
+without touching the source code you can just do
 
-Adding a new :class:`FGType` instance to :data:`functional_groups` will
-allow :meth:`.TopologyGraph.construct` to connect the functional group
-to all others during construction. In most cases, nothing except adding
-this instance should be necessary in order to incorporate new
-functional groups.
+.. code-block:: python
+
+    import stk
+
+    new_fg_type = FGType(
+        name='my_fg_type',
+        fg_smarts='[N]([H])[H]',
+        bonder_smarts=['[$([N]([H])[H])]'],
+        del_smarts=['[$([H][N][H])]']*2
+    )
+    stk.fg_types[new_fg_type.name] = new_fg_type
+
+    # You can now use the new_fg_type with BuildingBlocks.
+    bb = stk.BuildingBlock('NCCCN', ['my_fg_type'])
 
 Note that when adding SMARTS, if you want to make a SMARTS that targets
 an atom in an environment, for example, a bromine connected to a
@@ -31,11 +47,6 @@ works but::
     [$([C][Br])]
 
 does not.
-
-If a new functional group is to connect to another functional group
-with a bond other than a single, the names of the functional groups
-should be added to :attr:`Reactor.bond_orders`, along with the desired
-bond order.
 
 """
 
@@ -232,7 +243,7 @@ class FunctionalGroup:
 
     """
 
-    def __init__(self, atoms, bonders, deleters, fg_type=None):
+    def __init__(self, atoms, bonders, deleters, fg_type):
         """
         Initialize a :class:`.FunctionalGroup`.
 
@@ -381,21 +392,24 @@ class FunctionalGroup:
         )
 
 
-fg_types = {
+_fg_types = (
 
-    'amine': FGType(
+    FGType(
+        name='amine',
         fg_smarts='[N]([H])[H]',
         bonder_smarts=['[$([N]([H])[H])]'],
         del_smarts=['[$([H][N][H])]']*2
     ),
 
-    'aldehyde': FGType(
+    FGType(
+        name='aldehyde',
         fg_smarts='[C](=[O])[H]',
         bonder_smarts=['[$([C](=[O])[H])]'],
         del_smarts=['[$([O]=[C][H])]']
     ),
 
-    'carboxylic_acid': FGType(
+    FGType(
+        name='carboxylic_acid',
         fg_smarts='[C](=[O])[O][H]',
         bonder_smarts=['[$([C](=[O])[O][H])]'],
         del_smarts=[
@@ -404,7 +418,8 @@ fg_types = {
         ]
     ),
 
-    'amide': FGType(
+    FGType(
+        name='amide',
         fg_smarts='[C](=[O])[N]([H])[H]',
         bonder_smarts=['[$([C](=[O])[N]([H])[H])]'],
         del_smarts=(
@@ -413,43 +428,50 @@ fg_types = {
         )
     ),
 
-    'thioacid': FGType(
+    FGType(
+        name='thioacid',
         fg_smarts='[C](=[O])[S][H]',
         bonder_smarts=['[$([C](=[O])[S][H])]'],
         del_smarts=['[$([H][S][C](=[O]))]', '[$([S]([H])[C](=[O]))]']
     ),
 
-    'alcohol': FGType(
+    FGType(
+        name='alcohol',
         fg_smarts='[O][H]',
         bonder_smarts=['[$([O][H])]'],
         del_smarts=['[$([H][O])]']
     ),
 
-    'thiol': FGType(
+    FGType(
+        name='thiol',
         fg_smarts="[S][H]",
         bonder_smarts=['[$([S][H])]'],
         del_smarts=['[$([H][S])]']
     ),
 
-    'bromine': FGType(
+    FGType(
+        name='bromine',
         fg_smarts='*[Br]',
         bonder_smarts=['[$(*[Br])]'],
         del_smarts=['[$([Br]*)]']
     ),
 
-    'iodine': FGType(
+    FGType(
+        name='iodine',
         fg_smarts='*[I]',
         bonder_smarts=['[$(*[I])]'],
         del_smarts=['[$([I]*)]']
     ),
 
-    'alkyne': FGType(
+    FGType(
+        name='alkyne',
         fg_smarts='[C]#[C][H]',
         bonder_smarts=['[$([C]([H])#[C])]'],
         del_smarts=['[$([H][C]#[C])]']
     ),
 
-    'terminal_alkene': FGType(
+    FGType(
+        name='terminal_alkene',
         fg_smarts='[C]=[C]([H])[H]',
         bonder_smarts=['[$([C]=[C]([H])[H])]'],
         del_smarts=(
@@ -458,7 +480,8 @@ fg_types = {
         )
     ),
 
-    'boronic_acid': FGType(
+    FGType(
+        name='boronic_acid',
         fg_smarts='[B]([O][H])[O][H]',
         bonder_smarts=['[$([B]([O][H])[O][H])]'],
         del_smarts=(
@@ -469,13 +492,15 @@ fg_types = {
 
     # This amine functional group only deletes one of the
     # hydrogen atoms when a bond is formed.
-    'amine2': FGType(
+    FGType(
+        name='amine2',
         fg_smarts='[N]([H])[H]',
         bonder_smarts=['[$([N]([H])[H])]'],
         del_smarts=['[$([H][N][H])]']
     ),
 
-    'secondary_amine': FGType(
+    FGType(
+        name='secondary_amine',
         fg_smarts='[H][N]([#6])[#6]',
         bonder_smarts=[
             '[$([N]([H])([#6])[#6])]'
@@ -483,31 +508,36 @@ fg_types = {
         del_smarts=['[$([H][N]([#6])[#6])]']
     ),
 
-    'diol': FGType(
+    FGType(
+        name='diol',
         fg_smarts='[H][O][#6]~[#6][O][H]',
         bonder_smarts=['[$([O]([H])[#6]~[#6][O][H])]']*2,
         del_smarts=['[$([H][O][#6]~[#6][O][H])]']*2
     ),
 
-    'difluorene': FGType(
+    FGType(
+        name='difluorene',
         fg_smarts='[F][#6]~[#6][F]',
         bonder_smarts=['[$([#6]([F])~[#6][F])]']*2,
         del_smarts=['[$([F][#6]~[#6][F])]']*2
     ),
 
-    'dibromine': FGType(
+    FGType(
+        name='dibromine',
         fg_smarts='[Br][#6]~[#6][Br]',
         bonder_smarts=['[$([#6]([Br])~[#6][Br])]']*2,
         del_smarts=['[$([Br][#6]~[#6][Br])]']*2
     ),
 
-    'alkyne2': FGType(
+    FGType(
+        name='alkyne2',
         fg_smarts='[C]#[C][H]',
         bonder_smarts=['[$([C]#[C][H])]'],
         del_smarts=['[$([H][C]#[C])]', '[$([C](#[C])[H])]']
     ),
 
-    'ring_amine': FGType(
+    FGType(
+        name='ring_amine',
         fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
         bonder_smarts=[
             '[$([N]([H])([H])[#6]~[#6]([H])~[#6R1])]',
@@ -519,4 +549,6 @@ fg_types = {
         )
     ),
 
-}
+)
+
+fg_types = {fg_type.name: fg_type for fg_type in _fg_types}
