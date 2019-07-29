@@ -8,7 +8,7 @@ Read the docstring of :class:`.Atom`.
 
 class Atom:
     """
-    Base class for atoms.
+    Represnts an atom.
 
     A subclass is made for each element. The name of each elemental
     class is the periodic table symbol.
@@ -42,6 +42,9 @@ class Atom:
 
     Examples
     --------
+
+    *Initialization.*
+
     Initialization of an :class:`.Atom` can happen in one of two ways.
     The atom can be initalized through the :class:`.Atom` class or
     directly by through the class representing the element.
@@ -70,17 +73,14 @@ class Atom:
         c0 = stk.Atom(id=4, atomic_number=6)
         c1 = stk.C(id=5)
 
+    *Adding additional atom attributes.*
+
     Each atom can be given additional attributes. For example
 
     .. code-block:: python
 
-        h0.custom_attribute = 51
-        h0.other_attribute = 'something'
-
-    If we run ``print(h0)`` then ``H(0)`` will be
-    printed. However, if we run ``print(repr(h0))``, then
-    ``H(0, custom_attribute=51, other_attribute='something')`` will be
-    printed.
+        c0.custom_attribute = 51
+        c0.other_attr = 'something'
 
     We can initialize a :class:`.Atom` with additional, custom
     attributes direclty.
@@ -94,6 +94,30 @@ class Atom:
     Providing the additional attributes to the initiializer is
     functionally equivalent to to assigning them to the object
     manually.
+
+    *Printing*
+
+    To print a brief summary of the atom you can run
+
+    .. code-block:: python
+
+        # Prints C(4).
+        print(c0)
+
+    To print a complete description of the atom, including additional
+    attributes you can run
+
+    .. code-block:: python
+
+        # Prints C(4, custom_attribute=51, other_attr='something').
+        print(repr(c0))
+
+    If private attributes are added to the atom, they will not be
+    printed.
+
+        c0._attr_name = 12
+        # Prints C(4, custom_attribute=51, other_attr='something').
+        print(repr(c0))
 
     """
 
