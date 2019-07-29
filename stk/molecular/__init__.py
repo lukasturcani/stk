@@ -2,13 +2,11 @@ from .topology_graphs import (
     cof,
     macrocycle,
     polymer,
-    rotaxane
+    rotaxane,
+    cage
 )
 from .topology_graphs.topology_graph import *
-from .functional_groups import (
-    functional_groups,
-    functional_group_types
-)
+from .functional_groups import *
 from .molecules import *
 from .elements import *
 from .bonds import *
