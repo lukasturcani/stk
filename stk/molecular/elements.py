@@ -10,12 +10,11 @@ class Atom:
     """
     Represents an atom.
 
-    A subclass is made for each element. The name of each elemental
-    class is the periodic table symbol.
+    A subclass is made for each element. The name of each subclass is
+    the periodic table symbol of the element.
 
-    Atoms of a particular element can be made with this class or with
-    a subclass that represents that element directly. See the examples
-    below.
+    Atoms of a particular element can be made directly with this
+    class or with the subclass representing that element.
 
     Attributes
     ----------
