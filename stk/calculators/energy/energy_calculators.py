@@ -591,7 +591,7 @@ class XTBEnergy(EnergyCalculator):
 
     See Also
     --------
-    #. https://xtb-docs.readthedocs.io/en/latest/setup.html
+    .. [1] https://xtb-docs.readthedocs.io/en/latest/setup.html
 
     """
     def __init__(self,
