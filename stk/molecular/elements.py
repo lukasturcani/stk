@@ -87,14 +87,14 @@ class Atom:
 
     *Printing*
 
-    To print a brief summary of the atom you can run
+    To print a brief summary of an atom you can run
 
     .. code-block:: python
 
         # Prints C(4).
         print(c0)
 
-    To print a complete description of the atom, including additional
+    To print a complete description of an atom, including additional
     attributes, you can run
 
     .. code-block:: python
@@ -102,7 +102,7 @@ class Atom:
         # Prints C(4, custom_attribute=51, other_attr='something').
         print(repr(c0))
 
-    If private attributes are added to the atom, they will not be
+    If private attributes were added to an atom, they will not be
     printed
 
     .. code-block:: python

@@ -51,14 +51,14 @@ class Bond:
 
     *Printing*
 
-    To print a brief summary of the bond you can run
+    To print a brief summary of a bond you can run
 
     .. code-block:: python
 
         # Prints Bond(C(2), C(3), 1).
         print(bond2)
 
-    To print a complete description of the bond, including additional
+    To print a complete description of a bond, including additional
     attributes, you can run
 
     .. code-block:: python
@@ -76,7 +76,7 @@ class Bond:
         # Prints Bond(C(2, alpha=1), C(3), 1, attr1=123, attr2='hi')
         print(repr(bond2))
 
-    If private attributes are added to the bond, they will not be
+    If private attributes were added to a bond, they will not be
     printed
 
     .. code-block:: python
