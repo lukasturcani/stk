@@ -8,7 +8,7 @@ Read the docstring of :class:`.Atom`.
 
 class Atom:
     """
-    Represnts an atom.
+    Represents an atom.
 
     A subclass is made for each element. The name of each elemental
     class is the periodic table symbol.
@@ -32,12 +32,8 @@ class Atom:
     charge : :class:`int`
         The formal charge of the atom.
 
-    _elements : :class:`dict`
-        Maps an atomic number to the class for that element.
-
     Examples
     --------
-
     *Initialization.*
 
     Initialization of an :class:`.Atom` can happen in one of two ways.
@@ -118,6 +114,7 @@ class Atom:
 
     """
 
+    # Maps each atomic number (int) to the relevant Atom subclass.
     _elements = {}
 
     def __init_subclass__(cls, **kwargs):
@@ -190,12 +187,12 @@ class Atom:
 
     def clone(self):
         """
-        Clone the atom.
+        Return a clone.
 
         Returns
         -------
         :class:`.Atom`
-            A clone.
+            The clone.
 
         """
 
