@@ -35,11 +35,6 @@ class Atom:
     _elements : :class:`dict`
         Maps an atomic number to the class for that element.
 
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`clone`
-
     Examples
     --------
 
