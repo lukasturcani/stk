@@ -344,8 +344,11 @@ class BuildingBlock(Molecule):
 
         super().__init__(atoms, bonds, position_matrix)
 
+        fg_makers = (fg_types[name] for name in functional_groups)
         self.func_groups = tuple(
-            self.get_functional_groups(functional_groups)
+            func_group
+            for fg_maker in fg_makers
+            for func_group in fg_maker.get_functional_groups(self)
         )
 
     @classmethod

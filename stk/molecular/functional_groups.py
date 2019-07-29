@@ -150,7 +150,7 @@ class FGType:
         rdkit_mol = mol.to_rdkit_mol()
         rdkit.SanitizeMol(rdkit_mol)
 
-        func_groups = mol.GetSubstructMatches(self._func_group)
+        func_groups = rdkit_mol.GetSubstructMatches(self._func_group)
 
         # All the bonder atoms, grouped by fg.
         bonders = [[] for i in range(len(func_groups))]
@@ -182,9 +182,9 @@ class FGType:
         for atom_ids in zip(func_groups, bonders, deleters):
             fg, fg_bonders, fg_deleters = atom_ids
             yield FunctionalGroup(
-                atoms=tuple(self.atoms[id_] for id_ in fg),
-                bonders=tuple(self.atoms[id_] for id_ in fg_bonders),
-                deleters=tuple(self.atoms[id_] for id_ in fg_deleters),
+                atoms=tuple(mol.atoms[id_] for id_ in fg),
+                bonders=tuple(mol.atoms[id_] for id_ in fg_bonders),
+                deleters=tuple(mol.atoms[id_] for id_ in fg_deleters),
                 fg_type=self
             )
 
