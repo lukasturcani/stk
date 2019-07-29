@@ -115,6 +115,8 @@ class Atom:
     If private attributes are added to the atom, they will not be
     printed.
 
+    .. code-block:: python
+
         c0._attr_name = 12
         # Prints C(4, custom_attribute=51, other_attr='something').
         print(repr(c0))
