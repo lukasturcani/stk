@@ -1,49 +1,121 @@
+"""
+Defines classes which represent bonds.
+
+"""
+
+
 class Bond:
     """
     Represents an atomic bond.
 
     Attributes
     ----------
-    atom1 : :class:`Atom`
+    atom1 : :class:`.Atom`
         The first atom in the bond.
 
-    atom2 : :class:`Atom`
+    atom2 : :class:`.Atom`
         The second atom in the bond.
 
     order : :class:`int`
         The bond order.
 
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`clone`
+    Examples
+    --------
+    *Adding additional attributes.*
+
+    Each bond can be given additional attributes. For example
+
+    .. code-block:: python
+
+        import stk
+
+        bond1 = stk.Bond(stk.H(0), stk.H(1), 1)
+        bond1.attr1 = 12.2
+        bond1.attr2 = 'something'
+
+    A :class:`.Bond` can also initialized with additional attributes
+    directly
+
+    .. code-block:: python
+
+        bond2 = stk.Bond(
+            atom1=stk.C(2),
+            atom2=stk.C(3),
+            order=1,
+            attr1=123,
+            attr2='hi'
+        )
+
+        bond2.attr1  # Holds 123.
+        bond2.attr2  # Holds 'hi'.
+
+    *Printing*
+
+    To print a brief summary of the bond you can run
+
+    .. code-block:: python
+
+        # Prints Bond(C(2), C(3), 1).
+        print(bond2)
+
+    To print a complete description of the bond, including additional
+    attributes, you can run
+
+    .. code-block:: python
+
+        # Prints Bond(C(2), C(3), 1, attr1=123, attr2='hi')
+        print(repr(bond2))
+
+    If the atoms have additional attributes, they will be printed too
+
+    .. code-block:: python
+
+        # Add a custom attribute to an atom.
+        bond2.atom1.alpha = 1
+
+        # Prints Bond(C(2, alpha=1), C(3), 1, attr1=123, attr2='hi')
+        print(repr(bond2))
+
+    If private attributes are added to the bond, they will not be
+    printed
+
+    .. code-block:: python
+
+        bond2._attr3 = 'private'
+        # Prints Bond(C(2, alpha=1), C(3), 1, attr1=123, attr2='hi')
+        print(repr(bond2))
 
     """
 
-    def __init__(self, atom1, atom2, order):
+    def __init__(self, atom1, atom2, order, **kwargs):
         """
-        Intialize a :class:`Bond`.
+        Initialize a :class:`Bond`.
 
         Attributes
         ----------
-        atom1 : :class:`Atom`
+        atom1 : :class:`.Atom`
             The first atom in the bond.
 
-        atom2 : :class:`Atom`
+        atom2 : :class:`.Atom`
             The second atom in the bond.
 
         order : :class:`int`
             The bond order.
+
+        **kwargs : :class:`object`
+            Additional attributes to be added to the bond.
 
         """
 
         self.atom1 = atom1
         self.atom2 = atom2
         self.order = order
+        for attr, val in kwargs.items():
+            setattr(self, attr, val)
 
     def clone(self, atom_map=None):
         """
-        Clone the bond.
+        Return a clone.
 
         Parameters
         ----------

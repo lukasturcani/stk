@@ -95,7 +95,7 @@ class Atom:
         print(c0)
 
     To print a complete description of the atom, including additional
-    attributes you can run
+    attributes, you can run
 
     .. code-block:: python
 
@@ -103,7 +103,7 @@ class Atom:
         print(repr(c0))
 
     If private attributes are added to the atom, they will not be
-    printed.
+    printed
 
     .. code-block:: python
 
