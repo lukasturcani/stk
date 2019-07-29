@@ -188,6 +188,8 @@ class Atom:
         """
         Return a clone.
 
+        Private attributes are not passed to the clone.
+
         Returns
         -------
         :class:`.Atom`

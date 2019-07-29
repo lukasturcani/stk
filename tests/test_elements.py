@@ -3,7 +3,12 @@ import stk
 
 def test_initialization():
     for i in range(1, 119):
-        a1 = stk.Atom(id=1, atomic_number=i, attr1=12, attr2='hi')
+        a1 = stk.Atom(
+            id=1,
+            atomic_number=i,
+            attr1=12,
+            attr2='hi'
+        )
         a2 = stk.Atom._elements[i](id=2, attr3='bye', attr4=321.12)
 
         assert a1.__class__ is a2.__class__
@@ -39,3 +44,32 @@ def test_clone():
     assert carbon_clone.attr4 == carbon.attr4
     assert carbon._attr5 == 'private'
     assert not hasattr(carbon_clone, '_attr5')
+
+
+def test_str():
+    for i in range(1, 119):
+        atom = stk.Atom(
+            id=1,
+            atomic_number=i,
+            attr1=12,
+            attr2='hi'
+        )
+        assert f'{atom}' == f'{atom.__class__.__name__}({atom.id})'
+
+
+def test_repr():
+    for i in range(1, 119):
+        atom = stk.Atom(
+            id=1,
+            atomic_number=i,
+            attr1=12,
+            attr2='hi',
+            _private_attr=222
+        )
+        expected_repr = (
+            f'{atom.__class__.__name__}('
+            f"{atom.id}, attr1=12, attr2='hi'"
+            ')'
+        )
+        f'{atom.__class__.__name__}({atom.id})'
+        assert f'{atom!r}' == expected_repr

@@ -117,11 +117,13 @@ class Bond:
         """
         Return a clone.
 
+        Private attributes are not passed to the clone.
+
         Parameters
         ----------
         atom_map : :class:`dict`, optional
             If the clone should hold different :class:`.Atom`
-            instances, then a :class:`dict` should be provided which
+            instances, then a :class:`dict` should be provided, which
             maps atoms in the current :class:`.Bond` to the
             atoms which should be used in the clone. Only atoms which
             need to be remapped need to be present in the `atom_map`.
@@ -129,7 +131,45 @@ class Bond:
         Returns
         -------
         :class:`.Bond`
-            A clone of the bond.
+            The clone.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            import stk
+
+            c0 = stk.C(0)
+            c1 = stk.C(1)
+            bond = stk.Bond(c0, c1, 1, custom_attr=12, _private_attr=1)
+
+            # bond_clone holds c0 and c1 in its atom1 and atom2
+            # attributes, respectively. It also has a custom_attr
+            # with a value of 12 but it does not have a _private_attr
+            # attribute.
+            bond_clone = bond.clone()
+
+        It is possible to make sure that the clone holds different
+        atoms
+
+        .. code-block:: python
+
+            li2 = stk.Li(2)
+            n3 = stk.N(3)
+
+            # clone2 is also a clone, except that it holds
+            # li2 in the atom2 attribute. Its atom1 attribute still
+            # holds c0.
+            clone2 = bond.clone(atom_map={
+                c1: li2
+            })
+
+            # clone3 is also a clone, except that it holds n3 and
+            # li2 in its atom1 and atom2 attributes, respectively.
+            clone3 = bond.clone(atom_map={
+                c0: n3,
+                c1: li2
+            })
 
         """
 
@@ -145,12 +185,18 @@ class Bond:
         return obj
 
     def __repr__(self):
-        cls_name = self.__class__.__name__
         if isinstance(self.order, float) and self.order.is_integer():
             self.order = int(self.order)
 
+        mandatory = {'atom1', 'atom2', 'order'}
+        attrs = ', '.join(
+            f'{attr}={val!r}' for attr, val in vars(self).items()
+            if attr not in mandatory and not attr.startswith('_')
+        )
+        cls_name = self.__class__.__name__
         return (
-            f'{cls_name}({self.atom1!r}, {self.atom2!r}, {self.order})'
+            f'{cls_name}({self.atom1!r}, {self.atom2!r}, '
+            f'{self.order}{", " if attrs else ""}{attrs})'
         )
 
     def __str__(self):
@@ -185,14 +231,22 @@ class PeriodicBond(Bond):
 
         Parameters
         ----------
-        atom1 : :class:`Atom`
+        atom1 : :class:`.Atom`
             The first atom in the bond.
 
-        atom2 : :class:`Atom`
+        atom2 : :class:`.Atom`
             The second atom in the bond.
 
         order : :class:`int`
             The bond order.
+
+        direction : :class:`list` of :class:`int`
+            The directions across which the bond is periodic. For
+            example, ``[1, 0, -1]`` means that when going from
+            :attr:`~.Bond.atom1` to :attr:`~.Bond.atom2` the bond is
+            periodic across the x axis in the positive direction, is
+            not periodic across the y axis and is periodic across the z
+            axis in the negative direction.
 
         """
 
