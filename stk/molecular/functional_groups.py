@@ -26,9 +26,9 @@ without touching the source code you can just do
 
     new_fg_type = FGType(
         name='my_fg_type',
-        fg_smarts='[N]([H])[H]',
+        func_group_smarts='[N]([H])[H]',
         bonder_smarts=['[$([N]([H])[H])]'],
-        del_smarts=['[$([H][N][H])]']*2
+        deleter_smarts=['[$([H][N][H])]']*2
     )
     stk.fg_types[new_fg_type.name] = new_fg_type
 
@@ -396,23 +396,23 @@ _fg_types = (
 
     FGType(
         name='amine',
-        fg_smarts='[N]([H])[H]',
+        func_group_smarts='[N]([H])[H]',
         bonder_smarts=['[$([N]([H])[H])]'],
-        del_smarts=['[$([H][N][H])]']*2
+        deleter_smarts=['[$([H][N][H])]']*2
     ),
 
     FGType(
         name='aldehyde',
-        fg_smarts='[C](=[O])[H]',
+        func_group_smarts='[C](=[O])[H]',
         bonder_smarts=['[$([C](=[O])[H])]'],
-        del_smarts=['[$([O]=[C][H])]']
+        deleter_smarts=['[$([O]=[C][H])]']
     ),
 
     FGType(
         name='carboxylic_acid',
-        fg_smarts='[C](=[O])[O][H]',
+        func_group_smarts='[C](=[O])[O][H]',
         bonder_smarts=['[$([C](=[O])[O][H])]'],
-        del_smarts=[
+        deleter_smarts=[
             '[$([H][O][C](=[O]))]',
             '[$([O]([H])[C](=[O]))]'
         ]
@@ -420,9 +420,9 @@ _fg_types = (
 
     FGType(
         name='amide',
-        fg_smarts='[C](=[O])[N]([H])[H]',
+        func_group_smarts='[C](=[O])[N]([H])[H]',
         bonder_smarts=['[$([C](=[O])[N]([H])[H])]'],
-        del_smarts=(
+        deleter_smarts=(
             ['[$([N]([H])([H])[C](=[O]))]'] +
             ['[$([H][N]([H])[C](=[O]))]']*2
         )
@@ -430,51 +430,54 @@ _fg_types = (
 
     FGType(
         name='thioacid',
-        fg_smarts='[C](=[O])[S][H]',
+        func_group_smarts='[C](=[O])[S][H]',
         bonder_smarts=['[$([C](=[O])[S][H])]'],
-        del_smarts=['[$([H][S][C](=[O]))]', '[$([S]([H])[C](=[O]))]']
+        deleter_smarts=[
+            '[$([H][S][C](=[O]))]',
+            '[$([S]([H])[C](=[O]))]'
+        ]
     ),
 
     FGType(
         name='alcohol',
-        fg_smarts='[O][H]',
+        func_group_smarts='[O][H]',
         bonder_smarts=['[$([O][H])]'],
-        del_smarts=['[$([H][O])]']
+        deleter_smarts=['[$([H][O])]']
     ),
 
     FGType(
         name='thiol',
-        fg_smarts="[S][H]",
+        func_group_smarts="[S][H]",
         bonder_smarts=['[$([S][H])]'],
-        del_smarts=['[$([H][S])]']
+        deleter_smarts=['[$([H][S])]']
     ),
 
     FGType(
         name='bromine',
-        fg_smarts='*[Br]',
+        func_group_smarts='*[Br]',
         bonder_smarts=['[$(*[Br])]'],
-        del_smarts=['[$([Br]*)]']
+        deleter_smarts=['[$([Br]*)]']
     ),
 
     FGType(
         name='iodine',
-        fg_smarts='*[I]',
+        func_group_smarts='*[I]',
         bonder_smarts=['[$(*[I])]'],
-        del_smarts=['[$([I]*)]']
+        deleter_smarts=['[$([I]*)]']
     ),
 
     FGType(
         name='alkyne',
-        fg_smarts='[C]#[C][H]',
+        func_group_smarts='[C]#[C][H]',
         bonder_smarts=['[$([C]([H])#[C])]'],
-        del_smarts=['[$([H][C]#[C])]']
+        deleter_smarts=['[$([H][C]#[C])]']
     ),
 
     FGType(
         name='terminal_alkene',
-        fg_smarts='[C]=[C]([H])[H]',
+        func_group_smarts='[C]=[C]([H])[H]',
         bonder_smarts=['[$([C]=[C]([H])[H])]'],
-        del_smarts=(
+        deleter_smarts=(
             ['[$([H][C]([H])=[C])]']*2 +
             ['[$([C](=[C])([H])[H])]']
         )
@@ -482,9 +485,9 @@ _fg_types = (
 
     FGType(
         name='boronic_acid',
-        fg_smarts='[B]([O][H])[O][H]',
+        func_group_smarts='[B]([O][H])[O][H]',
         bonder_smarts=['[$([B]([O][H])[O][H])]'],
-        del_smarts=(
+        deleter_smarts=(
             ['[$([O]([H])[B][O][H])]']*2 +
             ['[$([H][O][B][O][H])]']*2
         )
@@ -494,56 +497,56 @@ _fg_types = (
     # hydrogen atoms when a bond is formed.
     FGType(
         name='amine2',
-        fg_smarts='[N]([H])[H]',
+        func_group_smarts='[N]([H])[H]',
         bonder_smarts=['[$([N]([H])[H])]'],
-        del_smarts=['[$([H][N][H])]']
+        deleter_smarts=['[$([H][N][H])]']
     ),
 
     FGType(
         name='secondary_amine',
-        fg_smarts='[H][N]([#6])[#6]',
+        func_group_smarts='[H][N]([#6])[#6]',
         bonder_smarts=[
             '[$([N]([H])([#6])[#6])]'
         ],
-        del_smarts=['[$([H][N]([#6])[#6])]']
+        deleter_smarts=['[$([H][N]([#6])[#6])]']
     ),
 
     FGType(
         name='diol',
-        fg_smarts='[H][O][#6]~[#6][O][H]',
+        func_group_smarts='[H][O][#6]~[#6][O][H]',
         bonder_smarts=['[$([O]([H])[#6]~[#6][O][H])]']*2,
-        del_smarts=['[$([H][O][#6]~[#6][O][H])]']*2
+        deleter_smarts=['[$([H][O][#6]~[#6][O][H])]']*2
     ),
 
     FGType(
         name='difluorene',
-        fg_smarts='[F][#6]~[#6][F]',
+        func_group_smarts='[F][#6]~[#6][F]',
         bonder_smarts=['[$([#6]([F])~[#6][F])]']*2,
-        del_smarts=['[$([F][#6]~[#6][F])]']*2
+        deleter_smarts=['[$([F][#6]~[#6][F])]']*2
     ),
 
     FGType(
         name='dibromine',
-        fg_smarts='[Br][#6]~[#6][Br]',
+        func_group_smarts='[Br][#6]~[#6][Br]',
         bonder_smarts=['[$([#6]([Br])~[#6][Br])]']*2,
-        del_smarts=['[$([Br][#6]~[#6][Br])]']*2
+        deleter_smarts=['[$([Br][#6]~[#6][Br])]']*2
     ),
 
     FGType(
         name='alkyne2',
-        fg_smarts='[C]#[C][H]',
+        func_group_smarts='[C]#[C][H]',
         bonder_smarts=['[$([C]#[C][H])]'],
-        del_smarts=['[$([H][C]#[C])]', '[$([C](#[C])[H])]']
+        deleter_smarts=['[$([H][C]#[C])]', '[$([C](#[C])[H])]']
     ),
 
     FGType(
         name='ring_amine',
-        fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
+        func_group_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
         bonder_smarts=[
             '[$([N]([H])([H])[#6]~[#6]([H])~[#6R1])]',
             '[$([#6]([H])(~[#6R1])~[#6][N]([H])[H])]',
         ],
-        del_smarts=(
+        deleter_smarts=(
                 ['[$([H][N]([H])[#6]~[#6]([H])~[#6R1])]']*2 +
                 ['[$([H][#6](~[#6R1])~[#6][N]([H])[H])]']
         )
