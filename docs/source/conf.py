@@ -39,20 +39,10 @@ extensions = [
     ]
 
 autodoc_default_options = {
+    'special-members': '__init__',
     'inherited-members': True,
-    'show-inheritance': True
+    'show-inheritance': True,
 }
-
-
-# Document __init__.
-def skip(app, what, name, obj, would_skip, options):
-    if name == "__init__":
-        return False
-    return would_skip
-
-
-def setup(app):
-    app.connect("autodoc-skip-member", skip)
 
 
 # Add any paths that contain templates here, relative to this directory.
