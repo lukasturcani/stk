@@ -31,6 +31,7 @@ def test_clone():
 
     carbon_clone = carbon.clone()
 
+    assert carbon_clone is not carbon
     assert carbon_clone.__class__ == carbon.__class__
     assert carbon_clone.attr1 == carbon.attr1
     assert carbon_clone.attr2 == carbon.attr2
