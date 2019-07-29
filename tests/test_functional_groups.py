@@ -1,4 +1,5 @@
 import stk
+import itertools as it
 
 
 def is_fg_match(fg1, fg2):
@@ -39,16 +40,54 @@ def test_get_functional_groups(amine2, aldehyde3):
 
 
 def test_clone(aldehyde3, hydrogen, carbon):
-    ...
+    fg = aldehyde3.func_groups[0]
+    fg_a0, fg_a1 = fg.atoms[:2]
+    clone = fg.clone({
+        fg_a0: hydrogen,
+        fg_a1: carbon
+    })
+
+    for a0, a1 in it.zip_longest(fg.atoms, clone.atoms):
+        if a0 is fg_a0:
+            assert a1 is hydrogen
+        elif a0 is fg_a1:
+            assert a1 is carbon
+        else:
+            assert a0 is a1
+
+    for a0, a1 in it.zip_longest(fg.bonders, clone.bonders):
+        if a0 is fg_a0:
+            assert a1 is hydrogen
+        elif a0 is fg_a1:
+            assert a1 is carbon
+        else:
+            assert a0 is a1
+
+    for a0, a1 in it.zip_longest(fg.deleters, clone.deleters):
+        if a0 is fg_a0:
+            assert a1 is hydrogen
+        elif a0 is fg_a1:
+            assert a1 is carbon
+        else:
+            assert a0 is a1
 
 
 def test_get_atom_ids(aldehyde3):
-    ...
+    for fg in aldehyde3.func_groups:
+        atoms = it.zip_longest(fg.get_atom_ids(), fg.atoms)
+        for atom, atom_id in atoms:
+            assert atom.id == atom_id
 
 
 def test_get_bonder_ids(aldehyde3):
-    ...
+    for fg in aldehyde3.func_groups:
+        bonders = it.zip_longest(fg.get_bonder_ids(), fg.bonders)
+        for bonder, bonder_id in bonders:
+            assert bonder.id == bonder_id
 
 
 def test_get_deleter_ids(aldehyde3):
-    ...
+    for fg in aldehyde3.func_groups:
+        deleters = it.zip_longest(fg.get_deleter_ids(), fg.deleters)
+        for deleter, deleter_id in deleters:
+            assert deleter.id == deleter_id
