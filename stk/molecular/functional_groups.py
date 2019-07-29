@@ -92,6 +92,8 @@ class _ReactionKey:
 
     """
 
+    __slots__ = ['_key']
+
     def __init__(self, *fg_names):
         """
         Initialize a :class:`ReactionKey`.
@@ -133,120 +135,50 @@ class _ReactionKey:
         return repr(self)
 
 
-class Match:
-    """
-    A container for SMARTS queries.
-
-    Attributes
-    ----------
-    smarts : :class:`str`
-        A SMARTS string which matches some atoms.
-
-    n : :class:`int`
-        The maximum number of atoms to be matched by :attr:`smarts`,
-        per functional group.
-
-    """
-
-    __slots__ = ['smarts', 'n']
-
-    def __init__(self, smarts, n):
-        """
-        Initialize a :class:`Match`.
-
-        Parameters
-        ----------
-        smarts : :class:`str`
-            A SMARTS string which matches some atoms.
-
-        n : :class:`int`
-            The maximum number of atoms to be matched by :attr:`smarts`,
-            per functional group.
-
-        """
-
-        self.smarts = smarts
-        self.n = n
-
-    def __eq__(self, other):
-        return self.smarts == other.smarts and self.n == other.n
-
-    def __hash__(self):
-        return (self.smarts, self.n)
-
-    def __repr__(self):
-        return f'Match({self.smarts!r}, {self.n!r})'
-
-    def __str__(self):
-        return repr(self)
-
-
 class FGType:
     """
     Represents a :class:`.FunctionalGroup` type.
 
-    Instances of this class are used to
-
-    Attributes
-    ----------
-
-    fg_smarts : :class:`str`
-        A SMARTS string which matches al the atoms in the functional
-        group.
-
-    bonder_smarts : :class:`list`
-        A :class:`list` of the form
-
-        .. code-block:: python
-
-            bonder_smarts = [
-                Match(smarts='[$([N]([H])[H])]', n=1),
-                Match(smarts='[$([H][N][H])]', n=1)
-            ]
-
-        Each string is SMARTS string which matches a bonder atom in the
-        functional group. The number represents how many matched atoms
-        should be used as bonders, per functional group.
-
-        In the example, ``Match(smarts='[$([N]([H])[H])]', n=1)``
-        matches the nitrogen atom in the amine functional group. The
-        ``n=1`` means that 1 nitrogen atom per functional group will be
-        used as a bonder. The second
-        ``Match(smarts='[$([H][N][H])]', n=1)``, matches the hydrogen
-        atom in the amine functional group. Because ``n=1``, only 1 of
-        hydrogen atoms per amine functional group will be used as a
-        bonder. If instead ``Match(smarts='[$([H][N][H])]', n=2)`` was
-        used, then both of the hydrogen atoms in the functional group
-        would be used as bonders.
-
-    del_smarts : :class:`list`
-        Same as :attr:`bonder_smarts` but matched atoms are deleters
+    Instances of this class are used to group the
+    :attr:`~.Molecule.atoms` of a :class:`.Molecule` into
+    :class:`.FunctionalGroup` instances.
 
     """
 
-    __slots__ = ['name', 'fg_smarts', 'bonder_smarts', 'del_smarts']
+    __slots__ = ['_fg_smarts', '_bonder_smarts', '_del_smarts']
 
-    def __init__(self, name, fg_smarts, bonder_smarts, del_smarts):
+    def __init__(self, fg_smarts, bonder_smarts, del_smarts):
         """
-        Initializes a :class:`FGType` instnace.
+        Initialize a :class:`FGType` instance.
 
         Parameters
         ---------
-        name : :class:`str`
-            The name of the functional group.
-
         fg_smarts : :class:`str`
-            A SMARTS string which matches the functional group.
+            A SMARTS string which matches all atoms in a functional
+            group.
 
-        bonder_smarts : :class:`list`
-            See :attr:`bonder_smarts`.
+        bonder_smarts : :class:`list` of :class:`str`
+            A :class:`list` of SMARTS strings, each of which matches a
+            single atom in a functional group. The matched atom is
+            added to :class:`.FunctionalGroup.bonders`. A SMARTS
+            string needs to be repeated if a single functional group
+            has multiple equivalent atoms, each of which has bonds
+            created during construction. The number of times the string
+            needs to be repeated, is equal to number of atoms which
+            need to be tagged.
 
-        del_smarts : :class:`list`
-            See :attr:`del_smarts`.
+        del_smarts : :class:`list` of :class:`str`
+            A :class:`list` of SMARTS strings, each of which matches a
+            single atom in a functional group. The matched atom is
+            added to :class:`.FunctionalGroup.deleters`. A SMARTS
+            string needs to be repeated if a single functional group
+            has multiple equivalent atoms, each of which is deleted
+            during construction. The number of times the string needs
+            to be repeated, is equal to number of atoms which need to
+            be tagged.
 
         """
 
-        self.name = name
         self._fg_smarts = fg_smarts
         self._bonder_smarts = bonder_smarts
         self._del_smarts = del_smarts
@@ -265,6 +197,9 @@ class FGType:
             A :class:`list` holding a :class:`.FunctionalGroup``
             instance for every matched functional group in the
             molecule.
+
+        Examples
+        --------
 
         """
 
@@ -941,165 +876,139 @@ class Reactor:
 fg_types = {
 
     'amine': FGType(
-        fg_smarts="[N]([H])[H]",
-        bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
-        del_smarts=[Match(smarts="[$([H][N][H])]", n=2)]
+        fg_smarts='[N]([H])[H]',
+        bonder_smarts=['[$([N]([H])[H])]'],
+        del_smarts=['[$([H][N][H])]']*2
     ),
 
     'aldehyde': FGType(
-        fg_smarts="[C](=[O])[H]",
-        bonder_smarts=[Match(smarts="[$([C](=[O])[H])]", n=1)],
-        del_smarts=[Match(smarts="[$([O]=[C][H])]", n=1)]
+        fg_smarts='[C](=[O])[H]',
+        bonder_smarts=['[$([C](=[O])[H])]'],
+        del_smarts=['[$([O]=[C][H])]']
     ),
 
     'carboxylic_acid': FGType(
-        fg_smarts="[C](=[O])[O][H]",
-        bonder_smarts=[Match(smarts="[$([C](=[O])[O][H])]", n=1)],
+        fg_smarts='[C](=[O])[O][H]',
+        bonder_smarts=['[$([C](=[O])[O][H])]'],
         del_smarts=[
-            Match(smarts="[$([H][O][C](=[O]))]", n=1),
-            Match(smarts="[$([O]([H])[C](=[O]))]", n=1)
+            '[$([H][O][C](=[O]))]',
+            '[$([O]([H])[C](=[O]))]'
         ]
     ),
 
     'amide': FGType(
-        fg_smarts="[C](=[O])[N]([H])[H]",
-        bonder_smarts=[
-            Match(smarts="[$([C](=[O])[N]([H])[H])]", n=1)
-        ],
-        del_smarts=[
-            Match(smarts="[$([N]([H])([H])[C](=[O]))]", n=1),
-            Match(smarts="[$([H][N]([H])[C](=[O]))]", n=2)
-        ]
+        fg_smarts='[C](=[O])[N]([H])[H]',
+        bonder_smarts=['[$([C](=[O])[N]([H])[H])]'],
+        del_smarts=(
+            ['[$([N]([H])([H])[C](=[O]))]'] +
+            ['[$([H][N]([H])[C](=[O]))]']*2
+        )
     ),
 
     'thioacid': FGType(
-        fg_smarts="[C](=[O])[S][H]",
-        bonder_smarts=[Match(smarts="[$([C](=[O])[S][H])]", n=1)],
-        del_smarts=[
-            Match(smarts="[$([H][S][C](=[O]))]", n=1),
-            Match(smarts="[$([S]([H])[C](=[O]))]", n=1)
-        ]
+        fg_smarts='[C](=[O])[S][H]',
+        bonder_smarts=['[$([C](=[O])[S][H])]'],
+        del_smarts=['[$([H][S][C](=[O]))]', '[$([S]([H])[C](=[O]))]']
     ),
 
     'alcohol': FGType(
-        fg_smarts="[O][H]",
-        bonder_smarts=[Match(smarts="[$([O][H])]", n=1)],
-        del_smarts=[Match(smarts="[$([H][O])]", n=1)]
+        fg_smarts='[O][H]',
+        bonder_smarts=['[$([O][H])]'],
+        del_smarts=['[$([H][O])]']
     ),
 
     'thiol': FGType(
         fg_smarts="[S][H]",
-        bonder_smarts=[Match(smarts="[$([S][H])]", n=1)],
-        del_smarts=[Match(smarts="[$([H][S])]", n=1)]
+        bonder_smarts=['[$([S][H])]'],
+        del_smarts=['[$([H][S])]']
     ),
 
     'bromine': FGType(
-        fg_smarts="*[Br]",
-        bonder_smarts=[Match(smarts="[$(*[Br])]", n=1)],
-        del_smarts=[Match(smarts="[$([Br]*)]", n=1)]
+        fg_smarts='*[Br]',
+        bonder_smarts=['[$(*[Br])]'],
+        del_smarts=['[$([Br]*)]']
     ),
 
     'iodine': FGType(
-        fg_smarts="*[I]",
-        bonder_smarts=[Match(smarts="[$(*[I])]", n=1)],
-        del_smarts=[Match(smarts="[$([I]*)]", n=1)]
+        fg_smarts='*[I]',
+        bonder_smarts=['[$(*[I])]'],
+        del_smarts=['[$([I]*)]']
     ),
 
     'alkyne': FGType(
         fg_smarts='[C]#[C][H]',
-        bonder_smarts=[Match(smarts='[$([C]([H])#[C])]', n=1)],
-        del_smarts=[Match(smarts='[$([H][C]#[C])]', n=1)]
+        bonder_smarts=['[$([C]([H])#[C])]'],
+        del_smarts=['[$([H][C]#[C])]']
     ),
 
     'terminal_alkene': FGType(
         fg_smarts='[C]=[C]([H])[H]',
-        bonder_smarts=[Match(smarts='[$([C]=[C]([H])[H])]', n=1)],
-        del_smarts=[
-            Match(smarts='[$([H][C]([H])=[C])]', n=2),
-            Match(smarts='[$([C](=[C])([H])[H])]', n=1)
-        ]
+        bonder_smarts=['[$([C]=[C]([H])[H])]'],
+        del_smarts=(
+            ['[$([H][C]([H])=[C])]']*2 +
+            ['[$([C](=[C])([H])[H])]']
+        )
     ),
 
     'boronic_acid': FGType(
         fg_smarts='[B]([O][H])[O][H]',
-        bonder_smarts=[Match(smarts='[$([B]([O][H])[O][H])]', n=1)],
-        del_smarts=[
-            Match(smarts='[$([O]([H])[B][O][H])]', n=2),
-            Match(smarts='[$([H][O][B][O][H])]', n=2)
-        ]
+        bonder_smarts=['[$([B]([O][H])[O][H])]'],
+        del_smarts=(
+            ['[$([O]([H])[B][O][H])]']*2 +
+            ['[$([H][O][B][O][H])]']*2
+        )
     ),
 
     # This amine functional group only deletes one of the
     # hydrogen atoms when a bond is formed.
     'amine2': FGType(
-        fg_smarts="[N]([H])[H]",
-        bonder_smarts=[Match(smarts="[$([N]([H])[H])]", n=1)],
-        del_smarts=[Match(smarts="[$([H][N][H])]", n=1)]
+        fg_smarts='[N]([H])[H]',
+        bonder_smarts=['[$([N]([H])[H])]'],
+        del_smarts=['[$([H][N][H])]']
     ),
 
     'secondary_amine': FGType(
-        fg_smarts="[H][N]([#6])[#6]",
+        fg_smarts='[H][N]([#6])[#6]',
         bonder_smarts=[
-            Match(smarts="[$([N]([H])([#6])[#6])]", n=1)
+            '[$([N]([H])([#6])[#6])]'
         ],
-        del_smarts=[Match(smarts="[$([H][N]([#6])[#6])]", n=1)]
+        del_smarts=['[$([H][N]([#6])[#6])]']
     ),
 
     'diol': FGType(
         fg_smarts='[H][O][#6]~[#6][O][H]',
-        bonder_smarts=[
-            Match(smarts='[$([O]([H])[#6]~[#6][O][H])]', n=2)
-        ],
-        del_smarts=[
-            Match(smarts='[$([H][O][#6]~[#6][O][H])]', n=2)
-        ]
+        bonder_smarts=['[$([O]([H])[#6]~[#6][O][H])]']*2,
+        del_smarts=['[$([H][O][#6]~[#6][O][H])]']*2
     ),
 
     'difluorene': FGType(
         fg_smarts='[F][#6]~[#6][F]',
-        bonder_smarts=[Match(smarts='[$([#6]([F])~[#6][F])]', n=2)],
-        del_smarts=[Match(smarts='[$([F][#6]~[#6][F])]', n=2)]
+        bonder_smarts=['[$([#6]([F])~[#6][F])]']*2,
+        del_smarts=['[$([F][#6]~[#6][F])]']*2
     ),
 
     'dibromine': FGType(
         fg_smarts='[Br][#6]~[#6][Br]',
-        bonder_smarts=[
-            Match(smarts='[$([#6]([Br])~[#6][Br])]', n=2)
-        ],
-        del_smarts=[Match(smarts='[$([Br][#6]~[#6][Br])]', n=2)]
+        bonder_smarts=['[$([#6]([Br])~[#6][Br])]']*2,
+        del_smarts=['[$([Br][#6]~[#6][Br])]']*2
     ),
 
     'alkyne2': FGType(
         fg_smarts='[C]#[C][H]',
-        bonder_smarts=[Match(smarts='[$([C]#[C][H])]', n=1)],
-        del_smarts=[
-            Match(smarts='[$([H][C]#[C])]', n=1),
-            Match(smarts='[$([C](#[C])[H])]', n=1)
-        ]
+        bonder_smarts=['[$([C]#[C][H])]'],
+        del_smarts=['[$([H][C]#[C])]', '[$([C](#[C])[H])]']
     ),
 
     'ring_amine': FGType(
         fg_smarts='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
         bonder_smarts=[
-            Match(
-                smarts='[$([N]([H])([H])[#6]~[#6]([H])~[#6R1])]',
-                n=1
-            ),
-            Match(
-                smarts='[$([#6]([H])(~[#6R1])~[#6][N]([H])[H])]',
-                n=1
-            ),
+            '[$([N]([H])([H])[#6]~[#6]([H])~[#6R1])]',
+            '[$([#6]([H])(~[#6R1])~[#6][N]([H])[H])]',
         ],
-        del_smarts=[
-            Match(
-                smarts='[$([H][N]([H])[#6]~[#6]([H])~[#6R1])]',
-                n=2
-            ),
-            Match(
-                smarts='[$([H][#6](~[#6R1])~[#6][N]([H])[H])]',
-                n=1
-            )
-        ]
+        del_smarts=(
+                ['[$([H][N]([H])[#6]~[#6]([H])~[#6R1])]']*2 +
+                ['[$([H][#6](~[#6R1])~[#6][N]([H])[H])]']
+        )
     ),
 
 }
