@@ -37,68 +37,28 @@ class _Cached(type):
 
 class Molecule(metaclass=_Cached):
     """
-    A base class for representing molecules.
+    Represents molecules.
 
-    This class defines the operations which any class
-    describing molecules should inherit or may find useful. Examples of
-    such are :class:`.BuildingBlock` and :class:`.ConstructedMolecule`.
-    This class should not be used directly, use an instance of a
-    derived class instead.
+    This is an abstract base class defines the operations which any
+    class describing molecules should inherit. Examples are
+    :class:`.BuildingBlock` and :class:`.ConstructedMolecule`.
+    This class should not be initialized directly, use an instance of a
+    subclass instead.
 
     Attributes
     ----------
     atoms : :class:`tuple` of :class:`.Atom`
-        The atoms which compose the molecule.
+        The atoms of the molecule.
 
     bonds : :class:`tuple` of :class:`.Bond`
         The bonds of the molecule.
 
-    _cache : :class:`dict`
-        This is a class attribute. It maps a :attr:`_key` to the
-        :class:`.Molecule` instance with that :attr:`_key`.
-
-    _position_matrix : :class:`numpy.ndarray`
-        A ``(3, n)`` matrix holding the position of every atom in the
-        molecule.
-
-    _key : :class:`object`
-        A hashable :class:`object`. This attribute will be the same
-        for molecules of the same class, which have the same structure.
-        A private method :meth:`_get_key` must be defined for
-        each subclass of :class:`.Molecule` and it will be used to
-        generate the :attr:`_key`.
-
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`init_from_dict`
-    :meth:`apply_displacement`
-    :meth:`apply_rotation_about_axis`
-    :meth:`apply_rotation_between_vectors`
-    :meth:`apply_rotation_to_minimize_theta`
-    :meth:`get_atom_coords`
-    :meth:`get_atom_distance`
-    :meth:`get_center_of_mass`
-    :meth:`get_centroid`
-    :meth:`get_direction`
-    :meth:`get_maximum_diameter`
-    :meth:`get_plane_normal`
-    :meth:`get_position_matrix`
-    :meth:`is_identical`
-    :meth:`set_centroid`
-    :meth:`set_position_matrix`
-    :meth:`dump`
-    :meth:`load`
-    :meth:`to_dict`
-    :meth:`to_rdkit_mol`
-    :meth:`update_cache`
-    :meth:`update_from_rdkit_mol`
-    :meth:`update_from_file`
-    :meth:`write`
-
     """
 
-    subclasses = {}
+    # Maps the name of each subclass to the class. Necessary for
+    # loading molecules from dict represeentations, as the dict
+    # representation will hold the name of the subclass.
+    _subclasses = {}
 
     def __init__(self, atoms, bonds, position_matrix):
         """
@@ -120,6 +80,8 @@ class Molecule(metaclass=_Cached):
 
         self.atoms = atoms
         self.bonds = bonds
+        # A (3, n) numpy.ndarray holding the position of every atom in
+        # the molecule.
         self._position_matrix = position_matrix.T
 
     @classmethod
@@ -150,7 +112,7 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        c = self.subclasses[mol_dict['class']]
+        c = self._subclasses[mol_dict['class']]
         return c._init_from_dict(mol_dict, use_cache=use_cache)
 
     @classmethod
@@ -184,10 +146,12 @@ class Molecule(metaclass=_Cached):
         raise NotImplementedError()
 
     def __init_subclass__(cls, **kwargs):
-        if cls.__name__ in cls.subclasses:
+        if cls.__name__ in cls._subclasses:
             msg = 'Subclass with this name already exists.'
             raise MoleculeSubclassError(msg)
-        cls.subclasses[cls.__name__] = cls
+        cls._subclasses[cls.__name__] = cls
+        # Maps the _key of each instance of a subclass to the
+        # to the actual instance.
         cls._cache = {}
         super().__init_subclass__(**kwargs)
 
@@ -692,6 +656,38 @@ class Molecule(metaclass=_Cached):
             json.dump(self.to_dict(include_attrs), f, indent=4)
 
     def _get_key(*args, **kwargs):
+        """
+        Get the key used for caching.
+
+        When being implemented by a subclass, this methods needs to be
+        defined as a :func:`staticmethod` and have the same parameters
+        as the :meth:`__init__` method of the subclass.
+
+        Parameters
+        ----------
+        *args : :class:`object`
+            These need to match the arguments of the :meth:`__init__`
+            method of a subclass.
+
+        **kwargs : :class:`object`
+            These need to match the keyword arguments of the
+            :meth`__init__` method of a subclass.
+
+        Returns
+        -------
+        :class:`object`
+            A hashable :class:`object`. This object will be equal
+            for molecules of the same class, which should be treated
+            as identical by ``stk``.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method which needs to be implemented by
+            a subclass.
+
+        """
+
         raise NotImplementedError()
 
     @classmethod
