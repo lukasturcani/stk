@@ -77,8 +77,8 @@ class BuildingBlock(Molecule):
         """
         Initialize from a SMILES string.
 
-        Note
-        ----
+        Notes
+        -----
         The molecule is given 3D coordinates using
         :func:`rdkit.ETKDGv2()`.
 
@@ -179,13 +179,6 @@ class BuildingBlock(Molecule):
                 )
             mol = cls._init_funcs[ext](path)
             rdkit.Kekulize(mol)
-
-        # If no functional group names passed, check if any functional
-        # group names appear in the file path.
-        if functional_groups is None:
-            functional_groups = tuple(
-                fg.name for fg in fgs if fg.name in path
-            )
 
         return cls.init_from_rdkit_mol(
             mol=mol,
@@ -384,9 +377,10 @@ class BuildingBlock(Molecule):
             removeHs=False,
             sanitize=False
         )
+        functional_groups = d.pop('func_groups')
         obj = cls.init_from_rdkit_mol(
             mol=rdkit_mol,
-            functional_groups=d.pop('func_groups'),
+            functional_groups=functional_groups,
             use_cache=use_cache
         )
 
@@ -400,6 +394,16 @@ class BuildingBlock(Molecule):
         obj.atoms = eval(d.pop('atoms'), vars(elements))
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
+        # Create the functional groups again because new atom
+        # instances got made and FunctionalGroup instances must hold
+        # the Atom instances in BuildingBlock.atoms.
+        fg_makers = (fg_types[name] for name in functional_groups)
+        obj.func_groups = tuple(
+            func_group
+            for fg_maker in fg_makers
+            for func_group in fg_maker.get_functional_groups(obj)
+        )
+
         return obj
 
     def get_bonder_ids(self, fg_ids=None):

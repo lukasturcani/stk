@@ -36,3 +36,19 @@ def test_get_functional_groups(amine2, aldehyde3):
         assert fg.deleters[0].__class__ is stk.O
     assert i == 2
     assert not list(amine.get_functional_groups(aldehyde3))
+
+
+def test_clone(aldehyde3, hydrogen, carbon):
+    ...
+
+
+def test_get_atom_ids(aldehyde3):
+    ...
+
+
+def test_get_bonder_ids(aldehyde3):
+    ...
+
+
+def test_get_deleter_ids(aldehyde3):
+    ...
