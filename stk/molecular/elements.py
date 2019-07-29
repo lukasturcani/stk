@@ -1,3 +1,11 @@
+"""
+Defines a class for each type of element.
+
+Read the docstring of :class:`.Atom`.
+
+"""
+
+
 class Atom:
     """
     Base class for atoms.
