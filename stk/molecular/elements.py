@@ -5,6 +5,10 @@ class Atom:
     A subclass is made for each element. The name of each elemental
     class is the periodic table symbol.
 
+    Atoms of a particular element can be made with this class or with
+    a subclass that represents that element directly. See the examples
+    below.
+
     Attributes
     ----------
     atomic_number : :class:`int`
@@ -27,6 +31,62 @@ class Atom:
     -------
     :meth:`__init__`
     :meth:`clone`
+
+    Examples
+    --------
+    Initialization of an :class:`.Atom` can happen in one of two ways.
+    The atom can be initalized through the :class:`.Atom` class or
+    directly by through the class representing the element.
+
+    .. code-block:: python
+
+        import stk
+
+        # hydrogen_atom0 is an instance of the H class.
+        hydrogen_atom0 = stk.Atom(id=0, atomic_number=1)
+
+        # hydrogen_atom1 is also an instance of the H class.
+        hydrogen_atom1 = stk.H(id=1)
+
+    When the class correspnding to the element is used directly, the
+    ``atomic_number``is not provided. Here are a few more examples.
+
+    .. code-block:: python
+
+        # Both helium_atom0 and helium_atom1 are instances of the
+        # He class.
+        helium_atom0 = stk.Atom(id=2, atomic_number=2)
+        helium_atom1 = stk.He(id=3)
+
+        # Both helium_atom0 and helium_atom1 are instances of the
+        # C class.
+        carbon_atom0 = stk.Atom(id=4, atomic_number=6)
+        carbon_atom1 = stk.C(id=5)
+
+    Each atom can be given additional attributes. For example
+
+    .. code-block:: python
+
+        hydrogen_atom0.custom_attribute = 51
+        hydrgoen_atom0.other_attribute = 'something'
+
+    If we run ``print(hydrogen_atom0)`` then ``H(0)`` will be
+    printed. However, if we run ``print(repr(hydrogen_atom0))``, then
+    ``H(0, custom_attribute=51, other_attribute='something')`` will be
+    printed.
+
+    We can initialize a :class:`.Atom` with additional, custom
+    attributes direclty.
+
+    .. code-block:: python
+
+        h = stk.H(id=6, custom_attr1=123, other_attr2='thing')
+        h.custom_attr1  # Holds 123.
+        h.other_attr2  # Holds 'thing'.
+
+    Providing the additional attributes to the initiializer is
+    functionally equivalent to to assigning them to the object
+    manually.
 
     """
 
