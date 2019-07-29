@@ -21,8 +21,8 @@ class Atom:
     atomic_number : :class:`int`
         A class attribute. Specifies the atomic number.
 
-    mass : :class:`int`
-        A class attribute. Specifies the standard atmoic weight.
+    mass : :class:`float`
+        A class attribute. Specifies the standard atomic weight.
 
     id : :class:`int`
         The id of the atom. Should be equal to its index in
@@ -36,7 +36,7 @@ class Atom:
     *Initialization.*
 
     Initialization of an :class:`.Atom` can happen in one of two ways.
-    The atom can be initalized through the :class:`.Atom` class or
+    The atom can be initialized through the :class:`.Atom` class or
     through the class representing the element.
 
     .. code-block:: python
@@ -73,7 +73,7 @@ class Atom:
         c0.other_attr = 'something'
 
     We can initialize an :class:`.Atom` with additional, custom
-    attributes direclty.
+    attributes directly
 
     .. code-block:: python
 
@@ -82,7 +82,7 @@ class Atom:
         h2.other_attr2  # Holds 'thing'.
 
     Providing the additional attributes to the initializer is
-    functionally equivalent to to assigning them to the object
+    functionally equivalent to assigning them to the object
     manually.
 
     *Printing*
