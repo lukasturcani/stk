@@ -114,7 +114,8 @@ def test_dump_and_load(tmp_polymer):
     assert bbs2[1].test_attr5 == 'alpha'
 
     mol3 = stk.Molecule.load(path, use_cache=True)
-    assert mol3 is tmp_polymer
+    mol4 = stk.Molecule.load(path, use_cache=True)
+    assert mol3 is mol4
 
 
 def test_is_identical(polymer, tmp_polymer):
