@@ -804,7 +804,7 @@ class Molecule(metaclass=_Cached):
 
     def to_rdkit_mol(self):
         """
-        Return a :mod:`rdkit` representation.
+        Return an :mod:`rdkit` representation.
 
         Returns
         -------
