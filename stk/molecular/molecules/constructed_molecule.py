@@ -295,7 +295,7 @@ class ConstructedMolecule(Molecule):
         bb_index = {}
         for i, bb in enumerate(self.building_block_vertices):
             bb_index[bb] = i
-            bb_counter.append((i, self.building_block_counter[bb]))
+            bb_counter.append(self.building_block_counter[bb])
             building_blocks.append(bb.to_dict(include_attrs, True))
             building_block_vertices[i] = [
                 repr(v) for v in self.building_block_vertices[bb]
@@ -391,7 +391,7 @@ class ConstructedMolecule(Molecule):
         ]
         key = cls._get_key(cls, bbs, topology_graph, use_cache)
         if key in cls._cache and use_cache:
-            return cls.cache[key]
+            return cls._cache[key]
 
         obj = cls.__new__(cls)
 
