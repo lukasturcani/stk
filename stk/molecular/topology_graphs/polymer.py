@@ -335,7 +335,7 @@ class Linear(TopologyGraph):
 
     """
 
-    def __init__(self, repeating_unit, orientation, n, processes=1):
+    def __init__(self, repeating_unit, orientations, n, processes=1):
         """
         Initialize a :class:`Linear` instance.
 
@@ -347,7 +347,7 @@ class Linear(TopologyGraph):
             building block molecules in the order they are passed to
             :meth:`.ConstructedMolecule.__init__`.
 
-        orientation : :class:`tuple` of :class:`float`
+        orientations : :class:`tuple` of :class:`float`
             For each character in the repeating unit, a value
             between ``0`` and ``1`` (both inclusive) must be given in
             a :class:`list`. It indicates the probability that each
@@ -369,10 +369,10 @@ class Linear(TopologyGraph):
         """
 
         self.repeating_unit = repeating_unit
-        self.orientation = tuple(orientation)
+        self.orientations = tuple(orientations)
         self.n = n
 
-        head, *body, tail = orientation*n
+        head, *body, tail = orientations*n
         vertices = [HeadVertex(0, 0, 0, head)]
         edges = []
         for i, orientation in enumerate(body, 1):
@@ -450,4 +450,11 @@ class Linear(TopologyGraph):
         return max(
             bb.get_maximum_diameter()
             for bb in mol.building_block_vertices
+        )
+
+    def __repr__(self):
+        return (
+            f'polymer.Linear({self.repeating_unit!r}, '
+            f'{self.orientations!r}, '
+            f'{self.n!r})'
         )

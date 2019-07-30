@@ -633,7 +633,12 @@ class Molecule(metaclass=_Cached):
         self._position_matrix = np.array(position_matrix.T)
         return self
 
-    def dump(self, path, include_attrs=None):
+    def dump(
+        self,
+        path,
+        include_attrs=None,
+        ignore_missing_attrs=False
+    ):
         """
         Write a :class:`dict` representation to a file.
 
@@ -648,6 +653,10 @@ class Molecule(metaclass=_Cached):
             the :class:`dict`. Each attribute is saved as a string
             using :func:`repr`.
 
+        ignore_missing_attrs : :class:`bool`, optional
+            If ``False`` and an attribute in `include_attrs` is not
+            held by the :class:`Molecule`, an error will be raised.
+
         Returns
         -------
         None : :class:`NoneType`
@@ -655,7 +664,8 @@ class Molecule(metaclass=_Cached):
         """
 
         with open(path, 'w') as f:
-            json.dump(self.to_dict(include_attrs), f, indent=4)
+            d = self.to_dict(include_attrs, ignore_missing_attrs)
+            json.dump(d, f, indent=4)
 
     def _get_key(*args, **kwargs):
         """

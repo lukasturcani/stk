@@ -293,9 +293,9 @@ class ConstructedMolecule(Molecule):
 
         bb_counter = []
         building_blocks = []
-        building_block_vertices = []
+        building_block_vertices = {}
         for i, bb in enumerate(self.building_block_vertices):
-            bb_counter.append((i, self.bb_counter[bb]))
+            bb_counter.append((i, self.building_block_counter[bb]))
             building_blocks.append(bb.to_dict(include_attrs, True))
             building_block_vertices[i] = [
                 repr(v) for v in self.building_block_vertices[bb]
@@ -313,9 +313,18 @@ class ConstructedMolecule(Molecule):
             'atoms': repr(self.atoms),
         }
 
-        d.update(
-            {attr: repr(getattr(self, attr)) for attr in include_attrs}
-        )
+        if ignore_missing_attrs:
+            d.update({
+                attr: repr(getattr(self, attr))
+                for attr in include_attrs
+                if hasattr(self, attr)
+            })
+        else:
+            d.update({
+                attr: repr(getattr(self, attr))
+                for attr in include_attrs
+            })
+
         return d
 
     @classmethod
@@ -366,7 +375,7 @@ class ConstructedMolecule(Molecule):
         obj.building_block_counter = Counter()
         obj.building_block_vertices = {}
 
-        counter = d.pop('bb_counter')
+        counter = d.pop('building_block_counter')
         vertices = d.pop('building_block_vertices')
         for i, bb in enumerate(bbs):
             obj.building_block_counter[bb] = counter[i]
@@ -453,7 +462,7 @@ class ConstructedMolecule(Molecule):
         return (
             f'{self.__class__.__name__}'
             '(building_blocks='
-            f'{[str(x) for x in self.building_blocks]}, '
+            f'{[str(x) for x in self.building_block_vertices]}, '
             f'topology_graph={self.topology_graph!r})'
         )
 

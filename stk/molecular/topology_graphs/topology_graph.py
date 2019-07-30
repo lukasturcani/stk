@@ -432,7 +432,14 @@ class Edge:
 
     def __repr__(self):
         vertices = ', '.join(repr(v) for v in self.vertices)
-        return f'Edge({vertices})'
+        cls_name = (
+            f'{__name__}.{self.__class__.__name__}'
+        )
+        # Make sure that the name has all the topology_graph submodule
+        # names.
+        p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
+        cls_name = p.findall(cls_name)[0]
+        return f'{cls_name}({vertices})'
 
 
 class TopologyGraph:
@@ -750,17 +757,3 @@ class TopologyGraph:
 
     def __str__(self):
         return repr(self)
-
-    def __repr__(self):
-        attrs = ', '.join(
-            f'{attr}={val!r}' for attr, val in vars(self).items()
-            if not attr.startswith('_')
-        )
-        cls_name = (
-            f'{__name__}.{self.__class__.__name__}'
-        )
-        # Make sure that the name has all the topology_graph submodule
-        # names.
-        p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
-        cls_name = p.findall(cls_name)[0]
-        return f'{cls_name}({attrs})'
