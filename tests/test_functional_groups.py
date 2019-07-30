@@ -18,11 +18,19 @@ def test_get_functional_groups(amine2, aldehyde3):
         assert any(
             is_fg_match(fg, other) for other in amine2.func_groups
         )
+        # Testing both the tuple and the set for length makes it
+        # easier to identify what the problem is.
         assert len(fg.atoms) == 3
+        assert len(set(fg.atoms)) == 3
+
         assert len(fg.bonders) == 1
+        assert len(set(fg.bonders)) == 1
         assert fg.bonders[0].__class__ is stk.N
+
         assert len(fg.deleters) == 2
+        assert len(set(fg.deleters)) == 2
         assert all(a.__class__ is stk.H for a in fg.deleters)
+
     assert i == 1
     assert not list(aldehyde.get_functional_groups(amine2))
 
@@ -31,9 +39,14 @@ def test_get_functional_groups(amine2, aldehyde3):
             is_fg_match(fg, other) for other in aldehyde3.func_groups
         )
         assert len(fg.atoms) == 3
+        assert len(set(fg.atoms)) == 3
+
         assert len(fg.bonders) == 1
+        assert len(set(fg.bonders)) == 1
         assert fg.bonders[0].__class__ is stk.C
+
         assert len(fg.deleters) == 1
+        assert len(set(fg.deleters)) == 1
         assert fg.deleters[0].__class__ is stk.O
     assert i == 2
     assert not list(amine.get_functional_groups(aldehyde3))
