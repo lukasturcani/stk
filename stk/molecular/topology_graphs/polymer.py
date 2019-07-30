@@ -318,7 +318,7 @@ class Linear(TopologyGraph):
         building block molecules in the order they are passed to
         :meth:`.ConstructedMolecule.__init__`.
 
-    orientation : :class:`tuple` of :class:`float`
+    orientations : :class:`tuple` of :class:`float`
         For each character in the repeating unit, a value between ``0``
         and ``1`` (both inclusive) must be given in a :class:`list`. It
         indicates the probability that each monomer will have its
