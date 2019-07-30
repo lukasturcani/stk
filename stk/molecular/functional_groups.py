@@ -51,6 +51,7 @@ does not.
 """
 
 import rdkit.Chem.AllChem as rdkit
+from collections import Counter
 
 from ..utilities import flatten
 
@@ -106,10 +107,12 @@ class FGType:
         self.name = name
         self._func_group = rdkit.MolFromSmarts(func_group_smarts)
         self._bonders = [
-            rdkit.MolFromSmarts(smarts) for smarts in bonder_smarts
+            (rdkit.MolFromSmarts(smarts), count)
+            for smarts, count in Counter(bonder_smarts).items()
         ]
         self._deleters = [
-            rdkit.MolFromSmarts(smarts) for smarts in deleter_smarts
+            (rdkit.MolFromSmarts(smarts), count)
+            for smarts, count in Counter(deleter_smarts).items()
         ]
 
     def get_functional_groups(self, mol):
@@ -155,29 +158,33 @@ class FGType:
         # All the bonder atoms, grouped by fg.
         bonders = [[] for i in range(len(func_groups))]
 
-        for bonder in self._bonders:
+        for bonder, count in self._bonders:
             matches = set(flatten(
                 rdkit_mol.GetSubstructMatches(bonder)
             ))
 
+            matched_bonders = [
+                [aid for aid in fg if aid in matches]
+                for fg in func_groups
+            ]
+
             for fg_id, fg in enumerate(func_groups):
-                for atom_id in fg:
-                    if atom_id in matches:
-                        bonders[fg_id].append(atom_id)
-                        break
+                bonders[fg_id].extend(matched_bonders[fg_id][:count])
 
         # All the deleter atoms, grouped by fg.
         deleters = [[] for i in range(len(func_groups))]
-        for deleter in self._deleters:
+        for deleter, count in self._deleters:
             matches = set(flatten(
                 rdkit_mol.GetSubstructMatches(deleter)
             ))
 
+            matched_deleters = [
+                [aid for aid in fg if aid in matches]
+                for fg in func_groups
+            ]
+
             for fg_id, fg in enumerate(func_groups):
-                for atom_id in fg:
-                    if atom_id in matches:
-                        deleters[fg_id].append(atom_id)
-                        break
+                deleters[fg_id].extend(matched_deleters[fg_id][:count])
 
         for atom_ids in zip(func_groups, bonders, deleters):
             fg, fg_bonders, fg_deleters = atom_ids
