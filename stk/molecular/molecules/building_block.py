@@ -34,14 +34,15 @@ class BuildingBlock(Molecule):
 
     Attributes
     ----------
+    atoms : :class:`tuple` of :class:`.Atom`
+        The atoms of the molecule.
+
+    bonds : :class:`tuple` of :class:`.Bond`
+        The bonds of the molecule.
+
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
         The functional groups present in the molecule. The
         id of a :class:`.FunctionalGroup` is its index.
-
-    _key : :class:`object`
-        Extends :class:`.Molecule._key`. :class:`BuildingBlock`
-        molecules with the same structure and with the same functional
-        groups will have equal keys. Used for caching.
 
     """
 
@@ -79,7 +80,7 @@ class BuildingBlock(Molecule):
 
         Notes
         -----
-        The molecule is given 3D coordinates using
+        The molecule is given 3D coordinates with
         :func:`rdkit.ETKDGv2()`.
 
         Parameters
@@ -140,7 +141,7 @@ class BuildingBlock(Molecule):
         use_cache=False
     ):
         """
-        Initialize a :class:`BuildingBlock` from a file.
+        Initialize from a file.
 
         Parameters
         ----------
@@ -194,7 +195,7 @@ class BuildingBlock(Molecule):
         use_cache=False
     ):
         """
-        Pick a random file from `file_glob` to initialize from.
+        Initialize from a random file in `file_glob`.
 
         Parameters
         ----------
@@ -432,18 +433,16 @@ class BuildingBlock(Molecule):
 
     def get_bonder_centroids(self, fg_ids=None):
         """
-        Yield the centroids of bonder atoms in functional groups.
+        Yield the centroids of bonder atoms.
 
         A bonder centroid is the centroid of all bonder atoms in a
         particular functional group.
 
-        The bonder centroids are yielded in the order given by
-        `fg_ids`.
-
         Parameters
         ----------
         fg_ids : :class:`iterable` of :class:`int`
-            The ids of functional groups to be used.
+            The ids of functional groups to be used. The bonder
+            centroids will be yielded in this order.
             If ``None`` then all functional groups are used and
             centroids are yielded in ascending order of functional
             group id.
@@ -719,7 +718,7 @@ class BuildingBlock(Molecule):
 
     def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """
-        Return a :class:`dict` representation of the molecule.
+        Return a :class:`dict` representation.
 
         Parameters
         ----------
@@ -774,7 +773,7 @@ class BuildingBlock(Molecule):
         use_cache
     ):
         """
-        Get the key used for caching the molecule.
+        Return the key used for caching.
 
         Parameters
         ----------
@@ -803,12 +802,6 @@ class BuildingBlock(Molecule):
             .. code-block:: python
 
                 ('amine', 'bromine', 'InChIString')
-
-        Raises
-        ------
-        :class:`ValueError`
-            If the there is file type cannot be used for
-            initialization.
 
         """
 
