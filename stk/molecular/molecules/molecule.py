@@ -645,8 +645,8 @@ class Molecule(metaclass=_Cached):
 
         include_attrs : :class:`list` of :class:`str`, optional
             The names of attributes of the molecule to be added to
-            the :class:. Each attribute is saved as a string using
-            :func:`repr`.
+            the :class:`dict`. Each attribute is saved as a string
+            using :func:`repr`.
 
         Returns
         -------
@@ -695,7 +695,7 @@ class Molecule(metaclass=_Cached):
     @classmethod
     def load(cls, path, use_cache=False):
         """
-        Create a :class:`Molecule` from a dump file.
+        Initialize from a dump file.
 
         The :class:`Molecule` returned has the class specified in
         in the file, not :class:`Molecule`. You can use this if you
