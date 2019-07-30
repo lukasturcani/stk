@@ -27,10 +27,10 @@ class ConstructedMolecule(Molecule):
     A :class:`ConstructedMolecule` requires at least 2 basic pieces of
     information: which building block molecules are used to construct
     the molecule and what the :class:`.TopologyGraph` of the
-    constructe molecule is. The construction of the molecular structure
-    is performed by :meth:`.TopologyGraph.construct`. This method does
-    not have to be called explicitly by the user, it will be called
-    automatically during initialization.
+    constructed molecule is. The construction of the molecular
+    structure is performed by :meth:`.TopologyGraph.construct`. This
+    method does not have to be called explicitly by the user, it will
+    be called automatically during initialization.
 
     The building block molecules used for construction can be either
     :class:`.BuildingBlock` instances or other
@@ -52,7 +52,7 @@ class ConstructedMolecule(Molecule):
         of this attribute will be ``None``.
 
         The second attribute is :attr:`building_block_id`.
-        This will be the same value on all atom that came from the
+        This will be the same value on all atoms that came from the
         building block. Note that if a building block is used multiple
         times during construction, the :attr:`building_block_id` will
         be different for each time it is used.
