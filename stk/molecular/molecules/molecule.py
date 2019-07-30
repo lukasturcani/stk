@@ -87,7 +87,7 @@ class Molecule(metaclass=_Cached):
     @classmethod
     def init_from_dict(self, mol_dict, use_cache=False):
         """
-        Create a :class:`Molecule` from a :class:`dict`.
+        Initialize from a :class:`dict` representation.
 
         The :class:`Molecule` returned has the class specified in
         `mol_dict`, not :class:`Molecule`.
@@ -118,10 +118,7 @@ class Molecule(metaclass=_Cached):
     @classmethod
     def _init_from_dict(cls, mol_dict, use_cache):
         """
-        Initialize a from a :class:`dict` representation.
-
-        This is a virtual method which needs to be implemented
-        by a subclass.
+        Initialize from a :class:`dict` representation.
 
         Parameters
         ----------
@@ -135,6 +132,11 @@ class Molecule(metaclass=_Cached):
             exists will be returned. If ``True`` and a cached,
             identical instance does not yet exist the created one will
             be added to the cache.
+
+        Returns
+        -------
+        :class:`dict`
+            A :class:`dict` representation.
 
         Raises
         ------
@@ -157,7 +159,7 @@ class Molecule(metaclass=_Cached):
 
     def apply_displacement(self, displacement):
         """
-        Shift the molecule by `displacement`.
+        Shift the centroid by `displacement`.
 
         Parameters
         ----------
@@ -178,7 +180,7 @@ class Molecule(metaclass=_Cached):
 
     def apply_rotation_about_axis(self, theta, axis, origin):
         """
-        Rotate the molecule by `theta` about `axis` on the `origin`.
+        Rotate by `theta` about `axis` on the `origin`.
 
         Parameters
         ----------
@@ -212,7 +214,7 @@ class Molecule(metaclass=_Cached):
 
     def apply_rotation_between_vectors(self, start, target, origin):
         """
-        Rotate the molecule by a rotation from `start` to `target`.
+        Rotate by a rotation from `start` to `target`.
 
         Given two direction vectors, `start` and `target`, this method
         applies the rotation required transform `start` to `target`
@@ -273,7 +275,7 @@ class Molecule(metaclass=_Cached):
         origin
     ):
         """
-        Rotates the molecule to minimize angle between vectors.
+        Rotate to minimize the angle between `start` and `target`.
 
         Note that this function will not necessarily overlay the
         `start` and `target` vectors. This is because the possible
@@ -402,7 +404,7 @@ class Molecule(metaclass=_Cached):
 
     def get_center_of_mass(self, atom_ids=None):
         """
-        Return the centre of mass of a group of atoms.
+        Return the centre of mass.
 
         Parameters
         ----------
@@ -439,7 +441,7 @@ class Molecule(metaclass=_Cached):
 
     def get_centroid(self, atom_ids=None):
         """
-        Return the centroid of a group of atoms.
+        Return the centroid.
 
         Parameters
         ----------
@@ -464,7 +466,7 @@ class Molecule(metaclass=_Cached):
 
     def get_direction(self, atom_ids=None):
         """
-        Return a vector of best fit through the molecule's atoms.
+        Return a vector of best fit through the atoms.
 
         Parameters
         ----------
@@ -491,7 +493,7 @@ class Molecule(metaclass=_Cached):
 
     def get_maximum_diameter(self, atom_ids=None):
         """
-        Get the maximum diameter in the molecule.
+        Return the maximum diamater.
 
         This method does not account for the van der Waals radius of
         atoms.
@@ -588,7 +590,7 @@ class Molecule(metaclass=_Cached):
 
     def set_centroid(self, position, atom_ids=None):
         """
-        Set the centroid of the molecule to `position`.
+        Set the centroid to `position`.
 
         Parameters
         ----------
@@ -613,7 +615,7 @@ class Molecule(metaclass=_Cached):
 
     def set_position_matrix(self, position_matrix):
         """
-        Set the molecule's coordinates to those in `position_matrix`.
+        Set the coordinates to those in `position_matrix`.
 
         Parameters
         ----------
@@ -633,7 +635,7 @@ class Molecule(metaclass=_Cached):
 
     def dump(self, path, include_attrs=None):
         """
-        Write a :class:`dict` of the molecule to a file.
+        Write a :class:`dict` representation to a file.
 
         Parameters
         ----------
@@ -657,7 +659,7 @@ class Molecule(metaclass=_Cached):
 
     def _get_key(*args, **kwargs):
         """
-        Get the key used for caching.
+        Return the key used for caching.
 
         When being implemented by a subclass, this methods needs to be
         defined as a :func:`staticmethod` and have the same parameters
@@ -802,7 +804,7 @@ class Molecule(metaclass=_Cached):
 
     def to_rdkit_mol(self):
         """
-        Return a :mod:`rdkit` version of the molecule.
+        Return a :mod:`rdkit` representation.
 
         Returns
         -------
@@ -833,7 +835,7 @@ class Molecule(metaclass=_Cached):
 
     def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """
-        Return a :class:`dict` representation of the molecule.
+        Return a :class:`dict` representation.
 
         Parameters
         ----------
@@ -887,7 +889,7 @@ class Molecule(metaclass=_Cached):
 
     def update_from_rdkit_mol(self, mol):
         """
-        Updates the structure to match an :mod:`rdkit` molecule.
+        Update the structure to match `mol`.
 
         Parameters
         ----------
@@ -907,7 +909,7 @@ class Molecule(metaclass=_Cached):
 
     def update_from_file(self, path):
         """
-        Update the molecular structure from a file.
+        Update the structure from a file.
 
         Multiple file types are supported, namely:
 
@@ -942,7 +944,7 @@ class Molecule(metaclass=_Cached):
 
     def _update_from_mae(self, path):
         """
-        Update the molecular structure to match an ``.mae`` file.
+        Update the structure to match an ``.mae`` file.
 
         Parameters
         ----------
@@ -960,7 +962,7 @@ class Molecule(metaclass=_Cached):
 
     def _update_from_mol(self, path):
         """
-        Update the molecular structure to match an ``.mol`` file.
+        Update the structure to match a ``.mol`` file.
 
         Parameters
         ----------
@@ -985,7 +987,7 @@ class Molecule(metaclass=_Cached):
 
     def _update_from_xyz(self, path):
         """
-        Update the molecular structure to match a ``.xyz`` file.
+        Update the structure to match an ``.xyz`` file.
 
         Parameters
         ----------
@@ -1112,7 +1114,7 @@ class Molecule(metaclass=_Cached):
 
     def write(self, path, atom_ids=None):
         """
-        Write a molecular structure file of the molecule.
+        Write the structure to a file.
 
         This function will write the format based on the extension
         of `path`.
@@ -1149,7 +1151,7 @@ class Molecule(metaclass=_Cached):
 
     def _write_mdl_mol_file(self, path, atom_ids):
         """
-        Write a V3000 ``.mol`` file of the molecule.
+        Write to a V3000 ``.mol`` file.
 
         This function should not be used directly, only via
         :meth:`write`.
@@ -1174,7 +1176,7 @@ class Molecule(metaclass=_Cached):
 
     def _write_xyz_file(self, path, atom_ids):
         """
-        Write a ``.xyz`` file of the molecule.
+        Write to a ``.xyz`` file.
 
         This function should not be used directly, only via
         :meth:`write`.
@@ -1210,7 +1212,7 @@ class Molecule(metaclass=_Cached):
 
     def _write_pdb_file(self, path, atom_ids):
         """
-        Write a ``.pdb`` file of the molecule.
+        Write to a ``.pdb`` file.
 
         This function should not be used directly, only via
         :meth:`write`.

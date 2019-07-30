@@ -215,6 +215,15 @@ class PeriodicBond(Bond):
 
     Attributes
     ----------
+    atom1 : :class:`.Atom`
+        The first atom in the bond.
+
+    atom2 : :class:`.Atom`
+        The second atom in the bond.
+
+    order : :class:`int`
+        The bond order.
+
     direction : :class:`list` of :class:`int`
         The directions across which the bond is periodic. For example,
         ``[1, 0, -1]`` means that when going from
