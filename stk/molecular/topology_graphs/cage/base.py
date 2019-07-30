@@ -19,7 +19,7 @@ class _CageVertex(Vertex):
     """
 
     def __init__(self, x, y, z):
-        self.aligner_edge = self.edges[0]
+        self.aligner_edge = None
         super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
@@ -41,7 +41,7 @@ class _CageVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone.aligner_edge = self.alignment
+        clone.aligner_edge = self.aligner_edge
         return clone
 
     def place_building_block(self, building_block):

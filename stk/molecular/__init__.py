@@ -3,7 +3,7 @@ from .topology_graphs import (
     macrocycle,
     polymer,
     rotaxane,
-    # cage
+    cage
 )
 from .topology_graphs.topology_graph import *
 from .functional_groups import *

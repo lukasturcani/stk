@@ -5,7 +5,8 @@ Defines cage topologies from 2 and 3 functionalized building blocks.
 
 import numpy as np
 
-from .base import CageTopology, Vertex, Edge
+from .base import CageTopology, _CageVertex
+from ..topology_graph import Edge
 
 
 class TwoPlusThree(CageTopology):
@@ -13,24 +14,28 @@ class TwoPlusThree(CageTopology):
     A cage topology from 2 and 3 functionalized building blocks.
 
     """
-    positions_A = a, b = [Vertex(0, 0, 1), Vertex(0, 0, -1)]
 
-    positions_B = alpha, beta, gamma = [
-        Edge(a, b),
-        Edge(a, b),
-        Edge(a, b)
-    ]
+    vertices = (
+        _CageVertex(0, 0, 1),
+        _CageVertex(0, 0, -1),
 
-    b.edge_plane_normal = (
-        lambda scale, a=a: np.multiply(a.edge_plane_normal(scale), -1)
+        _CageVertex(-1, -0.5*np.sqrt(3), 0),
+        _CageVertex(1, -0.5*np.sqrt(3), 0),
+        _CageVertex(0, 0.5*np.sqrt(3), 0)
+
     )
 
-    alpha.coord = np.array([-1, -0.5*np.sqrt(3), 0])
-    beta.coord = np.array([1, -0.5*np.sqrt(3), 0])
-    gamma.coord = np.array([0, 0.5*np.sqrt(3), 0])
+    edges = (
+        Edge(vertices[0], vertices[2]),
+        Edge(vertices[0], vertices[3]),
+        Edge(vertices[0], vertices[4]),
+        Edge(vertices[1], vertices[2]),
+        Edge(vertices[1], vertices[3]),
+        Edge(vertices[1], vertices[4])
+    )
 
-    n_windows = 3
-    n_window_types = 1
+    num_windows = 3
+    num_window_types = 1
 
 
 class FourPlusSix(CageTopology):
@@ -44,12 +49,14 @@ class FourPlusSix(CageTopology):
 
     # Vertices of a tetrahdron so that origin is at the origin. Source:
     # http://tinyurl.com/lc262h8.
-    positions_A = v0, v1, v2, v3 = [
-        Vertex(0, 0, np.sqrt(6)/2),
-        Vertex(-1, -np.sqrt(3)/3, -np.sqrt(6)/6),
-        Vertex(1, -np.sqrt(3)/3, -np.sqrt(6)/6),
-        Vertex(0, 2*np.sqrt(3)/3, -np.sqrt(6)/6)
-    ]
+    vertices = (
+        _CageVertex(0, 0, np.sqrt(6)/2),
+        _CageVertex(-1, -np.sqrt(3)/3, -np.sqrt(6)/6),
+        _CageVertex(1, -np.sqrt(3)/3, -np.sqrt(6)/6),
+        _CageVertex(0, 2*np.sqrt(3)/3, -np.sqrt(6)/6)
+
+        
+    )
 
     positions_B = [
         Edge(v0, v1, (0, 1)),
@@ -60,8 +67,8 @@ class FourPlusSix(CageTopology):
         Edge(v2, v3, (2, 3))
     ]
 
-    n_windows = 4
-    n_window_types = 1
+    num_windows = 4
+    num_window_types = 1
 
 
 class FourPlusSix2(CageTopology):
