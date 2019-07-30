@@ -43,22 +43,22 @@ class ConstructedMolecule(Molecule):
     Attributes
     ----------
     atoms : :class:`tuple` of :class:`.Atom`
-        Extends :class:`.Molecule.atoms`. Each :class:`.Atom`
-        instance is guaranteed to have two additional attributes. The
+        The atoms of the molecule. Each :class:`.Atom`
+        instance is guaranteed to have two attributes. The
         first is :attr:`building_block`, which holds the building
         block :class:`.Molecule` from which that
         :class:`.Atom` came. If the :class:`.Atom` did not come from a
-        building block, but was added during contruction, the value
+        building block, but was added by a reaction, the value
         of this attribute will be ``None``.
 
         The second attribute is :attr:`building_block_id`.
-        Every time a building block is added to the
-        :class:`ConstructedMolecule`, all added atoms will have the
-        same :attr:`building_block_id`. This means that if you use the
-        same building block twice during construction, each
-        :class:`.Atom` in the :class:`.ConstructedMolecule`
-        will have a :attr:`building_block_id` of either
-        ``0``or ``1``.
+        This will be the same value on all atom that came from the
+        building block. Note that if a building block is used multiple
+        times during construction, the :attr:`building_block_id` will
+        be different for each time it is used.
+
+    bonds : :class:`tuple` of :class:`.Bond`
+        The bonds of the molecule.
 
     building_block_vertices : :class:`dict`
         Maps the :class:`.Molecule` instances used for construction,
@@ -79,10 +79,6 @@ class ConstructedMolecule(Molecule):
                 ConstructedMolecule(...): [Vertex(...)]
             }
 
-        Each :class:`.BuildingBlock` and :class:`ConstructedMolecule`
-        can be mapped to multiple :class:`~.topologies.base.Vertex`
-        objects.
-
     building_block_counter : :class:`collections.Counter`
         A counter keeping track of how many times each building block
         molecule appears in the :class:`ConstructedMolecule`.
@@ -101,13 +97,77 @@ class ConstructedMolecule(Molecule):
         :class:`.FunctionalGroup` should match its index in
         :attr:`func_groups`.
 
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`to_dict`
-
     Examples
     --------
+    *Initialization*
+
+    A :class:`ConstructedMolecule` can be created from a set of
+    building blocks and a :class:`.TopologyGraph`
+
+    .. code-block:: python
+
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCCN', ['amine'])
+        bb2 = stk.BuildingBlock('O=CC(C=O)CC=O', ['aldehyde'])
+        tetrahedron = stk.cage.FourPlusSix()
+        cage1 = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2],
+            topology_graph=tetrahedron
+        )
+
+    A :class:`ConstructedMolecule` can be used to construct other
+    :class:`ConstructedMolecule` instances
+
+    .. code-block:: python
+
+        benzene = stk.BuildingBlock('c1ccccc1')
+        cage_complex = stk.ConstructedMolecule(
+            building_blocks=[cage1, benzene],
+            topology_graph=stk.host_guest_complex.Complex()
+        )
+
+    During initialization it is possible to force building blocks to
+    be placed on specific :attr:`~.TopologyGraph.vertices` of the
+    :class:`.TopologyGraph`
+
+    .. code-block:: python
+
+        bb3 = stk.BuildingBlock('NCOCN', ['amine'])
+        bb4 = stk.BuildingBlock('NCOCCCOCN', ['amine'])
+        cage2 = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2, bb3, bb4],
+            topology_graph=tetrahedron
+            building_block_vertices={
+                bb1: tetrahedron.vertices[4:6]
+                bb3: tetrahedron.vertices[6:7]
+                bb4: tetrahedron.vertices[7:8]
+            }
+        )
+
+    *Building blocks with the wrong number of functional groups.*
+
+    If the building block has too many functional groups, you can
+    remove some in order to use it
+
+    .. code-block:: python
+
+        chain = stk.polymer.Linear('AB', [0, 0],  3)
+
+        # This won't work, bb2 has 3 functional groups but 2 are needed
+        # for monomers in a linear polymer chain.
+        failed = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2],
+            topology_graph=chain
+        )
+
+        # Remove one of the functional groups and you will be able to
+        # construct the chain.
+        bb2.func_groups = (bb2.func_groups[0], bb2.func_groups[2])
+        failed = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2],
+            topology_graph=chain
+        )
 
     """
 
@@ -119,7 +179,7 @@ class ConstructedMolecule(Molecule):
         use_cache=False
     ):
         """
-        Initialize a :class:`ConstructedMolecule` instance.
+        Initialize a :class:`ConstructedMolecule`.
 
         Parameters
         ----------
@@ -165,6 +225,8 @@ class ConstructedMolecule(Molecule):
         self.bonds_made = 0
         self.func_groups = []
         self.building_block_counter = Counter()
+        # A (3, n) numpy.ndarray holding the position of every atom in
+        # the molecule.
         self._position_matrix = []
 
         try:
@@ -204,7 +266,7 @@ class ConstructedMolecule(Molecule):
 
     def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """
-        Return a :class:`dict` representation of the molecule.
+        Return a :class:`dict` representation.
 
         Parameters
         ----------
@@ -348,7 +410,7 @@ class ConstructedMolecule(Molecule):
         use_cache=False
     ):
         """
-        Get the key used for caching the molecule.
+        Return the key used for caching.
 
         Parameters
         ----------

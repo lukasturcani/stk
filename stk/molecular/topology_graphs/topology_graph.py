@@ -690,6 +690,7 @@ class TopologyGraph:
         for vertex in vertex_clones.values():
             vertex.apply_scale(scale)
 
+        bb_id = 0
         # Use a shorter alias.
         counter = mol.building_block_counter
         for bb, vertices in mol.building_block_vertices.items():
@@ -714,7 +715,7 @@ class TopologyGraph:
                     atom_map[atom] = atom_clone
 
                     atom_clone.building_block = bb
-                    atom_clone.building_block_id = counter[bb]
+                    atom_clone.building_block_id = bb_id
 
                     mol.atoms.append(atom_clone)
 
@@ -733,6 +734,7 @@ class TopologyGraph:
                 bb.set_position_matrix(original_coords)
                 mol.bonds.extend(b.clone(atom_map) for b in bb.bonds)
                 counter.update([bb])
+                bb_id += 1
 
     def _place_building_blocks_parallel(self, mol, vertices):
         raise NotImplementedError('TODO')
