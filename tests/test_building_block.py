@@ -851,21 +851,6 @@ def test_get_centroid_centroid_direction_vector(tmp_amine4):
     )
 
 
-def test_get_functional_groups(amine2):
-    amines = amine2.get_functional_groups(['amine'])
-
-    assert tuple(amines[0].get_atom_ids()) == (0, 5, 6)
-    assert tuple(amines[0].get_bonder_ids()) == (0, )
-    assert tuple(amines[0].get_deleter_ids()) == (5, 6)
-
-    assert tuple(amines[1].get_atom_ids()) == (4, 13, 14)
-    assert tuple(amines[1].get_bonder_ids()) == (4, )
-    assert tuple(amines[1].get_deleter_ids()) == (13, 14)
-
-    aldehydes = amine2.get_functional_groups(['aldehyde'])
-    assert not aldehydes
-
-
 def test_dump_and_load(tmp_amine2):
     path = os.path.join('building_block_tests_output', 'mol.dump')
 
