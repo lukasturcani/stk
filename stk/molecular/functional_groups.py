@@ -361,21 +361,23 @@ class FunctionalGroup:
     def __repr__(self):
         atoms = list(self.atoms)
         if len(atoms) == 1:
-            atoms.append('')
-        atoms = ', '.join(repr(atom) if atom else '' for atom in atoms)
+            atoms.append(None)
+        atoms = ', '.join(
+            repr(atom) if atom is not None else '' for atom in atoms
+        )
 
         bonders = list(self.bonders)
         if len(bonders) == 1:
-            bonders.append('')
+            bonders.append(None)
         bonders = ', '.join(
-            repr(atom) if atom else '' for atom in bonders
+            repr(atom) if atom is not None else '' for atom in bonders
         )
 
         deleters = list(self.deleters)
         if len(deleters) == 1:
-            deleters.append('')
+            deleters.append(None)
         deleters = ', '.join(
-            repr(atom) if atom else '' for atom in deleters
+            repr(atom) if atom is not None else '' for atom in deleters
         )
 
         return (

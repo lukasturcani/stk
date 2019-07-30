@@ -4,14 +4,12 @@ Defines :class:`ConstructedMolecule`.
 """
 
 import logging
-import rdkit.Chem.AllChem as rdkit
+import numpy as np
 from collections import Counter
 
-from .. import elements, bonds
+from .. import elements, bonds, topology_graphs
 from .molecule import Molecule
-from .. import topology_graphs
-from ..functional_groups import FunctionalGroup
-from ...utilities import remake
+from ..functional_groups import FunctionalGroup, fg_types
 
 logger = logging.getLogger(__name__)
 
@@ -328,6 +326,7 @@ class ConstructedMolecule(Molecule):
             clone.atoms = tuple(clone.get_atom_ids())
             clone.bonders = tuple(clone.get_bonder_ids())
             clone.deleters = tuple(clone.get_deleter_ids())
+            clone.fg_type = f'{clone.fg_type.name!r}'
             func_groups.append(clone)
 
         d = {
@@ -336,7 +335,7 @@ class ConstructedMolecule(Molecule):
             'building_block_counter': bb_counter,
             'bonds_made': self.bonds_made,
             'class': self.__class__.__name__,
-            'mol_block': self._to_mdl_mol_block(),
+            'position_matrix': self.get_position_matrix().tolist(),
             'topology_graph': repr(self.topology_graph),
             'func_groups': repr(tuple(func_groups)),
             'atoms': repr(tuple(atoms)),
@@ -396,12 +395,6 @@ class ConstructedMolecule(Molecule):
 
         obj = cls.__new__(cls)
 
-        mol = remake(rdkit.MolFromMolBlock(
-            molBlock=d.pop('mol_block'),
-            sanitize=False,
-            removeHs=False
-        ))
-
         obj.building_block_counter = Counter()
         obj.building_block_vertices = {}
 
@@ -416,7 +409,7 @@ class ConstructedMolecule(Molecule):
         obj.topology_graph = topology_graph
         obj.bonds_made = d.pop('bonds_made')
         obj._key = key
-        obj._position_matrix = mol.GetConformer().GetPositions().T
+        obj._position_matrix = np.array(d.pop('position_matrix')).T
 
         obj.atoms = eval(d.pop('atoms'), vars(elements))
         for atom in obj.atoms:
@@ -439,6 +432,7 @@ class ConstructedMolecule(Molecule):
             func_group.deleters = tuple(
                 obj.atoms[i] for i in func_group.deleters
             )
+            func_group.fg_type = fg_types[func_group.fg_type]
 
         if use_cache:
             cls._cache[key] = obj
