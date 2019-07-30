@@ -851,6 +851,13 @@ def test_get_centroid_centroid_direction_vector(tmp_amine4):
     )
 
 
+def test_is_identical(amine2, amine2_conf1, amine2_alt1):
+    assert amine2.is_identical(amine2_conf1)
+    assert amine2_conf1.is_identical(amine2)
+    assert not amine2.is_identical(amine2_alt1)
+    assert not amine2_conf1.is_identical(amine2_alt1)
+
+
 def test_dump_and_load(tmp_amine2):
     path = os.path.join('building_block_tests_output', 'mol.dump')
 

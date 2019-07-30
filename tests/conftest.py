@@ -123,6 +123,11 @@ def aldehyde2():
     return stk.BuildingBlock('O=CCC=O', ['aldehyde'])
 
 
+@pytest.fixture
+def tmp_aldehyde2():
+    return stk.BuildingBlock('O=CCC=O', ['aldehyde'])
+
+
 @pytest.fixture(scope='session')
 def boronic_acid2():
     return stk.BuildingBlock('OB(O)c1ccc(B(O)O)nc1', ['boronic_acid'])
@@ -242,34 +247,20 @@ def cycle():
     return stk.BuildingBlock('CCCC1CCCCCCCCC1')
 
 
-# @pytest.fixture(scope='session')
-# def polymer(amine2, aldehyde2):
-#     return stk.ConstructedMolecule(
-#         building_blocks=[amine2, aldehyde2],
-#         topology=stk.polymer.Linear('AB', [0, 0], 3)
-#     )
-#
-#
-# @pytest.fixture
-# def tmp_polymer(amine2, aldehyde2):
-#     return stk.ConstructedMolecule(
-#         building_blocks=[amine2, aldehyde2],
-#         topology=stk.polymer.Linear('AB', [0, 0], 3)
-#     )
+@pytest.fixture(scope='session')
+def polymer(amine2, aldehyde2):
+    return stk.ConstructedMolecule(
+        building_blocks=[amine2, aldehyde2],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
 
 
-# @pytest.fixture(scope='session')
-# def cc3():
-#     m = stk.Molecule.load(join('..', 'data', 'cc3.json'))
-#     m.name = 'cc3'
-#     return m
-
-
-# @pytest.fixture
-# def tmp_cc3():
-#     m = stk.Molecule.load(join('..', 'data', 'cc3.json'))
-#     m.name = 'tmp_cc3'
-#     return m
+@pytest.fixture
+def tmp_polymer(tmp_amine2, tmp_aldehyde2):
+    return stk.ConstructedMolecule(
+        building_blocks=[tmp_amine2, tmp_aldehyde2],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
 
 
 @pytest.fixture
