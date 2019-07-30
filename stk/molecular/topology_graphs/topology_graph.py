@@ -363,15 +363,15 @@ class TopologyGraph:
     """
     Represents topology graphs of :class:`.ConstructedMolecule`.
 
-    The topology graph is an abstract representation of the constructed
+    The topology graph is an abstract representation of a constructed
     molecule. The vertices indicate where building blocks are placed
     and the edges indicate which building blocks have bonds formed
     between them by the construction process.
 
-    Vertices are responsible for placing the building block molecules
-    and by initializing them with different settings, they can position
-    the building block molecules differently and therefore allow the
-    user to easily specify a different structural isomer.
+    Vertices are responsible for placing the building block molecules.
+    By initializing the vertices with different settings, they can
+    position the building block molecules differently and therefore
+    allow the user to easily specify a different structural isomer.
 
     Once a building block is placed on a vertex, the functional groups
     on the building block must be assigned to the different edges
@@ -383,9 +383,10 @@ class TopologyGraph:
     represents a reaction between the functional groups assigned to it.
     Note that an edge can be assigned more than two functional groups,
     in case you are dealing with something really exotic. The
-    functional groups are to an appropriate reaction, which generally
-    creates bond between the atoms of the functional groups. After
-    this you will end up with a :class:`.ConstructedMolecule`.
+    functional groups are then matched to an appropriate reaction,
+    which generally creates bond between the atoms of the functional
+    groups. After this you will end up with a
+    :class:`.ConstructedMolecule`.
 
     Attributes
     ----------
