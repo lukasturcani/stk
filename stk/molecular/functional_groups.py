@@ -206,7 +206,7 @@ class FGType:
         )
 
     def __str__(self):
-        return f'FGType({self.name})'
+        return f'FGType({self.name!r})'
 
 
 class FunctionalGroup:
@@ -376,7 +376,7 @@ class FunctionalGroup:
             f'    atoms=( {atoms} ), \n'
             f'    bonders=( {bonders} ), \n'
             f'    deleters=( {deleters} ), \n'
-            f'    fg_type={self.fg_type.name}\n'
+            f'    fg_type={self.fg_type}\n'
             ')'
         )
 
@@ -401,7 +401,7 @@ class FunctionalGroup:
             f'    atoms=( {atoms} ), \n'
             f'    bonders=( {bonders} ), \n'
             f'    deleters=( {deleters} ), \n'
-            f'    fg_type={self.fg_type.name}\n'
+            f'    fg_type={self.fg_type}\n'
             ')'
         )
 

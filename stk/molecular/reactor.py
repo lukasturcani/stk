@@ -201,7 +201,7 @@ class Reactor:
 
     def add_reaction(self, *fgs):
         """
-        Creates bonds between functional groups.
+        Create bonds between functional groups.
 
         This function first looks at the functional groups provided via
         the `*fgs` argument and checks which functional groups are
@@ -246,7 +246,7 @@ class Reactor:
 
     def add_periodic_reaction(self, direction, *fgs):
         """
-        Like :func:`add_reaction` but adds :class:`.PeriodicBond`.
+        Create periodic bonds between functional groups.
 
         Parameters
         ----------
@@ -318,7 +318,7 @@ class Reactor:
 
     def _diol_with_dihalogen(self, fg1, fg2, dihalogen):
         """
-        Creates bonds between functional groups.
+        Create bonds between functional groups.
 
         Parameters
         ----------
@@ -364,7 +364,7 @@ class Reactor:
 
     def _boronic_acid_with_diol(self, fg1, fg2):
         """
-        Creates bonds between functional groups.
+        Create bonds between functional groups.
 
         Parameters
         ----------
