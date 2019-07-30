@@ -384,7 +384,7 @@ class TopologyGraph:
     Note that an edge can be assigned more than two functional groups,
     in case you are dealing with something really exotic. The
     functional groups are then matched to an appropriate reaction,
-    which generally creates bond between the atoms of the functional
+    which generally creates bonds between the atoms of the functional
     groups. After this you will end up with a
     :class:`.ConstructedMolecule`.
 
