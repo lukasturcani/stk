@@ -4,3 +4,4 @@ psutil
 pandas
 seaborn
 pathos
+numpy
