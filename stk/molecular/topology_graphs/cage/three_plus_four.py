@@ -3,39 +3,60 @@ Defines cage topologies from building blocks of 3 and 4 func groups.
 
 """
 
-from .base import VertexOnlyCageTopology, Vertex
+from .base import CageTopology, _CageVertex
+from ..topology_graph import Edge
 
 
-class SixPlusEight(VertexOnlyCageTopology):
+class SixPlusEight(CageTopology):
     """
     A cage topology of 3 and 4 functional group building blocks.
 
     """
 
-    x = 1
-    positions_A = [
-        Vertex(-x, x, 0),
-        Vertex(-x, -x, 0),
-        Vertex(x, x, 0),
-        Vertex(x, -x, 0),
+    _x = 1
+    vertices = (
+        _CageVertex(-_x, _x, 0),  # 0
+        _CageVertex(-_x, -_x, 0),  # 1
+        _CageVertex(_x, _x, 0),  # 2
+        _CageVertex(_x, -_x, 0),  # 3
+        _CageVertex(0, 0, _x),  # 4
+        _CageVertex(0, 0, -_x),  # 5
+        _CageVertex(-2*_x, 0, _x),  # 6
+        _CageVertex(0, 2*_x, _x),  # 7
+        _CageVertex(2*_x, 0, _x),  # 8
+        _CageVertex(0, 2*_x, _x),  # 9
+        _CageVertex(-2*_x, 0, -_x),  # 10
+        _CageVertex(0, -2*_x, -_x),  # 11
+        _CageVertex(2*_x, 0, -_x),  # 12
+        _CageVertex(0, 2*_x, -_x),  # 13
+    )
 
-        Vertex(0, 0, x),
-        Vertex(0, 0, -x)
-    ]
+    edges = (
+        Edge(vertices[6], vertices[0]),
+        Edge(vertices[6], vertices[5]),
+        Edge(vertices[6], vertices[1]),
 
-    a, b, c, d, e, f = positions_A
+        Edge(vertices[7], vertices[1]),
+        Edge(vertices[7], vertices[5]),
+        Edge(vertices[7], vertices[4]),
 
-    positions_B = [
-        Vertex.vertex_init(a, e, b),
-        Vertex.vertex_init(b, e, d),
-        Vertex.vertex_init(e, d, c),
-        Vertex.vertex_init(e, c, a),
+        Edge(vertices[8], vertices[5]),
+        Edge(vertices[8], vertices[4]),
+        Edge(vertices[8], vertices[3]),
 
-        Vertex.vertex_init(a, f, b),
-        Vertex.vertex_init(f, b, d),
-        Vertex.vertex_init(d, f, c),
-        Vertex.vertex_init(c, f, a)
-    ]
+        Edge(vertices[9], vertices[5]),
+        Edge(vertices[9], vertices[3]),
+        Edge(vertices[9], vertices[1]),
 
-    n_windows = 12
-    n_window_types = 1
+        Edge(vertices[10], vertices[1]),
+        Edge(vertices[10], vertices[2]),
+        Edge(vertices[10], vertices[6]),
+
+        Edge(vertices[10], vertices[1]),
+        Edge(vertices[10], vertices[2]),
+        Edge(vertices[10], vertices[6]),
+        Edge(vertices[10], vertices[6]),
+    )
+
+    num_windows = 12
+    num_window_types = 1

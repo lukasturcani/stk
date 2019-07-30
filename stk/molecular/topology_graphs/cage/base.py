@@ -4,7 +4,7 @@ from collections import defaultdict
 from ..topology_graph import TopologyGraph, Vertex
 
 
-class CageVertex(Vertex):
+class _CageVertex(Vertex):
     """
     Represents a vertex of a :class:`.CageTopology`.
 
@@ -15,12 +15,6 @@ class CageVertex(Vertex):
         :class:`.BuildingBlock` placed on the vertex. The first
         :class:`.FunctionalGroup` in :attr:`.BuildingBlock.func_groups`
         is rotated such that it lies exactly on this :class:`.Edge`.
-
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`clone`
-    :meth:`place_building_block`
 
     """
 
@@ -47,7 +41,7 @@ class CageVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone.alignment = self.alignment
+        clone.aligner_edge = self.alignment
         return clone
 
     def place_building_block(self, building_block):
@@ -183,11 +177,11 @@ class CageVertex(Vertex):
 
 class CageTopology(TopologyGraph):
     """
-    A base :class:`.TopologyGraph` for cages.
+    Represents a cage topology graph.
 
     Attributes
     ----------
-    vertices : :class:`tuple` of :class:`.CageVertex`
+    vertices : :class:`tuple` of :class:`.Vertex`
         A class attribute. It holds vertices used to make a specific
         cage topology graph. This needs to be defined by a subclass.
 
@@ -204,8 +198,8 @@ class CageTopology(TopologyGraph):
         Parmaeters
         ----------
         vertex_alignments : :class:`dict`, optional
-            A mapping from a :class:`.CageVertex` in :attr:`vertices`
-            to an :class:`.Edge` connected to it. The :class:`Edge` is
+            A mapping from a :class:`.Vertex` in :attr:`vertices`
+            to an :class:`.Edge` connected to it. The :class:`.Edge` is
             used to align the first :class:`.FunctionalGroup` of a
             :class:`.BuildingBlock` placed on that vertex. Only
             vertices which need to have their default edge changed need
@@ -243,9 +237,7 @@ class CageTopology(TopologyGraph):
         This method will assign a random building block with the
         correct amount of functional groups to each vertex.
 
-        Note
-        ----
-        This method will modify
+        Assignment is done by modifying
         :attr:`.ConstructedMolecule.building_block_vertices`.
 
         Parameters
