@@ -1,5 +1,5 @@
 """
-Defines :class:`.Polymer` topologies.
+Defines topologies of polymers.
 
 """
 
@@ -15,21 +15,12 @@ logger = logging.getLogger(__name__)
 
 class LinearVertex(Vertex):
     """
-    Represents a vertex in the middle of the chain.
+    Represents a vertex in the middle of a linear polymer chain.
 
     Attributes
     ----------
-    _orientation : :class:`float`
-        Can be any number from ``0`` to ``1``, both inclusive. It
-        specifies the probability the building block placed on the
-        vertex will have its orientation along the chain flipped.
-
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`assign_func_groups_to_edges`
-    :meth:`clone`
-    :meth:`place_building_block`
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
 
     """
 
@@ -60,7 +51,7 @@ class LinearVertex(Vertex):
 
     def clone(self, clear_edges=False):
         """
-        Create a clone of the instance.
+        Return a clone.
 
         Parameters
         ----------
@@ -177,21 +168,15 @@ class LinearVertex(Vertex):
 
 class TerminalVertex(LinearVertex):
     """
-    Represents a :class:`.Vertex` on the end of a polymer chain.
+    Represents a vertex at the end of a polymer chain.
 
     Do not instantiate this class directly, use :class:`.HeadVertex` or
     :class:`.TailVertex` instead.
 
     Attributes
     ----------
-    _cap_direction : :class:`int`
-        The direction to use if the building block placed on the
-        vertex only has 1 :class:`.FunctionalGroup`.
-
-    Methods
-    -------
-    :meth:`assign_func_groups_to_edges`
-    :meth:`place_building_block`
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
 
     """
 
@@ -233,6 +218,7 @@ class TerminalVertex(LinearVertex):
         )
         building_block.apply_rotation_between_vectors(
             start=centroid_vector,
+            # _cap_direction is defined by a subclass.
             target=[self._cap_direction, 0, 0],
             origin=self._coord
         )
@@ -290,19 +276,33 @@ class TerminalVertex(LinearVertex):
 
 class HeadVertex(TerminalVertex):
     """
-    Represents a vertex at the head of the chain.
+    Represents a vertex at the head of a polymer chain.
+
+    Attributes
+    ----------
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
 
     """
 
+    # The direction to use if the building block placed on the
+    # vertex only has 1 FunctionalGroup.
     _cap_direction = -1
 
 
 class TailVertex(TerminalVertex):
     """
-    Represents a vertex at the tail of the chain.
+    Represents a vertex at the tail of a polymer chain.
+
+    Attributes
+    ----------
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
 
     """
 
+    # The direction to use if the building block placed on the
+    # vertex only has 1 FunctionalGroup.
     _cap_direction = 1
 
 
@@ -332,6 +332,12 @@ class Linear(TopologyGraph):
     n : :class:`int`
         The number of repeating units which are used to make the
         polymer.
+
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 
@@ -395,9 +401,7 @@ class Linear(TopologyGraph):
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        Note
-        ----
-        This method will modify
+        Assignment is done by modifying
         :attr:`.ConstructedMolecule.building_block_vertices`.
 
         Parameters
