@@ -1,9 +1,6 @@
-networkx
 scipy
 matplotlib
-scikit-learn
 psutil
-pywindowx
 pandas
 seaborn
 pathos

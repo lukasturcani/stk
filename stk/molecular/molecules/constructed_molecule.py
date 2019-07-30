@@ -7,7 +7,7 @@ import logging
 import rdkit.Chem.AllChem as rdkit
 from collections import Counter
 
-from . import elements
+from .. import elements, bonds
 from .molecule import Molecule
 from .. import topology_graphs
 from ..functional_groups import FunctionalGroup
@@ -294,12 +294,41 @@ class ConstructedMolecule(Molecule):
         bb_counter = []
         building_blocks = []
         building_block_vertices = {}
+        bb_index = {}
         for i, bb in enumerate(self.building_block_vertices):
+            bb_index[bb] = i
             bb_counter.append((i, self.building_block_counter[bb]))
             building_blocks.append(bb.to_dict(include_attrs, True))
             building_block_vertices[i] = [
                 repr(v) for v in self.building_block_vertices[bb]
             ]
+
+        # For atoms, bond sand func groups, need to change all atom
+        # references with the id of the atom. This is because when
+        # these objects a reconstructed you want to create pointers
+        # back to the atoms found in the atoms attribute.
+        atoms = []
+        for atom in self.atoms:
+            clone = atom.clone()
+            # This attribute is a pointer that will need to get
+            # re-created by load().
+            clone.building_block = bb_index[clone.building_block]
+            atoms.append(clone)
+
+        bonds = []
+        for bond in self.bonds:
+            clone = bond.clone()
+            clone.atom1 = clone.atom1.id
+            clone.atom2 = clone.atom2.id
+            bonds.append(clone)
+
+        func_groups = []
+        for fg in self.func_groups:
+            clone = fg.clone()
+            clone.atoms = tuple(clone.get_atom_ids())
+            clone.bonders = tuple(clone.get_bonder_ids())
+            clone.deleters = tuple(clone.get_deleter_ids())
+            func_groups.append(clone)
 
         d = {
             'building_blocks': building_blocks,
@@ -309,8 +338,9 @@ class ConstructedMolecule(Molecule):
             'class': self.__class__.__name__,
             'mol_block': self._to_mdl_mol_block(),
             'topology_graph': repr(self.topology_graph),
-            'func_groups': repr(self.func_groups),
-            'atoms': repr(self.atoms),
+            'func_groups': repr(tuple(func_groups)),
+            'atoms': repr(tuple(atoms)),
+            'bonds': repr(tuple(bonds)),
         }
 
         if ignore_missing_attrs:
@@ -380,27 +410,36 @@ class ConstructedMolecule(Molecule):
         for i, bb in enumerate(bbs):
             obj.building_block_counter[bb] = counter[i]
             obj.building_block_vertices[bb] = [
-                eval(v, tops) for v in vertices[i]
+                eval(v, tops) for v in vertices[str(i)]
             ]
 
         obj.topology_graph = topology_graph
         obj.bonds_made = d.pop('bonds_made')
         obj._key = key
         obj._position_matrix = mol.GetConformer().GetPositions().T
+
         obj.atoms = eval(d.pop('atoms'), vars(elements))
+        for atom in obj.atoms:
+            atom.building_block = bbs[atom.building_block]
 
-        obj.bonds = tuple(
-            elements.Bond(
-                obj.atoms[b.GetBeginAtomIdx()],
-                obj.atoms[b.GetEndAtomIdx()],
-                b.GetBondTypeAsDouble()
-            )
-            for b in mol.GetBonds()
-        )
+        obj.bonds = eval(d.pop('bonds'), vars(bonds))
+        for bond in obj.bonds:
+            bond.atom1 = obj.atoms[bond.atom1]
+            bond.atom2 = obj.atoms[bond.atom2]
 
-        # Globals for eval.
         g = {'FunctionalGroup': FunctionalGroup}
         obj.func_groups = tuple(eval(d.pop('func_groups'), g))
+        for func_group in obj.func_groups:
+            func_group.atoms = tuple(
+                obj.atoms[i] for i in func_group.atoms
+            )
+            func_group.bonders = tuple(
+                obj.atoms[i] for i in func_group.bonders
+            )
+            func_group.deleters = tuple(
+                obj.atoms[i] for i in func_group.deleters
+            )
+
         if use_cache:
             cls._cache[key] = obj
 

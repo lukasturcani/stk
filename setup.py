@@ -28,12 +28,9 @@ setup(name='stk',
           'stk.calculators.optimization'
       ],
       install_requires=[
-          'networkx',
           'scipy',
           'matplotlib',
-          'scikit-learn',
           'psutil',
-          'pywindowx',
           'pandas',
           'pathos',
           'seaborn'
