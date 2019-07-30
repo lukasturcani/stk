@@ -6,74 +6,14 @@ Defines :class:`.TopologyGraph` and related classes.
 Extending ``stk``: Adding new topology graphs.
 ----------------------------------------------
 
-General
-.......
-
-A new topology class must be defined. The class must inherit
-:class:`Topology`. The new topology class will have to define
-the methods :meth:`place_mols` and :meth:`bonded_fgs`. A description
-of what these methods should do is given by :meth:`Topology.place_mols`
-and :meth:`Topology.bonded_fgs`.
-
-The new class may optionally define the methods :meth:`prepare` and
-:meth:`cleanup`. The former performs operations on the molecule
-before it is joined up and has atoms deleted via
-:meth:`.Reactor.react`. The latter performs any final cleanup
-operations on the constructed molecule. For example, converting the end
-functional groups of a polymer into hydrogen atoms. See also
-:meth:`Topology.cleanup`.
-
-During the construction process, every time a building block is placed
-in the :class:`.ConstructedMolecule`, new :class:`FunctionalGroup`
-instances must be made, which correspond to the functional groups added
-by virtue of adding the building block. These must be added to the
-:class:`Reactor` held in :attr:`.Topology.reactor`, specifically into
-its :attr:`.Reactor.func_groups` attribute. This means that the
-reactor will keep the atom ids in these functional groups up to date
-when it deletes atoms. However, note that any functional groups
-yielded by :meth:`.Topology.bonded_fgs` are automatically added, so
-they do not have to be managed manually. If you do not wish to
-automatically add the functional groups into
-:attr:`.Reactor.func_groups` you can toggle it in
-:attr:`Topology.track_fgs`.
-
-Cages
-.....
-
-To add a new cage topology a new class should be created, named
-after the topology. This class should inherit :class:`.CageTopology`.
-This will give access to various methods which are necessary
-for dealing with any cage molecule. See the documenation of
-:class:`.CageTopology` for more details.
-
-The new class will only need to have five class attributes added:
-
-    1. a :class:`list` called :attr:`vertices`
-    2. a :class:`list` called :attr:`edges`
-    3. :attr:`n_windows`, which holds the number of windows the cage
-       topology has.
-    4. :attr:`n_window_types`, which holds the number of different
-       window types. For example, if :attr:`n_window_types` is ``2``,
-       then the topology will have two kinds of windows, each with a
-       different expected size. Windows of the same type are expected
-       to be of the same size.
-
-:attr:`vertices` holds instances of :class:`~.cage.base.Vertex`. Each
-instance represents a vertex of a cage and needs to be initialized
-with the coordinates of that vertex. Vertices of a cage are where
-building blocks of cages are placed.
-
-:attr:`edges` holds instances of the :class:`~.cage.base.Edge`. Each
-instance represents an edge of a cage and needs to be initialized
-with two instances of :class:`~.cage.base.Vertex`. The
-:class:`~.cage.base.Vertex` instances
-should be held in :attr:`vertices`, as mentioned above. The two
-vertices are the ones which the edge connects. Linkers of cages are
-placed on edges. The edge instances automatically derive their
-positions from the vertices supplied during initialization.
-
-The vertices need to be positioned such that the center of the
-topology is at the origin.
+To add a new topology graph a new subclass of :class:`.TopologyGraph`
+must be added, which implements it's virtual methods. Similarly,
+a new subclass of :class:`.Vertex` must also be made and its virtual
+methods implemented. When the new subclass of :class:`.TopologyGraph`
+is initialized, it must create instances of the :class:`.Vertex`
+subclass, together with :class:`.Edge` instances. Once your
+topology graph has the vertices and edges it wants, simply run
+``super().__init__(vertices, edges, processes)`` and you're done.
 
 
 """
@@ -88,24 +28,12 @@ from ...utilities import vector_theta
 
 class Vertex:
     """
-    Represents a vertex of a :class:`.TopologyGraph`.
+    Represents a vertex in a :class:`.TopologyGraph`.
 
     Attributes
     ----------
     edges : :class:`list` of :class:`.Edge`
         The edges the :class:`Vertex` is connected to.
-
-    _coord : :class:`numpy.ndarray`
-        The position of the vertex.
-
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`apply_scale`
-    :meth:`assign_func_groups_to_edges`
-    :meth:`clone`
-    :meth:`get_position`
-    :meth:`place_building_block`
 
     """
 
@@ -131,7 +59,7 @@ class Vertex:
 
     def apply_scale(self, scale):
         """
-        Scale the position of the :class:`.Vertex` by `scale`.
+        Scale the position of by `scale`.
 
         Parameters
         ----------
@@ -153,7 +81,7 @@ class Vertex:
 
     def clone(self, clear_edges=False):
         """
-        Create a clone of the instance.
+        Return a clone.
 
         Parameters
         ----------
@@ -175,7 +103,7 @@ class Vertex:
 
     def get_position(self):
         """
-        Return the position of the :class:`Vertex`.
+        Return the position.
 
         Returns
         -------
@@ -252,7 +180,7 @@ class Vertex:
 
     def _get_edge_centroid(self, edge_ids=None):
         """
-        Return the centroid of connected edges.
+        Return the centroid of the connected edges.
 
         Parameters
         ----------
@@ -340,26 +268,12 @@ class Vertex:
 
 class Edge:
     """
-    Represents the edge of a topology graph.
+    Represents an edge in a topology graph.
 
     Attributes
     ----------
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which the :class:`Edge` connects.
-
-    _func_groups : :class:`list` of :class:`.FunctionalGroup`
-        The functional groups which the edge connects.
-
-    _coord : :class:`numpy.ndarray`
-        The position of the edge. It is the centroid the
-        :attr:`_vertices`.
-
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`assign_func_group`
-    :meth:`get_func_groups`
-    :meth:`get_position`
 
     """
 
@@ -375,6 +289,9 @@ class Edge:
         """
 
         self.vertices = vertices
+        # The FunctionalGroup instances which the edge connects.
+        # These will belong to the molecules placed on the vertices
+        # connected by the edge.
         self._func_groups = []
 
         self._coord = 0
@@ -385,7 +302,7 @@ class Edge:
 
     def get_func_groups(self):
         """
-        Get the functional groups connected by the edge.
+        Get the functional groups connected by this edge.
 
         Returns
         -------
@@ -416,7 +333,7 @@ class Edge:
 
     def get_position(self):
         """
-        Return the position of the :class:`Edge`.
+        Return the position.
 
         Returns
         -------
@@ -444,7 +361,7 @@ class Edge:
 
 class TopologyGraph:
     """
-    A base class for topology graphs of :class:`.ConstructedMolecule`.
+    Represents topology graphs of :class:`.ConstructedMolecule`.
 
     Attributes
     ----------
@@ -453,15 +370,6 @@ class TopologyGraph:
 
     edges : :class:`tuple` of :class:`.Edge`
         The edges which make up the topology graph.
-
-    _processes : :class:`int`
-        The number of parallel processes to create during
-        :meth:`construct`.
-
-    Methods
-    -------
-    :meth:`__init__`
-    :meth:`construct`
 
     """
 
@@ -489,7 +397,7 @@ class TopologyGraph:
 
     def construct(self, mol, building_blocks):
         """
-        Construct a :class:`.ConstructedMolecule` conformer.
+        Construct a :class:`.ConstructedMolecule`.
 
         Parameters
         ----------
@@ -539,9 +447,7 @@ class TopologyGraph:
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        Note
-        ----
-        This method will modify
+        Assignment is done by modifying
         :attr:`.ConstructedMolecule.building_block_vertices`.
 
         Parameters
@@ -603,6 +509,8 @@ class TopologyGraph:
         """
         Create clones of :attr:`vertices`.
 
+        Notes
+        -----
         Clones are necessary so that multiple :meth:`construct`
         calls can be done asynchronously and so that the state of the
         original :class:`.Vertex` objects is not
