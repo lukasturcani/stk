@@ -10,7 +10,7 @@ if not os.path.exists(test_dir):
 def test_linear_vertex(tmp_amine2):
     t = stk.polymer.Linear(
         repeating_unit='AB',
-        orientation=[0, 0],
+        orientations=[0, 0],
         n=3
     )
     v1, v2 = t.vertices[2:4]
@@ -48,7 +48,7 @@ def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
         building_blocks=[amine2, aldehyde2],
         topology_graph=stk.polymer.Linear(
             repeating_unit='AB',
-            orientation=[1, 1],
+            orientations=[1, 1],
             n=repeat_units
         )
     )
@@ -57,7 +57,7 @@ def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
         building_blocks=[boronic_acid2, diol2],
         topology_graph=stk.polymer.Linear(
             repeating_unit='AB',
-            orientation=[0, 0],
+            orientations=[0, 0],
             n=repeat_units
         )
     )
