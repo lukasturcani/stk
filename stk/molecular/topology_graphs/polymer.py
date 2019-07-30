@@ -13,7 +13,7 @@ from .topology_graph import TopologyGraph, Vertex, Edge
 logger = logging.getLogger(__name__)
 
 
-class LinearVertex(Vertex):
+class _LinearVertex(Vertex):
     """
     Represents a vertex in the middle of a linear polymer chain.
 
@@ -166,7 +166,7 @@ class LinearVertex(Vertex):
         )
 
 
-class TerminalVertex(LinearVertex):
+class _TerminalVertex(_LinearVertex):
     """
     Represents a vertex at the end of a polymer chain.
 
@@ -274,7 +274,7 @@ class TerminalVertex(LinearVertex):
         self.edges[0].assign_func_group(fg_map[fg])
 
 
-class HeadVertex(TerminalVertex):
+class _HeadVertex(_TerminalVertex):
     """
     Represents a vertex at the head of a polymer chain.
 
@@ -290,7 +290,7 @@ class HeadVertex(TerminalVertex):
     _cap_direction = -1
 
 
-class TailVertex(TerminalVertex):
+class _TailVertex(_TerminalVertex):
     """
     Represents a vertex at the tail of a polymer chain.
 
@@ -379,16 +379,16 @@ class Linear(TopologyGraph):
         self.n = n
 
         head, *body, tail = orientations*n
-        vertices = [HeadVertex(0, 0, 0, head)]
+        vertices = [_HeadVertex(0, 0, 0, head)]
         edges = []
         for i, orientation in enumerate(body, 1):
-            v = LinearVertex(
+            v = _LinearVertex(
                 x=i, y=0, z=0, orientation=orientation
             )
             vertices.append(v)
             edges.append(Edge(vertices[i-1], vertices[i]))
 
-        vertices.append(TailVertex(len(vertices), 0, 0, tail))
+        vertices.append(_TailVertex(len(vertices), 0, 0, tail))
         edges.append(Edge(vertices[-2], vertices[-1]))
 
         super().__init__(tuple(vertices), tuple(edges), processes)
