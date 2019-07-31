@@ -128,7 +128,7 @@ class _LinearVertex(Vertex):
         ----------
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
-            functional groups assigned to
+            functional groups assigned to edges.
 
         fg_map : :class:`dict`
             A mapping from :class:`.FunctionalGroup` instances in

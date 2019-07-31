@@ -2,6 +2,7 @@ import numpy as np
 from collections import defaultdict
 
 from ..topology_graph import TopologyGraph, Vertex
+from ....utilities import vector_theta
 
 
 class _CageVertex(Vertex):
@@ -158,7 +159,7 @@ class _CageVertex(Vertex):
         ----------
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
-            functional groups assigned to
+            functional groups assigned to edges.
 
         fg_map : :class:`dict`
             A mapping from :class:`.FunctionalGroup` instances in
@@ -172,7 +173,80 @@ class _CageVertex(Vertex):
 
         """
 
-        ...
+        # The idea is to order the functional groups in building_block
+        # by their angle from func_groups[0] and the bonder centroid,
+        #  going in the clockwise direction.
+        #
+        # The edges are also ordered by their angle from aligner_edge
+        # and the edge centroid going in the clockwise direction.
+        #
+        # Once the fgs and edges are ordered, zip and assign them.
+
+        fg0_coord = building_block.get_centroid(
+            atom_ids=building_block.func_groups[0].get_bonder_ids()
+        )
+        bonder_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_bonder_ids()
+        )
+        func_groups = sorted(
+            building_block.func_groups,
+            key=self._func_group_angle(
+                building_block=building_block,
+                fg0_coord=fg0_coord,
+                bonder_centroid=bonder_centroid
+            )
+        )
+        edges = sorted(self.edges, key=self._edge_angle())
+
+        for func_group, edge in zip(func_groups, edges):
+            edge.assign_func_group(fg_map[func_group])
+
+        @staticmethod
+        def _func_group_angle(
+            building_block,
+            fg0_coord,
+            bonder_centroid
+        ):
+
+            # This axis is used to figure out the clockwise direction.
+            axis = np.cross(
+                fg0_coord-bonder_centroid,
+                building_block.get_bonder_plane_normal()
+            )
+
+            def angle(func_group):
+                coord = building_block.get_centroid(
+                    atom_ids=func_group.get_bonder_ids()
+                )
+                theta = vector_theta(coord, fg0_coord)
+
+                projection = coord @ axis
+                if projection < 0:
+                    return 2*np.pi - theta
+                return theta
+
+            return angle
+
+        def _edge_angle(self):
+
+            aligner_edge_coord = self.aligner_edge.get_position()
+            edge_centroid = self._get_edge_centroid()
+            # This axis is used to figure out the clockwise direction.
+            axis = np.cross(
+                aligner_edge_coord-edge_centroid,
+                self._get_edge_plane_normal()
+            )
+
+            def angle(edge):
+                coord = edge.get_position()
+                theta = vector_theta(coord, aligner_edge_coord)
+
+                projection = coord @ axis
+                if projection < 0:
+                    return 2*np.pi - theta
+                return theta
+
+            return angle
 
 
 class CageTopology(TopologyGraph):
