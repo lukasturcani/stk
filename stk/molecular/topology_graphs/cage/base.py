@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 
-from ..topology_graph import TopologyGraph, Vertex
+from ..topology_graph import TopologyGraph, Vertex, Edge
 from ....utilities import vector_theta
 
 
@@ -11,6 +11,9 @@ class _CageVertex(Vertex):
 
     Attributes
     ----------
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
+
     aligner_edge : :class:`.Edge`
         The :class:`.Edge` in :attr:`edges`, which is used to align the
         :class:`.BuildingBlock` placed on the vertex. The first
@@ -143,7 +146,7 @@ class _CageVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def _assign_func_groups_to_edges(self, building_block, fg_map):
+    def assign_func_groups_to_edges(self, building_block, fg_map):
         """
         Assign functional groups to edges.
 
@@ -201,52 +204,52 @@ class _CageVertex(Vertex):
         for func_group, edge in zip(func_groups, edges):
             edge.assign_func_group(fg_map[func_group])
 
-        @staticmethod
-        def _func_group_angle(
-            building_block,
-            fg0_coord,
-            bonder_centroid
-        ):
+    @staticmethod
+    def _func_group_angle(
+        building_block,
+        fg0_coord,
+        bonder_centroid
+    ):
 
-            # This axis is used to figure out the clockwise direction.
-            axis = np.cross(
-                fg0_coord-bonder_centroid,
-                building_block.get_bonder_plane_normal()
+        # This axis is used to figure out the clockwise direction.
+        axis = np.cross(
+            fg0_coord-bonder_centroid,
+            building_block.get_bonder_plane_normal()
+        )
+
+        def angle(func_group):
+            coord = building_block.get_centroid(
+                atom_ids=func_group.get_bonder_ids()
             )
+            theta = vector_theta(coord, fg0_coord)
 
-            def angle(func_group):
-                coord = building_block.get_centroid(
-                    atom_ids=func_group.get_bonder_ids()
-                )
-                theta = vector_theta(coord, fg0_coord)
+            projection = coord @ axis
+            if projection < 0:
+                return 2*np.pi - theta
+            return theta
 
-                projection = coord @ axis
-                if projection < 0:
-                    return 2*np.pi - theta
-                return theta
+        return angle
 
-            return angle
+    def _edge_angle(self):
 
-        def _edge_angle(self):
+        aligner_edge_coord = self.aligner_edge.get_position()
+        edge_centroid = self._get_edge_centroid()
+        # This axis is used to figure out the clockwise direction.
+        axis = np.cross(
+            aligner_edge_coord-edge_centroid,
+            self._get_edge_plane_normal()
+        )
 
-            aligner_edge_coord = self.aligner_edge.get_position()
-            edge_centroid = self._get_edge_centroid()
-            # This axis is used to figure out the clockwise direction.
-            axis = np.cross(
-                aligner_edge_coord-edge_centroid,
-                self._get_edge_plane_normal()
-            )
+        def angle(edge):
+            coord = edge.get_position()
+            theta = vector_theta(coord, aligner_edge_coord)
 
-            def angle(edge):
-                coord = edge.get_position()
-                theta = vector_theta(coord, aligner_edge_coord)
+            projection = coord @ axis
+            if projection < 0:
+                return 2*np.pi - theta
+            return theta
 
-                projection = coord @ axis
-                if projection < 0:
-                    return 2*np.pi - theta
-                return theta
-
-            return angle
+        return angle
 
 
 class CageTopology(TopologyGraph):
@@ -292,13 +295,30 @@ class CageTopology(TopologyGraph):
         if vertex_alignments is None:
             vertex_alignments = {}
 
-        vertices = []
+        vertex_clones = {}
         for vertex in self.vertices:
-            clone = vertex.clone()
-            edge = vertex_alignments.get(vertex, 0)
-            clone.aligner_edge = edge
-            vertices.append(clone)
-        super().__init__(tuple(vertices), self.edges, processes)
+            vertex.aligner_edge = vertex_alignments.get(
+                vertex,
+                vertex.edges[0]
+            )
+            clone = vertex.clone(clear_edges=True)
+            vertex_clones[vertex] = clone
+
+        edge_clones = {}
+        for edge in self.edges:
+            vertices = [
+                vertex_clones[vertex] for vertex in edge.vertices
+            ]
+            edge_clones[edge] = Edge(*vertices)
+
+        for vertex in vertex_clones.values():
+            vertex.aligner_edge = edge_clones[vertex.aligner_edge]
+
+        super().__init__(
+            vertices=tuple(vertex_clones.values()),
+            edges=tuple(edge_clones.values()),
+            processes=processes
+        )
 
     def _assign_building_blocks_to_vertices(
         self,
