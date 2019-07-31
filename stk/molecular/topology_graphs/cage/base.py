@@ -177,6 +177,46 @@ class _CageVertex(Vertex):
 
         """
 
+        if len(building_block.func_groups) == 2:
+            return self._assign_func_groups_to_edges_linear(
+                building_block=building_block,
+                fg_map=fg_map
+            )
+        return self._assign_func_groups_to_edges_nonlinear(
+            building_block=building_block,
+            fg_map=fg_map
+        )
+
+    def _assign_func_groups_to_edges_linear(
+        self,
+        building_block,
+        fg_map
+    ):
+
+        fg1, fg2 = sorted(
+            building_block.func_groups,
+            key=self._get_edge0_distance(building_block)
+        )
+        self.edges[0].assign_func_group(fg_map[fg1])
+        self.edges[1].assign_func_group(fg_map[fg2])
+
+    def _get_edge0_distance(self, building_block):
+        aligner_coord = self.edges[0].get_position()
+
+        def distance(fg):
+            fg_coord = building_block.get_centroid(
+                atom_ids=fg.get_bonder_ids()
+            )
+            displacement = aligner_coord - fg_coord
+            return np.linalg.norm(displacement)
+
+        return distance
+
+    def _assign_func_groups_to_edges_nonlinear(
+        self,
+        building_block,
+        fg_map
+    ):
         # The idea is to order the functional groups in building_block
         # by their angle from func_groups[0] and the bonder centroid,
         #  going in the clockwise direction.
@@ -194,19 +234,19 @@ class _CageVertex(Vertex):
         )
         func_groups = sorted(
             building_block.func_groups,
-            key=self._func_group_angle(
+            key=self._get_func_group_angle(
                 building_block=building_block,
                 fg0_coord=fg0_coord,
                 bonder_centroid=bonder_centroid
             )
         )
-        edges = sorted(self.edges, key=self._edge_angle())
+        edges = sorted(self.edges, key=self._get_edge_angle())
 
         for func_group, edge in zip(func_groups, edges):
             edge.assign_func_group(fg_map[func_group])
 
     @staticmethod
-    def _func_group_angle(
+    def _get_func_group_angle(
         building_block,
         fg0_coord,
         bonder_centroid
@@ -231,7 +271,7 @@ class _CageVertex(Vertex):
 
         return angle
 
-    def _edge_angle(self):
+    def _get_edge_angle(self):
 
         aligner_edge_coord = self.aligner_edge.get_position()
         edge_centroid = self._get_edge_centroid()
