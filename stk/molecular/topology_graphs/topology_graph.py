@@ -57,6 +57,27 @@ class Vertex:
         self._coord = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
 
+    @classmethod
+    def init_at_center(cls, *vertices):
+        """
+        Initialize at the center of `vertices`.
+
+        Parameters
+        ----------
+        vertices : :class:`.Vertex`
+            Vertices at whose center this vertex should be initialized.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
+        center = sum(vertex.get_position() for vertex in vertices)
+        center /= len(vertices)
+        return cls(*center)
+
     def apply_scale(self, scale):
         """
         Scale the position of by `scale`.

@@ -49,23 +49,38 @@ class FourPlusSix(CageTopology):
 
     # Vertices of a tetrahdron so that origin is at the origin. Source:
     # http://tinyurl.com/lc262h8.
-    vertices = (
+    _v0, _v1, _v2, _v3 = _vertices = (
         _CageVertex(0, 0, np.sqrt(6)/2),
         _CageVertex(-1, -np.sqrt(3)/3, -np.sqrt(6)/6),
         _CageVertex(1, -np.sqrt(3)/3, -np.sqrt(6)/6),
         _CageVertex(0, 2*np.sqrt(3)/3, -np.sqrt(6)/6)
-
-        
     )
 
-    positions_B = [
-        Edge(v0, v1, (0, 1)),
-        Edge(v0, v2, (0, 2)),
-        Edge(v0, v3, (0, 3)),
-        Edge(v1, v2, (1, 2)),
-        Edge(v1, v3, (1, 3)),
-        Edge(v2, v3, (2, 3))
-    ]
+    vertices = (
+        *_vertices,
+        _CageVertex.init_at_center(_v0, _v1),
+        _CageVertex.init_at_center(_v0, _v2),
+        _CageVertex.init_at_center(_v0, _v3),
+        _CageVertex.init_at_center(_v1, _v2),
+        _CageVertex.init_at_center(_v1, _v3),
+        _CageVertex.init_at_center(_v2, _v3)
+
+    )
+
+    edges = (
+        Edge(vertices[4], vertices[0]),
+        Edge(vertices[4], vertices[1]),
+        Edge(vertices[5], vertices[0]),
+        Edge(vertices[5], vertices[2]),
+        Edge(vertices[6], vertices[0]),
+        Edge(vertices[6], vertices[3]),
+        Edge(vertices[7], vertices[1]),
+        Edge(vertices[7], vertices[2]),
+        Edge(vertices[8], vertices[1]),
+        Edge(vertices[8], vertices[3]),
+        Edge(vertices[9], vertices[2]),
+        Edge(vertices[9], vertices[3])
+    )
 
     num_windows = 4
     num_window_types = 1
@@ -77,26 +92,41 @@ class FourPlusSix2(CageTopology):
 
     """
 
-    positions_A = a, b, c, d = [
-        Vertex(1, 0, 1),
-        Vertex(-1, 0, 1),
-        Vertex(1, 0, -1),
-        Vertex(-1, 0, -1)
-    ]
+    _vertices = (
+        _CageVertex(1, 0, 1),
+        _CageVertex(-1, 0, 1),
+        _CageVertex(1, 0, -1),
+        _CageVertex(-1, 0, -1),
 
-    positions_B = e1, e2, e3, e4, e5, e6 = [
-        Edge(a, b, 'a', True),
-        Edge(a, b, 'b', True),
-        Edge(c, d, 'e', True),
-        Edge(c, d, 'f', True),
-        Edge(a, c, 'd'),
-        Edge(b, d, 'c')
-    ]
+        _CageVertex(0, -1, 1),
+        _CageVertex(0, 1, 1),
+        _CageVertex(0, -1, -1),
+        _CageVertex(0, 1, -1)
+    )
 
-    e1.coord = np.array([0, -1, 1])
-    e2.coord = np.array([0, 1, 1])
-    e3.coord = np.array([0, -1, -1])
-    e4.coord = np.array([0, 1, -1])
+    vertices = (
+        *_vertices,
+        _CageVertex.init_at_center(_vertices[0], _vertices[2]),
+        _CageVertex.init_at_center(_vertices[1], _vertices[3])
+    )
+
+    edges = (
+        Edge(vertices[4], vertices[0]),
+        Edge(vertices[4], vertices[1]),
+        Edge(vertices[5], vertices[0]),
+        Edge(vertices[5], vertices[1]),
+        Edge(vertices[6], vertices[2]),
+        Edge(vertices[6], vertices[3]),
+        Edge(vertices[7], vertices[2]),
+        Edge(vertices[7], vertices[3]),
+        Edge(vertices[8], vertices[0]),
+        Edge(vertices[8], vertices[2]),
+        Edge(vertices[9], vertices[1]),
+        Edge(vertices[9], vertices[3])
+    )
+
+    num_windows = 4
+    num_window_types = 2
 
 
 class SixPlusNine(CageTopology):
@@ -106,29 +136,50 @@ class SixPlusNine(CageTopology):
     """
 
     # source: http://eusebeia.dyndns.org/4d/prism3
-    positions_A = a, b, c, d, e, f = [
-        Vertex(-1, -1/np.sqrt(3), -1),
-        Vertex(-1, -1/np.sqrt(3), 1),
-        Vertex(1, -1/np.sqrt(3), -1),
-        Vertex(1, -1/np.sqrt(3), 1),
-        Vertex(0, 2/np.sqrt(3), -1),
-        Vertex(0, 2/np.sqrt(3), 1)
-    ]
+    _vertices = (
+        _CageVertex(-1, -1/np.sqrt(3), -1),
+        _CageVertex(-1, -1/np.sqrt(3), 1),
+        _CageVertex(1, -1/np.sqrt(3), -1),
+        _CageVertex(1, -1/np.sqrt(3), 1),
+        _CageVertex(0, 2/np.sqrt(3), -1),
+        _CageVertex(0, 2/np.sqrt(3), 1)
+    )
+    vertices = (
+        *_vertices,
+        _CageVertex.init_at_center(_vertices[0], _vertices[1]),
+        _CageVertex.init_at_center(_vertices[0], _vertices[2]),
+        _CageVertex.init_at_center(_vertices[2], _vertices[3]),
+        _CageVertex.init_at_center(_vertices[1], _vertices[3]),
+        _CageVertex.init_at_center(_vertices[0], _vertices[4]),
+        _CageVertex.init_at_center(_vertices[2], _vertices[4]),
+        _CageVertex.init_at_center(_vertices[1], _vertices[5]),
+        _CageVertex.init_at_center(_vertices[3], _vertices[5]),
+        _CageVertex.init_at_center(_vertices[4], _vertices[5])
+    )
 
-    positions_B = [
-        Edge(a, b),
-        Edge(a, c),
-        Edge(c, d),
-        Edge(b, d),
-        Edge(a, e),
-        Edge(c, e),
-        Edge(b, f),
-        Edge(d, f),
-        Edge(e, f)
-    ]
+    edges = (
+        Edge(vertices[6], vertices[0]),
+        Edge(vertices[6], vertices[1]),
+        Edge(vertices[7], vertices[0]),
+        Edge(vertices[7], vertices[2]),
+        Edge(vertices[8], vertices[2]),
+        Edge(vertices[8], vertices[3]),
+        Edge(vertices[9], vertices[1]),
+        Edge(vertices[9], vertices[3]),
+        Edge(vertices[10], vertices[0]),
+        Edge(vertices[10], vertices[4]),
+        Edge(vertices[11], vertices[2]),
+        Edge(vertices[11], vertices[4]),
+        Edge(vertices[12], vertices[1]),
+        Edge(vertices[12], vertices[5]),
+        Edge(vertices[13], vertices[3]),
+        Edge(vertices[13], vertices[5]),
+        Edge(vertices[14], vertices[4]),
+        Edge(vertices[14], vertices[5])
+    )
 
-    n_windows = 5
-    n_window_types = 1
+    num_windows = 5
+    num_window_types = 1
 
 
 class EightPlusTwelve(CageTopology):
@@ -137,38 +188,78 @@ class EightPlusTwelve(CageTopology):
 
     """
 
-    positions_A = a, b, c, d, e, f, g, h = [
-        Vertex(-1, 1, -1),
-        Vertex(-1, -1, -1),
-        Vertex(1, 1, -1),
-        Vertex(1, -1, -1),
+    _vertices = (
+        _CageVertex(-1, 1, -1),
+        _CageVertex(-1, -1, -1),
+        _CageVertex(1, 1, -1),
+        _CageVertex(1, -1, -1),
 
-        Vertex(-1, 1, 1),
-        Vertex(-1, -1, 1),
-        Vertex(1, 1, 1),
-        Vertex(1, -1, 1)
-    ]
+        _CageVertex(-1, 1, 1),
+        _CageVertex(-1, -1, 1),
+        _CageVertex(1, 1, 1),
+        _CageVertex(1, -1, 1)
+    )
 
-    positions_B = [
-        Edge(a, c),
-        Edge(a, b),
-        Edge(b, d),
-        Edge(c, d),
+    vertices = (
+        *_vertices,
 
-        Edge(e, g),
-        Edge(e, f),
-        Edge(f, h),
-        Edge(g, h),
+        _CageVertex.init_at_center(_vertices[0], _vertices[2]),
+        _CageVertex.init_at_center(_vertices[0], _vertices[1]),
+        _CageVertex.init_at_center(_vertices[1], _vertices[3]),
+        _CageVertex.init_at_center(_vertices[2], _vertices[3]),
 
+        _CageVertex.init_at_center(_vertices[4], _vertices[6]),
+        _CageVertex.init_at_center(_vertices[4], _vertices[5]),
+        _CageVertex.init_at_center(_vertices[5], _vertices[7]),
+        _CageVertex.init_at_center(_vertices[6], _vertices[7]),
 
-        Edge(a, e),
-        Edge(b, f),
-        Edge(c, g),
-        Edge(d, h)
-    ]
+        _CageVertex.init_at_center(_vertices[0], _vertices[4]),
+        _CageVertex.init_at_center(_vertices[1], _vertices[5]),
+        _CageVertex.init_at_center(_vertices[2], _vertices[6]),
+        _CageVertex.init_at_center(_vertices[3], _vertices[7])
+    )
 
-    n_windows = 6
-    n_window_types = 1
+    edges = (
+        Edge(vertices[8], vertices[0]),
+        Edge(vertices[8], vertices[2]),
+
+        Edge(vertices[9], vertices[0]),
+        Edge(vertices[9], vertices[1]),
+
+        Edge(vertices[10], vertices[1]),
+        Edge(vertices[10], vertices[3]),
+
+        Edge(vertices[11], vertices[2]),
+        Edge(vertices[11], vertices[3]),
+
+        Edge(vertices[12], vertices[4]),
+        Edge(vertices[12], vertices[6]),
+
+        Edge(vertices[13], vertices[4]),
+        Edge(vertices[13], vertices[5]),
+
+        Edge(vertices[14], vertices[5]),
+        Edge(vertices[14], vertices[7]),
+
+        Edge(vertices[15], vertices[6]),
+        Edge(vertices[15], vertices[7]),
+
+        Edge(vertices[16], vertices[0]),
+        Edge(vertices[16], vertices[4]),
+
+        Edge(vertices[17], vertices[1]),
+        Edge(vertices[17], vertices[5]),
+
+        Edge(vertices[18], vertices[2]),
+        Edge(vertices[18], vertices[6]),
+
+        Edge(vertices[19], vertices[3]),
+        Edge(vertices[19], vertices[7])
+
+    )
+
+    num_windows = 6
+    num_window_types = 1
 
 
 class Dodecahedron(CageTopology):
@@ -178,44 +269,151 @@ class Dodecahedron(CageTopology):
     """
 
     # Source: http://tinyurl.com/h2dl949
-    phi = (1 + np.sqrt(5))/2
-    x = 1.5
-    positions_A = [
-        Vertex(x*phi, 0.0, x/phi),
-        Vertex(x*-phi, 0.0, x/phi),
-        Vertex(x*-phi, 0.0, x/-phi),
-        Vertex(x*phi, 0.0, x/-phi),
+    _phi = (1 + np.sqrt(5))/2
+    _x = 1.5
+    _vertices = (
+        _CageVertex(_x*_phi, 0.0, _x/_phi),
+        _CageVertex(_x*-_phi, 0.0, _x/_phi),
+        _CageVertex(_x*-_phi, 0.0, _x/-_phi),
+        _CageVertex(_x*_phi, 0.0, _x/-_phi),
 
-        Vertex(x/phi, x*phi, 0.0),
-        Vertex(x/phi, x*-phi, 0.0),
-        Vertex(x/-phi, x*-phi, 0.0),
-        Vertex(x/-phi, x*phi, 0.0),
-        Vertex(0.0, x/phi, x*phi),
-        Vertex(0.0, x/phi, x*-phi),
-        Vertex(0.0, x/-phi, x*-phi),
-        Vertex(0.0, x/-phi, x*phi),
+        _CageVertex(_x/_phi, _x*_phi, 0.0),
+        _CageVertex(_x/_phi, _x*-_phi, 0.0),
+        _CageVertex(_x/-_phi, _x*-_phi, 0.0),
+        _CageVertex(_x/-_phi, _x*_phi, 0.0),
+        _CageVertex(0.0, _x/_phi, _x*_phi),
+        _CageVertex(0.0, _x/_phi, _x*-_phi),
+        _CageVertex(0.0, _x/-_phi, _x*-_phi),
+        _CageVertex(0.0, _x/-_phi, _x*_phi),
 
-        Vertex(x, x, x),
-        Vertex(x, -x, x),
-        Vertex(-x, -x, x),
-        Vertex(-x, x, x),
-        Vertex(-x, x, -x),
-        Vertex(x, x, -x),
-        Vertex(x, -x, -x),
-        Vertex(-x, -x, -x)
-    ]
+        _CageVertex(_x, _x, _x),
+        _CageVertex(_x, -_x, _x),
+        _CageVertex(-_x, -_x, _x),
+        _CageVertex(-_x, _x, _x),
+        _CageVertex(-_x, _x, -_x),
+        _CageVertex(_x, _x, -_x),
+        _CageVertex(_x, -_x, -_x),
+        _CageVertex(-_x, -_x, -_x)
+    )
 
-    A, B, C, D, E, F, G, *_ = positions_A
-    H, I, J, K, L, M, N, O, P, Q, R, S, T = _
+    vertices = (
+        *_vertices,
+        _CageVertex.init_at_center(_vertices[0], _vertices[13]),
+        _CageVertex.init_at_center(_vertices[0], _vertices[12]),
+        _CageVertex.init_at_center(_vertices[0], _vertices[3]),
 
-    positions_B = [
-        Edge(A, N), Edge(A, M), Edge(A, D), Edge(B, O), Edge(B, P),
-        Edge(B, C), Edge(C, T), Edge(C, Q), Edge(D, S), Edge(D, R),
-        Edge(E, M), Edge(E, H), Edge(E, R), Edge(F, G), Edge(F, S),
-        Edge(F, N), Edge(G, O), Edge(G, T), Edge(H, P), Edge(H, Q),
-        Edge(I, L), Edge(I, M), Edge(I, P), Edge(J, K), Edge(J, R),
-        Edge(J, Q), Edge(K, S), Edge(K, T), Edge(L, O), Edge(L, N)
-    ]
+        _CageVertex.init_at_center(_vertices[1], _vertices[14]),
+        _CageVertex.init_at_center(_vertices[1], _vertices[15]),
+        _CageVertex.init_at_center(_vertices[1], _vertices[2]),
 
-    n_windows = 12
-    n_window_types = 1
+        _CageVertex.init_at_center(_vertices[2], _vertices[19]),
+        _CageVertex.init_at_center(_vertices[2], _vertices[16]),
+
+        _CageVertex.init_at_center(_vertices[3], _vertices[18]),
+        _CageVertex.init_at_center(_vertices[3], _vertices[17]),
+
+        _CageVertex.init_at_center(_vertices[4], _vertices[12]),
+        _CageVertex.init_at_center(_vertices[4], _vertices[7]),
+        _CageVertex.init_at_center(_vertices[4], _vertices[17]),
+
+        _CageVertex.init_at_center(_vertices[5], _vertices[6]),
+        _CageVertex.init_at_center(_vertices[5], _vertices[18]),
+        _CageVertex.init_at_center(_vertices[5], _vertices[13]),
+
+        _CageVertex.init_at_center(_vertices[6], _vertices[14]),
+        _CageVertex.init_at_center(_vertices[6], _vertices[19]),
+
+        _CageVertex.init_at_center(_vertices[7], _vertices[15]),
+        _CageVertex.init_at_center(_vertices[7], _vertices[16]),
+
+        _CageVertex.init_at_center(_vertices[8], _vertices[11]),
+        _CageVertex.init_at_center(_vertices[8], _vertices[12]),
+        _CageVertex.init_at_center(_vertices[8], _vertices[15]),
+
+        _CageVertex.init_at_center(_vertices[9], _vertices[10]),
+        _CageVertex.init_at_center(_vertices[9], _vertices[17]),
+        _CageVertex.init_at_center(_vertices[9], _vertices[16]),
+
+        _CageVertex.init_at_center(_vertices[10], _vertices[18]),
+        _CageVertex.init_at_center(_vertices[10], _vertices[19]),
+
+        _CageVertex.init_at_center(_vertices[11], _vertices[14]),
+        _CageVertex.init_at_center(_vertices[11], _vertices[13])
+    )
+
+    edges = (
+        Edge(_vertices[20], _vertices[0]),
+        Edge(_vertices[20], _vertices[13]),
+        Edge(_vertices[21], _vertices[0]),
+        Edge(_vertices[21], _vertices[12]),
+        Edge(_vertices[22], _vertices[0]),
+        Edge(_vertices[22], _vertices[3]),
+
+        Edge(_vertices[23], _vertices[1]),
+        Edge(_vertices[23], _vertices[14]),
+        Edge(_vertices[24], _vertices[1]),
+        Edge(_vertices[24], _vertices[15]),
+        Edge(_vertices[25], _vertices[1]),
+        Edge(_vertices[25], _vertices[2]),
+
+        Edge(_vertices[26], _vertices[2]),
+        Edge(_vertices[26], _vertices[19]),
+        Edge(_vertices[27], _vertices[2]),
+        Edge(_vertices[27], _vertices[16]),
+
+        Edge(_vertices[28], _vertices[3]),
+        Edge(_vertices[28], _vertices[18]),
+        Edge(_vertices[29], _vertices[3]),
+        Edge(_vertices[29], _vertices[17]),
+
+        Edge(_vertices[30], _vertices[4]),
+        Edge(_vertices[30], _vertices[12]),
+        Edge(_vertices[31], _vertices[4]),
+        Edge(_vertices[31], _vertices[7]),
+        Edge(_vertices[32], _vertices[4]),
+        Edge(_vertices[32], _vertices[17]),
+
+        Edge(_vertices[33], _vertices[5]),
+        Edge(_vertices[33], _vertices[6]),
+        Edge(_vertices[34], _vertices[5]),
+        Edge(_vertices[34], _vertices[18]),
+        Edge(_vertices[35], _vertices[5]),
+        Edge(_vertices[35], _vertices[13]),
+
+        Edge(_vertices[36], _vertices[6]),
+        Edge(_vertices[36], _vertices[14]),
+        Edge(_vertices[37], _vertices[6]),
+        Edge(_vertices[37], _vertices[19]),
+
+        Edge(_vertices[38], _vertices[7]),
+        Edge(_vertices[38], _vertices[15]),
+        Edge(_vertices[39], _vertices[7]),
+        Edge(_vertices[39], _vertices[16]),
+
+        Edge(_vertices[40], _vertices[8]),
+        Edge(_vertices[40], _vertices[11]),
+        Edge(_vertices[41], _vertices[8]),
+        Edge(_vertices[41], _vertices[12]),
+        Edge(_vertices[42], _vertices[8]),
+        Edge(_vertices[42], _vertices[15]),
+
+        Edge(_vertices[43], _vertices[9]),
+        Edge(_vertices[43], _vertices[10]),
+        Edge(_vertices[44], _vertices[9]),
+        Edge(_vertices[44], _vertices[17]),
+        Edge(_vertices[45], _vertices[9]),
+        Edge(_vertices[45], _vertices[16]),
+
+        Edge(_vertices[46], _vertices[10]),
+        Edge(_vertices[46], _vertices[18]),
+        Edge(_vertices[47], _vertices[10]),
+        Edge(_vertices[47], _vertices[19]),
+
+        Edge(_vertices[48], _vertices[11]),
+        Edge(_vertices[48], _vertices[14]),
+        Edge(_vertices[49], _vertices[11]),
+        Edge(_vertices[49], _vertices[13])
+    )
+
+    num_windows = 12
+    num_window_types = 1
