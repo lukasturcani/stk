@@ -93,7 +93,7 @@ class _CageVertex(Vertex):
             atom_ids=building_block.get_bonder_ids()
         )
         fg_centroid = building_block.get_centroid(
-            atom_ids=building_block.func_groups[0].get_atom_ids()
+            atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._coord
         edge_coord = self.aligner_edge.get_position()
@@ -103,6 +103,7 @@ class _CageVertex(Vertex):
             target=target,
             origin=self._coord
         )
+        return building_block.get_position_matrix()
 
     def _place_nonlinear_building_block(self, building_block):
         """
@@ -133,7 +134,7 @@ class _CageVertex(Vertex):
             origin=self._coord
         )
         fg_centroid = building_block.get_centroid(
-            atom_ids=building_block.func_groups[0].get_atom_ids()
+            atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._coord
         edge_coord = self.aligner_edge.get_position()
