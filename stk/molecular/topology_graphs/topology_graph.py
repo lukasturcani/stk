@@ -224,12 +224,17 @@ class Vertex:
             edge_positions.append(self.edges[edge_id].get_position())
         return np.sum(edge_positions, axis=0) / i
 
-    def _get_edge_plane_normal(self, edge_ids=None):
+    def _get_edge_plane_normal(self, reference, edge_ids=None):
         """
         Get the normal to the plane on which the :attr:`edges` lie.
 
         Parameters
         ----------
+        reference : :class:`numpy.ndarray`
+            A reference direction vector. The direction of the returned
+            normal is set such that its angle with with `reference`
+            is always acute.
+
         edge_ids : :class:`iterable` of :class:`int`
             The ids of edges which are used to calculate the plane.
             If there are more than three, a plane of best fit across
@@ -268,7 +273,8 @@ class Vertex:
 
         centroid = np.sum(edge_positions, axis=0) / i
         normal = np.linalg.svd(edge_positions - centroid)[-1][2, :]
-        if vector_theta(normal, centroid) > np.pi/2:
+
+        if vector_theta(normal, reference) > np.pi/2:
             normal *= -1
         return normal
 

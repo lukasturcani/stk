@@ -136,7 +136,9 @@ class _CageVertex(Vertex):
             position=self._coord,
             atom_ids=building_block.get_bonder_ids()
         )
-        edge_normal = self._get_edge_plane_normal()
+        edge_normal = self._get_edge_plane_normal(
+            reference=self._get_edge_centroid()
+        )
         building_block.apply_rotation_between_vectors(
             start=building_block.get_bonder_plane_normal(),
             target=edge_normal,
@@ -287,7 +289,7 @@ class _CageVertex(Vertex):
         # This axis is used to figure out the clockwise direction.
         axis = np.cross(
             aligner_edge_coord-edge_centroid,
-            self._get_edge_plane_normal()
+            self._get_edge_plane_normal(self._get_edge_centroid())
         )
 
         def angle(edge):
