@@ -103,6 +103,15 @@ class _CageVertex(Vertex):
             target=target,
             origin=self._coord
         )
+        start = building_block.get_centroid_centroid_direction_vector()
+        e0_coord = self.edges[0].get_position()
+        e1_coord = self.edges[1].get_position()
+        building_block.apply_rotation_to_minimize_theta(
+            start=start,
+            target=self._coord,
+            axis=e0_coord-e1_coord,
+            origin=self._coord,
+        )
         return building_block.get_position_matrix()
 
     def _place_nonlinear_building_block(self, building_block):
