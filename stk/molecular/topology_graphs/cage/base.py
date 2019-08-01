@@ -89,28 +89,28 @@ class _CageVertex(Vertex):
         """
 
         building_block.set_centroid(
-            position=self._coord,
+            position=self._position,
             atom_ids=building_block.get_bonder_ids()
         )
         fg_centroid = building_block.get_centroid(
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
-        start = fg_centroid - self._coord
+        start = fg_centroid - self._position
         edge_coord = self.aligner_edge.get_position()
         target = edge_coord - self._get_edge_centroid()
         building_block.apply_rotation_between_vectors(
             start=start,
             target=target,
-            origin=self._coord
+            origin=self._position
         )
         start = building_block.get_centroid_centroid_direction_vector()
         e0_coord = self.edges[0].get_position()
         e1_coord = self.edges[1].get_position()
         building_block.apply_rotation_to_minimize_theta(
             start=start,
-            target=self._coord,
+            target=self._position,
             axis=e0_coord-e1_coord,
-            origin=self._coord,
+            origin=self._position,
         )
         return building_block.get_position_matrix()
 
@@ -133,7 +133,7 @@ class _CageVertex(Vertex):
         """
 
         building_block.set_centroid(
-            position=self._coord,
+            position=self._position,
             atom_ids=building_block.get_bonder_ids()
         )
         edge_normal = self._get_edge_plane_normal(
@@ -142,19 +142,19 @@ class _CageVertex(Vertex):
         building_block.apply_rotation_between_vectors(
             start=building_block.get_bonder_plane_normal(),
             target=edge_normal,
-            origin=self._coord
+            origin=self._position
         )
         fg_centroid = building_block.get_centroid(
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
-        start = fg_centroid - self._coord
+        start = fg_centroid - self._position
         edge_coord = self.aligner_edge.get_position()
         target = edge_coord - self._get_edge_centroid()
         building_block.apply_rotation_to_minimize_theta(
             start=start,
             target=target,
             axis=edge_normal,
-            origin=self._coord
+            origin=self._position
         )
         return building_block.get_position_matrix()
 

@@ -102,7 +102,7 @@ class _LinearVertex(Vertex):
             )
 
         building_block.set_centroid(
-            position=self._coord,
+            position=self._position,
             atom_ids=building_block.get_bonder_ids(fg_ids=(0, 1))
         )
         bonder_vector = next(
@@ -116,7 +116,7 @@ class _LinearVertex(Vertex):
         building_block.apply_rotation_between_vectors(
             start=bonder_vector,
             target=[direction, 0, 0],
-            origin=self._coord
+            origin=self._position
         )
         return building_block.get_position_matrix()
 
@@ -152,7 +152,7 @@ class _LinearVertex(Vertex):
         self.edges[1].assign_func_group(fg_map[fg2])
 
     def __repr__(self):
-        x, y, z = self._coord
+        x, y, z = self._position
         cls_name = (
             f'{__name__}.{self.__class__.__name__}'
         )
@@ -210,7 +210,7 @@ class _TerminalVertex(_LinearVertex):
             return super().place_building_block(building_block)
 
         building_block.set_centroid(
-            position=self._coord,
+            position=self._position,
             atom_ids=building_block.get_bonder_ids(fg_ids=(0, )),
         )
         centroid_vector = next(
@@ -220,7 +220,7 @@ class _TerminalVertex(_LinearVertex):
             start=centroid_vector,
             # _cap_direction is defined by a subclass.
             target=[self._cap_direction, 0, 0],
-            origin=self._coord
+            origin=self._position
         )
         return building_block.get_position_matrix()
 

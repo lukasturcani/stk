@@ -54,7 +54,7 @@ class Vertex:
 
         """
 
-        self._coord = np.array([x, y, z], dtype=np.dtype('float64'))
+        self._position = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
 
     @classmethod
@@ -97,7 +97,7 @@ class Vertex:
 
         """
 
-        self._coord *= scale
+        self._position *= scale
         return self
 
     def clone(self, clear_edges=False):
@@ -118,7 +118,7 @@ class Vertex:
         """
 
         clone = self.__class__.__new__(self.__class__)
-        clone._coord = np.array(self._coord)
+        clone._coord = np.array(self._position)
         clone.edges = [] if clear_edges else list(self.edges)
         return clone
 
@@ -133,7 +133,7 @@ class Vertex:
 
         """
 
-        return np.array(self._coord)
+        return np.array(self._position)
 
     def place_building_block(self, building_block):
         """
@@ -282,7 +282,7 @@ class Vertex:
         return repr(self)
 
     def __repr__(self):
-        x, y, z = self._coord
+        x, y, z = self._position
         cls_name = (
             f'{__name__}.{self.__class__.__name__}'
         )
@@ -304,7 +304,7 @@ class Edge:
 
     """
 
-    def __init__(self, *vertices):
+    def __init__(self, *vertices, position=None):
         """
         Initialize an :class:`Edge`.
 
@@ -312,6 +312,10 @@ class Edge:
         ----------
         *vertices : :class:`.Vertex`
             The vertices which the :class:`Edge` connects.
+
+        position : :class:`numpy.ndarray`, optional
+            The position of the edge. If ``None``, the centroid
+            of `vertices` is used.
 
         """
 
@@ -321,11 +325,14 @@ class Edge:
         # connected by the edge.
         self._func_groups = []
 
-        self._coord = 0
-        for i, vertex in enumerate(vertices, 1):
-            vertex.edges.append(self)
-            self._coord += vertex.get_position()
-        self._coord = self._coord / i
+        if position is None:
+            self._position = 0
+            for i, vertex in enumerate(vertices, 1):
+                vertex.edges.append(self)
+                self._position += vertex.get_position()
+            self._position = self._position / i
+        else:
+            self._position = position
 
     def get_func_groups(self):
         """
@@ -369,7 +376,7 @@ class Edge:
 
         """
 
-        return np.array(self._coord)
+        return np.array(self._position)
 
     def __str__(self):
         return repr(self)
