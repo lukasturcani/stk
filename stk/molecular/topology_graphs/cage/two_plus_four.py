@@ -7,7 +7,7 @@ Defines cage topologies from 2 and 4 functionalized building blocks.
 import numpy as np
 
 from .base import CageTopology,  _CageVertex
-from ..topology_grpah import Edge
+from ..topology_graph import Edge
 
 
 class TwoPlusFour(CageTopology):

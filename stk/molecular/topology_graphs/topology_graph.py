@@ -477,6 +477,9 @@ class TopologyGraph:
                 mol=mol,
                 building_blocks=building_blocks
             )
+            mol.building_block_vertices = dict(
+                mol.building_block_vertices
+            )
 
         vertex_clones = self._clone_vertices()
         edge_clones = self._clone_edges(vertex_clones)
