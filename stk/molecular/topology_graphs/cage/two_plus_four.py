@@ -302,7 +302,7 @@ class EightPlusSixteen(CageTopology):
         _CageVertex.init_at_center(_vertices[2], _vertices[6]),
         _CageVertex.init_at_center(_vertices[3], _vertices[6]),
         _CageVertex.init_at_center(_vertices[0], _vertices[7]),
-        _CageVertex.init_at_center(_vertices[1], _vertices[7]),
+        _CageVertex.init_at_center(_vertices[3], _vertices[7]),
 
         _CageVertex.init_at_center(_vertices[0], _vertices[1]),
         _CageVertex.init_at_center(_vertices[1], _vertices[2]),
@@ -338,7 +338,7 @@ class EightPlusSixteen(CageTopology):
         Edge(vertices[14], vertices[0]),
         Edge(vertices[14], vertices[7]),
 
-        Edge(vertices[15], vertices[1]),
+        Edge(vertices[15], vertices[3]),
         Edge(vertices[15], vertices[7]),
 
         Edge(vertices[16], vertices[0]),
