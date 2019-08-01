@@ -251,16 +251,15 @@ class _CageVertex(Vertex):
                 bonder_centroid=bonder_centroid
             )
         )
+
+        num_fgs = len(building_block.func_groups)
         # Make sure that the aligned functional group is first.
         # If the functional group is positioned slightly to the wrong
         # side, it can end up being last.
+        fg_i = 0
         if building_block.func_groups[0] is not func_groups[0]:
-            shifted_func_groups = list(func_groups)
-            for i, func_group in enumerate(func_groups):
-                shifted_i = (i+1) % len(func_groups)
-                shifted_func_groups[shifted_i] = func_groups[i]
-            func_groups = shifted_func_groups
-        assert func_groups[0] is building_block.func_groups[0]
+            fg_i = num_fgs-1
+        assert func_groups[fg_i] is building_block.func_groups[0]
 
         edges = sorted(self.edges, key=self._get_edge_angle())
         # Make sure that the aligner_edge is first.
@@ -269,18 +268,18 @@ class _CageVertex(Vertex):
         aligner_first = all(
             edges[0].get_position() == self.aligner_edge.get_position()
         )
+        edge_i = 0
         if not aligner_first:
-            shifted_edges = list(edges)
-            for i, edge in enumerate(edges):
-                shifted_i = (i+1) % len(edges)
-                shifted_edges[shifted_i] = edges[i]
-            edges = shifted_edges
+            edge_i = num_fgs-1
+        edge0 = edges[edge_i]
         aligner_first = all(
-            edges[0].get_position() == self.aligner_edge.get_position()
+            edge0.get_position() == self.aligner_edge.get_position()
         )
         assert aligner_first
 
-        for func_group, edge in zip(func_groups, edges):
+        for i in range(len(edges)):
+            edge = edges[(edge_i+i) % num_fgs]
+            func_group = func_groups[(fg_i+i) % num_fgs]
             edge.assign_func_group(fg_map[func_group])
 
     @staticmethod
