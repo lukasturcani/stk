@@ -1,12 +1,15 @@
 import stk
 import os
 from os.path import join
-import numpy as np
 
 
 test_dir = 'cage_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
+
+
+def test_dump_and_load():
+    assert False
 
 
 def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
