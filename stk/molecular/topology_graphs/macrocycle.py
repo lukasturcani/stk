@@ -10,7 +10,7 @@ from .topology_graph import TopologyGraph
 from ...utilities import dedupe
 
 
-class Cyclic(TopologyGraph):
+class Macrocycle(TopologyGraph):
     """
     Represents cyclic polymers forming a :class:`.Macrocycle`.
 
@@ -22,7 +22,7 @@ class Cyclic(TopologyGraph):
         index ``0`` in :attr:`.ConstructedMolecule.building_blocks` is
         labelled as ``"A"`` while index ``1`` as ``"B"`` and so on.
 
-    orientation : :class:`tuple` of :class:`float`
+    orientations : :class:`tuple` of :class:`float`
         For each character in the repeating unit, a value between ``0``
         and ``1`` (both inclusive) must be given in a :class:`list`. It
         indicates the probability that each monomer will have its

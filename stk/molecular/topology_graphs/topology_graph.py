@@ -19,7 +19,6 @@ topology graph has the vertices and edges it wants, simply run
 """
 
 import numpy as np
-import re
 from collections import defaultdict
 
 from ..reactor import Reactor
@@ -32,17 +31,25 @@ class Vertex:
 
     Attributes
     ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
     edges : :class:`list` of :class:`.Edge`
         The edges the :class:`Vertex` is connected to.
 
     """
 
-    def __init__(self, x, y, z):
+    def __init__(self, id, x, y, z):
         """
         Initialize a :class:`.Vertex`.
 
         Parameters
         ----------
+        id : :class:`int`
+            The id of the vertex. This should be its index in
+            :attr:`TopologyGraph.vertices`.
+
         x : :class:`float`
             The x coordinate.
 
@@ -54,6 +61,7 @@ class Vertex:
 
         """
 
+        self.id = id
         self._position = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
 
@@ -118,6 +126,7 @@ class Vertex:
         """
 
         clone = self.__class__.__new__(self.__class__)
+        clone.id = self.id
         clone._coord = np.array(self._position)
         clone.edges = [] if clear_edges else list(self.edges)
         return clone
@@ -279,18 +288,11 @@ class Vertex:
         return normal
 
     def __str__(self):
-        return repr(self)
+        x, y, z = self._position
+        return f'Vertex(id={self.id}, position={[x, y, z]})'
 
     def __repr__(self):
-        x, y, z = self._position
-        cls_name = (
-            f'{__name__}.{self.__class__.__name__}'
-        )
-        # Make sure that the name has all the topology_graph submodule
-        # names.
-        p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
-        cls_name = p.findall(cls_name)[0]
-        return f'{cls_name}({x}, {y}, {z})'
+        raise str(self)
 
 
 class Edge:
@@ -326,12 +328,14 @@ class Edge:
         self._func_groups = []
 
         if position is None:
+            self._custom_position = False
             self._position = 0
             for i, vertex in enumerate(vertices, 1):
                 vertex.edges.append(self)
                 self._position += vertex.get_position()
             self._position = self._position / i
         else:
+            self._custom_position = True
             self._position = position
 
     def get_func_groups(self):
@@ -382,15 +386,11 @@ class Edge:
         return repr(self)
 
     def __repr__(self):
-        vertices = ', '.join(repr(v) for v in self.vertices)
-        cls_name = (
-            f'{__name__}.{self.__class__.__name__}'
-        )
-        # Make sure that the name has all the topology_graph submodule
-        # names.
-        p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
-        cls_name = p.findall(cls_name)[0]
-        return f'{cls_name}({vertices})'
+        vertices = ', '.join(str(v.id) for v in self.vertices)
+        if self._custom_position:
+            return f'Edge({vertices}, position={self._position})'
+        else:
+            return f'Edge({vertices})'
 
 
 class TopologyGraph:
@@ -727,3 +727,6 @@ class TopologyGraph:
 
     def __str__(self):
         return repr(self)
+
+    def __repr__(self):
+        raise NotImplementedError()

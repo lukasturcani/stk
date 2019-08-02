@@ -11,6 +11,10 @@ class _CageVertex(Vertex):
 
     Attributes
     ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
     edges : :class:`list` of :class:`.Edge`
         The edges the :class:`Vertex` is connected to.
 
@@ -22,12 +26,16 @@ class _CageVertex(Vertex):
 
     """
 
-    def __init__(self, x, y, z):
+    def __init__(self, id, x, y, z):
         """
         Initialize a :class:`_CageVertex`.
 
         Parameters
         ----------
+        id : :class:`int`
+            The id of the vertex. This should be its index in
+            :attr:`TopologyGraph.vertices`.
+
         x : :class:`float`
             The x coordinate.
 
@@ -40,7 +48,7 @@ class _CageVertex(Vertex):
         """
 
         self.aligner_edge = None
-        super().__init__(x, y, z)
+        super().__init__(id, x, y, z)
 
     def clone(self, clear_edges=False):
         """
@@ -350,6 +358,14 @@ class _CageVertex(Vertex):
 
         return angle
 
+    def __str__(self):
+        x, y, z = self._position
+        return (
+            f'Vertex(id={self.id}, '
+            f'position={[x, y, z]}, '
+            f'aligner_edge={self.edges.index(self.aligner_edge)})'
+        )
+
 
 class CageTopology(TopologyGraph):
     """
@@ -562,4 +578,16 @@ class CageTopology(TopologyGraph):
         return max(
             bb.get_maximum_diameter()
             for bb in mol.building_block_vertices
+        )
+
+    def __repr__(self):
+
+        vertex_alignments = ', '.join(
+            f'Vertex({v.id}): {v.index(v.aligner_edge)}'
+            for v in self.vertices
+        )
+
+        return (
+            f'cage.{self.__class__.__name__}('
+            f'vertex_alignments={vertex_alignments})'
         )

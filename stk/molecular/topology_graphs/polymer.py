@@ -4,7 +4,6 @@ Defines topologies of polymers.
 """
 
 import logging
-import re
 import numpy as np
 
 from .topology_graph import TopologyGraph, Vertex, Edge
@@ -19,17 +18,25 @@ class _LinearVertex(Vertex):
 
     Attributes
     ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
     edges : :class:`list` of :class:`.Edge`
         The edges the :class:`Vertex` is connected to.
 
     """
 
-    def __init__(self, x, y, z, orientation):
+    def __init__(self, id, x, y, z, orientation):
         """
         Initialize a :class:`.LinearVertex`.
 
         Parameters
         ----------
+        id : :class:`int`
+            The id of the vertex. This should be its index in
+            :attr:`TopologyGraph.vertices`.
+
         x : :class:`float`
             The x coordinate.
 
@@ -47,7 +54,7 @@ class _LinearVertex(Vertex):
         """
 
         self._orientation = orientation
-        super().__init__(x, y, z)
+        super().__init__(id, x, y, z)
 
     def clone(self, clear_edges=False):
         """
@@ -151,17 +158,11 @@ class _LinearVertex(Vertex):
         self.edges[0].assign_func_group(fg_map[fg1])
         self.edges[1].assign_func_group(fg_map[fg2])
 
-    def __repr__(self):
+    def __str__(self):
         x, y, z = self._position
-        cls_name = (
-            f'{__name__}.{self.__class__.__name__}'
-        )
-        # Make sure that the name has all the topology_graph submodule
-        # names.
-        p = re.compile(r'.*?topology_graphs\.(.*)', re.DOTALL)
-        cls_name = p.findall(cls_name)[0]
         return (
-            f'{cls_name}({x}, {y}, {z}, '
+            f'Vertex(id={self.id}, '
+            f'position={[x, y, z]}, '
             f'orientation={self._orientation})'
         )
 
@@ -175,6 +176,10 @@ class _TerminalVertex(_LinearVertex):
 
     Attributes
     ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
     edges : :class:`list` of :class:`.Edge`
         The edges the :class:`Vertex` is connected to.
 
@@ -312,27 +317,6 @@ class Linear(TopologyGraph):
 
     Attributes
     ----------
-    repeating_unit : :class:`str`
-        A string specifying the repeating unit of the polymer.
-        For example, ``"AB"`` or ``"ABB"``. Letters are assigned to
-        building block molecules in the order they are passed to
-        :meth:`.ConstructedMolecule.__init__`.
-
-    orientations : :class:`tuple` of :class:`float`
-        For each character in the repeating unit, a value between ``0``
-        and ``1`` (both inclusive) must be given in a :class:`list`. It
-        indicates the probability that each monomer will have its
-        orientation along the chain flipped. If ``0`` then the
-        monomer is guaranteed to not flip. If ``1`` it is
-        guaranteed to flip. This allows the user to create
-        head-to-head or head-to-tail chains, as well as chain with
-        a preference for head-to-head or head-to-tail if a number
-        between ``0`` and ``1`` is chosen.
-
-    n : :class:`int`
-        The number of repeating units which are used to make the
-        polymer.
-
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -374,21 +358,24 @@ class Linear(TopologyGraph):
 
         """
 
-        self.repeating_unit = repeating_unit
-        self.orientations = tuple(orientations)
-        self.n = n
+        # Keep these for __repr__
+        self._repeating_unit = repeating_unit
+        self._orientations = tuple(orientations)
+        self._n = n
 
         head, *body, tail = orientations*n
-        vertices = [_HeadVertex(0, 0, 0, head)]
+        vertices = [_HeadVertex(0, 0, 0, 0, head)]
         edges = []
         for i, orientation in enumerate(body, 1):
             v = _LinearVertex(
-                x=i, y=0, z=0, orientation=orientation
+                id=i, x=i, y=0, z=0, orientation=orientation
             )
             vertices.append(v)
             edges.append(Edge(vertices[i-1], vertices[i]))
 
-        vertices.append(_TailVertex(len(vertices), 0, 0, tail))
+        vertices.append(
+            _TailVertex(len(vertices), len(vertices), 0, 0, tail)
+        )
         edges.append(Edge(vertices[-2], vertices[-1]))
 
         super().__init__(tuple(vertices), tuple(edges), processes)
