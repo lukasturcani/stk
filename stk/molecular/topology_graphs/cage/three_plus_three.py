@@ -1,5 +1,5 @@
 """
-Defines cage topologies of building blocks with 3 functional groups.
+Defines cages made from building blocks with 3 functional groups.
 
 """
 
@@ -11,7 +11,19 @@ from ..topology_graph import Edge
 
 class OnePlusOne(CageTopology):
     """
-    A sandwich cage topology from tri-functionalised building blocks.
+    Represents a capsule cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 
@@ -33,7 +45,19 @@ class OnePlusOne(CageTopology):
 
 class TwoPlusTwo(CageTopology):
     """
-    Tetrahedral cage topology from tri-functionalised building blocks.
+    Represents a tetrahedron cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 
@@ -62,7 +86,19 @@ class TwoPlusTwo(CageTopology):
 
 class FourPlusFour(CageTopology):
     """
-    A square cage topology from tri-functionalised building blocks.
+    Represents a cube cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 

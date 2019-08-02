@@ -1,5 +1,5 @@
 """
-Defines cage topologies from 2 and 4 functionalized building blocks.
+Defines cages made from building blocks with 2 and 4 functional groups.
 
 """
 
@@ -12,7 +12,19 @@ from ..topology_graph import Edge
 
 class TwoPlusFour(CageTopology):
     """
-    Sandwich cage topology from 2 and 4 functionalized building blocks.
+    Represents a capsule cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 
@@ -41,7 +53,19 @@ class TwoPlusFour(CageTopology):
 
 class ThreePlusSix(CageTopology):
     """
-    A cage topology from 2 and 4 functionalized building blocks.
+    Represents a  cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 
@@ -88,7 +112,19 @@ class ThreePlusSix(CageTopology):
 
 class FourPlusEight(CageTopology):
     """
-    A cage topology from 2 and 4 functionalized building blocks.
+    Represents a  cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 
@@ -145,6 +181,21 @@ class FourPlusEight(CageTopology):
 
 
 class FivePlusTen(CageTopology):
+    """
+    Represents a cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
+    """
 
     _c1 = np.cos(2*np.pi/5)
     _c2 = np.cos(np.pi/5)
@@ -210,7 +261,19 @@ class FivePlusTen(CageTopology):
 
 class SixPlusTwelve(CageTopology):
     """
-    A cage topology from 2 and 4 functionalized building blocks.
+    Represents a cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 
@@ -277,6 +340,22 @@ class SixPlusTwelve(CageTopology):
 
 
 class EightPlusSixteen(CageTopology):
+    """
+    Represents a cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
+
+    """
 
     _x = 2
     _vertices = (
@@ -372,7 +451,19 @@ class EightPlusSixteen(CageTopology):
 
 class TenPlusTwenty(CageTopology):
     """
-    A cage topology from 2 and 4 functionalized building blocks.
+    Represents a cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 

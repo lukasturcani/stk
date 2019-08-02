@@ -23,6 +23,22 @@ class _CageVertex(Vertex):
     """
 
     def __init__(self, x, y, z):
+        """
+        Initialize a :class:`_CageVertex`.
+
+        Parameters
+        ----------
+        x : :class:`float`
+            The x coordinate.
+
+        y : :class:`float`
+            The y coordinate.
+
+        z : :class:`float`
+            The z coordinate.
+
+        """
+
         self.aligner_edge = None
         super().__init__(x, y, z)
 
@@ -339,15 +355,94 @@ class CageTopology(TopologyGraph):
     """
     Represents a cage topology graph.
 
+    Cage topologies are added by creating a subclass which defines the
+    :attr:`vertices` and :attr:`edges` of the topology as class
+    attributes.
+
     Attributes
     ----------
     vertices : :class:`tuple` of :class:`.Vertex`
-        A class attribute. It holds vertices used to make a specific
-        cage topology graph. This needs to be defined by a subclass.
+        The vertices which make up the topology graph.
 
     edges : :class:`tuple` of :class:`.Edge`
-        A class attribute. It hold the edges used to make a specific
-        cage topology graph. This needs to be defined by a subclass.
+        The edges which make up the topology graph.
+
+    Examples
+    --------
+    :class:`CageTopology` instances can be made without supplying
+    additional arguments (using :class:`.FourPlusSix` as an example)
+
+    .. code-block:: python
+
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', ['amine'])
+        bb2 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
+        cage1 = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2],
+            topology_graph=stk.cage.FourPlusSix()
+        )
+
+    Different structural isomers of cages can be made by using the
+    `vertex_alignments` optional parameter
+
+    .. code-block:: python
+
+        v0 = stk.FourPlusSix.vertices[0]
+        v2 = stk.FourPlusSix.vertices[2]
+        tetrahedron = stk.cage.FourPlusSix(
+            vertex_alignments={
+                v0: v0.edges[1],
+                v2: v2.edges[2]
+            }
+        )
+        cage2 = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2],
+            topology_graph=tetrahedron
+        )
+
+    By changing which edge each vertex is aligned with, a different
+    structural isomer of the cage can be formed.
+
+    Note the in the `vertex_alignments` parameter the class vertices
+    and edges are used, however when the `building_block_vertices`
+    parameter is used, the instance vertices are used. **These are not
+    interchangeable!**
+
+    .. code-block:: python
+
+        # Use the class vertices and edges to set vertex_alignments
+        # and create a topology graph.
+        v0 = stk.FourPlusSix.vertices[0]
+        v2 = stk.FourPlusSix.vertices[2]
+        tetrahedron = stk.cage.FourPlusSix(
+            vertex_alignments={
+                v0: v0.edges[1],
+                v2: v2.edges[2]
+            }
+        )
+        bb3 = stk.BuildingBlock('NCOCN', ['amine'])
+        cage2 = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2, bb3],
+            topology_graph=tetrahedron
+            # Use the instance vertices in the building_block_vertices
+            # parameter.
+            building_block_vertices={
+                bb1: tetrahedron.vertices[:2],
+                bb2: tetrahedron.vertices[4:],
+                bb3: tetrahedron.vertices[2:4]
+            }
+        )
+
+    The example above also demonstrates how cages with many building
+    blocks can be built. You can add as many :class:`.BuildingBlock`
+    instances into `building_blocks` as you like. If you do not
+    assign where each building block is placed with
+    `building_block_vertices`, they will be placed on the
+    :atttr:`vertices` of the :class:`.CageTopology` at random. Random
+    placement will account for the fact that the length of
+    :attr:`.BuildingBlock.func_groups` needs to match the number of
+    edges connected to a vertex.
 
     """
 

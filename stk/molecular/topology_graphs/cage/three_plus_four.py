@@ -1,5 +1,5 @@
 """
-Defines cage topologies from building blocks of 3 and 4 func groups.
+Defines cages made from building blocks with 3 and 4 functional groups.
 
 """
 
@@ -9,7 +9,19 @@ from ..topology_graph import Edge
 
 class SixPlusEight(CageTopology):
     """
-    A cage topology of 3 and 4 functional group building blocks.
+    Represents a rhombinc dodecahedron cage topology graph.
+
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 

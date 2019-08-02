@@ -1,5 +1,5 @@
 """
-Defines cage topologies from 2 and 5 functionalized building blocks.
+Defines cages made from building blocks with 2 and 5 functional groups.
 
 """
 
@@ -11,10 +11,19 @@ from ..topology_graph import Edge
 
 class Icosahedron(CageTopology):
     """
-    Defines the icosahederal, 12+30, topology.
+    Represents a icosahedron cage topology graph.
 
-    This is a topology of cages where 12 building blocks are placed on
-    the vertices and 30 linkers are placed on the edges between them.
+    See :class:`.CageTopology` for more details and examples.
+
+    .. image::
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
     """
 
