@@ -13,7 +13,7 @@ class SixPlusEight(CageTopology):
 
     See :class:`.CageTopology` for more details and examples.
 
-    .. image::
+    .. image:: https://github.com/lukasturcani/stk_images/cages/six_plus_eight.png
 
     Attributes
     ----------

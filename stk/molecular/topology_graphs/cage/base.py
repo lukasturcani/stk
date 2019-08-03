@@ -26,16 +26,12 @@ class _CageVertex(Vertex):
 
     """
 
-    def __init__(self, id, x, y, z):
+    def __init__(self, x, y, z):
         """
         Initialize a :class:`_CageVertex`.
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the vertex. This should be its index in
-            :attr:`TopologyGraph.vertices`.
-
         x : :class:`float`
             The x coordinate.
 
@@ -48,7 +44,31 @@ class _CageVertex(Vertex):
         """
 
         self.aligner_edge = None
-        super().__init__(id, x, y, z)
+        # id will be set automatically by CageTopology. This is because
+        # _CageVertex is defined manually in a subclass of CageTopology
+        # and writing the id for every vertex would be a pain.
+        super().__init__(None, x, y, z)
+
+    @classmethod
+    def init_at_center(cls, *vertices):
+        """
+        Initialize at the center of `vertices`.
+
+        Parameters
+        ----------
+        vertices : :class:`.Vertex`
+            Vertices at whose center this vertex should be initialized.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
+        center = sum(vertex.get_position() for vertex in vertices)
+        center /= len(vertices)
+        return cls(*center)
 
     def clone(self, clear_edges=False):
         """
@@ -461,6 +481,11 @@ class CageTopology(TopologyGraph):
     edges connected to a vertex.
 
     """
+
+    def __init_subclass__(cls, **kwargs):
+        for i, vertex in enumerate(cls.vertices):
+            vertex.id = i
+        return super().__init_subclass__(**kwargs)
 
     def __init__(self, vertex_alignments=None, processes=1):
         """

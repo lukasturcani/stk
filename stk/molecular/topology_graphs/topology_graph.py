@@ -66,12 +66,16 @@ class Vertex:
         self.edges = []
 
     @classmethod
-    def init_at_center(cls, *vertices):
+    def init_at_center(cls, id, *vertices):
         """
         Initialize at the center of `vertices`.
 
         Parameters
         ----------
+        id : :class:`int`
+            The id of the vertex. This should be its index in
+            :attr:`TopologyGraph.vertices`.
+
         vertices : :class:`.Vertex`
             Vertices at whose center this vertex should be initialized.
 
@@ -84,7 +88,7 @@ class Vertex:
 
         center = sum(vertex.get_position() for vertex in vertices)
         center /= len(vertices)
-        return cls(*center)
+        return cls(id, *center)
 
     def apply_scale(self, scale):
         """
@@ -292,7 +296,7 @@ class Vertex:
         return f'Vertex(id={self.id}, position={[x, y, z]})'
 
     def __repr__(self):
-        raise str(self)
+        return str(self)
 
 
 class Edge:
