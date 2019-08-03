@@ -124,7 +124,7 @@ class FourPlusFour(CageTopology):
         Edge(vertices[2], vertices[6]),
         Edge(vertices[2], vertices[3]),
         Edge(vertices[3], vertices[7]),
-        Edge(vertices[4], vertices[7]),
+        Edge(vertices[4], vertices[6]),
         Edge(vertices[4], vertices[5]),
         Edge(vertices[5], vertices[7]),
         Edge(vertices[6], vertices[7])

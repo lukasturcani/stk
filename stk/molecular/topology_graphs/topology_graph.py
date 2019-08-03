@@ -131,7 +131,7 @@ class Vertex:
 
         clone = self.__class__.__new__(self.__class__)
         clone.id = self.id
-        clone._coord = np.array(self._position)
+        clone._position = np.array(self._position)
         clone.edges = [] if clear_edges else list(self.edges)
         return clone
 
@@ -331,16 +331,50 @@ class Edge:
         # connected by the edge.
         self._func_groups = []
 
-        if position is None:
-            self._custom_position = False
-            self._position = 0
-            for i, vertex in enumerate(vertices, 1):
-                vertex.edges.append(self)
-                self._position += vertex.get_position()
-            self._position = self._position / i
-        else:
-            self._custom_position = True
-            self._position = position
+        self._custom_position = position is not None
+        self._position = position
+
+        _position = 0
+        for i, vertex in enumerate(vertices, 1):
+            vertex.edges.append(self)
+
+            if not self._custom_position:
+                _position += vertex.get_position()
+
+        if not self._custom_position:
+            self._position = _position / i
+
+    def clone(self, vertex_map=None):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        vertex_map : :class:`dict`, optional
+            If the clone should hold different :class:`.Vertex`
+            instances, then a :class:`dict` should be provided, which
+            maps vertices in the current :class:`.Edge` to the
+            vertices which should be used in the clone. Only
+            vertices which need to be remapped need to be present in
+            the `vertex_map`.
+
+        Returns
+        -------
+        :class:`Edge`
+            The clone.
+
+        """
+
+        clone = self.__class__.__new__(self.__class__)
+        clone._func_groups = list(self._func_groups)
+        clone._custom_position = self._custom_position
+        clone._position = self._position
+        clone.vertices = tuple(
+            vertex_map.get(vertex, vertex) for vertex in self.vertices
+        )
+        for vertex in clone.vertices:
+            vertex.edges.append(clone)
+        return clone
 
     def get_func_groups(self):
         """
@@ -613,10 +647,7 @@ class TopologyGraph:
 
         edges = []
         for edge in self.edges:
-            vertices = (
-                vertex_clones[vertex] for vertex in edge.vertices
-            )
-            edges.append(Edge(*vertices))
+            edges.append(edge.clone(vertex_clones))
         return edges
 
     def _prepare(self, mol):

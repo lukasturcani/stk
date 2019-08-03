@@ -44,7 +44,9 @@ class TwoPlusFour(CageTopology):
         Edge(vertices[3], vertices[0]),
         Edge(vertices[3], vertices[1]),
         Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[1])
+        Edge(vertices[4], vertices[1]),
+        Edge(vertices[5], vertices[0]),
+        Edge(vertices[5], vertices[1])
     )
 
     num_windows = 4

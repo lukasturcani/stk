@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 
-from ..topology_graph import TopologyGraph, Vertex, Edge
+from ..topology_graph import TopologyGraph, Vertex
 from ....utilities import vector_theta
 
 
@@ -233,16 +233,16 @@ class _CageVertex(Vertex):
         """
 
         if len(building_block.func_groups) == 2:
-            return self._assign_func_groups_to_edges_linear(
+            return self._assign_func_groups_to_linear_edges(
                 building_block=building_block,
                 fg_map=fg_map
             )
-        return self._assign_func_groups_to_edges_nonlinear(
+        return self._assign_func_groups_to_nonlinear_edges(
             building_block=building_block,
             fg_map=fg_map
         )
 
-    def _assign_func_groups_to_edges_linear(
+    def _assign_func_groups_to_linear_edges(
         self,
         building_block,
         fg_map
@@ -267,7 +267,7 @@ class _CageVertex(Vertex):
 
         return distance
 
-    def _assign_func_groups_to_edges_nonlinear(
+    def _assign_func_groups_to_nonlinear_edges(
         self,
         building_block,
         fg_map
@@ -525,10 +525,7 @@ class CageTopology(TopologyGraph):
 
         edge_clones = {}
         for edge in self.edges:
-            vertices = [
-                vertex_clones[vertex] for vertex in edge.vertices
-            ]
-            edge_clones[edge] = Edge(*vertices)
+            edge_clones[edge] = edge.clone(vertex_clones)
 
         for vertex in vertex_clones.values():
             vertex.aligner_edge = edge_clones[vertex.aligner_edge]
@@ -606,9 +603,8 @@ class CageTopology(TopologyGraph):
         )
 
     def __repr__(self):
-
         vertex_alignments = ', '.join(
-            f'Vertex({v.id}): {v.index(v.aligner_edge)}'
+            f'Vertex({v.id}): {v.edges.index(v.aligner_edge)}'
             for v in self.vertices
         )
 
