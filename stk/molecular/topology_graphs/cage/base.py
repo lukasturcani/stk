@@ -589,5 +589,5 @@ class CageTopology(TopologyGraph):
 
         return (
             f'cage.{self.__class__.__name__}('
-            f'vertex_alignments={vertex_alignments})'
+            f'vertex_alignments={{{vertex_alignments}}})'
         )
