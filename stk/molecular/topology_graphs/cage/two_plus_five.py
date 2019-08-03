@@ -9,7 +9,7 @@ from .base import CageTopology, _CageVertex
 from ..topology_graph import Edge
 
 
-class Icosahedron(CageTopology):
+class TwelvePlusThirty(CageTopology):
     """
     Represents a icosahedron cage topology graph.
 
