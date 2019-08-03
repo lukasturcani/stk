@@ -287,92 +287,71 @@ class _CageVertex(Vertex):
         bonder_centroid = building_block.get_centroid(
             atom_ids=building_block.get_bonder_ids()
         )
-        func_groups = sorted(
-            building_block.func_groups,
-            key=self._get_func_group_angle(
-                building_block=building_block,
-                fg0_coord=fg0_coord,
-                bonder_centroid=bonder_centroid
-            )
-        )
-
-        num_fgs = len(building_block.func_groups)
-        # Make sure that the aligned functional group is first.
-        # If the functional group is positioned slightly to the wrong
-        # side, it can end up being last.
-        fg_i = 0
-        if building_block.func_groups[0] is not func_groups[0]:
-            fg_i = num_fgs-1
-        assert func_groups[fg_i] is building_block.func_groups[0]
-
-        edges = sorted(self.edges, key=self._get_edge_angle())
-        # Make sure that the aligner_edge is first.
-        # If the aligner_edge is positioned slightly to the wrong
-        # side, it can end up being last.
-        aligner_first = all(
-            edges[0].get_position() == self.aligner_edge.get_position()
-        )
-        edge_i = 0
-        if not aligner_first:
-            edge_i = num_fgs-1
-        edge0 = edges[edge_i]
-        aligner_first = all(
-            edge0.get_position() == self.aligner_edge.get_position()
-        )
-        assert aligner_first
-
-        for i in range(len(edges)):
-            edge = edges[(edge_i+i) % num_fgs]
-            func_group = func_groups[(fg_i+i) % num_fgs]
-            edge.assign_func_group(fg_map[func_group])
-
-    @staticmethod
-    def _get_func_group_angle(
-        building_block,
-        fg0_coord,
-        bonder_centroid
-    ):
-
-        # This axis is used to figure out the clockwise direction.
         fg0_direction = fg0_coord-bonder_centroid
         axis = np.cross(
             fg0_direction,
             building_block.get_bonder_plane_normal()
         )
 
+        func_groups = sorted(
+            building_block.func_groups,
+            key=self._get_func_group_angle(
+                building_block=building_block,
+                fg0_direction=fg0_direction,
+                bonder_centroid=bonder_centroid,
+                axis=axis
+            )
+        )
+        assert func_groups[0] is building_block.func_groups[0]
+
+        edges = sorted(self.edges, key=self._get_edge_angle(axis))
+        aligner_first = all(
+            edges[0].get_position() == self.aligner_edge.get_position()
+        )
+        assert aligner_first
+
+        for edge, func_group in zip(edges, func_groups):
+            edge.assign_func_group(fg_map[func_group])
+
+    @staticmethod
+    def _get_func_group_angle(
+        building_block,
+        fg0_direction,
+        bonder_centroid,
+        axis
+    ):
+
         def angle(func_group):
             coord = building_block.get_centroid(
                 atom_ids=func_group.get_bonder_ids()
             )
-            theta = vector_theta(fg0_direction, coord-bonder_centroid)
+            fg_direction = coord-bonder_centroid
+            theta = vector_theta(fg0_direction, fg_direction)
 
-            projection = coord @ axis
-            if projection < 0:
+            projection = fg_direction @ axis
+            if theta > 0 and projection < 0:
                 return 2*np.pi - theta
             return theta
 
         return angle
 
-    def _get_edge_angle(self):
+    def _get_edge_angle(self, axis):
 
         aligner_edge_coord = self.aligner_edge.get_position()
         edge_centroid = self._get_edge_centroid()
         # This axis is used to figure out the clockwise direction.
         aligner_edge_direction = aligner_edge_coord - edge_centroid
-        axis = np.cross(
-            aligner_edge_direction,
-            self._get_edge_plane_normal(self._get_edge_centroid())
-        )
 
         def angle(edge):
             coord = edge.get_position()
+            edge_direction = coord - edge_centroid
             theta = vector_theta(
-                vector1=coord - edge_centroid,
+                vector1=edge_direction,
                 vector2=aligner_edge_direction
             )
 
-            projection = coord @ axis
-            if projection < 0:
+            projection = edge_direction @ axis
+            if theta > 0 and projection < 0:
                 return 2*np.pi - theta
             return theta
 
