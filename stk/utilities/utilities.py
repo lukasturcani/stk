@@ -152,10 +152,10 @@ class MAEExtractor:
     all of the conformers found during the search and their energies
     and other data.
 
-    Initializing this class with a MacroMolecule finds that
-    MacroMolecules -out.maegz file and converts it to a .mae file. It
-    then creates and additional .mae file holding only the lowest
-    energy conformer found.
+    Initializing this class with a :class:`.ConstructedMolecule` finds
+    the ``-out.maegz`` file of that :class:`.ConstructedMolecule` and
+    converts it to a ``.mae`` file. It then creates and additional
+    ``.mae`` file holding only the lowest energy conformer found.
 
     Attributes
     ----------
@@ -336,116 +336,6 @@ class MAEExtractor:
                 mae_file.write(maegz_file.read())
 
 
-class AtomicPeriodicBond:
-    """
-    Represents a periodic bond between two atoms.
-
-    Attributes
-    ----------
-    bonder1 : :class:`int`
-        The id of the first atom involved in the bond.
-
-    bonder2 : :class:`int`
-        The id of the second atom involved in the bond.
-
-    bond_type : :class:`rdkit.BondType`
-        The bond type.
-
-    direction : :class:`list` of :class:`int`
-        A 3 member list describing the axes along which the bond is
-        periodic, when going from :attr:`bonder1` to :attr:`bonder2`.
-        For example, ``[1, 0, 0]`` means that the bond is periodic
-        along the x axis in the positive direction.
-
-    """
-
-    def __init__(self, bonder1, bonder2, bond_type, direction):
-        self.bonder1 = bonder1
-        self.bonder2 = bonder2
-        self.bond_type = bond_type
-        self.direction = direction
-
-
-class PeriodicBond:
-    """
-    Represents a periodic bond.
-
-    Parameters
-    ----------
-    fg1 : :class:`.FunctionalGroup`
-        The first functional group involved in the bond.
-
-    fg2 : :class:`.FunctionalGroup`
-        The second functional group involved in the bond.
-
-    direction : :class:`list` of :class:`int`
-        A 3 member list describing the axes along which the bond is
-        periodic, when going from :attr:`fg1` to :attr:`fg2`. For
-        example, ``[1, 0, 0]`` means that the bond is periodic along
-        the x axis in the positive direction.
-
-    Attributes
-    ----------
-    fg1 : :class:`.FunctionalGroup`
-        The first functional group involved in the bond.
-
-    fg2 : :class:`.FunctionalGroup`
-        The second functional group involved in the bond.
-
-    direction : :class:`numpy.ndarray` of :class:`int`
-        A 3 member list describing the axes along which the bond is
-        periodic, when going from `fg1` to `fg2`. For example,
-        ``[1, 0, 0]`` means that the bond is periodic along the x axis
-        in the positive direction.
-
-    """
-
-    def __init__(self, fg1, fg2, direction):
-        self.fg1 = fg1
-        self.fg2 = fg2
-        self.direction = np.array(direction)
-
-    def __str__(self):
-        return (
-            f"PeriodicBond({self.fg1}, {self.fg2}, {self.direction})"
-        )
-
-
-class StopLogging:
-    ...
-
-
-def add_fragment_props(mol, bb_index, mol_index):
-    """
-    Adds properties to `mol` of `bb_index` and `mol_index`.
-
-    Properties called 'bb_index' and 'mol_index' are added to every
-    atom in `mol`.
-
-    Parameters
-    ----------
-    mol : :class:`rdkit.Mol`
-        A molecule which needs to have its atoms tagged.
-
-    bb_index : :class:`int`
-        The index of `mol` within `building_blocks` of some
-        macromolecule.
-
-    mol_index : :class:`int`
-        If `mol` is the 5th molecule of building block with `bb_index`
-        to be added to a macromolecule, `mol_index` is 4.
-
-    Returns
-    -------
-    None : NoneType
-
-    """
-
-    for atom in mol.GetAtoms():
-        atom.SetIntProp('bb_index', bb_index)
-        atom.SetIntProp('mol_index', mol_index)
-
-
 def archive_output():
     """
     Places the ``output`` folder into ``stk_ga_runs``.
@@ -471,25 +361,6 @@ def archive_output():
     num = len(os.listdir('stk_ga_runs'))
     new_dir = os.path.join('stk_ga_runs', str(num))
     os.rename('output', new_dir)
-
-
-def centroid(*coords):
-    """
-    Calculates the centroid of a group of coordinates.
-
-    Parameters
-    ----------
-    *coords : :class:`numpy.ndarray`
-        Any number of numpy arrays holding x, y and z positions.
-
-    Returns
-    -------
-    :class:`numpy.array`
-        The centroid of the coordinates `coords`.
-
-    """
-
-    return sum(coords) / len(coords)
 
 
 def dedupe(iterable, seen=None, key=None):
@@ -874,8 +745,7 @@ def normalize_vector(vector):
 
     """
 
-    v = np.divide(vector, np.linalg.norm(vector))
-    return np.round(v, decimals=4)
+    return np.divide(vector, np.linalg.norm(vector))
 
 
 def remake(mol):
@@ -894,28 +764,23 @@ def remake(mol):
 
     """
 
+    rdkit.Kekulize(mol)
     emol = rdkit.EditableMol(rdkit.Mol())
     for a in mol.GetAtoms():
         new_atom = rdkit.Atom(a.GetAtomicNum())
-        # Set properties.
-        for pname, pval in a.GetPropsAsDict(False, False).items():
-            if isinstance(pval, int):
-                new_atom.SetIntProp(pname, pval)
-            elif isinstance(pval, bool):
-                new_atom.SetBoolProp(pname, pval)
-            else:
-                new_atom.SetProp(pname, pval)
-
         new_atom.SetFormalCharge(a.GetFormalCharge())
         emol.AddAtom(new_atom)
 
     for bond in mol.GetBonds():
-        emol.AddBond(bond.GetBeginAtomIdx(),
-                     bond.GetEndAtomIdx(),
-                     bond.GetBondType())
+        emol.AddBond(
+            beginAtomIdx=bond.GetBeginAtomIdx(),
+            endAtomIdx=bond.GetEndAtomIdx(),
+            order=bond.GetBondType()
+        )
 
     m = emol.GetMol()
-    m.AddConformer(rdkit.Conformer(mol.GetConformer()))
+    if mol.GetConformers():
+        m.AddConformer(rdkit.Conformer(mol.GetConformer()))
 
     for a in m.GetAtoms():
         a.UpdatePropertyCache()
@@ -1149,9 +1014,12 @@ def vector_theta(vector1, vector2):
     denominator = (np.linalg.norm(vector1) * np.linalg.norm(vector2))
     # This if statement prevents returns of NaN due to floating point
     # incurracy.
-    if np.isclose(numerator, denominator, atol=1e-8):
+    term = numerator/denominator
+    if np.isclose(term, 1, atol=1e-8):
         return 0.0
-    return np.arccos(numerator/denominator)
+    if np.isclose(term, -1, atol=1e-8):
+        return 2*np.pi
+    return np.arccos(term)
 
 
 class XTBInvalidSolventError(Exception):
@@ -1175,9 +1043,9 @@ def is_valid_xtb_solvent(gfn_version, solvent):
     :class:`bool`
         ``True`` if solvent is valid.
 
-    See Also
-    --------
-    # https://xtb-docs.readthedocs.io/en/latest/gbsa.html
+    References
+    ----------
+    .. [1] https://xtb-docs.readthedocs.io/en/latest/gbsa.html
 
     """
     if gfn_version == 0:

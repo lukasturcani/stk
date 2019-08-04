@@ -6,5 +6,5 @@
 
 # Some folders get created by tests.
 **/*tests_output
-
+docs/build
 tests/failures.txt

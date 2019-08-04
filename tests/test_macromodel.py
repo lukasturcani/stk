@@ -126,13 +126,13 @@ def test_energy(amine2, macromodel_path):
 
 def test_forcefield_com_exceptions(cc3):
     with pytest.raises(stk.MacroModelInputError):
-        mm = stk.MacroModelForceField(
+        stk.MacroModelForceField(
             macromodel_path='dummy_path',
             maximum_iterations=1000000
         )
 
     with pytest.raises(stk.MacroModelInputError):
-        mm = stk.MacroModelForceField(
+        stk.MacroModelForceField(
             macromodel_path='dummy_path',
             minimum_gradient=0.00001
         )

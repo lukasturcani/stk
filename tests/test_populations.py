@@ -24,7 +24,8 @@ def test_init():
 
     """
 
-    def NewMol(): return stk.MacroMolecule.__new__(stk.MacroMolecule)
+    def NewMol():
+        return stk.ConstructedMolecule.__new__(stk.ConstructedMolecule)
 
     pop = stk.Population(
 
@@ -380,8 +381,8 @@ def test_getitem(generate_population):
     assert all(mol in flat_pop.members for mol in pop)
     # Verify lack of subpopulations.
     assert not flat_pop.populations
-    # An integer index should return a ``MacroMolecule`` instance.
-    assert isinstance(pop[5], stk.MacroMolecule)
+    # An integer index should return a ConstructedMolecule instance.
+    assert isinstance(pop[5], stk.ConstructedMolecule)
     # Non integer slice indices are not supported
     with pytest.raises(TypeError):
         pop[5.5]

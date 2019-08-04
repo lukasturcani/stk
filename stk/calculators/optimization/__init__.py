@@ -2,22 +2,23 @@
 Defines optimizers.
 
 Optimizers are objects used to optimize molecules. Each optimizer is
-initialized with some settings and used to optimize a molecule
+initialized with some settings and can optimize a molecule
 with :meth:`~.Optimizer.optimize`.
 
 .. code-block:: python
 
-    import rdkit.Chem.AllChem as rdkit
-    mol = StructUnit2.smiles_init('NCCCN', ['amine'])
-    mmff = MMFF()
+    import stk
+
+    mol = stk.BuildingBlock('NCCCN', ['amine'])
+    mmff = stk.MMFF()
     mmff.optimize(mol)
 
-    # Optionally, a conformer can be provided.
-    mmff.optimize(mol, conformer=2)
-
-    # Optimizers also work with MacroMolecule objects.
-    polymer = Polymer([mol], Linear('A', [0], n=3))
-    etkdg = ETKDG()
+    # Optimizers also work with ConstructedMolecule objects.
+    polymer = stk.ConstructedMolecule(
+        building_blocks=[mol],
+        topology_graph=stk.polymer.Linear('A', [0], n=3)
+    )
+    etkdg = stk.ETKDG()
     etkdg.optimize(polymer)
 
 Sometimes it is desirable to chain multiple optimizations, one after
@@ -29,7 +30,7 @@ desirable to embed a molecule first, to generate an initial structure.
 
     # Create a new optimizer which chains the previously defined
     # mmff and etkdg optimizers.
-    optimizer_sequence = OptimizerSequence(etkdg, mmff)
+    optimizer_sequence = stk.OptimizerSequence(etkdg, mmff)
 
     # Run each optimizer in sequence.
     optimizer_sequence.optimize(polymer)
@@ -41,7 +42,7 @@ optimized we can use the :attr:`~.Optimizer.use_cache` flag.
 
 .. code-block:: python
 
-    caching_etkdg = ETKDG(use_cache=True)
+    caching_etkdg = stk.ETKDG(use_cache=True)
     # First optimize call runs an optimization.
     caching_etkdg.optimize(polymer)
     # Second call does nothing.
@@ -75,12 +76,11 @@ Extending stk: Making new optimizers.
 
 New optimizers can be made by simply making a class which inherits the
 :class:`.Optimizer` class. In addition to this, the new class must
-define a :meth:`~.Optimizer.optimize` method. The method must take 2
-arguments a mandatory `mol` argument and an optional `conformer`
-argument. :meth:`~.Optimizer.optimize` will take a molecule and change
-its structure in whatever way it likes. Beyond this there are no
-requirements. New optimizers can be added into the :mod:`.optimizers`
-submodule or into a new submodule.
+define a :meth:`~.Optimizer.optimize` method. The method must take 1
+mandatory `mol` parameter. :meth:`~.Optimizer.optimize` will take the
+`mol` and change its structure in whatever way it likes. Beyond this
+there are no requirements. New optimizers can be added into the
+:mod:`.optimizers` submodule or into a new submodule.
 
 """
 

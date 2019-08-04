@@ -20,8 +20,8 @@ setup(name='stk',
           'stk.utilities',
           'stk.molecular',
           'stk.molecular.molecules',
-          'stk.molecular.topologies',
-          'stk.molecular.topologies.cage',
+          'stk.molecular.topology_graphs',
+          'stk.molecular.topology_graphs.cage',
           'stk.calculators',
           'stk.calculators.electronic_property',
           'stk.calculators.energy',
@@ -29,14 +29,12 @@ setup(name='stk',
           'stk.calculators.ga'
       ],
       install_requires=[
-          'networkx',
           'scipy',
           'matplotlib',
-          'scikit-learn',
           'psutil',
-          'pywindowx',
           'pandas',
           'pathos',
-          'seaborn'
+          'seaborn',
+          'numpy'
        ],
       python_requires='>=3.6')

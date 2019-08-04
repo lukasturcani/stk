@@ -1,8 +1,8 @@
 """
 Tests functions which use MOPAC.
 
-These tests are only run when the --macromodel py.test option is used.
-MacroModel is 3rd party software, it does not come with MMEA.
+These tests are only run when the --mopac_path pytest option is used.
+MOPAC is 3rd party software, it does not come with ``stk``.
 
 """
 

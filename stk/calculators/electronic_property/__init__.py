@@ -12,8 +12,8 @@ molecule with :meth:`~.ElectronicPropertyCalculator.dipole_moment`,
 .. code-block:: python
 
     # Electronic property calculators work with any Molecule objects ,
-    # such as StructUnit, Polymer, Cage etc.
-    mol1 = StructUnit(...)
+    # such as BuildingBlock, Polymer, Cage etc.
+    mol1 = BuildingBlock(...)
     mol2 = Cage(...)
     mol3 = Polymer(...)
 

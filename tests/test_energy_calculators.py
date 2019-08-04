@@ -38,7 +38,7 @@ def test_cache_use(amine2):
 def test_formation(polymer, amine2):
     mmff = stk.MMFFEnergy(use_cache=True)
 
-    water = stk.StructUnit.smiles_init('[H]O[H]', name='water')
+    water = stk.BuildingBlock.smiles_init('[H]O[H]')
     products = [water]*3
     formation = stk.FormationEnergy(
                         energy_calculator=mmff,

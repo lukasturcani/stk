@@ -1,52 +1,106 @@
-import os
-from os.path import join
 import stk
-
-test_dir = 'functional_group_tests_output'
-if not os.path.exists(test_dir):
-    os.mkdir(test_dir)
+import itertools as it
 
 
-def test_remove_deleters(tmp_fg):
-    tmp_fg.remove_deleters([1, 2, 15, 55, 100, 300])
-    assert tmp_fg.atom_ids == (8, 1, 2, 40, 3, 29)
-    assert tmp_fg.bonder_ids == (1, 29, 8)
-    assert tmp_fg.deleter_ids == (3, )
+def is_fg_match(fg1, fg2):
+    return (
+        fg1.atoms == fg2.atoms
+        and fg1.bonders == fg2.bonders
+        and fg1.deleters == fg2.deleters
+    )
 
 
-def test_shifted_fg(fg):
-    shifted = fg.shifted_fg(fg.id+1, 20)
-    assert shifted is not fg
-    assert shifted.id == fg.id+1
+def test_get_functional_groups(amine2, aldehyde3):
+    amine = stk.fg_types['amine']
+    aldehyde = stk.fg_types['aldehyde']
 
-    for a1, a2 in zip(fg.atom_ids, shifted.atom_ids):
-        assert a1 + 20 == a2
+    for i, fg in enumerate(amine.get_functional_groups(amine2)):
+        assert any(
+            is_fg_match(fg, other) for other in amine2.func_groups
+        )
+        # Testing both the tuple and the set for length makes it
+        # easier to identify what the problem is.
+        assert len(fg.atoms) == 3
+        assert len(set(fg.atoms)) == 3
 
-    for a1, a2 in zip(fg.bonder_ids, shifted.bonder_ids):
-        assert a1 + 20 == a2
+        assert len(fg.bonders) == 1
+        assert len(set(fg.bonders)) == 1
+        assert fg.bonders[0].__class__ is stk.N
 
-    for a1, a2 in zip(fg.bonder_ids, shifted.bonder_ids):
-        assert a1 + 20 == a2
+        assert len(fg.deleters) == 2
+        assert len(set(fg.deleters)) == 2
+        assert all(a.__class__ is stk.H for a in fg.deleters)
+
+    assert i == 1
+    assert not list(aldehyde.get_functional_groups(amine2))
+
+    for i, fg in enumerate(aldehyde.get_functional_groups(aldehyde3)):
+        assert any(
+            is_fg_match(fg, other) for other in aldehyde3.func_groups
+        )
+        assert len(fg.atoms) == 3
+        assert len(set(fg.atoms)) == 3
+
+        assert len(fg.bonders) == 1
+        assert len(set(fg.bonders)) == 1
+        assert fg.bonders[0].__class__ is stk.C
+
+        assert len(fg.deleters) == 1
+        assert len(set(fg.deleters)) == 1
+        assert fg.deleters[0].__class__ is stk.O
+    assert i == 2
+    assert not list(amine.get_functional_groups(aldehyde3))
 
 
-def test_bi_fg_bb(diol2, difluorene_dibromine):
-    p = stk.Polymer([diol2, difluorene_dibromine],
-                    stk.Linear('ABAB', [1, 1, 0, 0], 4))
-    p.write(join(test_dir, 'diol_difluorene_dibromine.mol'))
+def test_clone(aldehyde3, hydrogen, carbon):
+    fg = aldehyde3.func_groups[0]
+    fg_a0, fg_a1 = fg.atoms[:2]
+    clone = fg.clone({
+        fg_a0: hydrogen,
+        fg_a1: carbon
+    })
+
+    for a0, a1 in it.zip_longest(fg.atoms, clone.atoms):
+        if a0 is fg_a0:
+            assert a1 is hydrogen
+        elif a0 is fg_a1:
+            assert a1 is carbon
+        else:
+            assert a0 is a1
+
+    for a0, a1 in it.zip_longest(fg.bonders, clone.bonders):
+        if a0 is fg_a0:
+            assert a1 is hydrogen
+        elif a0 is fg_a1:
+            assert a1 is carbon
+        else:
+            assert a0 is a1
+
+    for a0, a1 in it.zip_longest(fg.deleters, clone.deleters):
+        if a0 is fg_a0:
+            assert a1 is hydrogen
+        elif a0 is fg_a1:
+            assert a1 is carbon
+        else:
+            assert a0 is a1
 
 
-def test_diol_with_difluorene(diol2, difluorene2):
-    p = stk.Polymer([diol2, difluorene2],
-                    stk.Linear('ABAB', [1, 1, 0, 0], 4))
-    p.write(join(test_dir, 'diol_difluorene.mol'))
+def test_get_atom_ids(aldehyde3):
+    for fg in aldehyde3.func_groups:
+        atoms = it.zip_longest(fg.get_atom_ids(), fg.atoms)
+        for atom_id, atom in atoms:
+            assert atom.id == atom_id
 
 
-def test_boronic_acid_with_diol(boronic_acid2, diol2):
-    p = stk.Polymer([boronic_acid2, diol2],
-                    stk.Linear('ABAB', [1, 1, 0, 0], 4))
-    p.write(join(test_dir, 'boronic_acid_diol.mol'))
+def test_get_bonder_ids(aldehyde3):
+    for fg in aldehyde3.func_groups:
+        bonders = it.zip_longest(fg.get_bonder_ids(), fg.bonders)
+        for bonder_id, bonder in bonders:
+            assert bonder.id == bonder_id
 
 
-def test_phenyl_with_ring_amine(ring_amine):
-    p = stk.Polymer([ring_amine], stk.Linear('A', [1], 8))
-    p.write(join(test_dir, 'ring_amine_ring_amine.mol'))
+def test_get_deleter_ids(aldehyde3):
+    for fg in aldehyde3.func_groups:
+        deleters = it.zip_longest(fg.get_deleter_ids(), fg.deleters)
+        for deleter_id, deleter in deleters:
+            assert deleter.id == deleter_id

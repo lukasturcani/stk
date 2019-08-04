@@ -8,14 +8,13 @@ import os
 from os.path import join
 import numpy as np
 import json
-from glob import iglob
-from pathos.helpers import mp
-import pathos
 import psutil
 from functools import wraps
 import logging
+import pathos
 
-from .utilities import dedupe, OPTIONS
+from .utilities import dedupe
+from .molecular import ConstructedMolecule, Molecule
 
 
 logger = logging.getLogger(__name__)
@@ -35,218 +34,461 @@ class Population:
     their structures optimized in parallel through the
     :meth:`optimize` method.
 
-    The only operations directly implemented by this class are those
-    relevant to its role as a container. It supports all expected and
-    necessary container operations such as iteration, indexing,
-    membership checks (via the ``is in`` operator) as would be
-    expected. Details of the various implementations and a full list of
-    supported operations can be found by examining the included
-    methods.
+    It supports all expected and necessary container operations such as
+    iteration, indexing and membership checks (via the ``is in``
+    operator).
 
     Attributes
     ----------
-    populations : :class:`list` of :class:`Population` instances
-        A list of other instances of the :class:`Population` class.
-        This allows the implementation of subpopulations or
-        evolutionary islands. This attribute is also used for grouping
-        molecules within a given population for organizational
-        purposes.
+    direct_members : :class:`list` of :class:`.Molecule`
+        Held here are direct members of the :class:`Population`.
+        In other words, these are the molecules not held by any
+        subpopulations. As a result, not all members of a
+        :class:`Population` are stored in this attribute.
 
-    members : :class:`list` of :class:`.Molecule` instances
-        Held here are the members of the population which are not held
-        within any subpopulations. This means that not all members of a
-        population are stored in this attribute. To access all members
-        of a population the generator :meth:`all_members` should be
-        used.
+    subpopulations : :class:`list` of :class:`Population`
+        A :class:`list` holding the subpopulations.
+
+    Examples
+    --------
+    A :class:`Population` can be iterated through just like a
+    :class:`list`
+
+    .. code-block:: python
+
+        import stk
+
+        # Create a population.
+        pop = stk.Population(...)
+
+        for member in pop:
+            do_stuff(member)
+
+    When iterating through a :class:`Population` you will also iterate
+    through nested members, that is members which are held by
+    subpopulations. If you only wish to iterate through direct
+    members, you can
+
+    .. code-block:: python
+
+        for member in pop.direct_members:
+            do_stuff(member)
+
+    You can also get access to members by using indices.
+    Indices have access to all members in the population
+
+    .. code-block:: python
+
+        first_member = pop[0]
+        second_member = pop[1]
+
+    Indices will first access direct members of the population and then
+    acess members in the subpopulations. Indices access nested members
+    depth-first
+
+    .. code-block:: python
+
+        pop2 = stk.Population(bb1, bb2, stk.Population(bb3, bb4))
+        # Get bb1.
+        pop2[0]
+        # Get bb2.
+        pop2[1]
+        # Get bb3.
+        pop2[2]
+        # Get bb4.
+        pop2[3]
+
+    You can get a subpopulation by taking a slice
+
+    .. code-block:: python
+
+        # new_pop is a new Population instance and has no nesting.
+        new_pop = pop[2:4]
+
+    You can take the length of a population to get the total number
+    of members
+
+    .. code-block:: python
+
+        len(pop)
+
+    Adding populations creates a new population with both of the added
+    populations as subpopulations
+
+    .. code-block:: python
+
+        # added has no direct members and two subpopulations, pop and
+        # pop2.
+        added = pop + pop2
+
+    Subtracting populations creates a new, flat population.
+
+    .. code-block:: python
+
+        # subbed has all objects in pop except those also found in
+        # pop2.
+        subbed = pop - pop2
+
+    You can check if an object is already present in the population.
+
+    .. code-block:: python
+
+        bb1 = stk.BuildingBlock(...)
+        bb2 = stk.BuildingBlock(...)
+        pop3 = stk.Population(bb1)
+
+        # Returns True.
+        bb1 in pop3
+        # Returns False.
+        bb2 in pop3
+        # Returns True.
+        bb2 not in pop3
 
     """
 
     def __init__(self, *args):
         """
-        Intializes a population.
+        Initialize a :class:`Population`.
 
         Parameters
         ----------
         *args : :class:`.Molecule`, :class:`Population`
             A population is initialized with the :class:`.Molecule` and
-            :class:`Population` instances it should hold. These are
-            placed into the :attr:`members` or :attr:`populations`
-            attributes, respectively.
+            :class:`Population` instances it should hold.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            bb1 = stk.BuildingBlock('CCC')
+            bb2 = stk.BuildingBlock('NCCNCNC')
+            bb3 = stk.BuildingBlock('[Br]CCC[Br]')
+            pop1 = stk.Population(bb1, bb2, bb3)
+
+            bb4 = stk.BuildingBlock('NNCCCN')
+            # pop2 has pop1 as a subpopulation and bb4 as a direct
+            # member.
+            pop2 = stk.Population(pop1, bb4)
 
         """
 
-        self.populations = []
-        self.members = []
+        self.direct_members = []
+        self.subpopulations = []
 
         for arg in args:
             if isinstance(arg, Population):
-                self.populations.append(arg)
+                self.subpopulations.append(arg)
             else:
-                self.members.append(arg)
+                self.direct_members.append(arg)
 
     @classmethod
-    def init_all(cls,
-                 macromol_class,
-                 building_blocks,
-                 topologies,
-                 processes=None,
-                 duplicates=False):
+    def init_all(
+        cls,
+        building_blocks,
+        topology_graphs,
+        processes=None,
+        duplicates=False,
+        use_cache=False
+    ):
         """
-        Creates all possible molecules from provided building blocks.
+        Make all possible molecules from groups of building blocks.
 
         Parameters
         ----------
-        macromol_class : :class:`type`
-            The class of the :class:`.MacroMolecule` objects being
-            built.
-
-        building_blocks : :class:`list`
-            A :class:`list` of the form
+        building_blocks : :class:`list` of :class:`.Molecule`
+            A :class:`list` holding nested building blocks, for
+            example
 
             .. code-block:: python
 
-                building_blocks = [[StructUnit2(), StructUnit2(), ...],
-                                   [StructUnit3(), StructUnit3(), ...],
-                                   [StructUnit2(), StructUnit2(), ...]]
+                bbs1 = [
+                    stk.BuildingBlock(...),
+                    stk.BuildingBlock(...),
+                    ...
+                ]
+                bbs2 = [
+                    stk.ConstructedMolecule(...),
+                    stk.BuildingBlock(...),
+                    ...,
+                ]
+                bbs3 = [
+                    stk.BuildingBlock(...),
+                    stk.BuildingBlock(...),
+                    ...
+                ]
+                building_blocks = [bbs1, bbs2, bbs3]
 
-            To assemble a new :class:`.MacroMolecule`, a
-            :class:`.StructUnit` is picked from each of the sublists
-            in `building_blocks`. The picked :class:`.StructUnit`
-            instances are then supplied to the macromolecule:
+            To construct a new :class:`.ConstructedMolecule`, a
+            :class:`.Molecule` is picked from each of the sublists
+            in `building_blocks`. The picked :class:`.Molecule`
+            instances are then supplied to
+            :class:`.ConstructedMolecule`
 
             .. code-block:: python
 
-                macro_mol = MacroMolecule([pick1, pick2, pick3],
-                                          Topology())
+                # mol is a new ConstructedMolecule. bb1 is selected
+                # from bbs1, bb2 is selected from bbs2 and bb3 is
+                # selected from bbs3.
+                mol = stk.ConstructedMolecule(
+                    building_blocks=[bb1, bb2, bb3],
+                    topology_graph=topology_pick
+                )
 
-            The order of picked :class:`.StructUnit` instances
-            corresponds to the order of the sublists.
+            The order a :class:`.Molecule` instance is given to
+            the :class:`.ConstructedMolecule` is determined by the
+            sublist of `building_blocks` it was picked from. Note that
+            the number of sublists in `building_blocks` is not fixed.
+            It merely has to be compatible with the
+            `topology_graphs`.
 
-        topologies : :class:`list` of :class:`.Topology`
-            The topologies of macromolecules being made.
+        topology_graphs : :class:`list` of :class:`.TopologyGraph`
+            The topology graphs of `.ConstructedMolecule` being made.
 
         processes : :class:`int`, optional
-            The number of parallel processes to create when building
-            the molecules. If ``None``, creates a process for each
-            core on the computer.
+            The number of parallel processes to create when
+            constructing the molecules. If ``None``, creates a process
+            for each core on the computer.
 
         duplicates : :class:`bool`, optional
             If ``False``, duplicate structures are removed from
             the population.
 
+        use_cache : :class:`bool`, optional
+            Toggles use of the molecular cache.
+
         Returns
         -------
         :class:`Population`
-            A population holding all possible macromolecules from
-            assembled from `databases`.
+            A :class:`.Population` holding `.ConstructedMolecule`
+            instances.
+
+        Examples
+        --------
+        Construct all possible cage molecules from some precursors
+
+        .. code-block:: python
+
+            import stk
+
+            amines = [
+                stk.BuildingBlock('NCCCN', ['amine']),
+                stk.BuildingBlock('NCCCCCN', ['amine']),
+                stk.BuildingBlock('NCCOCCN', ['amine']),
+            ]
+            aldehydes = [
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
+                stk.BuildingBlock('O=C(C=O)COCC=O', ['amine']),
+            ]
+            # A total of 9 cages will be created.
+            cages = stk.Population.init_all(
+                building_blocks=[amines, aldehydes],
+                topology_graphs=[stk.cage.FourPlusSix()]
+            )
+
+        Use the constructed cages and a new bunch of building blocks to
+        create all possible cage complexes.
+
+        .. code-block:: python
+
+            encapsulants = [
+                stk.BuildingBlock('[Br][Br]'),
+                stk.BuildingBlock('[F][F]'),
+            ]
+
+            # Every combination of cage and encapsulant.
+            complexes = stk.Population.init_all(
+                building_blocks=[cages, encapsulants],
+                topology_graphs=[stk.host_guest_complex.Complex()]
+            )
 
         """
 
         args = []
-        for *bbs, topology in it.product(*building_blocks, topologies):
+        mols = it.product(*building_blocks, topology_graphs)
+        for *bbs, topology in mols:
             args.append((bbs, topology))
 
-        with mp.Pool(processes) as pool:
-            mols = pool.starmap(macromol_class, args)
+        with pathos.pools.ProcessPool(processes) as pool:
+            mols = pool.map(ConstructedMolecule, args)
 
         # Update the cache.
-        for i, mol in enumerate(mols):
-            # If the molecule did not exist already add it to the
-            # cache.
-            if mol.key not in macromol_class.cache:
-                macromol_class.cache[mol.key] = mol
-            # If the molecule did exist already, use the cached
-            # version.
-            else:
-                mols[i] = macromol_class.cache[mol.key]
+        if use_cache:
+            for i, mol in enumerate(mols):
+                # If the molecule did not exist already, add it to the
+                # cache.
+                if mol._key not in ConstructedMolecule._cache:
+                    ConstructedMolecule._cache[mol._key] = mol
+                # If the molecule did exist already, use the cached
+                # version.
+                else:
+                    mols[i] = ConstructedMolecule._cache[mol._key]
 
         p = cls(*mols)
         if not duplicates:
             p.remove_duplicates()
         return p
 
-    @classmethod
-    def init_copy(cls, population):
+    def clone(self):
         """
-        Makes a copy of `population`
+        Return a clone.
 
-        Molecules in `population` are not copied.
-
-        Parameters
-        ----------
-        population : :class:`Population`
-            The population to copy.
+        The clone will share the :class:`.Molecule` objects, copies of
+        :class:`.Molecule` objects will not be made.
 
         Returns
         -------
         :class:`Population`
-            A copy of `population`.
+            The clone.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            import stk
+
+            # Make an intial population.
+            pop = stk.Population(stk.BuildingBlock('NCCN'))
+            # Make a clone.
+            clone = pop.clone()
 
         """
 
-        copy = cls(*population.members)
-        copy.populations = [
-            cls.init_copy(pop) for pop in population.populations
+        clone = self.__class__(*self.direct_members)
+        clone.subpopulations = [
+            pop.clone() for pop in self.subpopulations
         ]
-        return copy
+        return clone
 
     @classmethod
-    def init_diverse(cls,
-                     macromol_class,
-                     building_blocks,
-                     topologies,
-                     size):
+    def init_diverse(
+        cls,
+        building_blocks,
+        topology_graphs,
+        size,
+        use_cache=False
+    ):
         """
-        Assembles a population of :class:`.MacroMolecule`.
+        Construct a chemically diverse :class:`.Population`.
 
-        All molecules are held in the :attr:`members`.
+        All constructed molecules are held in :attr:`direct_members`.
 
-        From the supplied sublists of building blocks, a random
-        molecule is selected to initialize a :class:`.MacroMolecule`
-        per sublist. The next molecule selected from the same sublist
-        is the one most with the most different Morgan fingerprint. The
-        next molecule is picked at random again and so on. This is done
-        until `size` :class:`.MacroMolecule` instances have been
-        formed.
+        In order to construct a :class:`.ConstructedMolecule`, a random
+        :class:`.Molecule` is selected from each sublist in
+        `building_blocks`. Once the first construction is complete,
+        the next :class:`.Molecule` selected from each sublist is the
+        one with the most different Morgan fingerprint to the prior
+        one. The third construction uses randomly selected
+        :class:`.Molecule` objects again and so on. This is done until
+        `size` :class:`.ConstructedMolecule` instances have been
+        constructed.
 
         Parameters
         ----------
-        macromol_class : :class:`type`
-            The class of :class:`.MacroMolecule` to be assembled.
-
-        building_blocks : :class:`list`
-            A :class:`list` of the form
+        building_blocks : :class:`list` of :class:`.Molecule`
+            A :class:`list` holding nested building blocks, for
+            example
 
             .. code-block:: python
 
-                building_blocks = [[StructUnit2(), StructUnit2(), ...],
-                                   [StructUnit3(), StructUnit3(), ...],
-                                   [StructUnit2(), StructUnit2(), ...]]
+                bbs1 = [
+                    stk.BuildingBlock(...),
+                    stk.BuildingBlock(...),
+                    ...
+                ]
+                bbs2 = [
+                    stk.ConstructedMolecule(...),
+                    stk.BuildingBlock(...),
+                    ...
+                ]
+                bbs3 = [
+                    stk.BuildingBlock(...),
+                    stk.BuildingBlock(...),
+                    ...
+                ]
+                building_blocks = [bbs1, bbs2, bbs3]
 
-            To assemble a new :class:`.MacroMolecule`, a
-            :class:`.StructUnit` is picked from each of the sublists
-            in `building_blocks`. The picked :class:`.StructUnit`
-            instances are then supplied to the macromolecule:
+            To construct a new :class:`.ConstructedMolecule`, a
+            :class:`.Molecule` is picked from each of the sublists
+            in `building_blocks`. The picked :class:`.Molecule`
+            instances are then supplied to the
+            :class:`.ConstructedMolecule`
 
             .. code-block:: python
 
-                macro_mol = MacroMolecule([pick1, pick2, pick3],
-                                          Topology())
+                # mol is a new ConstructedMolecule. bb1 is selected
+                # from bbs1, bb2 is selected from bbs2 and bb3 is
+                # selected from bbs3.
+                mol = stk.ConstructedMolecule(
+                    building_blocks=[bb1, bb2, bb3],
+                    topology_graph=topology_pick
+                )
 
-            The order of picked :class:`.StructUnit` instances
-            corresponds to the order of the sublists.
+            The order a :class:`.Molecule` instance is given to
+            the `constructed_molecule_class` is determined by the
+            sublist of `building_blocks` it was picked from. Note that
+            the number of sublists in `building_blocks` is not fixed.
+            It merely has to be compatible with the
+            `constructed_molecule_class`.
 
-        topolgies : :class:`iterable` of :class:`.Topology`
-            An iterable holding topologies which should be randomly
-            selected during initialization of :class:`.MacroMolecule`.
+        topology_graphs : :class:`iterable` of :class:`.TopologyGraph`
+            An iterable holding topology grpahs which should be
+            randomly selected for the construction of a
+            :class:`.ConstructedMolecule`.
 
         size : :class:`int`
-            The size of the population to be initialized.
+            The desired size of the :class:`.Population`.
+
+        use_cache : :class:`bool`, optional
+            Toggles use of the molecular cache.
 
         Returns
         -------
         :class:`.Population`
-            A population filled with generated molecules.
+            A population filled with the constructed molecules.
+
+        Examples
+        --------
+        Construct a diverse :class:`.Population` of cage
+        molecules from some precursors
+
+        .. code-block:: python
+
+            import stk
+
+            amines = [
+                stk.BuildingBlock('NCCCN', ['amine']),
+                stk.BuildingBlock('NCCCCCN', ['amine']),
+                stk.BuildingBlock('NCCOCCN', ['amine']),
+            ]
+            aldehydes = [
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
+                stk.BuildingBlock('O=C(C=O)COCC=O', ['amine']),
+            ]
+            # A total of 4 cages will be created.
+            cages = stk.Population.init_diverse(
+                building_blocks=[amines, aldehydes],
+                topology_graphs=[stk.cage.FourPlusSix()],
+                size=4
+            )
+
+        Use the constructed cages and a new bunch of building blocks to
+        create some diverse cage complexes.
+
+        .. code-block:: python
+
+            encapsulants = [
+                stk.BuildingBlock('[Br][Br]'),
+                stk.BuildingBlock('[F][F]'),
+            ]
+
+            # 4 combinations of cage and encapsulant.
+            complexes = stk.Population.init_diverse(
+                building_blocks=[cages, encapsulants],
+                topology_graphs=[stk.host_guest_complex.Complex()],
+                size=4
+            )
 
         """
 
@@ -256,37 +498,50 @@ class Population:
         for db in building_blocks:
             np.random.shuffle(db)
 
-        # Go through every possible macromolecule.
-        for *bbs, top in it.product(*building_blocks, topologies):
+        # Go through every possible constructed molecule.
+        for *bbs, top in it.product(*building_blocks, topology_graphs):
 
-            # Generate the random macromolecule.
-            macro_mol = macromol_class(bbs, top)
-            if macro_mol not in pop:
-                pop.members.append(macro_mol)
+            # Generate the random constructed molecule.
+            mol = ConstructedMolecule(
+                building_blocks=bbs,
+                topolog_graph=top,
+                use_cache=use_cache
+            )
+            if mol not in pop:
+                pop.direct_members.append(mol)
 
             if len(pop) == size:
                 break
 
-            # Make an iterators which goes through all rdkit molecules
-            # in the sublists.
-            mol_iters = [(struct_unit.mol for struct_unit in db) for
-                         db in building_blocks]
             # Make a dictionary which maps every rdkit molecule to its
-            # StructUnit, for every sublist in building_blocks.
-            mol_maps = [{struct_unit.mol: struct_unit for struct_unit in db}
-                        for db in building_blocks]
+            # BuildingBlock, for every sublist in building_blocks.
+            mol_maps = [
+                {bb.to_rdkit_mol(): bb for bb in db}
+                for db in building_blocks
+            ]
 
-            # Get the most different StructUnit to the previously
-            # selected one, per sublist. Take index of 1 because the
-            # index of 0 will the molecule itself.
-            diff_mols = [bb.similar_molecules(mols)[1][1] for
-                         bb, mols in zip(bbs, mol_iters)]
-            diff_bbs = [mol_map[mol] for
-                        mol_map, mol in zip(mol_maps, diff_mols)]
+            # Make iterators which go through all rdkit molecules
+            # in the sublists.
+            mol_iters = (mol_map.keys() for mol_map in mol_maps)
 
-            macro_mol = macromol_class(diff_bbs, top)
-            if macro_mol not in pop:
-                pop.members.append(macro_mol)
+            # Get the most different BuildingBlock to the previously
+            # selected one, per sublist.
+            diff_mols = (
+                bb.similar_molecules(mols)[-1][1]
+                for bb, mols in zip(bbs, mol_iters)
+            )
+            diff_bbs = [
+                mol_map[mol]
+                for mol_map, mol in zip(mol_maps, diff_mols)
+            ]
+
+            mol = ConstructedMolecule(
+                building_blocks=diff_bbs,
+                topology_graph=top,
+                use_cache=use_cache
+            )
+            if mol not in pop:
+                pop.direct_members.append(mol)
 
             if len(pop) == size:
                 break
@@ -295,137 +550,214 @@ class Population:
         return pop
 
     @classmethod
-    def init_from_files(cls, folder, moltype, glob_pattern='*'):
+    def init_random(
+        cls,
+        building_blocks,
+        topology_graphs,
+        size,
+        use_cache=False
+    ):
         """
-        Creates a population from files in `folder`.
+        Construct molecules for a random :class:`.Population`.
+
+        All molecules are held in :attr:`direct_members`.
+
+        From the supplied building blocks a random :class:`.Molecule`
+        is selected from each sublist to form a
+        :class:`.ConstructedMolecule`. This is done until `size`
+        :class:`.ConstructedMolecule` objects have been constructed.
 
         Parameters
         ----------
-        folder : :class:`str`
-            The path to a folder holding molecular structure files
-            used to initialize :class:`~.Molecule` objects held by
-            the population.
+        building_blocks : :class:`list` of :class:`.Molecule`
+            A :class:`list` holding nested building blocks, for
+            example
 
-        moltype : :class:`type`
-            An initializer for the molecular structure files. For
-            example, :class:`.StructUnit` or :class:`.StructUnit2`.
-            If `folder` contains ``.json`` dump files of
-            :class:`.MacroMolecule` then :meth:`.Molecule.load` could
-            also be used.
+            .. code-block:: python
 
-        glob_pattern : :class:`str`, optional
-            A glob used for selecting specific files within `folder`.
+                bbs1 = [
+                    stk.BuildingBlock(...),
+                    sk.BuildingBlock(...),
+                    ...
+                ]
+                bbs2 = [
+                    stk.ConstructedMolecule(...),
+                    stk.BuildingBlock(...),
+                    ...
+                ]
+                bbs3 = [
+                    stk.BuildingBlock(...),
+                    stk.BuildingBlock(...),
+                    ...
+                ]
+                building_blocks = [bbs1, bbs2, bbs3]
+
+            To construct a new :class:`.ConstructedMolecule`, a
+            :class:`.Molecule` is picked from each of the sublists
+            in `building_blocks`. The picked :class:`.Molecule`
+            instances are then supplied to
+            :class:`.ConstructedMolecule`
+
+            .. code-block:: python
+
+                # mol is a new ConstructedMolecule. bb1 is selected
+                # from bbs1, bb2 is selected from bbs2 and bb3 is
+                # selected from bbs3.
+                mol = stk.ConstructedMolecule(
+                    building_blocks=[bb1, bb2, bb3],
+                    topology_graph=topology_pick
+                )
+
+            The order a :class:`.Molecule` instance is given to
+            the :class:`.ConstructedMolecule` is determined by the
+            sublist of `building_blocks` it was picked from. Note that
+            the number of sublists in `building_blocks` is not fixed.
+            It merely has to be compatible with the `topology_graphs`.
+
+        topology_graphs : :class:`iterable` of :class:`.TopologyGraph`
+            An :class:`iterable` holding topology graphs which should
+            be randomly selected during initialization of
+            :class:`.ConstructedMolecule`.
+
+        size : :class:`int`
+            The size of the population to be initialized.
+
+        use_cache : :class:`bool`, optional
+            Toggles use of the molecular cache.
+
+        Returns
+        -------
+        :class:`.Population`
+            A population filled with random
+            :class:`.ConstructedMolecule` instances.
+
+        Examples
+        --------
+        Construct 5 random cage molecules from some
+        precursors
+
+        .. code-block:: python
+
+            import stk
+
+            amines = [
+                stk.BuildingBlock('NCCCN', ['amine']),
+                stk.BuildingBlock('NCCCCCN', ['amine']),
+                stk.BuildingBlock('NCCOCCN', ['amine']),
+            ]
+            aldehydes = [
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
+                stk.BuildingBlock('O=C(C=O)COCC=O', ['amine']),
+            ]
+            # A total of 5 cages will be created.
+            cages = stk.Population.init_random(
+                building_blocks=[amines, aldehydes],
+                topology_graphs=[stk.cage.FourPlusSix()]
+            )
+
+        Use the constructed cages and a new bunch of building blocks to
+        create some random cage complexes.
+
+        .. code-block:: python
+
+            encapsulants = [
+                stk.BuildingBlock('[Br][Br]'),
+                stk.BuildingBlock('[F][F]'),
+            ]
+
+            # Random combinations of cage and encapsulant.
+            complexes = stk.Population.init_random(
+                building_blocks=[cages, encapsulants],
+                topology_graphs=[stk.host_guest_complex.Complex()],
+                size=5
+            )
+
+        """
+
+        pop = cls()
+
+        # Shuffle the sublists.
+        for db in building_blocks:
+            np.random.shuffle(db)
+
+        # Go through every possible constructed molecule.
+        for *bbs, top in it.product(*building_blocks, topology_graphs):
+
+            # Generate the random constructed molecule.
+            mol = ConstructedMolecule(
+                building_blocks=bbs,
+                topology_graph=top,
+                use_cache=use_cache
+            )
+            if mol not in pop:
+                pop.direct_members.append(mol)
+
+            if len(pop) == size:
+                break
+
+        assert len(pop) == size
+        return pop
+
+    @classmethod
+    def init_from_list(cls, pop_list):
+        """
+        Initialize a population from a :class:`list` representation.
+
+        Parameters
+        ----------
+        pop_list : :class:`list`
+            A :class:`list` which represents a :class:`Population`.
+            Like the ones created by :meth:`to_list`. For example in,
+
+            .. code-block:: python
+
+                pop_list = [{...}, [{...}], [{...}, {...}], {...}]
+
+            ``pop_list`` represents the :class:`Population`, sublists
+            represent its subpopulations and the :class:`dict`
+            ``{...}`` represents the members.
 
         Returns
         -------
         :class:`Population`
-            A population made from files in `folder`.
-
-        """
-
-        return cls(*(moltype(x) for x in
-                     iglob(join(folder, glob_pattern))))
-
-    @classmethod
-    def init_random(cls,
-                    macromol_class,
-                    building_blocks,
-                    topologies,
-                    size):
-        """
-        Assembles a population of :class:`.MacroMolecule`.
-
-        All molecules are held in :attr:`members`.
-
-        From the supplied building blocks a random molecule is selected
-        per sublist to for a :class:`.MacroMolecule`. This is done
-        until `size` :class:`.MacroMolecule` have been formed.
-
-        Parameters
-        ----------
-        macromol_class : :class:`type`
-            The class of :class:`.MacroMolecule` to be assembled.
-
-        building_blocks : :class:`list`
-            A :class:`list` of the form
-
-            .. code-block:: python
-
-                building_blocks = [[StructUnit2(), StructUnit2(), ...],
-                                   [StructUnit3(), StructUnit3(), ...],
-                                   [StructUnit2(), StructUnit2(), ...]]
-
-            To assemble a new :class:`.MacroMolecule`, a
-            :class:`.StructUnit` is picked from each of the sublists
-            in `building_blocks`. The picked :class:`.StructUnit`
-            instances are then supplied to the macromolecule:
-
-            .. code-block:: python
-
-                macro_mol = MacroMolecule([pick1, pick2, pick3],
-                                          Topology())
-
-            The order of picked :class:`.StructUnit` instances
-            corresponds to the order of the sublists.
-
-        topolgies : :class:`iterable` of :class:`.Topology`
-            An iterable holding topologies which should be randomly
-            selected during initialization of :class:`.MacroMolecule`.
-
-        size : :class:`int`
-            The size of the population to be initialized.
-
-        Returns
-        -------
-        :class:`.Population`
-            A population filled with random cages.
+            The population represented by `pop_list`.
 
         """
 
         pop = cls()
-
-        # Shuffle the sublists.
-        for db in building_blocks:
-            np.random.shuffle(db)
-
-        # Go through every possible macromolecule.
-        for *bbs, top in it.product(*building_blocks, topologies):
-
-            # Generate the random macromolecule.
-            macro_mol = macromol_class(bbs, top)
-            if macro_mol not in pop:
-                pop.members.append(macro_mol)
-
-            if len(pop) == size:
-                break
-
-        assert len(pop) == size
+        for item in pop_list:
+            if isinstance(item, list):
+                sp = cls.init_from_list(item)
+                pop.subpopulations.append(sp)
+            else:
+                pop.direct_members.append(
+                    Molecule.init_from_dict(item)
+                )
         return pop
 
-    def add_members(self, population, duplicates=False):
+    def add_members(self, *members, duplicates=True):
         """
-        Adds :class:`.Molecule` instances into :attr:`members`.
+        Add :class:`.Molecule` instances to the :class:`.Population`.
 
-        The :class:`.Molecule`  instances held within `population`, are
-        added into :attr:`members`. Any nesting is removed. This is
-        because all :class:`.Molecule`  instances are added into
-        :attr:`members` directly, regardless of how nested they are
-        within `population`.
+        The added :class:`.Molecule` instances are added as direct
+        members of the population, they are not placed into any
+        subpopulations.
 
         Parameters
         ----------
-        population : :class:`iterable` of :class:`.Molecule`
-            :class:`.Molecule` instances held by this container are
-            added into :attr:`members`.
+        *members : :class:`.Molecule`
+            The molecules to be added as direct members.
 
         duplicates : :class:`bool`, optional
-            Indicates whether multiple instances of the same molecule
-            are allowed to be added. Note, the sameness of a molecule
-            is judged by :meth:`.Molecule.same`.
+            Indicates whether multiple instances of the same
+            molecule are allowed to be added. Note that the
+            sameness of two :class:`.Molecule` objects is judged with
+            :meth:`.Molecule.is_identical`.
 
-            When ``False`` only molecules which are not already
-            held by the population will be added. ``True`` allows more
-            than one instance of the same molecule to be added.
+            When ``False``, only molecules which are not already
+            held by the population will be added. When ``True``,
+            multiple instances of the same molecule may be added.
 
         Returns
         -------
@@ -434,16 +766,17 @@ class Population:
         """
 
         if duplicates:
-            self.members.extend(mol for mol in population)
+            self.direct_members.extend(members)
         else:
-            self.members.extend(mol for mol in population if
-                                mol not in self)
+            self.direct_members.extend(
+                mol for mol in members if mol not in self
+            )
 
     def add_subpopulation(self, population):
         """
-        Appends a copy of `population` to :attr:`populations`.
+        Add a clone of `population` to :attr:`subpopulations`.
 
-        Only a copy of the `population` container is made. The
+        Only a clone of the `population` container is made. The
         molecules it holds are not copies.
 
         Parameters
@@ -457,88 +790,70 @@ class Population:
 
         """
 
-        pop = self.__class__(*population.members)
-        for sp in population.populations:
-            pop.add_subpopulation(sp)
+        self.subpopulations.append(population.clone())
 
-        self.populations.append(pop)
-
-    def all_members(self):
+    def _get_all_members(self):
         """
-        Yields all molecules in the population and its subpopulations.
+        Yield both direct and nested members of the population.
 
         Yields
         ------
         :class:`.Molecule`
             The next :class:`.Molecule` instance held within the
-            population or its subpopulations.
+            :class:`.Population`.
 
         """
 
-        # Go through `members` attribute and yield ``Molecule``
+        # Go through `direct_members` attribute and yield ``Molecule``
         # instances held within one by one.
-        for ind in self.members:
+        for ind in self.direct_members:
             yield ind
 
         # Go thorugh `populations` attribute and for each
         # ``Population`` instance within, yield ``Molecule``
         # instances from its `all_members` generator.
-        for pop in self.populations:
-            yield from pop.all_members()
+        for pop in self.subpopulations:
+            yield from pop._all_members()
 
-    def assign_names_from(self, n, overwrite=False):
+    def set_mol_ids(self, n, overwrite=False):
         """
-        Give each member of the population a name starting from `n`.
+        Give each member of the population an id starting from `n`.
 
-        Notes
-        -----
-        This method modifies the :attr:`.Molecule.name` attribute of
-        :class:`.Molecule` instances held by the population.
+        This method adds an :attr:`id` attribute to each
+        :class:`.Molecule` instance held by the population.
 
         Parameters
         ----------
         n : :class:`int`
-            A number. Members of this population are given a unique
-            number as a name, starting from this number and incremented
-            by one between members.
+            A number. Members of this :class:`Population` are given a
+            unique number as an id, starting from `n` and
+            incremented by one between members.
 
         overwrite : :class:`bool`, optional
-            If ``True``, existing names are replaced.
+            If ``True``, existing ids are replaced.
 
         Returns
         -------
         :class:`int`
-            The value of the last name assigned, plus 1.
+            The value of the last id assigned, plus 1.
 
         """
 
         for mem in self:
-            if not mem.name or overwrite:
-                mem.name = str(n)
+            if not hasattr(mem, 'id') or overwrite:
+                mem.id = n
                 n += 1
-
         return n
 
     def dump(self, path, include_attrs=None):
         """
-        Dumps the population to a file.
-
-        The population is dumped in the JSON format in the following
-        way. The population is represented as a list,
-
-        .. code-block:: python
-
-            [mem1.json(), mem2.json(), [mem3.json(), [mem4.json()]]]
-
-        where each member of the population held directly in the
-        `members` attribute is placed an an element in the list. Any
-        subpopulations are held as sublists.
+        Dump the :class:`.Population` to a file.
 
         Parameters
         ----------
         path : :class:`str`
-            The full path of the file to which the population should
-            be dumped.
+            The full path of the file to which the :class:`Population`
+            should be dumped.
 
         include_attrs : :class:`list` of :class:`str`, optional
             The names of attributes of the molecules to be added to
@@ -555,84 +870,14 @@ class Population:
             json.dump(self.to_list(include_attrs), f, indent=4)
 
     @classmethod
-    def from_list(cls, pop_list, member_init):
+    def load(cls, path):
         """
-        Initializes a population from a :class:`list` representation.
-
-        Parameters
-        ----------
-        pop_list : :class:`list`
-            A :class:`list` which represents a population. Like the
-            ones created by :meth:`to_list`. For example in,
-
-            .. code-block:: python
-
-                pop_list = [{...}, [{...}], [{...}, {...}], {...}]
-
-            ``pop_list`` represents the population, sublists represent
-            its subpopulations and the :class:`dict` ``{...}``
-            represents the members.
-
-        member_init : :class:`function`
-            The initialization function for the population's members.
-            It converts the member represenations in `pop_list` into
-            desired objects.
-
-        Returns
-        -------
-        :class:`Population`
-            The population represented by `pop_list`.
-
-        """
-
-        pop = cls()
-        for item in pop_list:
-            if isinstance(item, dict):
-                pop.members.append(member_init(item))
-            elif isinstance(item, list):
-                pop.populations.append(cls.from_list(item, member_init))
-
-            else:
-                raise TypeError(('Population list must consist only'
-                                 ' of strings and lists.'))
-        return pop
-
-    def has_structure(self, mol):
-        """
-        Returns ``True`` if molecule with `mol` structure is held.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            A molecule whose structure is being evaluated for presence
-            in the population.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if a molecule with the same structure as `mol`
-            is held by the population.
-
-        """
-
-        return any(x.same(mol) for x in self)
-
-    @classmethod
-    def load(cls, path, member_init):
-        """
-        Initializes a :class:`Population` from one dumped to a file.
+        Initialize a :class:`Population` from one dumped to a file.
 
         Parameters
         ----------
         path : :class:`str`
             The full path of the file holding the dumped population.
-
-        member_init : :class:`function`
-            The initialization function for the population's members.
-            It converts the member representations in the file to
-            :class:`.Molecule` objects. For example
-            :meth:`.Molecule.from_dict` when loading ``.json`` files
-            generated by :meth:`dump`.
 
         Returns
         -------
@@ -644,97 +889,7 @@ class Population:
         with open(path, 'r') as f:
             pop_list = json.load(f)
 
-        return cls.from_list(pop_list, member_init)
-
-    def max(self, key):
-        """
-        Calculates the maximum in the population given a key.
-
-        This method applies ``key(member)`` on every member of the
-        population and returns the maximum of returned values.
-
-        For example, if the maximum molecular cavity in the
-        population is desired:
-
-        .. code-block:: python
-
-            population.max(lambda macro_mol: macro_mol.cavity_size())
-
-        Parameters
-        ----------
-        key : :class:`function`
-            A function which should take a :class:`.Molecule` instance
-            as its argument and returns a numerical value.
-
-        Returns
-        -------
-        :class:`float`
-            The maximum of the values returned by the function `key`
-            when it is applied to all members of the population.
-
-        """
-
-        return np.max([key(member) for member in self], axis=0)
-
-    def mean(self, key):
-        """
-        Calculates the mean in the population given a key.
-
-        This method applies ``key(member)`` on every member of the
-        population and returns the mean of returned values.
-
-        For example, if the mean of molecular cavities in the
-        population is desired:
-
-        .. code-block:: python
-
-            population.mean(lambda macro_mol: macro_mol.cavity_size())
-
-        Parameters
-        ----------
-        key : :class:`function`
-            A function which should take a :class:`.Molecule` instance
-            as its argument and returns a numerical value.
-
-        Returns
-        -------
-        :class:`float`
-            The mean of the values returned by the function `key` when
-            it is applied to all members of the population.
-
-        """
-
-        return np.mean([key(member) for member in self], axis=0)
-
-    def min(self, key):
-        """
-        Calculates the minimum in the population given a key.
-
-        This method applies ``key(member)`` on every member of the
-        population and returns the minimum of returned values.
-
-        For example, if the minimum molecular cavity in the
-        population is desired:
-
-        .. code-block:: python
-
-            population.min(lambda macro_mol: macro_mol.cavity_size())
-
-        Parameters
-        ----------
-        key : :class:`function`
-            A function which should take a :class:`.Molecule` instance
-            as its argument and returns a numerical value.
-
-        Returns
-        -------
-        :class:`float`
-            The minimum of the values returned by the function `key`
-            when it is applied to all members of the population.
-
-        """
-
-        return np.min([key(member) for member in self], axis=0)
+        return cls.init_from_list(pop_list)
 
     def _optimize_parallel(self, optimizer, processes):
         opt_fn = _Guard(optimizer, optimizer.optimize)
@@ -755,12 +910,7 @@ class Population:
         for old, new in zip(sorted_pop, sorted_opt):
             old.__dict__ = dict(vars(new))
             if optimizer.use_cache:
-                optimizer.cache.add((old.key, -1))
-
-        # Make sure the cache is updated with the optimized versions.
-        if OPTIONS['cache']:
-            for member in optimized:
-                member.update_cache()
+                optimizer.cache.add(old)
 
     def _optimize_serial(self, optimizer):
         for member in self:
@@ -768,20 +918,14 @@ class Population:
 
     def optimize(self, optimizer, processes=None):
         """
-        Optimizes the structures of molecules in the population.
+        Optimize the structures of molecules in the population.
 
         The molecules are optimized serially or in parallel depending
         if `processes` is ``1`` or more. The serial version may be
         faster in cases where all molecules have already been
-        optimized, for example if optimized molecules are skipped.
+        optimized and the `optimizer` will skip them.
         In this case creating a parallel process pool creates
         unncessary overhead.
-
-        Notes
-        -----
-        This function modifies the structures of molecules held by the
-        population. This means their :attr:`.Molecule.mol` attributes
-        are modified.
 
         Parameters
         ----------
@@ -807,14 +951,16 @@ class Population:
         else:
             self._optimize_parallel(optimizer, processes)
 
-    def remove_duplicates(self,
-                          between_subpops=True,
-                          key=id,
-                          top_seen=None):
+    def remove_duplicates(
+        self,
+        between_subpops=True,
+        key=id,
+        top_seen=None
+    ):
         """
-        Removes duplicates from the population and preserves structure.
+        Remove duplicates from the population.
 
-        The question of which molcule is preserved when duplicates are
+        The question of which molecule is preserved when duplicates are
         removed is difficult to answer. The iteration through a
         population is depth-first, so a rule such as "the molecule in
         the topmost population is preserved" is not the case here.
@@ -848,22 +994,25 @@ class Population:
 
         # Whether duplicates are being removed from within a single
         # subpopulation or from different subpopulations, the duplicate
-        # must be removed from the `members` attribute of some
+        # must be removed from the `direct_members` attribute of some
         # ``Population`` instance. This means ``dedupe`` can be run
-        # on the `members` attribute of every population or
+        # on the `direct_members` attribute of every population or
         # subpopulation. The only difference is that when duplicates
         # must be removed between different subpopulations a global
         # ``seen`` set must be defined for the entire top level
         # ``Population`` instance. This can be passed each time dedupe
-        # is being called on a subpopulation's `members` attribute.
+        # is being called on a subpopulation's `durect_members`
+        # attribute.
         if between_subpops:
             if top_seen is None:
                 seen = set()
             if isinstance(top_seen, set):
                 seen = top_seen
 
-            self.members = list(dedupe(self.members, seen, key))
-            for subpop in self.populations:
+            self.direct_members = list(
+                dedupe(self.direct_members, seen, key)
+            )
+            for subpop in self.subpopulations:
                 subpop.remove_duplicates(True, key, seen)
 
         # If duplicates are only removed from within the same
@@ -871,15 +1020,15 @@ class Population:
         # subpopulation needs to be cleared of duplicates. To do this,
         # each `members` attribute is deduped recursively.
         if not between_subpops:
-            self.members = list(dedupe(self.members, key=key))
-            for subpop in self.populations:
+            self.direct_members = list(
+                dedupe(self.direct_members, key=key)
+            )
+            for subpop in self.subpopulations:
                 subpop.remove_duplicates(False, key)
 
     def remove_members(self, key):
         """
-        Removes all members where ``key(member)`` is ``True``.
-
-        The structure of the population is preserved.
+        Remove all members where ``key(member)`` is ``True``.
 
         Parameters
         ----------
@@ -895,29 +1044,27 @@ class Population:
 
         """
 
-        self.members = [ind for ind in self.members if not key(ind)]
-        for subpop in self.populations:
+        self.direct_members = [
+            ind for ind in self.direct_members if not key(ind)
+        ]
+        for subpop in self.subpopulations:
             subpop.remove_members(key)
 
     def to_list(self, include_attrs=None):
         """
-        Converts the population to a list representation.
-
-        The population and any subpopulations are represented as lists
-        (and sublists), while members are represented by their JSON
-        dictionaries (as strings).
+        Convert the population to a :class:`list` representation.
 
         Parameters
         ----------
         include_attrs : :class:`list` of :class:`str`, optional
-            The names of attributes of the molecules to be added to
-            the JSON. Each attribute is saved as a string using
+            The names of attributes to be added to the molecular
+            representations. Each attribute is saved as a string using
             :func:`repr`.
 
         Returns
         -------
-        :class:`str`
-            A JSON string representing the population.
+        :class:`list`
+            A :class:`list` representation of the :class:`Population`.
 
         """
 
@@ -926,28 +1073,22 @@ class Population:
 
         include_attrs = set(include_attrs)
         pop = [
-            m.json(list(include_attrs & m.__dict__.keys()))
-            for m in self.members
+            m.to_json(list(include_attrs & m.__dict__.keys()))
+            for m in self.direct_members
         ]
-        for sp in self.populations:
+        for sp in self.subpopulations:
             pop.append(sp.to_list(include_attrs))
         return pop
 
-    def write(self, dir_path, use_name=False):
+    def write(self, path):
         """
-        Writes the ``.mol`` files of members to a directory.
+        Write the ``.mol`` files of members to a directory.
 
         Parameters
         ----------
-        dir_path : :class:`str`
+        path : :class:`str`
             The full path of the directory into which the ``.mol`` file
             is written.
-
-        use_name : :class:`bool`, optional
-            When ``True`` the :attr:`.Molecule.name` attribute of the
-            members is used to make the name of the ``.mol`` file. If
-            ``False``, the files are just named after the member's
-            index in the population.
 
         Returns
         -------
@@ -956,96 +1097,93 @@ class Population:
         """
 
         # If the directory does not exist, create it.
-        if not os.path.exists(dir_path):
-            os.mkdir(dir_path)
+        if not os.path.exists(path):
+            os.mkdir(path)
 
         for i, member in enumerate(self):
-            if use_name:
-                fname = join(dir_path, '{}.mol'.format(
-                                                        member.name))
-            else:
-                fname = join(dir_path, '{}.mol'.format(i))
-
-            member.write(fname)
+            member.write(join(path, f'{i}.mol'))
 
     def __iter__(self):
         """
-        Allows populations to be iterated through,
+        Iterate through members of the :class:`Population`.
 
         When :class:`Population` instances are iterated through, they
-        yield :class:`.Molecule` instances from the :meth:`all_members`
-        generator.
+        yield both direct and nested members.
 
-        Returns
-        -------
-        :class:`generator`
-            The :meth:`all_members` generator.
+        Yields
+        ------
+        :class:`.Molecule`
+            The next molecule in the population.
 
         """
 
-        return self.all_members()
+        yield from self._get_all_members()
 
     def __getitem__(self, key):
         """
-        Allows indexing to select members of the population.
+        Get a member or members by index.
 
         Molecules held by the :class:`Population` instance can be
-        accessed by their index. Slices are also supported. These return
+        accessed by index. Slices are also supported and they return
         a new :class:`Population` instance holding the members with the
         requested indices. Using slices will return a flat
         :class:`Population` instance, meaing no nesting is preserved.
 
-        The index corresponds to the order of members in
-        :meth:`all_members`.
+        Indexing accesses both direct and nested members of the
+        :class:`Population`.
 
         Parameters
         ----------
         key : :class:`int`, :class:`slice`
             An :class:`int` or :class:`slice` can be used depending on
-            if a single members needs to be returned or a cllection of
+            if a single members needs to be returned or a collection of
             them.
 
         Returns
         -------
         :class:`.Molecule`
             If the supplied `key` is an :class:`int`. Returns the
-            :class:`.Molecule` instance with the corresponding index
-            from :meth:`all_members`.
+            :class:`.Molecule` instance at the corresponding index.
 
         :class:`Population`
             If the supplied `key` is a :class:`slice`. The returned
             :class:`Population` instance holds members at the given
-            indices in :meth:`all_members`.
+            indices.
 
         Raises
         ------
+        :class:`IndexError`
+            If the supplied `key` is out of range.
+
         :class:`TypeError`
             If the supplied `key` is not an :class:`int` or
             :class:`slice`.
 
         """
 
-        # Determine if provided key was an ``int`` or a ``slice``.
-        # If ``int``, return the corresponding ``Molecule``
-        # instance from the `all_members` generator.
         if isinstance(key, int):
-            return list(self.all_members())[key]
+            for i, member in enumerate(self):
+                if i == key:
+                    return member
+            raise IndexError('Population index out of range.')
 
-        # If ``slice`` return a ``Population`` of the corresponding
-        # ``Molecule`` instances.
         if isinstance(key, slice):
-            mols = it.islice(self.all_members(),
-                             key.start, key.stop, key.step)
-            pop = self.__class__(*mols)
-            return pop
+            mols = it.islice(
+                iterable=self,
+                start=key.start,
+                stop=key.stop,
+                step=key.step
+            )
+            return self.__class__(*mols)
 
-        # If `key` is not ``int`` or ``slice`` raise ``TypeError``.
-        raise TypeError("Index must be an integer or slice, not"
-                        " {}.".format(type(key).__name__))
+        raise TypeError(
+            'Index must be an integer or slice, not '
+            f'{key.__class__.__name__}.'
+        )
 
     def __len__(self):
         """
-        Returns the total number of members in the population.
+        Return the total number of members in the population.
 
         Returns
         -------
@@ -1055,17 +1193,17 @@ class Population:
 
         """
 
-        size = len(self.members)
-        stack = list(self.populations)
+        size = len(self.direct_members)
+        stack = list(self.subpopulations)
         while stack:
             subpop = stack.pop()
-            stack.extend(subpop.populations)
-            size += len(subpop.members)
+            stack.extend(subpop.subpopulations)
+            size += len(subpop.direct_members)
         return size
 
     def __sub__(self, other):
         """
-        Removes members of `other` from the population.
+        Remove members of `other` from the population.
 
         Subtracting one population from another,
 
@@ -1074,8 +1212,8 @@ class Population:
             pop3 = pop1 - pop2
 
         returns a new population, ``pop3``. The returned population
-        contains all molecules in ``pop1`` excep those also found in
-        ``pop2``. This refers to all molcules, including those held
+        contains all molecules in ``pop1`` except those also found in
+        ``pop2``. This refers to all molecules, including those held
         within any subpopulations. The returned population is flat.
         This means any nesting in ``pop1`` is not preserved.
 
@@ -1099,7 +1237,7 @@ class Population:
 
     def __add__(self, other):
         """
-        Joins two populations.
+        Add two populations.
 
         Parameters
         ----------
@@ -1119,34 +1257,38 @@ class Population:
         return self.__class__(self, other)
 
     def __contains__(self, item):
-        return any(item is mol for mol in self.all_members())
+        return any(item.is_identical(mol) for mol in self)
 
     def __str__(self):
-        output_string = (" Population " + str(id(self)) + "\n" +
-                         "--------------------------\n" +
-                         "\tMembers\n" + "   ---------\n")
+        name = f'Population {id(self)}\n'
+        dash = '-'
+        members = 'Members'
+        subpopulations = 'Subpopulations'
 
-        for mol in self.members:
-            output_string += "\t" + str(mol) + "\n"
+        if self.direct_members:
+            direct_members = '\n'.join(
+                f'\t{mol}' for mol in self.direct_members
+            )
+        else:
+            direct_members = '\tNone'
 
-        if len(self.members) == 0:
-            output_string += "\tNone\n\n"
+        if self.subpopulations:
+            subpops = ', '.join(
+                str(id(sp)) for sp in self.subpopulations
+            )
+        else:
+            subpops = 'None'
 
-        output_string += (("\tSub-populations\n" +
-                           "   -----------------\n\t"))
+        subpop_strs = '\n'.join(str(sp) for sp in self.subpopulations)
 
-        for pop in self.populations:
-            output_string += str(id(pop)) + ", "
-
-        if len(self.populations) == 0:
-            output_string += "None\n\n"
-
-        output_string += "\n\n"
-
-        for pop in self.populations:
-            output_string += str(pop)
-
-        return output_string
+        return (
+            f'{name}\n{dash*len(name)}\n'
+            f'\t{members}\n\t{dash*len(members)}\n'
+            f'{direct_members}\n\n'
+            f'\t{subpopulations}\n\t{dash*len(subpopulations)}\n'
+            f'{subpops}\n'
+            f'{subpop_strs}'
+        )
 
     def __repr__(self):
         return str(self)
@@ -1361,14 +1503,19 @@ class _Guard:
     A decorator for optimization functions.
 
     This decorator should be applied to all functions which are to
-    be used with :mod:`multiprocessing`. It prevents functions from
-    raising if they fail, which prevents the multiprocessing pool
+    be used with :mod:`pathos`. It prevents functions from
+    raising if they fail, which prevents the :mod:`pathos` pool
     from hanging.
+
+    Attributes
+    ----------
+    _calc_name : :class:`str`
+        The name of the :class:`.Optimizer` class being used.
 
     """
 
     def __init__(self, calculator, fn):
-        self.calc_name = calculator.__class__.__name__
+        self._calc_name = calculator.__class__.__name__
         wraps(fn)(self)
 
     def __call__(self, mol):
@@ -1388,7 +1535,7 @@ class _Guard:
         """
 
         fn = self.__wrapped__.__name__
-        cls = self.calc_name
+        cls = self._calc_name
         try:
             logger.info(f'Running "{cls}.{fn}()" on "{mol.name}"')
             self.__wrapped__(mol)
