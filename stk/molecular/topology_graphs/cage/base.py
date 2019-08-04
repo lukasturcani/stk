@@ -2,7 +2,7 @@ import numpy as np
 from collections import defaultdict
 
 from ..topology_graph import TopologyGraph, Vertex
-from ....utilities import vector_theta, normalize_vector
+from ....utilities import vector_theta
 
 
 class _CageVertex(Vertex):
@@ -200,25 +200,6 @@ class _CageVertex(Vertex):
             axis=edge_normal,
             origin=self._position
         )
-
-        # Move the building block toward the origin to ensure that
-        # the bonder centroids sit exactly on the edges of the
-        # topology.
-        fg_bonder_centroid = building_block.get_centroid(
-            atom_ids=building_block.func_groups[0].get_bonder_ids()
-        )
-        bonder_displacement = fg_bonder_centroid - self._position
-        edge_direction = normalize_vector(
-            self.aligner_edge.get_position() - self._position
-        )
-        b = bonder_displacement @ edge_direction
-        c = np.linalg.norm(bonder_displacement)
-        a = np.sqrt(c**2 - b**2)
-
-        n = a / np.linalg.norm(edge_normal)
-        displacement = -n * edge_normal
-        building_block.apply_displacement(displacement)
-
         return building_block.get_position_matrix()
 
     def assign_func_groups_to_edges(self, building_block, fg_map):
