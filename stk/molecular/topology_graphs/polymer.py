@@ -411,7 +411,7 @@ class Linear(TopologyGraph):
 
         """
 
-        polymer = self.repeating_unit*self.n
+        polymer = self._repeating_unit*self._n
         bb_map = {
             letter: bb for letter, bb in zip(polymer, building_blocks)
         }
@@ -445,7 +445,7 @@ class Linear(TopologyGraph):
 
     def __repr__(self):
         return (
-            f'polymer.Linear({self.repeating_unit!r}, '
-            f'{self.orientations!r}, '
-            f'{self.n!r})'
+            f'polymer.Linear({self._repeating_unit!r}, '
+            f'{self._orientations!r}, '
+            f'{self._n!r})'
         )

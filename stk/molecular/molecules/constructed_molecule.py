@@ -298,7 +298,8 @@ class ConstructedMolecule(Molecule):
             bb_counter.append(self.building_block_counter[bb])
             building_blocks.append(bb.to_dict(include_attrs, True))
             building_block_vertices[i] = [
-                repr(v) for v in self.building_block_vertices[bb]
+                self.topology_graph.vertices.index(v)
+                for v in self.building_block_vertices[bb]
             ]
 
         # For atoms, bond sand func groups, need to change all atom
@@ -403,7 +404,7 @@ class ConstructedMolecule(Molecule):
         for i, bb in enumerate(bbs):
             obj.building_block_counter[bb] = counter[i]
             obj.building_block_vertices[bb] = [
-                eval(v, tops) for v in vertices[str(i)]
+                topology_graph.vertices[i] for i in vertices[str(i)]
             ]
 
         obj.topology_graph = topology_graph
