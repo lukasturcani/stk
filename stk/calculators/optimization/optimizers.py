@@ -14,19 +14,22 @@ from functools import wraps
 import subprocess as sp
 import uuid
 import shutil
-from ...utilities import (is_valid_xtb_solvent,
-                          XTBInvalidSolventError,
-                          XTBExtractor)
+from ...utilities import (
+    is_valid_xtb_solvent,
+    XTBInvalidSolventError,
+    XTBExtractor
+)
+import pywindow
 
 logger = logging.getLogger(__name__)
 
 
 def _add_cache_use(optimize):
     """
-    Makes :meth:`~Optimizer.optimize` use the :attr:`~Optimizer.cache`.
+    Make :meth:`~Optimizer.optimize` use the :attr:`~Optimizer._cache`.
 
     Decorates `optimize` so that before running it checks if the
-    :class:`.Molecule` and conformer have already been optimized by the
+    :class:`.Molecule` has already been optimized by the
     optimizer. If so, and :attr:`~Optimizer.use_cache` is ``True``,
     then the molecule is skipped and no optimization is performed.
 
@@ -43,17 +46,13 @@ def _add_cache_use(optimize):
     """
 
     @wraps(optimize)
-    def inner(self, mol, conformer=-1):
-        key = (mol.key, conformer)
-        if self.use_cache and key in self.cache:
-            logger.info(
-                f'Skipping optimization on '
-                f'"{mol.name}" conformer {conformer}.'
-            )
+    def inner(self, mol):
+        if self.use_cache and mol in self._cache:
+            logger.info(f'Skipping optimization on {mol}.')
         else:
-            optimize(self, mol, conformer)
+            optimize(self, mol)
             if self.use_cache:
-                self.cache.add(key)
+                self._cache.add(mol)
 
     return inner
 
@@ -64,59 +63,41 @@ class Optimizer:
 
     Attributes
     ----------
-    cache : :class:`set`
-        A :class:`set` of the form
-
-        .. code-block:: python
-
-            cache = {
-                (mol1, conformer1),
-                (mol1, conformer2),
-                (mol2, conformer2)
-            }
-
-        which holds every :class:`Molecule` and conformer optimized
-        by the :class:`Optimizer`. Here ``mol1`` and ``mol2`` are
-        :class:`.Molecule` objects and ``conformer1`` and
-        ``conformer2`` are :class:`int`, which are the ids of the
-        optimized conformers of the molecules.
-
     use_cache : :class:`bool`
         If ``True`` :meth:`optimize` will not run twice on the same
-        molecule and conformer.
+        molecule.
 
     """
 
     def __init__(self, use_cache=False):
         """
-        Initializes an :class:`Optimizer`.
+        Initialize an :class:`Optimizer`.
 
         Parameters
         ----------
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
 
-        self.cache = set()
+        # Holds every previously optimized molecule if use_cache is
+        # true.
+        self._cache = set()
         self.use_cache = use_cache
 
     def __init_subclass__(cls, **kwargs):
         cls.optimize = _add_cache_use(cls.optimize)
         return super().__init_subclass__(**kwargs)
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Optimizes a molecule.
+        Optimize `mol`.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
 
         Returns
         -------
@@ -133,9 +114,9 @@ class OptimizerSequence(Optimizer):
 
     Attributes
     ----------
-    optimizers : :class:`tuple` of :class:`Optimizer`
-        A number of optimizers, each of which gets applied to a
-        molecule, based on the order in this :class:`tuple`.
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule.
 
     Examples
     --------
@@ -144,15 +125,17 @@ class OptimizerSequence(Optimizer):
 
     .. code-block:: python
 
-        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
-        optimizer = OptimizerSequence(ETKDG(), MMFF())
+        import stk
+
+        mol = stk.BuildingBlock('NCCNCCN', ['amine'])
+        optimizer = stk.OptimizerSequence(stk.ETKDG(), stk.MMFF())
         optimizer.optimize(mol)
 
     """
 
     def __init__(self, *optimizers, use_cache=False):
         """
-        Initializes a :class:`OptimizerSequence` instance.
+        Initialize a :class:`OptimizerSequence` instance.
 
         Parameters
         ----------
@@ -162,24 +145,21 @@ class OptimizerSequence(Optimizer):
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
 
-        self.optimizers = optimizers
+        self._optimizers = optimizers
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Chains multiple :class:`Optimizer` instances together.
+        Optimize `mol`.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
 
         Returns
         -------
@@ -187,25 +167,25 @@ class OptimizerSequence(Optimizer):
 
         """
 
-        for optimizer in self.optimizers:
+        for optimizer in self._optimizers:
             cls_name = optimizer.__class__.__name__
-            logger.info(f'Using {cls_name} on "{mol.name}".')
-            optimizer.optimize(mol, conformer)
+            logger.info(f'Using {cls_name} on "{mol}".')
+            optimizer.optimize(mol)
 
 
 class CageOptimizerSequence(Optimizer):
     """
-    Applies :class:`Optimizer` objects to a :class:`.Cage`.
+    Applies :class:`Optimizer` objects to a cage.
 
     Before each :class:`Optimizer` in the sequence is applied to the
-    :class:`.Cage`, it is checked to see if it is collapsed. If it is
+    cage, it is checked to see if it is collapsed. If it is
     collapsed, the optimization sequence ends immediately.
 
     Attributes
     ----------
-    optimizers : :class:`tuple` of :class:`Optimizer`
-        The :class:`Optimizer` objects which are used to optimize a
-        :class:`.Cage` molecule.
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule.
 
     Examples
     --------
@@ -214,42 +194,48 @@ class CageOptimizerSequence(Optimizer):
 
     .. code-block:: python
 
-        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
-        optimizer = CageOptimizerSequence(ETKDG(), MMFF())
-        optimizer.optimize(mol)
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCNCCN', ['amine'])
+        bb2 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
+        cage = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2],
+            topology_graph=stk.cage.FourPlusSix()
+        )
+        optimizer = stk.CageOptimizerSequence(stk.ETKDG(), stk.MMFF())
+        optimizer.optimize(cage)
 
     """
 
     def __init__(self, *optimizers, use_cache=False):
         """
-        Initializes a :class:`CageOptimizerSequence` instance.
+        Initialize a :class:`CageOptimizerSequence` instance.
 
         Parameters
         ----------
         *optimizers : :class:`Optimizer`
             The :class:`Optimizers` used in sequence to optimize
-            :class:`.Cage` molecules.
+            cage molecules.
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
 
-        self.optimizers = optimizers
+        self._optimizers = optimizers
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Optimizes a molecule.
+        Optimize `mol`.
 
         Parameters
         ----------
-        mol : :class:`.Cage`
-            The cage to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
+        mol : :class:`.Molecule`
+            The cage to be optimized. It must have an attribute
+            :attr:`num_windows`, which contains the expected number
+            of windows if the cage is not collapsed.
 
         Returns
         -------
@@ -257,22 +243,21 @@ class CageOptimizerSequence(Optimizer):
 
         """
 
-        for optimizer in self.optimizers:
+        for optimizer in self._optimizers:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                windows = mol.windows(conformer)
-
+                loader = pywindow.molecular.Molecule.load_rdkit_mol
+                pw_molecule = loader(mol.to_rdkit_mol())
+                windows = pw_molecule.calculate_windows()
             logger.debug(f'Windows found: {windows}.')
-            expected_windows = mol.topology.n_windows
-            if windows is None or len(windows) != expected_windows:
-                logger.info(
-                    f'"{mol.name}" is collapsed, exiting early.'
-                )
+
+            if windows is None or len(windows) != mol.num_windows:
+                logger.info(f'"{mol}" is collapsed, exiting early.')
                 return
 
             cls_name = optimizer.__class__.__name__
-            logger.info(f'Using {cls_name} on "{mol.name}".')
-            optimizer.optimize(mol, conformer)
+            logger.info(f'Using {cls_name} on "{mol}".')
+            optimizer.optimize(mol)
 
 
 class NullOptimizer(Optimizer):
@@ -281,9 +266,9 @@ class NullOptimizer(Optimizer):
 
     """
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Does not optimize a molecule.
+        Do not optimize `mol`.
 
         This function just returns immediately without changing the
         molecule.
@@ -292,9 +277,6 @@ class NullOptimizer(Optimizer):
         ----------
         mol : :class:`.Molecule`
             A molecule.
-
-        conformer : :class:`int`, optional
-            A conformer.
 
         Returns
         -------
@@ -311,33 +293,33 @@ class TryCatchOptimizer(Optimizer):
 
     Attributes
     ----------
-    try_optimizer : :class:`Optimizer`
-        The optimizer which is used initially to try and optimize a
-        :class:`.Molecule`.
-
-    catch_optimizer : :class:`Optimizer`
-        If :attr:`try_optimizer` raises an error, this optimizer is
-        run on the :class:`.Molecule` instead.
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule.
 
     Examples
     --------
     .. code-block:: python
 
+        import stk
+
         # Create some molecules to optimize.
-        mol1 = BuildingBlock.smiles_init('NCCN', ['amine'])
-        mol2 = BuildingBlock.smiles_init('CCCCC')
-        mol3 = BuildingBlock.smiles_init('O=CCCN')
+        mol1 = stk.BuildingBlock('NCCN', ['amine'])
+        mol2 = stk.BuildingBlock('CCCCC')
+        mol3 = stk.BuildingBlock('O=CCCN')
 
         # Create an optimizer which may fail.
-        uff = UFF()
+        uff = stk.UFF()
 
         # Create a backup optimizer.
-        mmff = MMFF()
+        mmff = stk.MMFF()
 
         # Make an optimizer which tries to run raiser and if that
         # raises an error, will run mmff on the molecule instead.
-        try_catch = TryCatchOptimizer(try_optimizer=uff,
-                                      catch_optimizer=mmff)
+        try_catch = stk.TryCatchOptimizer(
+            try_optimizer=uff,
+            catch_optimizer=mmff
+        )
 
         # Optimize the molecules. In each case if the optimization with
         # UFF fails, MMFF is used to optimize the molecule instead.
@@ -347,12 +329,14 @@ class TryCatchOptimizer(Optimizer):
 
     """
 
-    def __init__(self,
-                 try_optimizer,
-                 catch_optimizer,
-                 use_cache=False):
+    def __init__(
+        self,
+        try_optimizer,
+        catch_optimizer,
+        use_cache=False
+    ):
         """
-        Initializes a :class:`TryCatchOptimizer` instance.
+        Initialize a :class:`TryCatchOptimizer` instance.
 
         Parameters
         ----------
@@ -366,25 +350,22 @@ class TryCatchOptimizer(Optimizer):
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
 
-        self.try_optimizer = try_optimizer
-        self.catch_optimizer = catch_optimizer
+        self._try_optimizer = try_optimizer
+        self._catch_optimizer = catch_optimizer
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Optimizes a molecule.
+        Optimize `mol`.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
 
         Returns
         -------
@@ -393,15 +374,15 @@ class TryCatchOptimizer(Optimizer):
         """
 
         try:
-            return self.try_optimizer.optimize(mol, conformer)
+            return self._try_optimizer.optimize(mol)
         except Exception:
-            try_name = self.try_optimizer.__class__.__name__
-            catch_name = self.catch_optimizer.__class__.__name__
+            try_name = self._try_optimizer.__class__.__name__
+            catch_name = self._catch_optimizer.__class__.__name__
             logger.error(
                 f'{try_name} failed, trying {catch_name}.',
                 exc_info=True
             )
-            return self.catch_optimizer.optimize(mol, conformer)
+            return self._catch_optimizer.optimize(mol)
 
 
 class RaisingOptimizerError(Exception):
@@ -412,26 +393,27 @@ class RaisingOptimizer(Optimizer):
     """
     Raises and optimizes at random.
 
-    This optimizer is used for debugging to simulate optimization
-    functions which sometimes completes successfully and sometimes
-    randomly fails.
+    This optimizer is used for debugging to simulate optimizations
+    which sometimes complete successfully and sometimes
+    randomly fail.
 
     Attributes
     ----------
-    optimizer : :class:`Optimizer`
-        When the optimizer does not fail, it uses this
-        :class:`Optimizer` to optimize molecules.
-
-    fail_chance : :class:`float`
-        The probability that the optimizer will raise an error each
-        time :meth:`optimize` is used.
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule.
 
     Examples
     --------
     .. code-block:: python
 
-        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
-        partial_raiser = RaisingOptimizer(ETKDG(), fail_chance=0.75)
+        import stk
+
+        mol = stk.BuildingBlock('NCCNCCN', ['amine'])
+        partial_raiser = stk.RaisingOptimizer(
+            optimizer=stk.ETKDG(),
+            fail_chance=0.75
+        )
         # 75 % chance an error will be raised by calling optimize.
         partial_raiser.optimize(mol)
 
@@ -439,7 +421,7 @@ class RaisingOptimizer(Optimizer):
 
     def __init__(self, optimizer, fail_chance=0.5, use_cache=False):
         """
-        Initializes :class:`PartialRaiser`.
+        Initialize :class:`PartialRaiser`.
 
         Parameters
         ----------
@@ -453,25 +435,22 @@ class RaisingOptimizer(Optimizer):
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
 
-        self.optimizer = optimizer
-        self.fail_chance = fail_chance
+        self._optimizer = optimizer
+        self._fail_chance = fail_chance
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Optimizes a molecule.
+        Optimize `mol`.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
 
         Returns
         -------
@@ -484,36 +463,41 @@ class RaisingOptimizer(Optimizer):
 
         """
 
-        if np.random.rand() < self.fail_chance:
+        if np.random.rand() < self._fail_chance:
             raise RaisingOptimizerError('Used RaisingOptimizer.')
-        return self.optimizer.optimize(mol)
+        return self._optimizer.optimize(mol)
 
 
 class MMFF(Optimizer):
     """
     Use the MMFF force field to optimize molecules.
 
+    Attributes
+    ----------
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule.
+
     Examples
     --------
     .. code-block:: python
 
-        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
-        mmff = MMFF()
+        import stk
+
+        mol = stk.BuildingBlock('NCCNCCN', ['amine'])
+        mmff = stk.MMFF()
         mmff.optimize(mol)
 
     """
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Optimizes a molecule with the MMFF force field.
+        Optimize `mol`.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
 
         Returns
         -------
@@ -521,39 +505,43 @@ class MMFF(Optimizer):
 
         """
 
-        if conformer == -1:
-            conformer = mol.mol.GetConformer(conformer).GetId()
-
+        rdkit_mol = mol.to_rdkit_mol()
         # Needs to be sanitized to get force field params.
-        rdkit.SanitizeMol(mol.mol)
-        rdkit.MMFFOptimizeMolecule(mol.mol, confId=conformer)
+        rdkit.SanitizeMol(rdkit_mol)
+        rdkit.MMFFOptimizeMolecule(rdkit_mol)
+        mol.update_from_rdkit_mol(rdkit_mol)
 
 
 class UFF(Optimizer):
     """
     Use the UFF force field to optimize molecules.
 
+    Attributes
+    ----------
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule.
+
     Examples
     --------
     .. code-block:: python
 
-        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
-        uff = UFF()
+        import stk
+
+        mol = stk.BuildingBlock('NCCNCCN', ['amine'])
+        uff = stk.UFF()
         uff.optimize(mol)
 
     """
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Optimizes a molecule with the UFF force field.
+        Optimize `mol`.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
 
         Returns
         -------
@@ -561,12 +549,11 @@ class UFF(Optimizer):
 
         """
 
-        if conformer == -1:
-            conformer = mol.mol.GetConformer(conformer).GetId()
-
+        rdkit_mol = mol.to_rdkit_mol()
         # Needs to be sanitized to get force field params.
-        rdkit.SanitizeMol(mol.mol)
-        rdkit.UFFOptimizeMolecule(mol.mol, confId=conformer)
+        rdkit.SanitizeMol(rdkit_mol)
+        rdkit.UFFOptimizeMolecule(rdkit_mol)
+        mol.update_from_rdkit_mol(rdkit_mol)
 
 
 class ETKDG(Optimizer):
@@ -575,15 +562,18 @@ class ETKDG(Optimizer):
 
     Attributes
     ----------
-    random_seed : :class:`int`
-        The random seed to use.
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule.
 
     Examples
     --------
     .. code-block:: python
 
-        mol = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
-        etkdg = ETKDG()
+        import stk
+
+        mol = stk.BuildingBlock('NCCNCCN', ['amine'])
+        etkdg = stk.ETKDG()
         etkdg.optimize(mol)
 
     References
@@ -594,7 +584,7 @@ class ETKDG(Optimizer):
 
     def __init__(self, random_seed=12, use_cache=False):
         """
-        Initializes a :class:`ETKDG` instance.
+        Initialize a :class:`ETKDG` instance.
 
         Parameters
         ----------
@@ -603,24 +593,21 @@ class ETKDG(Optimizer):
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
 
-        self.random_seed = random_seed
+        self._random_seed = random_seed
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Optimizes a molecule.
+        Optimize `mol`.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
 
         Returns
         -------
@@ -628,18 +615,15 @@ class ETKDG(Optimizer):
 
         """
 
-        if conformer == -1:
-            conformer = mol.mol.GetConformer(conformer).GetId()
-
         params = rdkit.ETKDGv2()
-        params.clearConfs = False
-        params.random_seed = self.random_seed
+        params.clearConfs = True
+        params.random_seed = self._random_seed
 
-        conf_id = rdkit.EmbedMolecule(mol.mol, params)
-        # Make sure that the conformer order is not re-arranged.
-        positions = mol.position_matrix(conformer=conf_id)
-        mol.set_position_from_matrix(positions, conformer=conformer)
-        mol.mol.RemoveConformer(conf_id)
+        rdkit_mol = mol.to_rdkit_mol()
+        rdkit.EmbedMolecule(rdkit_mol, params)
+        mol.set_position_matrix(
+            position_matrix=rdkit_mol.GetConformer().GetPositions()
+        )
 
 
 class XTBOptimizerError(Exception):
@@ -671,82 +655,24 @@ class XTB(Optimizer):
 
     Furthermore, :meth:`optimize` will check that the
     structure is adequately optimized by checking for negative
-    frequencies after a Hessian calculation. :attr:`max_runs`
-    optimizations will be attempted at the given :attr:`opt_level`
-    to obtain an optimized structure. However, we outline in the
-    examples how to iterate over :attr:`opt_levels` to increase
+    frequencies after a Hessian calculation. `max_runs` can be
+    provided to the initializer to set the maximum number of
+    optimizations which will be attempted at the given
+    `opt_level` to obtain an optimized structure. However, we outline
+    in the examples how to iterate over `opt_levels` to increase
     convergence criteria and hopefully obtain an optimized structure.
     The presence of negative frequencies can occur even when the
-    optimization has converged based on the given
-    :attr:`opt_level`.
+    optimization has converged based on the given `opt_level`.
 
     Attributes
     ----------
-    xtb_path : :class:`str`
-        The path to the xTB executable.
+    use_cache : :class:`bool`
+        If ``True`` :meth:`optimize` will not run twice on the same
+        molecule.
 
-    gfn_version : :class:`str`
-        Parameterization of GFN to use in xTB.
-        For details see
-        https://xtb-docs.readthedocs.io/en/latest/basics.html.
-
-    output_dir : :class:`str`
-        The name of the directory into which files generated during
-        the optimization are written, if ``None`` then
-        :func:`uuid.uuid4` is used.
-
-    opt_level : :class:`str`
-        Optimization level to use.
-        Can be one of ``'crude'``, ``'sloppy'``, ``'loose'``,
-        ``'lax'``, ``'normal'``, ``'tight'``, ``'vtight'``
-        or ``'extreme'``.
-        For details see
-        https://xtb-docs.readthedocs.io/en/latest/optimization.html.
-
-    max_runs : :class:`int`
-        Maximum number of optimizations to attempt in a row.
-
-    calculate_hessian : :class:`bool`
-        Toggle calculation of the hessian and vibrational frequencies
-        after optimization. ``True`` is required to check that the
-        structure is completely optimized. ``False`` will drastically
-        speed up the calculation but potentially provide incomplete
-        optimizations and forces :attr:`max_runs` to be ``1``.
-
-    num_cores : :class:`str`
-        The number of cores xTB should use.
-
-    electronic_temperature : :class:`str`
-        Electronic temperature in Kelvin.
-
-    solvent : :class:`str`
-        Solvent to use in GBSA implicit solvation method.
-        For details see
-        https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
-
-    solvent_grid : :class:`str`
-        Grid level to use in SASA calculations for GBSA implicit
-        solvent.
-        Can be one of ``'normal'``, ``'tight'``, ``'verytight'``
-        or ``'extreme'``.
-        For details see
-        https://xtb-docs.readthedocs.io/en/latest/gbsa.html.
-
-    charge : :class:`str`
-        Formal molecular charge.
-
-    num_unpaired_electrons : :class:`str`
-        Number of unpaired electrons.
-
-    unlimited_memory : :class:`bool`
-        If ``True`` :meth:`optimize` will be run without constraints on
-        the stack size. If memory issues are encountered, this should
-        be ``True``, however this may raise issues on clusters.
-
-    incomplete : :class:`set`
-        A :class:`set` holding tuples of the form ``(mol, conformer)``,
-        which are the :class:`.Molecule` objects and conformer ids
-        passed to :meth:`optimize` whose optimzation was incomplete.
+    incomplete : :class:`set` of :class:`.Molecule`
+        A :class:`set` of molecules passed to :meth:`optimize` whose
+        optimzation was incomplete.
 
     Examples
     --------
@@ -759,13 +685,18 @@ class XTB(Optimizer):
 
     .. code-block:: python
 
-        bb1 = BuildingBlock.smiles_init('NCCNCCN', ['amine'])
-        bb2 = BuildingBlock.smiles_init('O=CCCC=O', ['aldehyde'])
-        polymer = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
+        import stk
 
-        xtb = OptimizerSequence(
-            UFF(),
-            XTB(xtb_path='/opt/gfnxtb/xtb', unlimited_memory=True)
+        bb1 = stk.BuildingBlock('NCCNCCN', ['amine'])
+        bb2 = stk.BuildingBlock('O=CCCC=O', ['aldehyde'])
+        polymer = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2],
+            topology_graph=stk.polymer.Linear("AB", [0, 0], 3)
+        )
+
+        xtb = stk.OptimizerSequence(
+            stk.UFF(),
+            stk.XTB(xtb_path='/opt/gfnxtb/xtb', unlimited_memory=True)
         )
         xtb.optimize(polymer)
 
@@ -775,20 +706,19 @@ class XTB(Optimizer):
     :meth:`optimize` will check that the structure is appropriately
     optimized (i.e. convergence is obtained and no negative vibrational
     frequencies are present) and continue optimizing a structure (up to
-    :attr:`max_runs` times) until this is achieved. This loop, by
-    default, will be performed at the same :attr:`opt_level`. The
+    `max_runs` times) until this is achieved. This loop, by
+    default, will be performed at the same `opt_level`. The
     following example shows how a user may optimize structures with
-    tigher convergence criteria (i.e. different :attr:`opt_level`)
+    tigher convergence criteria (i.e. different `opt_level`)
     until the structure is sufficiently optimized. Furthermore, the
     calculation of the Hessian can be turned off using
-    :attr:`max_runs` to ``1`` and :attr:`calculate_hessian` to
-    ``False``.
+    `max_runs` to ``1`` and `calculate_hessian` to ``False``.
 
     .. code-block:: python
 
         # Use crude optimization with max_runs=1 because this will
         # not achieve optimization and rerunning it is unproductive.
-        xtb_crude = XTB(
+        xtb_crude = stk.XTB(
             xtb_path='/opt/gfnxtb/xtb',
             output_dir='xtb_crude',
             unlimited_memory=True,
@@ -797,7 +727,7 @@ class XTB(Optimizer):
             calculate_hessian=True
         )
         # Use normal optimization with max_runs == 2.
-        xtb_normal = XTB(
+        xtb_normal = stk.XTB(
             xtb_path='/opt/gfnxtb/xtb',
             output_dir='xtb_normal',
             unlimited_memory=True,
@@ -806,7 +736,7 @@ class XTB(Optimizer):
         )
         # Use vtight optimization with max_runs == 2, which should
         # achieve sufficient optimization.
-        xtb_vtight = XTB(
+        xtb_vtight = stk.XTB(
             xtb_path='/opt/gfnxtb/xtb',
             output_dir='xtb_vtight',
             unlimited_memory=True,
@@ -814,14 +744,10 @@ class XTB(Optimizer):
             max_runs=2
         )
 
-        # The conformer must be known to check the `incomplete`
-        # attribute.
-        conformer = polymer.mol.GetConformer(-1).GetId()
-
         optimizers = [xtb_crude, xtb_normal, xtb_vtight]
         for optimizer in optimizers:
-            optimizer.optimize(polymer, conformer)
-            if (polymer, conformer) not in in optimizer.incomplete:
+            optimizer.optimize(polymer)
+            if polymer not in optimizer.incomplete:
                 break
 
     References
@@ -830,23 +756,25 @@ class XTB(Optimizer):
 
     """
 
-    def __init__(self,
-                 xtb_path,
-                 gfn_version=2,
-                 output_dir=None,
-                 opt_level='normal',
-                 max_runs=2,
-                 calculate_hessian=True,
-                 num_cores=1,
-                 electronic_temperature=300,
-                 solvent=None,
-                 solvent_grid='normal',
-                 charge=0,
-                 num_unpaired_electrons=0,
-                 unlimited_memory=False,
-                 use_cache=False):
+    def __init__(
+        self,
+        xtb_path,
+        gfn_version=2,
+        output_dir=None,
+        opt_level='normal',
+        max_runs=2,
+        calculate_hessian=True,
+        num_cores=1,
+        electronic_temperature=300,
+        solvent=None,
+        solvent_grid='normal',
+        charge=0,
+        num_unpaired_electrons=0,
+        unlimited_memory=False,
+        use_cache=False
+    ):
         """
-        Initializes a :class:`XTB` instance.
+        Initialize a :class:`XTB` instance.
 
         Parameters
         ----------
@@ -916,9 +844,10 @@ class XTB(Optimizer):
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
+
         if solvent is not None:
             solvent = solvent.lower()
             if gfn_version == 0:
@@ -941,19 +870,19 @@ class XTB(Optimizer):
                 'set to 1.'
             )
 
-        self.xtb_path = xtb_path
-        self.gfn_version = str(gfn_version)
-        self.output_dir = output_dir
-        self.opt_level = opt_level
-        self.max_runs = max_runs
-        self.calculate_hessian = calculate_hessian
-        self.num_cores = str(num_cores)
-        self.electronic_temperature = str(electronic_temperature)
-        self.solvent = solvent
-        self.solvent_grid = solvent_grid
-        self.charge = str(charge)
-        self.num_unpaired_electrons = str(num_unpaired_electrons)
-        self.unlimited_memory = unlimited_memory
+        self._xtb_path = xtb_path
+        self._gfn_version = str(gfn_version)
+        self._output_dir = output_dir
+        self._opt_level = opt_level
+        self._max_runs = max_runs
+        self._calculate_hessian = calculate_hessian
+        self._num_cores = str(num_cores)
+        self._electronic_temperature = str(electronic_temperature)
+        self._solvent = solvent
+        self._solvent_grid = solvent_grid
+        self._charge = str(charge)
+        self._num_unpaired_electrons = str(num_unpaired_electrons)
+        self._unlimited_memory = unlimited_memory
         self.incomplete = set()
         super().__init__(use_cache=use_cache)
 
@@ -977,7 +906,7 @@ class XTB(Optimizer):
         # 6 frequencies.
         return any(x < 0 for x in xtbext.frequencies[6:])
 
-    def _complete(self, output_file):
+    def _is_complete(self, output_file):
         """
         Check if xTB optimization has completed and converged.
 
@@ -1008,7 +937,7 @@ class XTB(Optimizer):
             # Check for negative frequencies in output file if the
             # hessian was calculated.
             # Return True if there exists at least one.
-            if self.calculate_hessian:
+            if self._calculate_hessian:
                 return not self._has_neg_frequencies(output_file)
             else:
                 return True
@@ -1019,7 +948,7 @@ class XTB(Optimizer):
 
     def _run_xtb(self, xyz, out_file):
         """
-        Runs GFN-xTB.
+        Run GFN-xTB.
 
         Parameters
         ----------
@@ -1036,30 +965,31 @@ class XTB(Optimizer):
         """
 
         # Modify the memory limit.
-        if self.unlimited_memory:
+        if self._unlimited_memory:
             memory = 'ulimit -s unlimited ;'
         else:
             memory = ''
 
         # Set optimization level and type.
-        if self.calculate_hessian:
+        if self._calculate_hessian:
             # Do optimization and check hessian.
-            optimization = f'--ohess {self.opt_level}'
+            optimization = f'--ohess {self._opt_level}'
         else:
             # Do optimization.
-            optimization = f'--opt {self.opt_level}'
+            optimization = f'--opt {self._opt_level}'
 
-        if self.solvent is not None:
-            solvent = f'--gbsa {self.solvent} {self.solvent_grid}'
+        if self._solvent is not None:
+            solvent = f'--gbsa {self._solvent} {self._solvent_grid}'
         else:
             solvent = ''
 
         cmd = (
-            f'{memory} {self.xtb_path} {xyz} --gfn {self.gfn_version} '
-            f'{optimization} --parallel {self.num_cores} '
-            f'--etemp {self.electronic_temperature} '
-            f'{solvent} --chrg {self.charge} '
-            f'--uhf {self.num_unpaired_electrons}'
+            f'{memory} {self._xtb_path} {xyz} '
+            f'--gfn {self._gfn_version} '
+            f'{optimization} --parallel {self._num_cores} '
+            f'--etemp {self._electronic_temperature} '
+            f'{solvent} --chrg {self._charge} '
+            f'--uhf {self._num_unpaired_electrons}'
         )
 
         with open(out_file, 'w') as f:
@@ -1072,20 +1002,17 @@ class XTB(Optimizer):
                 stderr=sp.PIPE,
                 # Uses the shell if unlimited_memory is True to run
                 # multiple commands in one subprocess.
-                shell=self.unlimited_memory
+                shell=self._unlimited_memory
             )
 
-    def _run_optimizations(self, mol, conformer):
+    def _run_optimizations(self, mol):
         """
-        Run loop of optimizations of the molecule `mol` using xTB.
+        Run loop of optimizations on `mol` using xTB.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
-
-        conformer : :class:`int`
-            The conformer to use.
 
         Returns
         -------
@@ -1094,60 +1021,47 @@ class XTB(Optimizer):
             ``False`` if the calculation is incomplete.
 
         """
-        for run in range(self.max_runs):
+        for run in range(self._max_runs):
             xyz = f'input_structure_{run+1}.xyz'
             out_file = f'optimization_{run+1}.output'
-            mol.write(xyz, conformer=conformer)
+            mol.write(xyz)
             self._run_xtb(xyz=xyz, out_file=out_file)
             # Check if the optimization is complete.
             coord_file = 'xtbhess.coord'
             coord_exists = os.path.exists(coord_file)
             output_xyz = 'xtbopt.xyz'
-            opt_complete = self._complete(out_file)
+            opt_complete = self._is_complete(out_file)
             if not opt_complete:
                 if coord_exists:
                     # The calculation is incomplete.
                     # Update mol from xtbhess.coord and continue.
-                    mol.update_from_turbomole(
-                        path=coord_file,
-                        conformer=conformer
-                    )
+                    mol.update_from_file(coord_file)
                 else:
                     # Update mol from xtbopt.xyz.
-                    mol.update_from_xyz(
-                        path=output_xyz,
-                        conformer=conformer
-                    )
+                    mol.update_from_file(output_xyz)
                     # If the negative frequencies are small, then GFN
                     # may not produce the restart file. If that is the
                     # case, exit optimization loop and warn.
-                    self.incomplete.add((mol, conformer))
+                    self.incomplete.add(mol)
                     logging.warning(
-                        'Small negative frequencies present in '
-                        f'{mol.name} conformer {conformer}.'
+                        f'Small negative frequencies present in {mol}.'
                     )
                     return False
             else:
                 # Optimization is complete.
                 # Update mol from xtbopt.xyz.
-                mol.update_from_xyz(
-                    path=output_xyz,
-                    conformer=conformer
-                )
+                mol.update_from_xyz(output_xyz)
                 break
         return opt_complete
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
-        Optimizes the molecule `mol` using xTB.
+        Optimize `mol`.
 
         Parameters
         ----------
         mol : :class:`.Molecule`
             The molecule to be optimized.
-
-        conformer : :class:`int`, optional
-            The conformer to use.
 
         Returns
         -------
@@ -1155,18 +1069,14 @@ class XTB(Optimizer):
 
         """
 
-        if conformer == -1:
-            conformer = mol.mol.GetConformer(conformer).GetId()
-        key = (mol, conformer)
+        # Remove mol from self.incomplete if present.
+        if mol in self.incomplete:
+            self.incomplete.remove(mol)
 
-        # Remove (mol, conformer) from self.incomplete if present.
-        if key in self.incomplete:
-            self.incomplete.remove(key)
-
-        if self.output_dir is None:
+        if self._output_dir is None:
             output_dir = str(uuid.uuid4().int)
         else:
-            output_dir = self.output_dir
+            output_dir = self._output_dir
         output_dir = os.path.abspath(output_dir)
 
         if os.path.exists(output_dir):
@@ -1177,13 +1087,10 @@ class XTB(Optimizer):
         os.chdir(output_dir)
 
         try:
-            complete = self._run_optimizations(mol, conformer)
+            complete = self._run_optimizations(mol)
         finally:
             os.chdir(init_dir)
 
         if not complete:
-            self.incomplete.add(key)
-            logging.warning(
-                'Optimization is incomplete for '
-                f'{mol.name} conformer {conformer}.'
-            )
+            self.incomplete.add(mol)
+            logging.warning(f'Optimization is incomplete for {mol}.')

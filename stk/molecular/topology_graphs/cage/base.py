@@ -374,6 +374,10 @@ class CageTopology(TopologyGraph):
     :attr:`vertices` and :attr:`edges` of the topology as class
     attributes.
 
+    A :class:`CageTopology` subclass will add the attributes
+    :attr:`num_windows` and :attr:`num_window_types` to each
+    :class:`.ConstructedMolecule`.
+
     Attributes
     ----------
     vertices : :class:`tuple` of :class:`.Vertex`
@@ -556,6 +560,11 @@ class CageTopology(TopologyGraph):
         for vertex in self.vertices:
             bb = np.random.choice(bb_by_degree[len(vertex.edges)])
             mol.building_block_vertices[bb].append(vertex)
+
+    def _clean_up(self, mol):
+        mol.num_windows = self.num_windows
+        mol.num_window_types = self.num_window_types
+        return super()._clean_up(mol)
 
     def _get_scale(self, mol):
         """
