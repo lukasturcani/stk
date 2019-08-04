@@ -745,8 +745,7 @@ def normalize_vector(vector):
 
     """
 
-    v = np.divide(vector, np.linalg.norm(vector))
-    return np.round(v, decimals=4)
+    return np.divide(vector, np.linalg.norm(vector))
 
 
 def remake(mol):
