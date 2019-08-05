@@ -18,7 +18,7 @@ calculates the energy of a molecule with
     mol2 = stk.ConstructedMolecule([mol1], chain)
 
     # Create the energy calculator.
-    mmff = MMFFEnergy()
+    mmff = stk.MMFFEnergy()
 
     # Calculate energies of various molecules.
     mol1_energy = mmff.get_energy(mol1)

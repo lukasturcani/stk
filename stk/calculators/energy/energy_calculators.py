@@ -39,7 +39,7 @@ def _add_cache_use(get_energy):
     Decorates `get_energy` so that before running it checks if the
     :class:`.Molecule` has already had its energy calculated. If so,
     and :attr:`~EnergyCalculator.use_cache` is ``True``, then the
-    energy value in the :attr:`~EnergyCalculator.cache` is returned.
+    energy value in the cache is returned.
 
     Parameters
     ----------
@@ -114,6 +114,12 @@ class EnergyCalculator:
         -------
         :class:`float`
             The energy.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
 
         """
 
@@ -368,11 +374,6 @@ class XTBEnergy(EnergyCalculator):
         molecule, but will instead return the previously calculated
         value.
 
-    calculate_free_energy : :class:`bool`
-        Whether to calculate the total free energy and vibrational
-        frequencies. Setting this to ``True`` can drastically
-        increase calculation time and memory requirements.
-
     total_energies : :class:`dict`
         :class:`dict` of the total energy of each :class:`.Molecule`
         passed to :meth:`get_energy`.
@@ -417,7 +418,7 @@ class XTBEnergy(EnergyCalculator):
     frequencies : :class:`dict`
         :class:`dict` of the vibrational frequencies of
         each :class:`.Molecule` passed to :meth:`get_energy`.
-        This is empty if :attr:`calculate_free_energy` is ``False``.
+        This is empty if `calculate_free_energy` was ``False``.
 
     Examples
     --------
@@ -460,10 +461,10 @@ class XTBEnergy(EnergyCalculator):
         # calculator.
         total_energy = xtb.total_energies[polymer]
 
-    If :attr:`calculate_free_energy` is ``True``, xTB performs a
+    If `calculate_free_energy` is ``True``, xTB performs a
     numerical Hessian calculation and calculates the total free energy
     and vibrational frequencies of a molecule. It is recommended that a
-    well optimized structure be used as input for these calculations.
+    well optimized structure be used as input for these calculations
 
     .. code-block:: python
 
@@ -589,7 +590,7 @@ class XTBEnergy(EnergyCalculator):
         self._gfn_version = str(gfn_version)
         self._output_dir = output_dir
         self._num_cores = str(num_cores)
-        self.calculate_free_energy = calculate_free_energy
+        self._calculate_free_energy = calculate_free_energy
         self._electronic_temperature = str(electronic_temperature)
         self._solvent = solvent
         self._solvent_grid = solvent_grid
@@ -642,7 +643,7 @@ class XTBEnergy(EnergyCalculator):
             xtbext.qdip_quadrupole_moment
         self.full_quadrupole_moments[mol] = \
             xtbext.full_quadrupole_moment
-        if self.calculate_free_energy:
+        if self._calculate_free_energy:
             self.total_free_energies[mol] = xtbext.total_free_energy
             self.frequencies[mol] = xtbext.frequencies
 
@@ -675,7 +676,7 @@ class XTBEnergy(EnergyCalculator):
         else:
             solvent = ''
 
-        if self.calculate_free_energy:
+        if self._calculate_free_energy:
             calc_type = '--hess'
         else:
             calc_type = ''
