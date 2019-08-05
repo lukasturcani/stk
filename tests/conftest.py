@@ -264,28 +264,31 @@ def tmp_polymer(tmp_amine2, tmp_aldehyde2):
 
 
 @pytest.fixture
-def reactor(amine2, aldehyde2):
-    building_blocks = [amine2, aldehyde2]
-    mol = stk.ConstructedMolecule.__new__(stk.ConstructedMolecule)
-    mol.topology_graph = stk.polymer.Linear('AB', [0, 0], 3)
-    mol.atoms = []
-    mol.bonds = []
-    mol.bonds_made = 0
-    mol.func_groups = []
-    mol.building_block_counter = Counter()
-    mol._position_matrix = []
-    mol.building_block_vertices = defaultdict(list)
-    mol.topology_graph._assign_building_blocks_to_vertices(
-        mol=mol,
-        building_blocks=building_blocks
-    )
-    vertex_clones = mol.topology_graph._clone_vertices()
-    edge_clones = mol.topology_graph._clone_edges(vertex_clones)
-    mol._edge_clones = edge_clones
+def make_reactor():
 
-    mol.topology_graph._prepare(mol)
-    mol.topology_graph._place_building_blocks(mol, vertex_clones)
-    return stk.molecular.reactor.Reactor(mol)
+    def inner(building_blocks, topology_graph):
+        mol = stk.ConstructedMolecule.__new__(stk.ConstructedMolecule)
+        mol.topology_graph = topology_graph
+        mol.atoms = []
+        mol.bonds = []
+        mol.bonds_made = 0
+        mol.func_groups = []
+        mol.building_block_counter = Counter()
+        mol._position_matrix = []
+        mol.building_block_vertices = defaultdict(list)
+        mol.topology_graph._assign_building_blocks_to_vertices(
+            mol=mol,
+            building_blocks=building_blocks
+        )
+        vertex_clones = mol.topology_graph._clone_vertices()
+        edge_clones = mol.topology_graph._clone_edges(vertex_clones)
+        mol._edge_clones = edge_clones
+
+        mol.topology_graph._prepare(mol)
+        mol.topology_graph._place_building_blocks(mol, vertex_clones)
+        return stk.molecular.reactor.Reactor(mol)
+
+    return inner
 
 
 @pytest.fixture(scope='session')

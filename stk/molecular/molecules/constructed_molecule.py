@@ -85,8 +85,9 @@ class ConstructedMolecule(Molecule):
         Defines the topology graph of :class:`ConstructedMolecule` and
         is responsible for constructing it.
 
-    bonds_made : :class:`int`
-        The net number of bonds added during construction.
+    construction_bonds : :class:`tuple` of :class:`.Bond`
+        Holds the bonds in :attr:`bonds`, which were added by the
+        construction process.
 
     func_groups : :class:`tuple` of :class:`.FunctionalGroup`
         The remnants of building block functional groups present in the
@@ -220,7 +221,7 @@ class ConstructedMolecule(Molecule):
         self.topology_graph = topology_graph
         self.atoms = []
         self.bonds = []
-        self.bonds_made = 0
+        self.construction_bonds = []
         self.func_groups = []
         self.building_block_counter = Counter()
         # A (3, n) numpy.ndarray holding the position of every atom in
@@ -256,6 +257,7 @@ class ConstructedMolecule(Molecule):
 
         self.atoms = tuple(self.atoms)
         self.bonds = tuple(self.bonds)
+        self.construction_bonds = tuple(self.construction_bonds)
         self.func_groups = tuple(self.func_groups)
 
         # Ensure that functional group ids are set correctly.
@@ -315,11 +317,17 @@ class ConstructedMolecule(Molecule):
             atoms.append(clone)
 
         bonds = []
-        for bond in self.bonds:
+        bond_indices = {}
+        for i, bond in enumerate(self.bonds):
             clone = bond.clone()
             clone.atom1 = clone.atom1.id
             clone.atom2 = clone.atom2.id
             bonds.append(clone)
+            bond_indices[bond] = i
+
+        construction_bonds = [
+            bond_indices[bond] for bond in self.construction_bonds
+        ]
 
         func_groups = []
         for fg in self.func_groups:
@@ -334,7 +342,7 @@ class ConstructedMolecule(Molecule):
             'building_blocks': building_blocks,
             'building_block_vertices': building_block_vertices,
             'building_block_counter': bb_counter,
-            'bonds_made': self.bonds_made,
+            'construction_bonds': construction_bonds,
             'class': self.__class__.__name__,
             'position_matrix': self.get_position_matrix().tolist(),
             'topology_graph': repr(self.topology_graph),
@@ -408,7 +416,6 @@ class ConstructedMolecule(Molecule):
             ]
 
         obj.topology_graph = topology_graph
-        obj.bonds_made = d.pop('bonds_made')
         obj._key = key
         obj._position_matrix = np.array(d.pop('position_matrix')).T
 
@@ -420,6 +427,10 @@ class ConstructedMolecule(Molecule):
         for bond in obj.bonds:
             bond.atom1 = obj.atoms[bond.atom1]
             bond.atom2 = obj.atoms[bond.atom2]
+
+        obj.construction_bonds = [
+            obj.bonds[i] for i in d.pop('construction_bonds')
+        ]
 
         g = {'FunctionalGroup': FunctionalGroup}
         obj.func_groups = tuple(eval(d.pop('func_groups'), g))

@@ -15,6 +15,7 @@ from scipy.spatial.distance import euclidean
 
 from .. import elements
 from ..elements import Atom
+from .. import bonds
 from ..bonds import Bond
 from .molecule import Molecule
 from ..functional_groups import fg_types
@@ -372,32 +373,19 @@ class BuildingBlock(Molecule):
 
         d = dict(mol_dict)
         d.pop('class')
-        mol_block = d.pop('mol_block')
-        rdkit_mol = rdkit.MolFromMolBlock(
-            molBlock=mol_block,
-            removeHs=False,
-            sanitize=False
-        )
         functional_groups = d.pop('func_groups')
-        obj = cls.init_from_rdkit_mol(
-            mol=rdkit_mol,
-            functional_groups=functional_groups,
-            use_cache=use_cache
-        )
 
-        # If the cached molecule is to be returned, do not change the
-        # atoms or attributes.
-        if use_cache:
-            return obj
+        obj = cls.__new__(cls)
 
-        # If the cached is not being used, make sure to update all the
+        obj._position_matrix = np.array(d.pop('position_matrix')).T
+        # If the cache is not being used, make sure to update all the
         # atoms and attributes to those in the dict.
         obj.atoms = eval(d.pop('atoms'), vars(elements))
-        for attr, val in d.items():
-            setattr(obj, attr, eval(val))
-        # Create the functional groups again because new atom
-        # instances got made and FunctionalGroup instances must hold
-        # the Atom instances in BuildingBlock.atoms.
+        obj.bonds = eval(d.pop('bonds'), vars(bonds))
+        for bond in obj.bonds:
+            bond.atom1 = obj.atoms[bond.atom1]
+            bond.atom2 = obj.atoms[bond.atom2]
+
         fg_makers = (fg_types[name] for name in functional_groups)
         obj.func_groups = tuple(
             func_group
@@ -405,7 +393,25 @@ class BuildingBlock(Molecule):
             for func_group in fg_maker.get_functional_groups(obj)
         )
 
-        return obj
+        for attr, val in d.items():
+            setattr(obj, attr, eval(val))
+
+        rdkit_mol = obj.to_rdkit_mol()
+        obj._key = cls._get_key(
+            smiles=rdkit.MolToSmiles(rdkit_mol),
+            functional_groups=functional_groups,
+            random_seed=None,
+            use_cache=None
+        )
+
+        if not use_cache:
+            return obj
+        else:
+            if obj._key in cls._cache:
+                return cls._cache[obj._key]
+            else:
+                cls._cache[obj._key] = obj
+                return obj
 
     def get_bonder_ids(self, fg_ids=None):
         """
@@ -743,11 +749,20 @@ class BuildingBlock(Molecule):
             include_attrs = []
 
         fgs = list(dedupe(fg.fg_type.name for fg in self.func_groups))
+
+        bonds = []
+        for bond in self.bonds:
+            clone = bond.clone()
+            clone.atom1 = clone.atom1.id
+            clone.atom2 = clone.atom2.id
+            bonds.append(clone)
+
         d = {
             'class': self.__class__.__name__,
             'func_groups': fgs,
-            'mol_block': self._to_mdl_mol_block(),
-            'atoms': repr(self.atoms)
+            'position_matrix': self.get_position_matrix().tolist(),
+            'atoms': repr(self.atoms),
+            'bonds': repr(bonds)
         }
 
         if ignore_missing_attrs:

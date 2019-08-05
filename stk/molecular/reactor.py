@@ -33,7 +33,6 @@ class _ReactionKey:
     --------
     The key is constant with respect to permutations
 
-
     .. code-block:: python
 
         key1 = _ReactionKey('amine', 'aldehyde', 'amine')
@@ -58,7 +57,7 @@ class _ReactionKey:
 
     def __init__(self, *fg_names):
         """
-        Initialize a :class:`ReactionKey`.
+        Initialize a :class:`_ReactionKey`.
 
         Parameters
         ----------
@@ -132,7 +131,7 @@ class Reactor:
 
     .. code-block:: python
 
-        bonds_made = reactor.finalize()
+        reactor.finalize()
 
     An obvious question given this tutorial, is what reaction does
     :meth:`react` carry out? This is documented by :meth:`react`.
@@ -140,7 +139,7 @@ class Reactor:
     reaction, which adds a bond between the bonder atoms of two
     functional groups. The bond order of the added bond is single by
     default but can be modified by editing :attr:`_bond_orders`. Here
-    you will specify the :class:`ReactionKey` for a reaction and what
+    you will specify the :class:`_ReactionKey` for a reaction and what
     bond order you want that reaction to use.
 
     For some reactions you may wish to forgo the default reaction and
@@ -154,9 +153,7 @@ class Reactor:
     Here a ketone is converted into an alcohol. If you wish to
     support a complex reaction, add it as a method within this class.
     The method will need take some :class:`FunctionalGroup` instances
-    as arguments. These are the functional groups which react. Within
-    the method itself, the attribute :attr:`bonds_made` must be
-    incremented by the number of bonds added by the reaction.
+    as arguments. These are the functional groups which react.
 
     Once the method is defined, :attr:`_custom_reactions` needs to
     be updated.
@@ -189,8 +186,6 @@ class Reactor:
 
         """
 
-        # The net number of bonds added.
-        self._bonds_made = 0
         # The molecule from which atoms and bonds are added and
         # removed.
         self._mol = mol
@@ -198,6 +193,38 @@ class Reactor:
         self._deleter_ids = set()
         # The ids of bonds which are to be removed.
         self._deleter_bonds = set()
+
+        # Maps a _ReactionKey for a given reaction to a custom
+        # method which carries out the reaction. This means that
+        # add_reaction will use that method for carrying out that
+        # reaction instead.
+        self._custom_reactions = {
+
+            _ReactionKey('boronic_acid', 'diol'):
+                self._boronic_acid_with_diol,
+
+            _ReactionKey('diol', 'difluorene'):
+                partial(
+                    self._diol_with_dihalogen,
+                    dihalogen='difluorene'
+                ),
+
+            _ReactionKey('diol', 'dibromine'):
+                partial(
+                    self._diol_with_dihalogen,
+                    dihalogen='dibromine'
+                ),
+
+            _ReactionKey('ring_amine', 'ring_amine'):
+                self._ring_amine_with_ring_amine
+
+        }
+
+        # Maps a _ReactionKey for a given reaction to a custom
+        # method which carries out the reaction. This means that
+        # add_periodic_reaction() will use that method for carrying out
+        # that reaction instead.
+        self._periodic_custom_reactions = {}
 
     def add_reaction(self, *fgs):
         """
@@ -227,22 +254,11 @@ class Reactor:
 
         names = (fg.fg_type.name for fg in fgs)
         reaction_key = _ReactionKey(*names)
-        if reaction_key in self._custom_reactions:
-            return self._custom_reactions[reaction_key](self, *fgs)
-
-        for fg in fgs:
-            self._deleter_ids.update(fg.get_deleter_ids())
-            fg.atoms = tuple(
-                a for a in fg.atoms if a.id not in self._deleter_ids
-            )
-            fg.deleters = ()
-
-        bond = self._bond_orders.get(reaction_key, 1)
-        fg1, fg2 = fgs
-        self._mol.bonds.append(
-            Bond(fg1.bonders[0], fg2.bonders[0], bond)
+        reaction = self._custom_reactions.get(
+            reaction_key,
+            self._react_any
         )
-        self._bonds_made += 1
+        return reaction(reaction_key, *fgs)
 
     def add_periodic_reaction(self, direction, *fgs):
         """
@@ -287,7 +303,6 @@ class Reactor:
                 direction=direction
             )
         )
-        self._bonds_made += 1
 
     def finalize(self):
         """
@@ -295,8 +310,7 @@ class Reactor:
 
         Returns
         -------
-        :class:`int`
-            The number of bonds added.
+        None : :class:`NoneType`
 
         """
 
@@ -314,9 +328,40 @@ class Reactor:
             if i not in self._deleter_ids
         ]
 
-        return self._bonds_made
+    def _react_any(self, reaction_key, fg1, fg2):
+        """
+        Create bonds between functional groups.
 
-    def _diol_with_dihalogen(self, fg1, fg2, dihalogen):
+        Parameters
+        ----------
+        reaction_key : :class:`._ReactionKey`
+            The key for the reaction.
+
+        fg1 : :class:`.FunctionalGroup`
+            A functional group which undergoes the reaction.
+
+        fg2 : :class:`.FunctionalGroup`
+            A functional group which undergoes the reaction.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        for fg in (fg1, fg2):
+            self._deleter_ids.update(fg.get_deleter_ids())
+            fg.atoms = tuple(
+                a for a in fg.atoms if a.id not in self._deleter_ids
+            )
+            fg.deleters = ()
+
+        bond_order = self._bond_orders.get(reaction_key, 1)
+        bond = Bond(fg1.bonders[0], fg2.bonders[0], bond_order)
+        self._mol.bonds.append(bond)
+        self._mol.construction_bonds.append(bond)
+
+    def _react_diol_with_dihalogen(self, fg1, fg2, dihalogen):
         """
         Create bonds between functional groups.
 
@@ -360,9 +405,8 @@ class Reactor:
         assert c1 != c2 and o1 != o2
         self._mol.bonds.append(Bond(c1, o1, 1))
         self._mol.bonds.append(Bond(c2, o2, 1))
-        self._bonds_made += 2
 
-    def _boronic_acid_with_diol(self, fg1, fg2):
+    def _react_boronic_acid_with_diol(self, fg1, fg2):
         """
         Create bonds between functional groups.
 
@@ -393,9 +437,8 @@ class Reactor:
         boron_atom = boron.bonders[0]
         self._mol.bonds.append(Bond(boron_atom, diol.bonders[0], 1))
         self._mol.bonds.append(Bond(boron_atom, diol.bonders[1], 1))
-        self._bonds_made += 2
 
-    def _ring_amine_with_ring_amine(self, fg1, fg2):
+    def _react_ring_amine_with_ring_amine(self, fg1, fg2):
         """
         Creates bonds between functional groups.
 
@@ -481,31 +524,3 @@ class Reactor:
         self._mol.bonds.append(Bond(n1, nc_joiner2, 1))
         self._mol.bonds.append(Bond(nc_joiner2, nc2h1, 1))
         self._mol.bonds.append(Bond(nc_joiner2, nc2h2, 1))
-
-        self._bonds_made += 12
-
-    # Maps a _ReactionKey for a given reaction to a custom
-    # method which carries out the reaction. This means that
-    # add_reaction will use that method for carrying out that
-    # reaction instead.
-    _custom_reactions = {
-
-        _ReactionKey('boronic_acid', 'diol'):
-            _boronic_acid_with_diol,
-
-        _ReactionKey('diol', 'difluorene'):
-            partial(_diol_with_dihalogen, dihalogen='difluorene'),
-
-        _ReactionKey('diol', 'dibromine'):
-            partial(_diol_with_dihalogen, dihalogen='dibromine'),
-
-        _ReactionKey('ring_amine', 'ring_amine'):
-            _ring_amine_with_ring_amine
-
-    }
-
-    # Maps a _ReactionKey for a given reaction to a custom
-    # method which carries out the reaction. This means that
-    # add_periodic_reaction() will use that method for carrying out
-    # that reaction instead.
-    _periodic_custom_reactions = {}

@@ -1,6 +1,12 @@
+import stk
 
 
-def test_add_reaction(reactor):
+def test_default_reaction(make_reactor, amine2, aldehyde2):
+    reactor = make_reactor(
+        building_blocks=[amine2, aldehyde2],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
+
     # Carry out the reactions.
     mol = reactor._mol
     num_start_atoms = len(mol.atoms)
@@ -31,3 +37,7 @@ def test_add_reaction(reactor):
     for atom in mol.atoms:
         assert atom not in deleters
     assert len(mol.atoms) == num_start_atoms - len(deleters)
+
+
+def test_diol_with_dihalogen(reactor):
+    ...
