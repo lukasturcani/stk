@@ -13,7 +13,7 @@ from functools import wraps
 import logging
 import pathos
 
-from .utilities import dedupe
+from .utilities import dedupe, dice_similarity
 from .molecular import ConstructedMolecule, Molecule
 
 
@@ -59,7 +59,21 @@ class Population:
         import stk
 
         # Create a population.
-        pop = stk.Population(...)
+        pop = stk.Population(
+            stk.BuildingBlock(...),
+            stk.ConstructedMolecule(...),
+            stk.BuildingBlock(...),
+            stk.BuildingBlock(...),
+
+            stk.Population(
+                stk.BuildingBlock(...),
+                stk.ConstructedMolecule(...)
+            )
+
+            stk.ConstructedMolecule(...),
+            stk.BuildingBlock(...)
+
+        )
 
         for member in pop:
             do_stuff(member)
@@ -366,6 +380,7 @@ class Population:
         building_blocks,
         topology_graphs,
         size,
+        random_seed=None,
         use_cache=False
     ):
         """
@@ -425,11 +440,10 @@ class Population:
                 )
 
             The order a :class:`.Molecule` instance is given to
-            the `constructed_molecule_class` is determined by the
+            :class:`.ConstructedMolecule` is determined by the
             sublist of `building_blocks` it was picked from. Note that
             the number of sublists in `building_blocks` is not fixed.
-            It merely has to be compatible with the
-            `constructed_molecule_class`.
+            It merely has to be compatible with the `topology_graphs`.
 
         topology_graphs : :class:`iterable` of :class:`.TopologyGraph`
             An iterable holding topology grpahs which should be
@@ -438,6 +452,10 @@ class Population:
 
         size : :class:`int`
             The desired size of the :class:`.Population`.
+
+        random_seed : :class:`int`, optional
+            Seed for the random number generator to get replicable
+            results.
 
         use_cache : :class:`bool`, optional
             Toggles use of the molecular cache.
@@ -495,6 +513,9 @@ class Population:
         pop = cls()
 
         # Shuffle the sublists.
+        if random_seed is not None:
+            np.random.seed(random_seed)
+
         for db in building_blocks:
             np.random.shuffle(db)
 
@@ -513,28 +534,13 @@ class Population:
             if len(pop) == size:
                 break
 
-            # Make a dictionary which maps every rdkit molecule to its
-            # BuildingBlock, for every sublist in building_blocks.
-            mol_maps = [
-                {bb.to_rdkit_mol(): bb for bb in db}
-                for db in building_blocks
-            ]
-
-            # Make iterators which go through all rdkit molecules
-            # in the sublists.
-            mol_iters = (mol_map.keys() for mol_map in mol_maps)
-
             # Get the most different BuildingBlock to the previously
             # selected one, per sublist.
-            diff_mols = (
-                bb.similar_molecules(mols)[-1][1]
-                for bb, mols in zip(bbs, mol_iters)
-            )
             diff_bbs = [
-                mol_map[mol]
-                for mol_map, mol in zip(mol_maps, diff_mols)
-            ]
+                min(db, key=lambda mol: dice_similarity(bb, mol))
+                for bb, db in zip(bbs, building_blocks)
 
+            ]
             mol = ConstructedMolecule(
                 building_blocks=diff_bbs,
                 topology_graph=top,
@@ -555,6 +561,7 @@ class Population:
         building_blocks,
         topology_graphs,
         size,
+        random_seed=None,
         use_cache=False
     ):
         """
@@ -622,6 +629,10 @@ class Population:
         size : :class:`int`
             The size of the population to be initialized.
 
+        random_seed : :class:`int`, optional
+            Seed for the random number generator to get replicable
+            results.
+
         use_cache : :class:`bool`, optional
             Toggles use of the molecular cache.
 
@@ -678,6 +689,9 @@ class Population:
         pop = cls()
 
         # Shuffle the sublists.
+        if random_seed is not None:
+            np.random.seed(random_seed)
+
         for db in building_blocks:
             np.random.shuffle(db)
 
@@ -905,8 +919,8 @@ class Population:
                 raise result
 
         # Update the structures in the population.
-        sorted_opt = sorted(optimized, key=lambda m: m.key)
-        sorted_pop = sorted(self, key=lambda m: m.key)
+        sorted_opt = sorted(optimized, key=lambda m: m._key)
+        sorted_pop = sorted(self, key=lambda m: m._key)
         for old, new in zip(sorted_pop, sorted_opt):
             old.__dict__ = dict(vars(new))
             if optimizer.use_cache:
@@ -1333,13 +1347,13 @@ class _Guard:
         fn = self.__wrapped__.__name__
         cls = self._calc_name
         try:
-            logger.info(f'Running "{cls}.{fn}()" on "{mol.name}"')
+            logger.info(f'Running "{cls}.{fn}()" on "{mol}"')
             self.__wrapped__(mol)
             return mol
 
         except Exception as ex:
             errormsg = (
-                f'"{cls}.{fn}()" failed on molecule "{mol.name}"'
+                f'"{cls}.{fn}()" failed on molecule "{mol}"'
             )
             logger.error(errormsg, exc_info=True)
             return ex

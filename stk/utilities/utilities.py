@@ -891,6 +891,44 @@ def rotation_matrix_arbitrary_axis(angle, axis):
                      [e31, e32, e33]])
 
 
+def dice_similarity(mol1, mol2, fp_radius=3):
+    """
+    Return the chemical similarity between two molecules.
+
+    Parameters
+    ----------
+    mol1 : :class:`.Molecule`
+        The first molecule.
+
+    mol2 : :class:`.Molecule`
+        The second molecule.
+
+    fp_radius : :class:`int`, optional
+        The radius of the Morgan fingerprint used to calculate
+        similarity.
+
+    Returns
+    -------
+    :class:`float`
+        The similarity.
+
+    """
+
+    rdkit_mol1 = mol1.to_rdkit_mol()
+    fp1 = rdkit.GetMorganFingerprint(
+        mol=rdkit_mol1,
+        radius=fp_radius,
+
+    )
+    rdkit_mol2 = mol2.to_rdkit_mol()
+    fp2 = rdkit.GetMorganFingerprint(
+        mol=rdkit_mol2,
+        radius=fp_radius,
+
+    )
+    return rdkit.DataStructs.DiceSimilarity(fp1, fp2)
+
+
 def quaternion(u):
     """
     Returns a translation + rotation quaternion.
