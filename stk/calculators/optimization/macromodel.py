@@ -982,7 +982,7 @@ class MacroModelMD(_MacroModel):
                  output_dir=None,
                  timeout=None,
                  force_field=16,
-                 temperature=300,
+                 temperature=750,
                  conformers=50,
                  time_step=1,
                  eq_time=10,
