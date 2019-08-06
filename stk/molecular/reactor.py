@@ -12,6 +12,7 @@ See :class:`.Reactor`.
 
 from collections import Counter
 import numpy as np
+from scipy.spatial.distance import euclidean
 
 from . import elements
 from .bonds import Bond
@@ -373,8 +374,10 @@ class Reactor:
 
         distances = []
         for carbon in dihalogen.get_bonder_ids():
+            c_coord = self._mol._position_matrix[carbon]
             for oxygen in diol.get_bonder_ids():
-                d = self._mol.get_atom_distance(carbon, oxygen)
+                o_coord = self._mol._position_matrix[oxygen]
+                d = euclidean(c_coord, o_coord)
                 distances.append((d, carbon, oxygen))
         distances.sort()
 
@@ -389,8 +392,18 @@ class Reactor:
         (c1, o1), (c2, o2), *_ = deduped_pairs
         assert c1 != c2 and o1 != o2
 
-        bond1 = Bond(c1, o1, 1, periodicity)
-        bond2 = Bond(c2, o2, 1, periodicity)
+        bond1 = Bond(
+            atom1=self._mol.atoms[c1],
+            atom2=self._mol.atoms[o1],
+            order=1,
+            periodicity=periodicity
+        )
+        bond2 = Bond(
+            atom1=self._mol.atoms[c2],
+            atom2=self._mol.atoms[o2],
+            order=1,
+            periodicity=periodicity
+        )
         self._mol.bonds.append(bond1)
         self._mol.construction_bonds.append(bond1)
         self._mol.bonds.append(bond2)

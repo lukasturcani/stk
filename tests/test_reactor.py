@@ -11,6 +11,7 @@ def _test_reaction(
     atom_change_per_reaction,
     bond_change_per_reaction,
     costruction_bonds_per_reaction,
+    periodic_bonds_per_periodic_reaction,
     expected_construction_bond_order
 ):
     mol = reactor._mol
@@ -29,26 +30,16 @@ def _test_reaction(
         (1, 0, -1)
     ]
 
-    num_expected_periodic_bonds = 0
-    degrees = {}
+    num_periodic_reactions = 0
     for i, edge in enumerate(edge_clones):
         for fg in edge.get_func_groups():
-            for atom in fg.deleters:
-                degree = 0
-                for bond in mol.bonds:
-                    if bond.atom1 is atom or bond.atom2 is atom:
-                        degree += 1
-                degrees[atom] = degree
-
             deleters.update(fg.deleters)
 
-        start_bonds = len(mol.bonds)
         reactor.add_reaction(
             func_groups=edge.get_func_groups(),
             periodicity=periodicities[i % 2]
         )
-        if i % 2 == 1:
-            num_expected_periodic_bonds += start_bonds - len(mol.bonds)
+        num_periodic_reactions += i % 2
 
         reacted_fgs.extend(edge.get_func_groups())
     reactor.finalize()
@@ -110,23 +101,25 @@ def _test_reaction(
 
     # Make sure the correct number of bonds is left.
     assert (
-        len(mol.bonds) == num_start_bonds - bond_change_per_reaction*5
+        len(mol.bonds) == num_start_bonds + bond_change_per_reaction*5
     )
 
     # Make sure construction bonds are shared with bonds.
     bonds = set(mol.bonds)
     assert all(bond in bonds for bond in mol.construction_bonds)
 
-    # Make sure the correct amount of bonds is periodic
-    num_periodic_bonds = sum(
-        1 for bond in mol.bonds if bond.is_periodic()
-    )
+    # Make sure the correct amount of bonds is periodic.
+    num_periodic_bonds = 0
     for bond in mol.bonds:
         if bond.is_periodic():
+            num_periodic_bonds += 1
             assert bond.periodicity == (1, 0, -1)
         else:
             assert bond.periodicity == (0, 0, 0)
-    assert num_expected_periodic_bonds == num_periodic_bonds
+    assert (
+        num_periodic_bonds ==
+        periodic_bonds_per_periodic_reaction*num_periodic_reactions
+    )
 
 
 def test_react_any_single(make_reactor, amine2):
@@ -139,6 +132,7 @@ def test_react_any_single(make_reactor, amine2):
         atom_change_per_reaction=-4,
         bond_change_per_reaction=-3,
         costruction_bonds_per_reaction=1,
+        periodic_bonds_per_periodic_reaction=1,
         expected_construction_bond_order=lambda bond: 1
     )
 
@@ -153,6 +147,7 @@ def test_react_any_double(make_reactor, amine2, aldehyde2):
         atom_change_per_reaction=-3,
         bond_change_per_reaction=-2,
         costruction_bonds_per_reaction=1,
+        periodic_bonds_per_periodic_reaction=1,
         expected_construction_bond_order=lambda bond: 2
     )
 
@@ -171,6 +166,7 @@ def test_react_diol_with_dihalogen(
         atom_change_per_reaction=-4,
         bond_change_per_reaction=-2,
         costruction_bonds_per_reaction=2,
+        periodic_bonds_per_periodic_reaction=2,
         expected_construction_bond_order=lambda bond: 1
     )
 
@@ -189,6 +185,7 @@ def test_react_boronic_acid_with_diol(
         atom_change_per_reaction=-6,
         bond_change_per_reaction=-4,
         costruction_bonds_per_reaction=2,
+        periodic_bonds_per_periodic_reaction=2,
         expected_construction_bond_order=lambda bond: 1
     )
 
@@ -203,5 +200,6 @@ def test_react_ring_amine_with_ring_amine(make_reactor, ring_amine):
         atom_change_per_reaction=3,
         bond_change_per_reaction=6,
         costruction_bonds_per_reaction=12,
+        periodic_bonds_per_periodic_reaction=3,
         expected_construction_bond_order=lambda bond: 1
     )
