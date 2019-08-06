@@ -527,7 +527,7 @@ class Reactor:
         self._mol._position_matrix.append(nc2h2_coord)
 
         self._mol.bonds.append(Bond(n1, n_joiner, 1))
-        self._mol.bonds.append(Bond(n_joiner, n2, 1), periodicity)
+        self._mol.bonds.append(Bond(n_joiner, n2, 1, periodicity))
         self._mol.bonds.append(Bond(n_joiner, nh1, 1))
         self._mol.bonds.append(Bond(n_joiner, nh2, 1))
 

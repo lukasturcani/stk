@@ -79,7 +79,7 @@ def periodic_bond(lithium, chlorine):
         atom1=lithium,
         atom2=chlorine,
         order=21,
-        periodicity=[1, 0, -1],
+        periodicity=(1, 0, -1),
         attr10=16,
         attr20='26',
         _attr30=126.2
@@ -271,7 +271,7 @@ def make_reactor():
         mol.topology_graph = topology_graph
         mol.atoms = []
         mol.bonds = []
-        mol.bonds_made = 0
+        mol.construction_bonds = []
         mol.func_groups = []
         mol.building_block_counter = Counter()
         mol._position_matrix = []

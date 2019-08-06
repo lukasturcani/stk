@@ -19,8 +19,6 @@ from collections import deque
 import tarfile
 from glob import iglob
 
-# Holds global stk options.
-OPTIONS = {}
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {

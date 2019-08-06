@@ -246,6 +246,11 @@ class Bond:
         if isinstance(self.order, float) and self.order.is_integer():
             self.order = int(self.order)
 
+        periodicity = (
+            '' if not self.is_periodic()
+            else f', {self.periodicity}'
+        )
         return (
-            f'{cls_name}({self.atom1}, {self.atom2}, {self.order})'
+            f'{cls_name}({self.atom1}, {self.atom2}, '
+            f'{self.order}{periodicity})'
         )

@@ -3,7 +3,7 @@ import stk
 
 def func_groups(building_blocks):
     fgs = (fg for bb in building_blocks for fg in bb.func_groups)
-    yield from stk.dedupe(fgs, lambda fg: fg.fg_type.name)
+    yield from stk.dedupe(fgs, key=lambda fg: fg.fg_type.name)
 
 
 def _test_reaction(
@@ -15,7 +15,6 @@ def _test_reaction(
     num_start_atoms = len(mol.atoms)
     num_start_bonds = len(mol.bonds)
     edge_clones = reactor._mol._edge_clones
-    topology_graph = reactor._mol.topology_graph
     original_fgs = tuple(mol.func_groups)
     assert len(original_fgs) == 12
     reacted_fgs = []
@@ -24,15 +23,14 @@ def _test_reaction(
     assert len(mol.construction_bonds) == 0
 
     periodicities = [
-        [0, 0, 0],
-        [1, 0, -1]
+        (0, 0, 0),
+        (1, 0, -1)
     ]
 
-    bonded_fgs = topology_graph._get_bonded_fgs(mol, edge_clones)
     num_expected_periodic_bonds = 0
     degrees = {}
-    for i, fgs in enumerate(bonded_fgs):
-        for fg in fgs:
+    for i, edge in enumerate(edge_clones):
+        for fg in edge.get_func_groups():
             for atom in fg.deleters:
                 degree = 0
                 for bond in mol.bonds:
@@ -43,11 +41,14 @@ def _test_reaction(
             deleters.update(fg.deleters)
 
         start_bonds = len(mol.bonds)
-        reactor.add_reaction(*fgs, periodicity=periodicities[i % 2])
+        reactor.add_reaction(
+            func_groups=edge.get_func_groups(),
+            periodicity=periodicities[i % 2]
+        )
         if i % 2 == 1:
             num_expected_periodic_bonds += start_bonds - len(mol.bonds)
 
-        reacted_fgs.extend(fgs)
+        reacted_fgs.extend(edge.get_func_groups())
     reactor.finalize()
     assert len(reacted_fgs) == 10
 
@@ -87,11 +88,7 @@ def _test_reaction(
         assert len(fg.atoms) == num_expected_atoms
         assert all(atom not in deleters for atom in fg.atoms)
 
-        num_expected_bonders = (
-            num_original_bonders[fg_name] -
-            num_original_deleters[fg_name]
-        )
-        assert len(fg.bonders) == num_expected_bonders
+        assert len(fg.bonders) == num_original_bonders[fg_name]
         assert all(atom not in deleters for atom in fg.bonders)
 
     # Make sure the deleters atoms are not present in the molecule.
