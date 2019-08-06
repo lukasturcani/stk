@@ -398,6 +398,7 @@ class BuildingBlock(Molecule):
 
         rdkit_mol = obj.to_rdkit_mol()
         obj._key = cls._get_key(
+            self=obj,
             smiles=rdkit.MolToSmiles(rdkit_mol),
             functional_groups=functional_groups,
             random_seed=None,

@@ -8,7 +8,9 @@ def func_groups(building_blocks):
 
 def _test_reaction(
     reactor,
-    num_expected_construction_bonds,
+    atom_change_per_reaction,
+    bond_change_per_reaction,
+    costruction_bonds_per_reaction,
     expected_construction_bond_order
 ):
     mol = reactor._mol
@@ -93,11 +95,13 @@ def _test_reaction(
 
     # Make sure the deleters atoms are not present in the molecule.
     assert all(atom not in deleters for atom in mol.atoms)
-    assert len(mol.atoms) == num_start_atoms - len(deleters)
+    assert (
+        len(mol.atoms) == num_start_atoms + atom_change_per_reaction*5
+    )
 
     # Make sure the correct number of construction bonds was made.
     assert (
-        len(mol.construction_bonds) == num_expected_construction_bonds
+        len(mol.construction_bonds) == costruction_bonds_per_reaction*5
     )
 
     # Make sure all constructed bonds have the correct bond oder.
@@ -105,12 +109,9 @@ def _test_reaction(
         assert bond.order == expected_construction_bond_order(bond)
 
     # Make sure the correct number of bonds is left.
-    expected_bonds = (
-        num_start_bonds -
-        sum(degrees[a] for a in deleters) +
-        len(mol.construction_bonds)
+    assert (
+        len(mol.bonds) == num_start_bonds - bond_change_per_reaction*5
     )
-    assert len(mol.bonds) == expected_bonds
 
     # Make sure construction bonds are shared with bonds.
     bonds = set(mol.bonds)
@@ -133,7 +134,13 @@ def test_react_any_single(make_reactor, amine2):
         building_blocks=[amine2, amine2],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    _test_reaction(reactor, 5, lambda bond: 1)
+    _test_reaction(
+        reactor=reactor,
+        atom_change_per_reaction=-4,
+        bond_change_per_reaction=-3,
+        costruction_bonds_per_reaction=1,
+        expected_construction_bond_order=lambda bond: 1
+    )
 
 
 def test_react_any_double(make_reactor, amine2, aldehyde2):
@@ -141,7 +148,13 @@ def test_react_any_double(make_reactor, amine2, aldehyde2):
         building_blocks=[amine2, aldehyde2],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    _test_reaction(reactor, 5, lambda bond: 2)
+    _test_reaction(
+        reactor=reactor,
+        atom_change_per_reaction=-3,
+        bond_change_per_reaction=-2,
+        costruction_bonds_per_reaction=1,
+        expected_construction_bond_order=lambda bond: 2
+    )
 
 
 def test_react_diol_with_dihalogen(
@@ -153,7 +166,13 @@ def test_react_diol_with_dihalogen(
         building_blocks=[diol2, difluorene_dibromine],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    _test_reaction(reactor, 10, lambda bond: 1)
+    _test_reaction(
+        reactor=reactor,
+        atom_change_per_reaction=-4,
+        bond_change_per_reaction=-2,
+        costruction_bonds_per_reaction=2,
+        expected_construction_bond_order=lambda bond: 1
+    )
 
 
 def test_react_boronic_acid_with_diol(
@@ -165,7 +184,13 @@ def test_react_boronic_acid_with_diol(
         building_blocks=[boronic_acid2, diol2],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    _test_reaction(reactor, 10, lambda bond: 1)
+    _test_reaction(
+        reactor=reactor,
+        atom_change_per_reaction=-6,
+        bond_change_per_reaction=-4,
+        costruction_bonds_per_reaction=2,
+        expected_construction_bond_order=lambda bond: 1
+    )
 
 
 def test_react_ring_amine_with_ring_amine(make_reactor, ring_amine):
@@ -173,4 +198,10 @@ def test_react_ring_amine_with_ring_amine(make_reactor, ring_amine):
         building_blocks=[ring_amine, ring_amine],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    _test_reaction(reactor, 5, lambda bond: 2)
+    _test_reaction(
+        reactor=reactor,
+        atom_change_per_reaction=3,
+        bond_change_per_reaction=6,
+        costruction_bonds_per_reaction=12,
+        expected_construction_bond_order=lambda bond: 1
+    )

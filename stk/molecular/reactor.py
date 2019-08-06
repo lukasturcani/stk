@@ -526,17 +526,20 @@ class Reactor:
         nc2h2_coord = nc_joiner2_coord + np.array([0, 0, -1])
         self._mol._position_matrix.append(nc2h2_coord)
 
-        self._mol.bonds.append(Bond(n1, n_joiner, 1))
-        self._mol.bonds.append(Bond(n_joiner, n2, 1, periodicity))
-        self._mol.bonds.append(Bond(n_joiner, nh1, 1))
-        self._mol.bonds.append(Bond(n_joiner, nh2, 1))
-
-        self._mol.bonds.append(Bond(c1, nc_joiner1, 1))
-        self._mol.bonds.append(Bond(nc_joiner1, n2, 1, periodicity))
-        self._mol.bonds.append(Bond(nc_joiner1, nc1h1, 1))
-        self._mol.bonds.append(Bond(nc_joiner1, nc1h2, 1))
-
-        self._mol.bonds.append(Bond(nc_joiner2, c2, 1, periodicity))
-        self._mol.bonds.append(Bond(n1, nc_joiner2, 1))
-        self._mol.bonds.append(Bond(nc_joiner2, nc2h1, 1))
-        self._mol.bonds.append(Bond(nc_joiner2, nc2h2, 1))
+        bonds = (
+            Bond(n1, n_joiner, 1),
+            Bond(n_joiner, n2, 1, periodicity),
+            Bond(n_joiner, nh1, 1),
+            Bond(n_joiner, nh2, 1),
+            Bond(c1, nc_joiner1, 1),
+            Bond(nc_joiner1, n2, 1, periodicity),
+            Bond(nc_joiner1, nc1h1, 1),
+            Bond(nc_joiner1, nc1h2, 1),
+            Bond(nc_joiner2, c2, 1, periodicity),
+            Bond(n1, nc_joiner2, 1),
+            Bond(nc_joiner2, nc2h1, 1),
+            Bond(nc_joiner2, nc2h2, 1)
+        )
+        for bond in bonds:
+            self._mol.bonds.append(bond)
+            self._mol.construction_bonds.append(bond)
