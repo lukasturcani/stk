@@ -19,6 +19,14 @@ class Bond:
     order : :class:`int`
         The bond order.
 
+    periodicity : :class:`tuple` of :class:`int`
+        The directions across which the bond is periodic. For example,
+        ``(1, 0, -1)`` means that when going from
+        :attr:`~.Bond.atom1` to :attr:`~.Bond.atom2` the bond is
+        periodic across the x axis in the positive direction, is not
+        periodic across the y axis and is periodic across the z axis
+        in the negative direction.
+
     Examples
     --------
     *Adding additional attributes.*
@@ -87,7 +95,14 @@ class Bond:
 
     """
 
-    def __init__(self, atom1, atom2, order, **kwargs):
+    def __init__(
+        self,
+        atom1,
+        atom2,
+        order,
+        periodicity=(0, 0, 0),
+        **kwargs
+    ):
         """
         Initialize a :class:`Bond`.
 
@@ -102,7 +117,15 @@ class Bond:
         order : :class:`int`
             The bond order.
 
-        **kwargs : :class:`object`
+        periodicity : :class:`tuple` of :class:`int`, optional
+            The directions across which the bond is periodic. For
+            example, ``(1, 0, -1)`` means that when going from
+            :attr:`~.Bond.atom1` to :attr:`~.Bond.atom2` the bond is
+            periodic across the x axis in the positive direction, is
+            not periodic across the y axis and is periodic across the z
+            axis in the negative direction.
+
+        **kwargs : :class:`object`, optional
             Additional attributes to be added to the bond.
 
         """
@@ -110,6 +133,7 @@ class Bond:
         self.atom1 = atom1
         self.atom2 = atom2
         self.order = order
+        self.periodicity = periodicity
         for attr, val in kwargs.items():
             setattr(self, attr, val)
 
@@ -184,11 +208,29 @@ class Bond:
         obj.atom2 = atom_map.get(obj.atom2, obj.atom2)
         return obj
 
+    def is_periodic(self):
+        """
+        Return ``True`` if the bond is periodic.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if the bond is periodic.
+
+        """
+
+        return any(direction != 0 for direction in self.periodicity)
+
     def __repr__(self):
         if isinstance(self.order, float) and self.order.is_integer():
             self.order = int(self.order)
 
-        mandatory = {'atom1', 'atom2', 'order'}
+        periodicity = (
+            '' if not self.is_periodic()
+            else f', periodicity={self.periodicity}'
+        )
+
+        mandatory = {'atom1', 'atom2', 'order', 'periodicity'}
         attrs = ', '.join(
             f'{attr}={val!r}' for attr, val in vars(self).items()
             if attr not in mandatory and not attr.startswith('_')
@@ -196,7 +238,7 @@ class Bond:
         cls_name = self.__class__.__name__
         return (
             f'{cls_name}({self.atom1!r}, {self.atom2!r}, '
-            f'{self.order}{", " if attrs else ""}{attrs})'
+            f'{self.order}{periodicity}{", " if attrs else ""}{attrs})'
         )
 
     def __str__(self):
@@ -206,66 +248,4 @@ class Bond:
 
         return (
             f'{cls_name}({self.atom1}, {self.atom2}, {self.order})'
-        )
-
-
-class PeriodicBond(Bond):
-    """
-    Represents a periodic bond.
-
-    Attributes
-    ----------
-    atom1 : :class:`.Atom`
-        The first atom in the bond.
-
-    atom2 : :class:`.Atom`
-        The second atom in the bond.
-
-    order : :class:`int`
-        The bond order.
-
-    direction : :class:`list` of :class:`int`
-        The directions across which the bond is periodic. For example,
-        ``[1, 0, -1]`` means that when going from
-        :attr:`~.Bond.atom1` to :attr:`~.Bond.atom2` the bond is
-        periodic across the x axis in the positive direction, is not
-        periodic across the y axis and is periodic across the z axis
-        in the negative direction.
-
-    """
-
-    def __init__(self, atom1, atom2, order, direction, **kwargs):
-        """
-        Initialize a :class:`PeriodicBond`.
-
-        Parameters
-        ----------
-        atom1 : :class:`.Atom`
-            The first atom in the bond.
-
-        atom2 : :class:`.Atom`
-            The second atom in the bond.
-
-        order : :class:`int`
-            The bond order.
-
-        direction : :class:`list` of :class:`int`
-            The directions across which the bond is periodic. For
-            example, ``[1, 0, -1]`` means that when going from
-            :attr:`~.Bond.atom1` to :attr:`~.Bond.atom2` the bond is
-            periodic across the x axis in the positive direction, is
-            not periodic across the y axis and is periodic across the z
-            axis in the negative direction.
-
-        **kwargs : :class:`object`
-            Additional attributes to be added to the bond.
-
-        """
-
-        super().__init__(
-            atom1=atom1,
-            atom2=atom2,
-            order=order,
-            direction=direction,
-            **kwargs
         )

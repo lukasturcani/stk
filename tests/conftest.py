@@ -155,7 +155,7 @@ def amine3():
 
 @pytest.fixture(scope='session')
 def ring_amine():
-    return stk.BuildingBlock.init_from_smiles(
+    return stk.BuildingBlock(
         smiles='Nc1ccc2cc3cc(N)ccc3cc2c1',
         functional_groups=['ring_amine']
     )

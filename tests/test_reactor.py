@@ -1,43 +1,174 @@
 import stk
 
 
-def test_default_reaction(make_reactor, amine2, aldehyde2):
-    reactor = make_reactor(
-        building_blocks=[amine2, aldehyde2],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
-    )
+def func_groups(building_blocks):
+    fgs = (fg for bb in building_blocks for fg in bb.func_groups)
+    yield from stk.dedupe(fgs, lambda fg: fg.fg_type.name)
 
-    # Carry out the reactions.
+
+def _test_reaction(
+    reactor,
+    num_expected_construction_bonds,
+    expected_construction_bond_order
+):
     mol = reactor._mol
     num_start_atoms = len(mol.atoms)
+    num_start_bonds = len(mol.bonds)
     edge_clones = reactor._mol._edge_clones
     topology_graph = reactor._mol.topology_graph
+    original_fgs = tuple(mol.func_groups)
+    assert len(original_fgs) == 12
     reacted_fgs = []
     deleters = set()
-    for fgs in topology_graph._get_bonded_fgs(mol, edge_clones):
+
+    assert len(mol.construction_bonds) == 0
+
+    periodicities = [
+        [0, 0, 0],
+        [1, 0, -1]
+    ]
+
+    bonded_fgs = topology_graph._get_bonded_fgs(mol, edge_clones)
+    num_expected_periodic_bonds = 0
+    degrees = {}
+    for i, fgs in enumerate(bonded_fgs):
         for fg in fgs:
+            for atom in fg.deleters:
+                degree = 0
+                for bond in mol.bonds:
+                    if bond.atom1 is atom or bond.atom2 is atom:
+                        degree += 1
+                degrees[atom] = degree
+
             deleters.update(fg.deleters)
 
-        reactor.add_reaction(*fgs)
+        start_bonds = len(mol.bonds)
+        reactor.add_reaction(*fgs, periodicity=periodicities[i % 2])
+        if i % 2 == 1:
+            num_expected_periodic_bonds += start_bonds - len(mol.bonds)
+
         reacted_fgs.extend(fgs)
     reactor.finalize()
+    assert len(reacted_fgs) == 10
+
+    # Make sure that unreacted functional groups are unchanged.
+    num_original_atoms = {
+        fg.fg_type.name: len(fg.atoms)
+        for fg in func_groups(mol.building_block_vertices.keys())
+    }
+    num_original_bonders = {
+        fg.fg_type.name: len(fg.bonders)
+        for fg in func_groups(mol.building_block_vertices.keys())
+    }
+    num_original_deleters = {
+        fg.fg_type.name: len(fg.deleters)
+        for fg in func_groups(mol.building_block_vertices.keys())
+    }
+
+    num_unreacted_fgs = 0
+    for fg in original_fgs:
+        if fg not in reacted_fgs:
+            fg_name = fg.fg_type.name
+            assert len(fg.atoms) == num_original_atoms[fg_name]
+            assert len(fg.bonders) == num_original_bonders[fg_name]
+            assert len(fg.deleters) == num_original_deleters[fg_name]
+            num_unreacted_fgs += 1
+    assert num_unreacted_fgs == 2
 
     # Make sure the deleter atoms got purged from the functional
     # groups.
     for fg in reacted_fgs:
         assert not fg.deleters
+        fg_name = fg.fg_type.name
+        num_expected_atoms = (
+            num_original_atoms[fg_name] -
+            num_original_deleters[fg_name]
+        )
+        assert len(fg.atoms) == num_expected_atoms
+        assert all(atom not in deleters for atom in fg.atoms)
 
-        for atom in fg.atoms:
-            assert atom not in deleters
-
-        for atom in fg.bonders:
-            assert atom not in deleters
+        num_expected_bonders = (
+            num_original_bonders[fg_name] -
+            num_original_deleters[fg_name]
+        )
+        assert len(fg.bonders) == num_expected_bonders
+        assert all(atom not in deleters for atom in fg.bonders)
 
     # Make sure the deleters atoms are not present in the molecule.
-    for atom in mol.atoms:
-        assert atom not in deleters
+    assert all(atom not in deleters for atom in mol.atoms)
     assert len(mol.atoms) == num_start_atoms - len(deleters)
 
+    # Make sure the correct number of construction bonds was made.
+    assert (
+        len(mol.construction_bonds) == num_expected_construction_bonds
+    )
 
-def test_diol_with_dihalogen(reactor):
-    ...
+    # Make sure all constructed bonds have the correct bond oder.
+    for bond in mol.construction_bonds:
+        assert bond.order == expected_construction_bond_order(bond)
+
+    # Make sure the correct number of bonds is left.
+    expected_bonds = (
+        num_start_bonds -
+        sum(degrees[a] for a in deleters) +
+        len(mol.construction_bonds)
+    )
+    assert len(mol.bonds) == expected_bonds
+
+    # Make sure construction bonds are shared with bonds.
+    bonds = set(mol.bonds)
+    assert all(bond in bonds for bond in mol.construction_bonds)
+
+    # Make sure the correct amount of bonds is periodic
+    num_periodic_bonds = sum(
+        1 for bond in mol.bonds if bond.is_periodic()
+    )
+    assert num_expected_periodic_bonds == num_periodic_bonds
+
+
+def test_react_any_single(make_reactor, amine2):
+    reactor = make_reactor(
+        building_blocks=[amine2, amine2],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
+    _test_reaction(reactor, 5, lambda bond: 1)
+
+
+def test_react_any_double(make_reactor, amine2, aldehyde2):
+    reactor = make_reactor(
+        building_blocks=[amine2, aldehyde2],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
+    _test_reaction(reactor, 5, lambda bond: 2)
+
+
+def test_react_diol_with_dihalogen(
+    make_reactor,
+    diol2,
+    difluorene_dibromine
+):
+    reactor = make_reactor(
+        building_blocks=[diol2, difluorene_dibromine],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
+    _test_reaction(reactor, 10, lambda bond: 1)
+
+
+def test_react_boronic_acid_with_diol(
+    make_reactor,
+    boronic_acid2,
+    diol2
+):
+    reactor = make_reactor(
+        building_blocks=[boronic_acid2, diol2],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
+    _test_reaction(reactor, 10, lambda bond: 1)
+
+
+def test_react_ring_amine_with_ring_amine(make_reactor, ring_amine):
+    reactor = make_reactor(
+        building_blocks=[ring_amine, ring_amine],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
+    _test_reaction(reactor, 5, lambda bond: 2)

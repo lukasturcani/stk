@@ -85,6 +85,10 @@ def test_clone(bond, periodic_bond):
     assert not hasattr(mapped_periodic_clone, '_attr30')
 
 
+def test_is_periodic():
+    assert False
+
+
 def test_str(bond, periodic_bond):
     assert f'{bond}' == 'Bond(H(1), C(333), 2)'
     assert f'{periodic_bond}' == 'PeriodicBond(Li(121), Cl(786), 21)'
