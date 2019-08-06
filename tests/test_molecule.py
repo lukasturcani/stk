@@ -105,13 +105,13 @@ def test_get_atom_coords(tmp_amine2):
     # Test different input types.
     all_atom_ids = ((0, 2, 4), [0, 2, 4], (i for i in [0, 2, 4]))
     for atom_ids in all_atom_ids:
-        coords = tmp_amine2.get_atom_coords(atom_ids=atom_ids)
-        for atom_id, atom_coords in zip(atom_ids, coords):
-            assert all(atom_coords == [atom_id*10]*3)
-        num_coords = sum(
-            1 for _ in tmp_amine2.get_atom_coords(atom_ids)
+        coords = zip(
+            (0, 2, 4),
+            tmp_amine2.get_atom_coords(atom_ids=atom_ids)
         )
-        assert num_coords == len(atom_ids)
+        for i, (atom_id, atom_coords) in enumerate(coords, 1):
+            assert all(atom_coords == [atom_id*10]*3)
+        assert i == 3
 
 
 def test_get_atom_distance(tmp_amine2):
@@ -129,11 +129,12 @@ def test_get_center_of_mass(tmp_amine2):
     assert all(tmp_amine2.get_center_of_mass() == [0, 0, 0])
 
     new_coords = tmp_amine2.get_position_matrix()
+    new_coords[(0, 2, 4), :] = np.ones((3, 3))
+    tmp_amine2.set_position_matrix(new_coords)
     assert not all(tmp_amine2.get_center_of_mass() == [1, 1, 1])
+
     all_atom_ids = ((0, 2, 4), [0, 2, 4], (i for i in [0, 2, 4]))
     for atom_ids in all_atom_ids:
-        new_coords[atom_ids] = np.ones((len(atom_ids), 3))
-        tmp_amine2.set_position_matrix(new_coords)
         assert all(
             tmp_amine2.get_center_of_mass(atom_ids) == [1, 1, 1]
         )
@@ -245,16 +246,18 @@ def test_set_centroid(tmp_amine2):
     tmp_amine2.set_centroid([12, 13, 15])
     assert np.allclose(tmp_amine2.get_centroid(), [12, 13, 15], 1e-6)
 
-    all_atom_ids = ([1, 3], (2, 3), (i for i in [0, 3]))
-    for atom_ids in all_atom_ids:
-        tmp_amine2.set_centroid([-12, 4, 160], atom_ids=atom_ids)
+    set_all_atom_ids = ([1, 3], (2, 3), (i for i in [0, 3]))
+    get_all_atom_ids = ([1, 3], (2, 3), (i for i in [0, 3]))
+    all_atom_ids = zip(set_all_atom_ids, get_all_atom_ids)
+    for set_atom_ids, get_atom_ids in all_atom_ids:
+        tmp_amine2.set_centroid([-12, 4, 160], atom_ids=set_atom_ids)
         assert not np.allclose(
             a=tmp_amine2.get_centroid(),
             b=[-12, 4, 160],
             atol=1e-6
         )
         assert np.allclose(
-            a=tmp_amine2.get_centroid(atom_ids=atom_ids),
+            a=tmp_amine2.get_centroid(atom_ids=get_atom_ids),
             b=[-12, 4, 160],
             atol=1e-6
         )
