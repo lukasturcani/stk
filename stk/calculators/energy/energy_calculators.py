@@ -38,7 +38,7 @@ def _add_cache_use(get_energy):
 
     Decorates `get_energy` so that before running it checks if the
     :class:`.Molecule` has already had its energy calculated. If so,
-    and :attr:`~EnergyCalculator.use_cache` is ``True``, then the
+    and :attr:`~EnergyCalculator._use_cache` is ``True``, then the
     energy value in the cache is returned.
 
     Parameters
@@ -55,12 +55,12 @@ def _add_cache_use(get_energy):
 
     @wraps(get_energy)
     def inner(self, mol):
-        if self.use_cache and mol in self._cache:
+        if self._use_cache and mol in self._cache:
             logger.info(f'Using cached energy value with {mol}.')
             return self._cache[mol]
         else:
             e = get_energy(self, mol)
-            if self.use_cache:
+            if self._use_cache:
                 self._cache[mol] = e
             return e
 
@@ -70,13 +70,6 @@ def _add_cache_use(get_energy):
 class EnergyCalculator:
     """
     Calculates the energy of molecules.
-
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`get_energy` will not run twice on the same
-        molecule, but will instead return the previously
-        calculated value.
 
     """
 
@@ -95,7 +88,7 @@ class EnergyCalculator:
 
         # Maps molecules to previously calculated energy values.
         self._cache = {}
-        self.use_cache = use_cache
+        self._use_cache = use_cache
 
     def __init_subclass__(cls, **kwargs):
         cls.get_energy = _add_cache_use(cls.get_energy)
@@ -129,13 +122,6 @@ class EnergyCalculator:
 class FormationEnergy(EnergyCalculator):
     """
     Calculates the formation energy of a molecule.
-
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`get_energy` will not run twice on the same
-        molecule, but will instead return the previously calculated
-        value.
 
     Examples
     --------
@@ -243,13 +229,6 @@ class MMFFEnergy(EnergyCalculator):
     """
     Uses the MMFF force field to calculate energies.
 
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`get_energy` will not run twice on the same
-        molecule, but will instead return the previously calculated
-        value.
-
     Examples
     --------
     .. code-block:: python
@@ -284,6 +263,7 @@ class MMFFEnergy(EnergyCalculator):
         """
 
         rdkit_mol = mol.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_mol)
         rdkit.GetSSSR(rdkit_mol)
         ff = rdkit.MMFFGetMoleculeForceField(
             rdkit_mol,
@@ -295,13 +275,6 @@ class MMFFEnergy(EnergyCalculator):
 class UFFEnergy(EnergyCalculator):
     """
     Uses the UFF force field to calculate energies.
-
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`get_energy` will not run twice on the same
-        molecule, but will instead return the previously calculated
-        value.
 
     Examples
     --------
@@ -337,6 +310,7 @@ class UFFEnergy(EnergyCalculator):
         """
 
         rdkit_mol = mol.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_mol)
         # RingInfo needs to be initialized, else rdkit may raise an
         # error.
         rdkit.GetSSSR(rdkit_mol)
@@ -369,11 +343,6 @@ class XTBEnergy(EnergyCalculator):
 
     Attributes
     ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`get_energy` will not run twice on the same
-        molecule, but will instead return the previously calculated
-        value.
-
     total_energies : :class:`dict`
         :class:`dict` of the total energy of each :class:`.Molecule`
         passed to :meth:`get_energy`.
