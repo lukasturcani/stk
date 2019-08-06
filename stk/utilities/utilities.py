@@ -361,7 +361,7 @@ def archive_output():
     os.rename('output', new_dir)
 
 
-def dedupe(iterable, seen=None, key=None):
+def dedupe(iterable, key=None, seen=None):
     """
     Yields items from `iterable` barring duplicates.
 
@@ -373,13 +373,13 @@ def dedupe(iterable, seen=None, key=None):
     iterable : :class:`iterable`
         An iterable of elements which are to be yielded, only once.
 
-    seen : :class:`set`, optional
-        Holds items which are not to be yielded.
-
     key : :class:`callable`
         A function which gets applied to every member of `iterable`.
         The return of this function is checked for duplication rather
         than the member itself.
+
+    seen : :class:`set`, optional
+        Holds items which are not to be yielded.
 
     Yields
     ------
@@ -913,12 +913,14 @@ def dice_similarity(mol1, mol2, fp_radius=3):
     """
 
     rdkit_mol1 = mol1.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_mol1)
     fp1 = rdkit.GetMorganFingerprint(
         mol=rdkit_mol1,
         radius=fp_radius,
 
     )
     rdkit_mol2 = mol2.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_mol2)
     fp2 = rdkit.GetMorganFingerprint(
         mol=rdkit_mol2,
         radius=fp_radius,

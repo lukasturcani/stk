@@ -290,9 +290,9 @@ class Population:
                 stk.BuildingBlock('NCCOCCN', ['amine']),
             ]
             aldehydes = [
-                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
-                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
-                stk.BuildingBlock('O=C(C=O)COCC=O', ['amine']),
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
+                stk.BuildingBlock('O=C(C=O)COCC=O', ['aldehyde']),
             ]
             # A total of 9 cages will be created.
             cages = stk.Population.init_all(
@@ -480,9 +480,9 @@ class Population:
                 stk.BuildingBlock('NCCOCCN', ['amine']),
             ]
             aldehydes = [
-                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
-                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
-                stk.BuildingBlock('O=C(C=O)COCC=O', ['amine']),
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
+                stk.BuildingBlock('O=C(C=O)COCC=O', ['aldehyde']),
             ]
             # A total of 4 cages will be created.
             cages = stk.Population.init_diverse(
@@ -525,7 +525,7 @@ class Population:
             # Generate the random constructed molecule.
             mol = ConstructedMolecule(
                 building_blocks=bbs,
-                topolog_graph=top,
+                topology_graph=top,
                 use_cache=use_cache
             )
             if mol not in pop:
@@ -657,14 +657,15 @@ class Population:
                 stk.BuildingBlock('NCCOCCN', ['amine']),
             ]
             aldehydes = [
-                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
-                stk.BuildingBlock('O=CCC(C=O)CC=O', ['amine']),
-                stk.BuildingBlock('O=C(C=O)COCC=O', ['amine']),
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
+                stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
+                stk.BuildingBlock('O=C(C=O)COCC=O', ['aldehyde']),
             ]
             # A total of 5 cages will be created.
             cages = stk.Population.init_random(
                 building_blocks=[amines, aldehydes],
-                topology_graphs=[stk.cage.FourPlusSix()]
+                topology_graphs=[stk.cage.FourPlusSix()],
+                size=5
             )
 
         Use the constructed cages and a new bunch of building blocks to
@@ -714,7 +715,7 @@ class Population:
         return pop
 
     @classmethod
-    def init_from_list(cls, pop_list):
+    def init_from_list(cls, pop_list, use_cache=False):
         """
         Initialize a population from a :class:`list` representation.
 
@@ -732,6 +733,9 @@ class Population:
             represent its subpopulations and the :class:`dict`
             ``{...}`` represents the members.
 
+        use_cache : :class:`bool`, optional
+            Toggles use of the molecular cache.
+
         Returns
         -------
         :class:`Population`
@@ -742,11 +746,11 @@ class Population:
         pop = cls()
         for item in pop_list:
             if isinstance(item, list):
-                sp = cls.init_from_list(item)
+                sp = cls.init_from_list(item, use_cache=use_cache)
                 pop.subpopulations.append(sp)
             else:
                 pop.direct_members.append(
-                    Molecule.init_from_dict(item)
+                    Molecule.init_from_dict(item, use_cache=use_cache)
                 )
         return pop
 
@@ -827,7 +831,7 @@ class Population:
         # ``Population`` instance within, yield ``Molecule``
         # instances from its `all_members` generator.
         for pop in self.subpopulations:
-            yield from pop._all_members()
+            yield from pop._get_all_members()
 
     def set_mol_ids(self, n, overwrite=False):
         """
@@ -859,7 +863,12 @@ class Population:
                 n += 1
         return n
 
-    def dump(self, path, include_attrs=None):
+    def dump(
+        self,
+        path,
+        include_attrs=None,
+        ignore_missing_attrs=False
+    ):
         """
         Dump the :class:`.Population` to a file.
 
@@ -874,6 +883,10 @@ class Population:
             the JSON. Each attribute is saved as a string using
             :func:`repr`.
 
+        ignore_missing_attrs : :class:`bool`, optional
+            If ``False`` and an attribute in `include_attrs` is not
+            held by a :class:`.Molecule`, an error will be raised.
+
         Returns
         -------
         None : :class:`NoneType`
@@ -881,10 +894,11 @@ class Population:
         """
 
         with open(path, 'w') as f:
-            json.dump(self.to_list(include_attrs), f, indent=4)
+            content = self.to_list(include_attrs, ignore_missing_attrs)
+            json.dump(content, f, indent=4)
 
     @classmethod
-    def load(cls, path):
+    def load(cls, path, use_cache=False):
         """
         Initialize a :class:`Population` from one dumped to a file.
 
@@ -892,6 +906,9 @@ class Population:
         ----------
         path : :class:`str`
             The full path of the file holding the dumped population.
+
+        use_cache : :class:`bool`, optional
+            Toggles use of the moleular cache.
 
         Returns
         -------
@@ -903,7 +920,7 @@ class Population:
         with open(path, 'r') as f:
             pop_list = json.load(f)
 
-        return cls.init_from_list(pop_list)
+        return cls.init_from_list(pop_list, use_cache)
 
     def _optimize_parallel(self, optimizer, processes):
         opt_fn = _Guard(optimizer, optimizer.optimize)
@@ -965,12 +982,7 @@ class Population:
         else:
             self._optimize_parallel(optimizer, processes)
 
-    def remove_duplicates(
-        self,
-        between_subpops=True,
-        key=id,
-        top_seen=None
-    ):
+    def remove_duplicates(self, across_subpopulations=True, key=id):
         """
         Remove duplicates from the population.
 
@@ -991,7 +1003,7 @@ class Population:
 
         Parameters
         ----------
-        between_subpops : :class:`bool`, optional
+        across_subpopulations : :class:`bool`, optional
             When ``False`` duplicates are only removed from within a
             given subpopulation. If ``True``, all duplicates are
             removed, regardless of which subpopulation they are in.
@@ -1006,39 +1018,21 @@ class Population:
 
         """
 
-        # Whether duplicates are being removed from within a single
-        # subpopulation or from different subpopulations, the duplicate
-        # must be removed from the `direct_members` attribute of some
-        # ``Population`` instance. This means ``dedupe`` can be run
-        # on the `direct_members` attribute of every population or
-        # subpopulation. The only difference is that when duplicates
-        # must be removed between different subpopulations a global
-        # ``seen`` set must be defined for the entire top level
-        # ``Population`` instance. This can be passed each time dedupe
-        # is being called on a subpopulation's `durect_members`
-        # attribute.
-        if between_subpops:
-            if top_seen is None:
-                seen = set()
-            if isinstance(top_seen, set):
-                seen = top_seen
+        return self._remove_duplicates(
+            across_subpopulations=across_subpopulations,
+            key=key,
+            seen=set()
+        )
 
-            self.direct_members = list(
-                dedupe(self.direct_members, seen, key)
-            )
-            for subpop in self.subpopulations:
-                subpop.remove_duplicates(True, key, seen)
+    def _remove_duplicates(self, across_subpopulations, key, seen):
+        if not across_subpopulations:
+            seen = set()
 
-        # If duplicates are only removed from within the same
-        # subpopulation, only the `members` attribute of each
-        # subpopulation needs to be cleared of duplicates. To do this,
-        # each `members` attribute is deduped recursively.
-        if not between_subpops:
-            self.direct_members = list(
-                dedupe(self.direct_members, key=key)
-            )
-            for subpop in self.subpopulations:
-                subpop.remove_duplicates(False, key)
+        self.direct_members = list(
+            dedupe(self.direct_members, key, seen)
+        )
+        for subpop in self.subpopulations:
+            subpop._remove_duplicates(across_subpopulations, key, seen)
 
     def remove_members(self, key):
         """
@@ -1064,7 +1058,7 @@ class Population:
         for subpop in self.subpopulations:
             subpop.remove_members(key)
 
-    def to_list(self, include_attrs=None):
+    def to_list(self, include_attrs=None, ignore_missing_attrs=False):
         """
         Convert the population to a :class:`list` representation.
 
@@ -1074,6 +1068,10 @@ class Population:
             The names of attributes to be added to the molecular
             representations. Each attribute is saved as a string using
             :func:`repr`.
+
+        ignore_missing_attrs : :class:`bool`, optional
+            If ``False`` and an attribute in `include_attrs` is not
+            held by a :class:`.Molecule`, an error will be raised.
 
         Returns
         -------
@@ -1085,13 +1083,12 @@ class Population:
         if include_attrs is None:
             include_attrs = []
 
-        include_attrs = set(include_attrs)
         pop = [
-            m.to_json(list(include_attrs & m.__dict__.keys()))
+            m.to_dict(include_attrs, ignore_missing_attrs)
             for m in self.direct_members
         ]
         for sp in self.subpopulations:
-            pop.append(sp.to_list(include_attrs))
+            pop.append(sp.to_list(include_attrs, ignore_missing_attrs))
         return pop
 
     def write(self, path):

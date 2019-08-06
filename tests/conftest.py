@@ -279,6 +279,113 @@ def tmp_cc3():
     return bb
 
 
+@pytest.fixture('session')
+def population():
+
+    bb1 = stk.BuildingBlock('NC(CNCN)CN', ['amine'])
+    bb2 = stk.BuildingBlock('[Br]CCCC[Br]', ['bromine'])
+    bb3 = stk.BuildingBlock('[I]COCC[I]', ['iodine'])
+    bb4 = stk.BuildingBlock('O=CC(C=O)CC=O', ['aldehyde'])
+
+    constructed1 = stk.ConstructedMolecule(
+        building_blocks=[bb2],
+        topology_graph=stk.polymer.Linear('A', [0], 3)
+    )
+    constructed2 = stk.ConstructedMolecule(
+        building_blocks=[bb1, bb4],
+        topology_graph=stk.cage.FourPlusSix()
+    )
+    constructed3 = stk.ConstructedMolecule(
+        building_blocks=[bb1, bb4],
+        topology_graph=stk.cage.EightPlusTwelve()
+    )
+    constructed4 = stk.ConstructedMolecule(
+        building_blocks=[bb2, bb3],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
+
+    return stk.Population(
+        constructed3,
+        stk.BuildingBlock('NCCCN'),
+        bb1,
+        stk.BuildingBlock('NCCCN', ['amine']),
+        constructed1,
+        stk.BuildingBlock('O=CCC=O'),
+        constructed1,
+        stk.BuildingBlock('O=CCC=O', ['aldehyde']),
+        stk.Population(
+            constructed1,
+            stk.BuildingBlock('[Br]CC[Br]'),
+            bb1,
+            bb2,
+            bb1
+        ),
+        constructed2,
+        stk.Population(
+            bb1,
+            stk.BuildingBlock('CCCC'),
+            stk.Population(
+                bb3,
+                stk.BuildingBlock('NNNN'),
+                constructed4
+            )
+        )
+    )
+
+
+@pytest.fixture
+def tmp_population():
+    bb1 = stk.BuildingBlock('NC(CNCN)CN', ['amine'])
+    bb2 = stk.BuildingBlock('[Br]CCCC[Br]', ['bromine'])
+    bb3 = stk.BuildingBlock('[I]COCC[I]', ['iodine'])
+    bb4 = stk.BuildingBlock('O=CC(C=O)CC=O', ['aldehyde'])
+
+    constructed1 = stk.ConstructedMolecule(
+        building_blocks=[bb2],
+        topology_graph=stk.polymer.Linear('A', [0], 3)
+    )
+    constructed2 = stk.ConstructedMolecule(
+        building_blocks=[bb1, bb4],
+        topology_graph=stk.cage.FourPlusSix()
+    )
+    constructed3 = stk.ConstructedMolecule(
+        building_blocks=[bb1, bb4],
+        topology_graph=stk.cage.EightPlusTwelve()
+    )
+    constructed4 = stk.ConstructedMolecule(
+        building_blocks=[bb2, bb3],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+    )
+
+    return stk.Population(
+        constructed3,
+        stk.BuildingBlock('NCCCN'),
+        bb1,
+        stk.BuildingBlock('NCCCN', ['amine']),
+        constructed1,
+        stk.BuildingBlock('O=CCC=O'),
+        constructed1,
+        stk.BuildingBlock('O=CCC=O', ['aldehyde']),
+        stk.Population(
+            constructed1,
+            stk.BuildingBlock('[Br]CC[Br]'),
+            bb1,
+            bb2,
+            bb1
+        ),
+        constructed2,
+        stk.Population(
+            bb1,
+            stk.BuildingBlock('CCCC'),
+            stk.Population(
+                bb3,
+                stk.BuildingBlock('NNNN'),
+                constructed4
+            )
+        )
+    )
+
+
 @pytest.fixture
 def make_reactor():
 
