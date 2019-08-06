@@ -250,7 +250,7 @@ class Reactor:
             reaction_key,
             self._react_any
         )
-        return reaction(reaction_key, func_groups)
+        return reaction(reaction_key, func_groups, periodicity)
 
     def finalize(self):
         """

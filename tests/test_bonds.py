@@ -85,8 +85,9 @@ def test_clone(bond, periodic_bond):
     assert not hasattr(mapped_periodic_clone, '_attr30')
 
 
-def test_is_periodic():
-    assert False
+def test_is_periodic(bond, periodic_bond):
+    assert not bond.is_periodic()
+    assert periodic_bond.is_periodic()
 
 
 def test_str(bond, periodic_bond):
@@ -104,10 +105,10 @@ def test_repr(bond, periodic_bond):
     assert f'{bond!r}' == bond_repr
 
     periodic_repr = (
-        "PeriodicBond(Li(121, charge=2, alpha=232, beta='bvc'), "
+        "Bond(Li(121, charge=2, alpha=232, beta='bvc'), "
         "Cl(786, a=9, b='bbb'), "
         "21, "
-        "direction=[1, 0, -1], "
+        "periodicity=(1, 0, -1), "
         "attr10=16, attr20='26')"
     )
     assert f'{periodic_bond!r}' == periodic_repr

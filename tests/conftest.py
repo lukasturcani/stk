@@ -75,11 +75,11 @@ def bond(hydrogen, carbon):
 
 @pytest.fixture('session')
 def periodic_bond(lithium, chlorine):
-    return stk.PeriodicBond(
+    return stk.Bond(
         atom1=lithium,
         atom2=chlorine,
         order=21,
-        direction=[1, 0, -1],
+        periodicity=[1, 0, -1],
         attr10=16,
         attr20='26',
         _attr30=126.2
