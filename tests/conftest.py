@@ -264,6 +264,22 @@ def tmp_polymer(tmp_amine2, tmp_aldehyde2):
 
 
 @pytest.fixture
+def tmp_cage(tmp_amine2, tmp_aldehyde3):
+    return stk.ConstructedMolecule(
+        building_blocks=[tmp_amine2, tmp_aldehyde3],
+        topology_graph=stk.cage.EightPlusTwelve()
+    )
+
+
+@pytest.fixture
+def tmp_cc3():
+    path = join('..', 'data', 'cc3.mol')
+    bb = stk.BuildingBlock.init_from_file(path)
+    bb.num_windows = 4
+    return bb
+
+
+@pytest.fixture
 def make_reactor():
 
     def inner(building_blocks, topology_graph):

@@ -38,7 +38,7 @@ desirable to embed a molecule first, to generate an initial structure.
 By default, running :meth:`.Optimizer.optimize` twice on the same
 molecule will perform an optimization a second time on a molecule. If
 we want to skip optimizations on molecules which have already been
-optimized we can use the :attr:`~.Optimizer.use_cache` flag.
+optimized we can use the `use_cache` flag.
 
 .. code-block:: python
 

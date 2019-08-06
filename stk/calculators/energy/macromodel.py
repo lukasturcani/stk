@@ -10,13 +10,6 @@ class MacroModelEnergy(EnergyCalculator):
     """
     Calculates the energy using MacroModel.
 
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`get_energy` will not run twice on the same
-        molecule, but will instead return the previously calculated
-        value.
-
     """
 
     def __init__(

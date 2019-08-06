@@ -26,7 +26,7 @@ calculates the energy of a molecule with
 
 By default, calling :meth:`~.EnergyCalculator.get_energy` twice on the
 same molecule will calculate the energy a second time. However, we can
-use the :attr:`~.EnergyCalculator.use_cache` option to prevent
+use the `use_cache` option to prevent
 recalculations when the same molecule is given to the same energy
 calculator a second time
 
