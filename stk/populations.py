@@ -318,13 +318,14 @@ class Population:
 
         """
 
-        args = []
+        bbs, topologies = [], []
         mols = it.product(*building_blocks, topology_graphs)
-        for *bbs, topology in mols:
-            args.append((bbs, topology))
+        for *mol_bbs, topology in mols:
+            bbs.append(mol_bbs),
+            topologies.append(topology)
 
         with pathos.pools.ProcessPool(processes) as pool:
-            mols = pool.map(ConstructedMolecule, args)
+            mols = pool.map(ConstructedMolecule, bbs, topologies)
 
         # Update the cache.
         if use_cache:
