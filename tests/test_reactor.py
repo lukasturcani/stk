@@ -123,6 +123,11 @@ def _test_reaction(
     num_periodic_bonds = sum(
         1 for bond in mol.bonds if bond.is_periodic()
     )
+    for bond in mol.bonds:
+        if bond.is_periodic():
+            assert bond.periodicity == (1, 0, -1)
+        else:
+            assert bond.periodicity == (0, 0, 0)
     assert num_expected_periodic_bonds == num_periodic_bonds
 
 

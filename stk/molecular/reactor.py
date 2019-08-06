@@ -389,8 +389,8 @@ class Reactor:
         (c1, o1), (c2, o2), *_ = deduped_pairs
         assert c1 != c2 and o1 != o2
 
-        bond1 = Bond(c1, o1, 1)
-        bond2 = Bond(c2, o2, 1)
+        bond1 = Bond(c1, o1, 1, periodicity)
+        bond2 = Bond(c2, o2, 1, periodicity)
         self._mol.bonds.append(bond1)
         self._mol.construction_bonds.append(bond1)
         self._mol.bonds.append(bond2)
@@ -417,7 +417,7 @@ class Reactor:
         periodicity : :class:`tuple` of :class:`int`
             Specifies the periodicity of the bonds added by the
             reaction, which bridge the `func_groups`. See
-            :attr:`.Bond.periodicity`..
+            :attr:`.Bond.periodicity`.
 
         Returns
         -------
@@ -431,8 +431,13 @@ class Reactor:
         diol = fg2 if boron is fg1 else fg1
 
         boron_atom = boron.bonders[0]
-        self._mol.bonds.append(Bond(boron_atom, diol.bonders[0], 1))
-        self._mol.bonds.append(Bond(boron_atom, diol.bonders[1], 1))
+        bond1 = Bond(boron_atom, diol.bonders[0], 1, periodicity)
+        self._mol.bonds.append(bond1)
+        self._mol.construction_bonds.append(bond1)
+
+        bond2 = Bond(boron_atom, diol.bonders[1], 1, periodicity)
+        self._mol.bonds.append(bond2)
+        self._mol.construction_bonds.append(bond2)
 
     def _react_ring_amine_with_ring_amine(
         self,
@@ -463,6 +468,7 @@ class Reactor:
 
         """
 
+        self._remove_deleters(func_groups)
         fg1, fg2 = func_groups
         c1 = next(a for a in fg1.bonders if a.atomic_number == 6)
         n1 = next(a for a in fg1.bonders if a.atomic_number == 7)
@@ -470,8 +476,10 @@ class Reactor:
         c2 = next(a for a in fg2.bonders if a.atomic_number == 6)
         n2 = next(a for a in fg2.bonders if a.atomic_number == 7)
 
-        coords = self._mol.get_atom_coords(atom_ids=(c1, n1, c2, n2))
-        n1_coord, n2_coord, c1_coord, c2_coord = coords
+        n1_coord = np.array(self._mol._position_matrix[n1.id])
+        n2_coord = np.array(self._mol._position_matrix[n2.id])
+        c1_coord = np.array(self._mol._position_matrix[c1.id])
+        c2_coord = np.array(self._mol._position_matrix[c2.id])
 
         n_joiner = elements.C(len(self._mol.atoms))
         self._mol.atoms.append(n_joiner)
@@ -519,16 +527,16 @@ class Reactor:
         self._mol._position_matrix.append(nc2h2_coord)
 
         self._mol.bonds.append(Bond(n1, n_joiner, 1))
-        self._mol.bonds.append(Bond(n2, n_joiner, 1))
+        self._mol.bonds.append(Bond(n_joiner, n2, 1), periodicity)
         self._mol.bonds.append(Bond(n_joiner, nh1, 1))
         self._mol.bonds.append(Bond(n_joiner, nh2, 1))
 
         self._mol.bonds.append(Bond(c1, nc_joiner1, 1))
-        self._mol.bonds.append(Bond(n2, nc_joiner1, 1))
+        self._mol.bonds.append(Bond(nc_joiner1, n2, 1, periodicity))
         self._mol.bonds.append(Bond(nc_joiner1, nc1h1, 1))
         self._mol.bonds.append(Bond(nc_joiner1, nc1h2, 1))
 
-        self._mol.bonds.append(Bond(c2, nc_joiner2, 1))
+        self._mol.bonds.append(Bond(nc_joiner2, c2, 1, periodicity))
         self._mol.bonds.append(Bond(n1, nc_joiner2, 1))
         self._mol.bonds.append(Bond(nc_joiner2, nc2h1, 1))
         self._mol.bonds.append(Bond(nc_joiner2, nc2h2, 1))
