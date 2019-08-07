@@ -768,7 +768,11 @@ class MacroModelForceField(_MacroModel):
 
         """
 
-        bonder_ids = set(mol.get_bonder_ids())
+        bonder_ids = set(
+            id_
+            for fg in mol.func_groups
+            for id_ in fg.get_bonder_ids()
+        )
 
         # Go through all the bonds in the rdkit molecule. If the bond
         # is not between bonder atoms add a fix line to the
@@ -849,7 +853,7 @@ class MacroModelForceField(_MacroModel):
         """
 
         paths = rdkit.FindAllPathsOfLengthN(
-            mol=mol.mol.to_rdkit_mol(),
+            mol=mol.to_rdkit_mol(),
             length=4,
             useBonds=False,
             useHs=True

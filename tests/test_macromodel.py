@@ -70,9 +70,10 @@ def test_restricted_md(tmp_tetrahedron, macromodel_path):
     tmp_tetrahedron.write(join(outdir, 'rmm_md_before.mol'))
 
     # Freeze one of the bonders.
-    bonder = tmp_tetrahedron.func_groups[0].bonder_ids[0]
+    bonder = tmp_tetrahedron.func_groups[0].bonders[0].id
+    rdkit_mol = tmp_tetrahedron.to_rdkit_mol()
     restricted_bonds = []
-    for neighbor in tmp_tetrahedron.mol.GetAtomWithIdx(bonder).GetNeighbors():
+    for neighbor in rdkit_mol.GetAtomWithIdx(bonder).GetNeighbors():
         restricted_bonds.append(frozenset((bonder, neighbor.GetIdx())))
 
     mm = stk.MacroModelMD(
