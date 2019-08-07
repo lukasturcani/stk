@@ -47,43 +47,18 @@ class _MacroModel(Optimizer):
     """
     Base class for MacroModel optimzers.
 
-    Attributes
-    ----------
-    macromodel_path : :class:`str`
-        The full path of the Schrodinger suite within the user's
-        machine. For example, on a Linux machine this may be something
-        like ``'/opt/schrodinger2017-2'``.
-
-    output_dir : :class:`str`
-        The name of the directory into which files generated during
-        the optimization are written, if ``None`` then
-        :func:`uuid.uuid4` is used.
-
-    force_field : :class:`int`
-        The number of the force field to be used.
-
-    maximum_iterations : :class:`int`
-        The maximum number of iterations done during the optimization.
-        Cannot be more than ``999999``.
-
-    minimum_gradient : :class:`float`
-        The gradient at which optimization is stopped.
-        Cannot be less than ``0.0001``.
-
-    timeout : :class:`float`
-        The amount in seconds the MD is allowed to run before
-        being terminated. ``None`` means there is no timeout.
-
     """
 
-    def __init__(self,
-                 macromodel_path,
-                 output_dir,
-                 timeout,
-                 force_field,
-                 maximum_iterations,
-                 minimum_gradient,
-                 use_cache):
+    def __init__(
+        self,
+        macromodel_path,
+        output_dir,
+        timeout,
+        force_field,
+        maximum_iterations,
+        minimum_gradient,
+        use_cache
+    ):
         """
         Initializes a :class:`_MacroModel` instance.
 
@@ -117,19 +92,19 @@ class _MacroModel(Optimizer):
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
 
-        self.macromodel_path = macromodel_path
-        self.output_dir = output_dir
-        self.timeout = timeout
-        self.force_field = force_field
-        self.maximum_iterations = maximum_iterations
-        self.minimum_gradient = minimum_gradient
+        self._macromodel_path = macromodel_path
+        self._output_dir = output_dir
+        self._timeout = timeout
+        self._force_field = force_field
+        self._maximum_iterations = maximum_iterations
+        self._minimum_gradient = minimum_gradient
         super().__init__(use_cache=use_cache)
 
-    def run_bmin(self, mol):
+    def _run_bmin(self, mol):
         """
         Runs an optimization using bmin.
 
@@ -158,7 +133,7 @@ class _MacroModel(Optimizer):
 
         """
 
-        logger.info(f'Running bmin on "{mol.name}".')
+        logger.info(f'Running bmin on "{mol}".')
 
         # To run MacroModel a command is issued to the console via
         # ``subprocess.Popen``. The command is the full path of the
@@ -166,7 +141,7 @@ class _MacroModel(Optimizer):
         # installation folder.
         file_root, ext = os.path.splitext(mol._file)
         log_file = f'{file_root}.log'
-        opt_app = os.path.join(self.macromodel_path, 'bmin')
+        opt_app = os.path.join(self._macromodel_path, 'bmin')
         # The first member of the list is the command, the following
         # ones are any additional arguments.
 
@@ -174,23 +149,25 @@ class _MacroModel(Optimizer):
 
         incomplete = True
         while incomplete:
-            process = psutil.Popen(opt_cmd,
-                                   stdout=sp.PIPE,
-                                   stderr=sp.STDOUT,
-                                   universal_newlines=True)
+            process = psutil.Popen(
+                opt_cmd,
+                stdout=sp.PIPE,
+                stderr=sp.STDOUT,
+                universal_newlines=True
+            )
             try:
-                output, _ = process.communicate(timeout=self.timeout)
+                output, _ = process.communicate(timeout=self._timeout)
 
             except sp.TimeoutExpired:
                 logger.warning(
-                    ('Minimization took too long and was terminated '
-                     f'by force on "{mol.name}".')
+                    'Minimization took too long and was terminated '
+                    f'by force on "{mol}".'
                 )
-                self.kill_bmin(mol)
+                self._kill_bmin(mol)
                 output = ''
 
             logger.debug(
-                f'Output of bmin on "{mol.name}" was: {output}.'
+                f'Output of bmin on "{mol}" was: {output}.'
             )
 
             with open(log_file, 'r') as log:
@@ -219,7 +196,7 @@ class _MacroModel(Optimizer):
             )
             if error3 in log_content and error4 in log_content:
                 raise MacroModelLewisStructureError(
-                        'bmin failed due to poor Lewis structure.'
+                    'bmin failed due to poor Lewis structure.'
                 )
 
             if 'MDYN error encountered' in log_content:
@@ -236,19 +213,19 @@ class _MacroModel(Optimizer):
 
             # If optimization fails because the license is not found,
             # rerun the function.
-            if self.license_found(output, mol):
+            if self._license_found(output, mol):
                 incomplete = False
 
         # Make sure the .maegz file created by the optimization is
         # present.
         maegz = file_root + '-out.maegz'
-        self.wait_for_file(maegz)
+        self._wait_for_file(maegz)
         if not os.path.exists(log_file) or not os.path.exists(maegz):
             raise MacroModelOptimizationError(
                 'The .log and/or .maegz files were not created.'
             )
 
-    def kill_bmin(self, mol):
+    def _kill_bmin(self, mol):
         """
         Kills bmin.
 
@@ -265,18 +242,20 @@ class _MacroModel(Optimizer):
 
         name, ext = os.path.splitext(mol._file)
         name = re.split(r'\\|/', name)[-1]
-        app = os.path.join(self.macromodel_path, 'jobcontrol')
+        app = os.path.join(self._macromodel_path, 'jobcontrol')
         cmd = [app, '-stop', name]
 
         incomplete = True
         while incomplete:
-            out = sp.run(cmd,
-                         stdout=sp.PIPE,
-                         stderr=sp.STDOUT,
-                         universal_newlines=True)
+            out = sp.run(
+                cmd,
+                stdout=sp.PIPE,
+                stderr=sp.STDOUT,
+                universal_newlines=True
+            )
 
             # Keep re-running the function until license is found.
-            if self.license_found(out.stdout):
+            if self._license_found(out.stdout):
                 incomplete = False
 
         # This loop causes the function to wait until the job has been
@@ -288,14 +267,16 @@ class _MacroModel(Optimizer):
         output = name
         start = time.time()
         while name in output:
-            output = sp.run(cmd,
-                            stdout=sp.PIPE,
-                            stderr=sp.STDOUT,
-                            universal_newlines=True).stdout
+            output = sp.run(
+                cmd,
+                stdout=sp.PIPE,
+                stderr=sp.STDOUT,
+                universal_newlines=True
+            ).stdout
             if time.time() - start > 600:
                 break
 
-    def license_found(self, output, mol=None):
+    def _license_found(self, output, mol=None):
         """
         Checks to see if minimization failed due to a missing license.
 
@@ -343,12 +324,14 @@ class _MacroModel(Optimizer):
         return True
 
     @staticmethod
-    def com_line(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
-        return (f' {arg1:<5}{arg2:>7}{arg3:>7}'
-                f'{arg4:>7}{arg5:>7}{arg6:>11.4f}'
-                f'{arg7:>11.4f}{arg8:>11.4f}{arg9:>11.4f}')
+    def _com_line(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
+        return (
+            f' {arg1:<5}{arg2:>7}{arg3:>7}'
+            f'{arg4:>7}{arg5:>7}{arg6:>11.4f}'
+            f'{arg7:>11.4f}{arg8:>11.4f}{arg9:>11.4f}'
+        )
 
-    def structconvert(self, iname, oname):
+    def _structconvert(self, iname, oname):
         """
         Uses structconvert to change file type.
 
@@ -366,9 +349,9 @@ class _MacroModel(Optimizer):
 
         """
 
-        convrt_app = os.path.join(self.macromodel_path,
-                                  'utilities',
-                                  'structconvert')
+        convrt_app = os.path.join(
+            self._macromodel_path, 'utilities', 'structconvert'
+        )
         convrt_cmd = [convrt_app, iname, oname]
 
         incomplete = True
@@ -376,10 +359,12 @@ class _MacroModel(Optimizer):
 
             # Execute the file conversion.
             try:
-                convrt_return = sp.run(convrt_cmd,
-                                       stdout=sp.PIPE,
-                                       stderr=sp.STDOUT,
-                                       universal_newlines=True)
+                convrt_return = sp.run(
+                    convrt_cmd,
+                    stdout=sp.PIPE,
+                    stderr=sp.STDOUT,
+                    universal_newlines=True
+                )
 
             # If conversion fails because a wrong Schrodinger path was
             # given, raise.
@@ -390,28 +375,28 @@ class _MacroModel(Optimizer):
 
             if 'File does not exist' in convrt_return.stdout:
                 raise MacroModelConversionError(
-                    (f'structconvert input file, {iname}, missing. '
-                     f'Console output was {convrt_return.stdout}')
+                    f'structconvert input file, {iname}, missing. '
+                    f'Console output was {convrt_return.stdout}'
                 )
 
             # Keep re-running the function until license is found.
-            if self.license_found(convrt_return.stdout):
+            if self._license_found(convrt_return.stdout):
                 incomplete = False
 
         # If force field failed, raise.
         if 'number 1' in convrt_return.stdout:
             raise MacroModelForceFieldError(convrt_return.stdout)
 
-        self.wait_for_file(oname)
+        self._wait_for_file(oname)
         if not os.path.exists(oname):
             raise MacroModelConversionError(
-                (f'Conversion output file {oname} was not found.'
-                 f' Console output was {convrt_return.stdout}.')
-             )
+                f'Conversion output file {oname} was not found.'
+                f' Console output was {convrt_return.stdout}.'
+            )
 
         return convrt_return
 
-    def create_mae(self, mol):
+    def _create_mae(self, mol):
         """
         Creates the ``.mae`` file holding the molecule to be optimized.
 
@@ -431,16 +416,16 @@ class _MacroModel(Optimizer):
 
         _, ext = os.path.splitext(mol._file)
 
-        logger.debug(f'Converting {ext} of "{mol.name}" to .mae.')
+        logger.debug(f'Converting {ext} of "{mol}" to .mae.')
 
         # Create the name of the new ``.mae`` file. It is the same as
         # the original structure file, including the same path. Only
         # the extensions are different.
         mae_file = mol._file.replace(ext, '.mae')
-        self.structconvert(mol._file, mae_file)
+        self._structconvert(mol._file, mae_file)
         return mae_file
 
-    def wait_for_file(self, filename, timeout=10):
+    def _wait_for_file(self, filename, timeout=10):
         """
         Stalls until a given file exists or `timeout` expires.
 
@@ -470,7 +455,7 @@ class _MacroModel(Optimizer):
             if os.path.exists(filename) or time_taken > timeout:
                 break
 
-    def convert_maegz_to_mae(self, mol):
+    def _convert_maegz_to_mae(self, mol):
         """
         Converts a ``.maegz`` file to a ``.mae`` file.
 
@@ -487,7 +472,7 @@ class _MacroModel(Optimizer):
 
         """
 
-        logger.debug(f'Converting .maegz of "{mol.name}" to .mae.')
+        logger.debug(f'Converting .maegz of "{mol}" to .mae.')
         name, ext = os.path.splitext(mol._file)
         # ``out`` is the full path of the optimized ``.mae`` file.
         maegz = name + '-out.maegz'
@@ -499,7 +484,7 @@ class _MacroModel(Optimizer):
             f.write(gz_file.read())
         gz_file.close()
 
-    def fix_params(self, mol, com):
+    def _fix_params(self, mol, com):
         """
         Fix bond distances and angles in ``.com`` file.
 
@@ -530,11 +515,11 @@ class _MacroModel(Optimizer):
 
         fix_block = ''
         # Add lines that fix the bond distance.
-        fix_block = self.fix_distances(mol, fix_block)
+        fix_block = self._fix_distances(mol, fix_block)
         # Add lines that fix the bond angles.
-        fix_block = self.fix_bond_angles(mol, fix_block)
+        fix_block = self._fix_bond_angles(mol, fix_block)
         # Add lines that fix the torsional angles.
-        fix_block = self.fix_torsional_angles(mol, fix_block)
+        fix_block = self._fix_torsional_angles(mol, fix_block)
 
         return com.replace(
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!\n',
@@ -546,24 +531,19 @@ class MacroModelForceField(_MacroModel):
     """
     Uses MacroModel force fields to optimize molecules.
 
-    Attributes
-    ----------
-    restricted : :class:`bool`
-        If ``True`` then an optimization is performed only on the bonds
-        added by :meth:`~.Topology.construct`. If ``False`` then all
-        bonds are optimized.
-
     """
 
-    def __init__(self,
-                 macromodel_path,
-                 output_dir=None,
-                 restricted=False,
-                 timeout=None,
-                 force_field=16,
-                 maximum_iterations=2500,
-                 minimum_gradient=0.05,
-                 use_cache=False):
+    def __init__(
+        self,
+        macromodel_path,
+        output_dir=None,
+        restricted=False,
+        timeout=None,
+        force_field=16,
+        maximum_iterations=2500,
+        minimum_gradient=0.05,
+        use_cache=False
+    ):
         """
         Initializes a :class:`MacroModelForceField` object.
 
@@ -602,27 +582,26 @@ class MacroModelForceField(_MacroModel):
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
         self._check_params(
             minimum_gradient=minimum_gradient,
             maximum_iterations=maximum_iterations
         )
-        self.restricted = restricted
-        super().__init__(macromodel_path=macromodel_path,
-                         output_dir=output_dir,
-                         force_field=force_field,
-                         maximum_iterations=maximum_iterations,
-                         minimum_gradient=minimum_gradient,
-                         timeout=timeout,
-                         use_cache=use_cache)
+        self._restricted = restricted
+        super().__init__(
+            macromodel_path=macromodel_path,
+            output_dir=output_dir,
+            force_field=force_field,
+            maximum_iterations=maximum_iterations,
+            minimum_gradient=minimum_gradient,
+            timeout=timeout,
+            use_cache=use_cache
+        )
 
     @staticmethod
-    def _check_params(
-        minimum_gradient,
-        maximum_iterations
-    ):
+    def _check_params(minimum_gradient, maximum_iterations):
         """
         Check if the optimization parameters are valid for MacroModel.
 
@@ -658,7 +637,7 @@ class MacroModelForceField(_MacroModel):
                 'Number of iterations (> 999999) is too high.'
             )
 
-    def generate_com(self, mol):
+    def _generate_com(self, mol):
         """
         Create a ``.com`` file for a MacroModel optimization.
 
@@ -682,26 +661,26 @@ class MacroModelForceField(_MacroModel):
 
         """
 
-        logger.debug('Creating .com file for "{}".'.format(mol.name))
+        logger.debug(f'Creating .com file for "{mol}".')
 
         # This is the body of the ``.com`` file. The line that begins
         # and ends with exclamation lines is replaced with the various
         # commands that fix bond distances and angles.
-        line1 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
+        line1 = ('FFLD', self._force_field, 1, 0, 0, 1, 0, 0, 0)
         line2 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
         line3 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
-        line4 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
-        line5 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
+        line4 = ('CONV', 2, 0, 0, 0, self._minimum_gradient, 0, 0, 0)
+        line5 = ('MINI', 1, 0, self._maximum_iterations, 0, 0, 0, 0, 0)
         line6 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
-            self.com_line(*line1),
-            self.com_line(*line2),
-            self.com_line(*line3),
+            self._com_line(*line1),
+            self._com_line(*line2),
+            self._com_line(*line3),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
-            self.com_line(*line4),
-            self.com_line(*line5),
-            self.com_line(*line6)
+            self._com_line(*line4),
+            self._com_line(*line5),
+            self._com_line(*line6)
         ])
 
         # Create a path for the ``.com`` file. It is the same as that
@@ -709,7 +688,7 @@ class MacroModelForceField(_MacroModel):
         name, ext = os.path.splitext(mol._file)
 
         # If `restricted` is ``False`` do not add a fix block.
-        if not self.restricted:
+        if not self._restricted:
             com_block = com_block.replace(
                 "!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!\n",
                 ''
@@ -717,7 +696,7 @@ class MacroModelForceField(_MacroModel):
         else:
             # This function adds all the lines which fix bond distances
             # and angles into com_block.
-            com_block = self.fix_params(mol, com_block)
+            com_block = self._fix_params(mol, com_block)
 
         # Writes the .com file.
         with open(f'{name}.com', 'w') as com:
@@ -730,7 +709,7 @@ class MacroModelForceField(_MacroModel):
             # Next is the body of the .com file.
             com.write(com_block)
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
         Optimizes a molecule.
 
@@ -739,9 +718,6 @@ class MacroModelForceField(_MacroModel):
         mol : :class:`.Molecule`
             The molecule to be optimized.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
-
         Returns
         -------
         None : :class:`NoneType`
@@ -749,28 +725,28 @@ class MacroModelForceField(_MacroModel):
         """
 
         basename = str(uuid4().int)
-        if self.output_dir is None:
+        if self._output_dir is None:
             output_dir = basename
         else:
-            output_dir = self.output_dir
+            output_dir = self._output_dir
 
         mol._file = f'{basename}.mol'
 
         # First write a .mol file of the molecule.
-        mol.write(mol._file, conformer=conformer)
+        mol.write(mol._file)
         # MacroModel requires a ``.mae`` file as input.
-        self.create_mae(mol)
+        self._create_mae(mol)
         # generate the ``.com`` file for the MacroModel run.
-        self.generate_com(mol)
+        self._generate_com(mol)
         # Run the optimization.
-        self.run_bmin(mol)
+        self._run_bmin(mol)
         # Get the ``.maegz`` optimization output to a ``.mae``.
-        self.convert_maegz_to_mae(mol)
-        mol.update_from_mae(f'{basename}.mae', conformer)
+        self._convert_maegz_to_mae(mol)
+        mol.update_from_file(f'{basename}.mae')
 
         move_generated_macromodel_files(basename, output_dir)
 
-    def fix_distances(self, mol, fix_block):
+    def _fix_distances(self, mol, fix_block):
         """
         Adds lines fixing bond distances to ``.com`` body.
 
@@ -792,9 +768,7 @@ class MacroModelForceField(_MacroModel):
 
         """
 
-        bonder_ids = set(
-            bid for fg in mol.func_groups for bid in fg.bonder_ids
-        )
+        bonder_ids = set(mol.get_bonder_ids())
 
         # Go through all the bonds in the rdkit molecule. If the bond
         # is not between bonder atoms add a fix line to the
@@ -802,25 +776,23 @@ class MacroModelForceField(_MacroModel):
         # to the next bond. This is because a bond between 2 bonder
         # atoms was added during construction and should therefore not
         # be fixed.
-        for bond in mol.mol.GetBonds():
-            atom1 = bond.GetBeginAtom()
-            atom2 = bond.GetEndAtom()
+        for bond in mol.bonds:
 
-            if (atom1.GetIdx() in bonder_ids and
-               atom2.GetIdx() in bonder_ids):
+            if (bond.atom1.id in bonder_ids
+               and bond.atom2.id in bonder_ids):
                 continue
 
             # Make sure that the indices are increased by 1 in the .mae
             # file.
-            atom1_id = atom1.GetIdx() + 1
-            atom2_id = atom2.GetIdx() + 1
+            atom1_id = bond.atom1.id + 1
+            atom2_id = bond.atom2.id + 1
             args = ('FXDI', atom1_id, atom2_id, 0, 0, 99999, 0, 0, 0)
-            fix_block += self.com_line(*args)
+            fix_block += self._com_line(*args)
             fix_block += '\n'
 
         return fix_block
 
-    def fix_bond_angles(self, mol, fix_block):
+    def _fix_bond_angles(self, mol, fix_block):
         """
         Adds lines fixing bond angles to the ``.com`` body.
 
@@ -842,7 +814,7 @@ class MacroModelForceField(_MacroModel):
         """
 
         paths = rdkit.FindAllPathsOfLengthN(
-            mol=mol.mol,
+            mol=mol.to_rdkit_mol(),
             length=3,
             useBonds=False,
             useHs=True
@@ -850,12 +822,12 @@ class MacroModelForceField(_MacroModel):
         for atom_ids in paths:
             atom_ids = [i+1 for i in atom_ids]
             args = ('FXBA', *atom_ids, 99999, 0, 0, 0, 0)
-            fix_block += self.com_line(*args)
+            fix_block += self._com_line(*args)
             fix_block += '\n'
 
         return fix_block
 
-    def fix_torsional_angles(self, mol, fix_block):
+    def _fix_torsional_angles(self, mol, fix_block):
         """
         Adds lines fixing torsional bond angles to the ``.com`` body.
 
@@ -877,7 +849,7 @@ class MacroModelForceField(_MacroModel):
         """
 
         paths = rdkit.FindAllPathsOfLengthN(
-            mol=mol.mol,
+            mol=mol.mol.to_rdkit_mol(),
             length=4,
             useBonds=False,
             useHs=True
@@ -885,7 +857,7 @@ class MacroModelForceField(_MacroModel):
         for atom_ids in paths:
             atom_ids = [i+1 for i in atom_ids]
             args = ('FXTA', *atom_ids, 99999, 361, 0, 0)
-            fix_block += self.com_line(*args)
+            fix_block += self._com_line(*args)
             fix_block += '\n'
 
         return fix_block
@@ -895,104 +867,26 @@ class MacroModelMD(_MacroModel):
     """
     Runs a molecular dynamics conformer search using MacroModel.
 
-    Attributes
-    ----------
-    temperature : :class:`float`
-        The temperature in Kelvin at which the MD is run.
-        Cannot be more than ``99999.99``.
-
-    conformers : :class:`int`
-        The number of conformers sampled and optimized from the MD.
-        Cannot be more than ``9999``.
-
-    time_step : :class:`float`
-        The time step in ``fs`` for the MD.
-        Cannot be more than ``99999.99``.
-
-    eq_time : :class:`float`
-        The equilibriation time in ``ps`` before the MD is run.
-        Cannot be more than ``999999.99``.
-
-    simulation_time : :class:`float`
-        The simulation time in ``ps`` of the MD.
-        Cannot be more than ``999999.99``.
-
-    restricted_bonds : :class:`set`
-        A :class:`set` of the form
-
-        .. code-block:: python
-
-            restricted_bonds = {
-                frozenset((0, 10)),
-                frozenset((3, 14)),
-                frozenset((5, 6))
-            }
-
-        Where each :class:`frozenset` defines which bonds should have
-        a fixed length via the atom ids of atoms in the bond.
-
-    restricted_bond_angles : :class:`set`
-        A :class:`set` of the form
-
-        .. code-block:: python
-
-            restricted_bonds = {
-                frozenset((0, 10, 12)),
-                frozenset((3, 14, 7)),
-                frozenset((5, 8, 2))
-            }
-
-        Where each :class:`frozenset` defines which bond angles should
-        have a fixed size via the atom ids of atoms in the bond
-        angle.
-
-    restricted_torsional_angles : :class:`set`
-        A :class:`set` of the form
-
-        .. code-block:: python
-
-            restricted_bonds = {
-                frozenset((0, 10, 12, 3)),
-                frozenset((3, 14, 7, 4)),
-                frozenset((5, 8, 2, 9))
-            }
-
-        Where each :class:`frozenset` defines which torsional angles
-        should have a fixed size via the atom ids of atoms in the
-        torsional angle.
-
-    _sim_time : class:`float`
-        The effective simulation time of the MD simulation, used for
-        generation of the lines in the ``.com`` file.
-
-        If positive then interpreted as ``ps``.
-        If negative then run 100 times the number of ``ps``.
-
-    _eq_time : class:`float`
-        The effective equilibration time of the MD simulation, used for
-        generation of the lines in the ``.com`` file.
-
-        If positive then interpreted as ``ps``.
-        If negative then run 100 times the number of ``ps``.
-
     """
 
-    def __init__(self,
-                 macromodel_path,
-                 output_dir=None,
-                 timeout=None,
-                 force_field=16,
-                 temperature=300,
-                 conformers=50,
-                 time_step=1,
-                 eq_time=10,
-                 simulation_time=200,
-                 maximum_iterations=2500,
-                 minimum_gradient=0.05,
-                 restricted_bonds=None,
-                 restricted_bond_angles=None,
-                 restricted_torsional_angles=None,
-                 use_cache=False):
+    def __init__(
+        self,
+        macromodel_path,
+        output_dir=None,
+        timeout=None,
+        force_field=16,
+        temperature=300,
+        conformers=50,
+        time_step=1,
+        eq_time=10,
+        simulation_time=200,
+        maximum_iterations=2500,
+        minimum_gradient=0.05,
+        restricted_bonds=None,
+        restricted_bond_angles=None,
+        restricted_torsional_angles=None,
+        use_cache=False
+    ):
         """
         Runs a MD conformer search on `mol`.
 
@@ -1089,7 +983,7 @@ class MacroModelMD(_MacroModel):
 
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
-            molecule and conformer.
+            molecule.
 
         """
 
@@ -1110,14 +1004,14 @@ class MacroModelMD(_MacroModel):
             maximum_iterations=maximum_iterations
         )
 
-        self.temperature = temperature
-        self.conformers = conformers
-        self.time_step = time_step
-        self.eq_time = eq_time
-        self.simulation_time = simulation_time
-        self.restricted_bonds = restricted_bonds
-        self.restricted_bond_angles = restricted_bond_angles
-        self.restricted_torsional_angles = restricted_torsional_angles
+        self._temperature = temperature
+        self._conformers = conformers
+        self._time_step = time_step
+        self._eq_time = eq_time
+        self._simulation_time = simulation_time
+        self._restricted_bonds = restricted_bonds
+        self._restricted_bond_angles = restricted_bond_angles
+        self._restricted_torsional_angles = restricted_torsional_angles
 
         # Negative simulation time is interpreted as times 100 ps.
         if simulation_time > 99999.99:
@@ -1131,13 +1025,15 @@ class MacroModelMD(_MacroModel):
         else:
             self._eq_time = eq_time
 
-        super().__init__(macromodel_path=macromodel_path,
-                         output_dir=output_dir,
-                         timeout=timeout,
-                         force_field=force_field,
-                         maximum_iterations=maximum_iterations,
-                         minimum_gradient=minimum_gradient,
-                         use_cache=use_cache)
+        super().__init__(
+            macromodel_path=macromodel_path,
+            output_dir=output_dir,
+            timeout=timeout,
+            force_field=force_field,
+            maximum_iterations=maximum_iterations,
+            minimum_gradient=minimum_gradient,
+            use_cache=use_cache
+        )
 
     @staticmethod
     def _check_params(
@@ -1229,7 +1125,7 @@ class MacroModelMD(_MacroModel):
                 'Number of iterations (> 999999) is too high.'
             )
 
-    def generate_com(self, mol):
+    def _generate_com(self, mol):
         """
         Create a ``.com`` file for a MacroModel optimization.
 
@@ -1253,47 +1149,47 @@ class MacroModelMD(_MacroModel):
 
         """
 
-        logger.debug(f'Creating .com file for "{mol.name}".')
+        logger.debug(f'Creating .com file for "{mol}".')
 
         # Define some short aliases to keep the following lines neat.
-        temp = self.temperature
+        temp = self._temperature
         sim_time = self._sim_time
-        tstep = self.time_step
+        tstep = self._time_step
         eq_time = self._eq_time
 
-        line1 = ('FFLD', self.force_field, 1, 0, 0, 1, 0, 0, 0)
+        line1 = ('FFLD', self._force_field, 1, 0, 0, 1, 0, 0, 0)
         line2 = ('READ', 0, 0, 0, 0, 0, 0, 0, 0)
         line3 = ('MDIT', 0, 0, 0, 0, temp, 0, 0, 0)
         line4 = ('MDYN', 0, 0, 0, 0, tstep, eq_time, temp, 0)
-        line5 = ('MDSA', self.conformers, 0, 0, 0, 0, 0, 1, 0)
+        line5 = ('MDSA', self._conformers, 0, 0, 0, 0, 0, 1, 0)
         line6 = ('MDYN', 1, 0, 0, 0, tstep, sim_time, temp, 0)
         line7 = ('WRIT', 0, 0, 0, 0, 0, 0, 0, 0)
         line8 = ('RWND', 0, 1, 0, 0, 0, 0, 0, 0)
         line9 = ('BGIN', 0, 0, 0, 0, 0, 0, 0, 0)
         line10 = ('READ', -2, 0, 0, 0, 0, 0, 0, 0)
-        line11 = ('CONV', 2, 0, 0, 0, self.minimum_gradient, 0, 0, 0)
-        line12 = ('MINI', 1, 0, self.maximum_iterations, 0, 0, 0, 0, 0)
+        line11 = ('CONV', 2, 0, 0, 0, self._minimum_gradient, 0, 0, 0)
+        line12 = ('MINI', 1, 0, self._maximum_iterations, 0, 0, 0, 0, 0)
         line13 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
-            self.com_line(*line1),
-            self.com_line(*line2),
+            self._com_line(*line1),
+            self._com_line(*line2),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
-            self.com_line(*line3),
-            self.com_line(*line4),
-            self.com_line(*line5),
-            self.com_line(*line6),
-            self.com_line(*line7),
-            self.com_line(*line8),
-            self.com_line(*line9),
-            self.com_line(*line10),
+            self._com_line(*line3),
+            self._com_line(*line4),
+            self._com_line(*line5),
+            self._com_line(*line6),
+            self._com_line(*line7),
+            self._com_line(*line8),
+            self._com_line(*line9),
+            self._com_line(*line10),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
-            self.com_line(*line11),
-            self.com_line(*line12),
-            self.com_line(*line13),
+            self._com_line(*line11),
+            self._com_line(*line12),
+            self._com_line(*line13),
         ])
 
-        com_block = self.fix_params(mol, com_block)
+        com_block = self._fix_params(mol, com_block)
 
         name, ext = os.path.splitext(mol._file)
 
@@ -1306,7 +1202,7 @@ class MacroModelMD(_MacroModel):
             # details of the macromodel run
             com.write(com_block)
 
-    def optimize(self, mol, conformer=-1):
+    def optimize(self, mol):
         """
         Optimizes a molecule.
 
@@ -1315,9 +1211,6 @@ class MacroModelMD(_MacroModel):
         mol : :class:`.Molecule`
             The molecule to be optimized.
 
-        conformer : :class:`int`, optional
-            The conformer to use.
-
         Returns
         -------
         None : :class:`NoneType`
@@ -1325,28 +1218,28 @@ class MacroModelMD(_MacroModel):
         """
 
         basename = str(uuid4().int)
-        if self.output_dir is None:
+        if self._output_dir is None:
             output_dir = basename
         else:
-            output_dir = self.output_dir
+            output_dir = self._output_dir
 
         mol._file = f'{basename}.mol'
 
         # First write a .mol file of the molecule.
-        mol.write(mol._file, conformer=conformer)
+        mol.write(mol._file)
         # MacroModel requires a ``.mae`` file as input.
-        self.create_mae(mol)
+        self._create_mae(mol)
         # Generate the ``.com`` file for the MacroModel MD run.
-        self.generate_com(mol)
+        self._generate_com(mol)
         # Run the optimization.
-        self.run_bmin(mol)
+        self._run_bmin(mol)
         # Extract the lowest energy conformer into its own .mae file.
         conformer_mae = MAEExtractor(mol._file).path
-        mol.update_from_mae(conformer_mae, conformer)
+        mol.update_from_file(conformer_mae)
 
         move_generated_macromodel_files(basename, output_dir)
 
-    def fix_distances(self, mol, fix_block):
+    def _fix_distances(self, mol, fix_block):
         """
         Adds lines fixing bond distances to ``.com`` body.
 
@@ -1371,24 +1264,22 @@ class MacroModelMD(_MacroModel):
         # to the next bond. This is because a bond between 2 bonder
         # atoms was added during construction and should therefore not
         # be fixed.
-        for bond in mol.mol.GetBonds():
-            atom1 = bond.GetBeginAtom()
-            atom2 = bond.GetEndAtom()
-            bond_key = frozenset((atom1.GetIdx(), atom2.GetIdx()))
-            if (bond_key not in self.restricted_bonds):
+        for bond in mol.bonds:
+            bond_key = frozenset((bond.atom1.id, bond.atom2.id))
+            if (bond_key not in self._restricted_bonds):
                 continue
 
             # Make sure that the indices are increased by 1 in the .mae
             # file.
-            atom1_id = atom1.GetIdx() + 1
-            atom2_id = atom2.GetIdx() + 1
+            atom1_id = bond.atom1.id + 1
+            atom2_id = bond.atom2.id + 1
             args = ('FXDI', atom1_id, atom2_id, 0, 0, 99999, 0, 0, 0)
-            fix_block += self.com_line(*args)
+            fix_block += self._com_line(*args)
             fix_block += '\n'
 
         return fix_block
 
-    def fix_bond_angles(self, mol, fix_block):
+    def _fix_bond_angles(self, mol, fix_block):
         """
         Adds lines fixing bond angles to the ``.com`` body.
 
@@ -1408,21 +1299,21 @@ class MacroModelMD(_MacroModel):
         """
 
         paths = rdkit.FindAllPathsOfLengthN(
-            mol=mol.mol,
+            mol=mol.to_rdkit_mol(),
             length=3,
             useBonds=False,
             useHs=True
         )
         for atom_ids in paths:
-            if frozenset(atom_ids) in self.restricted_bond_angles:
+            if frozenset(atom_ids) in self._restricted_bond_angles:
                 atom_ids = [i+1 for i in atom_ids]
                 args = ('FXBA', *atom_ids, 99999, 0, 0, 0, 0)
-                fix_block += self.com_line(*args)
+                fix_block += self._com_line(*args)
                 fix_block += '\n'
 
         return fix_block
 
-    def fix_torsional_angles(self, mol, fix_block):
+    def _fix_torsional_angles(self, mol, fix_block):
         """
         Adds lines fixing torsional bond angles to the ``.com`` body.
 
@@ -1442,17 +1333,17 @@ class MacroModelMD(_MacroModel):
         """
 
         paths = rdkit.FindAllPathsOfLengthN(
-            mol=mol.mol,
+            mol=mol.to_rdkit_mol(),
             length=4,
             useBonds=False,
             useHs=True
         )
         # Apply the fix.
         for atom_ids in paths:
-            if frozenset(atom_ids) in self.restricted_torsional_angles:
+            if frozenset(atom_ids) in self._restricted_torsional_angles:
                 atom_ids = [i+1 for i in atom_ids]
                 args = ('FXTA', *atom_ids, 99999, 361, 0, 0)
-                fix_block += self.com_line(*args)
+                fix_block += self._com_line(*args)
                 fix_block += '\n'
 
         return fix_block
