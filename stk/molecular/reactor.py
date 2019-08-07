@@ -11,11 +11,11 @@ See :class:`.Reactor`.
 """
 
 from collections import Counter
-from functools import partial
 import numpy as np
+from scipy.spatial.distance import euclidean
 
 from . import elements
-from .bonds import Bond, PeriodicBond
+from .bonds import Bond
 
 
 class _ReactionKey:
@@ -32,7 +32,6 @@ class _ReactionKey:
     Examples
     --------
     The key is constant with respect to permutations
-
 
     .. code-block:: python
 
@@ -58,7 +57,7 @@ class _ReactionKey:
 
     def __init__(self, *fg_names):
         """
-        Initialize a :class:`ReactionKey`.
+        Initialize a :class:`_ReactionKey`.
 
         Parameters
         ----------
@@ -132,7 +131,7 @@ class Reactor:
 
     .. code-block:: python
 
-        bonds_made = reactor.finalize()
+        reactor.finalize()
 
     An obvious question given this tutorial, is what reaction does
     :meth:`react` carry out? This is documented by :meth:`react`.
@@ -140,7 +139,7 @@ class Reactor:
     reaction, which adds a bond between the bonder atoms of two
     functional groups. The bond order of the added bond is single by
     default but can be modified by editing :attr:`_bond_orders`. Here
-    you will specify the :class:`ReactionKey` for a reaction and what
+    you will specify the :class:`_ReactionKey` for a reaction and what
     bond order you want that reaction to use.
 
     For some reactions you may wish to forgo the default reaction and
@@ -154,9 +153,7 @@ class Reactor:
     Here a ketone is converted into an alcohol. If you wish to
     support a complex reaction, add it as a method within this class.
     The method will need take some :class:`FunctionalGroup` instances
-    as arguments. These are the functional groups which react. Within
-    the method itself, the attribute :attr:`bonds_made` must be
-    incremented by the number of bonds added by the reaction.
+    as arguments. These are the functional groups which react.
 
     Once the method is defined, :attr:`_custom_reactions` needs to
     be updated.
@@ -189,8 +186,6 @@ class Reactor:
 
         """
 
-        # The net number of bonds added.
-        self._bonds_made = 0
         # The molecule from which atoms and bonds are added and
         # removed.
         self._mol = mol
@@ -199,14 +194,34 @@ class Reactor:
         # The ids of bonds which are to be removed.
         self._deleter_bonds = set()
 
-    def add_reaction(self, *fgs):
+        # Maps a _ReactionKey for a given reaction to a custom
+        # method which carries out the reaction. This means that
+        # add_reaction will use that method for carrying out that
+        # reaction instead.
+        self._custom_reactions = {
+
+            _ReactionKey('boronic_acid', 'diol'):
+                self._react_boronic_acid_with_diol,
+
+            _ReactionKey('diol', 'difluorene'):
+                self._react_diol_with_dihalogen,
+
+            _ReactionKey('diol', 'dibromine'):
+                self._react_diol_with_dihalogen,
+
+            _ReactionKey('ring_amine', 'ring_amine'):
+                self._react_ring_amine_with_ring_amine
+
+        }
+
+    def add_reaction(self, func_groups, periodicity):
         """
         Create bonds between functional groups.
 
         This function first looks at the functional groups provided via
-        the `*fgs` argument and checks which functional groups are
-        involved in the reaction. If the functional groups are handled
-        by one of the custom reactions specified in
+        the `func_groups` argument and checks which functional groups
+        are involved in the reaction. If the functional groups are
+        handled by one of the custom reactions specified in
         :attr:`_custom_reactions` then that function is executed.
 
         In all other cases the function is assumed to have received two
@@ -216,8 +231,13 @@ class Reactor:
 
         Parameters
         ----------
-        *fgs : :class:`FunctionalGroup`
+        func_groups : :class:`tuple` of :class:`.FunctionalGroup`
             The functional groups to react.
+
+        periodicity : :class:`tuple` of :class:`int`
+            Specifies the periodicity of the bonds added by the
+            reaction, which bridge the `func_groups`. See
+            :attr:`.Bond.periodicity`.
 
         Returns
         -------
@@ -225,69 +245,13 @@ class Reactor:
 
         """
 
-        names = (fg.fg_type.name for fg in fgs)
+        names = (fg.fg_type.name for fg in func_groups)
         reaction_key = _ReactionKey(*names)
-        if reaction_key in self._custom_reactions:
-            return self._custom_reactions[reaction_key](self, *fgs)
-
-        for fg in fgs:
-            self._deleter_ids.update(fg.get_deleter_ids())
-            fg.atoms = tuple(
-                a for a in fg.atoms if a.id not in self._deleter_ids
-            )
-            fg.deleters = ()
-
-        bond = self._bond_orders.get(reaction_key, 1)
-        fg1, fg2 = fgs
-        self._mol.bonds.append(
-            Bond(fg1.bonders[0], fg2.bonders[0], bond)
+        reaction = self._custom_reactions.get(
+            reaction_key,
+            self._react_any
         )
-        self._bonds_made += 1
-
-    def add_periodic_reaction(self, direction, *fgs):
-        """
-        Create periodic bonds between functional groups.
-
-        Parameters
-        ----------
-        direction : :class:`list` of :class:`int`
-            A 3 member :class:`list` describing the axes along which
-            the created bonds are periodic. For example, ``[1, 0, 0]``
-            means that he bonds are periodic along the x axis in the
-            positive direction.
-
-        *fgs : :class:`FunctionalGroup`
-            The functional groups to react.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for fg in fgs:
-            self._deleter_ids.update(fg.get_deleter_ids())
-            fg.deleters = ()
-
-        names = (fg.fg_type.name for fg in fgs)
-        reaction_key = _ReactionKey(*names)
-        if reaction_key in self._periodic_custom_reactions:
-            rxn_fn = self._periodic_custom_reactions[reaction_key]
-            return rxn_fn(self, direction, *fgs)
-
-        bond = self._bond_orders.get(reaction_key, 1)
-
-        # Make sure the direction of the periodic bond is maintained.
-        fg1, fg2 = fgs
-        self._mol.bonds.append(
-            PeriodicBond(
-                atom1=fg1.bonders[0],
-                atom2=fg2.bonders[0],
-                order=bond,
-                direction=direction
-            )
-        )
-        self._bonds_made += 1
+        return reaction(reaction_key, func_groups, periodicity)
 
     def finalize(self):
         """
@@ -295,8 +259,7 @@ class Reactor:
 
         Returns
         -------
-        :class:`int`
-            The number of bonds added.
+        None : :class:`NoneType`
 
         """
 
@@ -314,23 +277,15 @@ class Reactor:
             if i not in self._deleter_ids
         ]
 
-        return self._bonds_made
-
-    def _diol_with_dihalogen(self, fg1, fg2, dihalogen):
+    def _remove_deleters(self, func_groups):
         """
-        Create bonds between functional groups.
+        Remove deleter atoms from `fgs`.
 
         Parameters
         ----------
-        fg1 : :class:`.FunctionalGroup`
-            A functional group which undergoes the reaction.
-
-        fg2 : :class:`.FunctionalGroup`
-            A functional group which undergoes the reaction.
-
-        halogen : :class:`str`
-            The name of the dihalogen functional group to use. For
-            example, ``'dibromine'`` or ``'difluorene'``.
+        func_groups : :class:`list` of :class:`.FunctionalGroup`
+            The functional groups from which deleter atoms should be
+            removed.
 
         Returns
         -------
@@ -338,13 +293,91 @@ class Reactor:
 
         """
 
+        for fg in func_groups:
+            self._deleter_ids.update(fg.get_deleter_ids())
+            fg.atoms = tuple(
+                a for a in fg.atoms if a.id not in self._deleter_ids
+            )
+            fg.deleters = ()
+
+    def _react_any(self, reaction_key, func_groups, periodicity):
+        """
+        Create bonds between functional groups.
+
+        Parameters
+        ----------
+        reaction_key : :class:`._ReactionKey`
+            The key for the reaction.
+
+        func_groups : :class:`list` of :class:`.FunctionalGroup`
+            The functional groups from which deleter atoms should be
+            removed.
+
+        periodicity : :class:`tuple` of :class:`int`
+            Specifies the periodicity of the bonds added by the
+            reaction, which bridge the `func_groups`. See
+            :attr:`.Bond.periodicity`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self._remove_deleters(func_groups)
+
+        fg1, fg2 = func_groups
+        bond_order = self._bond_orders.get(reaction_key, 1)
+        bond = Bond(
+            atom1=fg1.bonders[0],
+            atom2=fg2.bonders[0],
+            order=bond_order,
+            periodicity=periodicity
+        )
+        self._mol.bonds.append(bond)
+        self._mol.construction_bonds.append(bond)
+
+    def _react_diol_with_dihalogen(
+        self,
+        reaction_key,
+        func_groups,
+        periodicity
+    ):
+        """
+        Create bonds between functional groups.
+
+        Parameters
+        ----------
+        reaction_key : :class:`._ReactionKey`
+            The key for the reaction.
+
+        func_groups : :class:`list` of :class:`.FunctionalGroup`
+            The functional groups from which deleter atoms should be
+            removed.
+
+        periodicity : :class:`tuple` of :class:`int`
+            Specifies the periodicity of the bonds added by the
+            reaction, which bridge the `func_groups`. See
+            :attr:`.Bond.periodicity`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self._remove_deleters(func_groups)
+
+        fg1, fg2 = func_groups
         diol = fg1 if fg1.fg_type.name == 'diol' else fg2
         dihalogen = fg2 if diol is fg1 else fg1
 
         distances = []
         for carbon in dihalogen.get_bonder_ids():
+            c_coord = self._mol._position_matrix[carbon]
             for oxygen in diol.get_bonder_ids():
-                d = self._mol.get_atom_distance(carbon, oxygen)
+                o_coord = self._mol._position_matrix[oxygen]
+                d = euclidean(c_coord, o_coord)
                 distances.append((d, carbon, oxygen))
         distances.sort()
 
@@ -358,21 +391,46 @@ class Reactor:
 
         (c1, o1), (c2, o2), *_ = deduped_pairs
         assert c1 != c2 and o1 != o2
-        self._mol.bonds.append(Bond(c1, o1, 1))
-        self._mol.bonds.append(Bond(c2, o2, 1))
-        self._bonds_made += 2
 
-    def _boronic_acid_with_diol(self, fg1, fg2):
+        bond1 = Bond(
+            atom1=self._mol.atoms[c1],
+            atom2=self._mol.atoms[o1],
+            order=1,
+            periodicity=periodicity
+        )
+        bond2 = Bond(
+            atom1=self._mol.atoms[c2],
+            atom2=self._mol.atoms[o2],
+            order=1,
+            periodicity=periodicity
+        )
+        self._mol.bonds.append(bond1)
+        self._mol.construction_bonds.append(bond1)
+        self._mol.bonds.append(bond2)
+        self._mol.construction_bonds.append(bond2)
+
+    def _react_boronic_acid_with_diol(
+        self,
+        reaction_key,
+        func_groups,
+        periodicity
+    ):
         """
         Create bonds between functional groups.
 
         Parameters
         ----------
-        fg1 : :class:`.FunctionalGroup`
-            A functional group which undergoes the reaction.
+        reaction_key : :class:`._ReactionKey`
+            The key for the reaction.
 
-        fg2 : :class:`.FunctionalGroup`
-            A functional group which undergoes the reaction.
+        func_groups : :class:`list` of :class:`.FunctionalGroup`
+            The functional groups from which deleter atoms should be
+            removed.
+
+        periodicity : :class:`tuple` of :class:`int`
+            Specifies the periodicity of the bonds added by the
+            reaction, which bridge the `func_groups`. See
+            :attr:`.Bond.periodicity`.
 
         Returns
         -------
@@ -380,32 +438,42 @@ class Reactor:
 
         """
 
-        for fg in (fg1, fg2):
-            self._deleter_ids.update(fg.get_deleter_ids())
-            fg.atoms = tuple(
-                a for a in fg.atoms if a.id not in self._deleter_ids
-            )
-            fg.deleters = ()
-
+        self._remove_deleters(func_groups)
+        fg1, fg2 = func_groups
         boron = fg1 if fg1.fg_type.name == 'boronic_acid' else fg2
         diol = fg2 if boron is fg1 else fg1
 
         boron_atom = boron.bonders[0]
-        self._mol.bonds.append(Bond(boron_atom, diol.bonders[0], 1))
-        self._mol.bonds.append(Bond(boron_atom, diol.bonders[1], 1))
-        self._bonds_made += 2
+        bond1 = Bond(boron_atom, diol.bonders[0], 1, periodicity)
+        self._mol.bonds.append(bond1)
+        self._mol.construction_bonds.append(bond1)
 
-    def _ring_amine_with_ring_amine(self, fg1, fg2):
+        bond2 = Bond(boron_atom, diol.bonders[1], 1, periodicity)
+        self._mol.bonds.append(bond2)
+        self._mol.construction_bonds.append(bond2)
+
+    def _react_ring_amine_with_ring_amine(
+        self,
+        reaction_key,
+        func_groups,
+        periodicity
+    ):
         """
         Creates bonds between functional groups.
 
         Parameters
         ----------
-        fg1 : :class:`.FunctionalGroup`
-            A functional group which undergoes the reaction.
+        reaction_key : :class:`._ReactionKey`
+            The key for the reaction.
 
-        fg2 : :class:`.FunctionalGroup`
-            A functional group which undergoes the reaction.
+        func_groups : :class:`list` of :class:`.FunctionalGroup`
+            The functional groups from which deleter atoms should be
+            removed.
+
+        periodicity : :class:`tuple` of :class:`int`
+            Specifies the periodicity of the bonds added by the
+            reaction, which bridge the `func_groups`. See
+            :attr:`.Bond.periodicity`.
 
         Returns
         -------
@@ -413,14 +481,18 @@ class Reactor:
 
         """
 
+        self._remove_deleters(func_groups)
+        fg1, fg2 = func_groups
         c1 = next(a for a in fg1.bonders if a.atomic_number == 6)
         n1 = next(a for a in fg1.bonders if a.atomic_number == 7)
 
         c2 = next(a for a in fg2.bonders if a.atomic_number == 6)
         n2 = next(a for a in fg2.bonders if a.atomic_number == 7)
 
-        coords = self._mol.get_atom_coords(atom_ids=(c1, n1, c2, n2))
-        n1_coord, n2_coord, c1_coord, c2_coord = coords
+        n1_coord = np.array(self._mol._position_matrix[n1.id])
+        n2_coord = np.array(self._mol._position_matrix[n2.id])
+        c1_coord = np.array(self._mol._position_matrix[c1.id])
+        c2_coord = np.array(self._mol._position_matrix[c2.id])
 
         n_joiner = elements.C(len(self._mol.atoms))
         self._mol.atoms.append(n_joiner)
@@ -467,45 +539,20 @@ class Reactor:
         nc2h2_coord = nc_joiner2_coord + np.array([0, 0, -1])
         self._mol._position_matrix.append(nc2h2_coord)
 
-        self._mol.bonds.append(Bond(n1, n_joiner, 1))
-        self._mol.bonds.append(Bond(n2, n_joiner, 1))
-        self._mol.bonds.append(Bond(n_joiner, nh1, 1))
-        self._mol.bonds.append(Bond(n_joiner, nh2, 1))
-
-        self._mol.bonds.append(Bond(c1, nc_joiner1, 1))
-        self._mol.bonds.append(Bond(n2, nc_joiner1, 1))
-        self._mol.bonds.append(Bond(nc_joiner1, nc1h1, 1))
-        self._mol.bonds.append(Bond(nc_joiner1, nc1h2, 1))
-
-        self._mol.bonds.append(Bond(c2, nc_joiner2, 1))
-        self._mol.bonds.append(Bond(n1, nc_joiner2, 1))
-        self._mol.bonds.append(Bond(nc_joiner2, nc2h1, 1))
-        self._mol.bonds.append(Bond(nc_joiner2, nc2h2, 1))
-
-        self._bonds_made += 12
-
-    # Maps a _ReactionKey for a given reaction to a custom
-    # method which carries out the reaction. This means that
-    # add_reaction will use that method for carrying out that
-    # reaction instead.
-    _custom_reactions = {
-
-        _ReactionKey('boronic_acid', 'diol'):
-            _boronic_acid_with_diol,
-
-        _ReactionKey('diol', 'difluorene'):
-            partial(_diol_with_dihalogen, dihalogen='difluorene'),
-
-        _ReactionKey('diol', 'dibromine'):
-            partial(_diol_with_dihalogen, dihalogen='dibromine'),
-
-        _ReactionKey('ring_amine', 'ring_amine'):
-            _ring_amine_with_ring_amine
-
-    }
-
-    # Maps a _ReactionKey for a given reaction to a custom
-    # method which carries out the reaction. This means that
-    # add_periodic_reaction() will use that method for carrying out
-    # that reaction instead.
-    _periodic_custom_reactions = {}
+        bonds = (
+            Bond(n1, n_joiner, 1),
+            Bond(n_joiner, n2, 1, periodicity),
+            Bond(n_joiner, nh1, 1),
+            Bond(n_joiner, nh2, 1),
+            Bond(c1, nc_joiner1, 1),
+            Bond(nc_joiner1, n2, 1, periodicity),
+            Bond(nc_joiner1, nc1h1, 1),
+            Bond(nc_joiner1, nc1h2, 1),
+            Bond(nc_joiner2, c2, 1, periodicity),
+            Bond(n1, nc_joiner2, 1),
+            Bond(nc_joiner2, nc2h1, 1),
+            Bond(nc_joiner2, nc2h2, 1)
+        )
+        for bond in bonds:
+            self._mol.bonds.append(bond)
+            self._mol.construction_bonds.append(bond)

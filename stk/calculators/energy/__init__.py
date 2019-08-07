@@ -18,7 +18,7 @@ calculates the energy of a molecule with
     mol2 = stk.ConstructedMolecule([mol1], chain)
 
     # Create the energy calculator.
-    mmff = MMFFEnergy()
+    mmff = stk.MMFFEnergy()
 
     # Calculate energies of various molecules.
     mol1_energy = mmff.get_energy(mol1)
@@ -26,7 +26,7 @@ calculates the energy of a molecule with
 
 By default, calling :meth:`~.EnergyCalculator.get_energy` twice on the
 same molecule will calculate the energy a second time. However, we can
-use the :attr:`~.EnergyCalculator.use_cache` option to prevent
+use the `use_cache` option to prevent
 recalculations when the same molecule is given to the same energy
 calculator a second time
 

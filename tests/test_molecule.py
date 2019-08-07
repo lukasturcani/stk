@@ -101,12 +101,17 @@ def test_get_atom_coords(tmp_amine2):
         assert all(atom_coords == [i, i, i])
 
     tmp_amine2.set_position_matrix(new_coords*10)
-    atom_ids = [0, 2, 4]
-    coords = tmp_amine2.get_atom_coords(atom_ids=atom_ids)
-    for atom_id, atom_coords in zip(atom_ids, coords):
-        assert all(atom_coords == [atom_id*10]*3)
-    num_coords = sum(1 for _ in tmp_amine2.get_atom_coords(atom_ids))
-    assert num_coords == len(atom_ids)
+
+    # Test different input types.
+    all_atom_ids = ((0, 2, 4), [0, 2, 4], (i for i in [0, 2, 4]))
+    for atom_ids in all_atom_ids:
+        coords = zip(
+            (0, 2, 4),
+            tmp_amine2.get_atom_coords(atom_ids=atom_ids)
+        )
+        for i, (atom_id, atom_coords) in enumerate(coords, 1):
+            assert all(atom_coords == [atom_id*10]*3)
+        assert i == 3
 
 
 def test_get_atom_distance(tmp_amine2):
@@ -124,11 +129,15 @@ def test_get_center_of_mass(tmp_amine2):
     assert all(tmp_amine2.get_center_of_mass() == [0, 0, 0])
 
     new_coords = tmp_amine2.get_position_matrix()
-    atom_ids = [0, 2, 4]
-    new_coords[atom_ids] = np.ones((len(atom_ids), 3))
+    new_coords[(0, 2, 4), :] = np.ones((3, 3))
     tmp_amine2.set_position_matrix(new_coords)
     assert not all(tmp_amine2.get_center_of_mass() == [1, 1, 1])
-    assert all(tmp_amine2.get_center_of_mass(atom_ids) == [1, 1, 1])
+
+    all_atom_ids = ((0, 2, 4), [0, 2, 4], (i for i in [0, 2, 4]))
+    for atom_ids in all_atom_ids:
+        assert all(
+            tmp_amine2.get_center_of_mass(atom_ids) == [1, 1, 1]
+        )
 
 
 def test_get_centroid(tmp_amine2):
@@ -142,11 +151,14 @@ def test_get_centroid(tmp_amine2):
 
     coords = np.array([[i]*3 for i in range(num_atoms)])
     tmp_amine2.set_position_matrix(coords)
-    assert np.allclose(
-        a=tmp_amine2.get_centroid(atom_ids=[1, 3]),
-        b=[2, 2, 2],
-        atol=1e-6
-    )
+
+    all_atom_ids = ((1, 3), [1, 3], (i for i in [1, 3]))
+    for atom_ids in all_atom_ids:
+        assert np.allclose(
+            a=tmp_amine2.get_centroid(atom_ids=atom_ids),
+            b=[2, 2, 2],
+            atol=1e-6
+        )
 
 
 def test_get_direction(tmp_amine2):
@@ -162,11 +174,14 @@ def test_get_direction(tmp_amine2):
 
     coords[[1, 3]] = [[1, 1, 1], [3, 3, 3]]
     tmp_amine2.set_position_matrix(coords)
-    assert np.allclose(
-        a=tmp_amine2.get_direction([1, 3]),
-        b=stk.normalize_vector([1, 1, 1]),
-        atol=1e-6
-    )
+
+    all_atom_ids = ((1, 3), [1, 3], (i for i in [1, 3]))
+    for atom_ids in all_atom_ids:
+        assert np.allclose(
+            a=tmp_amine2.get_direction(atom_ids=atom_ids),
+            b=stk.normalize_vector([1, 1, 1]),
+            atol=1e-6
+        )
 
 
 def test_get_maximum_diamter(tmp_amine2):
@@ -178,16 +193,21 @@ def test_get_maximum_diamter(tmp_amine2):
     tmp_amine2.set_position_matrix(pos_mat)
     assert abs(tmp_amine2.get_maximum_diameter() - 100) < 1e-6
 
-    atom_ids = [
-        i for i in range(len(tmp_amine2.atoms)) if i not in {1, 13}
-    ]
-    assert abs(tmp_amine2.get_maximum_diameter(atom_ids)) < 1e-8
+    all_atom_ids = (
+        [i for i in range(len(tmp_amine2.atoms)) if i not in {1, 13}],
+        (i for i in range(len(tmp_amine2.atoms)) if i not in {1, 13}),
+        tuple(
+            i for i in range(len(tmp_amine2.atoms)) if i not in {1, 13}
+        )
+    )
+    for atom_ids in all_atom_ids:
+        assert abs(tmp_amine2.get_maximum_diameter(atom_ids)) < 1e-8
 
 
 def test_get_plane_normal(tmp_amine2):
     coords = tmp_amine2.get_position_matrix()
-    atom_ids = [1, 13]
-    coords[atom_ids, 2] = 0
+    all_atom_ids = ([1, 13], (1, 13), (i for i in [1, 13]))
+    coords[[1, 13], 2] = 0
     tmp_amine2.set_position_matrix(coords)
 
     assert not np.allclose(
@@ -195,11 +215,13 @@ def test_get_plane_normal(tmp_amine2):
         b=[0, 0, 1],
         atol=1e-6
     )
-    assert np.allclose(
-        a=tmp_amine2.get_plane_normal(atom_ids),
-        b=[0, 0, 1],
-        atol=1e-6
-    )
+
+    for atom_ids in all_atom_ids:
+        assert np.allclose(
+            a=tmp_amine2.get_plane_normal(atom_ids),
+            b=[0, 0, 1],
+            atol=1e-6
+        )
 
     coords[:, 2] = 0
     tmp_amine2.set_position_matrix(coords)
@@ -224,17 +246,21 @@ def test_set_centroid(tmp_amine2):
     tmp_amine2.set_centroid([12, 13, 15])
     assert np.allclose(tmp_amine2.get_centroid(), [12, 13, 15], 1e-6)
 
-    tmp_amine2.set_centroid([-12, 4, 160], atom_ids=[1, 3])
-    assert not np.allclose(
-        a=tmp_amine2.get_centroid(),
-        b=[-12, 4, 160],
-        atol=1e-6
-    )
-    assert np.allclose(
-        a=tmp_amine2.get_centroid(atom_ids=[1, 3]),
-        b=[-12, 4, 160],
-        atol=1e-6
-    )
+    set_all_atom_ids = ([1, 3], (2, 3), (i for i in [0, 3]))
+    get_all_atom_ids = ([1, 3], (2, 3), (i for i in [0, 3]))
+    all_atom_ids = zip(set_all_atom_ids, get_all_atom_ids)
+    for set_atom_ids, get_atom_ids in all_atom_ids:
+        tmp_amine2.set_centroid([-12, 4, 160], atom_ids=set_atom_ids)
+        assert not np.allclose(
+            a=tmp_amine2.get_centroid(),
+            b=[-12, 4, 160],
+            atol=1e-6
+        )
+        assert np.allclose(
+            a=tmp_amine2.get_centroid(atom_ids=get_atom_ids),
+            b=[-12, 4, 160],
+            atol=1e-6
+        )
 
 
 def test_update_from_rdkit_mol(tmp_amine2):

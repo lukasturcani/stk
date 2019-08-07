@@ -66,8 +66,8 @@ def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
     p1.write(path)
     p2.write(path.replace('1', '2'))
 
-    assert p1.bonds_made == monomer_joins
-    assert p2.bonds_made == monomer_joins*2
+    assert len(p1.construction_bonds) == monomer_joins
+    assert len(p2.construction_bonds) == monomer_joins*2
 
     num_monomer_atoms = len(amine2.atoms) + len(aldehyde2.atoms)
 

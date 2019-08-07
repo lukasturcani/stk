@@ -19,8 +19,6 @@ from collections import deque
 import tarfile
 from glob import iglob
 
-# Holds global stk options.
-OPTIONS = {}
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
@@ -363,7 +361,7 @@ def archive_output():
     os.rename('output', new_dir)
 
 
-def dedupe(iterable, seen=None, key=None):
+def dedupe(iterable, key=None, seen=None):
     """
     Yields items from `iterable` barring duplicates.
 
@@ -375,13 +373,13 @@ def dedupe(iterable, seen=None, key=None):
     iterable : :class:`iterable`
         An iterable of elements which are to be yielded, only once.
 
-    seen : :class:`set`, optional
-        Holds items which are not to be yielded.
-
     key : :class:`callable`
         A function which gets applied to every member of `iterable`.
         The return of this function is checked for duplication rather
         than the member itself.
+
+    seen : :class:`set`, optional
+        Holds items which are not to be yielded.
 
     Yields
     ------
@@ -889,6 +887,46 @@ def rotation_matrix_arbitrary_axis(angle, axis):
     return np.array([[e11, e12, e13],
                      [e21, e22, e23],
                      [e31, e32, e33]])
+
+
+def dice_similarity(mol1, mol2, fp_radius=3):
+    """
+    Return the chemical similarity between two molecules.
+
+    Parameters
+    ----------
+    mol1 : :class:`.Molecule`
+        The first molecule.
+
+    mol2 : :class:`.Molecule`
+        The second molecule.
+
+    fp_radius : :class:`int`, optional
+        The radius of the Morgan fingerprint used to calculate
+        similarity.
+
+    Returns
+    -------
+    :class:`float`
+        The similarity.
+
+    """
+
+    rdkit_mol1 = mol1.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_mol1)
+    fp1 = rdkit.GetMorganFingerprint(
+        mol=rdkit_mol1,
+        radius=fp_radius,
+
+    )
+    rdkit_mol2 = mol2.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_mol2)
+    fp2 = rdkit.GetMorganFingerprint(
+        mol=rdkit_mol2,
+        radius=fp_radius,
+
+    )
+    return rdkit.DataStructs.DiceSimilarity(fp1, fp2)
 
 
 def quaternion(u):

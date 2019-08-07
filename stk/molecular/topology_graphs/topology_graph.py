@@ -308,9 +308,21 @@ class Edge:
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which the :class:`Edge` connects.
 
+    periodicity : :class:`tuple` of :class:`int`
+        The periodicity of the edge. For example, if ``(0, 0, 0)``
+        then the edge is not periodic. If, ``(1, 0, -1)`` then the
+        edge is periodic across the x axis in the positive direction,
+        is not periodic across the y axis and is periodic across the
+        z axis in the negative direction.
+
     """
 
-    def __init__(self, *vertices, position=None):
+    def __init__(
+        self,
+        *vertices,
+        position=None,
+        periodicity=(0, 0, 0)
+    ):
         """
         Initialize an :class:`Edge`.
 
@@ -323,9 +335,17 @@ class Edge:
             The position of the edge. If ``None``, the centroid
             of `vertices` is used.
 
+        periodicity : :class:`tuple` of :class:`int`
+            The periodicity of the edge. For example, if ``(0, 0, 0)``
+            then the edge is not periodic. If, ``(1, 0, -1)`` then the
+            edge is periodic across the x axis in the positive
+            direction, is not periodic across the y axis and is
+            periodic across the z axis in the negative direction.
+
         """
 
         self.vertices = vertices
+        self.periodicity = periodicity
         # The FunctionalGroup instances which the edge connects.
         # These will belong to the molecules placed on the vertices
         # connected by the edge.
@@ -369,6 +389,7 @@ class Edge:
         clone._func_groups = list(self._func_groups)
         clone._custom_position = self._custom_position
         clone._position = self._position
+        clone.periodicity = self.periodicity
         clone.vertices = tuple(
             vertex_map.get(vertex, vertex) for vertex in self.vertices
         )
@@ -533,9 +554,12 @@ class TopologyGraph:
         self._place_building_blocks(mol, vertex_clones)
 
         reactor = Reactor(mol)
-        for fgs in self._get_bonded_fgs(mol, edge_clones):
-            reactor.add_reaction(*fgs)
-        mol.bonds_made = reactor.finalize()
+        for edge in edge_clones:
+            reactor.add_reaction(
+                func_groups=edge.get_func_groups(),
+                periodicity=edge.periodicity
+            )
+        reactor.finalize()
 
         self._clean_up(mol)
 
@@ -750,10 +774,6 @@ class TopologyGraph:
 
     def _place_building_blocks_parallel(self, mol, vertices):
         raise NotImplementedError('TODO')
-
-    def _get_bonded_fgs(self, mol, edges):
-        for edge in edges:
-            yield edge.get_func_groups()
 
     def _clean_up(self, mol):
         mol._position_matrix = np.array(mol._position_matrix).T

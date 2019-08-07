@@ -95,7 +95,10 @@ def test_dump_and_load(tmp_polymer):
     assert (
         repr(tmp_polymer.topology_graph) == repr(mol2.topology_graph)
     )
-    assert tmp_polymer.bonds_made == mol2.bonds_made
+    assert (
+        len(tmp_polymer.construction_bonds) ==
+        len(mol2.construction_bonds)
+    )
     assert tmp_polymer.test_attr1 == mol2.test_attr1
     assert tmp_polymer.test_attr2 == mol2.test_attr2
     assert tmp_polymer.test_attr3 == mol2.test_attr3

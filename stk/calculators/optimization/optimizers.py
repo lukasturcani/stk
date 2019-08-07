@@ -47,11 +47,11 @@ def _add_cache_use(optimize):
 
     @wraps(optimize)
     def inner(self, mol):
-        if self.use_cache and mol in self._cache:
+        if self._use_cache and mol in self._cache:
             logger.info(f'Skipping optimization on {mol}.')
         else:
             optimize(self, mol)
-            if self.use_cache:
+            if self._use_cache:
                 self._cache.add(mol)
 
     return inner
@@ -84,7 +84,7 @@ class Optimizer:
         # Holds every previously optimized molecule if use_cache is
         # true.
         self._cache = set()
-        self.use_cache = use_cache
+        self._use_cache = use_cache
 
     def __init_subclass__(cls, **kwargs):
         cls.optimize = _add_cache_use(cls.optimize)
@@ -111,12 +111,6 @@ class Optimizer:
 class OptimizerSequence(Optimizer):
     """
     Applies optimizers in sequence.
-
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule.
 
     Examples
     --------
@@ -180,12 +174,6 @@ class CageOptimizerSequence(Optimizer):
     Before each :class:`Optimizer` in the sequence is applied to the
     cage, it is checked to see if it is collapsed. If it is
     collapsed, the optimization sequence ends immediately.
-
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule.
 
     Examples
     --------
@@ -293,12 +281,6 @@ class TryCatchOptimizer(Optimizer):
     """
     Try to optimize with a :class:`Optimizer`, use another on failure.
 
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule.
-
     Examples
     --------
     .. code-block:: python
@@ -399,12 +381,6 @@ class RaisingOptimizer(Optimizer):
     which sometimes complete successfully and sometimes
     randomly fail.
 
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule.
-
     Examples
     --------
     .. code-block:: python
@@ -474,12 +450,6 @@ class MMFF(Optimizer):
     """
     Use the MMFF force field to optimize molecules.
 
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule.
-
     Examples
     --------
     .. code-block:: python
@@ -518,12 +488,6 @@ class UFF(Optimizer):
     """
     Use the UFF force field to optimize molecules.
 
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule.
-
     Examples
     --------
     .. code-block:: python
@@ -561,12 +525,6 @@ class UFF(Optimizer):
 class ETKDG(Optimizer):
     """
     Uses the ETKDG [#]_ v2 algorithm to find an optimized structure.
-
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule.
 
     Examples
     --------
@@ -668,10 +626,6 @@ class XTB(Optimizer):
 
     Attributes
     ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule.
-
     incomplete : :class:`set` of :class:`.Molecule`
         A :class:`set` of molecules passed to :meth:`optimize` whose
         optimzation was incomplete.
