@@ -488,6 +488,9 @@ class CageTopology(TopologyGraph):
             mean that the topology graph represents different
             structural isomers.
 
+            The vertices and edges can also be referred to by their
+            indices.
+
         processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
@@ -496,6 +499,13 @@ class CageTopology(TopologyGraph):
 
         if vertex_alignments is None:
             vertex_alignments = {}
+
+        # Convert ints to Vertex and Edge instances.
+        _vertex_alignments = {}
+        for v, e in vertex_alignments.items():
+            v = self.vertices[v] if isinstance(v, int) else v
+            e = v.edges[e] if isinstance(e, int) else e
+        vertex_alignments = _vertex_alignments
 
         vertex_clones = {}
         for vertex in self.vertices:
@@ -592,7 +602,7 @@ class CageTopology(TopologyGraph):
 
     def __repr__(self):
         vertex_alignments = ', '.join(
-            f'Vertex({v.id}): {v.edges.index(v.aligner_edge)}'
+            f'{v.id}: {v.edges.index(v.aligner_edge)}'
             for v in self.vertices
         )
 
