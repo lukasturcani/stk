@@ -1006,7 +1006,7 @@ class XTB(Optimizer):
             else:
                 # Optimization is complete.
                 # Update mol from xtbopt.xyz.
-                mol.update_from_xyz(output_xyz)
+                mol.update_from_file(output_xyz)
                 break
         return opt_complete
 
