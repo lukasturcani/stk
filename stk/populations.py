@@ -755,7 +755,7 @@ class Population:
                 )
         return pop
 
-    def add_members(self, *members, duplicates=True):
+    def add_members(self, molecules, duplicate_key=None):
         """
         Add :class:`.Molecule` instances to the :class:`.Population`.
 
@@ -765,18 +765,14 @@ class Population:
 
         Parameters
         ----------
-        *members : :class:`.Molecule`
+        molecules : :class:`iterable` of :class:`.Molecule`
             The molecules to be added as direct members.
 
-        duplicates : :class:`bool`, optional
-            Indicates whether multiple instances of the same
-            molecule are allowed to be added. Note that the
-            sameness of two :class:`.Molecule` objects is judged with
-            :meth:`.Molecule.is_identical`.
-
-            When ``False``, only molecules which are not already
-            held by the population will be added. When ``True``,
-            multiple instances of the same molecule may be added.
+        duplicate_key : :class:`callable`, optional
+            If not ``None``, ``duplicate_key(mol)`` is evalued on each
+            molecule in `members`. If a molecule with the same
+            `duplicate_key` is already present in the population, the
+            molecule is not added.
 
         Returns
         -------
@@ -784,12 +780,15 @@ class Population:
 
         """
 
-        if duplicates:
-            self.direct_members.extend(members)
+        if duplicate_key is None:
+            self.direct_members.extend(molecules)
         else:
-            self.direct_members.extend(
-                mol for mol in members if mol not in self
-            )
+            keys = {duplicate_key(mol) for mol in self}
+            for mol in molecules:
+                key = duplicate_key(mol)
+                if key not in keys:
+                    keys.add(key)
+                    self.direct_members.append(mol)
 
     def add_subpopulation(self, population):
         """
@@ -937,12 +936,13 @@ class Population:
                 raise result
 
         # Update the structures in the population.
-        sorted_opt = sorted(optimized, key=lambda m: m._key)
-        sorted_pop = sorted(self, key=lambda m: m._key)
+        sorted_opt = sorted(optimized, key=lambda m: repr(m))
+        sorted_pop = sorted(self, key=lambda m: repr(m))
         for old, new in zip(sorted_pop, sorted_opt):
+            assert old.is_identical(new)
             old.__dict__ = dict(vars(new))
-            if optimizer.use_cache:
-                optimizer.cache.add(old)
+            if optimizer._use_cache:
+                optimizer._cache.add(old)
 
     def _optimize_serial(self, optimizer):
         for member in self:
@@ -1180,12 +1180,7 @@ class Population:
             raise IndexError('Population index out of range.')
 
         if isinstance(key, slice):
-            mols = it.islice(
-                iterable=self,
-                start=key.start,
-                stop=key.stop,
-                step=key.step
-            )
+            mols = it.islice(self, key.start, key.stop, key.step)
             return self.__class__(*mols)
 
         raise TypeError(
@@ -1244,7 +1239,9 @@ class Population:
         """
 
         new_pop = self.__class__()
-        new_pop.add_members(mol for mol in self if mol not in other)
+        new_pop.add_members(
+            molecules=(mol for mol in self if mol not in other)
+        )
         return new_pop
 
     def __add__(self, other):
@@ -1269,7 +1266,7 @@ class Population:
         return self.__class__(self, other)
 
     def __contains__(self, item):
-        return any(item.is_identical(mol) for mol in self)
+        return any(mol is item for mol in self)
 
     def __str__(self):
         name = f'Population {id(self)}\n'

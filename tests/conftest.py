@@ -281,8 +281,7 @@ def tmp_cc3():
 
 @pytest.fixture('session')
 def population():
-
-    bb1 = stk.BuildingBlock('NC(CNCN)CN', ['amine'])
+    bb1 = stk.BuildingBlock('NC(CCO)CN', ['amine'])
     bb2 = stk.BuildingBlock('[Br]CCCC[Br]', ['bromine'])
     bb3 = stk.BuildingBlock('[I]COCC[I]', ['iodine'])
     bb4 = stk.BuildingBlock('O=CC(C=O)CC=O', ['aldehyde'])
@@ -335,7 +334,7 @@ def population():
 
 @pytest.fixture
 def tmp_population():
-    bb1 = stk.BuildingBlock('NC(CNCN)CN', ['amine'])
+    bb1 = stk.BuildingBlock('NC(CCO)CN', ['amine'])
     bb2 = stk.BuildingBlock('[Br]CCCC[Br]', ['bromine'])
     bb3 = stk.BuildingBlock('[I]COCC[I]', ['iodine'])
     bb4 = stk.BuildingBlock('O=CC(C=O)CC=O', ['aldehyde'])

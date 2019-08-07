@@ -45,7 +45,7 @@ def test_init_all():
     aldehydes = [
         stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
         stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
-        stk.BuildingBlock('O=C(C=O)COCC=O', ['aldehyde']),
+        stk.BuildingBlock('O=CC(C=O)COCC=O', ['aldehyde']),
     ]
     # A total of 9 cages will be created.
     cages = stk.Population.init_all(
@@ -53,8 +53,9 @@ def test_init_all():
         topology_graphs=[stk.cage.FourPlusSix()]
     )
 
-    cages.remove_duplicates(key=lambda mol: mol._key)
     assert len(cages) == 9
+    cages.remove_duplicates(key=lambda mol: mol._key)
+    assert len(cages) == 6
 
     for cage in cages:
         bbs = tuple(cage.building_block_vertices.keys())
@@ -89,7 +90,7 @@ def test_init_random():
     aldehydes = [
         stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
         stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
-        stk.BuildingBlock('O=C(C=O)COCC=O', ['aldehyde']),
+        stk.BuildingBlock('O=CC(C=O)COCC=O', ['aldehyde']),
     ]
 
     cages = stk.Population.init_random(
@@ -129,8 +130,9 @@ def test_init_diverse():
     aldehydes = [
         stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
         stk.BuildingBlock('O=CCC(C=O)CC=O', ['aldehyde']),
-        stk.BuildingBlock('O=C(C=O)COCC=O', ['aldehyde']),
+        stk.BuildingBlock('O=CC(C=O)COCC=O', ['aldehyde']),
     ]
+
     # A total of 4 cages will be created.
     cages = stk.Population.init_diverse(
         building_blocks=[amines, aldehydes],
@@ -139,26 +141,47 @@ def test_init_diverse():
     )
 
     cage1, cage2 = cages
-    bb1, bb2 = cage1.building_block_vertices.keys()
+    amine = next(
+        bb for bb in cage1.building_block_vertices
+        if bb.func_groups[0].fg_type.name == 'amine'
+    )
+    aldehyde = next(
+        bb for bb in cage1.building_block_vertices
+        if bb.func_groups[0].fg_type.name == 'aldehyde'
+    )
     diff_bb1 = min(
-        stk.dice_similarity(bb1, amine) for amine in amines
+        amines,
+        key=lambda m: stk.dice_similarity(m, amine)
     )
     diff_bb2 = min(
-        stk.dice_similarity(bb2, aldehyde) for aldehyde in aldehydes
+        aldehydes,
+        key=lambda m: stk.dice_similarity(m, aldehyde)
     )
-    cage2_bb1, cage2_bb2 = cage2.building_block_vertices.keys()
-
-    assert cage2_bb1 is diff_bb1
-    assert cage2_bb2 is diff_bb2
+    cage2_amine = next(
+        bb for bb in cage2.building_block_vertices
+        if bb.func_groups[0].fg_type.name == 'amine'
+    )
+    cage2_aldehyde = next(
+        bb for bb in cage2.building_block_vertices
+        if bb.func_groups[0].fg_type.name == 'aldehyde'
+    )
+    assert cage2_amine is diff_bb1
+    assert cage2_aldehyde is diff_bb2
 
 
 def test_add_members(tmp_population, population):
     assert len(tmp_population) == len(population)
 
-    tmp_population.add_members(*population, duplicates=False)
+    tmp_population.add_members(
+        molecules=population,
+        duplicate_key=lambda m: m._key
+    )
     assert len(population) == len(tmp_population)
 
-    tmp_population.add_members(*population, duplicates=True)
+    tmp_population.add_members(
+        molecules=population,
+        duplicate_key=None
+    )
     assert len(population)*2 == len(tmp_population)
 
 
@@ -215,7 +238,7 @@ def test_dump_and_load(tmp_population):
         tmp_population.dump(
             path=path,
             include_attrs=include_attrs,
-            ignore_missing_attrs=True
+            ignore_missing_attrs=False
         )
 
     tmp_population.dump(
@@ -329,9 +352,8 @@ def test_len(population):
     assert len(population) == 19
 
 
-def test_sub(tmp_population, population):
-    new_pop = tmp_population - population
-    assert len(new_pop) == 0
+def test_sub(population):
+    assert len(population - population.clone()) == 0
 
 
 def test_add(population):
@@ -348,17 +370,17 @@ def test_add(population):
     c2 = population.clone()
     result = c1 + c2
     assert len(result) == 2*len(population)
-    assert not result.members
+    assert not result.direct_members
     assert len(result.subpopulations) == 2
     assert result.subpopulations[0] is c1
     assert result.subpopulations[1] is c2
 
 
-def test_contains(population):
+def test_contains(tmp_population, population):
     """
     Ensure the `in` operator works.
 
     """
 
-    clone = population.clone()
-    assert all(m in population for m in clone)
+    assert all(m not in population for m in tmp_population)
+    assert all(m in population for m in population.clone())
