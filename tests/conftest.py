@@ -128,6 +128,11 @@ def tmp_aldehyde2():
     return stk.BuildingBlock('O=CCC=O', ['aldehyde'])
 
 
+@pytest.fixture
+def aldehyde2_alt1():
+    return stk.BuildingBlock('O=CCNCC=O', ['aldehyde'])
+
+
 @pytest.fixture(scope='session')
 def boronic_acid2():
     return stk.BuildingBlock('OB(O)c1ccc(B(O)O)nc1', ['boronic_acid'])
