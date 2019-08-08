@@ -8,7 +8,7 @@ Available exiters.
 ------------------
 
 #. :class:`.NumGenerations`
-#. :class:`.MolPresent`
+#. :class:`.MoleculePresent`
 #. :class:`.FitnessPlateau`
 #. :class:`.AnyExiter`
 #. :class:`.AllExiters`
@@ -40,7 +40,7 @@ class Exiter:
 
     def exit(self, progress):
         """
-        Checks to see the the GA should stop.
+        Check to see the the GA should stop.
 
         Parameters
         ----------
@@ -66,7 +66,7 @@ class AnyExiter(Exiter):
 
     def __init__(self, *exiters):
         """
-        Initializes a :class:`AnyExiter` instance.
+        Initialize a :class:`AnyExiter` instance.
 
         Parameters
         ----------
@@ -80,7 +80,7 @@ class AnyExiter(Exiter):
 
     def exit(self, progress):
         """
-        Checks to see if any exit condition has been satisfied.
+        Check to see if any exit condition has been satisfied.
 
         Parameters
         ----------
@@ -106,7 +106,7 @@ class AllExiters(Exiter):
 
     def __init__(self, *exiters):
         """
-        Initializes a :class:`AllExiter` instance.
+        Initialize a :class:`AllExiter` instance.
 
         Parameters
         ----------
@@ -146,7 +146,7 @@ class NumGenerations(Exiter):
 
     def __init__(self, num_generations):
         """
-        Initializes a :class:`NumGenerations` instance.
+        Initialize a :class:`NumGenerations` instance.
 
         Parameters
         ----------
@@ -159,7 +159,7 @@ class NumGenerations(Exiter):
 
     def exit(self, progress):
         """
-        Checks if a number of generations has passed.
+        Check if a number of generations has passed.
 
         Parameters
         ----------
@@ -175,7 +175,7 @@ class NumGenerations(Exiter):
         return len(progress.populations) >= self._num_generations
 
 
-class MolPresent(Exiter):
+class MoleculePresent(Exiter):
     """
     Stops the GA if a specific molecule has been found.
 
@@ -183,7 +183,7 @@ class MolPresent(Exiter):
 
     def __init__(self, mol):
         """
-        Initializes a :class:`MolPresent` instance.
+        Initialize a :class:`MoleculePresent` instance.
 
         Parameters
         ----------
@@ -201,7 +201,7 @@ class MolPresent(Exiter):
 
     def exit(self, progress):
         """
-        ``True`` if :attr:`mol` is in `progress`.
+        Return ``True`` if :attr:`mol` is in `progress`.
 
         Parameters
         ----------
@@ -238,7 +238,7 @@ class FitnessPlateau(Exiter):
 
     def __init__(self, num_generations, top_members=1):
         """
-        Initializes a :class:`FitnessPlateau` instance.
+        Initialize a :class:`FitnessPlateau` instance.
 
         Parameters
         ----------
@@ -257,7 +257,7 @@ class FitnessPlateau(Exiter):
 
     def exit(self, progress):
         """
-        Checks if the fittest molecules changed between generations.
+        Check if the fittest molecules changed between generations.
 
         Parameters
         ----------

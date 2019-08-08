@@ -108,7 +108,7 @@ class ProgressPlotter(Plotter):
 
     def __init__(self, filename, property_fn, y_label, default):
         """
-        Initializes a :class:`ProgressPlotter` instance.
+        Initialize a :class:`ProgressPlotter` instance.
 
         Parameters
         ----------

@@ -141,7 +141,7 @@ class RandomCrossover(Crosser):
 
     def __init__(self, *crossers, weights=None):
         """
-        Initializes a :class:`RandomCrossover` instance.
+        Initialize a :class:`RandomCrossover` instance.
 
         Parameters
         ----------
@@ -302,7 +302,7 @@ class GeneticRecombination(Crosser):
 
     def __init__(self, key, random_yield_order=True, use_cache=False):
         """
-        Initializes a :class:`GeneticRecombination` instance.
+        Initialize a :class:`GeneticRecombination` instance.
 
         Parameters
         ----------
@@ -432,7 +432,7 @@ class Jumble(Crosser):
         use_cache=False
     ):
         """
-        Initializes a :class:`Jumble` instance.
+        Initialize a :class:`Jumble` instance.
 
         Parameters
         ----------

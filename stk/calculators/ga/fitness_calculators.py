@@ -136,7 +136,7 @@ class FitnessCalculator:
 
     def __init__(self, use_cache):
         """
-        Initializes a :class:`FitnessCalculator` instance.
+        Initialize a :class:`FitnessCalculator` instance.
 
         Parameters
         ----------
