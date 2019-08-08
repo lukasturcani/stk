@@ -28,6 +28,10 @@ subpopulation.
 """
 
 
+import rdkit.Chem.AllChem as rdkit
+from functools import partial
+
+
 class Exiter:
     """
     Checks if the exit criterion for the GA has been satisfied.
@@ -58,12 +62,6 @@ class AnyExiter(Exiter):
     """
     Checks if any :class:`Exiter` has satisfied its exit condition.
 
-    Attributes
-    ----------
-    exiters : :class:`tuple` of :class:`Exiter`
-        :class:`Exiter` objects which are checked to see if their exit
-        conditions have been satisfied.
-
     """
 
     def __init__(self, *exiters):
@@ -78,7 +76,7 @@ class AnyExiter(Exiter):
 
         """
 
-        self.exiters = exiters
+        self._exiters = exiters
 
     def exit(self, progress):
         """
@@ -97,18 +95,12 @@ class AnyExiter(Exiter):
 
         """
 
-        return any(exiter.exit(progress) for exiter in self.exiters)
+        return any(exiter.exit(progress) for exiter in self._exiters)
 
 
 class AllExiters(Exiter):
     """
     Checks if all :class:`Exiter` objects return ``True``.
-
-    Attributes
-    ----------
-    exiters : :class:`tuple` of :class:`Exiter`
-        :class:`Exiter` objects which are checked to see if their exit
-        conditions have been satisfied.
 
     """
 
@@ -124,7 +116,7 @@ class AllExiters(Exiter):
 
         """
 
-        self.exiters = exiters
+        self._exiters = exiters
 
     def exit(self, progress):
         """
@@ -143,17 +135,12 @@ class AllExiters(Exiter):
 
         """
 
-        return all(exiter.exit(progress) for exiter in self.exiters)
+        return all(exiter.exit(progress) for exiter in self._exiters)
 
 
 class NumGenerations(Exiter):
     """
     Stop the GA after a certain number of generations.
-
-    Attributes
-    ----------
-    num_generations : :class:`int`
-        The number of generations after which the GA should stop.
 
     """
 
@@ -168,7 +155,7 @@ class NumGenerations(Exiter):
 
         """
 
-        self.num_generations = num_generations
+        self._num_generations = num_generations
 
     def exit(self, progress):
         """
@@ -185,18 +172,12 @@ class NumGenerations(Exiter):
 
         """
 
-        return len(progress.populations) >= self.num_generations
+        return len(progress.populations) >= self._num_generations
 
 
 class MolPresent(Exiter):
     """
     Stops the GA if a specific molecule has been found.
-
-    Attributes
-    ----------
-    mol : :class:`.Molecule`
-        A molecule which if present in any of the GA's generations
-        causes it to stop running.
 
     """
 
@@ -212,7 +193,11 @@ class MolPresent(Exiter):
 
         """
 
-        self.mol = mol
+        self._mol = mol
+        self._is_same_molecule = partial(
+            self._is_same_molecule,
+            mol.to_rdkit_mol()
+        )
 
     def exit(self, progress):
         """
@@ -233,24 +218,21 @@ class MolPresent(Exiter):
         # Check for the presence of the molecule, starting with the
         # newest generation first.
         for pop in progress.populations:
-            if any(mol.same(self.mol) for mol in pop):
+            if any(
+                self._is_same_molecule(mol.to_rdkit_mol())
+                for mol in pop
+            ):
                 return True
         return False
+
+    @staticmethod
+    def _is_same_molecule(mol1, mol2):
+        return rdkit.MolToInchi(mol1) == rdkit.MolToInchi(mol2)
 
 
 class FitnessPlateau(Exiter):
     """
     Checks if the fittest molecules remain the same.
-
-    Attributes
-    ----------
-    num_generations : :class:`int`
-        Number of generations in which the fittest molecules did
-        not change.
-
-    top_members : :class:`int`
-        The number of fittest molecules which are checked. This
-        number needs to be smaller than the population size.
 
     """
 
@@ -270,8 +252,8 @@ class FitnessPlateau(Exiter):
 
         """
 
-        self.num_generations = num_generations
-        self.top_members = top_members
+        self._num_generations = num_generations
+        self._top_members = top_members
 
     def exit(self, progress):
         """
@@ -291,15 +273,17 @@ class FitnessPlateau(Exiter):
         """
 
         # Check that the GA has run for more than num_gens generations.
-        if len(progress.populations) >= self.num_generations:
+        if len(progress.populations) >= self._num_generations:
             gens = set()
-            for i in range(self.num_generations):
-                gen = sorted(progress.populations[-i-1],
-                             reverse=True,
-                             key=lambda mol: mol.fitness)
+            for i in range(self._num_generations):
+                gen = sorted(
+                    progress.populations[-i-1],
+                    reverse=True,
+                    key=lambda mol: mol.fitness
+                )
                 # Get the top members of the generation.
                 keys = frozenset(
-                    mol.key for mol in gen[:self.top_members]
+                    mol.key for mol in gen[:self._top_members]
                 )
                 gens.add(keys)
             unique_gens = len(gens)

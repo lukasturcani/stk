@@ -41,11 +41,6 @@ class Crosser:
     """
     Carries out crossover on molecules.
 
-    Attributes
-    ----------
-    use_cache : class:`bool`
-        Toggles use of the molecular cache.
-
     """
 
     def __init__(self, use_cache):
@@ -59,7 +54,7 @@ class Crosser:
 
         """
 
-        self.use_cache = use_cache
+        self._use_cache = use_cache
 
     def cross(self, *mols):
         """
@@ -251,11 +246,6 @@ class GeneticRecombination(Crosser):
     For obvious reasons, this approach works with any number of
     parents.
 
-    Attributes
-    ----------
-    use_cache : class:`bool`
-        Toggles use of the molecular cache.
-
     Examples
     --------
     Note that any number of parents can be used for the crossover.
@@ -375,7 +365,7 @@ class GeneticRecombination(Crosser):
             yield cls(
                 building_blocks=building_blocks,
                 topology_graph=top,
-                use_cache=self.use_cache
+                use_cache=self._use_cache
             )
 
 
@@ -387,11 +377,6 @@ class Jumble(Crosser):
     and building blocks are drawn from the pot to generate the
     offspring. The offspring inherit the topology  graph of one of the
     parents.
-
-    Attributes
-    ----------
-    use_cache : class:`bool`
-        Toggles use of the molecular cache.
 
     Examples
     --------
@@ -513,5 +498,5 @@ class Jumble(Crosser):
             yield cls(
                 building_blocks=bbs,
                 topology_graph=top,
-                use_cache=self.use_cache
+                use_cache=self._use_cache
             )

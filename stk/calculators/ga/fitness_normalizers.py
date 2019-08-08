@@ -50,12 +50,12 @@ logger = logging.getLogger(__name__)
 
 def _handle_failed_molecules(normalize):
     """
-    Decorates :meth:`~FitnessNormalizer.normalize` methods.
+    Decorate :meth:`~FitnessNormalizer.normalize` methods.
 
     This decorator makes :meth:`~FitnessNormalizer.normalize` methods
     set the fitness of molecules with a :attr:`fitness` of ``None`` to
     half the minimum fitness in the population, if
-    :attr:`handle_failed` is ``True```.
+    :attr:`_handle_failed` is ``True```.
 
     Parameters
     ----------
@@ -71,14 +71,17 @@ def _handle_failed_molecules(normalize):
 
     @wraps(normalize)
     def inner(self, population):
-        valid_pop = population.init_copy(population)
+        valid_pop = population.clone()
         valid_pop.remove_members(
             lambda m: m.fitness is None
         )
         r = normalize(self, valid_pop)
 
-        if self.handle_failed:
-            minimum_fitness = min((m.fitness for m in valid_pop), default=1)
+        if self._handle_failed:
+            minimum_fitness = min(
+                (m.fitness for m in valid_pop),
+                default=1
+            )
             for member in population:
                 if member.fitness is None:
                     member.fitness = minimum_fitness/2
@@ -89,7 +92,7 @@ def _handle_failed_molecules(normalize):
 
 def _dedupe(normalize):
     """
-    Makes sure that duplicates are removed before normalization.
+    Make sure that duplicates are removed before normalization.
 
     Parameters
     ----------
@@ -115,19 +118,10 @@ class FitnessNormalizer:
     """
     Normalizes fitness values across a :class:`.Population`.
 
-    Attributes
-    ----------
-    handle_failed : :class:`bool`
-        If ``True``, the normalized :attr:`fitness` value of molecules
-        with a :attr:`fitness` value of ``None`` is half the minimum
-        normalized fitness value in the population. If ``False`` the
-        normalization keeps ``None`` in the :attr:`fitness` attribute
-        of molecules.
-
     """
 
     def __init__(self):
-        self.handle_failed = True
+        self._handle_failed = True
 
     def __init_subclass__(cls, **kwargs):
         cls.normalize = _dedupe(cls.normalize)
@@ -136,7 +130,7 @@ class FitnessNormalizer:
 
     def normalize(self, population):
         """
-        Normalizes the fitness values in `population`.
+        Normalize the fitness values in `population`.
 
         Parameters
         ----------
@@ -163,7 +157,7 @@ class NullFitnessNormalizer(FitnessNormalizer):
 
     def normalize(self, population):
         """
-        Does not normalize the fitness values in `population`.
+        Do not normalize the fitness values in `population`.
 
         Parameters
         ----------
@@ -183,17 +177,13 @@ class NullFitnessNormalizer(FitnessNormalizer):
 
 class NormalizerSequence(FitnessNormalizer):
     """
-    Applies a sequence of normalizers in sequence.
-
-    Attributes
-    ----------
-    normalizers : :class:`tuple` of :class:`FitnessNormalizer`
-        The normalizers which get applied in sequence by
-        :meth:`normalize`.
+    Applies a collection of normalizers in sequence.
 
     Examples
     --------
     .. code-block:: python
+
+        import stk
 
         # Make the normalizer.
         sequence = stk.NormalizerSequence(
@@ -202,9 +192,12 @@ class NormalizerSequence(FitnessNormalizer):
         )
 
         # Make a population of molecules.
-        mol1 = StructUnit(...)
-        mol2 = Cage(...)
-        mol3 = Polymer(...)
+        mol1 = stk.BuildingBlock('NCCCN')
+        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
+        mol3 = stk.ConstructedMolecule(
+            building_blocks=[mol2],
+            topology_graph=stk.polymer.Linear('A', [0], 5)
+        )
         pop = stk.Population(mol1, mol2, mol3)
 
         # Set the fitness values.
@@ -224,7 +217,7 @@ class NormalizerSequence(FitnessNormalizer):
 
     def __init__(self, *normalizers):
         """
-        Initializes a :class:`NormalizerSequence` instance.
+        Initialize a :class:`NormalizerSequence` instance.
 
         Parameters
         ----------
@@ -234,12 +227,12 @@ class NormalizerSequence(FitnessNormalizer):
 
         """
 
-        self.normalizers = normalizers
+        self._normalizers = normalizers
         super().__init__()
 
     def normalize(self, population):
         """
-        Normalizes the fitness values in `population`.
+        Normalize the fitness values in `population`.
 
         Parameters
         ----------
@@ -252,14 +245,15 @@ class NormalizerSequence(FitnessNormalizer):
         None : :class:`NoneType`
             The :attr:`fitness` attributes of the molecules in
             `population` are modified in place.
+
         """
 
-        for normalizer in self.normalizers:
-            handle_failed = normalizer.handle_failed
-            normalizer.handle_failed = False
+        for normalizer in self._normalizers:
+            handle_failed = normalizer._handle_failed
+            normalizer._handle_failed = False
             logger.info(f'Using {normalizer.__class__.__name__}.')
             normalizer.normalize(population)
-            normalizer.handle_failed = handle_failed
+            normalizer._handle_failed = handle_failed
 
 
 class Power(FitnessNormalizer):
@@ -269,35 +263,32 @@ class Power(FitnessNormalizer):
     This works for cases where the :attr:`fitness` is single
     :class:`float` and where it is :class:`list` of :class:`float`.
 
-    Attributes
-    ----------
-    power : :class:`float` or :class:`list` of :class:`float`
-        The power to raise each :attr:`fitness` value to. Can be
-        a single number or multiple numbers.
-
     Examples
     --------
     Raising a :attr:`fitness` value by some power.
 
     .. code-block:: python
 
+        import stk
+
         # Create the molecules and give them some arbitrary fitness.
-        # Normally the fitness would be set by the fitness() method of
+        # Normally the fitness would be set by the get_fitness() method of
         # some a fitness calculator.
-        mol1 = StructUnit(...)
+        mol1 = stk.BuildingBlock('NCCCN')
+        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
+        mol3 = stk.ConstructedMolecule(
+            building_blocks=[mol2],
+            topology_graph=stk.polymer.Linear('A', [0], 5)
+        )
         mol1.fitness = 1
-
-        mol2 = Cage(...)
         mol2.fitness = 2
-
-        mol3 = Polymer(...)
         mol3.fitness = 3
 
         # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
+        pop = stk.Population(mol1, mol2, mol3)
 
         # Create the normalizer.
-        power = Power(2)
+        power = stk.Power(2)
 
         # Normalize the fitness values.
         power.normalize(pop)
@@ -310,24 +301,14 @@ class Power(FitnessNormalizer):
 
     .. code-block:: python
 
-        # Create the molecules and give them some arbitrary fitness
-        # vectors.
-        # Normally the fitness would be set by the fitness() method of
-        # some a fitness calculator.
-        mol1 = StructUnit(...)
+        # Normally the fitness would be set by the get_fitness() method
+        # of some a fitness calculator.
         mol1.fitness = [1, 2, 3]
-
-        mol2 = Cage(...)
         mol2.fitness = [4, 5, 6]
-
-        mol3 = Polymer(...)
         mol3.fitness = [7, 8, 9]
 
-        # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
-
         # Create the normalizer.
-        power = Power(2)
+        power = stk.Power(2)
 
         # Normalize the fitness values.
         power.normalize(pop)
@@ -336,28 +317,19 @@ class Power(FitnessNormalizer):
         # mol2.fitness is now [16, 25, 36].
         # mol3.fitness is now [49, 64, 81]
 
-    Raising a :attr:`fitness` vector by different powers.
+    Raising a :attr:`get_fitness` vector by different powers.
 
     .. code-block:: python
 
-        # Create the molecules and give them some arbitrary fitness
-        # vectors.
-        # Normally the fitness would be set by the fitness() method of
-        # some a fitness calculator.
-        mol1 = StructUnit(...)
+        # Give the molecules some arbitrary fitness vectors.
+        # Normally the fitness would be set by the get_fitness() method
+        # of some a fitness calculator.
         mol1.fitness = [1, 2, 3]
-
-        mol2 = Cage(...)
         mol2.fitness = [4, 5, 6]
-
-        mol3 = Polymer(...)
         mol3.fitness = [7, 8, 9]
 
-        # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
-
         # Create the normalizer.
-        power = Power([1, 2, 3])
+        power = stk.Power([1, 2, 3])
 
         # Normalize the fitness values.
         power.normalize(pop)
@@ -370,7 +342,7 @@ class Power(FitnessNormalizer):
 
     def __init__(self, power):
         """
-        Initializes a :class:`Power` instance.
+        Initialize a :class:`Power` instance.
 
         Parameters
         ----------
@@ -385,7 +357,7 @@ class Power(FitnessNormalizer):
 
     def normalize(self, population):
         """
-        Normalizes the fitness values in `population`.
+        Normalize the fitness values in `population`.
 
         Parameters
         ----------
@@ -409,35 +381,34 @@ class Multiply(FitnessNormalizer):
     """
     Multiplies the fitness value by some coefficent.
 
-    Attributes
-    ----------
-    coefficent : :class:`float` or :class:`list` of :class:`float`
-        The cofficients to multiply each :attr:`fitness` value by. Can
-        be a single number or multiple numbers.
-
     Examples
     --------
     Multiplying a :attr:`fitness` value by a coefficent.
 
     .. code-block:: python
 
+        import stk
+
         # Create the molecules and give them some arbitrary fitness.
-        # Normally the fitness would be set by the fitness() method of
-        # some a fitness calculator.
-        mol1 = StructUnit(...)
+        # Normally the fitness would be set by the get_fitness() method
+        # of some a fitness calculator.
+
+        mol1 = stk.BuildingBlock('NCCCN')
+        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
+        mol3 = stk.ConstructedMolecule(
+            building_blocks=[mol2],
+            topology_graph=stk.polymer.Linear('A', [0], 5)
+        )
+
         mol1.fitness = 1
-
-        mol2 = Cage(...)
         mol2.fitness = 2
-
-        mol3 = Polymer(...)
         mol3.fitness = 3
 
         # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
+        pop = stk.Population(mol1, mol2, mol3)
 
         # Create the normalizer.
-        multiply = Multiply(2)
+        multiply = stk.Multiply(2)
 
         # Normalize the fitness values.
         multiply.normalize(pop)
@@ -450,24 +421,18 @@ class Multiply(FitnessNormalizer):
 
     .. code-block:: python
 
-        # Create the molecules and give them some arbitrary fitness
-        # vectors.
-        # Normally the fitness would be set by the fitness() method of
-        # some a fitness calculator.
-        mol1 = StructUnit(...)
+        # Give the molecules some arbitrary fitness vectors.
+        # Normally the fitness would be set by the get_fitness() method
+        # of some a fitness calculator.
         mol1.fitness = [1, 2, 3]
-
-        mol2 = Cage(...)
         mol2.fitness = [4, 5, 6]
-
-        mol3 = Polymer(...)
         mol3.fitness = [7, 8, 9]
 
         # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
+        pop = stk.Population(mol1, mol2, mol3)
 
         # Create the normalizer.
-        multiply = Multiply(2)
+        multiply = stk.Multiply(2)
 
         # Normalize the fitness values.
         multiply.normalize(pop)
@@ -480,24 +445,15 @@ class Multiply(FitnessNormalizer):
 
     .. code-block:: python
 
-        # Create the molecules and give them some arbitrary fitness
-        # vectors.
-        # Normally the fitness would be set by the fitness() method of
-        # some a fitness calculator.
-        mol1 = StructUnit(...)
+        # Give the molecules some arbitrary fitness vectors.
+        # Normally the fitness would be set by the get_fitness() method
+        # of some a fitness calculator.
         mol1.fitness = [1, 2, 3]
-
-        mol2 = Cage(...)
         mol2.fitness = [4, 5, 6]
-
-        mol3 = Polymer(...)
         mol3.fitness = [7, 8, 9]
 
-        # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
-
         # Create the normalizer.
-        multiply = Multiply([1, 2, 3])
+        multiply = stk.Multiply([1, 2, 3])
 
         # Normalize the fitness values.
         multiply.normalize(pop)
@@ -510,7 +466,7 @@ class Multiply(FitnessNormalizer):
 
     def __init__(self, coefficient):
         """
-        Initializes a :class:`Multiply` instance.
+        Initialize a :class:`Multiply` instance.
 
         Parameters
         ----------
@@ -520,12 +476,12 @@ class Multiply(FitnessNormalizer):
 
         """
 
-        self.coefficient = coefficient
+        self._coefficient = coefficient
         super().__init__()
 
     def normalize(self, population):
         """
-        Normalizes the fitness values in `population`.
+        Normalize the fitness values in `population`.
 
         Parameters
         ----------
@@ -542,7 +498,7 @@ class Multiply(FitnessNormalizer):
         """
 
         for mol in population:
-            mol.fitness = np.multiply(mol.fitness, self.coefficient)
+            mol.fitness = np.multiply(mol.fitness, self._coefficient)
 
 
 class Sum(FitnessNormalizer):
@@ -553,24 +509,26 @@ class Sum(FitnessNormalizer):
     --------
     .. code-block:: python
 
+        mol1 = stk.BuildingBlock('NCCCN')
+        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
+        mol3 = stk.ConstructedMolecule(
+            building_blocks=[mol2],
+            topology_graph=stk.polymer.Linear('A', [0], 5)
+        )
+
         # Create the molecules and give them some arbitrary fitness
         # vectors.
         # Normally the fitness would be set by the fitness() method of
         # some a fitness calculator.
-        mol1 = StructUnit(...)
         mol1.fitness = [1, 2, 3]
-
-        mol2 = Cage(...)
         mol2.fitness = [4, 5, 6]
-
-        mol3 = Polymer(...)
         mol3.fitness = [7, 8, 9]
 
         # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
+        pop = stk.Population(mol1, mol2, mol3)
 
         # Create the normalizer.
-        sum_normalizer = Sum()
+        sum_normalizer = stk.Sum()
 
         # Normalize the fitness values.
         sum_normalizer.normalize(pop)
@@ -583,7 +541,7 @@ class Sum(FitnessNormalizer):
 
     def normalize(self, population):
         """
-        Normalizes the fitness values in `population`.
+        Normalize the fitness values in `population`.
 
         Parameters
         ----------
@@ -632,24 +590,28 @@ class ScaleByMean(FitnessNormalizer):
 
     .. code-block:: python
 
+        import stk
+
         # Create the molecules and give them some arbitrary fitness
         # vectors.
         # Normally the fitness would be set by the fitness() method of
         # some a fitness calculator.
-        mol1 = StructUnit(...)
+        mol1 = stk.BuildingBlock('NCCCN')
+        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
+        mol3 = stk.ConstructedMolecule(
+            building_blocks=[mol2],
+            topology_graph=stk.polymer.Linear('A', [0], 5)
+        )
+
         mol1.fitness = 1
-
-        mol2 = Cage(...)
         mol2.fitness = 2
-
-        mol3 = Polymer(...)
         mol3.fitness = 3
 
         # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
+        pop = stk.Population(mol1, mol2, mol3)
 
         # Create the normalizer.
-        mean_scaler = ScaleByMean()
+        mean_scaler = stk.ScaleByMean()
 
         # Normalize the fitness values.
         mean_scaler.normalize(pop)
@@ -662,21 +624,12 @@ class ScaleByMean(FitnessNormalizer):
 
     .. code-block:: python
 
-        # Create the molecules and give them some arbitrary fitness
-        # vectors.
-        # Normally the fitness would be set by the fitness() method of
-        # some a fitness calculator.
-        mol1 = StructUnit(...)
+        # Give the molecules some arbitrary fitness vectors.
+        # Normally the fitness would be set by the get_fitness() method
+        # of some a fitness calculator.
         mol1.fitness = [1, 10, 100]
-
-        mol2 = Cage(...)
         mol2.fitness = [2, 20, 200]
-
-        mol3 = Polymer(...)
         mol3.fitness = [3, 30, 300]
-
-        # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
 
         # Create the normalizer.
         mean_scaler = ScaleByMean()
@@ -692,7 +645,7 @@ class ScaleByMean(FitnessNormalizer):
 
     def normalize(self, population):
         """
-        Normalizes the fitness values in `population`.
+        Normalize the fitness values in `population`.
 
         Parameters
         ----------
@@ -732,7 +685,7 @@ class ShiftUp(FitnessNormalizer):
     value is not a positive number. To fix this, the ``-10`` should be
     shifted to a positive value.
 
-    This :class:`FitnessNormalizer` find the minimum value of each
+    This :class:`FitnessNormalizer` finds the minimum value of each
     property across the entire population, and for properties where
     this minimum value is less than ``0``, shifts up the property value
     for every molecule in the population, so that the minimum value is
@@ -757,13 +710,6 @@ class ShiftUp(FitnessNormalizer):
     This :class:`FitnessNormalizer` also works when the :attr:`fitness`
     is a single value.
 
-    Parameters
-    ----------
-    indices : :class:`list` of :class:`int`
-        This holds the indices of elements in the
-        :attr:`~.MacroMolecule.fitness` array which should be
-        shifted.
-
     Examples
     --------
     .. code-block:: python
@@ -772,13 +718,15 @@ class ShiftUp(FitnessNormalizer):
         # vectors.
         # Normally the fitness would be set by the fitness() method of
         # some a fitness calculator.
-        mol1 = StructUnit(...)
+        mol1 = stk.BuildingBlock('NCCCN')
+        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
+        mol3 = stk.ConstructedMolecule(
+            building_blocks=[mol2],
+            topology_graph=stk.polymer.Linear('A', [0], 5)
+        )
+
         mol1.fitness = [1, -2, 3]
-
-        mol2 = Cage(...)
         mol2.fitness = [4, 5, -6]
-
-        mol3 = Polymer(...)
         mol3.fitness = [7, 8, 9]
 
         # Place the molecules in a Population.
@@ -798,7 +746,7 @@ class ShiftUp(FitnessNormalizer):
 
     def normalize(self, population):
         """
-        Normalizes the fitness values in `population`.
+        Normalize the fitness values in `population`.
 
         Parameters
         ----------
