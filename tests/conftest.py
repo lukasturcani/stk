@@ -128,9 +128,14 @@ def tmp_aldehyde2():
     return stk.BuildingBlock('O=CCC=O', ['aldehyde'])
 
 
-@pytest.fixture
+@pytest.fixture('session')
 def aldehyde2_alt1():
     return stk.BuildingBlock('O=CCNCC=O', ['aldehyde'])
+
+
+@pytest.fixture('session')
+def aldehyde2_alt2():
+    return stk.BuildingBlock('O=CCOCC=O', ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
@@ -268,11 +273,19 @@ def tmp_polymer(tmp_amine2, tmp_aldehyde2):
     )
 
 
-@pytest.fixture
+@pytest.fixture('session')
 def polymer_alt1(amine2_alt1, aldehyde2_alt1):
     return stk.ConstructedMolecule(
         building_blocks=[amine2_alt1, aldehyde2_alt1],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 6)
+    )
+
+
+@pytest.fixture('session')
+def polymer_alt2(amine2_alt2, aldehyde2_alt2):
+    return stk.ConstructedMolecule(
+        building_blocks=[aldehyde2_alt2, amine2_alt2],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
 
 
