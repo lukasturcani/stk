@@ -661,7 +661,7 @@ class ScaleByMean(FitnessNormalizer):
 
         """
 
-        mean = population.mean(lambda x: x.fitness)
+        mean = np.mean([mol.fitness for mol in population], axis=0)
         logger.debug(f'Means used in ScaleByMean: {mean}')
 
         for mol in population:
