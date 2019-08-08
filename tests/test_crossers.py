@@ -4,17 +4,22 @@ import stk
 def test_random_crossover(polymer, polymer_alt1):
     jumble = stk.Jumble(num_offspring_building_blocks=2)
     recombination = stk.GeneticRecombination(
-                        key=lambda mol: mol.func_group_infos[0].name)
-    random_crossover = stk.RandomCrossover(jumble,
-                                           recombination,
-                                           weights=[0, 1])
-    cohort1 = list(random_crossover.crossover(polymer, polymer_alt1))
-    assert len(cohort1) == 4
+        key=lambda mol: mol.func_groups[0].fg_type.name
+    )
+    random_crossover = stk.RandomCrossover(
+        jumble,
+        recombination,
+        weights=[0, 1]
+    )
+    cohort1 = list(random_crossover.cross(polymer, polymer_alt1))
+    assert len(cohort1) == 8
 
-    random_crossover = stk.RandomCrossover(jumble,
-                                           recombination,
-                                           weights=[1, 0])
-    cohort1 = list(random_crossover.crossover(polymer, polymer_alt1))
+    random_crossover = stk.RandomCrossover(
+        jumble,
+        recombination,
+        weights=[1, 0]
+    )
+    cohort1 = list(random_crossover.cross(polymer, polymer_alt1))
     assert len(cohort1) == 6
 
 
