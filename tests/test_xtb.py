@@ -38,7 +38,7 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
         output_dir=join(odir, out_dir),
         unlimited_memory=True,
         opt_level='crude',
-        max_runs=1,
+        max_runs=2,
         calculate_hessian=True
     )
     opt_lowtol.optimize(tmp_polymer)
@@ -47,10 +47,11 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     assert tmp_polymer in opt_lowtol.incomplete
     # Check for restart file.
     assert os.path.isfile(join(join(odir, out_dir), 'xtbhess.coord'))
-    # Check number of output files is more than one.
-    assert len(glob.glob(f'*.output')) > 1
+    # Check number of output files is more than one because the
+    # optimisation is crude and max_runs = 2.
+    assert len(glob.glob(f'{join(odir, out_dir)}/*.output')) > 1
     # Optimized structure has lower energy than initial structure.
-    new_energy = energy.energy(tmp_polymer)
+    new_energy = energy.get_energy(tmp_polymer)
     assert new_energy < init_energy
 
     # Run high criteria optimization.
@@ -76,7 +77,7 @@ def test_xtb_negfreq(tmp_polymer, xtb_path):
     )
 
     # Check that the calculation was run only once.
-    assert len(glob.glob(f'*.output')) == 1
+    assert len(glob.glob(f'{join(odir, out_dir)}/*.output')) == 1
 
     # Optimized structure has lower energy than initial structure.
     new_energy = energy.get_energy(tmp_polymer)
