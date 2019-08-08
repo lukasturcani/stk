@@ -172,7 +172,7 @@ class NumGenerations(Exiter):
 
         """
 
-        return len(progress.populations) >= self._num_generations
+        return len(progress.subpopulations) >= self._num_generations
 
 
 class MoleculePresent(Exiter):
@@ -217,7 +217,7 @@ class MoleculePresent(Exiter):
 
         # Check for the presence of the molecule, starting with the
         # newest generation first.
-        for pop in progress.populations:
+        for pop in progress.subpopulations:
             if any(
                 self._is_same_molecule(mol.to_rdkit_mol())
                 for mol in pop
@@ -273,17 +273,17 @@ class FitnessPlateau(Exiter):
         """
 
         # Check that the GA has run for more than num_gens generations.
-        if len(progress.populations) >= self._num_generations:
+        if len(progress.subpopulations) >= self._num_generations:
             gens = set()
             for i in range(self._num_generations):
                 gen = sorted(
-                    progress.populations[-i-1],
+                    progress.subpopulations[-i-1],
                     reverse=True,
                     key=lambda mol: mol.fitness
                 )
                 # Get the top members of the generation.
                 keys = frozenset(
-                    mol.key for mol in gen[:self._top_members]
+                    mol._key for mol in gen[:self._top_members]
                 )
                 gens.add(keys)
             unique_gens = len(gens)

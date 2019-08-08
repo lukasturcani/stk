@@ -41,22 +41,32 @@ def test_num_generations():
     assert exiter.exit(pop3)
 
 
-def test_mol_present(amine2):
+def test_molecule_present(amine2):
     pop1 = stk.Population(stk.Population())
     pop2 = stk.Population(stk.Population(amine2))
 
-    exiter = stk.MolPresent(amine2)
+    exiter = stk.MoleculePresent(amine2)
 
     assert not exiter.exit(pop1)
     assert exiter.exit(pop2)
 
 
-def test_fitness_plateau(generate_population):
-    exiter = stk.FitnessPlateau(2)
+def test_fitness_plateau():
+    bbs = [
+        stk.BuildingBlock.__new__(stk.BuildingBlock)
+        for i in range(5*10)
+    ]
+    for i, bb in enumerate(bbs):
+        bb._key = i
 
-    pop = generate_population()
+    pop = stk.Population(
+        *(stk.Population(*bbs[i:i+5]) for i in range(0, len(bbs), 5))
+    )
     for i, mol in enumerate(pop):
         mol.fitness = i
+
+    exiter = stk.FitnessPlateau(2)
+
     assert not exiter.exit(pop)
 
     for mol in pop:
