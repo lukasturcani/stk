@@ -264,6 +264,14 @@ def tmp_polymer(tmp_amine2, tmp_aldehyde2):
 
 
 @pytest.fixture
+def polymer_alt1(amine2_alt1, aldehyde2_alt1):
+    return stk.ConstructedMolecule(
+        building_block=[amine2_alt1, aldehyde2_alt1],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 6)
+    )
+
+
+@pytest.fixture
 def tmp_cage(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde3],
