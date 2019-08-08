@@ -1,77 +1,65 @@
 import stk
-import numpy as np
 import pytest
 
 
-def test_property_vector(test_mol1):
-    def window_variance(mol, conformer):
-        return mol.window_variance(conformer)
+class _Thing:
+    ...
 
-    def cavity_size(mol, conformer):
-        return mol.cavity_size(conformer)
 
-    def bb_distortion(mol, conformer):
-        return mol.bb_distortion(conformer)
-
-    def dihedral_strain(mol, conformer):
-        return mol.dihedral_strain(conformer)
-
-    fitness_calculator = stk.PropertyVector(window_variance,
-                                            cavity_size,
-                                            bb_distortion,
-                                            dihedral_strain)
-    assert np.allclose(fitness_calculator.fitness(test_mol1),
-                       [test_mol1.window_variance(),
-                        test_mol1.cavity_size(),
-                        test_mol1.bb_distortion(),
-                        test_mol1.dihedral_strain()],
-                       atol=1e-6)
+def test_property_vector(tmp_amine2):
+    fitness_calculator = stk.PropertyVector(
+        lambda mol: 1,
+        lambda mol: 2,
+        lambda mol: 3,
+        lambda mol: 4
+    )
+    assert fitness_calculator.get_fitness(tmp_amine2) == [1, 2, 3, 4]
 
 
 def test_cache_use(tmp_amine2):
-    calc = stk.PropertyVector(lambda mol, conformer: 1,
-                              use_cache=False)
-    calc.fitness(tmp_amine2)
+    calls = 0
+    things = [_Thing(), _Thing(), _Thing(), _Thing()]
 
-    # Since use_cache is False the cache should be empty.
-    assert not calc.cache
+    def prop(mol):
+        nonlocal calls
+        nonlocal things
+        calls += 1
+        r = things[0]
+        things.remove(r)
+        return r
 
-    # To test that the cache is not being used, put a random object
-    # into it, and test that it was not returned.
-    obj = object()
-    calc.cache[(tmp_amine2.key, 1)] = obj
-    assert calc.fitness(tmp_amine2, 1) is not obj
+    calc = stk.PropertyVector(
+        prop,
+        use_cache=False
+    )
+    fst = calc.get_fitness(tmp_amine2)
+    assert calls == 1
+    assert calc.get_fitness(tmp_amine2) is not fst
+    assert calls == 2
 
     # Test that the cache is being filled when use_cache is True.
-    calc = stk.PropertyVector(lambda mol, conformer: 1, use_cache=True)
-    assert not calc.cache
-    calc.fitness(tmp_amine2)
-    assert calc.cache
-
-    # Test that the cache is being used by putting a random object into
-    # it and making sure it gets returned.
-    calc.cache[(tmp_amine2.key, 1)] = obj
-    assert calc.fitness(tmp_amine2, 1) is obj
+    calc = stk.PropertyVector(
+        prop,
+        use_cache=True
+    )
+    snd = calc.get_fitness(tmp_amine2)
+    assert calls == 3
+    assert calc.get_fitness(tmp_amine2) is snd
+    assert calls == 3
 
 
 def test_attribute_creation(tmp_amine2):
-    calc = stk.PropertyVector(lambda mol, conformer: 1,
-                              use_cache=False)
+    calc = stk.PropertyVector(lambda mol: 1)
     assert not hasattr(tmp_amine2, 'fitness')
-    calc.fitness(tmp_amine2)
+    calc.get_fitness(tmp_amine2)
     assert tmp_amine2.fitness == [1]
 
-    calc = stk.PropertyVector(lambda mol, conformer: 2)
-    del tmp_amine2.fitness
-    assert not hasattr(tmp_amine2, 'fitness')
-    calc.fitness(tmp_amine2)
-    assert tmp_amine2.fitness == [2]
 
-
-def test_raising_fitness_calculator(fitness_calculator, tmp_amine2):
+def test_raising_fitness_calculator(tmp_amine2):
+    fitness_calculator = stk.PropertyVector(lambda m: 1)
     never_raiser = stk.RaisingFitnessCalculator(fitness_calculator, 0)
-    never_raiser.fitness(tmp_amine2)
+    never_raiser.get_fitness(tmp_amine2)
 
     always_raiser = stk.RaisingFitnessCalculator(fitness_calculator, 1)
     with pytest.raises(stk.RaisingFitnessCalculatorError):
-        always_raiser.fitness(tmp_amine2)
+        always_raiser.get_fitness(tmp_amine2)
