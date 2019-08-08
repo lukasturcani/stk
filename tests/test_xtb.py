@@ -115,7 +115,7 @@ def test_xtb_solvent_charge_uhf(tmp_polymer, xtb_path):
     solv_energy = solvent.get_energy(tmp_polymer)
     assert solv_energy != init_energy
 
-    # Check that directory movement has worked.``
+    # Check that directory movement has worked.
     assert os.getcwd() == init_dir
 
     out_dir = 'gfnxtb_charge_energy'
