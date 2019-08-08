@@ -248,7 +248,7 @@ class GeneticRecombination(Crosser):
 
     Examples
     --------
-    Note that any number of parents can be used for the crossover.
+    Note that any number of parents can be used for the crossover
 
     .. code-block:: python
 
@@ -300,7 +300,13 @@ class GeneticRecombination(Crosser):
 
     """
 
-    def __init__(self, key, random_yield_order=True, use_cache=False):
+    def __init__(
+        self,
+        key,
+        random_yield_order=True,
+        random_seed=None,
+        use_cache=False
+    ):
         """
         Initialize a :class:`GeneticRecombination` instance.
 
@@ -312,9 +318,8 @@ class GeneticRecombination(Crosser):
             offspring, one of the building blocks from each category is
             picked at random.
 
-        random_yield_order : :class:`bool`, optional
-            Toggles if the order in which the building blocks are
-            made should be random.
+        random_seed : :class:`int`, optional
+            The random seed to use.
 
         use_cache : :class:`bool`, optional
             Toggles use of the molecular cache.
@@ -322,7 +327,7 @@ class GeneticRecombination(Crosser):
         """
 
         self._key = key
-        self._random_yield_order = random_yield_order
+        self._random_seed = random_seed
         super().__init__(use_cache=use_cache)
 
     def cross(self, *mols):
@@ -343,25 +348,46 @@ class GeneticRecombination(Crosser):
 
         cls = mols[0].__class__
 
-        genes = defaultdict(set)
+        # Use a dict here to prevent the same structure for being
+        # used in the same gene twice.
+        genes = defaultdict(dict)
         for mol in mols:
             for allele in mol.building_block_vertices:
-                genes[self._key(allele)].add(allele)
+                gene = genes[self._key(allele)]
+                if allele._key not in gene:
+                    gene[allele._key] = allele
+
+        if self._random_seed is not None:
+            np.random.seed(self._random_seed)
 
         genes = {
-            gene: np.random.permutation(list(alleles))
+            gene: np.random.permutation(list(alleles.values()))
             for gene, alleles in genes.items()
         }
-
         tops = dedupe((mol.topology_graph for mol in mols), key=repr)
+        product = list(it.product(*genes.values(), tops))
+        np.random.shuffle(product)
 
-        product = it.product(*genes.values(), tops)
-
-        if self._random_yield_order:
-            product = list(product)
-            np.random.shuffle(product)
-
+        parents = {
+            (
+                *tuple(sorted(
+                    bb._key for bb in mol.building_block_vertices
+                )),
+                repr(mol.topology_graph)
+            )
+            for mol in mols
+        }
         for *building_blocks, top in product:
+            # Do not yield the parents.
+            mol = (
+                *tuple(sorted(
+                    bb._key for bb in building_blocks
+                )),
+                repr(top)
+            )
+            if mol in parents:
+                continue
+
             yield cls(
                 building_blocks=building_blocks,
                 topology_graph=top,
@@ -380,7 +406,7 @@ class Jumble(Crosser):
 
     Examples
     --------
-    Note that any number of parents can be used for the crossover.
+    Note that any number of parents can be used for the crossover
 
     .. code-block:: python
 
@@ -429,6 +455,7 @@ class Jumble(Crosser):
         num_offspring_building_blocks,
         duplicate_building_blocks=False,
         random_yield_order=True,
+        random_seed=None,
         use_cache=False
     ):
         """
@@ -443,9 +470,8 @@ class Jumble(Crosser):
             Indicates whether the building blocks used to construct the
             offspring must all be unique.
 
-        random_yield_order : :class:`bool`, optional
-            Toggles if the order in which the building blocks are
-            made should be random.
+        random_seed : :class:`int`, optional
+            The random seed to use.
 
         use_cache : :class:`bool`, optional
             Toggles use of the molecular cache.
@@ -455,7 +481,7 @@ class Jumble(Crosser):
         n = num_offspring_building_blocks
         self._num_offspring_building_blocks = n
         self._duplicate_building_blocks = duplicate_building_blocks
-        self._random_yield_order = random_yield_order
+        self._random_seed = random_seed
         super().__init__(use_cache=use_cache)
 
     def cross(self, *mols):
@@ -476,7 +502,8 @@ class Jumble(Crosser):
 
         cls = mols[0].__class__
         building_blocks = dedupe(
-            bb for mol in mols for bb in mol.building_block_vertices
+            (bb for mol in mols for bb in mol.building_block_vertices),
+            key=lambda bb: bb._key
         )
 
         if self._duplicate_building_blocks:
@@ -491,13 +518,28 @@ class Jumble(Crosser):
             (mol.topology_graph for mol in mols),
             key=repr
         )
-        product = it.product(building_block_groups, topologies)
+        product = list(it.product(building_block_groups, topologies))
 
-        if self._random_yield_order:
-            product = list(product)
-            np.random.shuffle(product)
+        if self._random_seed is not None:
+            np.random.seed(self._random_seed)
+        np.random.shuffle(product)
+
+        parents = {
+            (
+                *tuple(sorted(
+                    bb._key for bb in mol.building_block_vertices
+                )),
+                repr(mol.topology_graph)
+            )
+            for mol in mols
+        }
 
         for bbs, top in product:
+            # Do not yield the parents.
+            mol = (*tuple(sorted(bb._key for bb in bbs)), repr(top))
+            if mol in parents:
+                continue
+
             yield cls(
                 building_blocks=bbs,
                 topology_graph=top,
