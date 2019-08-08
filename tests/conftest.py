@@ -21,11 +21,6 @@ if not os.path.exists(output_dir):
 os.chdir(output_dir)
 
 
-class TestFitnessCalculator(stk.FitnessCalculator):
-    def fitness(self, mol, conformer=-1):
-        return 12
-
-
 def pytest_addoption(parser):
     parser.addoption('--macromodel_path', default='')
     parser.addoption('--mopac_path', default='')
@@ -92,11 +87,6 @@ def periodic_bond(lithium, chlorine):
 
 
 @pytest.fixture(scope='session')
-def fitness_calculator():
-    return TestFitnessCalculator(use_cache=False)
-
-
-@pytest.fixture(scope='session')
 def amine2():
     return stk.BuildingBlock('NCCCN', ['amine'])
 
@@ -113,23 +103,9 @@ def amine2_conf1():
     return amine2
 
 
-@pytest.fixture
-def tmp_amine2_alt1():
-    return stk.StructUnit2.smiles_init(smiles='NCNCN',
-                                       functional_groups=['amine'],
-                                       name='tmp_amine2_alt1')
-
-
 @pytest.fixture(scope='session')
 def amine2_alt1():
     return stk.BuildingBlock('NCNCN', ['amine'])
-
-
-@pytest.fixture
-def tmp_amine2_alt2():
-    return stk.StructUnit2.smiles_init(smiles='NC[Si]CN',
-                                       functional_groups=['amine'],
-                                       name='tmp_amine2_alt2')
 
 
 @pytest.fixture(scope='session')
@@ -153,41 +129,13 @@ def tmp_aldehyde2():
 
 
 @pytest.fixture(scope='session')
-def aldehyde2_alt1():
-    return stk.StructUnit2.smiles_init(smiles='O=CNC=O',
-                                       functional_groups=['aldehyde'],
-                                       name='aldehyde2_alt1')
-
-
-@pytest.fixture(scope='session')
-def aldehyde2_alt2():
-    return stk.StructUnit2.smiles_init(smiles='O=CNNC=O',
-                                       functional_groups=['aldehyde'],
-                                       name='aldehyde2_alt2')
-
-
-@pytest.fixture(scope='session')
 def boronic_acid2():
     return stk.BuildingBlock('OB(O)c1ccc(B(O)O)nc1', ['boronic_acid'])
-
-
-@pytest.fixture(scope='session')
-def bromine2():
-    return stk.StructUnit2.smiles_init(smiles='[Br]CCC[Br]',
-                                       functional_groups=['bromine'],
-                                       name='bromine2')
 
 
 @pytest.fixture
 def tmp_bromine2():
     return stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
-
-
-@pytest.fixture(scope='session')
-def bromine2_alt1():
-    return stk.StructUnit2.smiles_init(smiles='[Br]CNC[Br]',
-                                       functional_groups=['bromine'],
-                                       name='bromine2_alt1')
 
 
 @pytest.fixture
@@ -305,20 +253,6 @@ def polymer(amine2, aldehyde2):
         building_blocks=[amine2, aldehyde2],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-
-
-@pytest.fixture(scope='session')
-def polymer_alt1(amine2_alt1, aldehyde2_alt1):
-    return stk.Polymer([amine2_alt1, aldehyde2_alt1],
-                       stk.Linear('AB', [0, 0], 3),
-                       'polymer_alt1')
-
-
-@pytest.fixture(scope='session')
-def polymer_alt2(amine2_alt2, aldehyde2_alt2):
-    return stk.Polymer([amine2_alt2, aldehyde2_alt2],
-                       stk.Linear('AB', [0, 0], 3),
-                       'polymer_alt2')
 
 
 @pytest.fixture
@@ -519,102 +453,6 @@ def bb_dir():
 #     ))
 
 
-<<<<<<< HEAD
-@pytest.fixture(scope='session')
-def generate_population(struct_units2, struct_units3):
-
-    def inner(cache=False, offset=False):
-        """
-        Returns a population of subpopulations and direct members.
-
-        """
-
-        stk.OPTIONS['cache'] = cache
-
-        # Generate a bunch of cages.
-        if offset:
-            mols = [TestMol([struct_units2[i], struct_units3[i+1]],
-                            stk.FourPlusSix(),
-                            f'test_mol_{i}')
-                    for i in range(10)]
-
-        else:
-            mols = [TestMol([struct_units2[i], struct_units3[i]],
-                            stk.FourPlusSix(),
-                            f'test_mol_{i}')
-                    for i in range(10)]
-
-        # Generate a couple of
-        # populations to be used as subpopulations.
-        sub1 = stk.Population(*mols[:2])
-        sub2 = stk.Population(*mols[2:4])
-        sub3 = stk.Population(*mols[4:6])
-        sub4 = stk.Population(*mols[6:8])
-
-        # Place subpopulations into one another.
-        sub1.populations.append(sub3)
-        sub2.populations.append(sub4)
-
-        # Initialize final population of subpopulations and cages.
-        p = stk.Population(sub1, sub2, *mols[8:])
-        p.assign_names_from(0, True)
-
-        stk.OPTIONS['cache'] = False
-
-        return p
-
-    return inner
-
-
-@pytest.fixture(scope='session')
-def pop(generate_population):
-    return generate_population()
-
-
-@pytest.fixture
-def tmp_polymer_pop(bromine2, bromine2_alt1):
-    p1 = stk.Polymer([bromine2, bromine2_alt1],
-                     stk.Linear('AB', [0, 0], 1),
-                     'p1')
-    p2 = stk.Polymer([bromine2, bromine2_alt1],
-                     stk.Linear('ABBA', [0, 0], 1),
-                     'p2')
-    p3 = stk.Polymer([bromine2, bromine2_alt1],
-                     stk.Linear('ABA', [0, 0], 1),
-                     'p3')
-    p4 = stk.Polymer([bromine2, bromine2_alt1],
-                     stk.Linear('AAB', [0, 0], 1),
-                     'p4')
-
-    return stk.Population(p1, p2, p3, p4)
-
-
-@pytest.fixture(scope='session')
-def ga_input():
-    return stk.GAInput(join('..', 'data', 'inputfile.py'))
-
-
-@pytest.fixture(scope='session')
-def progress():
-    pop = stk.Population(*(
-        stk.Population(*(
-            stk.Molecule(f'{i}') for i in range(20)
-        ))
-        for i in range(25)
-    ))
-
-    for i, mol in enumerate(pop):
-        mol.fitness = i
-        mol.cavity_size = -i
-
-    return pop
-
-
-@pytest.fixture(scope='session')
-def flat_pop(progress):
-    return progress.populations[0]
-=======
 # @pytest.fixture(scope='session')
 # def ga_input():
 #     return stk.GAInput(join('..', 'data', 'inputfile.py'))
->>>>>>> fixing_tests
