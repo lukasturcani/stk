@@ -345,7 +345,7 @@ class GeneticRecombination(Crosser):
 
         genes = defaultdict(set)
         for mol in mols:
-            for allele in mol.building_blocks:
+            for allele in mol.building_block_vertices:
                 genes[self._key(allele)].add(allele)
 
         genes = {
@@ -353,7 +353,7 @@ class GeneticRecombination(Crosser):
             for gene, alleles in genes.items()
         }
 
-        tops = dedupe((mol.topology for mol in mols), key=repr)
+        tops = dedupe((mol.topology_graph for mol in mols), key=repr)
 
         product = it.product(*genes.values(), tops)
 
@@ -476,7 +476,7 @@ class Jumble(Crosser):
 
         cls = mols[0].__class__
         building_blocks = dedupe(
-            bb for mol in mols for bb in mol.building_blocks
+            bb for mol in mols for bb in mol.building_block_vertices
         )
 
         if self._duplicate_building_blocks:
@@ -487,7 +487,10 @@ class Jumble(Crosser):
             iterable=building_blocks,
             r=self._num_offspring_building_blocks
         )
-        topologies = dedupe((mol.topology for mol in mols), key=repr)
+        topologies = dedupe(
+            (mol.topology_graph for mol in mols),
+            key=repr
+        )
         product = it.product(building_block_groups, topologies)
 
         if self._random_yield_order:
