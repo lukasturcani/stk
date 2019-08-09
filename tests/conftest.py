@@ -419,6 +419,21 @@ def tmp_population():
     )
 
 
+@pytest.fixture('session')
+def progress():
+    pop = stk.Population()
+    for i in range(15):
+        subpop = stk.Population(
+            *(stk.BuildingBlock('C') for j in range(5))
+        )
+        pop.subpopulations.append(subpop)
+
+    for i, mol in enumerate(pop):
+        mol.fitness = i
+
+    return pop
+
+
 @pytest.fixture
 def make_reactor():
 

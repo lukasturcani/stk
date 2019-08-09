@@ -87,8 +87,7 @@ class ProgressPlotter(Plotter):
         plotter = stk.ProgressPlotter(
             filename='fitness_plot',
             property_fn=lambda mol: mol.fitness,
-            y_label='Fitness',
-            default=1e-4
+            y_label='Fitness'
         )
         plotter.plot(progress)
 
@@ -99,14 +98,13 @@ class ProgressPlotter(Plotter):
         plotter = ProgressPlotter(
             filename='atom_plot',
             property_fn=lambda mol: len(mol.atoms),
-            y_label='Number of Atoms',
-            default=0
+            y_label='Number of Atoms'
         )
         plotter.plot(progress)
 
     """
 
-    def __init__(self, filename, property_fn, y_label, default):
+    def __init__(self, filename, property_fn, y_label):
         """
         Initialize a :class:`ProgressPlotter` instance.
 
@@ -131,7 +129,6 @@ class ProgressPlotter(Plotter):
         self._filename = filename
         self._property_fn = property_fn
         self._y_label = y_label
-        self._default = default
 
     def plot(self, progress):
         """
@@ -292,9 +289,9 @@ class SelectionPlotter(Plotter):
 
         self._plots = 0
         self._filename = filename
-        self._x_label
+        self._x_label = x_label
         self._molecule_label = molecule_label
-        self._order_by = order_by,
+        self._order_by = order_by
         self._heat_map_value = heat_map_value
         self._heat_map_label = heat_map_label
         selector.select = self._update_counter(selector.select)
@@ -375,7 +372,7 @@ class SelectionPlotter(Plotter):
         ax = sns.scatterplot(
             x=self._x_label,
             y='Number of times selected',
-            hue=self._heat_map_label,
+            hue='heat_map',
             palette='magma_r',
             data=df,
             s=[200 for i in range(len(counter.keys()))]
