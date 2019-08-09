@@ -314,6 +314,16 @@ def tmp_cc3():
 
 
 @pytest.fixture('session')
+def flat_pop():
+    pop = stk.Population(
+        *(stk.BuildingBlock('C') for i in range(10))
+    )
+    for i, mol in enumerate(pop):
+        mol.fitness = i
+    return pop
+
+
+@pytest.fixture('session')
 def population():
     bb1 = stk.BuildingBlock('NC(CCO)CN', ['amine'])
     bb2 = stk.BuildingBlock('[Br]CCCC[Br]', ['bromine'])
@@ -417,6 +427,21 @@ def tmp_population():
             )
         )
     )
+
+
+@pytest.fixture('session')
+def progress():
+    pop = stk.Population()
+    for i in range(15):
+        subpop = stk.Population(
+            *(stk.BuildingBlock('C') for j in range(5))
+        )
+        pop.subpopulations.append(subpop)
+
+    for i, mol in enumerate(pop):
+        mol.fitness = i
+
+    return pop
 
 
 @pytest.fixture
