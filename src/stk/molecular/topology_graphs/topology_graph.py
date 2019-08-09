@@ -151,6 +151,25 @@ class Vertex:
 
         return np.array(self._position)
 
+    def set_position(self, position):
+        """
+        Set the position of the vertex.
+
+        Parameters
+        ----------
+        :class:`numpy.ndarray`
+            The new position of the vertex.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
+        self._position = np.array(position)
+        return self
+
     def set_contructed_molecule(self, mol):
         """
         Set the :class:`.ConstructedMolecule` being constructed.
