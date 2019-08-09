@@ -257,16 +257,17 @@ class _CageVertex(Vertex):
             )
 
         bb_fgs = set(fg_map.values())
+
         for edge in self.edges:
             for vertex in edge.vertices:
                 if vertex is self:
                     continue
 
                 for func_group in edge.get_func_groups():
-                    if func_group in bb_fgs:
+                    if func_group not in bb_fgs:
                         continue
 
-                    self._neighbor_positions.append(
+                    vertex._neighbor_positions.append(
                         self._get_molecule_centroid(
                             atom_ids=func_group.get_bonder_ids()
                         )
