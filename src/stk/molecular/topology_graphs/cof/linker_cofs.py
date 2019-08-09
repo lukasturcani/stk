@@ -32,7 +32,7 @@ class _COFVertex(Vertex):
 
     """
 
-    def __init__(self, x, y, z):
+    def __init__(self, x, y, z, lattice_constants):
         """
         Initialize a :class:`_COFVertex`.
 
@@ -47,16 +47,20 @@ class _COFVertex(Vertex):
         z : :class:`float`
             The z coordinate.
 
+        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+            The a, b and c lattice constants, each written as a vector.
+
         """
 
         self.aligner_edge = None
+        self._lattice_constants = lattice_constants
         # id will be set automatically by COF. This is because
         # _COFVertex is defined manually in a subclass of COF
         # and writing the id for every vertex would be a pain.
         super().__init__(None, x, y, z)
 
     @classmethod
-    def init_at_center(cls, *vertices):
+    def init_at_center(cls, *vertices, lattice_constants):
         """
         Initialize at the center of `vertices`.
 
@@ -64,6 +68,9 @@ class _COFVertex(Vertex):
         ----------
         vertices : :class:`.Vertex`
             Vertices at whose center this vertex should be initialized.
+
+        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+            The a, b and c lattice constants, each written as a vector.
 
         Returns
         -------
@@ -74,10 +81,15 @@ class _COFVertex(Vertex):
 
         center = sum(vertex.get_position() for vertex in vertices)
         center /= len(vertices)
-        return cls(*center)
+        return cls(*center, lattice_constants)
 
     @classmethod
-    def init_at_shifted_center(cls, vertices, shifts, cell_dimensions):
+    def init_at_shifted_center(
+        cls,
+        vertices,
+        shifts,
+        lattice_constants
+    ):
         """
         Initialize at the center of shifted `vertices`.
 
@@ -103,32 +115,16 @@ class _COFVertex(Vertex):
             and is shifted down along the z axis and the second
             vertex is not shifted at all.
 
-        cell_dimensions : :class:`tuple` of :class:`numpy.ndarray`
-            Holds the shift vector for the x, y and z dimensions.
-            For example
-
-            .. code-block:: python
-
-                cell_dimensions = (
-                    numpy.array([1, 0, 0]),
-                    numpy.array([0, 0.8, 0.2]),
-                    numpy.array([0.3, 0.3, 0.3])
-                )
-
-            means that a shift along the x axis means that the
-            x coordinate is increased by ``1``, a shift along the y
-            axis means that the y and z coordinates are increased by
-            ``0.8`` and ``0.2`` respectiely and a shift along the z
-            axis means that the x, y and z coordinates are all
-            increased by ``0.3``.
+        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+            The a, b and c lattice constants, each written as a vector.
 
         """
 
         positions = []
         for vertex, shift in zip(vertices, shifts):
             total_shift = 0
-            for dim_shift, cell_dim in zip(shift, cell_dimensions):
-                total_shift += dim_shift * cell_dim
+            for dim_shift, constant in zip(shift, lattice_constants):
+                total_shift += dim_shift * constant
             position = vertex.get_position() + total_shift
             positions.append(position)
 
@@ -136,7 +132,7 @@ class _COFVertex(Vertex):
             np.sum(positions, axis=0),
             len(positions)
         )
-        return cls(*position)
+        return cls(*position, lattice_constants)
 
     def clone(self, clear_edges=False):
         """
@@ -158,6 +154,7 @@ class _COFVertex(Vertex):
 
         clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
+        clone._lattice_constants = self._lattice_constants
         return clone
 
     def place_building_block(self, building_block):
@@ -617,7 +614,7 @@ class COF(TopologyGraph):
 
             # Shift the clone so that it's within the cell.
             shift = 0
-            for axis, dim in zip(cell, self._cell_dimensions):
+            for axis, dim in zip(cell, self._lattice_constants):
                 shift += axis * dim
             clone.set_position(clone.get_position()+shift)
 
@@ -766,29 +763,37 @@ class COF(TopologyGraph):
 
 
 class Honeycomb(COF):
-    _cell_dimensions = _a, _b, _c = (
+    _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
         np.array([0.5, 0.866, 0]),
         np.array([0, 0, 5/1.7321])
     )
 
     _vertices = (
-        _COFVertex(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
-        _COFVertex(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
+        _COFVertex(
+            *((1/3)*_a + (1/3)*_b + (1/2)*_c), _lattice_constants
+        ),
+        _COFVertex(
+            *((2/3)*_a + (2/3)*_b + (1/2)*_c), _lattice_constants
+        )
     )
 
     vertices = (
         *_vertices,
-        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
+        _COFVertex.init_at_center(
+            _vertices[0],
+            _vertices[1],
+            lattice_constants=_lattice_constants
+        ),
         _COFVertex.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[1]),
             shifts=((0, 0, 0), (0, -1, 0)),
-            cell_dimensions=_cell_dimensions
+            lattice_constants=_lattice_constants
         ),
         _COFVertex.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[1]),
             shifts=((0, 0, 0), (-1, 0, 0)),
-            cell_dimensions=_cell_dimensions
+            lattice_constants=_lattice_constants
         )
     )
 
