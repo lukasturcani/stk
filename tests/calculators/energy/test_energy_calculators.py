@@ -35,18 +35,15 @@ def test_cache_use(amine2):
     assert cached_mmff.get_energy(amine2) is obj
 
 
-def test_formation(polymer, amine2):
+def test_formation(polymer, amine2, water):
     mmff = stk.MMFFEnergy(use_cache=True)
-
-    water = stk.BuildingBlock('[H]O[H]')
-    products = [water]*3
     building_blocks = list(polymer.building_block_vertices.keys())
+
     formation = stk.FormationEnergy(
         energy_calculator=mmff,
         reactants=building_blocks,
-        products=products
+        products=[water]*3
     )
-
     reactant_energy = sum(
         mmff.get_energy(bb) for bb in building_blocks
     )

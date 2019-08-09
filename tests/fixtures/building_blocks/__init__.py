@@ -1,4 +1,4 @@
 from .amine import *
-from .aldeyde import *
+from .aldehyde import *
 from .halogen import *
 from .misc import *

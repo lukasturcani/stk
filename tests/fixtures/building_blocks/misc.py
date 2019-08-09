@@ -29,6 +29,11 @@ def ring_amine():
 
 
 @pytest.fixture(scope='session')
+def water():
+    return stk.BuildingBlock('[H]O[H]')
+
+
+@pytest.fixture(scope='session')
 def cycle():
     return stk.BuildingBlock('CCCC1CCCCCCCCC1')
 
