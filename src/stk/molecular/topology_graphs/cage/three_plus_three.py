@@ -5,15 +5,15 @@ Defines cages made from building blocks with 3 functional groups.
 
 import numpy as np
 
-from .base import CageTopology,  _CageVertex
+from .base import Cage,  _CageVertex
 from ..topology_graph import Edge
 
 
-class OnePlusOne(CageTopology):
+class OnePlusOne(Cage):
     """
     Represents a capsule cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
+    See :class:`.Cage` for more details and examples.
 
     .. image::
 
@@ -43,11 +43,11 @@ class OnePlusOne(CageTopology):
     num_window_types = 1
 
 
-class TwoPlusTwo(CageTopology):
+class TwoPlusTwo(Cage):
     """
     Represents a tetrahedron cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
+    See :class:`.Cage` for more details and examples.
 
     .. image::
 
@@ -84,11 +84,11 @@ class TwoPlusTwo(CageTopology):
     num_window_types = 1
 
 
-class FourPlusFour(CageTopology):
+class FourPlusFour(Cage):
     """
     Represents a cube cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
+    See :class:`.Cage` for more details and examples.
 
     .. image::
 

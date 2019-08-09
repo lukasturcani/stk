@@ -1,13 +1,17 @@
+"""
+Defines COF topologies.
+
+"""
+
 import numpy as np
-from collections import defaultdict
 
 from ..topology_graph import TopologyGraph, Vertex
-from ....utilities import vector_theta
+from ...utliities import vector_theta
 
 
-class _CageVertex(Vertex):
+class _COFVertex(Vertex):
     """
-    Represents a vertex of a :class:`.Cage`.
+    Represents a vertex of a :class:`.COF`.
 
     Attributes
     ----------
@@ -28,7 +32,7 @@ class _CageVertex(Vertex):
 
     def __init__(self, x, y, z):
         """
-        Initialize a :class:`_CageVertex`.
+        Initialize a :class:`_COFVertex`.
 
         Parameters
         ----------
@@ -43,12 +47,9 @@ class _CageVertex(Vertex):
 
         """
 
-        # _neighbor_positions holds the bonder centroids of functional
-        # groups on neighbor vertices connected to this vertex.
-        self._neighbor_positions = []
         self.aligner_edge = None
-        # id will be set automatically by Cage. This is because
-        # _CageVertex is defined manually in a subclass of Cage
+        # id will be set automatically by COF. This is because
+        # _COFVertex is defined manually in a subclass of COF
         # and writing the id for every vertex would be a pain.
         super().__init__(None, x, y, z)
 
@@ -93,7 +94,6 @@ class _CageVertex(Vertex):
 
         clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
-        clone._neighbor_positions = list(self._neighbor_positions)
         return clone
 
     def place_building_block(self, building_block):
@@ -113,9 +113,6 @@ class _CageVertex(Vertex):
             placed.
 
         """
-
-        if len(self._neighbor_positions) == len(self.edges):
-            self._update_position()
 
         if len(building_block.func_groups) == 2:
             return self._place_linear_building_block(building_block)
@@ -246,33 +243,14 @@ class _CageVertex(Vertex):
         """
 
         if len(building_block.func_groups) == 2:
-            r = self._assign_func_groups_to_linear_edges(
+            return self._assign_func_groups_to_linear_edges(
                 building_block=building_block,
                 fg_map=fg_map
             )
-        else:
-            r = self._assign_func_groups_to_nonlinear_edges(
+        return self._assign_func_groups_to_nonlinear_edges(
                 building_block=building_block,
                 fg_map=fg_map
             )
-
-        bb_fgs = set(fg_map.values())
-
-        for edge in self.edges:
-            for vertex in edge.vertices:
-                if vertex is self:
-                    continue
-
-                for func_group in edge.get_func_groups():
-                    if func_group not in bb_fgs:
-                        continue
-
-                    vertex._neighbor_positions.append(
-                        self._get_molecule_centroid(
-                            atom_ids=func_group.get_bonder_ids()
-                        )
-                    )
-        return r
 
     def _assign_func_groups_to_linear_edges(
         self,
@@ -398,17 +376,13 @@ class _CageVertex(Vertex):
         )
 
 
-class Cage(TopologyGraph):
+class COF(TopologyGraph):
     """
-    Represents a cage topology graph.
+    Represents a COF topology graph.
 
-    Cage topologies are added by creating a subclass which defines the
+    COF topologies are added by creating a subclass which defines the
     :attr:`vertices` and :attr:`edges` of the topology as class
     attributes.
-
-    A :class:`Cage` subclass will add the attributes
-    :attr:`num_windows` and :attr:`num_window_types` to each
-    :class:`.ConstructedMolecule`.
 
     Attributes
     ----------
@@ -420,8 +394,8 @@ class Cage(TopologyGraph):
 
     Examples
     --------
-    :class:`Cage` instances can be made without supplying
-    additional arguments (using :class:`.FourPlusSix` as an example)
+    :class:`COF` instances can be made without supplying
+    additional arguments (using :class:`.Honeycomb` as an example)
 
     .. code-block:: python
 
@@ -429,31 +403,32 @@ class Cage(TopologyGraph):
 
         bb1 = stk.BuildingBlock('NCCN', ['amine'])
         bb2 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
-        cage1 = stk.ConstructedMolecule(
+        cof1 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2],
-            topology_graph=stk.cage.FourPlusSix()
+            topology_graph=stk.cof.Honeycomb((2, 2, 1))
         )
 
-    Different structural isomers of cages can be made by using the
+    Different structural isomers of COFs can be made by using the
     `vertex_alignments` optional parameter
 
     .. code-block:: python
 
-        v0 = stk.cage.FourPlusSix.vertices[0]
-        v2 = stk.cage.FourPlusSix.vertices[2]
-        tetrahedron = stk.cage.FourPlusSix(
+        v0 = stk.cof.Honeycomb.vertices[0]
+        v2 = stk.cof.Honeycomb.vertices[2]
+        lattice = stk.cof.Honeycomb(
+            lattice_size=(2, 2, 1),
             vertex_alignments={
                 v0: v0.edges[1],
                 v2: v2.edges[2]
             }
         )
-        cage2 = stk.ConstructedMolecule(
+        cof2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2],
-            topology_graph=tetrahedron
+            topology_graph=lattice
         )
 
     By changing which edge each vertex is aligned with, a different
-    structural isomer of the cage can be formed.
+    structural isomer of the COF can be formed.
 
     Note the in the `vertex_alignments` parameter the class vertices
     and edges are used, however when the `building_block_vertices`
@@ -464,33 +439,34 @@ class Cage(TopologyGraph):
 
         # Use the class vertices and edges to set vertex_alignments
         # and create a topology graph.
-        v0 = stk.cage.FourPlusSix.vertices[0]
-        v2 = stk.cage.FourPlusSix.vertices[2]
-        tetrahedron = stk.cage.FourPlusSix(
+        v0 = stk.cof.Honeycomb.vertices[0]
+        v2 = stk.cof.Honeycomb.vertices[2]
+        lattice = stk.cof.Honeycomb(
+            lattice_size=(2, 2, 1),
             vertex_alignments={
                 v0: v0.edges[1],
                 v2: v2.edges[2]
             }
         )
         bb3 = stk.BuildingBlock('NCOCN', ['amine'])
-        cage2 = stk.ConstructedMolecule(
+        cof2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
-            topology_graph=tetrahedron
+            topology_graph=lattice
             # Use the instance vertices in the building_block_vertices
             # parameter.
             building_block_vertices={
-                bb1: tetrahedron.vertices[:2],
-                bb2: tetrahedron.vertices[4:],
-                bb3: tetrahedron.vertices[2:4]
+                bb1: lattice.vertices[:2],
+                bb2: lattice.vertices[4:],
+                bb3: lattice.vertices[2:4]
             }
         )
 
-    The example above also demonstrates how cages with many building
+    The example above also demonstrates how COFs with many building
     blocks can be built. You can add as many :class:`.BuildingBlock`
     instances into `building_blocks` as you like. If you do not
     assign where each building block is placed with
     `building_block_vertices`, they will be placed on the
-    :atttr:`vertices` of the :class:`.Cage` at random. Random
+    :atttr:`vertices` of the :class:`.COF` at random. Random
     placement will account for the fact that the length of
     :attr:`.BuildingBlock.func_groups` needs to match the number of
     edges connected to a vertex.
@@ -502,12 +478,21 @@ class Cage(TopologyGraph):
             vertex.id = i
         return super().__init_subclass__(**kwargs)
 
-    def __init__(self, vertex_alignments=None, processes=1):
+    def __init__(
+        self,
+        lattice_size,
+        vertex_alignments=None,
+        processes=1
+    ):
         """
-        Initialize a :class:`.Cage`.
+        Initialize a :class:`.COF`.
 
         Parameters
         ----------
+        lattice_size : :class:`tuple` of :class:`int`
+            The number of unit cells which should be placed along the
+            x, y and z dimensions, respectively.
+
         vertex_alignments : :class:`dict`, optional
             A mapping from a :class:`.Vertex` in :attr:`vertices`
             to an :class:`.Edge` connected to it. The :class:`.Edge` is
@@ -555,6 +540,7 @@ class Cage(TopologyGraph):
         for vertex in vertex_clones.values():
             vertex.aligner_edge = edge_clones[vertex.aligner_edge]
 
+        self._lattice_size = lattice_size
         super().__init__(
             vertices=tuple(vertex_clones.values()),
             edges=tuple(edge_clones.values()),
@@ -668,7 +654,96 @@ class Cage(TopologyGraph):
             for v in self.vertices
         )
 
+        x, y, z = self._lattice_size
+
         return (
-            f'cage.{self.__class__.__name__}('
+            f'cof.{self.__class__.__name__}('
+            f'lattice_size=({x}, {y}, {z})'
             f'vertex_alignments={{{vertex_alignments}}})'
         )
+
+
+class Honeycomb(COF):
+    cell_dimensions = a, b, c = [
+        np.array([1, 0, 0]),
+        np.array([0.5, 0.866, 0]),
+        np.array([0, 0, 5/1.7321])
+    ]
+
+    vertices = v1, v2 = [
+        Vertex((1/3, 1/3, 1/2)),
+        Vertex((2/3, 2/3, 1/2))
+    ]
+
+    edges = [
+        Edge(v1, v2, (0, 2)),
+        Edge(v1, v2, (1, 0), [0, -1, 0]),
+        Edge(v1, v2, (2, 1), [-1, 0, 0])
+    ]
+
+
+class Hexagonal(COF):
+    cell_dimensions = a, b, c = [
+        np.array([1, 0, 0]),
+        np.array([0.5, 0.866, 0]),
+        np.array([0, 0, 5/1.7321])
+    ]
+
+    vertices = v1, v2, v3, v4 = [
+        Vertex((1/4, 1/4, 1/2)),
+        Vertex((1/4, 3/4, 1/2)),
+        Vertex((3/4, 1/4, 1/2)),
+        Vertex((3/4, 3/4, 1/2))
+    ]
+
+    edges = [
+        Edge(v1, v2, (0, 3)),
+        Edge(v1, v3, (1, 4)),
+        Edge(v2, v3, (2, 5)),
+        Edge(v2, v4, (1, 4)),
+        Edge(v3, v4, (0, 3)),
+        Edge(v1, v3, (4, 1), [-1, 0, 0]),
+        Edge(v1, v2, (3, 0), [0, -1, 0]),
+        Edge(v1, v4, (2, 5), [0, -1, 0]),
+        Edge(v3, v2, (2, 5), [1, -1, 0]),
+        Edge(v3, v4, (3, 0), [0, -1, 0]),
+        Edge(v2, v4, (4, 1), [-1, 0, 0]),
+        Edge(v4, v1, (2, 5), [1, 0, 0])
+    ]
+
+
+class Square(COF):
+    cell_dimensions = a, b, c = [
+        np.array([1, 0, 0]),
+        np.array([0, 1, 0]),
+        np.array([0, 0, 1])
+    ]
+
+    vertices = v1, = [Vertex((0.5, 0.5, 0.5))]
+    edges = [
+        Edge(v1, v1, (1, 3), [1, 0, 0]),
+        Edge(v1, v1, (0, 2), [0, 1, 0])
+    ]
+
+
+class Kagome(COF):
+    cell_dimensions = a, b, c = [
+        np.array([1, 0, 0]),
+        np.array([0.5, 0.866, 0]),
+        np.array([0, 0, 5/1.7321])
+    ]
+
+    vertices = v1, v2, v3 = [
+        Vertex((1/4, 3/4, 0.5)),
+        Vertex((3/4, 3/4, 1/2)),
+        Vertex((3/4, 1/4, 1/2))
+    ]
+
+    edges = [
+        Edge(v1, v2, (0, 3)),
+        Edge(v1, v3, (1, 3)),
+        Edge(v2, v3, (2, 0)),
+        Edge(v1, v2, (2, 1), [-1, 0, 0]),
+        Edge(v1, v3, (3, 1), [-1, 1, 0]),
+        Edge(v2, v3, (0, 2), [0, 1, 0])
+    ]
