@@ -4,9 +4,11 @@ Defines COF topologies.
 """
 
 import numpy as np
+import itertools as it
+from collections import defaultdict
 
-from ..topology_graph import TopologyGraph, Vertex
-from ...utliities import vector_theta
+from ..topology_graph import TopologyGraph, Vertex, Edge
+from ....utilities import vector_theta, flatten
 
 
 class _COFVertex(Vertex):
@@ -74,6 +76,68 @@ class _COFVertex(Vertex):
         center /= len(vertices)
         return cls(*center)
 
+    @classmethod
+    def init_at_shifted_center(cls, vertices, shifts, cell_dimensions):
+        """
+        Initialize at the center of shifted `vertices`.
+
+        Parameters
+        ----------
+        vertices : :class:`tuple` of :class:`_COFVertex`
+            The vertics at whose center this vertex should be
+            intialized.
+
+        shifts : :class:`tuple`
+            For every vertex in `vertices` the amount by which it is
+            shifted along each axis. For example
+
+            .. code-block:: python
+
+                shifts = (
+                    (1, 0, -1),
+                    (0, 0, 0)
+                )
+
+            means that the first vertex in `vertices` is shifted
+            up along the x axis, is not shifted along the y axis
+            and is shifted down along the z axis and the second
+            vertex is not shifted at all.
+
+        cell_dimensions : :class:`tuple` of :class:`numpy.ndarray`
+            Holds the shift vector for the x, y and z dimensions.
+            For example
+
+            .. code-block:: python
+
+                cell_dimensions = (
+                    numpy.array([1, 0, 0]),
+                    numpy.array([0, 0.8, 0.2]),
+                    numpy.array([0.3, 0.3, 0.3])
+                )
+
+            means that a shift along the x axis means that the
+            x coordinate is increased by ``1``, a shift along the y
+            axis means that the y and z coordinates are increased by
+            ``0.8`` and ``0.2`` respectiely and a shift along the z
+            axis means that the x, y and z coordinates are all
+            increased by ``0.3``.
+
+        """
+
+        positions = []
+        for vertex, shift in zip(vertices, shifts):
+            total_shift = 0
+            for dim_shift, cell_dim in zip(shift, cell_dimensions):
+                total_shift += dim_shift * cell_dim
+            position = vertex.get_position() + total_shift
+            positions.append(position)
+
+        position = np.divide(
+            np.sum(positions, axis=0),
+            len(positions)
+        )
+        return cls(*position)
+
     def clone(self, clear_edges=False):
         """
         Create a clone of the instance.
@@ -117,12 +181,6 @@ class _COFVertex(Vertex):
         if len(building_block.func_groups) == 2:
             return self._place_linear_building_block(building_block)
         return self._place_nonlinear_building_block(building_block)
-
-    def _update_position(self):
-        self._position = np.divide(
-            np.sum(self._neighbor_positions, axis=0),
-            len(self._neighbor_positions)
-        )
 
     def _place_linear_building_block(self, building_block):
         """
@@ -481,6 +539,7 @@ class COF(TopologyGraph):
     def __init__(
         self,
         lattice_size,
+        periodic=False,
         vertex_alignments=None,
         processes=1
     ):
@@ -492,6 +551,11 @@ class COF(TopologyGraph):
         lattice_size : :class:`tuple` of :class:`int`
             The number of unit cells which should be placed along the
             x, y and z dimensions, respectively.
+
+        periodic : :class:`bool`, optional
+            If periodic bonds are to be made across the lattice,
+            this should be ``True``. If ``False`` the functional
+            groups on the ends of the lattice will be unreacted.
 
         vertex_alignments : :class:`dict`, optional
             A mapping from a :class:`.Vertex` in :attr:`vertices`
@@ -517,6 +581,9 @@ class COF(TopologyGraph):
         if vertex_alignments is None:
             vertex_alignments = {}
 
+        self._lattice_size = lattice_size
+        self._periodic = periodic
+
         # Convert ints to Vertex and Edge instances.
         _vertex_alignments = {}
         for v, e in vertex_alignments.items():
@@ -524,28 +591,98 @@ class COF(TopologyGraph):
             e = v.edges[e] if isinstance(e, int) else e
         vertex_alignments = _vertex_alignments
 
-        vertex_clones = {}
-        for vertex in self.vertices:
-            vertex.aligner_edge = vertex_alignments.get(
+        xdim, ydim, zdim = (range(dim) for dim in lattice_size)
+        # vertex_clones is indexed as vertex_clones[x][y][z]
+        vertex_clones = [
+            [
+                [
+                    {} for k in zdim
+                ]
+                for j in ydim
+            ]
+            for i in xdim
+        ]
+
+        # Make a clone of each vertex for each unit cell.
+        vertices = it.product(
+            it.product(xdim, ydim, zdim), self.vertices
+        )
+        for cell, vertex in vertices:
+            x, y, z = cell
+            clone = vertex.clone(clear_edges=True)
+            clone.aligner_edge = vertex_alignments.get(
                 vertex,
                 vertex.edges[0]
             )
-            clone = vertex.clone(clear_edges=True)
-            vertex_clones[vertex] = clone
 
-        edge_clones = {}
-        for edge in self.edges:
-            edge_clones[edge] = edge.clone(vertex_clones)
+            # Shift the clone so that it's within the cell.
+            shift = 0
+            for axis, dim in zip(cell, self._cell_dimensions):
+                shift += axis * dim
+            clone.set_position(clone.get_position()+shift)
 
-        for vertex in vertex_clones.values():
-            vertex.aligner_edge = edge_clones[vertex.aligner_edge]
+            vertex_clones[x][y][z][vertex] = clone
 
-        self._lattice_size = lattice_size
+        edge_clones = []
+        # Get an edge for every cell.
+        edges = it.product(it.product(xdim, ydim, zdim), self.edges)
+        for cell, edge in edges:
+            x, y, z = cell
+            # The cell in which the periodic vertex is found.
+            periodic_cell = (
+                np.array(cell) + np.array(edge.periodicity)
+            )
+            v_x, v_y, v_z = (
+                dim if dim < 0 else dim % max_dim
+                for dim, max_dim in zip(periodic_cell, lattice_size)
+            )
+            # Make a vertex map which accounts for the fact that
+            # second vertex is in the periodic cell.
+            v0 = edge.vertices[0]
+            v1 = edge.vertices[1]
+            vertex_map = {
+                v0: vertex_clones[x][y][z][v0],
+                v1: vertex_clones[v_x][v_y][v_z][v1]
+            }
+            clone = edge.clone(vertex_map)
+            edge_clones.append(clone)
+            # If the edge is not periodic if the cell of the periodic
+            # cell exists.
+            edge_is_periodic = any(
+                dim < 0 or dim >= max_dim
+                for dim, max_dim in zip(periodic_cell, lattice_size)
+            )
+            if not edge_is_periodic:
+                clone.periodicity = (0, 0, 0)
+            # If the edge is periodic it should use the position of
+            # the original edge.
+            else:
+                clone.set_position(edge.get_position())
+
+            # Set the aligner edge to the clone.
+            for vertex in vertex_map.values():
+                if vertex.aligner_edge is edge:
+                    vertex.aligner_edge = clone
+
+        vertices = tuple(
+            vertex
+            for clones in flatten(vertex_clones, {dict})
+            for vertex in clones.values()
+        )
+
         super().__init__(
-            vertices=tuple(vertex_clones.values()),
-            edges=tuple(edge_clones.values()),
+            vertices=vertices,
+            edges=tuple(edge_clones),
             processes=processes
         )
+
+    def _before_react(self, mol, vertex_clones, edge_clones):
+        if self._periodic:
+            return vertex_clones, edge_clones
+        return vertex_clones, [
+            edge for edge in edge_clones
+            if all(dim == 0 for dim in edge.periodicity)
+        ]
 
     def _assign_building_blocks_to_vertices(
         self,
@@ -589,41 +726,6 @@ class COF(TopologyGraph):
             bb = np.random.choice(bb_by_degree[len(vertex.edges)])
             mol.building_block_vertices[bb].append(vertex)
 
-    def _prepare(self, mol):
-        """
-        Do preprocessing on `mol` before construction.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # Order the building blocks by number of functional groups
-        # so that building blocks with more functional groups are
-        # always placed first.
-
-        bb_verts = dict()
-        bbs = sorted(
-            mol.building_block_vertices,
-            key=lambda bb: len(bb.func_groups),
-            reverse=True
-        )
-        for bb in bbs:
-            bb_verts[bb] = mol.building_block_vertices[bb]
-        mol.building_block_vertices = bb_verts
-        return super()._prepare(mol)
-
-    def _clean_up(self, mol):
-        mol.num_windows = self.num_windows
-        mol.num_window_types = self.num_window_types
-        return super()._clean_up(mol)
-
     def _get_scale(self, mol):
         """
         Get the scale used for the positions of :attr:`vertices`.
@@ -643,7 +745,7 @@ class COF(TopologyGraph):
 
         """
 
-        return max(
+        return 2*max(
             bb.get_maximum_diameter()
             for bb in mol.building_block_vertices
         )
@@ -664,86 +766,108 @@ class COF(TopologyGraph):
 
 
 class Honeycomb(COF):
-    cell_dimensions = a, b, c = [
-        np.array([1, 0, 0]),
+    _cell_dimensions = _a, _b, _c = (
+        np.array([1., 0., 0.]),
         np.array([0.5, 0.866, 0]),
         np.array([0, 0, 5/1.7321])
-    ]
+    )
 
-    vertices = v1, v2 = [
-        Vertex((1/3, 1/3, 1/2)),
-        Vertex((2/3, 2/3, 1/2))
-    ]
+    _vertices = (
+        _COFVertex(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
+        _COFVertex(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
+    )
 
-    edges = [
-        Edge(v1, v2, (0, 2)),
-        Edge(v1, v2, (1, 0), [0, -1, 0]),
-        Edge(v1, v2, (2, 1), [-1, 0, 0])
-    ]
+    vertices = (
+        *_vertices,
+        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
+        _COFVertex.init_at_shifted_center(
+            vertices=(_vertices[0], _vertices[1]),
+            shifts=((0, 0, 0), (0, -1, 0)),
+            cell_dimensions=_cell_dimensions
+        ),
+        _COFVertex.init_at_shifted_center(
+            vertices=(_vertices[0], _vertices[1]),
+            shifts=((0, 0, 0), (-1, 0, 0)),
+            cell_dimensions=_cell_dimensions
+        )
+    )
 
+    edges = (
+        Edge(vertices[2], vertices[0]),
+        Edge(vertices[2], vertices[1]),
 
-class Hexagonal(COF):
-    cell_dimensions = a, b, c = [
-        np.array([1, 0, 0]),
-        np.array([0.5, 0.866, 0]),
-        np.array([0, 0, 5/1.7321])
-    ]
+        Edge(vertices[3], vertices[0]),
+        Edge(vertices[3], vertices[1], periodicity=(0, -1, 0)),
 
-    vertices = v1, v2, v3, v4 = [
-        Vertex((1/4, 1/4, 1/2)),
-        Vertex((1/4, 3/4, 1/2)),
-        Vertex((3/4, 1/4, 1/2)),
-        Vertex((3/4, 3/4, 1/2))
-    ]
+        Edge(vertices[4], vertices[0]),
+        Edge(vertices[4], vertices[1], periodicity=(-1, 0, 0))
+    )
 
-    edges = [
-        Edge(v1, v2, (0, 3)),
-        Edge(v1, v3, (1, 4)),
-        Edge(v2, v3, (2, 5)),
-        Edge(v2, v4, (1, 4)),
-        Edge(v3, v4, (0, 3)),
-        Edge(v1, v3, (4, 1), [-1, 0, 0]),
-        Edge(v1, v2, (3, 0), [0, -1, 0]),
-        Edge(v1, v4, (2, 5), [0, -1, 0]),
-        Edge(v3, v2, (2, 5), [1, -1, 0]),
-        Edge(v3, v4, (3, 0), [0, -1, 0]),
-        Edge(v2, v4, (4, 1), [-1, 0, 0]),
-        Edge(v4, v1, (2, 5), [1, 0, 0])
-    ]
-
-
-class Square(COF):
-    cell_dimensions = a, b, c = [
-        np.array([1, 0, 0]),
-        np.array([0, 1, 0]),
-        np.array([0, 0, 1])
-    ]
-
-    vertices = v1, = [Vertex((0.5, 0.5, 0.5))]
-    edges = [
-        Edge(v1, v1, (1, 3), [1, 0, 0]),
-        Edge(v1, v1, (0, 2), [0, 1, 0])
-    ]
-
-
-class Kagome(COF):
-    cell_dimensions = a, b, c = [
-        np.array([1, 0, 0]),
-        np.array([0.5, 0.866, 0]),
-        np.array([0, 0, 5/1.7321])
-    ]
-
-    vertices = v1, v2, v3 = [
-        Vertex((1/4, 3/4, 0.5)),
-        Vertex((3/4, 3/4, 1/2)),
-        Vertex((3/4, 1/4, 1/2))
-    ]
-
-    edges = [
-        Edge(v1, v2, (0, 3)),
-        Edge(v1, v3, (1, 3)),
-        Edge(v2, v3, (2, 0)),
-        Edge(v1, v2, (2, 1), [-1, 0, 0]),
-        Edge(v1, v3, (3, 1), [-1, 1, 0]),
-        Edge(v2, v3, (0, 2), [0, 1, 0])
-    ]
+#
+# class Hexagonal(COF):
+#     _cell_dimensions = (
+#         np.array([1, 0, 0]),
+#         np.array([0.5, 0.866, 0]),
+#         np.array([0, 0, 5/1.7321])
+#     )
+#
+#     _vertices = (
+#         Vertex((1/4, 1/4, 1/2)),
+#         Vertex((1/4, 3/4, 1/2)),
+#         Vertex((3/4, 1/4, 1/2)),
+#         Vertex((3/4, 3/4, 1/2))
+#     )
+#
+#     edges = [
+#         Edge(v1, v2, (0, 3)),
+#         Edge(v1, v3, (1, 4)),
+#         Edge(v2, v3, (2, 5)),
+#         Edge(v2, v4, (1, 4)),
+#         Edge(v3, v4, (0, 3)),
+#         Edge(v1, v3, (4, 1), [-1, 0, 0]),
+#         Edge(v1, v2, (3, 0), [0, -1, 0]),
+#         Edge(v1, v4, (2, 5), [0, -1, 0]),
+#         Edge(v3, v2, (2, 5), [1, -1, 0]),
+#         Edge(v3, v4, (3, 0), [0, -1, 0]),
+#         Edge(v2, v4, (4, 1), [-1, 0, 0]),
+#         Edge(v4, v1, (2, 5), [1, 0, 0])
+#     ]
+#
+#
+# class Square(COF):
+#     _cell_dimensions = (
+#         np.array([1, 0, 0]),
+#         np.array([0, 1, 0]),
+#         np.array([0, 0, 1])
+#     )
+#
+#     _vertices = (
+#         Vertex((0.5, 0.5, 0.5))
+#     )
+#     edges = [
+#         Edge(v1, v1, (1, 3), [1, 0, 0]),
+#         Edge(v1, v1, (0, 2), [0, 1, 0])
+#     ]
+#
+#
+# class Kagome(COF):
+#     _cell_dimensions = (
+#         np.array([1, 0, 0]),
+#         np.array([0.5, 0.866, 0]),
+#         np.array([0, 0, 5/1.7321])
+#     )
+#
+#     _vertices = (
+#         Vertex((1/4, 3/4, 0.5)),
+#         Vertex((3/4, 3/4, 1/2)),
+#         Vertex((3/4, 1/4, 1/2))
+#     )
+#
+#     edges = [
+#         Edge(v1, v2, (0, 3)),
+#         Edge(v1, v3, (1, 3)),
+#         Edge(v2, v3, (2, 0)),
+#         Edge(v1, v2, (2, 1), [-1, 0, 0]),
+#         Edge(v1, v3, (3, 1), [-1, 1, 0]),
+#         Edge(v2, v3, (0, 2), [0, 1, 0])
+#     ]

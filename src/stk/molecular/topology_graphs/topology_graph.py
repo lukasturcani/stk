@@ -515,6 +515,24 @@ class Edge:
 
         return np.array(self._position)
 
+    def set_position(self, position):
+        """
+        Set the position.
+
+        Parameters
+        ----------
+        position : :class:`numpy.ndarray`
+            The new position of the edge.
+
+        Returns
+        -------
+        :class:`Edge`
+            The edge.
+
+        """
+
+        self._position = np.array(position)
+
     def __str__(self):
         return repr(self)
 
@@ -626,7 +644,9 @@ class TopologyGraph:
 
         self._prepare(mol)
         self._place_building_blocks(mol, vertex_clones)
-
+        vertex_clones, edge_clones = (
+            self._before_react(mol, vertex_clones, edge_clones)
+        )
         reactor = Reactor(mol)
         for edge in edge_clones:
             reactor.add_reaction(
@@ -754,6 +774,9 @@ class TopologyGraph:
         for edge in self.edges:
             edges.append(edge.clone(vertex_clones))
         return edges
+
+    def _before_react(self, mol, vertex_clones, edge_clones):
+        return vertex_clones, edge_clones
 
     def _prepare(self, mol):
         """

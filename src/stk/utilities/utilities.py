@@ -445,7 +445,7 @@ def flatten(iterable, excluded_types=None):
 
     for x in iterable:
         if hasattr(x, '__iter__') and type(x) not in excluded_types:
-            yield from flatten(x)
+            yield from flatten(x, excluded_types)
         else:
             yield x
 
