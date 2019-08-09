@@ -54,6 +54,8 @@ class _COFVertex(Vertex):
 
         self.aligner_edge = None
         self._lattice_constants = lattice_constants
+        # (x, y, z) identifying the cell in which the vertex is found.
+        self._cell = None
         # id will be set automatically by COF. This is because
         # _COFVertex is defined manually in a subclass of COF
         # and writing the id for every vertex would be a pain.
@@ -155,6 +157,7 @@ class _COFVertex(Vertex):
         clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
         clone._lattice_constants = self._lattice_constants
+        clone._cell = self._cell
         return clone
 
     def place_building_block(self, building_block):
@@ -205,7 +208,7 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._position
-        edge_coord = self.aligner_edge.get_position()
+        edge_coord = self._get_aligner_edge_position()
         target = edge_coord - self._get_edge_centroid()
         building_block.apply_rotation_between_vectors(
             start=start,
@@ -245,27 +248,49 @@ class _COFVertex(Vertex):
             position=self._position,
             atom_ids=building_block.get_bonder_ids()
         )
-        edge_normal = self._get_edge_plane_normal(
-            reference=self._get_edge_centroid()
-        )
         building_block.apply_rotation_between_vectors(
             start=building_block.get_bonder_plane_normal(),
-            target=edge_normal,
+            target=[0, 0, 1],
             origin=self._position
         )
         fg_bonder_centroid = building_block.get_centroid(
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_bonder_centroid - self._position
-        edge_coord = self.aligner_edge.get_position()
+        edge_coord = self._get_aligner_edge_position()
         target = edge_coord - self._get_edge_centroid()
         building_block.apply_rotation_to_minimize_theta(
             start=start,
             target=target,
-            axis=edge_normal,
+            axis=[0, 0, 1],
             origin=self._position
         )
         return building_block.get_position_matrix()
+
+    def _get_aligner_edge_position(self):
+        periodic = any(
+            dim != 0 for dim in self.aligner_edge.periodicity
+        )
+        if not periodic:
+            return self.aligner_edge.get_position()
+
+        if self is self.aligner_edge.vertices[0]:
+            other = self.aligner_edge.vertices[1].get_position()
+            periodicity = self.aligner_edge.periodicity
+
+        else:
+            other = self.aligner_edge.vertices[0].get_position()
+            periodicity = -1*np.array(self.aligner_edge.periodicity)
+
+        dims = zip(self._cell, periodicity)
+        other_cell = (dim+shift for dim, shift in dims)
+
+        shift = 0
+        for dim, constant in zip(other_cell, self._lattice_constants):
+            shift += dim*constant
+        other += shift
+
+        return (self._position + other)/2
 
     def assign_func_groups_to_edges(self, building_block, fg_map):
         """
@@ -607,6 +632,7 @@ class COF(TopologyGraph):
         for cell, vertex in vertices:
             x, y, z = cell
             clone = vertex.clone(clear_edges=True)
+            clone._cell = cell
             clone.aligner_edge = vertex_alignments.get(
                 vertex,
                 vertex.edges[0]
@@ -742,7 +768,7 @@ class COF(TopologyGraph):
 
         """
 
-        return 2*max(
+        return 5*max(
             bb.get_maximum_diameter()
             for bb in mol.building_block_vertices
         )
