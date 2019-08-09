@@ -1,82 +1,88 @@
 import stk
 
 
-def test_random_building_block(polymer,
-                               amine2,
-                               aldehyde2,
-                               aldehyde2_alt1):
-
+def test_random_building_block(
+    polymer,
+    amine2,
+    aldehyde2,
+    aldehyde2_alt1
+):
     mutator = stk.RandomBuildingBlock(
-            building_blocks=[aldehyde2_alt1],
-            key=lambda mol: mol.func_group_infos[0].name == 'aldehyde'
+        building_blocks=[aldehyde2_alt1],
+        key=lambda mol: mol.func_groups[0].fg_type.name == 'aldehyde'
     )
     mutant = mutator.mutate(polymer)
-
-    assert mutant.__class__ == polymer.__class__
-    assert mutant.topology.__class__ == polymer.topology.__class__
-    assert any(
-        bb.same(aldehyde2_alt1) for bb in mutant.building_blocks
+    expected = stk.ConstructedMolecule(
+        building_blocks=[amine2, aldehyde2_alt1],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    assert all(
-        not bb.same(aldehyde2) for bb in mutant.building_blocks
-    )
+    assert mutant._key == expected._key
 
 
-def test_similar_bb(polymer,
-                    amine2,
-                    aldehyde2,
-                    aldehyde2_alt1,
-                    aldehyde2_alt2):
+def test_similar_building_block(
+    polymer,
+    amine2,
+    aldehyde2,
+    aldehyde2_alt1,
+    aldehyde2_alt2
+):
 
     mutator = stk.SimilarBuildingBlock(
-            building_blocks=[aldehyde2_alt1, aldehyde2_alt2],
-            duplicate_building_blocks=False,
-            key=lambda mol: mol.func_group_infos[0].name == 'aldehyde'
+        building_blocks=[aldehyde2_alt1, aldehyde2_alt2],
+        duplicate_building_blocks=False,
+        key=lambda mol: mol.func_groups[0].fg_type.name == 'aldehyde'
     )
     mutant = mutator.mutate(polymer)
-
-    assert mutant.__class__ == polymer.__class__
-    assert mutant.topology.__class__ == polymer.topology.__class__
-    assert any(
-        bb.same(aldehyde2_alt1) for bb in mutant.building_blocks
+    expected = stk.ConstructedMolecule(
+        building_blocks=[amine2, aldehyde2_alt1],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    assert all(
-        not bb.same(aldehyde2) for bb in mutant.building_blocks
-    )
+    assert mutant._key == expected._key
 
     mutant = mutator.mutate(polymer)
-
-    assert mutant.__class__ == polymer.__class__
-    assert mutant.topology.__class__ == polymer.topology.__class__
-    assert any(
-        bb.same(aldehyde2_alt2) for bb in mutant.building_blocks
+    expected = stk.ConstructedMolecule(
+        building_blocks=[amine2, aldehyde2_alt2],
+        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    assert all(
-        not bb.same(aldehyde2) for bb in mutant.building_blocks
+    assert mutant._key == expected._key
+
+
+def test_random_topology_graph(polymer):
+    chain1 = stk.polymer.Linear('AB', [0, 0], 4)
+    chain2 = stk.polymer.Linear('AB', [0, 0], 5)
+    expected1 = stk.ConstructedMolecule(
+        building_blocks=list(polymer.building_block_vertices.keys()),
+        topology_graph=chain1
     )
-
-
-def test_random_topology(cage):
-    topologies = [stk.EightPlusTwelve(), stk.FourPlusSix()]
-    mutator = stk.RandomTopology(topologies)
-    mutant = mutator.mutate(cage)
-
-    assert type(mutant) == type(cage)
-    assert mutant.topology.__class__ != cage.topology.__class__
-    assert all(
-        any(m.same(c) for c in cage.building_blocks)
-        for m in mutant.building_blocks
+    expected2 = stk.ConstructedMolecule(
+        building_blocks=list(polymer.building_block_vertices.keys()),
+        topology_graph=chain2
     )
-    assert mutant.building_blocks == cage.building_blocks
+    mutator = stk.RandomTopologyGraph([chain1, chain2])
+    mutant = mutator.mutate(polymer)
+
+    expected = {expected1._key, expected2._key}
+    assert mutant._key in expected
 
 
-def test_random_mutation(cage):
-    t1 = stk.RandomTopology([stk.EightPlusTwelve()])
-    t2 = stk.RandomTopology([stk.FourPlusSix2()])
+def test_random_mutation(polymer):
+    chain1 = stk.polymer.Linear('AB', [0, 0], 4)
+    chain2 = stk.polymer.Linear('AB', [0, 0], 5)
+    t1 = stk.RandomTopologyGraph([chain1])
+    t2 = stk.RandomTopologyGraph([chain2])
     mutator1 = stk.RandomMutation(t1, t2, weights=[1, 0])
     mutator2 = stk.RandomMutation(t1, t2, weights=[0, 1])
 
-    mutant1 = mutator1.mutate(cage)
-    assert isinstance(mutant1.topology, stk.EightPlusTwelve)
-    mutant2 = mutator2.mutate(cage)
-    assert isinstance(mutant2.topology, stk.FourPlusSix2)
+    mutant1 = mutator1.mutate(polymer)
+    expected1 = stk.ConstructedMolecule(
+        building_blocks=list(polymer.building_block_vertices.keys()),
+        topology_graph=chain1
+    )
+    assert mutant1._key == expected1._key
+
+    expected2 = stk.ConstructedMolecule(
+        building_blocks=list(polymer.building_block_vertices.keys()),
+        topology_graph=chain2
+    )
+    mutant2 = mutator2.mutate(polymer)
+    assert mutant2._key == expected2._key

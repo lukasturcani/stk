@@ -158,7 +158,7 @@ class RandomMutation(Mutator):
 
     """
 
-    def __init__(self, *mutators, weights=None):
+    def __init__(self, *mutators, weights=None, random_seed=None):
         """
         Initialize a :class:`RandomMutation` instance.
 
@@ -172,10 +172,14 @@ class RandomMutation(Mutator):
             The probability that each :class:`Mutator` will be selected
             to carry out a mutation.
 
+        random_seed : :class:`bool`, optional
+            The random seed to use.
+
         """
 
         self._mutators = mutators
         self._weights = weights
+        self._random_seed = random_seed
 
     def mutate(self, mol):
         """
@@ -193,6 +197,8 @@ class RandomMutation(Mutator):
 
         """
 
+        if self._random_seed is not None:
+            np.random.seed(self._random_seed)
         mutator = np.random.choice(self._mutators, p=self._weights)
         return mutator.mutate(mol)
 
@@ -247,6 +253,7 @@ class RandomBuildingBlock(Mutator):
         building_blocks,
         key,
         duplicate_building_blocks=False,
+        random_seed=None,
         use_cache=False
     ):
         """
@@ -269,6 +276,9 @@ class RandomBuildingBlock(Mutator):
             Indicates whether the building blocks used to construct the
             mutant must all be unique.
 
+        random_seed : :class:`bool`, optional
+            The random seed to use.
+
         use_cache : :class:`bool`, optional
             Toggles use of the molecular cache.
 
@@ -277,6 +287,7 @@ class RandomBuildingBlock(Mutator):
         self._building_blocks = building_blocks
         self._key = key
         self._duplicate_building_blocks = duplicate_building_blocks
+        self._random_seed = random_seed
         super().__init__(use_cache=use_cache)
 
     def mutate(self, mol):
@@ -294,6 +305,9 @@ class RandomBuildingBlock(Mutator):
             The mutant.
 
         """
+
+        if self._random_seed is not None:
+            np.random.seed(self._random_seed)
 
         # Choose the building block which undergoes mutation.
         valid_bbs = [
@@ -383,6 +397,7 @@ class SimilarBuildingBlock(Mutator):
         building_blocks,
         key,
         duplicate_building_blocks,
+        random_seed=None,
         use_cache=False
     ):
         """
@@ -405,6 +420,9 @@ class SimilarBuildingBlock(Mutator):
             Indicates whether the building blocks used to construct the
             mutant must all be unique.
 
+        random_seed : :class:`bool`, optional
+            The random seed to use.
+
         use_cache : :class:`bool`, optional
             Toggles use of the molecular cache.
 
@@ -414,6 +432,7 @@ class SimilarBuildingBlock(Mutator):
         self._key = key
         self._duplicate_building_blocks = duplicate_building_blocks
         self._similar_bbs = {}
+        self._random_seed = random_seed
         super().__init__(use_cache=use_cache)
 
     def mutate(self, mol):
@@ -431,6 +450,9 @@ class SimilarBuildingBlock(Mutator):
             The mutant.
 
         """
+
+        if self._random_seed is not None:
+            np.random.seed(self._random_seed)
 
         if mol not in self._similar_bbs:
             # Maps the mol to a dict. The dict maps each
@@ -483,7 +505,7 @@ class SimilarBuildingBlock(Mutator):
         new_bbs.append(new_bb)
         return mol.__class__(
             building_blocks=new_bbs,
-            topology_graph=mol.topology_grpah,
+            topology_graph=mol.topology_graph,
             use_cache=self._use_cache
         )
 
@@ -527,7 +549,12 @@ class RandomTopologyGraph(Mutator):
 
     """
 
-    def __init__(self, topology_graphs, use_cache=False):
+    def __init__(
+        self,
+        topology_graphs,
+        random_seed=None,
+        use_cache=False
+    ):
         """
         Initialize a :class:`RandomTopology` instance.
 
@@ -537,12 +564,16 @@ class RandomTopologyGraph(Mutator):
             This lists holds the topology instances from which one is
             selected at random to form a new molecule.
 
+        random_seed : :class:`bool`, optional
+            The random seed to use.
+
         use_cache : :class:`bool`, optional
             Toggles use of the molecular cache.
 
         """
 
         self._topology_graphs = topology_graphs
+        self._random_seed = random_seed
         super().__init__(use_cache=use_cache)
 
     def mutate(self, mol):
@@ -561,8 +592,11 @@ class RandomTopologyGraph(Mutator):
 
         """
 
+        if self._random_seed is not None:
+            np.random.seed(self._random_seed)
+
         tops = [
-            x for x in self._topology_graph
+            x for x in self._topology_graphs
             if repr(x) != repr(mol.topology_graph)
         ]
         topology_graph = np.random.choice(tops)
