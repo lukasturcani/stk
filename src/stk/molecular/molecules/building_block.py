@@ -709,14 +709,14 @@ class BuildingBlock(Molecule):
         # the centroid - centroid vector should be orthogonal to the
         # bonder direction vector.
         if np.allclose(centroid, bonder_centroid, 1e-5):
-            *_, bvec = self.get_bonder_direction_vectors(
+            *_, bvec = next(self.get_bonder_direction_vectors(
                 fg_ids=fg_ids
-            )
+            ))
             # Construct a secondary vector by finding the minimum
             # component of bvec and setting it to 0.
             vec2 = list(bvec)
             minc = min(vec2)
-            vec2[vec2.index(min(vec2))] = 0 if abs(minc) >= 1e-5 else 1
+            vec2[vec2.index(minc)] = 0 if abs(minc) >= 1e-5 else 1
             # Get a vector orthogonal to bvec and vec2.
             return normalize_vector(np.cross(bvec, vec2))
 
