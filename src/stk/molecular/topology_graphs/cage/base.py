@@ -603,6 +603,36 @@ class CageTopology(TopologyGraph):
             bb = np.random.choice(bb_by_degree[len(vertex.edges)])
             mol.building_block_vertices[bb].append(vertex)
 
+    def _prepare(self, mol):
+        """
+        Do preprocessing on `mol` before construction.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        # Order the building blocks by number of functional groups
+        # so that building blocks with more functional groups are
+        # always placed first.
+
+        bb_verts = dict()
+        bbs = sorted(
+            mol.building_block_vertices,
+            key=lambda bb: len(bb.func_groups),
+            reverse=True
+        )
+        for bb in bbs:
+            bb_verts[bb] = mol.building_block_vertices[bb]
+        mol.building_block_vertices = bb_verts
+        return super()._prepare(mol)
+
     def _clean_up(self, mol):
         mol.num_windows = self.num_windows
         mol.num_window_types = self.num_window_types
