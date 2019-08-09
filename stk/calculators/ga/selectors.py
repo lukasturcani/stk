@@ -266,7 +266,7 @@ class SelectorFunnel(Selector):
 
         """
 
-        *head, tail = self._sselectors
+        *head, tail = self._selectors
         for selector in head:
             population = [mol for mol, in selector.select(population)]
         yield from tail.select(population)
@@ -523,7 +523,8 @@ class Roulette(Selector):
         num_batches=None,
         duplicates=True,
         use_rank=False,
-        batch_size=1
+        batch_size=1,
+        random_seed=None
     ):
         """
         Initialize a :class:`Roulette` instance.
@@ -546,8 +547,12 @@ class Roulette(Selector):
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
+        random_seed : :class:`int`, optional
+            The random seed to use.
+
         """
 
+        self._random_seed = random_seed
         super().__init__(
             num_batches=num_batches,
             duplicates=duplicates,
@@ -572,6 +577,9 @@ class Roulette(Selector):
 
         """
 
+        if self._random_seed is not None:
+            np.random.seed(self._random_seed)
+
         if not self._duplicates:
             valid_pop = [
                 mol for mol in population if mol not in self._yielded
@@ -591,18 +599,20 @@ class Roulette(Selector):
                 ranks = range(1, len(valid_pop)+1)
                 weights = [1/(rank*total) for rank in ranks]
 
-                valid_pop = sorted(valid_pop,
-                                   key=lambda m: m.fitness,
-                                   reverse=True)
+                valid_pop = sorted(
+                    valid_pop, key=lambda m: m.fitness, reverse=True
+                )
 
             else:
                 total = sum(mol.fitness for mol in valid_pop)
                 weights = [mol.fitness / total for mol in valid_pop]
 
-            selected = tuple(np.random.choice(a=valid_pop,
-                                              size=self._batch_size,
-                                              replace=False,
-                                              p=weights))
+            selected = tuple(np.random.choice(
+                a=valid_pop,
+                size=self._batch_size,
+                replace=False,
+                p=weights
+            ))
             yield selected
             yields += 1
             if not self._duplicates:

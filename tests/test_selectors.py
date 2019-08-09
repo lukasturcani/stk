@@ -1,12 +1,15 @@
 import stk
+import numpy as np
 
 
 def test_fittest(flat_pop):
-    fittest = stk.Fittest(num=10)
+    fittest = stk.Fittest(num_batches=10)
     selected = fittest.select(flat_pop)
-    sorted_pop = sorted(flat_pop,
-                        reverse=True,
-                        key=lambda mol: mol.fitness)
+    sorted_pop = sorted(
+        flat_pop,
+        reverse=True,
+        key=lambda mol: mol.fitness
+    )
     for (mol1, ), mol2 in zip(selected, sorted_pop):
         assert mol1 is mol2
 
@@ -16,13 +19,13 @@ def test_fittest(flat_pop):
 
 
 def test_roulette(flat_pop):
-    roulette = stk.Roulette(num=5, batch_size=5)
+    roulette = stk.Roulette(num_batches=5, batch_size=5)
     for batch in roulette.select(flat_pop):
         assert len(batch) == 5
 
 
 def test_above_average(flat_pop):
-    mean = flat_pop.mean(lambda mol: mol.fitness)
+    mean = np.mean([mol.fitness for mol in flat_pop])
     above_average = stk.AboveAverage()
     selected = set(
         mol
@@ -42,7 +45,7 @@ def test_above_average(flat_pop):
 
 
 def test_selector_sequence(flat_pop):
-    elitism = stk.Fittest(num=5)
+    elitism = stk.Fittest(num_batches=5)
     above_avg = stk.AboveAverage()
     selected = (
         *(mol for batch in elitism.select(flat_pop) for mol in batch),
@@ -55,7 +58,7 @@ def test_selector_sequence(flat_pop):
 
 
 def test_selector_funnel(flat_pop):
-    elitism = stk.Fittest(num=5)
+    elitism = stk.Fittest(num_batches=5)
     above_avg = stk.AboveAverage()
     funnel = stk.SelectorFunnel(elitism, above_avg)
 
