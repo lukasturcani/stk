@@ -461,8 +461,10 @@ class Molecule(metaclass=_Cached):
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        s = self._position_matrix[:, atom_ids].sum(axis=1)
-        return s / len(atom_ids)
+        return np.divide(
+            self._position_matrix[:, atom_ids].sum(axis=1),
+            len(atom_ids)
+        )
 
     def get_direction(self, atom_ids=None):
         """
