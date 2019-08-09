@@ -64,6 +64,9 @@ class Vertex:
         self.id = id
         self._position = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
+        # This holds the ConstructedMolecule that the vertex is used
+        # to construct.
+        self._mol = None
 
     @classmethod
     def init_at_center(cls, id, *vertices):
@@ -147,6 +150,24 @@ class Vertex:
         """
 
         return np.array(self._position)
+
+    def set_contructed_molecule(self, mol):
+        """
+        Set the :class:`.ConstructedMolecule` being constructed.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
+        self._mol = mol
 
     def place_building_block(self, building_block):
         """
@@ -290,6 +311,40 @@ class Vertex:
         if vector_theta(normal, reference) > np.pi/2:
             normal *= -1
         return normal
+
+    def _get_molecule_centroid(self, atom_ids=None):
+        """
+        Get the centroid of the molecule being constructed.
+
+        During construction :meth:`.Molecule.get_centroid` cannot be
+        used, because the molecule is not fully constructed yet. This
+        method acts as its replacement during construction.
+
+        Parameters
+        ----------
+        atom_ids : :class:`iterable` of :class:`int`, optional
+            The ids of atoms which are used to calculate the
+            centroid. If ``None``, then all atoms will be used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The centroid of atoms specified by `atom_ids`.
+
+        """
+
+        if atom_ids is None:
+            atom_ids = range(len(self.atoms))
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
+
+        return np.divide(
+            np.sum(
+                np.array(self._mol._position_matrix)[atom_ids, :],
+                axis=0
+            ),
+            len(atom_ids)
+        )
 
     def __str__(self):
         x, y, z = self._position
@@ -547,7 +602,7 @@ class TopologyGraph:
                 mol.building_block_vertices
             )
 
-        vertex_clones = self._clone_vertices()
+        vertex_clones = self._clone_vertices(mol)
         edge_clones = self._clone_edges(vertex_clones)
 
         self._prepare(mol)
@@ -629,7 +684,7 @@ class TopologyGraph:
 
         raise NotImplementedError()
 
-    def _clone_vertices(self):
+    def _clone_vertices(self, mol):
         """
         Create clones of :attr:`vertices`.
 
@@ -640,6 +695,11 @@ class TopologyGraph:
         original :class:`.Vertex` objects is not
         changed by the construction process.
 
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
         Returns
         -------
         :class:`dict`
@@ -647,10 +707,12 @@ class TopologyGraph:
 
         """
 
-        return {
-            vertex: vertex.clone(clear_edges=True)
-            for vertex in self.vertices
-        }
+        clones = {}
+        for vertex in self.vertices:
+            clone = vertex.clone(clear_edges=True)
+            clone.set_contructed_molecule(mol)
+            clones[vertex] = clone
+        return clones
 
     def _clone_edges(self, vertex_clones):
         """

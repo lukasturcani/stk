@@ -43,6 +43,9 @@ class _CageVertex(Vertex):
 
         """
 
+        # _neighbor_positions holds the bonder centroids of functional
+        # groups on neighbor vertices connected to this vertex.
+        self._neighbor_positions = []
         self.aligner_edge = None
         # id will be set automatically by CageTopology. This is because
         # _CageVertex is defined manually in a subclass of CageTopology
@@ -90,6 +93,7 @@ class _CageVertex(Vertex):
 
         clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
+        clone._neighbor_positions = list(self._neighbor_positions)
         return clone
 
     def place_building_block(self, building_block):
@@ -110,9 +114,18 @@ class _CageVertex(Vertex):
 
         """
 
+        if len(self._neighbor_positions) == len(self.edges):
+            self._update_position()
+
         if len(building_block.func_groups) == 2:
             return self._place_linear_building_block(building_block)
         return self._place_nonlinear_building_block(building_block)
+
+    def _update_position(self):
+        self._position = np.divide(
+            np.sum(self._neighbor_positions, axis=0),
+            len(self._neighbor_positions)
+        )
 
     def _place_linear_building_block(self, building_block):
         """
@@ -233,14 +246,32 @@ class _CageVertex(Vertex):
         """
 
         if len(building_block.func_groups) == 2:
-            return self._assign_func_groups_to_linear_edges(
+            r = self._assign_func_groups_to_linear_edges(
                 building_block=building_block,
                 fg_map=fg_map
             )
-        return self._assign_func_groups_to_nonlinear_edges(
-            building_block=building_block,
-            fg_map=fg_map
-        )
+        else:
+            r = self._assign_func_groups_to_nonlinear_edges(
+                building_block=building_block,
+                fg_map=fg_map
+            )
+
+        bb_fgs = set(fg_map.values())
+        for edge in self.edges:
+            for vertex in edge.vertices:
+                if vertex is self:
+                    continue
+
+                for func_group in edge.get_func_groups():
+                    if func_group in bb_fgs:
+                        continue
+
+                    self._neighbor_positions.append(
+                        self._get_molecule_centroid(
+                            atom_ids=func_group.get_bonder_ids()
+                        )
+                    )
+        return r
 
     def _assign_func_groups_to_linear_edges(
         self,
