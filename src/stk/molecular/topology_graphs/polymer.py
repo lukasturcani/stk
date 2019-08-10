@@ -360,7 +360,7 @@ class Linear(TopologyGraph):
 
         # Keep these for __repr__
         self._repeating_unit = repeating_unit
-        self._orientations = tuple(orientations)
+        self._orientations = orientations
         self._n = n
 
         head, *body, tail = orientations*n

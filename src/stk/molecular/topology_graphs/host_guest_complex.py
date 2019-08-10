@@ -267,7 +267,7 @@ class Complex(TopologyGraph):
 
     def __repr__(self):
         return (
-            f'Complex(axis={self._axis!r}, '
+            f'host_guest_complex.Complex(axis={self._axis!r}, '
             f'angle={self._angle!r}, '
             f'displacement={self._displacement!r})'
         )
