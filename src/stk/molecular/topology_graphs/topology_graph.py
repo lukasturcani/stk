@@ -595,7 +595,7 @@ class TopologyGraph:
         edges : :class:`tuple` of :class:`.Edge`
             The edges which make up the graph.
 
-        processes : :class:`int`, optional
+        processes : :class:`int`
             The number of parallel processes to create during
             :meth:`construct`.
 
