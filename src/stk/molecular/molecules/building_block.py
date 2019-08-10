@@ -19,7 +19,7 @@ from .. import bonds
 from ..bonds import Bond
 from .molecule import Molecule
 from ..functional_groups import fg_types
-from ...utilities import normalize_vector, vector_theta, dedupe
+from ...utilities import normalize_vector, vector_angle, dedupe
 
 
 logger = logging.getLogger(__name__)
@@ -582,7 +582,7 @@ class BuildingBlock(Molecule):
         cc_vector = self.get_centroid_centroid_direction_vector(
             fg_ids=fg_ids
         )
-        if vector_theta(normal, cc_vector) > np.pi/2:
+        if vector_angle(normal, cc_vector) > np.pi/2:
             normal *= -1
         return normal
 

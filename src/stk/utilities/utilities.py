@@ -1029,7 +1029,7 @@ def time_it():
     print(f'\nTime taken was {int(h)} : {int(m)} : {int(s)}.\n\n')
 
 
-def vector_theta(vector1, vector2):
+def vector_angle(vector1, vector2):
     """
     Returns the angle between two vectors in radians.
 

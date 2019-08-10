@@ -7,7 +7,7 @@ from inspect import signature
 
 from ...utilities import (
     normalize_vector,
-    vector_theta,
+    vector_angle,
     rotation_matrix,
     rotation_matrix_arbitrary_axis,
     mol_from_mae_file,
@@ -178,13 +178,13 @@ class Molecule(metaclass=_Cached):
         ).T
         return self
 
-    def apply_rotation_about_axis(self, theta, axis, origin):
+    def apply_rotation_about_axis(self, angle, axis, origin):
         """
-        Rotate by `theta` about `axis` on the `origin`.
+        Rotate by `angle` about `axis` on the `origin`.
 
         Parameters
         ----------
-        theta : :class:`float`
+        angle : :class:`float`
             The size of the rotation in radians.
 
         axis : :class:`numpy.ndarray`
@@ -202,7 +202,7 @@ class Molecule(metaclass=_Cached):
 
         # Set the origin of the rotation to "origin".
         self.apply_displacement(-origin)
-        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
+        rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
 
         # Apply the rotation matrix on the position matrix, to get the
         # new position matrix.
@@ -267,7 +267,7 @@ class Molecule(metaclass=_Cached):
         self.apply_displacement(origin)
         return self
 
-    def apply_rotation_to_minimize_theta(
+    def apply_rotation_to_minimize_angle(
         self,
         start,
         target,
@@ -328,15 +328,15 @@ class Molecule(metaclass=_Cached):
 
         tend = np.dot(rotmat, target)
         tend = np.array([tend[0], tend[1], 0])
-        angle = vector_theta(tstart, tend)
+        angle = vector_angle(tstart, tend)
 
         # Check in which direction the rotation should go.
         # This is done by applying the rotation in each direction and
-        # seeing which one leads to a smaller theta.
+        # seeing which one leads to a smaller angle.
         r1 = rotation_matrix_arbitrary_axis(angle, [0, 0, 1])
-        t1 = vector_theta(np.dot(r1, tstart), tend)
+        t1 = vector_angle(np.dot(r1, tstart), tend)
         r2 = rotation_matrix_arbitrary_axis(-angle, [0, 0, 1])
-        t2 = vector_theta(np.dot(r2, tstart), tend)
+        t2 = vector_angle(np.dot(r2, tstart), tend)
 
         if t2 < t1:
             angle *= -1

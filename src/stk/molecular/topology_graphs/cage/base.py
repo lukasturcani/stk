@@ -2,7 +2,7 @@ import numpy as np
 from collections import defaultdict
 
 from ..topology_graph import TopologyGraph, Vertex
-from ....utilities import vector_theta
+from ....utilities import vector_angle
 
 
 class _CageVertex(Vertex):
@@ -163,7 +163,7 @@ class _CageVertex(Vertex):
         start = building_block.get_centroid_centroid_direction_vector()
         e0_coord = self.edges[0].get_position()
         e1_coord = self.edges[1].get_position()
-        building_block.apply_rotation_to_minimize_theta(
+        building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=self._position,
             axis=e0_coord-e1_coord,
@@ -207,7 +207,7 @@ class _CageVertex(Vertex):
         start = fg_bonder_centroid - self._position
         edge_coord = self.aligner_edge.get_position()
         target = edge_coord - self._get_edge_centroid()
-        building_block.apply_rotation_to_minimize_theta(
+        building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=target,
             axis=edge_normal,
@@ -358,7 +358,7 @@ class _CageVertex(Vertex):
                 atom_ids=func_group.get_bonder_ids()
             )
             fg_direction = coord-bonder_centroid
-            theta = vector_theta(fg0_direction, fg_direction)
+            theta = vector_angle(fg0_direction, fg_direction)
 
             projection = fg_direction @ axis
             if theta > 0 and projection < 0:
@@ -377,7 +377,7 @@ class _CageVertex(Vertex):
         def angle(edge):
             coord = edge.get_position()
             edge_direction = coord - edge_centroid
-            theta = vector_theta(
+            theta = vector_angle(
                 vector1=edge_direction,
                 vector2=aligner_edge_direction
             )

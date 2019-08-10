@@ -1,87 +1,273 @@
-import rdkit.Chem.AllChem as rdkit
+import numpy as np
 
-from ..base import Topology
-from ....utilities import (rotation_matrix_arbitrary_axis,
-                           add_fragment_props)
+from .topology_graph import TopologyGraph, Vertex
 
 
-class CageWithGuest(Topology):
+class _HostVertex(Vertex):
     """
-    A topology representing a cage with a guest.
-
-    When using this topology the cage must be the first building block
-    in :attr:`.ConstructedMolecule.building_blocks` and the guest must
-    be the second.
+    Places the host in a :class:`.Complex`.
 
     Attributes
     ----------
-    rot_mat : :class:`numpy.ndarray`
-        The rotation matrix applied to the guest molecule.
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
 
-    displacement : :class:`list` of :class:`float`
-        The translational offset of the guest from the center of the
-        cage cavity.
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
 
     """
 
-    def __init__(self, axis=None, angle=0, displacement=None):
+    def place_building_block(self, building_block):
         """
-        Initializes an instance of :class:`CageWithGuest`.
+        Place `building_block` on the :class:`.Vertex`.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is to be placed on the
+            vertex.
+
+        Returns
+        -------
+        :class:`numpy.nadarray`
+            The position matrix of `building_block` after being
+            placed.
+
+        """
+
+        building_block.set_centroid(self._position)
+        return building_block.get_position_matrix()
+
+    def assign_func_groups_to_edges(self, building_block, fg_map):
+        return
+
+
+class _GuestVertex(Vertex):
+    """
+    Places the guest in a :class:`.Complex`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
+
+    """
+
+    def __init__(self, id, x, y, z, axis, angle):
+        self._axis = axis
+        self._angle = angle
+        super().__init__(id, x, y, z)
+
+    def clone(self, clear_edges=False):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            If ``True`` the :attr:`edges` attribute of the clone will
+            be empty.
+
+        Returns
+        -------
+        :class:`Vertex`
+            The clone.
+
+        """
+
+        clone = super().clone(clear_edges)
+        clone._axis = self._axis
+        clone._angle = self._angle
+        return clone
+
+    def place_building_block(self, building_block):
+        """
+        Place `building_block` on the :class:`.Vertex`.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is to be placed on the
+            vertex.
+
+        Returns
+        -------
+        :class:`numpy.nadarray`
+            The position matrix of `building_block` after being
+            placed.
+
+        """
+
+        building_block.set_centroid(self._position)
+        if self._axis is not None:
+            building_block.apply_rotation_about_axis(
+                angle=self._angle,
+                axis=self._axis,
+                origin=self._position
+            )
+        return building_block.get_position_matrix()
+
+    def assign_func_groups_to_edges(self, building_block, fg_map):
+        return
+
+
+class Complex(TopologyGraph):
+    """
+    Represents a host-guest complex topology graph.
+
+    When using this topology graph, the host must be first in the
+    `building_blocks` of the :class:`.ConstructedMolecule`
+    and the guest must be second.
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        import stk
+
+        guest = stk.BuildingBlock('[Br][Br]')
+        host = stk.ConstructedMolecule(
+            building_blocks=[
+                stk.BuildingBlock('NCCN', ['amine']),
+                stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
+            ],
+            topology_graph=stk.cage.FourPlusSix()
+        )
+        complex1 = stk.ConstructedMolecule(
+            building_blocks=[host, guest],
+            topology_graph=stk.host_guest_complex.Complex()
+        )
+
+    Change the position and orientation of the guest
+
+    .. code-block:: python
+
+        complex2 = stk.ConstructedMolecule(
+            building_blocks=[host, guest],
+            topology_graph=stk.host_guest_complex.Complex(
+                axis=[1, 0, 0],
+                angle=3.14/3,
+                displacement=[5.3, 2.1, 7.1]
+            )
+        )
+
+
+    """
+
+    def __init__(
+        self,
+        axis=None,
+        angle=0,
+        displacement=None,
+        processes=1
+    ):
+        """
+        Initialize an instance of :class:`.Complex`.
 
         Parameters
         ----------
         axis : :class:`list` of :class:`int`, optional
             The axis about which the guest is rotated.
 
-        angle : :class:`float`
-            The angle by which the guest is rotated.
+        angle : :class:`float`, optional
+            The angle by which the guest is rotated in radians.
 
-        displacement : :class:`list` of :class:`float`
+        displacement : :class:`list` of :class:`float`, optional
             The translational offset of the guest from the center of
-            the cage cavity.
+            the host cavity.
+
+        processes : :class:`int`, optional
+            The number of parallel processes to create during
+            :meth:`construct`.
 
         """
 
-        self.rot_mat = None
-        if axis is not None:
-            self.rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
+        self._axis = axis
+        self._angle = angle
+        self._displacement = displacement
 
-        self.displacement = None
-        if displacement is not None:
-            # Nested list so that it can be added to a [3, n] array.
-            self.displacement = [[i] for i in displacement]
+        if displacement is None:
+            displacement = np.array([0, 0, 0])
 
-        super().__init__(del_atoms=False)
+        x, y, z = displacement
+        vertices = (
+            _HostVertex(0, 0, 0, 0),
+            _GuestVertex(1, x, y, z, axis, angle)
+        )
+        super().__init__(vertices, (), processes)
 
-    def place_mols(self, mol):
-        origin = [0, 0, 0]
+    def _assign_building_blocks_to_vertices(
+        self,
+        mol,
+        building_blocks
+    ):
+        """
+        Assign `building_blocks` to :attr:`vertices`.
 
-        for i, bb in enumerate(mol.building_blocks):
-            pos = bb.position_matrix()
-            bb.set_position(origin)
+        Assignment is done by modifying
+        :attr:`.ConstructedMolecule.building_block_vertices`.
 
-            # Make sure that the building blocks are always positioned
-            # consistently, regardless of initial position.
-            _, a1, a2 = bb.max_diameter()
-            mol_axis = bb.atom_coords(a1) - bb.atom_coords(a2)
-            bb.set_orientation(mol_axis, [0, 1, 0])
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` instance being
+            constructed.
 
-            # Apply the rotation and displacement to the guest.
-            if i == 1:
-                new_pos = bb.position_matrix()
-                if self.rot_mat is not None:
-                    new_pos = self.rot_mat @ new_pos
-                if self.displacement is not None:
-                    new_pos += self.displacement
+        building_blocks : :class:`list` of :class:`.Molecule`
+            The :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` instances which
+            represent the building block molecules used for
+            construction. Only one instance is present per building
+            block molecule, even if multiples of that building block
+            join up to form the :class:`ConstructedMolecule`.
 
-                bb.set_position_from_matrix(new_pos)
+        Returns
+        -------
+        None : :class:`NoneType`
 
-            # Make a copy so that atoms can be tagged without modifying
-            # the original.
-            bb_mol = rdkit.Mol(bb.mol)
-            add_fragment_props(bb_mol, i, i)
-            mol.mol = rdkit.CombineMols(mol.mol, bb_mol)
-            bb.set_position_from_matrix(pos)
+        """
 
-    def bonded_fgs(self, mol):
-        return iter(())
+        host, guest = building_blocks
+        mol.building_block_vertices[host].append(self.vertices[0])
+        mol.building_block_vertices[guest].append(self.vertices[1])
+
+    def _get_scale(self, mol):
+        """
+        Get the scale used for the positions of :attr:`vertices`.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
+        Returns
+        -------
+        :class:`float` or :class:`list` of :class:`float`
+            The value by which the position of each :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
+
+        """
+
+        return 1
+
+    def __repr__(self):
+        return (
+            f'Complex(axis={self._axis!r}, '
+            f'angle={self._angle!r}, '
+            f'displacement={self._displacement!r})'
+        )

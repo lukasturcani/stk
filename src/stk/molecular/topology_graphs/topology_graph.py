@@ -22,7 +22,7 @@ import numpy as np
 from collections import defaultdict
 
 from ..reactor import Reactor
-from ...utilities import vector_theta
+from ...utilities import vector_angle
 
 
 class Vertex:
@@ -327,7 +327,7 @@ class Vertex:
         centroid = np.sum(edge_positions, axis=0) / i
         normal = np.linalg.svd(edge_positions - centroid)[-1][2, :]
 
-        if vector_theta(normal, reference) > np.pi/2:
+        if vector_angle(normal, reference) > np.pi/2:
             normal *= -1
         return normal
 
