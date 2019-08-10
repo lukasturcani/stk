@@ -230,9 +230,9 @@ class Macrocycle(TopologyGraph):
         orientations : :class:`tuple` of :class:`float`
             For each character in the repeating unit, a value
             between ``0`` and ``1`` (both inclusive) must be given in
-            a :class:`list`. It indicates the probability that each
+            a :class:`tuplet`. It indicates the probability that each
             monomer will have its orientation along the chain flipped.
-            If ``0`` then the monomer is guaranteed to not flip. If
+            If ``0`` then the monomer is guaranteed not to flip. If
             ``1`` it is guaranteed to flip. This allows the user to
             create head-to-head or head-to-tail chains, as well as
             chain with a preference for head-to-head or head-to-tail if
