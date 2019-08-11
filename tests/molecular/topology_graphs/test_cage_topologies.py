@@ -239,7 +239,7 @@ def _test_construction(cage, num_expected_bbs):
         len(cage.bonds) ==
         num_bb_bonds + len(cage.construction_bonds) - num_deleters
     )
-    # Check window attributes got added
+    # Check window attributes got added.
     assert cage.num_windows == cage.topology_graph.num_windows
     assert (
         cage.num_window_types == cage.topology_graph.num_window_types

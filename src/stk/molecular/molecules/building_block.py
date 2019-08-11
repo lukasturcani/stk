@@ -829,7 +829,10 @@ class BuildingBlock(Molecule):
         if functional_groups is None:
             functional_groups = ()
         functional_groups = sorted(functional_groups)
-        return (*functional_groups, rdkit.MolToInchi(mol))
+        return (
+            *functional_groups,
+            rdkit.MolToSmiles(mol, canonical=True)
+        )
 
     def __str__(self):
         smiles = rdkit.MolToSmiles(rdkit.RemoveHs(self.to_rdkit_mol()))

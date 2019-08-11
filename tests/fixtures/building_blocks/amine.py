@@ -26,7 +26,7 @@ def amine2_alt1():
 
 @pytest.fixture(scope='session')
 def amine2_alt2():
-    return stk.BuildingBlock('NC[Si]CN', ['amine'])
+    return stk.BuildingBlock('NC[SiH2]CN', ['amine'])
 
 
 @pytest.fixture(scope='session')

@@ -39,7 +39,7 @@ def aldehyde3_alt1():
 
 @pytest.fixture(scope='session')
 def aldehyde3_alt2():
-    return stk.BuildingBlock('O=C[Si](C=O)C=O', ['aldehyde'])
+    return stk.BuildingBlock('O=C[SiH](C=O)C=O', ['aldehyde'])
 
 
 @pytest.fixture(scope='session')
