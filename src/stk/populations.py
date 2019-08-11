@@ -1305,42 +1305,31 @@ class Population:
 
 class GAPopulation(Population):
     """
-    Used for applying GA operations to molecules.
+    A population which also carries out genetic algorithm operations.
 
     Attributes
     ----------
-    generation_selector : :class:`.Selector`
-        A :class:`.Selector` used to select molecules in the next
-        generation.
+    direct_members : :class:`list` of :class:`.Molecule`
+        Held here are direct members of the :class:`Population`.
+        In other words, these are the molecules not held by any
+        subpopulations. As a result, not all members of a
+        :class:`Population` are stored in this attribute.
 
-    mutation_selector : :class:`.Selector`
-        A :class:`.Selector` used to select molecules for mutation.
-
-    crossover_selector : :class:`.Selector`
-        A :class:`.Selector` used to select molecules for crossover.
-
-    mutator : :class:`.Mutator`
-        Carries out the mutation of molecules.
-
-    crosser : :class:`.Crosser`
-        Carries out the crossover of molecules.
-
-    fitness_calculator : :class:`.FitnessCalculator`
-        Calculates the fitness values of molecules.
-
-    fitness_normalizer : :class:`.FitnessNormalizer`
-        Normalizes fitness values of molecules.
+    subpopulations : :class:`list` of :class:`Population`
+        A :class:`list` holding the subpopulations.
 
     """
 
-    def set_ga_tools(self,
-                     generation_selector,
-                     mutation_selector,
-                     crossover_selector,
-                     mutator,
-                     crosser):
+    def set_ga_tools(
+        self,
+        generation_selector,
+        mutation_selector,
+        crossover_selector,
+        mutator,
+        crosser
+    ):
         """
-        Sets the GA calculators.
+        Set the genetic algorithm calculators.
 
         Parameters
         ----------
@@ -1362,27 +1351,29 @@ class GAPopulation(Population):
 
         """
 
-        self.generation_selector = generation_selector
-        self.mutation_selector = mutation_selector
-        self.crossover_selector = crossover_selector
-        self.mutator = mutator
-        self.crosser = crosser
+        self._generation_selector = generation_selector
+        self._mutation_selector = mutation_selector
+        self._crossover_selector = crossover_selector
+        self._mutator = mutator
+        self._crosser = crosser
 
-    def calculate_member_fitness(self,
-                                 fitness_calculator,
-                                 processes=psutil.cpu_count()):
+    def calculate_member_fitness(
+        self,
+        fitness_calculator,
+        processes=None
+    ):
         """
         Calculates the fitness values of molecules.
 
         Parameters
         ----------
-        processes : :class:`int`
-            The number of processes to create. If ``1`` then fitness
-            values are calculated serially.
-
         fitness_calculator : :class:`.FitnessCalculator`
             The :class:`.FitnessCalculator` used to calculate the
             fitness.
+
+        processes : :class:`int`, optional
+            The number of processes to create. If ``1`` then fitness
+            values are calculated serially.
 
         Returns
         -------
@@ -1393,19 +1384,25 @@ class GAPopulation(Population):
         if processes == 1:
             self._calculate_fitness_serial(fitness_calculator)
         else:
-            self._calculate_fitness_parallel(fitness_calculator,
-                                             processes)
+            self._calculate_fitness_parallel(
+                fitness_calculator=fitness_calculator,
+                processes=processes
+            )
 
     def _calculate_fitness_serial(self, fitness_calculator):
         for mol in self:
-            fitness_calculator.fitness(mol)
+            fitness_calculator.get_fitness(mol)
 
-    def _calculate_fitness_parallel(self,
-                                    fitness_calculator,
-                                    processes):
+    def _calculate_fitness_parallel(
+        self,
+        fitness_calculator,
+        processes
+    ):
 
-        fitness_fn = _Guard(fitness_calculator,
-                            fitness_calculator.fitness)
+        fitness_fn = _Guard(
+            calculator=fitness_calculator,
+            fn=fitness_calculator.get_fitness
+        )
 
         # Apply the function to every member of the population, in
         # parallel.
@@ -1418,24 +1415,17 @@ class GAPopulation(Population):
                 raise result
 
         # Update the molecules in the population.
-        sorted_new = sorted(evaluated, key=lambda m: m.key)
-        sorted_old = sorted(self, key=lambda m: m.key)
-        for old, new in zip(sorted_old, sorted_new):
+        sorted_opt = sorted(evaluated, key=lambda m: repr(m))
+        sorted_pop = sorted(self, key=lambda m: repr(m))
+        for old, new in zip(sorted_pop, sorted_opt):
+            assert old.is_identical(new)
             old.__dict__ = dict(vars(new))
-            if fitness_calculator.use_cache:
-                fitness_calculator.cache[(old.key, -1)] = new.fitness
+            if fitness_calculator._use_cache:
+                fitness_calculator._cache[old] = new.fitness
 
-        # Make sure the cache is updated.
-        if OPTIONS['cache']:
-            for member in evaluated:
-                member.update_cache()
-
-    def gen_mutants(self):
+    def get_mutants(self):
         """
-        Creates mutants.
-
-        The function uses :attr:`mutation_selector` to select molecules
-        and :attr:`mutator` to create the mutants.
+        Perform mutations and return the mutants.
 
         Returns
         -------
@@ -1446,19 +1436,18 @@ class GAPopulation(Population):
         """
 
         mutants = []
-        parents = self.mutation_selector.select(self)
-        num = self.mutation_selector.num
+        parents = self._mutation_selector.select(self)
+        num = self._mutation_selector.num_batches
         for i, (parent, ) in enumerate(parents, 1):
             logger.info(f'Mutation number {i}. Finish when {num}.')
-            mutant = self.mutator.mutate(parent)
+            mutant = self._mutator.mutate(parent)
             if mutant not in self:
                 mutants.append(mutant)
-
         return mutants
 
-    def gen_next_gen(self):
+    def get_next_generation(self):
         """
-        Returns the next GA generation.
+        Get the next genetic algorithm generation.
 
         Returns
         -------
@@ -1469,23 +1458,20 @@ class GAPopulation(Population):
 
         cls = self.__class__
         next_gen = cls(*(
-            mol for mol, in self.generation_selector.select(self)
+            mol for mol, in self._generation_selector.select(self)
         ))
         next_gen.set_ga_tools(
-                 generation_selector=self.generation_selector,
-                 mutation_selector=self.mutation_selector,
-                 crossover_selector=self.crossover_selector,
-                 mutator=self.mutator,
-                 crosser=self.crosser
+            generation_selector=self._generation_selector,
+            mutation_selector=self._mutation_selector,
+            crossover_selector=self._crossover_selector,
+            mutator=self._mutator,
+            crosser=self._crosser
         )
         return next_gen
 
-    def gen_offspring(self):
+    def get_offspring(self):
         """
-        Creates offspring.
-
-        The function uses :attr:`crossover_selector` to select
-        molecules and :attr:`crosser` to create the offspring.
+        Perform crossover operations and return the offspring.
 
         Returns
         -------
@@ -1496,11 +1482,11 @@ class GAPopulation(Population):
         """
 
         offspring = []
-        parent_batches = self.crossover_selector.select(self)
-        num = self.crossover_selector.num
+        parent_batches = self._crossover_selector.select(self)
+        num = self._crossover_selector.num_batches
         for i, parents in enumerate(parent_batches, 1):
             logger.info(f'Crossover number {i}. Finish when {num}.')
-            for child in self.crosser.crossover(*parents):
+            for child in self._crosser.cross(*parents):
                 if child not in self:
                     offspring.append(child)
 
