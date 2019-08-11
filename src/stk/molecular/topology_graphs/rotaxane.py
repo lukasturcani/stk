@@ -11,11 +11,133 @@ from .topology_graph import TopologyGraph, Vertex
 
 
 class _AxleVertex(Vertex):
-    ...
+    """
+    Places the axle in a :class:`NRotaxane`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
+
+    """
+
+    def place_building_block(self, building_block):
+        """
+        Place `building_block` on the :class:`.Vertex`.
+
+        `building_block` is placed such that its bonder-bonder
+        direction vector is either parallel or anti-parallel to the
+        polymer chain.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is to be placed on the
+            vertex.
+
+        Returns
+        -------
+        :class:`numpy.nadarray`
+            The position matrix of `building_block` after being
+            placed.
+
+        """
+
+        building_block.set_centroid(self._position)
+        return building_block.get_position_matrix()
+
+    def assign_func_groups_to_edges(self, building_block, fg_map):
+        return
 
 
 class _CycleVertex(Vertex):
-    ...
+    """
+    Places the cycles in a :class:`NRotaxane`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
+
+    """
+
+    def __init__(self, id, x, y, z, orientation):
+        self._orientation = orientation
+        super().__init__(id, x, y, z)
+
+    def clone(self, clear_edges=False):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            If ``True`` the :attr:`edges` attribute of the clone will
+            be empty.
+
+        Returns
+        -------
+        :class:`Vertex`
+            The clone.
+
+        """
+
+        clone = super().clone(clear_edges)
+        clone._orientation = self._orientation
+        return clone
+
+    def place_building_block(self, building_block):
+        """
+        Place `building_block` on the :class:`.Vertex`.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is to be placed on the
+            vertex.
+
+        Returns
+        -------
+        :class:`numpy.nadarray`
+            The position matrix of `building_block` after being
+            placed.
+
+        """
+
+        rdkit_mol = building_block.to_rdkit_mol()
+        macrocycle = max(rdkit.GetSymmSSSR(rdkit_mol), key=len)
+        cycle_normal = building_block.get_plane_normal(macrocycle)
+        building_block.set_centroid(
+            position=self._position,
+            atom_ids=macrocycle
+        )
+        p = [1-self._orientation, self._orientation]
+        direction = np.random.choice([1, -1], p=p)
+        building_block.apply_rotation_between_vectors(
+            start=cycle_normal,
+            target=[direction, 0, 0],
+            origin=self._position
+        )
+        return building_block.get_position_matrix()
+
+    def assign_func_groups_to_edges(self, building_block, fg_map):
+        return
+
+    def __str__(self):
+        x, y, z = self._position
+        return (
+            f'Vertex(id={self.id}, '
+            f'position={[x, y, z]}, '
+            f'orientation={self._orientation})'
+        )
 
 
 class NRotaxane(TopologyGraph):
@@ -45,9 +167,27 @@ class NRotaxane(TopologyGraph):
 
         import stk
 
+        cycle = stk.ConstructedMolecule(
+            building_blocks=[
+                stk.BuildingBlock('[Br]CC[Br]', ['bromine'])
+            ],
+            topology_graph=stk.macrocycle.Macrocycle('A', [0], 5)
+        )
+        axle = stk.ConstructedMolecule(
+            building_blocks=[
+                stk.BuildingBlock('NCCN', ['amine']),
+                stk.BuildingBlock('O=CCC=O', ['aldehyde'])
+            ],
+            topology_graph=stk.polymer.Linear('AB', [0, 0], 7)
+        )
+        rotaxane = stk.ConstructedMolecule(
+            building_blocks=[axle, cycle],
+            topology_graph=stk.rotaxane.NRotaxane('A', [0], 3)
+        )
+
     """
 
-    def __init__(self, repeating_unit, orientation, n):
+    def __init__(self, repeating_unit, orientations, n, processes=1):
         """
         Initialize a :class:`NRotaxane` instance.
 
@@ -77,9 +217,95 @@ class NRotaxane(TopologyGraph):
             The number of parallel processes to create during
             :meth:`construct`.
 
-
         """
 
         self._repeating_unit = repeating_unit
-        self._orientations = orientation
+        self._orientations = orientations
         self._n = n
+
+        vertices = [_AxleVertex(0, 0, 0, 0)]
+        threads = orientations * n
+        distance = 1 / (len(threads)-1)
+        for i, orientation in enumerate(threads):
+            vertices.append(
+                _CycleVertex(
+                    id=i+1,
+                    x=(i*distance) - 0.5,
+                    y=0,
+                    z=0,
+                    orientation=orientation
+                )
+            )
+        super().__init__(tuple(vertices), (), processes)
+
+    def _assign_building_blocks_to_vertices(
+        self,
+        mol,
+        building_blocks
+    ):
+        """
+        Assign `building_blocks` to :attr:`vertices`.
+
+        Assignment is done by modifying
+        :attr:`.ConstructedMolecule.building_block_vertices`.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` instance being
+            constructed.
+
+        building_blocks : :class:`list` of :class:`.Molecule`
+            The :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` instances which
+            represent the building block molecules used for
+            construction. Only one instance is present per building
+            block molecule, even if multiples of that building block
+            join up to form the :class:`ConstructedMolecule`.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        threads = self._repeating_unit*self._n
+        axle, *cycles = building_blocks
+        bb_map = {
+            letter: bb for letter, bb in zip(threads, cycles)
+        }
+        mol.building_block_vertices[axle].append(self.vertices[0])
+        for letter, vertex in zip(threads, self.vertices[1:]):
+            bb = bb_map[letter]
+            mol.building_block_vertices[bb].append(vertex)
+
+    def _get_scale(self, mol):
+        """
+        Get the scale used for the positions of :attr:`vertices`.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
+        Returns
+        -------
+        :class:`float` or :class:`list` of :class:`float`
+            The value by which the position of each :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
+
+        """
+
+        axle = next(iter(mol.building_block_vertices))
+        return 0.8*axle.get_maximum_diameter()
+
+    def __repr__(self):
+        return (
+            f'rotaxane.NRotaxane('
+            f'{self._repeating_unit!r}, '
+            f'{self._orientations!r}, '
+            f'{self._n}'
+            f')'
+        )

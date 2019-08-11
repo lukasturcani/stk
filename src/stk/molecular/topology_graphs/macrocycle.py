@@ -88,10 +88,6 @@ class _CycleVertex(Vertex):
         """
         Place `building_block` on the :class:`.Vertex`.
 
-        `building_block` is placed such that its bonder-bonder
-        direction vector is either parallel or anti-parallel to the
-        polymer chain.
-
         Parameters
         ----------
         building_block : :class:`.Molecule`
