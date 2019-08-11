@@ -204,7 +204,9 @@ def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
 
 
 def _test_construction(cage, num_expected_bbs):
-    cage.write(join(test_dir, f'{cage.__class__.__name__}.mol'))
+    cage.write(
+        join(test_dir, f'{cage.topology_graph.__class__.__name__}.mol')
+    )
 
     for bb in cage.get_building_blocks():
         assert cage.building_block_counter[bb] == num_expected_bbs[bb]
