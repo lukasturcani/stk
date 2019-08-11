@@ -39,6 +39,11 @@ def amine3():
     return stk.BuildingBlock('NCC(CN)CN', ['amine'])
 
 
+@pytest.fixture
+def tmp_amine3():
+    return stk.BuildingBlock('NCC(CN)CN', ['amine'])
+
+
 @pytest.fixture(scope='session')
 def amine4():
     return stk.BuildingBlock('NCC(CN)(CN)CN', ['amine'])

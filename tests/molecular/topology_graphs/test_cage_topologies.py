@@ -1,6 +1,7 @@
 import stk
 import os
 from os.path import join
+import itertools as it
 
 
 test_dir = 'cage_topology_tests_output'
@@ -8,11 +9,107 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
+def _add_test_attrs(cage):
+    cage.test_attr1 = 'something'
+    cage.test_attr2 = 12
+    cage.test_attr3 = ['12', 'something', 21]
+    cage.test_attr4 = 'skip'
+
+    bb1, bb2 = cage.building_block_vertices
+    bb1.test_attr1 = 1232
+    bb2.test_attr5 = 'alpha'
+
+    # Add some custom atom properties.
+    cage.atoms[0].some_prop = 'custom atom prop'
+    # Add some custom bond properties
+    cage.bonds[2].other_prop = 1999
+
+
+def _test_func_groups(cage, loaded):
+    fgs = it.zip_longest(cage.func_groups, loaded.func_groups)
+    for fg1, fg2 in fgs:
+        atoms = it.zip_longest(fg1.atoms, fg2.atoms)
+        bonders = it.zip_longest(fg1.bonders, fg2.bonders)
+        deleters = it.zip_longest(fg1.deleters, fg2.deleters)
+        for a1, a2 in it.chain(atoms, bonders, deleters):
+            assert a1.__class__ is a2.__class__
+            assert a1.id is a1.id
+
+
+def _test_atoms(cage, loaded):
+    for a1, a2 in zip(cage.atoms, loaded.atoms):
+        assert a1.__class__ is a2.__class__
+        d1, d2 = vars(a1), vars(a2)
+        bb1, bb2 = d1.pop('building_block'), d2.pop('building_block')
+        assert d1 == d2
+        assert bb1.is_identical(bb2)
+
+
+def _test_bonds(cage, loaded):
+    for b1, b2 in zip(cage.bonds, loaded.bonds):
+        assert b1.__class__ is b2.__class__
+        d1, d2 = vars(b1), vars(b2)
+        assert repr(d1.pop('atom1')) == repr(d2.pop('atom1'))
+        assert repr(d1.pop('atom2')) == repr(d2.pop('atom2'))
+        assert d1 == d2
+
+
+def _test_attrs(cage, loaded):
+    assert cage.test_attr1 == loaded.test_attr1
+    assert cage.test_attr2 == loaded.test_attr2
+    assert cage.test_attr3 == loaded.test_attr3
+    assert not hasattr(loaded, 'test_attr4')
+
+
+def _test_bbs(cage, loaded):
+    bbs1 = list(cage.building_block_vertices.keys())
+    bbs2 = list(loaded.building_block_vertices.keys())
+    for bb1, bb2 in it.zip_longest(bbs1, bbs2):
+        assert bb1.is_identical(bb2)
+        assert bb1 is not bb2
+        bb1_count = cage.building_block_counter[bb1]
+        bb2_count = loaded.building_block_counter[bb2]
+        assert bb1_count == bb2_count
+
+    assert bbs2[0].test_attr1 == 1232
+    assert bbs2[1].test_attr5 == 'alpha'
+
+
 def _test_dump_and_load(cage):
-    cage.dump(join(test_dir, f'{cage.__class__.__name__}.mol'))
+    path = join(
+        test_dir, f'{cage.topology_graph.__class__.__name__}.dump'
+    )
+    _add_test_attrs(cage)
+    cage.dump(
+        path=path,
+        include_attrs=[
+            'test_attr1',
+            'test_attr2',
+            'test_attr3',
+            'test_attr5'
+        ],
+        ignore_missing_attrs=True
+    )
+    loaded = stk.Molecule.load(path)
+
+    assert cage.__class__ is loaded.__class__
+    assert loaded is not cage
+    _test_func_groups(cage, loaded)
+    _test_atoms(cage, loaded)
+    _test_bonds(cage, loaded)
+
+    assert repr(loaded.topology_graph) == repr(cage.topology_graph)
+    assert (
+        len(loaded.construction_bonds) == len(cage.construction_bonds)
+    )
+    _test_attrs(cage, loaded)
+    _test_bbs(cage, loaded)
+    mol3 = stk.Molecule.load(path, use_cache=True)
+    mol4 = stk.Molecule.load(path, use_cache=True)
+    assert mol3 is mol4
 
 
-def test_dump_and_load(
+def test_topologies(
     tmp_six_plus_eight,
     tmp_one_plus_one,
     tmp_two_plus_two,
@@ -25,16 +122,35 @@ def test_dump_and_load(
     tmp_six_plus_twelve,
     tmp_eight_plus_sixteen,
     tmp_ten_plus_twenty,
-
+    tmp_two_plus_three,
+    tmp_four_plus_six,
+    tmp_four_plus_six2,
+    tmp_six_plus_nine,
+    tmp_eight_plus_twelve,
+    tmp_twenty_plus_thirty
 ):
     cages = (
-        tmp_rhombic_dodecahedron,
-        tmp_tri_capsule,
-        tmp_tri_tetrahedron,
-        tmp_tri_cube,
-        tmp_di_tetra_capsule,
+        (tmp_six_plus_eight, 6, 8),
+        (tmp_one_plus_one, 1, 1),
+        (tmp_two_plus_two, 2, 2),
+        (tmp_four_plus_four, 4, 4),
+        (tmp_twelve_plus_thirty, 12, 30),
+        (tmp_two_plus_four, 2, 4),
+        (tmp_three_plus_six, 3, 6),
+        (tmp_four_plus_eight, 4, 8),
+        (tmp_five_plus_ten, 5, 10),
+        (tmp_six_plus_twelve, 6, 12),
+        (tmp_eight_plus_sixteen, 8, 16),
+        (tmp_ten_plus_twenty, 10, 20),
+        (tmp_two_plus_three, 2, 3),
+        (tmp_four_plus_six, 4, 6),
+        (tmp_four_plus_six2, 4, 6),
+        (tmp_six_plus_nine, 6, 9),
+        (tmp_eight_plus_twelve, 8, 12),
+        (tmp_twenty_plus_thirty, 20, 30),
     )
-    for cage in cages:
+    for cage, num_expected_bb1s, num_expected_bb2s in cages:
+        _test_construction(cage, num_expected_bb1s, num_expected_bb2s)
         _test_dump_and_load(cage)
 
 
@@ -82,405 +198,59 @@ def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
     c.write(join(test_dir, f'4p6_edge_alignment.mol'))
 
 
-def test_SixPlusEight(aldehyde3, amine4):
-    rhombic_dodecahedron = stk.cage.SixPlusEight()
-    amine_fg_count = 4
-    amine_count = 6
-    aldehyde_count = 8
-
-    c = stk.ConstructedMolecule(
-        buliding_blocks=[aldehyde3, amine4],
-        topology_graph=rhombic_dodecahedron
+def _test_construction(cage, num_expected_bb1s, num_expected_bb2s):
+    cage.write(join(test_dir, f'{cage.__class__.__name__}.mol'))
+    bb1, bb2 = sorted(
+        cage.building_block_vertices,
+        key=lambda bb: len(bb.func_groups),
+        reverse=True
     )
-    c.write(join(test_dir, 'SixPlusEight.mol'))
+    num_bb1s = cage.building_block_counter[bb1]
+    num_bb2s = cage.building_block_counter[bb2]
+    num_bb1_deleters = sum(len(fg.deleters) for fg in bb1.func_groups)
+    num_bb2_deleters = sum(len(fg.deleters) for fg in bb2.func_groups)
 
-    assert c.bonds_made == amine_fg_count * amine_count
-    num_expected_atoms = (
-        len(amine4.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
+    # Check that the correct number of bonds got made.
+    assert (
+        len(cage.construction_bonds) == len(cage.topology_graph.edges)
     )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine4.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
+    assert (
+        len(cage.construction_bonds) == num_bb1s * len(bb1.func_groups)
     )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology_graph == rhombic_dodecahedron
-    assert c.building_block_counter[amine4] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_TwoPlusFour(aldehyde2, amine4):
-    capsule = stk.cage.TwoPlusFour()
-    amine_fg_count = 4
-    amine_count = 2
-    aldehyde_count = 4
-
-    c = stk.ConstructedMolecule(
-        buliding_blocks=[aldehyde2, amine4],
-        topology_graph=capsule
+    assert (
+        len(cage.construction_bonds) == num_bb2s * len(bb2.func_groups)
     )
-    c.write(join(test_dir, 'TwoPlusFour.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine4.atoms)*amine_count +
-        len(aldehyde2.atoms)*aldehyde_count -
-        c.bonds_made*3
+    # Check correct total number of atoms.
+    assert (
+        len(cage.atoms) ==
+        len(bb1.atoms)*num_bb1s
+        + len(bb2.atoms)*num_bb2s
+        - num_bb1_deleters*num_bb1s
+        - num_bb2_deleters*num_bb2s
     )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine4.bonds)*amine_count +
-        len(aldehyde2.bonds)*aldehyde_count -
-        c.bonds_made*2
+    # Check correct total number of bonds.
+    assert (
+        len(cage.bonds) ==
+        len(bb1.bonds)*num_bb1s
+        + len(bb2.bonds)*num_bb2s
+        + len(cage.construction_bonds)
+        - num_bb1_deleters*num_bb1s
+        - num_bb2_deleters*num_bb2s
     )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology_graph == capsule
-    assert c.building_block_counter[amine4] == amine_count
-    assert c.building_block_counter[aldehyde2] == aldehyde_count
-
-
-def test_ThreePlusSix(aldehyde2, amine4):
-    top = stk.cage.ThreePlusSix()
-    amine_fg_count = 4
-    amine_count = 3
-    aldehyde_count = 6
-
-    c = stk.ConstructedMolecule(
-        building_blocks=[aldehyde2, amine4],
-        topology_graph=topology_graph
-    )
-    c.write(join(test_dir, 'ThreePlusSix.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        amine4.mol.GetNumAtoms()*amine_count +
-        aldehyde2.mol.GetNumAtoms()*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine4.bonds)*amine_count +
-        len(aldehyde2.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology_graph == a
-    assert c.building_block_counter[amine4] == amine_count
-    assert c.building_block_counter[aldehyde2] == aldehyde_count
-
-
-def test_FourPlusEight(aldehyde2, amine4):
-    top = stk.cage.FourPlusEight()
-    amine_fg_count = 4
-    amine_count = 4
-    aldehyde_count = 8
-
-    c = stk.ConstructedMolecule(
-        buliding_blocks=[aldehyde2, amine4],
-        topology_graph=a
-    )
-    c.write(join(test_dir, 'FourPlusEight.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine4.atoms)*amine_count +
-        len(aldehyde2.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine4.bonds)*amine_count +
-        len(aldehyde2.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology_graph == a
-    assert c.building_block_counter[amine4] == amine_count
-    assert c.building_block_counter[aldehyde2] == aldehyde_count
-
-
-def test_FivePlusTen(aldehyde2, amine4):
-    top = stk.cage.FivePlusTen()
-    amine_fg_count = 4
-    amine_count = 5
-    aldehyde_count = 10
-
-    c = stk.ConstructedMolecule(
-        buliding_blocks=[aldehyde2, amine4],
-        topology_graph=a
+    # Check building block counts.
+    assert num_bb1s == num_expected_bb1s
+    assert num_bb2s == num_expected_bb2s
+    # Check window attributes got added
+    assert cage.num_windows == cage.topology_graph.num_windows
+    assert (
+        cage.num_window_types == cage.topology_graph.num_window_types
     )
 
-    c.write(join(test_dir, 'FivePlusTen.mol'))
 
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine4.atoms)*amine_count +
-        len(aldehyde2.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine4.bonds)*amine_count +
-        len(aldehyde2.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology_graph == a
-    assert c.building_block_counter[amine4] == amine_count
-    assert c.building_block_counter[aldehyde2] == aldehyde_count
-
-
-def test_SixPlusTwelve(aldehyde2, amine4):
-    top = stk.cage.SixPlusTwelve()
-    amine_fg_count = 4
-    amine_count = 6
-    aldehyde_count = 12
-
-    c = stk.ConstructedMolecule(
-        buliding_blocks=[aldehyde2, amine4],
-        topology_graph=a)
-
-    c.write(join(test_dir, 'SixPlusTwelve.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine4.atoms)*amine_count +
-        len(aldehyde2.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine4.bonds)*amine_count +
-        len(aldehyde2.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology_graph == a
-    assert c.building_block_counter[amine4] == amine_count
-    assert c.building_block_counter[aldehyde2] == aldehyde_count
-
-
-def test_EightPlusSixteen(aldehyde2, amine4):
-    top = stk.cage.EightPlusSixteen()
-    amine_fg_count = 4
-    amine_count = 8
-    aldehyde_count = 16
-
-    c = stk.ConstructedMolecule(
-        buliding_blocks=[aldehyde2, amine4],
-        topology_graph=a
-    )
-
-    c.write(join(test_dir, 'EightPlusSixteen.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine4.atoms)*amine_count +
-        len(aldehyde2.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine4.bonds)*amine_count +
-        len(aldehyde2.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology == a
-    assert c.building_block_counter[amine4] == amine_count
-    assert c.building_block_counter[aldehyde2] == aldehyde_count
-
-
-def test_TenPlusTwenty(aldehyde2, amine4):
-    top = stk.cage.TenPlusTwenty()
-    amine_fg_count = 4
-    amine_count = 10
-    aldehyde_count = 20
-
-    c = stk.ConstructedMolecule(
-        buliding_blocks=[amine4, aldehyde2],
-        topology_graph=a
-    )
-    c.write(join(test_dir, 'TenPlusTwenty.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    assert len(c.atoms) == (
-        len(amine4.atoms)*amine_count +
-        len(aldehyde2.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    num_expected_bonds = (
-        len(amine4.bonds)*amine_count +
-        len(aldehyde2.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology_graph == a
-    assert c.building_block_counter[amine4] == amine_count
-    assert c.building_block_counter[aldehyde2] == aldehyde_count
-
-
-def test_OnePlusOne(amine3, aldehyde3):
-    capsule = stk.cage.OnePlusOne(bb_positions={
-                            0: [0],
-                            1: [1]
-    })
-    amine_fg_count = 3
-    amine_count = 1
-    aldehyde_count = 1
-
-    c = stk.Cage([aldehyde3, amine3], capsule)
-    c.write(join(test_dir, 'OnePlusOne.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine3.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine3.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology_graph == capsule
-    assert c.building_block_counter[amine3] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_TwoPlusTwo(amine3, aldehyde3):
-    tetrahedron = stk.cage.TwoPlusTwo(bb_positions={
-                            0: [0, 1],
-                            1: [2, 3]
-    })
-    amine_fg_count = 3
-    amine_count = 2
-    aldehyde_count = 2
-
-    c = stk.ConstructedMolecule(
-        building_blocks=[aldehyde3, amine3],
-        topology_graph=tetrahedron
-    )
-    c.write(join(test_dir, 'TwoPlusTwo.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine3.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine3.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert repr(c.topology_graph) == repr(tetrahedron)
-    assert c.building_block_counter[amine3] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_FourPlusFour(amine3, aldehyde3):
-    cube = stk.cage.FourPlusFour(bb_positions={
-                                0: [4, 1, 6, 3],
-                                1: [0, 5, 2, 7]
-    })
-    amine_fg_count = 3
-    amine_count = 4
-    aldehyde_count = 4
-
-    c = stk.ConstructedMolecule(
-        building_blocks=[aldehyde3, amine3],
-        topology_graph=cube
-    )
-    c.write(join(test_dir, 'FourPlusFour.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine3.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine3.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert repr(c.topology_graph) == repr(cube)
-    assert c.building_block_counter[amine3] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_TwoPlusThree(amine2, aldehyde3):
-    capsule = stk.cage.TwoPlusThree()
-    amine_fg_count = 2
-    amine_count = 3
-    aldehyde_count = 2
-
-    c = stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde3],
-        topology_graph=capsule
-    )
-    c.write(join(test_dir, 'TwoPlusThree.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine2.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine2.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology_graph == capsule
-    assert c.building_block_counter[amine2] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_FourPlusSix(amine2, aldehyde3):
-    tetrahedron = stk.cage.FourPlusSix()
-    amine_fg_count = 2
-    amine_count = 6
-    aldehyde_count = 4
-
-    c = stk.ConstructedMolecule(
-        buliding_blocks=[amine2, aldehyde3],
-        topology_graph=tetrahedron
-    )
-    c.write(join(test_dir, 'FourPlusSix.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine2.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine2.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert repr(c.topology_graph) == repr(tetrahedron)
-    assert c.building_block_counter[amine2] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_multiFourPlusSix(amine2, amine2_alt1, amine2_alt2,
-                          aldehyde3, aldehyde3_alt1, aldehyde3_alt2):
+def test_multicage(
+    amine2, amine2_alt1, amine2_alt2,
+    aldehyde3, aldehyde3_alt1, aldehyde3_alt2
+):
     tetrahedron = stk.FourPlusSix(
                       bb_positions={
                           0: [0, 1],
@@ -534,173 +304,3 @@ def test_multiFourPlusSix(amine2, amine2_alt1, amine2_alt2,
         c.bonds_made*2
     )
     assert len(c.bonds) == num_expected_bonds
-
-
-def test_multiFourPlusFour(aldehyde3, aldehyde3_alt1, aldehyde3_alt2):
-    tetrahedron = stk.cage.FourPlusFour(
-                      bb_positions={
-                          aldehyde3: [0, 1],
-                          aldehyde3_alt1: [2, 3, 4, 6, 7],
-                          aldehyde3_alt2: [5]
-                       }
-    )
-    building_blocks = [aldehyde3, aldehyde3_alt1, aldehyde3_alt2]
-    c = stk.ConstructedMolecule(
-        building_blocks=building_blocks,
-        tetrahedron=tetrahedron
-    )
-    c.write(join(test_dir, 'multi_FourPlusFour.mol'))
-
-    assert c.building_block_counter[aldehyde3] == 2
-    assert c.building_block_counter[aldehyde3_alt1] == 5
-    assert c.building_block_counter[aldehyde3_alt2] == 1
-
-
-def test_FourPlusSix2(amine2, aldehyde3):
-    top = stk.cage.FourPlusSix2()
-    amine_fg_count = 2
-    amine_count = 6
-    aldehyde_count = 4
-
-    c = stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde3],
-        topology_graph=a
-    )
-    c.write(join(test_dir, 'FourPlusSix2.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine2.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine2.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert repr(c.topology_graph) == repr(a)
-    assert c.building_block_counter[amine2] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_SixPlusNine(amine2, aldehyde3):
-    triangular_prism = stk.cage.SixPlusNine()
-    amine_fg_count = 2
-    amine_count = 9
-    aldehyde_count = 6
-
-    c = stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde3],
-        topology_graph=triangular_prism
-    )
-    c.write(join(test_dir, 'SixPlusNine.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine2.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine2.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert c.topology == triangular_prism
-    assert c.building_block_counter[amine2] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_EightPlusTwelve(amine2, aldehyde3):
-    cube = stk.cage.EightPlusTwelve()
-    amine_fg_count = 2
-    amine_count = 12
-    aldehyde_count = 8
-
-    c = stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde3],
-        topology_graph=cube
-    )
-    c.write(join(test_dir, 'EightPlusTwelve.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine2.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine2.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert repr(c.topology_graph) == repr(cube)
-    assert c.building_block_counter[amine2] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_TwentyPlusThirty(amine2, aldehyde3):
-    dodecahedron = stk.cage.TenPlusTwenty()
-    amine_fg_count = 2
-    amine_count = 30
-    aldehyde_count = 20
-
-    c = stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde3],
-        topology_graph=dodecahedron
-    )
-    c.write(join(test_dir, 'Dodecahedron.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine2.atoms)*amine_count +
-        len(aldehyde3.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine2.bonds)*amine_count +
-        len(aldehyde3.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert repr(c.topology_graph) == repr(dodecahedron)
-    assert c.building_block_counter[amine2] == amine_count
-    assert c.building_block_counter[aldehyde3] == aldehyde_count
-
-
-def test_A(amine2, aldehyde5):
-    icosahedron = stk.cage.A()
-    amine_fg_count = 2
-    amine_count = 30
-    aldehyde_count = 12
-
-    c = stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde5],
-        topology_graph=icosahedron
-    )
-    c.write(join(test_dir, 'Icosahedron.mol'))
-
-    assert c.bonds_made == amine_fg_count*amine_count
-    num_expected_atoms = (
-        len(amine2.atoms)*amine_count +
-        len(aldehyde5.atoms)*aldehyde_count -
-        c.bonds_made*3
-    )
-    assert len(c.atoms) == num_expected_atoms
-    num_expected_bonds = (
-        len(amine2.bonds)*amine_count +
-        len(aldehyde5.bonds)*aldehyde_count -
-        c.bonds_made*2
-    )
-    assert len(c.bonds) == num_expected_bonds
-    assert repr(c.topology_graph) == repr(icosahedron)
-    assert c.building_block_counter[amine2] == amine_count
-    assert c.building_block_counter[aldehyde5] == aldehyde_count

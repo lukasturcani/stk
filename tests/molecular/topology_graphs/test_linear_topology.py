@@ -11,7 +11,7 @@ if not os.path.exists(test_dir):
 
 def test_dump_and_load(tmp_polymer):
 
-    path = join('constructed_molecule_tests_output', 'mol.dump')
+    path = join(test_dir, 'mol.dump')
 
     tmp_polymer.test_attr1 = 'something'
     tmp_polymer.test_attr2 = 12
