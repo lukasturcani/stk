@@ -121,6 +121,14 @@ def tmp_two_plus_three(tmp_amine2, tmp_aldehyde3):
     )
 
 
+@pytest.fixture(scope='session')
+def four_plus_six(amine2, aldehyde3):
+    return stk.ConstructedMolecule(
+        building_blocks=[amine2, aldehyde3],
+        topology_graph=stk.cage.FourPlusSix()
+    )
+
+
 @pytest.fixture
 def tmp_four_plus_six(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
