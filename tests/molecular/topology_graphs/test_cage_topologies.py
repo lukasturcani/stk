@@ -3,7 +3,7 @@ import os
 from os.path import join
 
 
-from ...._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load
 
 
 test_dir = 'cage_topology_tests_output'
