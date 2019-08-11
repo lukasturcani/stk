@@ -21,13 +21,16 @@ except OSError:
     # When testing os.get_terminal_size() will fail because stdout is
     # not connceted to a terminal.
     f = '\n' + '='*100 + '\n\n'
-formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
-                                     '%(name)s - %(message)s'),
-                              datefmt='%H:%M:%S')
+formatter = logging.Formatter(
+    fmt=f+('%(asctime)s - %(levelname)s - %(name)s - %(message)s'),
+    datefmt='%H:%M:%S'
+)
 
 # Define logging handlers.
-errorhandler = logging.FileHandler('output/scratch/errors.log',
-                                   delay=True)
+errorhandler = logging.FileHandler(
+    'output/scratch/errors.log',
+    delay=True
+)
 errorhandler.setLevel(logging.ERROR)
 
 streamhandler = logging.StreamHandler()
@@ -68,11 +71,13 @@ class GAHistory:
 
     """
 
-    def __init__(self,
-                 fitness_calculator,
-                 log_file,
-                 progress_dump,
-                 database_dump):
+    def __init__(
+        self,
+        fitness_calculator,
+        log_file,
+        progress_dump,
+        database_dump
+    ):
         self.fitness_calculator = fitness_calculator
         self.log_file = log_file
         self.progress_dump = progress_dump
@@ -98,7 +103,7 @@ class GAHistory:
         """
 
         if self.database_dump:
-            self.db_pop.add_members(mols)
+            self.db_pop.add_members(mols, duplicate_key=id)
 
     def dump(self):
         """
@@ -136,7 +141,7 @@ class GAHistory:
     def log_file_content(progress):
         for sp in progress.populations:
             for mol in sp:
-                yield f'{mol.name} {mol.key} {mol.fitness}'
+                yield f'{mol.id} {mol}'
             yield '\n'
 
     def log_pop(self, logger, pop):
@@ -187,8 +192,7 @@ class GAHistory:
 
     def pop_log_content(self, pop, underline):
         for i, mol in enumerate(pop, 1):
-            key = (mol.key, -1)
-            fitness = self.fitness_calculator.cache[key]
+            fitness = self.fitness_calculator._cache[mol]
             yield (
                 f'{i:<10}\t{mol.name:<10}\t\t{fitness!r:<40}\t'
                 f'{mol.fitness}\n{underline}'
@@ -253,15 +257,17 @@ def ga_run(filename, input_file):
         logging_level = input_file.logging_level
     rootlogger.setLevel(logging_level)
 
-    pop.set_ga_tools(generation_selector=generation_selector,
-                     mutation_selector=mutation_selector,
-                     crossover_selector=crossover_selector,
-                     mutator=mutator,
-                     crosser=crosser)
+    pop.set_ga_tools(
+        generation_selector=generation_selector,
+        mutation_selector=mutation_selector,
+        crossover_selector=crossover_selector,
+        mutator=mutator,
+        crosser=crosser
+    )
 
     # GA optimizer and fitness calculator should always use the cache.
-    optimizer.use_cache = True
-    fitness_calculator.use_cache = True
+    optimizer._use_cache = True
+    fitness_calculator._use_cache = True
 
     # 2. Set up the directory structure.
 
@@ -287,14 +293,16 @@ def ga_run(filename, input_file):
     os.chdir('scratch')
     open('errors.log', 'w').close()
 
-    history = GAHistory(fitness_calculator=fitness_calculator,
-                        log_file=log_file,
-                        database_dump=database_dump,
-                        progress_dump=progress_dump)
+    history = GAHistory(
+        fitness_calculator=fitness_calculator,
+        log_file=log_file,
+        database_dump=database_dump,
+        progress_dump=progress_dump
+    )
     progress = history.progress
 
     # 3. Run the GA.
-    id_ = pop.assign_names_from(0)
+    id_ = pop.set_mol_ids(0)
     logger.info('Optimizing the population.')
     pop.optimize(optimizer, processes)
 
@@ -316,16 +324,16 @@ def ga_run(filename, input_file):
         logger.info(f'Starting generation {gen}.')
 
         logger.info('Starting crossovers.')
-        offspring = pop.gen_offspring()
+        offspring = pop.get_offspring()
 
         logger.info('Starting mutations.')
-        mutants = pop.gen_mutants()
+        mutants = pop.get_mutants()
 
         logger.debug(f'Population size is {len(pop)}.')
 
         logger.info('Adding offsping and mutants to population.')
-        pop.members.extend(offspring)
-        pop.members.extend(mutants)
+        pop.direct_members.extend(offspring)
+        pop.direct_members.extend(mutants)
 
         logger.debug(f'Population size is {len(pop)}.')
 
@@ -334,7 +342,7 @@ def ga_run(filename, input_file):
 
         logger.debug(f'Population size is {len(pop)}.')
 
-        id_ = pop.assign_names_from(id_)
+        id_ = pop.set_mol_ids(id_)
 
         if debug_dumps:
             pop.dump(
@@ -354,7 +362,7 @@ def ga_run(filename, input_file):
         history.db(pop)
 
         logger.info('Selecting members of the next generation.')
-        pop = pop.gen_next_gen()
+        pop = pop.get_next_gen()
 
         history.log_pop(logger, pop)
 
@@ -371,12 +379,12 @@ def ga_run(filename, input_file):
     progress.calculate_member_fitness(fitness_calculator, processes)
     # Keep the fitness of failed molecules as None. Plotters can ignore
     # these values to make better graphs.
-    handle_failed = fitness_normalizer.handle_failed
-    fitness_normalizer.handle_failed = False
+    handle_failed = fitness_normalizer._handle_failed
+    fitness_normalizer._handle_failed = False
     fitness_normalizer.normalize(progress)
     for plotter in plotters:
         plotter.plot(progress)
-    fitness_normalizer.handle_failed = handle_failed
+    fitness_normalizer._handle_failed = handle_failed
 
     os.chdir(root_dir)
     os.rename('scratch/errors.log', 'errors.log')
@@ -394,8 +402,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='python -m stk.ga')
 
     parser.add_argument('input_file', type=str)
-    parser.add_argument('-l', '--loops', type=int, default=1,
-                        help='The number times the GA should be run.')
+    parser.add_argument(
+        '-l', '--loops', type=int, default=1,
+        help='The number times the GA should be run.'
+    )
 
     args = parser.parse_args()
     loader = SourceFileLoader('input_file', args.input_file)
