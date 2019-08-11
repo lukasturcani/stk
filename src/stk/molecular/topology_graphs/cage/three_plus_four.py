@@ -9,11 +9,12 @@ from ..topology_graph import Edge
 
 class SixPlusEight(Cage):
     """
-    Represents a rhombinc dodecahedron cage topology graph.
+    Represents a cage topology graph.
+
+    Building blocks with three and four functional groups are required
+    for this topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image:: https://github.com/lukasturcani/stk_images/cages/six_plus_eight.png
 
     Attributes
     ----------

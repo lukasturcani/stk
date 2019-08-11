@@ -16,8 +16,6 @@ class TwoPlusFour(Cage):
 
     See :class:`.Cage` for more details and examples.
 
-    .. image::
-
     Attributes
     ----------
     vertices : :class:`tuple` of :class:`.Vertex`
@@ -55,11 +53,9 @@ class TwoPlusFour(Cage):
 
 class ThreePlusSix(Cage):
     """
-    Represents a  cage topology graph.
+    Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------
@@ -114,11 +110,9 @@ class ThreePlusSix(Cage):
 
 class FourPlusEight(Cage):
     """
-    Represents a  cage topology graph.
+    Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------
@@ -187,8 +181,6 @@ class FivePlusTen(Cage):
     Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------
@@ -267,8 +259,6 @@ class SixPlusTwelve(Cage):
 
     See :class:`.Cage` for more details and examples.
 
-    .. image::
-
     Attributes
     ----------
     vertices : :class:`tuple` of :class:`.Vertex`
@@ -346,8 +336,6 @@ class EightPlusSixteen(Cage):
     Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------
@@ -456,8 +444,6 @@ class TenPlusTwenty(Cage):
     Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------

@@ -15,8 +15,6 @@ class OnePlusOne(Cage):
 
     See :class:`.Cage` for more details and examples.
 
-    .. image::
-
     Attributes
     ----------
     vertices : :class:`tuple` of :class:`.Vertex`
@@ -48,8 +46,6 @@ class TwoPlusTwo(Cage):
     Represents a tetrahedron cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------
@@ -89,8 +85,6 @@ class FourPlusFour(Cage):
     Represents a cube cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------

@@ -8,8 +8,34 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def test_dump_and_load():
-    assert False
+def _test_dump_and_load(cage):
+    cage.dump(join(test_dir, f'{cage.__class__.__name__}.mol'))
+
+
+def test_dump_and_load(
+    tmp_six_plus_eight,
+    tmp_one_plus_one,
+    tmp_two_plus_two,
+    tmp_four_plus_four,
+    tmp_twelve_plus_thirty,
+    tmp_two_plus_four,
+    tmp_three_plus_six,
+    tmp_four_plus_eight,
+    tmp_five_plus_ten,
+    tmp_six_plus_twelve,
+    tmp_eight_plus_sixteen,
+    tmp_ten_plus_twenty,
+
+):
+    cages = (
+        tmp_rhombic_dodecahedron,
+        tmp_tri_capsule,
+        tmp_tri_tetrahedron,
+        tmp_tri_cube,
+        tmp_di_tetra_capsule,
+    )
+    for cage in cages:
+        _test_dump_and_load(cage)
 
 
 def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):

@@ -11,11 +11,9 @@ from ..topology_graph import Edge
 
 class TwoPlusThree(Cage):
     """
-    Represents a capsule cage topology graph.
+    Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------
@@ -52,7 +50,7 @@ class TwoPlusThree(Cage):
 
 class FourPlusSix(Cage):
     """
-    Represents a tetrahedron cage topology graph.
+    Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
 
@@ -113,8 +111,6 @@ class FourPlusSix2(Cage):
 
     See :class:`.Cage` for more details and examples.
 
-    .. image::
-
     Attributes
     ----------
     vertices : :class:`tuple` of :class:`.Vertex`
@@ -164,11 +160,9 @@ class FourPlusSix2(Cage):
 
 class SixPlusNine(Cage):
     """
-    Represents a triangular prism cage topology graph.
+    Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------
@@ -229,11 +223,9 @@ class SixPlusNine(Cage):
 
 class EightPlusTwelve(Cage):
     """
-    Represents a cube cage topology graph.
+    Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------
@@ -321,11 +313,9 @@ class EightPlusTwelve(Cage):
 
 class TwentyPlusThirty(Cage):
     """
-    Represents a dodecahedron cage topology graph.
+    Represents a cage topology graph.
 
     See :class:`.Cage` for more details and examples.
-
-    .. image::
 
     Attributes
     ----------
