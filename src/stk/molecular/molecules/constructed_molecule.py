@@ -264,6 +264,19 @@ class ConstructedMolecule(Molecule):
         for id_, func_group in enumerate(self.func_groups):
             func_group.id = id_
 
+    def get_building_blocks(self):
+        """
+        Yield the building blocks.
+
+        Yields
+        ------
+        :class:`.Molecule`
+            A building block of the :class:`ConstructedMolecule`.
+
+        """
+
+        yield from self.building_block_vertices.keys()
+
     def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """
         Return a :class:`dict` representation.

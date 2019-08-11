@@ -3,17 +3,18 @@ Defines cages made from building blocks with 3 and 4 functional groups.
 
 """
 
-from .base import CageTopology, _CageVertex
+from .base import Cage, _CageVertex
 from ..topology_graph import Edge
 
 
-class SixPlusEight(CageTopology):
+class SixPlusEight(Cage):
     """
-    Represents a rhombinc dodecahedron cage topology graph.
+    Represents a cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
+    Building blocks with three and four functional groups are required
+    for this topology graph.
 
-    .. image:: https://github.com/lukasturcani/stk_images/cages/six_plus_eight.png
+    See :class:`.Cage` for more details and examples.
 
     Attributes
     ----------

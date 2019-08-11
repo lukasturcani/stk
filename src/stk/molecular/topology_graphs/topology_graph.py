@@ -22,7 +22,7 @@ import numpy as np
 from collections import defaultdict
 
 from ..reactor import Reactor
-from ...utilities import vector_theta
+from ...utilities import vector_angle
 
 
 class Vertex:
@@ -64,6 +64,9 @@ class Vertex:
         self.id = id
         self._position = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
+        # This holds the ConstructedMolecule that the vertex is used
+        # to construct.
+        self._mol = None
 
     @classmethod
     def init_at_center(cls, id, *vertices):
@@ -147,6 +150,43 @@ class Vertex:
         """
 
         return np.array(self._position)
+
+    def set_position(self, position):
+        """
+        Set the position of the vertex.
+
+        Parameters
+        ----------
+        :class:`numpy.ndarray`
+            The new position of the vertex.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
+        self._position = np.array(position)
+        return self
+
+    def set_contructed_molecule(self, mol):
+        """
+        Set the :class:`.ConstructedMolecule` being constructed.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
+        self._mol = mol
 
     def place_building_block(self, building_block):
         """
@@ -287,9 +327,43 @@ class Vertex:
         centroid = np.sum(edge_positions, axis=0) / i
         normal = np.linalg.svd(edge_positions - centroid)[-1][2, :]
 
-        if vector_theta(normal, reference) > np.pi/2:
+        if vector_angle(normal, reference) > np.pi/2:
             normal *= -1
         return normal
+
+    def _get_molecule_centroid(self, atom_ids=None):
+        """
+        Get the centroid of the molecule being constructed.
+
+        During construction :meth:`.Molecule.get_centroid` cannot be
+        used, because the molecule is not fully constructed yet. This
+        method acts as its replacement during construction.
+
+        Parameters
+        ----------
+        atom_ids : :class:`iterable` of :class:`int`, optional
+            The ids of atoms which are used to calculate the
+            centroid. If ``None``, then all atoms will be used.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The centroid of atoms specified by `atom_ids`.
+
+        """
+
+        if atom_ids is None:
+            atom_ids = range(len(self.atoms))
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
+
+        return np.divide(
+            np.sum(
+                np.array(self._mol._position_matrix)[atom_ids, :],
+                axis=0
+            ),
+            len(atom_ids)
+        )
 
     def __str__(self):
         x, y, z = self._position
@@ -441,6 +515,24 @@ class Edge:
 
         return np.array(self._position)
 
+    def set_position(self, position):
+        """
+        Set the position.
+
+        Parameters
+        ----------
+        position : :class:`numpy.ndarray`
+            The new position of the edge.
+
+        Returns
+        -------
+        :class:`Edge`
+            The edge.
+
+        """
+
+        self._position = np.array(position)
+
     def __str__(self):
         return repr(self)
 
@@ -503,7 +595,7 @@ class TopologyGraph:
         edges : :class:`tuple` of :class:`.Edge`
             The edges which make up the graph.
 
-        processes : :class:`int`, optional
+        processes : :class:`int`
             The number of parallel processes to create during
             :meth:`construct`.
 
@@ -547,12 +639,14 @@ class TopologyGraph:
                 mol.building_block_vertices
             )
 
-        vertex_clones = self._clone_vertices()
+        vertex_clones = self._clone_vertices(mol)
         edge_clones = self._clone_edges(vertex_clones)
 
         self._prepare(mol)
         self._place_building_blocks(mol, vertex_clones)
-
+        vertex_clones, edge_clones = (
+            self._before_react(mol, vertex_clones, edge_clones)
+        )
         reactor = Reactor(mol)
         for edge in edge_clones:
             reactor.add_reaction(
@@ -629,7 +723,7 @@ class TopologyGraph:
 
         raise NotImplementedError()
 
-    def _clone_vertices(self):
+    def _clone_vertices(self, mol):
         """
         Create clones of :attr:`vertices`.
 
@@ -640,6 +734,11 @@ class TopologyGraph:
         original :class:`.Vertex` objects is not
         changed by the construction process.
 
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
         Returns
         -------
         :class:`dict`
@@ -647,10 +746,12 @@ class TopologyGraph:
 
         """
 
-        return {
-            vertex: vertex.clone(clear_edges=True)
-            for vertex in self.vertices
-        }
+        clones = {}
+        for vertex in self.vertices:
+            clone = vertex.clone(clear_edges=True)
+            clone.set_contructed_molecule(mol)
+            clones[vertex] = clone
+        return clones
 
     def _clone_edges(self, vertex_clones):
         """
@@ -673,6 +774,9 @@ class TopologyGraph:
         for edge in self.edges:
             edges.append(edge.clone(vertex_clones))
         return edges
+
+    def _before_react(self, mol, vertex_clones, edge_clones):
+        return vertex_clones, edge_clones
 
     def _prepare(self, mol):
         """

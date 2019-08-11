@@ -32,19 +32,3 @@ def polymer_alt2(amine2_alt2, aldehyde2_alt2, ab_chain3):
         building_blocks=[aldehyde2_alt2, amine2_alt2],
         topology_graph=ab_chain3
     )
-
-
-@pytest.fixture
-def tmp_cage(tmp_amine2, tmp_aldehyde3):
-    return stk.ConstructedMolecule(
-        building_blocks=[tmp_amine2, tmp_aldehyde3],
-        topology_graph=stk.cage.EightPlusTwelve()
-    )
-
-
-@pytest.fixture
-def tmp_tetrahedron(tmp_amine2, tmp_aldehyde3):
-    return stk.ConstructedMolecule(
-        building_blocks=[tmp_amine2, tmp_aldehyde3],
-        topology_graph=stk.cage.FourPlusSix()
-    )

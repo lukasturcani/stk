@@ -19,7 +19,7 @@ from .. import bonds
 from ..bonds import Bond
 from .molecule import Molecule
 from ..functional_groups import fg_types
-from ...utilities import normalize_vector, vector_theta, dedupe
+from ...utilities import normalize_vector, vector_angle, dedupe
 
 
 logger = logging.getLogger(__name__)
@@ -582,7 +582,7 @@ class BuildingBlock(Molecule):
         cc_vector = self.get_centroid_centroid_direction_vector(
             fg_ids=fg_ids
         )
-        if vector_theta(normal, cc_vector) > np.pi/2:
+        if vector_angle(normal, cc_vector) > np.pi/2:
             normal *= -1
         return normal
 
@@ -709,14 +709,14 @@ class BuildingBlock(Molecule):
         # the centroid - centroid vector should be orthogonal to the
         # bonder direction vector.
         if np.allclose(centroid, bonder_centroid, 1e-5):
-            *_, bvec = self.get_bonder_direction_vectors(
+            *_, bvec = next(self.get_bonder_direction_vectors(
                 fg_ids=fg_ids
-            )
+            ))
             # Construct a secondary vector by finding the minimum
             # component of bvec and setting it to 0.
             vec2 = list(bvec)
             minc = min(vec2)
-            vec2[vec2.index(min(vec2))] = 0 if abs(minc) >= 1e-5 else 1
+            vec2[vec2.index(minc)] = 0 if abs(minc) >= 1e-5 else 1
             # Get a vector orthogonal to bvec and vec2.
             return normalize_vector(np.cross(bvec, vec2))
 
@@ -829,7 +829,10 @@ class BuildingBlock(Molecule):
         if functional_groups is None:
             functional_groups = ()
         functional_groups = sorted(functional_groups)
-        return (*functional_groups, rdkit.MolToInchi(mol))
+        return (
+            *functional_groups,
+            rdkit.MolToSmiles(mol, canonical=True)
+        )
 
     def __str__(self):
         smiles = rdkit.MolToSmiles(rdkit.RemoveHs(self.to_rdkit_mol()))

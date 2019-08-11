@@ -5,17 +5,15 @@ Defines cages made from building blocks with 2 and 5 functional groups.
 
 from scipy.constants import golden
 
-from .base import CageTopology, _CageVertex
+from .base import Cage, _CageVertex
 from ..topology_graph import Edge
 
 
-class TwelvePlusThirty(CageTopology):
+class TwelvePlusThirty(Cage):
     """
     Represents a icosahedron cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
-
-    .. image::
+    See :class:`.Cage` for more details and examples.
 
     Attributes
     ----------

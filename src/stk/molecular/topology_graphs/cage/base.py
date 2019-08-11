@@ -2,12 +2,12 @@ import numpy as np
 from collections import defaultdict
 
 from ..topology_graph import TopologyGraph, Vertex
-from ....utilities import vector_theta
+from ....utilities import vector_angle
 
 
 class _CageVertex(Vertex):
     """
-    Represents a vertex of a :class:`.CageTopology`.
+    Represents a vertex of a :class:`.Cage`.
 
     Attributes
     ----------
@@ -43,9 +43,12 @@ class _CageVertex(Vertex):
 
         """
 
+        # _neighbor_positions holds the bonder centroids of functional
+        # groups on neighbor vertices connected to this vertex.
+        self._neighbor_positions = []
         self.aligner_edge = None
-        # id will be set automatically by CageTopology. This is because
-        # _CageVertex is defined manually in a subclass of CageTopology
+        # id will be set automatically by Cage. This is because
+        # _CageVertex is defined manually in a subclass of Cage
         # and writing the id for every vertex would be a pain.
         super().__init__(None, x, y, z)
 
@@ -90,6 +93,7 @@ class _CageVertex(Vertex):
 
         clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
+        clone._neighbor_positions = list(self._neighbor_positions)
         return clone
 
     def place_building_block(self, building_block):
@@ -110,9 +114,18 @@ class _CageVertex(Vertex):
 
         """
 
+        if len(self._neighbor_positions) == len(self.edges):
+            self._update_position()
+
         if len(building_block.func_groups) == 2:
             return self._place_linear_building_block(building_block)
         return self._place_nonlinear_building_block(building_block)
+
+    def _update_position(self):
+        self._position = np.divide(
+            np.sum(self._neighbor_positions, axis=0),
+            len(self._neighbor_positions)
+        )
 
     def _place_linear_building_block(self, building_block):
         """
@@ -150,7 +163,7 @@ class _CageVertex(Vertex):
         start = building_block.get_centroid_centroid_direction_vector()
         e0_coord = self.edges[0].get_position()
         e1_coord = self.edges[1].get_position()
-        building_block.apply_rotation_to_minimize_theta(
+        building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=self._position,
             axis=e0_coord-e1_coord,
@@ -194,7 +207,7 @@ class _CageVertex(Vertex):
         start = fg_bonder_centroid - self._position
         edge_coord = self.aligner_edge.get_position()
         target = edge_coord - self._get_edge_centroid()
-        building_block.apply_rotation_to_minimize_theta(
+        building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=target,
             axis=edge_normal,
@@ -233,14 +246,33 @@ class _CageVertex(Vertex):
         """
 
         if len(building_block.func_groups) == 2:
-            return self._assign_func_groups_to_linear_edges(
+            r = self._assign_func_groups_to_linear_edges(
                 building_block=building_block,
                 fg_map=fg_map
             )
-        return self._assign_func_groups_to_nonlinear_edges(
-            building_block=building_block,
-            fg_map=fg_map
-        )
+        else:
+            r = self._assign_func_groups_to_nonlinear_edges(
+                building_block=building_block,
+                fg_map=fg_map
+            )
+
+        bb_fgs = set(fg_map.values())
+
+        for edge in self.edges:
+            for vertex in edge.vertices:
+                if vertex is self:
+                    continue
+
+                for func_group in edge.get_func_groups():
+                    if func_group not in bb_fgs:
+                        continue
+
+                    vertex._neighbor_positions.append(
+                        self._get_molecule_centroid(
+                            atom_ids=func_group.get_bonder_ids()
+                        )
+                    )
+        return r
 
     def _assign_func_groups_to_linear_edges(
         self,
@@ -326,7 +358,7 @@ class _CageVertex(Vertex):
                 atom_ids=func_group.get_bonder_ids()
             )
             fg_direction = coord-bonder_centroid
-            theta = vector_theta(fg0_direction, fg_direction)
+            theta = vector_angle(fg0_direction, fg_direction)
 
             projection = fg_direction @ axis
             if theta > 0 and projection < 0:
@@ -345,7 +377,7 @@ class _CageVertex(Vertex):
         def angle(edge):
             coord = edge.get_position()
             edge_direction = coord - edge_centroid
-            theta = vector_theta(
+            theta = vector_angle(
                 vector1=edge_direction,
                 vector2=aligner_edge_direction
             )
@@ -366,7 +398,7 @@ class _CageVertex(Vertex):
         )
 
 
-class CageTopology(TopologyGraph):
+class Cage(TopologyGraph):
     """
     Represents a cage topology graph.
 
@@ -374,7 +406,7 @@ class CageTopology(TopologyGraph):
     :attr:`vertices` and :attr:`edges` of the topology as class
     attributes.
 
-    A :class:`CageTopology` subclass will add the attributes
+    A :class:`Cage` subclass will add the attributes
     :attr:`num_windows` and :attr:`num_window_types` to each
     :class:`.ConstructedMolecule`.
 
@@ -388,7 +420,7 @@ class CageTopology(TopologyGraph):
 
     Examples
     --------
-    :class:`CageTopology` instances can be made without supplying
+    :class:`Cage` instances can be made without supplying
     additional arguments (using :class:`.FourPlusSix` as an example)
 
     .. code-block:: python
@@ -407,8 +439,8 @@ class CageTopology(TopologyGraph):
 
     .. code-block:: python
 
-        v0 = stk.FourPlusSix.vertices[0]
-        v2 = stk.FourPlusSix.vertices[2]
+        v0 = stk.cage.FourPlusSix.vertices[0]
+        v2 = stk.cage.FourPlusSix.vertices[2]
         tetrahedron = stk.cage.FourPlusSix(
             vertex_alignments={
                 v0: v0.edges[1],
@@ -432,8 +464,8 @@ class CageTopology(TopologyGraph):
 
         # Use the class vertices and edges to set vertex_alignments
         # and create a topology graph.
-        v0 = stk.FourPlusSix.vertices[0]
-        v2 = stk.FourPlusSix.vertices[2]
+        v0 = stk.cage.FourPlusSix.vertices[0]
+        v2 = stk.cage.FourPlusSix.vertices[2]
         tetrahedron = stk.cage.FourPlusSix(
             vertex_alignments={
                 v0: v0.edges[1],
@@ -458,7 +490,7 @@ class CageTopology(TopologyGraph):
     instances into `building_blocks` as you like. If you do not
     assign where each building block is placed with
     `building_block_vertices`, they will be placed on the
-    :atttr:`vertices` of the :class:`.CageTopology` at random. Random
+    :atttr:`vertices` of the :class:`.Cage` at random. Random
     placement will account for the fact that the length of
     :attr:`.BuildingBlock.func_groups` needs to match the number of
     edges connected to a vertex.
@@ -472,9 +504,9 @@ class CageTopology(TopologyGraph):
 
     def __init__(self, vertex_alignments=None, processes=1):
         """
-        Initialize a :class:`.CageTopology`.
+        Initialize a :class:`.Cage`.
 
-        Parmaeters
+        Parameters
         ----------
         vertex_alignments : :class:`dict`, optional
             A mapping from a :class:`.Vertex` in :attr:`vertices`
@@ -570,6 +602,36 @@ class CageTopology(TopologyGraph):
         for vertex in self.vertices:
             bb = np.random.choice(bb_by_degree[len(vertex.edges)])
             mol.building_block_vertices[bb].append(vertex)
+
+    def _prepare(self, mol):
+        """
+        Do preprocessing on `mol` before construction.
+
+        Parameters
+        ----------
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        # Order the building blocks by number of functional groups
+        # so that building blocks with more functional groups are
+        # always placed first.
+
+        bb_verts = dict()
+        bbs = sorted(
+            mol.building_block_vertices,
+            key=lambda bb: len(bb.func_groups),
+            reverse=True
+        )
+        for bb in bbs:
+            bb_verts[bb] = mol.building_block_vertices[bb]
+        mol.building_block_vertices = bb_verts
+        return super()._prepare(mol)
 
     def _clean_up(self, mol):
         mol.num_windows = self.num_windows

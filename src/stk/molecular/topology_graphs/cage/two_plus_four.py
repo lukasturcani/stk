@@ -6,17 +6,15 @@ Defines cages made from building blocks with 2 and 4 functional groups.
 
 import numpy as np
 
-from .base import CageTopology,  _CageVertex
+from .base import Cage,  _CageVertex
 from ..topology_graph import Edge
 
 
-class TwoPlusFour(CageTopology):
+class TwoPlusFour(Cage):
     """
     Represents a capsule cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
-
-    .. image::
+    See :class:`.Cage` for more details and examples.
 
     Attributes
     ----------
@@ -53,13 +51,11 @@ class TwoPlusFour(CageTopology):
     num_window_types = 1
 
 
-class ThreePlusSix(CageTopology):
+class ThreePlusSix(Cage):
     """
-    Represents a  cage topology graph.
+    Represents a cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
-
-    .. image::
+    See :class:`.Cage` for more details and examples.
 
     Attributes
     ----------
@@ -112,13 +108,11 @@ class ThreePlusSix(CageTopology):
     num_window_types = 2
 
 
-class FourPlusEight(CageTopology):
+class FourPlusEight(Cage):
     """
-    Represents a  cage topology graph.
+    Represents a cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
-
-    .. image::
+    See :class:`.Cage` for more details and examples.
 
     Attributes
     ----------
@@ -182,13 +176,11 @@ class FourPlusEight(CageTopology):
     num_window_types = 2
 
 
-class FivePlusTen(CageTopology):
+class FivePlusTen(Cage):
     """
     Represents a cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
-
-    .. image::
+    See :class:`.Cage` for more details and examples.
 
     Attributes
     ----------
@@ -261,13 +253,11 @@ class FivePlusTen(CageTopology):
     num_window_types = 2
 
 
-class SixPlusTwelve(CageTopology):
+class SixPlusTwelve(Cage):
     """
     Represents a cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
-
-    .. image::
+    See :class:`.Cage` for more details and examples.
 
     Attributes
     ----------
@@ -341,13 +331,11 @@ class SixPlusTwelve(CageTopology):
     num_window_types = 1
 
 
-class EightPlusSixteen(CageTopology):
+class EightPlusSixteen(Cage):
     """
     Represents a cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
-
-    .. image::
+    See :class:`.Cage` for more details and examples.
 
     Attributes
     ----------
@@ -451,13 +439,11 @@ class EightPlusSixteen(CageTopology):
     num_window_types = 2
 
 
-class TenPlusTwenty(CageTopology):
+class TenPlusTwenty(Cage):
     """
     Represents a cage topology graph.
 
-    See :class:`.CageTopology` for more details and examples.
-
-    .. image::
+    See :class:`.Cage` for more details and examples.
 
     Attributes
     ----------

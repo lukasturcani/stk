@@ -7,94 +7,261 @@ Defines rotaxane topologies.
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
-from .topology_graph import TopologyGraph
-from ...utilities import dedupe
+from .topology_graph import TopologyGraph, Vertex
+
+
+class _AxleVertex(Vertex):
+    """
+    Places the axle in a :class:`NRotaxane`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
+
+    """
+
+    def place_building_block(self, building_block):
+        """
+        Place `building_block` on the :class:`.Vertex`.
+
+        `building_block` is placed such that its bonder-bonder
+        direction vector is either parallel or anti-parallel to the
+        polymer chain.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is to be placed on the
+            vertex.
+
+        Returns
+        -------
+        :class:`numpy.nadarray`
+            The position matrix of `building_block` after being
+            placed.
+
+        """
+
+        building_block.set_centroid(self._position)
+        return building_block.get_position_matrix()
+
+    def assign_func_groups_to_edges(self, building_block, fg_map):
+        return
+
+
+class _CycleVertex(Vertex):
+    """
+    Places the cycles in a :class:`NRotaxane`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    edges : :class:`list` of :class:`.Edge`
+        The edges the :class:`Vertex` is connected to.
+
+    """
+
+    def __init__(self, id, x, y, z, orientation):
+        self._orientation = orientation
+        super().__init__(id, x, y, z)
+
+    def clone(self, clear_edges=False):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            If ``True`` the :attr:`edges` attribute of the clone will
+            be empty.
+
+        Returns
+        -------
+        :class:`Vertex`
+            The clone.
+
+        """
+
+        clone = super().clone(clear_edges)
+        clone._orientation = self._orientation
+        return clone
+
+    def place_building_block(self, building_block):
+        """
+        Place `building_block` on the :class:`.Vertex`.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is to be placed on the
+            vertex.
+
+        Returns
+        -------
+        :class:`numpy.nadarray`
+            The position matrix of `building_block` after being
+            placed.
+
+        """
+
+        rdkit_mol = building_block.to_rdkit_mol()
+        macrocycle = max(rdkit.GetSymmSSSR(rdkit_mol), key=len)
+        cycle_normal = building_block.get_plane_normal(macrocycle)
+        building_block.set_centroid(
+            position=self._position,
+            atom_ids=macrocycle
+        )
+        p = [1-self._orientation, self._orientation]
+        direction = np.random.choice([1, -1], p=p)
+        building_block.apply_rotation_between_vectors(
+            start=cycle_normal,
+            target=[direction, 0, 0],
+            origin=self._position
+        )
+        return building_block.get_position_matrix()
+
+    def assign_func_groups_to_edges(self, building_block, fg_map):
+        return
+
+    def __str__(self):
+        x, y, z = self._position
+        return (
+            f'Vertex(id={self.id}, '
+            f'position={[x, y, z]}, '
+            f'orientation={self._orientation})'
+        )
 
 
 class NRotaxane(TopologyGraph):
     """
-    Represents the topology of [n]rotaxanes.
+    Represents [n]rotaxane topology graphs.
 
     This class assumes one axle with (n-1) macrocycles threaded on it.
     The macrocycles are spaced evenly along the thread in repeating
-    patterns analogous to non-bonded monomers in :class:`.Linear`. The
-    orientation of the macrocycle defines the threading direction, thus
-    giving access to different mechanical stereoisomers. The axle is
-    automatically found in the :class:`list` of
-    :attr:`.ConstructedMolecule.building_blocks` so only the order of
-    the macrocycles in the :class:`list` is important for
-    construction.
+    patterns. The threaded macrocycles can be described analagously
+    to monomers in linear polymers, in terms of a repeating unit,
+    except that no bonds are formed between them.
+
+    The axle must be provided first to the `building_blocks` in
+    :class:`.ConstructedMolecule.__init__`.
 
     Attributes
     ----------
-    repeating_unit : :class:`str`
-        A string showing the repeating unit of the macrocycles within
-        :class:`.Rotaxane`. For example, ``"AB"`` or ``"ABB"``, would
-        implied two or three macrocycles threaded, respectively.
-        The building block with index ``0`` in
-        :attr:`.ConstructedMolecule.building_blocks` is labelled as
-        ``"A"`` while index ``1`` as ``"B"`` and so on.
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
 
-    orientation : :class:`tuple` of :class:`float`
-        For each character in the repeating unit, a value between ``0``
-        and ``1`` (both inclusive) must be given in a :class:`list`. It
-        indicates the probability that each macrocycle will have its
-        orientation along the axle flipped.  If
-        ``0`` then the macrocycle is guaranteed be aligned with the
-        axle. If ``1`` it is guaranteed to be aligned against the
-        axle. This allows the user to create stereoisomers.
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
 
-    n : :class:`int`
-        The number of repeating units in the rotaxane.
+    Examples
+    --------
+    .. code-block:: python
+
+        import stk
+
+        cycle = stk.ConstructedMolecule(
+            building_blocks=[
+                stk.BuildingBlock('[Br]CC[Br]', ['bromine'])
+            ],
+            topology_graph=stk.macrocycle.Macrocycle('A', [0], 5)
+        )
+        axle = stk.ConstructedMolecule(
+            building_blocks=[
+                stk.BuildingBlock('NCCN', ['amine']),
+                stk.BuildingBlock('O=CCC=O', ['aldehyde'])
+            ],
+            topology_graph=stk.polymer.Linear('AB', [0, 0], 7)
+        )
+        rotaxane = stk.ConstructedMolecule(
+            building_blocks=[axle, cycle],
+            topology_graph=stk.rotaxane.NRotaxane('A', [0], 3)
+        )
 
     """
 
-    def __init__(self, repeating_unit, orientation, n):
+    def __init__(self, repeating_unit, orientations, n, processes=1):
         """
         Initialize a :class:`NRotaxane` instance.
 
         Parameters
         ----------
         repeating_unit : :class:`str`
-            A string showing the repeating unit of the macrocycles
-            within :class:`.Rotaxane`. For example, ``"AB"`` or
-            ``"ABB"``, would implied two or three macrocycles threaded,
-            respectively. The building block with index ``0`` in
-            :attr:`.ConstructedMolecule.building_blocks` is labelled as
-            ``"A"`` while index ``1`` as ``"B"`` and so on.
+            A string specifying the repeating unit of the macrocycles.
+            For example, ``'AB'`` or ``'ABB'``. Letters are assigned to
+            building block molecules in the order they are passed to
+            :meth:`.ConstructedMolecule.__init__`.
 
-        orientation : :class:`tuple` of :class:`float`
-            For each character in the repeating unit, a value between
-            ``0`` (inclusive) and ``1`` (inclusive) must be given.
-            The values give the probability that each macrocycle is
-            threaded onto the axle in the opposite directions. If
-            ``0`` then the macrocycle is guaranteed be aligned with the
-            axle. If ``1`` it is guaranteed to be aligned against the
-            axle. This allows the user to create stereoisomers.
+        orientations : :class:`tuple` of :class:`float`
+            For each character in the repeating unit, a value
+            between ``0`` and ``1`` (both inclusive) must be given in
+            a :class:`tuple`. It indicates the probability that each
+            macrocycle will have its orientation along the axle
+            flipped. If ``0`` then the macrocycle is guaranteed not to
+            flip. If ``1`` it is guaranteed to flip. This allows the
+            user to create head-to-head or head-to-tail chains, as well
+            as chain with a preference for head-to-head or head-to-tail
+            if a number between ``0`` and ``1`` is chosen.
 
         n : :class:`int`
-            The number of macrocycle repeating units which are used to
-            make rotaxane. Constructs [n*len(repeat_unit)+1]rotaxane.
+            The number of repeating units threaded along the axle.
+
+        processes : :class:`int`, optional
+            The number of parallel processes to create during
+            :meth:`construct`.
 
         """
 
-        self.repeating_unit = repeating_unit
-        self.orientation = tuple(orientation)
-        self.n = n
-        super().__init__(track_fgs=False)
+        self._repeating_unit = repeating_unit
+        self._orientations = orientations
+        self._n = n
 
-    def place_mols(self, mol):
+        vertices = [_AxleVertex(0, 0, 0, 0)]
+        threads = orientations * n
+        distance = 1 / (len(threads)-1)
+        for i, orientation in enumerate(threads):
+            vertices.append(
+                _CycleVertex(
+                    id=i+1,
+                    x=(i*distance) - 0.5,
+                    y=0,
+                    z=0,
+                    orientation=orientation
+                )
+            )
+        super().__init__(tuple(vertices), (), processes)
+
+    def _assign_building_blocks_to_vertices(
+        self,
+        mol,
+        building_blocks
+    ):
         """
-        Distribute the macrocycles evenly along the axis.
+        Assign `building_blocks` to :attr:`vertices`.
 
-        The axle is positioned along the x axis and the macrocycles
-        are distributed evenly and rotates to that the vectors normal
-        to their planes lie along the the axle.
+        Assignment is done by modifying
+        :attr:`.ConstructedMolecule.building_block_vertices`.
 
         Parameters
         ----------
-        mol : :class:`.Rotaxane`
-            The :class:`.Rotaxane` being constructed.
+        mol : :class:`.ConstructedMolecule`
+            The :class:`.ConstructedMolecule` instance being
+            constructed.
+
+        building_blocks : :class:`list` of :class:`.Molecule`
+            The :class:`.BuildingBlock` and
+            :class:`ConstructedMolecule` instances which
+            represent the building block molecules used for
+            construction. Only one instance is present per building
+            block molecule, even if multiples of that building block
+            join up to form the :class:`ConstructedMolecule`.
 
         Returns
         -------
@@ -102,112 +269,43 @@ class NRotaxane(TopologyGraph):
 
         """
 
-        # Identify the axle and the macrocycles in the building_blocks.
-        bbs = mol.building_blocks
-        axle = next(m for m in bbs if not hasattr(m, 'cycle_atoms'))
+        threads = self._repeating_unit*self._n
+        axle, *cycles = building_blocks
+        bb_map = {
+            letter: bb for letter, bb in zip(threads, cycles)
+        }
+        mol.building_block_vertices[axle].append(self.vertices[0])
+        for letter, vertex in zip(threads, self.vertices[1:]):
+            bb = bb_map[letter]
+            mol.building_block_vertices[bb].append(vertex)
 
-        cycles = [m for m in bbs if m is not axle]
-
-        # Make a map from monomer label to object.
-        mapping = {}
-        # Assign every monomer a label ("A", "B", "C", etc.).
-        for l, monomer in zip(dedupe(self.repeating_unit), cycles):
-            mapping[l] = monomer
-
-        # Make string representing the entire set of macrocycles,
-        # not just the repeating unit.
-        polycycle = self.repeating_unit*self.n
-
-        # Get the direction for each macrocycle along the axle,
-        # not just the repeating unit.
-        dirs = self.orientation*self.n
-
-        # Place the axle along the x axis with the centroid at origin.
-        axle_dir = axle.direction()
-        axle.set_orientation(axle_dir, [1, 0, 0])
-        axle.set_position([0, 0, 0])
-
-        mol.bb_counter.update([axle])
-        mol.mol = rdkit.CombineMols(mol.mol, axle.mol)
-
-        # Find the limiting x coordinates to space the cycles evenly.
-        min_x, max_x = self._minmax_x(axle)
-        spacing = (max_x - min_x) / (len(polycycle)+1)
-
-        # Space the macrocycles along the axle and rotate so that the
-        # vectors normal to their planes lie along the x axis.
-
-        for i, (label, mdir) in enumerate(zip(polycycle, dirs)):
-            cycle = mapping[label]
-            mol.bb_counter.update([cycle])
-            ring_ids = cycle.cycle_atoms()
-            normal = cycle.plane_normal(atom_ids=ring_ids)
-            org_pos = cycle.mol.GetConformer().GetPositions().T
-
-            # Rotate the macrocycle towards the x or -x direction
-            # as given by the probability in `mdir`.
-            mdir = np.random.choice([1, -1], p=[mdir, 1-mdir])
-            cycle.set_orientation(normal, [1, 0, 0])
-            cycle.rotate(np.pi, [0, 0, 1]) if mdir < 0 else None
-
-            # Position the macrocycle along the axle.
-            cycle_x = min_x + (i + 1) * spacing
-            mono_cyc = cycle.shift([cycle_x, 0, 0] -
-                                   cycle.atom_centroid(ring_ids))
-
-            cycle_index = mol.building_blocks.index(cycle)
-            add_fragment_props(mono_cyc, cycle_index, i)
-
-            mol.mol = rdkit.CombineMols(mono_cyc, mol.mol)
-            cycle.set_position_from_matrix(org_pos)
-
-    def bonded_fgs(self, mol):
+    def _get_scale(self, mol):
         """
-        Yield functional groups to react.
+        Get the scale used for the positions of :attr:`vertices`.
 
         Parameters
         ----------
-        mol : :class:`.Rotaxane`
-            The :class:`.Rotaxane` being constructed.
-
-        Yields
-        -------
-        :class:`tuple` of :class:`int`
-            Holds the ids of the functional groups set to react.
-
-        """
-
-        return iter(())
-
-    def _minmax_x(self, axle, exclude_ids=None):
-        """
-        Calculate the maximum and minimum x coordinate along the axle.
-
-        Parameters
-        ----------
-        mol : :class:`.Rotaxane`
-            The :class:`.Rotaxane` being constructed.
-
-        axle : :class:`.Molecule`
-            The axle of the :class:`.Rotaxane`.
+        mol : :class:`.ConstructedMolecule`
+            The molecule being constructed.
 
         Returns
         -------
-        :class:`float`
-            The minium x coordinate along the axle.
-
-        :class:`float`
-            The minium x coordinate along the axle.
+        :class:`float` or :class:`list` of :class:`float`
+            The value by which the position of each :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
 
         """
 
-        conf = axle.mol.GetConformer()
-        xyz = np.array(conf.GetPositions())
+        axle = next(iter(mol.building_block_vertices))
+        return 0.8*axle.get_maximum_diameter()
 
-        if exclude_ids is not None:
-            xyz = np.delete(xyz, exclude_ids, axis=0)
-
-        max_x = np.amax(xyz, axis=0)[0]
-        min_x = np.amin(xyz, axis=0)[0]
-
-        return min_x, max_x
+    def __repr__(self):
+        return (
+            f'rotaxane.NRotaxane('
+            f'{self._repeating_unit!r}, '
+            f'{self._orientations!r}, '
+            f'{self._n}'
+            f')'
+        )

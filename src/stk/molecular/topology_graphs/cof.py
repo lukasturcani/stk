@@ -1,948 +1,1022 @@
-"""
-Defines COF topologies.
-
-.. _`cof assembly`:
-
-How the assembly process works for 2D COF topologies.
------------------------------------------------------
-
-Linker topologies.
-..................
-
-Linker topologies are those which use a building block with two
-functional groups and a building block with three or more functional
-groups. These are implemented as subclasses to
-:class:`LinkerCOFLattice`.
-
-As for any assembly process, there are 2 main stages: placement of
-building blocks and yielding of functional groups which react.
-
-A 2D COF topology can be defined through vertices and the edges which
-connect them. The building block with 3 or more functional groups
-sits on the vertices while the building block with 2 functional groups
-sits on the edges. To assemble a COF topology, first the vertices
-and edges are defined. They are represented by the classes
-:class:`Vertex` and :class:`Edge`. Each of these objects defines their
-positions in terms of the fractional coordinates along the
-``a``, ``b`` and ``c`` vectors of a unit cell. In addition, each
-of these objects defines a set of "fg positiions".
-
-For edges, there are two fg positions, 0 and 1. 0 is the position
-of the fg which gets connected to an fg on the first vertex
-connected by the edge, while 1 is the
-position of the fg which gets connected to the second vertex
-connected by the edge. Identification of which fg of a
-di-functionalized building block sits on which fg position is done
-in the following way. Check the distance of each fg to the
-first vertex. The closer one is on position 0, the further one is on
-position 1.
-
-For vertices there are multiple fg positions. The number of
-fg positions on a vertex is equal to the number of functional
-groups the building block placed on the vertex has. The fg
-positions are labelled from ``0`` to ``n`` where ``n`` is one less than
-the number of functional groups in the building block. Going clockwise
-around the vertex, starting at the 12 o clock position, the positions
-are labelled starting at 0. After placing and aligning a building block
-on a vertex, it is necessary to identify which fg sits on
-which fg position. Alignment is done by rotating the building block
-around the z axis so that the distance of one of the fgs
-and one of the edges is minimized. Because each edge keeps a record
-of which position it connects, the aligned fg can be assigned to
-a position. Then the fgs are assigned to the next positions
-in clockwise order.
-
-To join molecules simply go through all the edges in a topology. Each
-edge holds the vertices it is connected to and the positions on those
-vertices it connects. Each edge and vertex defines
-a dictionary which maps the position to the fg which sits on
-it. For each edge take the fg at position ``0`` and the fg
-position on the vertex which is connceted to it. Use the fg
-position on the connected vertex to get the id of the fg which
-is to be connected. The same can be done for the fg at position
-``1`` on the edge.
-
-Periodic bonds are not added to the rdkit molecule, instead they
-are registered in :attr:`.Periodic.periodic_bonds`.
-
-"""
-
-import rdkit.Chem.AllChem as rdkit
-import numpy as np
-from scipy.spatial.distance import euclidean
-import itertools as it
-
-from .topology_graph import TopologyGraph
-from ...utilities import normalize_vector
-
-
-class Vertex:
-    """
-    Represents a vertex of a 2D COF topology.
-
-    Attributes
-    ----------
-    frac_coord : :class:`tuple` of :class:`float`
-        The fractional positions along the ``a``, ``b`` and ``c``
-        vectors of the vector.
-
-    connected : :class:`list` of :class:`Edge`
-        The edges connected to this vertex.
-
-    fg_map : :class:`dict`
-        Maps the id of a fg position on the vertex to the
-        :class:`.FunctionalGroup` sitting on it.
-
-    """
-
-    def __init__(self, frac_coord):
-        self.frac_coord = frac_coord
-        self.connected = []
-
-    def place_mol(self, cell_params, mol, aligner):
-        """
-        Places and aligns a molecule on the vertex.
-
-        Parameters
-        ----------
-        cell_params : :class:`list` of :class:`numpy.array`
-            The ``a``, ``b`` and ``c`` vectors of the unit cell.
-
-        mol : :class:`.BuildingBlock`
-            The building block to be placed.
-
-        aligner : :class:`int`
-            The id of the functional group to be aligned with an edge.
-
-        Returns
-        -------
-        :class:`rdkit.Mol`
-            The rdkit instance of the placed `mol`.
-
-        """
-
-        coord = self.calc_coord(cell_params)
-        original_position = mol.mol.GetConformer().GetPositions().T
-        mol.set_orientation2([0, 0, 1])
-
-        mol.set_bonder_centroid(coord)
-
-        edges = (
-            e for e in self.connected if all(b == 0 for b in e.bond)
-        )
-        aligner_edge = next(edges, self.connected[0])
-        vector = (aligner_edge.calc_coord(cell_params) - coord)
-
-        mol.minimize_theta2(aligner, vector, [0, 0, 1])
-
-        rdkit_mol = rdkit.Mol(mol.mol)
-        mol.set_position_from_matrix(original_position)
-        return rdkit_mol
-
-    def calc_coord(self, cell_params, cell_position=None):
-        """
-        Calculate the position of the vertex within a unit cell.
-
-        Parameters
-        ----------
-        cell_params : :class:`list` of :class:`numpy.ndarray`
-            The ``a``, ``b`` and ``c`` vectors of the unit cell.
-
-        cell_position : :class:`list` of :class:`int`, optional
-            Indicates if the vertex is in a periodic cell or not.
-            Analogous to the defintion of a periodic bond.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            The position.
-
-        """
-
-        if cell_position is None:
-            cell_position = [0, 0, 0]
-
-        coord = np.zeros((3, ))
-        cells = zip(self.frac_coord, cell_params, cell_position)
-        for frac, dim, p in cells:
-            coord += (frac+p) * dim
-
-        return coord
-
-    def create_fg_map(self,
-                      mol,
-                      cell_params,
-                      fgs,
-                      aligned_fg):
-        """
-        Creates the attribute :attr:`fg_map`.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being built.
-
-        cell_params : :class:`list` of :class:`numpy.ndarray`
-            The ``a``, ``b`` and ``c`` vectors of the unit cell.
-
-        fgs : :class:`list` of :class:`.FunctionalGroup`
-            The functional groups being placed on the vertex.
-
-        aligned_fg : :class:`int`
-            The id of the functional group to be aligned with an edge.
-            The id corresponods to the value in the building block,
-            not the :class:`.ConstructedMolecule`.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        center = self.calc_coord(cell_params)
-
-        start = np.array([0, 1])
-        angles = []
-        for fg in fgs:
-            fg_coords = mol.atom_centroid(fg.bonder_ids) - center
-            x, y, _ = normalize_vector(fg_coords)
-            angle = np.arccos(start@np.array([x, y]))
-            if x < 0:
-                angle = 2*np.pi - angle
-
-            angles.append((angle, fg))
-        angles.sort()
-
-        sorted_fgs = [fg for angle, fg in angles]
-        aligned = fgs[aligned_fg]
-        sorted_fgs = (sorted_fgs[sorted_fgs.index(aligned):] +
-                      sorted_fgs[:sorted_fgs.index(aligned)])
-
-        aligned_pos = self.aligned_position()
-        positions = it.chain(range(aligned_pos, len(fgs)),
-                             range(0, aligned_pos))
-
-        self.fg_map = {}
-        for fg, position in zip(sorted_fgs, positions):
-            self.fg_map[position] = fg
-
-    def aligned_position(self):
-        """
-        Returns the position of the fg aligned by :meth:`place_mol`.
-
-        Returns
-        -------
-        :class:`int`
-            The id of a position of on the vertex. The fg
-            which gets aligned during :meth:`place_mol` sits on this
-            position.
-
-        """
-
-        edges = (
-            e for e in self.connected if all(b == 0 for b in e.bond)
-        )
-        aligner_edge = next(edges, self.connected[0])
-        vindex = 0 if self is aligner_edge.v1 else 1
-        return aligner_edge.joint_positions[vindex]
-
-
-class Edge:
-    """
-    Represents a bond in a COF unit cell.
-
-    This class is used for positioning and aligning ditopic building
-    blocks in 2D COF topologies.
-
-    Attributes
-    ----------
-    v1 : :class:`Vertex`
-        The first vertex connected by the edge.
-
-    v2 : :class:Vertex`
-        The second vertex connected by the edge.
-
-    joint_positions : :class:`tuple` of :class:`int`
-        Holds 2 numbers. The first is the id of the position on
-        :attr:`v1` which gets connected by the edge. The second is the
-        id of the position on :attr:`v2` which gets connected by the
-        edge.
-
-    bond : :class:`list` of :class:`int`:
-        Indicates if the bond is periodic.
-
-    connected : class:`list` of :class:`Vertex`
-        The vertices conncetd by the edge.
-
-    frac_coord : :class:`list` of :class`float`
-        The position of the edge in terms of the fractional positions
-        along the ``a``, ``b`` and ``c`` vectors of a unit cell.
-
-    fg_map : :class:`dict`
-        Maps the id of a position to the :class:`.FunctionalGroup`
-        which sits on it. The positions are ``0`` and ``1`` where ``0``
-        is the  position which is closer to :attr:`v1` while ``1``
-        is the position closer to :attr:`v2`.
-
-    """
-
-    def __init__(self, v1, v2, joint_positions, bond=[0, 0, 0]):
-        self.v1 = v1
-        self.v2 = v2
-        self.joint_positions = joint_positions
-        self.bond = bond
-        self.connected = [v1, v2]
-
-        self.frac_coord = []
-        for f1, f2, b in zip(v1.frac_coord, v2.frac_coord, bond):
-            self.frac_coord.append((f1+f2+b) / 2)
-
-        v1.connected.append(self)
-        v2.connected.append(self)
-
-    def place_mol(self, mol, cell_params, bb, alignment):
-        """
-        Places and aligned a building block along the edge.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` being constructed.
-
-        cell_params : :class:`list` of :class:`numpy.ndarray`
-            The ``a``, ``b`` and ``c`` vectors of the unit cell.
-
-        bb : :class:`.BuildingBlock`
-            The building block to be placed.
-
-        alignment : :class:`int`
-            Can be ``1`` or ``-1`` to align `mol` either parallel or
-            anti-parallel with the edge.
-
-        Returns
-        -------
-        :class:`rdkit.Mol`
-            The :class:`rdkit` instance of the placed `mol`.
-
-        """
-
-        coord = self.fg_centroid(mol, cell_params)
-        original_position = bb.mol.GetConformer().GetPositions().T
-
-        bb.set_bonder_centroid(coord)
-        d = self.fg_direction(mol, cell_params)*alignment
-        bb.set_orientation2(d)
-
-        rdkit_mol = rdkit.Mol(bb.mol)
-        bb.set_position_from_matrix(original_position)
-        return rdkit_mol
-
-    def fg_direction(self, mol, cell_params):
-        """
-        Calculates the direction vector between the fgs.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` being constructed.
-
-        cell_params : :class:`list` of :class:`numpy.ndarray`
-            The ``a``, ``b`` and ``c`` vectors of the unit cell.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            The direction vector.
-
-        """
-
-        coords = []
-        for i, position in enumerate(self.joint_positions):
-            vertex = self.connected[i]
-            fg = vertex.fg_map[position]
-            coords.append(mol.atom_centroid(fg.bonder_ids))
-
-        for d, param in zip(self.bond, cell_params):
-            coords[1] += d*param
-
-        return normalize_vector(coords[1] - coords[0])
-
-    def direction(self, cell_params):
-        """
-        The direction vector of the edge.
-
-        Parameters
-        ----------
-        cell_params : :class:`list` of :class:`numpy.ndarray`
-            The ``a``, ``b`` and ``c`` vectors of the unit cell.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            The direction vector.
-
-        """
-
-        v1coord = self.v1.calc_coord(cell_params)
-        v2coord = self.v2.calc_coord(cell_params, self.bond)
-        return normalize_vector((v1coord-v2coord)/2)
-
-    def calc_coord(self, cell_params):
-        """
-        Calculates the position of the edge in a cell.
-
-        Parameters
-        ----------
-        cell_params : :class:`list` of :class:`numpy.ndarray`
-            The ``a``, ``b`` and ``c`` vectors of the unit cell.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            The position.
-        """
-
-        coord = np.zeros((3, ))
-        for frac, dim in zip(self.frac_coord, cell_params):
-            coord += frac * dim
-        return coord
-
-    def fg_centroid(self, mol, cell_params):
-        """
-        The centroid of the fgs connected to the edge.
-
-        So the fgs NOT sitting on the edge itself.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` being constructed.
-
-        cell_params : :class:`list` of :class:`numpy.ndarray`
-            The ``a``, ``b`` and ``c`` vectors of the unit cell.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            The centroid of the fgs connected to those on the edge.
-
-        """
-
-        coord = np.zeros((3, ))
-        for i, position in enumerate(self.joint_positions):
-            vertex = self.connected[i]
-            fg = vertex.fg_map[position]
-            coord += mol.atom_centroid(fg.bonder_ids)
-
-        for d, param in zip(self.bond, cell_params):
-            coord += d*param
-
-        return coord / (i+1)
-
-    def create_fg_map(self, mol, fgs, cell_params):
-        """
-        Creates the attribute :attr:`fg_map`.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` being built.
-
-        fgs : :class:`list` of :class:`.FunctionalGroup`
-            The functional groups which need to be mapped to edge
-            positions.
-
-        cell_params : :class:`list` of :class:`numpy.ndarray`
-            The ``a``, ``b`` and ``c`` vectors of the unit cell.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        def v1_dist(fg):
-            v1_coord = self.v1.calc_coord(cell_params)
-            bonder_coord = mol.atom_centroid(fg.bonder_ids)
-            return euclidean(v1_coord, bonder_coord)
-
-        fgs = sorted(fgs, key=v1_dist)
-        self.fg_map = {0: fgs[0], 1: fgs[1]}
-
-
-def bb_size(mol):
-    """
-    Sums the diameters of the building blocks.
-
-    Parameters
-    ---------
-    mol : :class:`.ConstructedMolecule`
-        The molecule being constructed.
-
-    Returns
-    -------
-    :class:`float`
-        The sum of the diameters of the building blocks. Used to
-        scale the size of unit cells.
-
-    """
-
-    return sum(bb.max_diameter()[0] for bb in mol.building_blocks)
-
-
-def linker_cof_scale_func(mol):
-    """
-    Calculates the scale factor for :class:`LinkerCOFLattice`.
-
-    Parameters
-    ---------
-    mol : :class:`.ConstructedMolecule`
-        The molecule being constructed.
-
-    Returns
-    -------
-    :class:`float`
-        A product of the sum of the diameters of the building blocks
-        and the number of vertices in the unit cell.
-
-    """
-
-    nice_number = (len(mol.topology.vertices)+1) // 1.5
-    return bb_size(mol) * nice_number
-
-
-class COFLattice(TopologyGraph):
-    """
-    A base class for periodic topologies.
-
-    This class behaves almost exactly like
-    :class:`.Topology` with only minor additions to suit the
-    representation of COF periodic lattices. The :meth:`del_atoms`
-    method is extended to collect the coordinates of any deleted atoms.
-    This is necessary for positioning terminating atoms on islands
-    generated from the periodic structure by :meth:`.Periodic.island`.
-
-    Attributes
-    ----------
-    scale_func : :class:`function`
-        A function which takes a :class:`.ConstructedMolecule`
-        instance as its only argument and returns a number. The number
-        is used to scale the size of the unit cell. See :func:`bb_size`
-        for an example.
-
-    """
-
-    def __init__(self, scale_func=bb_size):
-        self.scale_func = scale_func
-        super().__init__()
-
-
-class LinkerCOFLattice(COFLattice):
-    """
-    For 2D COF topologies which use a linker.
-
-    These are topologies which consist of 2 building blocks. One
-    which has two functional groups and one which has 3 or more
-    functional groups.
-
-    This class will have to be extended by subclasses which define
-    the vertices and edges which a particular topology consists of.
-
-    Attributes
-    ----------
-    vertices : :class:`list` of :class:`Vertex`
-        Class attribute added when defining a subclass. Holds the
-        vertices which make up the topology.
-
-    edges : :class:`list` of :class:`Edge`
-        Class attribute added when defining a subclass. Holds the
-        edges which make up the topology.
-
-    ditopic_directions : :class:`list` of :class:`int`
-        For each edge in the topology, holds ``1`` or ``-1`` to
-        indicate if the building block is placed parallel or
-        anti-parallel to the edge.
-
-    multitopic_aligners : :class:`list` of :class:`int`
-        For each vertex in the topology, holds the value of a
-        functional group id of the multitopic bulding block. This is
-        the functional group which gets aligned at a given edge.
-
-    """
-
-    def __init__(self,
-                 ditopic_directions=None,
-                 multitopic_aligners=None,
-                 scale_func=linker_cof_scale_func):
-        super().__init__(scale_func=scale_func)
-
-        if ditopic_directions is None:
-            ditopic_directions = [1 for i in range(len(self.edges))]
-        if multitopic_aligners is None:
-            multitopic_aligners = [
-                0 for i in range(len(self.vertices))
-            ]
-
-        self.ditopic_directions = ditopic_directions
-        self.multitopic_aligners = multitopic_aligners
-
-    def bonded_fgs(self, mol):
-        """
-        Yield functional groups to be bonded.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.FunctionalGroup`
-            The functional groups to bond.
-
-        """
-
-        for e in self.edges:
-            fg1 = e.fg_map[0]
-            fg2 = e.v1.fg_map[e.joint_positions[0]]
-            yield fg1, fg2
-
-            fg3 = e.fg_map[1]
-            fg4 = e.v2.fg_map[e.joint_positions[1]]
-            # True if bond is not periodic.
-            if all(b == 0 for b in e.bond):
-                yield fg3, fg4
-            else:
-                mol.func_groups.append(fg3)
-                mol.func_groups.append(fg4)
-                periodic_bond = PeriodicBond(fg3, fg4, e.bond)
-                mol.periodic_bonds.append(periodic_bond)
-
-    def place_mols(self, mol):
-        """
-        Places the building blocks on the topology.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # Create the rdkit molecule of the assembled molecule.
-        mol.mol = rdkit.Mol()
-
-        # Identify which building block is ditopic and which is
-        # tri or more topic.
-        di = next(bb for bb in mol.building_blocks
-                  if len(bb.func_groups) == 2)
-        multi = next(bb for bb in mol.building_blocks
-                     if len(bb.func_groups) >= 3)
-
-        # Keep track of the number of functional groups in the cof.
-        n_fgs = 0
-
-        # Calculate the size of the unit cell by scaling to the size of
-        # building blocks.
-        size = self.scale_func(mol)
-        cell_params = [size*p for p in self.cell_dimensions]
-        mol.cell_dimensions = cell_params
-
-        # For each vertex in the topology, place a multitopic building
-        # block on it. The Vertex object takes care of alignment.
-
-        for i, v in enumerate(self.vertices):
-            n_atoms = mol.mol.GetNumAtoms()
-
-            # Make the functional groups of the bb being placed.
-            ids = range(n_fgs, n_fgs+len(multi.func_groups))
-            fgs = list(multi.shift_fgs(ids, n_atoms))
-            n_fgs += len(multi.func_groups)
-
-            # Place the bb.
-            aligner = self.multitopic_aligners[i]
-            bb = v.place_mol(cell_params, multi, aligner)
-            add_fragment_props(
-                bb, mol.building_blocks.index(multi), i
-            )
-
-            mol.mol = rdkit.CombineMols(mol.mol, bb)
-            mol.bb_counter.update([multi])
-
-            # Save the ids of the fgs in the assembled molecule.
-            # This is used when creating bonds later in the assembly
-            # process.
-            v.create_fg_map(mol, cell_params, fgs, aligner)
-
-        for i, e in enumerate(self.edges):
-            n_atoms = mol.mol.GetNumAtoms()
-
-            # Make the functional groups of the bb being placed.
-            ids = range(n_fgs, n_fgs+2)
-            fgs = list(di.shift_fgs(ids, n_atoms))
-            n_fgs += 2
-
-            bb = e.place_mol(mol,
-                             cell_params,
-                             di,
-                             self.ditopic_directions[i])
-
-            add_fragment_props(bb,
-                               mol.building_blocks.index(di),
-                               i)
-
-            mol.mol = rdkit.CombineMols(mol.mol, bb)
-            mol.bb_counter.update([di])
-
-            e.create_fg_map(mol, fgs, cell_params)
-
-
-class NoLinkerCOFLattice(COFLattice):
-    ...
-
-
-class NoLinkerHoneycomb(NoLinkerCOFLattice):
-    """
-    Represents a hexagonal lattice with 2 tritopic building blocks.
-
-    """
-
-    cell_dimensions = a, b, c = [np.array([1, 0, 0]),
-                                 np.array([0.5, 0.866, 0]),
-                                 np.array([0, 0, 5/1.7321])]
-
-    vertices = [(a/3 + b/3 + c/2),
-                (2*a/3 + 2*b/3 + c/2)]
-
-    def bonded_fgs(self, mol):
-        """
-        Yields functional groups to be bonded.
-
-        Notes
-        -----
-        The :attr:`~.Periodic.periodic_bonds` attribute is filled
-        with :class:`.PeriodicBond` instances.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The unit cell being constructed.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`int`
-            The ids of the functional groups to be bonded.
-
-        """
-
-        # The fragment with the larger fg ids has higher x and y
-        # values - due to place_mols() implmentation. It is the "top"
-        # fragment.
-        bottom = self._func_groups[:3]
-        top = self._func_groups[3:]
-
-        # In the top fragment find the fg with the
-        # largest y value and connect it to the fg in the
-        # bottom fragment with the lowest y value. Note that the
-        # connection must be registered as periodic, hence the
-        # directions are 1/-1.
-        top_fg = max(
-            top,
-            key=lambda x:
-                mol.atom_centroid(x.bonder_ids)[1]
-        )
-        bottom_fg = min(
-            bottom,
-            key=lambda x:
-                mol.atom_centroid(x.bonder_ids)[1]
-        )
-        mol.func_groups.append(top_fg)
-        mol.func_groups.append(bottom_fg)
-        periodic_bond = PeriodicBond(top_fg, bottom_fg, [0, 1, 0])
-        mol.periodic_bonds.append(periodic_bond)
-
-        # Do the same for the x-axis periodic bonds.
-        right_fg = max(
-            top,
-            key=lambda x:
-                mol.atom_centroid(x.bonder_ids)[0]
-        )
-        left_fg = min(
-            bottom,
-            key=lambda x:
-                mol.atom_centroid(x.bonder_ids)[0]
-        )
-        mol.func_groups.append(right_fg)
-        mol.func_groups.append(left_fg)
-        periodic_bond = PeriodicBond(right_fg, left_fg, [1, 0, 0])
-        mol.periodic_bonds.append(periodic_bond)
-
-        # For the bond which gets created directly, find the bonder
-        # atom in the bottom fragment closest to the position of the
-        # top fragment.
-        bottom_fg2 = min(
-            bottom,
-            key=lambda x:
-                euclidean(self.vertices[1],
-                          mol.atom_centroid(x.bonder_ids))
-        )
-        top_fg2 = min(
-            top,
-            key=lambda x:
-                euclidean(self.vertices[0],
-                          mol.atom_centroid(x.bonder_ids))
-        )
-        yield top_fg2, bottom_fg2
-
-    def place_mols(self, mol):
-        """
-        Places and aligns building blocks in the unit cell.
-
-        Notes
-        -----
-        This method modifies `mol`. A :mod:`rdkit` molecule of the
-        unit cell with the building blocks not joined up is placed in
-        the :attr:`~.ConstructedMolecule.mol` attribute.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The unit cell being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # Keep track of functional groups in the constructed molecule.
-        self._func_groups = []
-
-        # Get the building blocks.
-        bb1, bb2 = mol.building_blocks
-        cell_size = self.scale_func(mol)
-        mol.cell_dimensions = [
-            cell_size*x for x in self.cell_dimensions
-        ]
-        self.vertices = [cell_size*x for x in self.vertices]
-
-        # Place and set orientation of the first building block.
-        bb1.set_bonder_centroid(self.vertices[0])
-        bb1.set_orientation2([0, 0, 1])
-        bb1.minimize_theta2(0, [0, -1, 0], [0, 0, 1])
-
-        # Add to the constructed molecule.
-        fgs = bb1.shift_fgs(range(0, 3), mol.mol.GetNumAtoms())
-        self._func_groups.extend(fgs)
-
-        add_fragment_props(bb1.mol,
-                           mol.building_blocks.index(bb1),
-                           0)
-        mol.mol = rdkit.CombineMols(mol.mol, bb1.mol)
-
-        # Place and set orientation of the second building block.
-        bb2.set_bonder_centroid(self.vertices[1])
-        bb2.set_orientation2([0, 0, 1])
-        bb2.minimize_theta2(0, [0, 1, 0], [0, 0, 1])
-
-        # Add to the constructed molecule.
-        fgs = bb2.shift_fgs(range(3, 6), mol.mol.GetNumAtoms())
-        self._func_groups.extend(fgs)
-
-        add_fragment_props(bb2.mol,
-                           mol.building_blocks.index(bb2),
-                           0)
-
-        bb = rdkit.Mol(bb2.mol)
-        mol.mol = rdkit.CombineMols(mol.mol, bb)
-        mol.bb_counter.update([bb1, bb2])
-
-
-class Honeycomb(LinkerCOFLattice):
-    cell_dimensions = a, b, c = [
-        np.array([1, 0, 0]),
-        np.array([0.5, 0.866, 0]),
-        np.array([0, 0, 5/1.7321])
-    ]
-
-    vertices = v1, v2 = [
-        Vertex((1/3, 1/3, 1/2)),
-        Vertex((2/3, 2/3, 1/2))
-    ]
-
-    edges = [
-        Edge(v1, v2, (0, 2)),
-        Edge(v1, v2, (1, 0), [0, -1, 0]),
-        Edge(v1, v2, (2, 1), [-1, 0, 0])
-    ]
-
-
-class Hexagonal(LinkerCOFLattice):
-    cell_dimensions = a, b, c = [
-        np.array([1, 0, 0]),
-        np.array([0.5, 0.866, 0]),
-        np.array([0, 0, 5/1.7321])
-    ]
-
-    vertices = v1, v2, v3, v4 = [
-        Vertex((1/4, 1/4, 1/2)),
-        Vertex((1/4, 3/4, 1/2)),
-        Vertex((3/4, 1/4, 1/2)),
-        Vertex((3/4, 3/4, 1/2))
-    ]
-
-    edges = [
-        Edge(v1, v2, (0, 3)),
-        Edge(v1, v3, (1, 4)),
-        Edge(v2, v3, (2, 5)),
-        Edge(v2, v4, (1, 4)),
-        Edge(v3, v4, (0, 3)),
-        Edge(v1, v3, (4, 1), [-1, 0, 0]),
-        Edge(v1, v2, (3, 0), [0, -1, 0]),
-        Edge(v1, v4, (2, 5), [0, -1, 0]),
-        Edge(v3, v2, (2, 5), [1, -1, 0]),
-        Edge(v3, v4, (3, 0), [0, -1, 0]),
-        Edge(v2, v4, (4, 1), [-1, 0, 0]),
-        Edge(v4, v1, (2, 5), [1, 0, 0])
-    ]
-
-
-class Square(LinkerCOFLattice):
-    cell_dimensions = a, b, c = [
-        np.array([1, 0, 0]),
-        np.array([0, 1, 0]),
-        np.array([0, 0, 1])
-    ]
-
-    vertices = v1, = [Vertex((0.5, 0.5, 0.5))]
-    edges = [
-        Edge(v1, v1, (1, 3), [1, 0, 0]),
-        Edge(v1, v1, (0, 2), [0, 1, 0])
-    ]
-
-
-class Kagome(LinkerCOFLattice):
-    cell_dimensions = a, b, c = [
-        np.array([1, 0, 0]),
-        np.array([0.5, 0.866, 0]),
-        np.array([0, 0, 5/1.7321])
-    ]
-
-    vertices = v1, v2, v3 = [
-        Vertex((1/4, 3/4, 0.5)),
-        Vertex((3/4, 3/4, 1/2)),
-        Vertex((3/4, 1/4, 1/2))
-    ]
-
-    edges = [
-        Edge(v1, v2, (0, 3)),
-        Edge(v1, v3, (1, 3)),
-        Edge(v2, v3, (2, 0)),
-        Edge(v1, v2, (2, 1), [-1, 0, 0]),
-        Edge(v1, v3, (3, 1), [-1, 1, 0]),
-        Edge(v2, v3, (0, 2), [0, 1, 0])
-    ]
+# """
+# Defines COF topologies.
+#
+# """
+#
+# import numpy as np
+# import itertools as it
+# from collections import defaultdict
+#
+# from ..topology_graph import TopologyGraph, Vertex, Edge
+# from ....utilities import vector_angle, flatten
+#
+#
+# class _COFVertex(Vertex):
+#     """
+#     Represents a vertex of a :class:`.COF`.
+#
+#     Attributes
+#     ----------
+#     id : :class:`int`
+#         The id of the vertex. This should be its index in
+#         :attr:`TopologyGraph.vertices`.
+#
+#     edges : :class:`list` of :class:`.Edge`
+#         The edges the :class:`Vertex` is connected to.
+#
+#     aligner_edge : :class:`.Edge`
+#         The :class:`.Edge` in :attr:`edges`, which is used to align the
+#         :class:`.BuildingBlock` placed on the vertex. The first
+#         :class:`.FunctionalGroup` in :attr:`.BuildingBlock.func_groups`
+#         is rotated such that it lies exactly on this :class:`.Edge`.
+#
+#     """
+#
+#     def __init__(self, x, y, z, lattice_constants):
+#         """
+#         Initialize a :class:`_COFVertex`.
+#
+#         Parameters
+#         ----------
+#         x : :class:`float`
+#             The x coordinate.
+#
+#         y : :class:`float`
+#             The y coordinate.
+#
+#         z : :class:`float`
+#             The z coordinate.
+#
+#         lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+#             The a, b and c lattice constants, each written as a vector.
+#
+#         """
+#
+#         self.aligner_edge = None
+#         self._lattice_constants = lattice_constants
+#         # (x, y, z) identifying the cell in which the vertex is found.
+#         self._cell = None
+#         # id will be set automatically by COF. This is because
+#         # _COFVertex is defined manually in a subclass of COF
+#         # and writing the id for every vertex would be a pain.
+#         super().__init__(None, x, y, z)
+#
+#     @classmethod
+#     def init_at_center(cls, *vertices, lattice_constants):
+#         """
+#         Initialize at the center of `vertices`.
+#
+#         Parameters
+#         ----------
+#         vertices : :class:`.Vertex`
+#             Vertices at whose center this vertex should be initialized.
+#
+#         lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+#             The a, b and c lattice constants, each written as a vector.
+#
+#         Returns
+#         -------
+#         :class:`.Vertex`
+#             The vertex.
+#
+#         """
+#
+#         center = sum(vertex.get_position() for vertex in vertices)
+#         center /= len(vertices)
+#         return cls(*center, lattice_constants)
+#
+#     @classmethod
+#     def init_at_shifted_center(
+#         cls,
+#         vertices,
+#         shifts,
+#         lattice_constants
+#     ):
+#         """
+#         Initialize at the center of shifted `vertices`.
+#
+#         Parameters
+#         ----------
+#         vertices : :class:`tuple` of :class:`_COFVertex`
+#             The vertics at whose center this vertex should be
+#             intialized.
+#
+#         shifts : :class:`tuple`
+#             For every vertex in `vertices` the amount by which it is
+#             shifted along each axis. For example
+#
+#             .. code-block:: python
+#
+#                 shifts = (
+#                     (1, 0, -1),
+#                     (0, 0, 0)
+#                 )
+#
+#             means that the first vertex in `vertices` is shifted
+#             up along the x axis, is not shifted along the y axis
+#             and is shifted down along the z axis and the second
+#             vertex is not shifted at all.
+#
+#         lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+#             The a, b and c lattice constants, each written as a vector.
+#
+#         """
+#
+#         positions = []
+#         for vertex, shift in zip(vertices, shifts):
+#             total_shift = 0
+#             for dim_shift, constant in zip(shift, lattice_constants):
+#                 total_shift += dim_shift * constant
+#             position = vertex.get_position() + total_shift
+#             positions.append(position)
+#
+#         position = np.divide(
+#             np.sum(positions, axis=0),
+#             len(positions)
+#         )
+#         return cls(*position, lattice_constants)
+#
+#     def clone(self, clear_edges=False):
+#         """
+#         Create a clone of the instance.
+#
+#         Parameters
+#         ----------
+#         clear_edges : :class:`bool`, optional
+#             If ``True`` the :attr:`edges` attribute of the clone will
+#             be empty.
+#
+#         Returns
+#         -------
+#         :class:`Vertex`
+#             A clone with the same position but not connected to any
+#             :class:`.Edge` objects.
+#
+#         """
+#
+#         clone = super().clone(clear_edges)
+#         clone.aligner_edge = self.aligner_edge
+#         clone._lattice_constants = self._lattice_constants
+#         clone._cell = self._cell
+#         return clone
+#
+#     def place_building_block(self, building_block):
+#         """
+#         Place `building_block` on the :class:`.Vertex`.
+#
+#         Parameters
+#         ----------
+#         building_block : :class:`.BuildingBlock`
+#             The building block molecule which is to be placed on the
+#             vertex.
+#
+#         Returns
+#         -------
+#         :class:`numpy.nadarray`
+#             The position matrix of `building_block` after being
+#             placed.
+#
+#         """
+#
+#         if len(building_block.func_groups) == 2:
+#             return self._place_linear_building_block(building_block)
+#         return self._place_nonlinear_building_block(building_block)
+#
+#     def _place_linear_building_block(self, building_block):
+#         """
+#         Place `building_block` on the :class:`.Vertex`.
+#
+#         Parameters
+#         ----------
+#         building_block : :class:`.BuildingBlock`
+#             The building block molecule which is to be placed on the
+#             vertex.
+#
+#         Returns
+#         -------
+#         :class:`numpy.nadarray`
+#             The position matrix of `building_block` after being
+#             placed.
+#
+#         """
+#
+#         building_block.set_centroid(
+#             position=self._position,
+#             atom_ids=building_block.get_bonder_ids()
+#         )
+#         fg_centroid = building_block.get_centroid(
+#             atom_ids=building_block.func_groups[0].get_bonder_ids()
+#         )
+#         start = fg_centroid - self._position
+#         edge_coord = self._get_aligner_edge_position()
+#         target = edge_coord - self._get_edge_centroid()
+#         building_block.apply_rotation_between_vectors(
+#             start=start,
+#             target=target,
+#             origin=self._position
+#         )
+#         start = building_block.get_centroid_centroid_direction_vector()
+#         e0_coord = self.edges[0].get_position()
+#         e1_coord = self.edges[1].get_position()
+#         building_block.apply_rotation_to_minimize_angle(
+#             start=start,
+#             target=self._position,
+#             axis=e0_coord-e1_coord,
+#             origin=self._position,
+#         )
+#         return building_block.get_position_matrix()
+#
+#     def _place_nonlinear_building_block(self, building_block):
+#         """
+#         Place `building_block` on the :class:`.Vertex`.
+#
+#         Parameters
+#         ----------
+#         building_block : :class:`.BuildingBlock`
+#             The building block molecule which is to be placed on the
+#             vertex.
+#
+#         Returns
+#         -------
+#         :class:`numpy.nadarray`
+#             The position matrix of `building_block` after being
+#             placed.
+#
+#         """
+#
+#         building_block.set_centroid(
+#             position=self._position,
+#             atom_ids=building_block.get_bonder_ids()
+#         )
+#         building_block.apply_rotation_between_vectors(
+#             start=building_block.get_bonder_plane_normal(),
+#             target=[0, 0, 1],
+#             origin=self._position
+#         )
+#         fg_bonder_centroid = building_block.get_centroid(
+#             atom_ids=building_block.func_groups[0].get_bonder_ids()
+#         )
+#         start = fg_bonder_centroid - self._position
+#         edge_coord = self._get_aligner_edge_position()
+#         target = edge_coord - self._get_edge_centroid()
+#         building_block.apply_rotation_to_minimize_angle(
+#             start=start,
+#             target=target,
+#             axis=[0, 0, 1],
+#             origin=self._position
+#         )
+#         return building_block.get_position_matrix()
+#
+#     def _get_aligner_edge_position(self):
+#         periodic = any(
+#             dim != 0 for dim in self.aligner_edge.periodicity
+#         )
+#         if not periodic:
+#             return self.aligner_edge.get_position()
+#
+#         if self is self.aligner_edge.vertices[0]:
+#             other = self.aligner_edge.vertices[1].get_position()
+#             periodicity = self.aligner_edge.periodicity
+#
+#         else:
+#             other = self.aligner_edge.vertices[0].get_position()
+#             periodicity = -1*np.array(self.aligner_edge.periodicity)
+#
+#         dims = zip(self._cell, periodicity)
+#         other_cell = (dim+shift for dim, shift in dims)
+#
+#         shift = 0
+#         for dim, constant in zip(other_cell, self._lattice_constants):
+#             shift += dim*constant
+#         other += shift
+#
+#         return (self._position + other)/2
+#
+#     def assign_func_groups_to_edges(self, building_block, fg_map):
+#         """
+#         Assign functional groups to edges.
+#
+#         Each :class:`.FunctionalGroup` of the `building_block` needs
+#         to be associated with one of the :class:`.Edge` instances in
+#         :attr:`edges`. Then, using `fg_map`, the
+#         :class:`FunctionalGroup` instances in the molecule being
+#         constructed need to be assigned to those edges. This is
+#         because bonds need to be formed between functional groups of
+#         the molecule being constructed, not the `building_block`.
+#
+#         Parameters
+#         ----------
+#         building_block : :class:`.Molecule`
+#             The building block molecule which is needs to have
+#             functional groups assigned to edges.
+#
+#         fg_map : :class:`dict`
+#             A mapping from :class:`.FunctionalGroup` instances in
+#             `building_block` to the equivalent
+#             :class:`.FunctionalGroup` instances in the molecule being
+#             constructed.
+#
+#         Returns
+#         -------
+#         None : :class:`NoneType`
+#
+#         """
+#
+#         if len(building_block.func_groups) == 2:
+#             return self._assign_func_groups_to_linear_edges(
+#                 building_block=building_block,
+#                 fg_map=fg_map
+#             )
+#         return self._assign_func_groups_to_nonlinear_edges(
+#                 building_block=building_block,
+#                 fg_map=fg_map
+#             )
+#
+#     def _assign_func_groups_to_linear_edges(
+#         self,
+#         building_block,
+#         fg_map
+#     ):
+#
+#         fg1, fg2 = sorted(
+#             building_block.func_groups,
+#             key=self._get_edge0_distance(building_block)
+#         )
+#         self.edges[0].assign_func_group(fg_map[fg1])
+#         self.edges[1].assign_func_group(fg_map[fg2])
+#
+#     def _get_edge0_distance(self, building_block):
+#         aligner_coord = self.edges[0].get_position()
+#
+#         def distance(fg):
+#             fg_coord = building_block.get_centroid(
+#                 atom_ids=fg.get_bonder_ids()
+#             )
+#             displacement = aligner_coord - fg_coord
+#             return np.linalg.norm(displacement)
+#
+#         return distance
+#
+#     def _assign_func_groups_to_nonlinear_edges(
+#         self,
+#         building_block,
+#         fg_map
+#     ):
+#         # The idea is to order the functional groups in building_block
+#         # by their angle from func_groups[0] and the bonder centroid,
+#         #  going in the clockwise direction.
+#         #
+#         # The edges are also ordered by their angle from aligner_edge
+#         # and the edge centroid going in the clockwise direction.
+#         #
+#         # Once the fgs and edges are ordered, zip and assign them.
+#
+#         fg0_coord = building_block.get_centroid(
+#             atom_ids=building_block.func_groups[0].get_bonder_ids()
+#         )
+#         bonder_centroid = building_block.get_centroid(
+#             atom_ids=building_block.get_bonder_ids()
+#         )
+#         fg0_direction = fg0_coord-bonder_centroid
+#         axis = np.cross(
+#             fg0_direction,
+#             building_block.get_bonder_plane_normal()
+#         )
+#
+#         func_groups = sorted(
+#             building_block.func_groups,
+#             key=self._get_func_group_angle(
+#                 building_block=building_block,
+#                 fg0_direction=fg0_direction,
+#                 bonder_centroid=bonder_centroid,
+#                 axis=axis
+#             )
+#         )
+#         assert func_groups[0] is building_block.func_groups[0]
+#
+#         edges = sorted(self.edges, key=self._get_edge_angle(axis))
+#         aligner_first = all(
+#             edges[0].get_position() == self.aligner_edge.get_position()
+#         )
+#         assert aligner_first
+#
+#         for edge, func_group in zip(edges, func_groups):
+#             edge.assign_func_group(fg_map[func_group])
+#
+#     @staticmethod
+#     def _get_func_group_angle(
+#         building_block,
+#         fg0_direction,
+#         bonder_centroid,
+#         axis
+#     ):
+#
+#         def angle(func_group):
+#             coord = building_block.get_centroid(
+#                 atom_ids=func_group.get_bonder_ids()
+#             )
+#             fg_direction = coord-bonder_centroid
+#             theta = vector_angle(fg0_direction, fg_direction)
+#
+#             projection = fg_direction @ axis
+#             if theta > 0 and projection < 0:
+#                 return 2*np.pi - theta
+#             return theta
+#
+#         return angle
+#
+#     def _get_edge_angle(self, axis):
+#
+#         aligner_edge_coord = self.aligner_edge.get_position()
+#         edge_centroid = self._get_edge_centroid()
+#         # This axis is used to figure out the clockwise direction.
+#         aligner_edge_direction = aligner_edge_coord - edge_centroid
+#
+#         def angle(edge):
+#             coord = edge.get_position()
+#             edge_direction = coord - edge_centroid
+#             theta = vector_angle(
+#                 vector1=edge_direction,
+#                 vector2=aligner_edge_direction
+#             )
+#
+#             projection = edge_direction @ axis
+#             if theta > 0 and projection < 0:
+#                 return 2*np.pi - theta
+#             return theta
+#
+#         return angle
+#
+#     def __str__(self):
+#         x, y, z = self._position
+#         return (
+#             f'Vertex(id={self.id}, '
+#             f'position={[x, y, z]}, '
+#             f'aligner_edge={self.edges.index(self.aligner_edge)})'
+#         )
+#
+#
+# class COF(TopologyGraph):
+#     """
+#     Represents a COF topology graph.
+#
+#     COF topologies are added by creating a subclass which defines the
+#     :attr:`vertices` and :attr:`edges` of the topology as class
+#     attributes.
+#
+#     Attributes
+#     ----------
+#     vertices : :class:`tuple` of :class:`.Vertex`
+#         The vertices which make up the topology graph.
+#
+#     edges : :class:`tuple` of :class:`.Edge`
+#         The edges which make up the topology graph.
+#
+#     Examples
+#     --------
+#     :class:`COF` instances can be made without supplying
+#     additional arguments (using :class:`.Honeycomb` as an example)
+#
+#     .. code-block:: python
+#
+#         import stk
+#
+#         bb1 = stk.BuildingBlock('NCCN', ['amine'])
+#         bb2 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
+#         cof1 = stk.ConstructedMolecule(
+#             building_blocks=[bb1, bb2],
+#             topology_graph=stk.cof.Honeycomb((2, 2, 1))
+#         )
+#
+#     Different structural isomers of COFs can be made by using the
+#     `vertex_alignments` optional parameter
+#
+#     .. code-block:: python
+#
+#         v0 = stk.cof.Honeycomb.vertices[0]
+#         v2 = stk.cof.Honeycomb.vertices[2]
+#         lattice = stk.cof.Honeycomb(
+#             lattice_size=(2, 2, 1),
+#             vertex_alignments={
+#                 v0: v0.edges[1],
+#                 v2: v2.edges[2]
+#             }
+#         )
+#         cof2 = stk.ConstructedMolecule(
+#             building_blocks=[bb1, bb2],
+#             topology_graph=lattice
+#         )
+#
+#     By changing which edge each vertex is aligned with, a different
+#     structural isomer of the COF can be formed.
+#
+#     Note the in the `vertex_alignments` parameter the class vertices
+#     and edges are used, however when the `building_block_vertices`
+#     parameter is used, the instance vertices are used. **These are not
+#     interchangeable!**
+#
+#     .. code-block:: python
+#
+#         # Use the class vertices and edges to set vertex_alignments
+#         # and create a topology graph.
+#         v0 = stk.cof.Honeycomb.vertices[0]
+#         v2 = stk.cof.Honeycomb.vertices[2]
+#         lattice = stk.cof.Honeycomb(
+#             lattice_size=(2, 2, 1),
+#             vertex_alignments={
+#                 v0: v0.edges[1],
+#                 v2: v2.edges[2]
+#             }
+#         )
+#         bb3 = stk.BuildingBlock('NCOCN', ['amine'])
+#         cof2 = stk.ConstructedMolecule(
+#             building_blocks=[bb1, bb2, bb3],
+#             topology_graph=lattice
+#             # Use the instance vertices in the building_block_vertices
+#             # parameter.
+#             building_block_vertices={
+#                 bb1: lattice.vertices[:2],
+#                 bb2: lattice.vertices[4:],
+#                 bb3: lattice.vertices[2:4]
+#             }
+#         )
+#
+#     The example above also demonstrates how COFs with many building
+#     blocks can be built. You can add as many :class:`.BuildingBlock`
+#     instances into `building_blocks` as you like. If you do not
+#     assign where each building block is placed with
+#     `building_block_vertices`, they will be placed on the
+#     :atttr:`vertices` of the :class:`.COF` at random. Random
+#     placement will account for the fact that the length of
+#     :attr:`.BuildingBlock.func_groups` needs to match the number of
+#     edges connected to a vertex.
+#
+#     """
+#
+#     def __init_subclass__(cls, **kwargs):
+#         for i, vertex in enumerate(cls.vertices):
+#             vertex.id = i
+#         return super().__init_subclass__(**kwargs)
+#
+#     def __init__(
+#         self,
+#         lattice_size,
+#         periodic=False,
+#         vertex_alignments=None,
+#         processes=1
+#     ):
+#         """
+#         Initialize a :class:`.COF`.
+#
+#         Parameters
+#         ----------
+#         lattice_size : :class:`tuple` of :class:`int`
+#             The number of unit cells which should be placed along the
+#             x, y and z dimensions, respectively.
+#
+#         periodic : :class:`bool`, optional
+#             If periodic bonds are to be made across the lattice,
+#             this should be ``True``. If ``False`` the functional
+#             groups on the ends of the lattice will be unreacted.
+#
+#         vertex_alignments : :class:`dict`, optional
+#             A mapping from a :class:`.Vertex` in :attr:`vertices`
+#             to an :class:`.Edge` connected to it. The :class:`.Edge` is
+#             used to align the first :class:`.FunctionalGroup` of a
+#             :class:`.BuildingBlock` placed on that vertex. Only
+#             vertices which need to have their default edge changed need
+#             to be present in the :class:`dict`. If ``None`` then the
+#             first :class:`.Edge` in :class:`.Vertex.edges` is for each
+#             vertex is used. Changing which :class:`.Edge` is used will
+#             mean that the topology graph represents different
+#             structural isomers.
+#
+#             The vertices and edges can also be referred to by their
+#             indices.
+#
+#         processes : :class:`int`, optional
+#             The number of parallel processes to create during
+#             :meth:`construct`.
+#
+#         """
+#
+#         if vertex_alignments is None:
+#             vertex_alignments = {}
+#
+#         self._lattice_size = lattice_size
+#         self._periodic = periodic
+#
+#         # Convert ints to Vertex and Edge instances.
+#         _vertex_alignments = {}
+#         for v, e in vertex_alignments.items():
+#             v = self.vertices[v] if isinstance(v, int) else v
+#             e = v.edges[e] if isinstance(e, int) else e
+#         vertex_alignments = _vertex_alignments
+#
+#         xdim, ydim, zdim = (range(dim) for dim in lattice_size)
+#         # vertex_clones is indexed as vertex_clones[x][y][z]
+#         vertex_clones = [
+#             [
+#                 [
+#                     {} for k in zdim
+#                 ]
+#                 for j in ydim
+#             ]
+#             for i in xdim
+#         ]
+#
+#         # Make a clone of each vertex for each unit cell.
+#         vertices = it.product(
+#             it.product(xdim, ydim, zdim), self.vertices
+#         )
+#         for cell, vertex in vertices:
+#             x, y, z = cell
+#             clone = vertex.clone(clear_edges=True)
+#             clone._cell = cell
+#             clone.aligner_edge = vertex_alignments.get(
+#                 vertex,
+#                 vertex.edges[0]
+#             )
+#
+#             # Shift the clone so that it's within the cell.
+#             shift = 0
+#             for axis, dim in zip(cell, self._lattice_constants):
+#                 shift += axis * dim
+#             clone.set_position(clone.get_position()+shift)
+#
+#             vertex_clones[x][y][z][vertex] = clone
+#
+#         edge_clones = []
+#         # Get an edge for every cell.
+#         edges = it.product(it.product(xdim, ydim, zdim), self.edges)
+#         for cell, edge in edges:
+#             x, y, z = cell
+#             # The cell in which the periodic vertex is found.
+#             periodic_cell = (
+#                 np.array(cell) + np.array(edge.periodicity)
+#             )
+#             v_x, v_y, v_z = (
+#                 dim if dim < 0 else dim % max_dim
+#                 for dim, max_dim in zip(periodic_cell, lattice_size)
+#             )
+#             # Make a vertex map which accounts for the fact that
+#             # second vertex is in the periodic cell.
+#             v0 = edge.vertices[0]
+#             v1 = edge.vertices[1]
+#             vertex_map = {
+#                 v0: vertex_clones[x][y][z][v0],
+#                 v1: vertex_clones[v_x][v_y][v_z][v1]
+#             }
+#             clone = edge.clone(vertex_map)
+#             edge_clones.append(clone)
+#             # If the edge is not periodic if the cell of the periodic
+#             # cell exists.
+#             edge_is_periodic = any(
+#                 dim < 0 or dim >= max_dim
+#                 for dim, max_dim in zip(periodic_cell, lattice_size)
+#             )
+#             if not edge_is_periodic:
+#                 clone.periodicity = (0, 0, 0)
+#             # If the edge is periodic it should use the position of
+#             # the original edge.
+#             else:
+#                 clone.set_position(edge.get_position())
+#
+#             # Set the aligner edge to the clone.
+#             for vertex in vertex_map.values():
+#                 if vertex.aligner_edge is edge:
+#                     vertex.aligner_edge = clone
+#
+#         vertices = tuple(
+#             vertex
+#             for clones in flatten(vertex_clones, {dict})
+#             for vertex in clones.values()
+#         )
+#
+#         super().__init__(
+#             vertices=vertices,
+#             edges=tuple(edge_clones),
+#             processes=processes
+#         )
+#
+#     def _before_react(self, mol, vertex_clones, edge_clones):
+#         if self._periodic:
+#             return vertex_clones, edge_clones
+#         return vertex_clones, [
+#             edge for edge in edge_clones
+#             if all(dim == 0 for dim in edge.periodicity)
+#         ]
+#
+#     def _assign_building_blocks_to_vertices(
+#         self,
+#         mol,
+#         building_blocks
+#     ):
+#         """
+#         Assign `building_blocks` to :attr:`vertices`.
+#
+#         This method will assign a random building block with the
+#         correct amount of functional groups to each vertex.
+#
+#         Assignment is done by modifying
+#         :attr:`.ConstructedMolecule.building_block_vertices`.
+#
+#         Parameters
+#         ----------
+#         mol : :class:`.ConstructedMolecule`
+#             The :class:`.ConstructedMolecule` instance being
+#             constructed.
+#
+#         building_blocks : :class:`list` of :class:`.Molecule`
+#             The :class:`.BuildingBlock` and
+#             :class:`ConstructedMolecule` instances which
+#             represent the building block molecules used for
+#             construction. Only one instance is present per building
+#             block molecule, even if multiples of that building block
+#             join up to form the :class:`ConstructedMolecule`.
+#
+#         Returns
+#         -------
+#         None : :class:`NoneType`
+#
+#         """
+#
+#         bb_by_degree = defaultdict(list)
+#         for bb in building_blocks:
+#             bb_by_degree[len(bb.func_groups)].append(bb)
+#
+#         for vertex in self.vertices:
+#             bb = np.random.choice(bb_by_degree[len(vertex.edges)])
+#             mol.building_block_vertices[bb].append(vertex)
+#
+#     def _get_scale(self, mol):
+#         """
+#         Get the scale used for the positions of :attr:`vertices`.
+#
+#         Parameters
+#         ----------
+#         mol : :class:`.ConstructedMolecule`
+#             The molecule being constructed.
+#
+#         Returns
+#         -------
+#         :class:`float` or :class:`list` of :class:`float`
+#             The value by which the position of each :class:`Vertex` is
+#             scaled. Can be a single number if all axes are scaled by
+#             the same amount or a :class:`list` of three numbers if
+#             each axis is scaled by a different value.
+#
+#         """
+#
+#         return 5*max(
+#             bb.get_maximum_diameter()
+#             for bb in mol.building_block_vertices
+#         )
+#
+#     def __repr__(self):
+#         vertex_alignments = ', '.join(
+#             f'{v.id}: {v.edges.index(v.aligner_edge)}'
+#             for v in self.vertices
+#         )
+#
+#         x, y, z = self._lattice_size
+#
+#         return (
+#             f'cof.{self.__class__.__name__}('
+#             f'lattice_size=({x}, {y}, {z})'
+#             f'vertex_alignments={{{vertex_alignments}}})'
+#         )
+#
+#
+# class Honeycomb(COF):
+#     _lattice_constants = _a, _b, _c = (
+#         np.array([1., 0., 0.]),
+#         np.array([0.5, 0.866, 0]),
+#         np.array([0, 0, 5/1.7321])
+#     )
+#
+#     _vertices = (
+#         _COFVertex(
+#             *((1/3)*_a + (1/3)*_b + (1/2)*_c), _lattice_constants
+#         ),
+#         _COFVertex(
+#             *((2/3)*_a + (2/3)*_b + (1/2)*_c), _lattice_constants
+#         )
+#     )
+#
+#     vertices = (
+#         *_vertices,
+#         _COFVertex.init_at_center(
+#             _vertices[0],
+#             _vertices[1],
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[0], _vertices[1]),
+#             shifts=((0, 0, 0), (0, -1, 0)),
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[0], _vertices[1]),
+#             shifts=((0, 0, 0), (-1, 0, 0)),
+#             lattice_constants=_lattice_constants
+#         )
+#     )
+#
+#     edges = (
+#         Edge(vertices[2], vertices[0]),
+#         Edge(vertices[2], vertices[1]),
+#
+#         Edge(vertices[3], vertices[0]),
+#         Edge(vertices[3], vertices[1], periodicity=(0, -1, 0)),
+#
+#         Edge(vertices[4], vertices[0]),
+#         Edge(vertices[4], vertices[1], periodicity=(-1, 0, 0))
+#     )
+#
+#
+# class Hexagonal(COF):
+#     _lattice_constants = _a, _b, _c = (
+#         np.array([1., 0., 0.]),
+#         np.array([0.5, 0.866, 0]),
+#         np.array([0, 0, 5/1.7321])
+#     )
+#
+#     _vertices = (
+#         _COFVertex(
+#             *((1/4)*_a + (1/4)*_b + (1/2)*_c), _lattice_constants
+#         ),
+#         _COFVertex(
+#             *((1/4)*_a + (3/4)*_b + (1/2)*_c), _lattice_constants
+#         ),
+#         _COFVertex(
+#             *((3/4)*_a + (1/4)*_b + (1/2)*_c), _lattice_constants
+#         ),
+#         _COFVertex(
+#             *((3/4)*_a + (3/4)*_b + (1/2)*_c), _lattice_constants
+#         )
+#     )
+#
+#     vertices = (
+#         *_vertices,
+#         _COFVertex.init_at_center(
+#             _vertices[0],
+#             _vertices[1],
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_center(
+#             _vertices[0],
+#             _vertices[2],
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_center(
+#             _vertices[1],
+#             _vertices[2],
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_center(
+#             _vertices[1],
+#             _vertices[3],
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_center(
+#             _vertices[2],
+#             _vertices[3],
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[0], _vertices[2]),
+#             shifts=((0, 0, 0), (-1, 0, 0)),
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[0], _vertices[1]),
+#             shifts=((0, 0, 0), (0, -1, 0)),
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[0], _vertices[3]),
+#             shifts=((0, 0, 0), (0, -1, 0)),
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[2], _vertices[1]),
+#             shifts=((0, 0, 0), (1, -1, 0)),
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[2], _vertices[3]),
+#             shifts=((0, 0, 0), (0, -1, 0)),
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[1], _vertices[3]),
+#             shifts=((0, 0, 0), (-1, 0, 0)),
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[3], _vertices[0]),
+#             shifts=((0, 0, 0), (1, 0, 0)),
+#             lattice_constants=_lattice_constants
+#         )
+#     )
+#
+#     edges = (
+#         Edge(vertices[4], vertices[0]),
+#         Edge(vertices[4], vertices[1]),
+#
+#         Edge(vertices[5], vertices[0]),
+#         Edge(vertices[5], vertices[2]),
+#
+#         Edge(vertices[6], vertices[1]),
+#         Edge(vertices[6], vertices[2]),
+#
+#         Edge(vertices[7], vertices[1]),
+#         Edge(vertices[7], vertices[3]),
+#
+#         Edge(vertices[8], vertices[2]),
+#         Edge(vertices[8], vertices[3]),
+#
+#         Edge(vertices[9], vertices[0]),
+#         Edge(vertices[9], vertices[2]),
+#
+#         Edge(vertices[10], vertices[0]),
+#         Edge(vertices[10], vertices[1]),
+#
+#         Edge(vertices[11], vertices[0]),
+#         Edge(vertices[11], vertices[3]),
+#
+#         Edge(vertices[12], vertices[2]),
+#         Edge(vertices[12], vertices[1]),
+#
+#         Edge(vertices[13], vertices[2]),
+#         Edge(vertices[13], vertices[3]),
+#
+#         Edge(vertices[14], vertices[1]),
+#         Edge(vertices[14], vertices[3]),
+#
+#         Edge(vertices[15], vertices[3]),
+#         Edge(vertices[15], vertices[0])
+#     )
+#
+#
+# class Square(COF):
+#     _lattice_constants = _a, _b, _c = (
+#         np.array([1., 0., 0.]),
+#         np.array([0., 1., 0.]),
+#         np.array([0., 0., 1.])
+#     )
+#
+#     _vertices = (
+#         _COFVertex(
+#             *((0.5)*_a + (0.5)*_b + (0.5)*_c), _lattice_constants
+#         ),
+#     )
+#     vertices = (
+#         *_vertices,
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[0], _vertices[0]),
+#             shifts=((0, 0, 0), (1, 0, 0)),
+#             lattice_constants=_lattice_constants
+#         ),
+#         _COFVertex.init_at_shifted_center(
+#             vertices=(_vertices[0], _vertices[0]),
+#             shifts=((0, 0, 0), (0, 1, 0)),
+#             lattice_constants=_lattice_constants
+#         )
+#
+#     )
+#
+#     edges = (
+#         Edge(vertices[1], vertices[0]),
+#         Edge(vertices[1], vertices[0]),
+#         Edge(vertices[2], vertices[0]),
+#         Edge(vertices[2], vertices[0])
+#     )
+#
+#
+# class Kagome(COF):
+#     _lattice_constants = _a, _b, _c = (
+#         np.array([1., 0., 0.]),
+#         np.array([0.5, 0.866, 0.]),
+#         np.array([0., 0., 5/1.7321])
+#     )
+#
+#     _vertices = (
+#         Vertex((1/4, 3/4, 0.5)),
+#         Vertex((3/4, 3/4, 1/2)),
+#         Vertex((3/4, 1/4, 1/2))
+#     )
+#
+#     edges = [
+#         Edge(v1, v2, (0, 3)),
+#         Edge(v1, v3, (1, 3)),
+#         Edge(v2, v3, (2, 0)),
+#         Edge(v1, v2, (2, 1), [-1, 0, 0]),
+#         Edge(v1, v3, (3, 1), [-1, 1, 0]),
+#         Edge(v2, v3, (0, 2), [0, 1, 0])
+#     ]
+#
+#
+# class LinkerlessHoneycomb(COF):
+#     ...
