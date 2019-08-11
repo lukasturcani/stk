@@ -1,112 +1,14 @@
 import stk
 import os
 from os.path import join
-import itertools as it
+
+
+from ...._test_utilities import _test_dump_and_load
 
 
 test_dir = 'cage_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
-
-
-def _add_test_attrs(cage):
-    cage.test_attr1 = 'something'
-    cage.test_attr2 = 12
-    cage.test_attr3 = ['12', 'something', 21]
-    cage.test_attr4 = 'skip'
-
-    bb1, bb2, *_ = cage.get_building_blocks()
-    bb1.test_attr1 = 1232
-    bb2.test_attr5 = 'alpha'
-
-    # Add some custom atom properties.
-    cage.atoms[0].some_prop = 'custom atom prop'
-    # Add some custom bond properties
-    cage.bonds[2].other_prop = 1999
-
-
-def _test_func_groups(cage, loaded):
-    fgs = it.zip_longest(cage.func_groups, loaded.func_groups)
-    for fg1, fg2 in fgs:
-        atoms = it.zip_longest(fg1.atoms, fg2.atoms)
-        bonders = it.zip_longest(fg1.bonders, fg2.bonders)
-        deleters = it.zip_longest(fg1.deleters, fg2.deleters)
-        for a1, a2 in it.chain(atoms, bonders, deleters):
-            assert a1.__class__ is a2.__class__
-            assert a1.id is a1.id
-
-
-def _test_atoms(cage, loaded):
-    for a1, a2 in zip(cage.atoms, loaded.atoms):
-        assert a1.__class__ is a2.__class__
-        d1, d2 = dict(vars(a1)), dict(vars(a2))
-        bb1, bb2 = d1.pop('building_block'), d2.pop('building_block')
-        assert d1 == d2
-        assert bb1.is_identical(bb2)
-
-
-def _test_bonds(cage, loaded):
-    for b1, b2 in zip(cage.bonds, loaded.bonds):
-        assert b1.__class__ is b2.__class__
-        d1, d2 = dict(vars(b1)), dict(vars(b2))
-        assert repr(d1.pop('atom1')) == repr(d2.pop('atom1'))
-        assert repr(d1.pop('atom2')) == repr(d2.pop('atom2'))
-        assert d1 == d2
-
-
-def _test_attrs(cage, loaded):
-    assert cage.test_attr1 == loaded.test_attr1
-    assert cage.test_attr2 == loaded.test_attr2
-    assert cage.test_attr3 == loaded.test_attr3
-    assert not hasattr(loaded, 'test_attr4')
-
-
-def _test_bbs(cage, loaded):
-    bbs1 = list(cage.building_block_vertices.keys())
-    bbs2 = list(loaded.building_block_vertices.keys())
-    for bb1, bb2 in it.zip_longest(bbs1, bbs2):
-        assert bb1.is_identical(bb2)
-        assert bb1 is not bb2
-        bb1_count = cage.building_block_counter[bb1]
-        bb2_count = loaded.building_block_counter[bb2]
-        assert bb1_count == bb2_count
-
-    assert bbs2[0].test_attr1 == 1232
-    assert bbs2[1].test_attr5 == 'alpha'
-
-
-def _test_dump_and_load(cage):
-    path = join(
-        test_dir, f'{cage.topology_graph.__class__.__name__}.dump'
-    )
-    _add_test_attrs(cage)
-    cage.dump(
-        path=path,
-        include_attrs=[
-            'test_attr1',
-            'test_attr2',
-            'test_attr3',
-            'test_attr5'
-        ],
-        ignore_missing_attrs=True
-    )
-    loaded = stk.Molecule.load(path)
-
-    assert cage.__class__ is loaded.__class__
-    assert loaded is not cage
-    _test_func_groups(cage, loaded)
-    _test_atoms(cage, loaded)
-    _test_bonds(cage, loaded)
-
-    assert repr(loaded.topology_graph) == repr(cage.topology_graph)
-    assert (
-        len(loaded.construction_bonds) == len(cage.construction_bonds)
-    )
-    _test_attrs(cage, loaded)
-    _test_bbs(cage, loaded)
-    mol3 = stk.Molecule.load(path, use_cache=True)
-    mol4 = stk.Molecule.load(path, use_cache=True)
-    assert mol3 is mol4
 
 
 def test_topologies(
@@ -160,7 +62,7 @@ def test_topologies(
             bb2: num_expected_bb2s
         }
         _test_construction(cage, num_expected_bbs)
-        _test_dump_and_load(cage)
+        _test_dump_and_load(test_dir, cage)
 
 
 def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
@@ -210,7 +112,6 @@ def _test_construction(cage, num_expected_bbs):
 
     for bb in cage.get_building_blocks():
         assert cage.building_block_counter[bb] == num_expected_bbs[bb]
-
         # This test only holds true when each building block is
         # involved in every construction bond.
         if len(num_expected_bbs) < 3:
@@ -248,7 +149,7 @@ def _test_construction(cage, num_expected_bbs):
     )
 
 
-def test_multicage(
+def test_multi_bb(
     amine2,
     amine2_alt1,
     amine2_alt2,
@@ -288,4 +189,4 @@ def test_multicage(
         aldehyde3_alt2: 2
     }
     _test_construction(c, num_expected_bbs)
-    _test_dump_and_load(c)
+    _test_dump_and_load(test_dir, c)

@@ -834,71 +834,71 @@ class Honeycomb(COF):
         Edge(vertices[4], vertices[1], periodicity=(-1, 0, 0))
     )
 
-#
-# class Hexagonal(COF):
-#     _cell_dimensions = (
-#         np.array([1, 0, 0]),
-#         np.array([0.5, 0.866, 0]),
-#         np.array([0, 0, 5/1.7321])
-#     )
-#
-#     _vertices = (
-#         Vertex((1/4, 1/4, 1/2)),
-#         Vertex((1/4, 3/4, 1/2)),
-#         Vertex((3/4, 1/4, 1/2)),
-#         Vertex((3/4, 3/4, 1/2))
-#     )
-#
-#     edges = [
-#         Edge(v1, v2, (0, 3)),
-#         Edge(v1, v3, (1, 4)),
-#         Edge(v2, v3, (2, 5)),
-#         Edge(v2, v4, (1, 4)),
-#         Edge(v3, v4, (0, 3)),
-#         Edge(v1, v3, (4, 1), [-1, 0, 0]),
-#         Edge(v1, v2, (3, 0), [0, -1, 0]),
-#         Edge(v1, v4, (2, 5), [0, -1, 0]),
-#         Edge(v3, v2, (2, 5), [1, -1, 0]),
-#         Edge(v3, v4, (3, 0), [0, -1, 0]),
-#         Edge(v2, v4, (4, 1), [-1, 0, 0]),
-#         Edge(v4, v1, (2, 5), [1, 0, 0])
-#     ]
-#
-#
-# class Square(COF):
-#     _cell_dimensions = (
-#         np.array([1, 0, 0]),
-#         np.array([0, 1, 0]),
-#         np.array([0, 0, 1])
-#     )
-#
-#     _vertices = (
-#         Vertex((0.5, 0.5, 0.5))
-#     )
-#     edges = [
-#         Edge(v1, v1, (1, 3), [1, 0, 0]),
-#         Edge(v1, v1, (0, 2), [0, 1, 0])
-#     ]
-#
-#
-# class Kagome(COF):
-#     _cell_dimensions = (
-#         np.array([1, 0, 0]),
-#         np.array([0.5, 0.866, 0]),
-#         np.array([0, 0, 5/1.7321])
-#     )
-#
-#     _vertices = (
-#         Vertex((1/4, 3/4, 0.5)),
-#         Vertex((3/4, 3/4, 1/2)),
-#         Vertex((3/4, 1/4, 1/2))
-#     )
-#
-#     edges = [
-#         Edge(v1, v2, (0, 3)),
-#         Edge(v1, v3, (1, 3)),
-#         Edge(v2, v3, (2, 0)),
-#         Edge(v1, v2, (2, 1), [-1, 0, 0]),
-#         Edge(v1, v3, (3, 1), [-1, 1, 0]),
-#         Edge(v2, v3, (0, 2), [0, 1, 0])
-#     ]
+
+class Hexagonal(COF):
+    _lattice_constants = (
+        np.array([1, 0, 0]),
+        np.array([0.5, 0.866, 0]),
+        np.array([0, 0, 5/1.7321])
+    )
+
+    _vertices = (
+        Vertex((1/4, 1/4, 1/2)),
+        Vertex((1/4, 3/4, 1/2)),
+        Vertex((3/4, 1/4, 1/2)),
+        Vertex((3/4, 3/4, 1/2))
+    )
+
+    edges = [
+        Edge(v1, v2, (0, 3)),
+        Edge(v1, v3, (1, 4)),
+        Edge(v2, v3, (2, 5)),
+        Edge(v2, v4, (1, 4)),
+        Edge(v3, v4, (0, 3)),
+        Edge(v1, v3, (4, 1), [-1, 0, 0]),
+        Edge(v1, v2, (3, 0), [0, -1, 0]),
+        Edge(v1, v4, (2, 5), [0, -1, 0]),
+        Edge(v3, v2, (2, 5), [1, -1, 0]),
+        Edge(v3, v4, (3, 0), [0, -1, 0]),
+        Edge(v2, v4, (4, 1), [-1, 0, 0]),
+        Edge(v4, v1, (2, 5), [1, 0, 0])
+    ]
+
+
+class Square(COF):
+    _lattice_constants = (
+        np.array([1, 0, 0]),
+        np.array([0, 1, 0]),
+        np.array([0, 0, 1])
+    )
+
+    _vertices = (
+        Vertex((0.5, 0.5, 0.5))
+    )
+    edges = [
+        Edge(v1, v1, (1, 3), [1, 0, 0]),
+        Edge(v1, v1, (0, 2), [0, 1, 0])
+    ]
+
+
+class Kagome(COF):
+    _lattice_constants = (
+        np.array([1, 0, 0]),
+        np.array([0.5, 0.866, 0]),
+        np.array([0, 0, 5/1.7321])
+    )
+
+    _vertices = (
+        Vertex((1/4, 3/4, 0.5)),
+        Vertex((3/4, 3/4, 1/2)),
+        Vertex((3/4, 1/4, 1/2))
+    )
+
+    edges = [
+        Edge(v1, v2, (0, 3)),
+        Edge(v1, v3, (1, 3)),
+        Edge(v2, v3, (2, 0)),
+        Edge(v1, v2, (2, 1), [-1, 0, 0]),
+        Edge(v1, v3, (3, 1), [-1, 1, 0]),
+        Edge(v2, v3, (0, 2), [0, 1, 0])
+    ]

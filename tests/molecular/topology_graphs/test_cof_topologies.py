@@ -1,141 +1,116 @@
 import stk
 import os
 from os.path import join
-import rdkit.Chem.AllChem as rdkit
+
+from ...._test_utilities import _test_dump_and_load
+
 
 test_dir = 'cof_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def test_aligning(amine2, aldehyde4_alt1):
+def test_alignments(amine2_alt3, aldehyde3_alt3, aldehyde4_alt1):
     for i in range(4):
-        top = stk.Kagome(multitopic_aligners=[i, 0, 0])
-        cof = stk.Periodic([amine2, aldehyde4_alt1], top)
-        cof.write(join(test_dir, f'aligning_{i}.sdf'))
+        v0 = stk.cof.Kagome.vertices[0]
+        v = stk.cof.Kagome.vertices[-1]
+        cof = stk.ConstructedMolecule(
+            building_blocks=[amine2_alt3, aldehyde4_alt1],
+            topology_graph=stk.cof.Kagome(
+                lattice_size=(3, 3, 1),
+                vertex_alignments={
+                    v0: v0.edges[i],
+                    v: v.edges[i % 2]
+                }
+            )
+        )
+        cof.write(join(test_dir, f'aligning_{i}_{i%2}.sdf'))
 
 
-def test_honeycomb(amine2, aldehyde3):
-    cof = stk.Periodic([amine2, aldehyde3], stk.Honeycomb())
-    path = join(test_dir, 'honeycomb.sdf')
+def test_multi_bb():
+    assert False
+
+
+def _test_construction(cof, num_expected_bbs):
+    path = join(
+        test_dir, f'{cof.topology_graph.__class__.__name__}.mol'
+    )
     cof.write(path)
-    island = cof.island([3, 3, 1])
-    rdkit.MolToMolFile(island, path.replace('.sdf', '_island.sdf'))
 
-    assert cof.bonds_made == 4
-    assert (cof.mol.GetNumAtoms() ==
-            amine2.mol.GetNumAtoms()*3 +
-            aldehyde3.mol.GetNumAtoms()*2 -
-            cof.bonds_made*3)
-    assert (cof.mol.GetNumBonds() ==
-            amine2.mol.GetNumBonds()*3 +
-            aldehyde3.mol.GetNumBonds()*2 -
-            cof.bonds_made*2)
-    assert cof.bb_counter[amine2] == 3
-    assert cof.bb_counter[aldehyde3] == 2
-    assert cof.topology == stk.Honeycomb()
+    is_periodic = any(
+        any(d != 0 for d in bond.periodicity) for bond in cof.bonds
+    )
+    for bb in cof.get_building_blocks():
+        assert cof.building_block_counter[bb] == num_expected_bbs[bb]
+        # This test only holds true when each building block is
+        # involved in every construction bond and the cof is
+        # periodic.
+        if len(num_expected_bbs) < 3 and is_periodic:
+            assert (
+                len(cof.construction_bonds) ==
+                cof.building_block_counter[bb] * len(bb.func_groups)
+            )
 
-
-def test_hexagonal(amine2, aldehyde6):
-    cof = stk.Periodic([amine2, aldehyde6], stk.Hexagonal())
-    path = os.path.join(test_dir, 'hexagonal.sdf')
-    cof.write(path)
-    island = cof.island([3, 3, 1])
-    rdkit.MolToMolFile(island, path.replace('.sdf', '_island.sdf'))
-
-    assert cof.bonds_made == 17
-    assert (cof.mol.GetNumAtoms() ==
-            amine2.mol.GetNumAtoms()*12 +
-            aldehyde6.mol.GetNumAtoms()*4 -
-            cof.bonds_made*3)
-    assert (cof.mol.GetNumBonds() ==
-            amine2.mol.GetNumBonds()*12 +
-            aldehyde6.mol.GetNumBonds()*4 -
-            cof.bonds_made*2)
-    assert cof.bb_counter[amine2] == 12
-    assert cof.bb_counter[aldehyde6] == 4
-    assert cof.topology == stk.Hexagonal()
-
-
-def test_square(amine2, aldehyde4):
-    cof = stk.Periodic([amine2, aldehyde4], stk.Square())
-    path = os.path.join(test_dir, 'square.sdf')
-    cof.write(path)
-    island = cof.island([3, 3, 1])
-    rdkit.MolToMolFile(island, path.replace('.sdf', '_island.sdf'))
-
-    assert cof.bonds_made == 2
-    assert (cof.mol.GetNumAtoms() ==
-            amine2.mol.GetNumAtoms()*2 +
-            aldehyde4.mol.GetNumAtoms()*1 -
-            cof.bonds_made*3)
-    assert (cof.mol.GetNumBonds() ==
-            amine2.mol.GetNumBonds()*2 +
-            aldehyde4.mol.GetNumBonds()*1 -
-            cof.bonds_made*2)
-    assert cof.bb_counter[amine2] == 2
-    assert cof.bb_counter[aldehyde4] == 1
-    assert cof.topology == stk.Square()
+    num_deleters = sum(
+        len(fg.deleters)*cof.building_block_counter[bb]
+        for bb in cof.get_building_blocks() for fg in bb.func_groups
+    )
+    num_bb_atoms = sum(
+        len(bb.atoms)*cof.building_block_counter[bb]
+        for bb in cof.get_building_blocks()
+    )
+    num_bb_bonds = sum(
+        len(bb.bonds)*cof.building_block_counter[bb]
+        for bb in cof.get_building_blocks()
+    )
+    # Check that the correct number of bonds got made.
+    assert (
+        len(cof.construction_bonds) == len(cof.topology_graph.edges)
+    )
+    # Check correct total number of atoms.
+    if is_periodic:
+        assert len(cof.atoms) == num_bb_atoms - num_deleters
+    # Check correct total number of bonds.
+    if is_periodic:
+        assert (
+            len(cof.bonds) ==
+            num_bb_bonds + len(cof.construction_bonds) - num_deleters
+        )
 
 
-def test_kagome(amine2, aldehyde4):
-    cof = stk.Periodic([amine2, aldehyde4], stk.Kagome())
-    path = os.path.join(test_dir, 'kagome.sdf')
-    cof.write(path)
-    island = cof.island([3, 3, 1])
-    rdkit.MolToMolFile(island, path.replace('.sdf', '_island.sdf'))
+def test_topologies(
+    tmp_honeycomb,
+    tmp_periodic_honeycomb,
+    tmp_kagome,
+    tmp_periodic_kagome,
+    tmp_hexagonal,
+    tmp_periodic_hexagonal,
+    tmp_square,
+    tmp_periodic_square,
+    tmp_linkerless_honeycomb,
+    tmp_periodic_linkerless_honeycomb
+):
+    cofs = (
+        (tmp_honeycomb, 3*9, 2*9),
+        (tmp_periodic_honeycomb, 3*9, 2*9)
+        (tmp_kagome, 6*9, 3*9),
+        (tmp_periodic_kagome, 6*9, 3*9),
+        (tmp_hexagonal, 12*9, 4*9),
+        (tmp_periodic_hexagonal, 12*9, 4*9)
+        (tmp_square, 2*9, 1*9),
+        (tmp_periodic_square, 2*9, 1*9)
+        (tmp_linkerless_honeycomb, 1*9, 1*9)
+        (tmp_periodic_linkerless_honeycomb, 1*9, 1*9)
+    )
 
-    assert cof.bonds_made == 9
-    assert (cof.mol.GetNumAtoms() ==
-            amine2.mol.GetNumAtoms()*6 +
-            aldehyde4.mol.GetNumAtoms()*3 -
-            cof.bonds_made*3)
-    assert (cof.mol.GetNumBonds() ==
-            amine2.mol.GetNumBonds()*6 +
-            aldehyde4.mol.GetNumBonds()*3 -
-            cof.bonds_made*2)
-    assert cof.bb_counter[amine2] == 6
-    assert cof.bb_counter[aldehyde4] == 3
-    assert cof.topology == stk.Kagome()
-
-
-def test_boron_cof(diol2, boronic_acid4):
-    cof = stk.Periodic([diol2, boronic_acid4], stk.Square())
-    path = join(test_dir, 'boron.sdf')
-    cof.write(path)
-    island = cof.island([3, 3, 1])
-    rdkit.MolToMolFile(island, path.replace('.sdf', '_island.sdf'))
-
-    assert cof.bonds_made == 4
-    assert (cof.mol.GetNumAtoms() ==
-            diol2.mol.GetNumAtoms()*2 +
-            boronic_acid4.mol.GetNumAtoms()*1 -
-            cof.bonds_made*3)
-    assert (cof.mol.GetNumBonds() ==
-            diol2.mol.GetNumBonds()*2 +
-            boronic_acid4.mol.GetNumBonds()*1 -
-            cof.bonds_made*2)
-    assert cof.bb_counter[diol2] == 2
-    assert cof.bb_counter[boronic_acid4] == 1
-    assert cof.topology == stk.Square()
-
-
-def test_nolinkerhoneycomb(amine3, aldehyde3):
-    cof = stk.Periodic([amine3, aldehyde3], stk.NoLinkerHoneycomb())
-    path = join(test_dir, 'nolinkerhoneycomb.sdf')
-    cof.write(path)
-    island = cof.island([3, 3, 1])
-    rdkit.MolToMolFile(island, path.replace('.sdf', '_island.sdf'))
-
-    assert cof.bonds_made == 1
-    assert (cof.mol.GetNumAtoms() ==
-            amine3.mol.GetNumAtoms() +
-            aldehyde3.mol.GetNumAtoms() -
-            cof.bonds_made*3)
-    assert (cof.mol.GetNumBonds() ==
-            amine3.mol.GetNumBonds()*1 +
-            aldehyde3.mol.GetNumBonds()*1 -
-            cof.bonds_made*2)
-    assert cof.bb_counter[amine3] == 1
-    assert cof.bb_counter[aldehyde3] == 1
-    assert cof.topology == stk.NoLinkerHoneycomb()
+    for cof, num_linkers, num_building_blocks in cofs:
+        linker, building_block = sorted(
+            cof.get_building_blocks(),
+            key=lambda bb: len(bb.func_groups)
+        )
+        num_expected_bbs = {
+            linker: num_linkers,
+            building_block: num_building_blocks
+        }
+        _test_construction(cof, num_expected_bbs)
+        _test_dump_and_load(cof)
