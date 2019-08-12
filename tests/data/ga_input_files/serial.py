@@ -23,20 +23,22 @@ logging_level = logging.DEBUG
 
 carbon = 'C'
 building_blocks = [
-    stk.StructUnit2.smiles_init(f'[Br]{carbon*i}[Br]', ['bromine'])
+    stk.BuildingBlock(f'[Br]{carbon*i}[Br]', ['bromine'])
     for i in range(2, 27)
 ]
 
-topologies = [
-    stk.Linear('A', [0], 3),
-    stk.Linear('A', [0], 6),
-    stk.Linear('A', [0], 12)
+topology_graphs = [
+    stk.polymer.Linear('A', [0], 3),
+    stk.polymer.Linear('A', [0], 6),
+    stk.polymer.Linear('A', [0], 12)
 ]
 
-population = stk.GAPopulation.init_random(stk.Polymer,
-                                          [building_blocks],
-                                          topologies,
-                                          25)
+population = stk.GAPopulation.init_random(
+    building_blocks=[building_blocks],
+    topology_graphs=topology_graphs,
+    size=25,
+    use_cache=True
+)
 
 # #####################################################################
 # Selector for selecting the next generation.
@@ -51,15 +53,15 @@ generation_selector = stk.SelectorSequence(
 # Selector for selecting parents.
 # #####################################################################
 
-crossover_selector = stk.AboveAverage(num=5, batch_size=2)
+crossover_selector = stk.AboveAverage(num_batches=5, batch_size=2)
 
 # #####################################################################
 # Selector for selecting molecules for mutation.
 # #####################################################################
 
 mutation_selector = stk.SelectorFunnel(
-    stk.AboveAverage(num=10, duplicates=False),
-    stk.Roulette(num=5)
+    stk.AboveAverage(num_batches=10, duplicates=False),
+    stk.Roulette(num_batches=5)
 )
 
 # #####################################################################
@@ -73,7 +75,7 @@ crosser = stk.Jumble(num_offspring_building_blocks=3)
 # #####################################################################
 
 mutator = stk.RandomMutation(
-    stk.RandomTopology(topologies),
+    stk.RandomTopology(topology_graphs),
     stk.RandomBuildingBlock(building_blocks, lambda mol: True),
     stk.SimilarBuildingBlock(building_blocks, lambda mol: True, False)
 )
@@ -89,11 +91,8 @@ optimizer = stk.NullOptimizer(use_cache=True)
 # #####################################################################
 
 
-def num_atoms(mol, conformer):
-    n_atoms = mol.mol.GetNumAtoms()
-    # Save the number of atoms in an attribute for later plotting.
-    mol.num_atoms = n_atoms
-    return n_atoms
+def num_atoms(mol):
+    return len(mol.atoms)
 
 
 fitness_calculator = stk.PropertyVector(num_atoms)
@@ -121,19 +120,27 @@ exiter = stk.NumGenerations(25)
 # #####################################################################
 
 plotters = [
-    stk.ProgressPlotter(filename='fitness_plot',
-                        attr='fitness',
-                        y_label='Fitness',
-                        default=1e-4),
-    stk.ProgressPlotter(filename='atom_number_plot',
-                        attr='num_atoms',
-                        y_label='Number of Atoms',
-                        default=0)
+    stk.ProgressPlotter(
+        filename='fitness_plot',
+        property_fn=lambda mol: mol.fitness,
+        y_label='Fitness',
+    ),
+    stk.ProgressPlotter(
+        filename='atom_number_plot',
+        property_fn=lambda mol: len(mol.atoms),
+        y_label='Number of Atoms',
+    )
 ]
 
-stk.SelectionPlotter(filename='generational_selection',
-                     selector=generation_selector)
-stk.SelectionPlotter(filename='crossover_selection',
-                     selector=crossover_selector)
-stk.SelectionPlotter(filename='mutation_selection',
-                     selector=mutation_selector)
+stk.SelectionPlotter(
+    filename='generational_selection',
+    selector=generation_selector
+)
+stk.SelectionPlotter(
+    filename='crossover_selection',
+    selector=crossover_selector
+)
+stk.SelectionPlotter(
+    filename='mutation_selection',
+    selector=mutation_selector
+)
