@@ -1437,7 +1437,7 @@ class GAPopulation(Population):
 
         mutants = []
         parents = self._mutation_selector.select(self)
-        num = self._mutation_selector.num_batches
+        num = self._mutation_selector._num_batches
         for i, (parent, ) in enumerate(parents, 1):
             logger.info(f'Mutation number {i}. Finish when {num}.')
             mutant = self._mutator.mutate(parent)
@@ -1483,7 +1483,7 @@ class GAPopulation(Population):
 
         offspring = []
         parent_batches = self._crossover_selector.select(self)
-        num = self._crossover_selector.num_batches
+        num = self._crossover_selector._num_batches
         for i, parents in enumerate(parent_batches, 1):
             logger.info(f'Crossover number {i}. Finish when {num}.')
             for child in self._crosser.cross(*parents):

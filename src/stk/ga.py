@@ -139,7 +139,7 @@ class GAHistory:
 
     @staticmethod
     def log_file_content(progress):
-        for sp in progress.populations:
+        for sp in progress.subpopulations:
             for mol in sp:
                 yield f'{mol.id} {mol}'
             yield '\n'
@@ -194,7 +194,7 @@ class GAHistory:
         for i, mol in enumerate(pop, 1):
             fitness = self.fitness_calculator._cache[mol]
             yield (
-                f'{i:<10}\t{mol.name:<10}\t\t{fitness!r:<40}\t'
+                f'{i:<10}\t{mol}\t\t{fitness!r:<40}\t'
                 f'{mol.fitness}\n{underline}'
             )
 
@@ -362,7 +362,7 @@ def ga_run(filename, input_file):
         history.db(pop)
 
         logger.info('Selecting members of the next generation.')
-        pop = pop.get_next_gen()
+        pop = pop.get_next_generation()
 
         history.log_pop(logger, pop)
 
@@ -389,7 +389,7 @@ def ga_run(filename, input_file):
     os.chdir(root_dir)
     os.rename('scratch/errors.log', 'errors.log')
 
-    pop.write('final_pop', True)
+    pop.write('final_pop')
     os.chdir(launch_dir)
     if tar_output:
         logger.info('Compressing output.')

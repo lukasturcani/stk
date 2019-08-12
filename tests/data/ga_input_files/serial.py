@@ -45,8 +45,8 @@ population = stk.GAPopulation.init_random(
 # #####################################################################
 
 generation_selector = stk.SelectorSequence(
-    stk.Fittest(num=3, duplicates=False),
-    stk.Roulette(num=22, duplicates=False)
+    stk.Fittest(num_batches=3, duplicates=False),
+    stk.Roulette(num_batches=22, duplicates=False)
 )
 
 # #####################################################################
@@ -75,7 +75,7 @@ crosser = stk.Jumble(num_offspring_building_blocks=3)
 # #####################################################################
 
 mutator = stk.RandomMutation(
-    stk.RandomTopology(topology_graphs),
+    stk.RandomTopologyGraph(topology_graphs),
     stk.RandomBuildingBlock(building_blocks, lambda mol: True),
     stk.SimilarBuildingBlock(building_blocks, lambda mol: True, False)
 )
