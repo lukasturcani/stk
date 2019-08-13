@@ -184,6 +184,31 @@ class _COFVertex(Vertex):
         clone._cell = self._cell
         return clone
 
+    def set_cell(self, x, y, z):
+        """
+        Set in which cell of the lattice the vertex is found.
+
+        Parameters
+        ----------
+        x : :class:`int`
+            The x position of the cell.
+
+        y : :class:`int`
+            The y position of the cell.
+
+        z : :class:`int`
+            The z position of the cell.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
+        self._cell = (x, y, z)
+        return self
+
     def place_building_block(self, building_block):
         """
         Place `building_block` on the :class:`.Vertex`.
@@ -589,19 +614,22 @@ class COF(TopologyGraph):
             groups on the ends of the lattice will be unreacted.
 
         vertex_alignments : :class:`dict`, optional
-            A mapping from a :class:`.Vertex` in :attr:`vertices`
-            to an :class:`.Edge` connected to it. The :class:`.Edge` is
-            used to align the first :class:`.FunctionalGroup` of a
-            :class:`.BuildingBlock` placed on that vertex. Only
-            vertices which need to have their default edge changed need
-            to be present in the :class:`dict`. If ``None`` then the
-            first :class:`.Edge` in :class:`.Vertex.edges` is for each
-            vertex is used. Changing which :class:`.Edge` is used will
-            mean that the topology graph represents different
-            structural isomers.
+            A mapping from a :class:`.Vertex`, in the class
+            attribute :attr:`vertices`, to an :class:`.Edge`, in the
+            class attribute :attr:`edges`, connected to it.
+            The :class:`.Edge` is used to align the first
+            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+            placed on that vertex. Only vertices which need to have
+            their default alignment changed need to be present in the
+            :class:`dict`. If ``None`` then the first :class:`.Edge`
+            in :attr:`.Vertex.edges` is used for each vertex. Changing
+            which :class:`.Edge` is used will mean that the topology
+            graph will represent a different structural isomer.
 
             The vertices and edges can also be referred to by their
-            indices.
+            indices. The vertices are referred to by their index in
+            the class attribute :attr:`vertices` while the edges are
+            referred to by their index in :attr:`.Vertex.edges`.
 
         processes : :class:`int`, optional
             The number of parallel processes to create during
@@ -640,19 +668,22 @@ class COF(TopologyGraph):
         Parameters
         ----------
         vertex_alignments : :class:`dict`
-            A mapping from a :class:`.Vertex` in :attr:`vertices`
-            to an :class:`.Edge` connected to it. The :class:`.Edge` is
-            used to align the first :class:`.FunctionalGroup` of a
-            :class:`.BuildingBlock` placed on that vertex. Only
-            vertices which need to have their default edge changed need
-            to be present in the :class:`dict`. If ``None`` then the
-            first :class:`.Edge` in :class:`.Vertex.edges` is for each
-            vertex is used. Changing which :class:`.Edge` is used will
-            mean that the topology graph represents different
-            structural isomers.
+            A mapping from a :class:`.Vertex`, in the class
+            attribute :attr:`vertices`, to an :class:`.Edge`, in the
+            class attribute :attr:`edges`, connected to it.
+            The :class:`.Edge` is used to align the first
+            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+            placed on that vertex. Only vertices which need to have
+            their default alignment changed need to be present in the
+            :class:`dict`. If ``None`` then the first :class:`.Edge`
+            in :attr:`.Vertex.edges` is used for each vertex. Changing
+            which :class:`.Edge` is used will mean that the topology
+            graph will represent a different structural isomer.
 
             The vertices and edges can also be referred to by their
-            indices.
+            indices. The vertices are referred to by their index in
+            the class attribute :attr:`vertices` while the edges are
+            referred to by their index in :attr:`.Vertex.edges`.
 
         Returns
         -------
@@ -675,20 +706,27 @@ class COF(TopologyGraph):
         Parameters
         ---------
         vertex_alignments : :class:`dict`
-            A mapping from a :class:`.Vertex` in :attr:`vertices`
-            to an :class:`.Edge` connected to it. The :class:`.Edge` is
-            used to align the first :class:`.FunctionalGroup` of a
-            :class:`.BuildingBlock` placed on that vertex. Only
-            vertices which need to have their default edge changed need
-            to be present in the :class:`dict`. If ``None`` then the
-            first :class:`.Edge` in :class:`.Vertex.edges` is for each
-            vertex is used. Changing which :class:`.Edge` is used will
-            mean that the topology graph represents different
-            structural isomers.
+            A mapping from a :class:`.Vertex`, in the class
+            attribute :attr:`vertices`, to an :class:`.Edge`, in the
+            class attribute :attr:`edges`, connected to it.
+            The :class:`.Edge` is used to align the first
+            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+            placed on that vertex. Only vertices which need to have
+            their default alignment changed need to be present in the
+            :class:`dict`. If ``None`` then the first :class:`.Edge`
+            in :attr:`.Vertex.edges` is used for each vertex. Changing
+            which :class:`.Edge` is used will mean that the topology
+            graph will represent a different structural isomer.
 
         Returns
         -------
-        :class:
+        :class:`list`
+            A nested :class:`list` which can be indexed as
+            ``vertices[x][y][z]``, which will return a :class:`dict`
+            for the unit cell at (x, y, z). The :class:`dict` maps
+            the vertices in the class attribute :attr:`vertices` to
+            the instance clones, for that unit cell.
+
 
         """
 
@@ -711,7 +749,7 @@ class COF(TopologyGraph):
         for cell, vertex in vertices:
             x, y, z = cell
             clone = vertex.clone(clear_edges=True)
-            clone._cell = cell
+            clone.set_cell(x, y, z)
             clone.aligner_edge = vertex_alignments.get(
                 vertex,
                 vertex.edges[0]
@@ -731,6 +769,18 @@ class COF(TopologyGraph):
         Create the edges in the topology graph instance.
 
         Parameters
+        ----------
+        vertices : :class:`list`
+            A nested :class:`list` which can be indexed as
+            ``vertices[x][y][z]``, which will return a :class:`dict`
+            for the unit cell at (x, y, z). The :class:`dict` maps
+            the vertices in the class attribute :attr:`vertices` to
+            the instance clones, for that unit cell.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.Edge`
+            The edges of the topology graph instance.
 
         """
 
