@@ -2,6 +2,7 @@ import stk
 import os
 from collections import namedtuple
 from os.path import join
+import numpy as np
 
 from ..._test_utilities import _test_dump_and_load
 
@@ -12,9 +13,59 @@ if not os.path.exists(test_dir):
 
 
 def test_place_linear_building_block(tmp_amine2):
+    topology_graphs = (
+        stk.cof.Honeycomb((2, 2, 1)),
+        stk.cof.Hexagonal((2, 2, 1)),
+        stk.cof.Square((2, 2, 1)),
+        stk.cof.Kagome((2, 2, 1)),
+        stk.cof.LinkerlessHoneycomb((2, 2, 1))
+    )
+    for topology_graph in topology_graphs:
+        linear_vertex = next(
+            v for v in topology_graph.vertices if len(v.edges) == 2
+        )
+        linear_vertex.place_building_block(tmp_amine2)
+        bonder_centroid = tmp_amine2.get_centroid(
+            atom_ids=tmp_amine2.get_bonder_ids()
+        )
+        assert np.allclose(
+            a=bonder_centroid,
+            b=linear_vertex.get_position(),
+            atol=1e-6
+        )
 
 
-
+def test_place_nonlinear_building_block(
+    tmp_aldehyde3,
+    tmp_aldehyde4,
+    tmp_aldehyde6
+):
+    topology_graphs = (
+        stk.cof.Honeycomb((2, 2, 1)),
+        stk.cof.Hexagonal((2, 2, 1)),
+        stk.cof.Square((2, 2, 1)),
+        stk.cof.Kagome((2, 2, 1)),
+        stk.cof.LinkerlessHoneycomb((2, 2, 1))
+    )
+    building_blocks = {
+        3: tmp_aldehyde3,
+        4: tmp_aldehyde4,
+        6: tmp_aldehyde6
+    }
+    for topology_graph in topology_graphs:
+        nonlinear_vertex = next(
+            v for v in topology_graph.vertices if len(v.edges) > 2
+        )
+        bb = building_blocks[len(nonlinear_vertex.edges)]
+        nonlinear_vertex.place_building_block(bb)
+        bonder_centroid = tmp_aldehyde3.get_centroid(
+            atom_ids=tmp_aldehyde3.get_bonder_ids()
+        )
+        assert np.allclose(
+            a=bonder_centroid,
+            b=nonlinear_vertex.get_position(),
+            atol=1e-6
+        )
 
 
 def _test_construction(

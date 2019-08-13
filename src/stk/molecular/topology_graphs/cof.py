@@ -776,14 +776,15 @@ class COF(TopologyGraph):
     def __repr__(self):
         vertex_alignments = ', '.join(
             f'{v.id}: {v.edges.index(v.aligner_edge)}'
-            for v in self.vertices
+            # Only get the vertices in the first unit cell.
+            for v in self.vertices[:len(self.__class__.vertices)]
         )
 
         x, y, z = self._lattice_size
 
         return (
             f'cof.{self.__class__.__name__}('
-            f'lattice_size=({x}, {y}, {z})'
+            f'lattice_size=({x}, {y}, {z}), '
             f'vertex_alignments={{{vertex_alignments}}})'
         )
 

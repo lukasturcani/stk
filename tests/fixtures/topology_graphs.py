@@ -15,3 +15,8 @@ def tmp_ab_chain3():
 @pytest.fixture(scope='session')
 def ab_chain6():
     return stk.polymer.Linear('AB', [0, 0], 6)
+
+
+@pytest.fixture(scope='session')
+def honeycomb_lattice():
+    return stk.cof.Honeycomb((3, 3, 1))
