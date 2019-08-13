@@ -179,7 +179,7 @@ def test_multi_bb(
             amine2_alt2: four_plus_six.vertices[7:]
         }
     )
-    c.write(join(test_dir, 'multi_FourPlusSix.mol'))
+    c.write(join(test_dir, 'multi_bb.mol'))
     num_expected_bbs = {
         amine2: 2,
         amine2_alt1: 1,
