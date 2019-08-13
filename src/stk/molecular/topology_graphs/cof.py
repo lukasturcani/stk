@@ -783,7 +783,7 @@ class COF(TopologyGraph):
 
         """
 
-        edges = []
+        edge_clones = []
         # Make a clone for each edge for each unit cell.
         xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
         cells = it.product(xdim, ydim, zdim)
@@ -813,17 +813,17 @@ class COF(TopologyGraph):
                 for dim, max_dim in zip(cell2, self._lattice_size)
             )
             clone = edge.clone(
-                recalculate_position=edge_is_not_periodic,
-                vertex_map=vertex_map
+                vertex_map=vertex_map,
+                recalculate_position=edge_is_not_periodic
             )
-            edges.append(clone)
+            edge_clones.append(clone)
             if edge_is_not_periodic:
                 clone.periodicity = (0, 0, 0)
             # Set the aligner edge to the clone.
             for vertex in vertex_map.values():
                 if vertex.aligner_edge is edge:
                     vertex.aligner_edge = clone
-        return tuple(edges)
+        return tuple(edge_clones)
 
     def _before_react(self, mol, vertex_clones, edge_clones):
         if self._periodic:

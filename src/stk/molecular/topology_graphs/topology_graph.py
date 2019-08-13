@@ -461,17 +461,12 @@ class Edge:
         if not self._custom_position:
             self._position = _position / i
 
-    def clone(self, recalculate_position=False, vertex_map=None):
+    def clone(self, vertex_map=None, recalculate_position=False):
         """
         Return a clone.
 
         Parameters
         ----------
-        recalculate_position : :class:`bool`, optional
-            Toggle if the position of the clone should be reculated
-            from the vertices it connects or if it should inherit
-            the position of the original edge.
-
         vertex_map : :class:`dict`, optional
             If the clone should hold different :class:`.Vertex`
             instances, then a :class:`dict` should be provided, which
@@ -479,6 +474,11 @@ class Edge:
             vertices which should be used in the clone. Only
             vertices which need to be remapped need to be present in
             the `vertex_map`.
+
+        recalculate_position : :class:`bool`, optional
+            Toggle if the position of the clone should be reculated
+            from the vertices it connects or if it should inherit
+            the position of the original edge.
 
         Returns
         -------
