@@ -611,97 +611,25 @@ class COF(TopologyGraph):
 
         if vertex_alignments is None:
             vertex_alignments = {}
-
-        self._lattice_size = lattice_size
-        self._periodic = periodic
-
         vertex_alignments = self._normalize_vertex_alignments(
             vertex_alignments=vertex_alignments
         )
 
-        xdim, ydim, zdim = (range(dim) for dim in lattice_size)
-        # vertex_clones is indexed as vertex_clones[x][y][z]
-        vertex_clones = [
-            [
-                [
-                    {} for k in zdim
-                ]
-                for j in ydim
-            ]
-            for i in xdim
-        ]
+        self._lattice_size = lattice_size
+        self._periodic = periodic
 
-        # Make a clone of each vertex for each unit cell.
-        vertices = it.product(
-            it.product(xdim, ydim, zdim), self.vertices
-        )
-        for cell, vertex in vertices:
-            x, y, z = cell
-            clone = vertex.clone(clear_edges=True)
-            clone._cell = cell
-            clone.aligner_edge = vertex_alignments.get(
-                vertex,
-                vertex.edges[0]
-            )
-
-            # Shift the clone so that it's within the cell.
-            shift = 0
-            for axis, dim in zip(cell, self._lattice_constants):
-                shift += axis * dim
-            clone.set_position(clone.get_position()+shift)
-
-            vertex_clones[x][y][z][vertex] = clone
-
-        edge_clones = []
-        # Get an edge for every cell.
-        edges = it.product(it.product(xdim, ydim, zdim), self.edges)
-        for cell, edge in edges:
-            x, y, z = cell
-            # The cell in which the periodic vertex is found.
-            periodic_cell = (
-                np.array(cell) + np.array(edge.periodicity)
-            )
-            v_x, v_y, v_z = (
-                dim if dim < 0 else dim % max_dim
-                for dim, max_dim in zip(periodic_cell, lattice_size)
-            )
-            # Make a vertex map which accounts for the fact that
-            # second vertex is in the periodic cell.
-            v0 = edge.vertices[0]
-            v1 = edge.vertices[1]
-            vertex_map = {
-                v0: vertex_clones[x][y][z][v0],
-                v1: vertex_clones[v_x][v_y][v_z][v1]
-            }
-            clone = edge.clone(vertex_map)
-            edge_clones.append(clone)
-            # If the edge is not periodic if the cell of the periodic
-            # cell exists.
-            edge_is_periodic = any(
-                dim < 0 or dim >= max_dim
-                for dim, max_dim in zip(periodic_cell, lattice_size)
-            )
-            if not edge_is_periodic:
-                clone.periodicity = (0, 0, 0)
-            # If the edge is periodic it should use the position of
-            # the original edge.
-            else:
-                clone.set_position(edge.get_position())
-
-            # Set the aligner edge to the clone.
-            for vertex in vertex_map.values():
-                if vertex.aligner_edge is edge:
-                    vertex.aligner_edge = clone
+        vertices = self._get_instance_vertices(vertex_alignments)
+        edges = self._get_instance_edges(vertices)
 
         vertices = tuple(
             vertex
-            for clones in flatten(vertex_clones, {dict})
+            for clones in flatten(vertices, {dict})
             for vertex in clones.values()
         )
 
         super().__init__(
             vertices=vertices,
-            edges=tuple(edge_clones),
+            edges=edges,
             processes=processes
         )
 
@@ -739,6 +667,115 @@ class COF(TopologyGraph):
             v = self.vertices[v] if isinstance(v, int) else v
             e = v.edges[e] if isinstance(e, int) else e
         return _vertex_alignments
+
+    def _get_instance_vertices(self, vertex_alignments):
+        """
+        Create the vertices of the topology graph instance.
+
+        Parameters
+        ---------
+        vertex_alignments : :class:`dict`
+            A mapping from a :class:`.Vertex` in :attr:`vertices`
+            to an :class:`.Edge` connected to it. The :class:`.Edge` is
+            used to align the first :class:`.FunctionalGroup` of a
+            :class:`.BuildingBlock` placed on that vertex. Only
+            vertices which need to have their default edge changed need
+            to be present in the :class:`dict`. If ``None`` then the
+            first :class:`.Edge` in :class:`.Vertex.edges` is for each
+            vertex is used. Changing which :class:`.Edge` is used will
+            mean that the topology graph represents different
+            structural isomers.
+
+        Returns
+        -------
+        :class:
+
+        """
+
+        xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
+        # vertex_clones is indexed as vertex_clones[x][y][z]
+        vertex_clones = [
+            [
+                [
+                    {} for k in zdim
+                ]
+                for j in ydim
+            ]
+            for i in xdim
+        ]
+
+        # Make a clone of each vertex for each unit cell.
+        vertices = it.product(
+            it.product(xdim, ydim, zdim), self.vertices
+        )
+        for cell, vertex in vertices:
+            x, y, z = cell
+            clone = vertex.clone(clear_edges=True)
+            clone._cell = cell
+            clone.aligner_edge = vertex_alignments.get(
+                vertex,
+                vertex.edges[0]
+            )
+
+            # Shift the clone so that it's within the cell.
+            shift = 0
+            for axis, dim in zip(cell, self._lattice_constants):
+                shift += axis * dim
+            clone.set_position(clone.get_position()+shift)
+
+            vertex_clones[x][y][z][vertex] = clone
+        return vertex_clones
+
+    def _get_instance_edges(self, vertices):
+        """
+        Create the edges in the topology graph instance.
+
+        Parameters
+
+        """
+
+        edges = []
+        # Get an edge for every cell.
+        xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
+        edges = it.product(it.product(xdim, ydim, zdim), self.edges)
+        for cell, edge in edges:
+            x, y, z = cell
+            # The cell in which edge.vertices[1] is found.
+            cell2 = np.array(cell) + np.array(edge.periodicity)
+            # If cell2 is bigger than lattice_size along any
+            # dimension, treat it periodically - ie wrap around.
+            cell2_x, cell2_y, cell2_z = (
+                dim if dim < 0 else dim % max_dim
+                for dim, max_dim in zip(cell2, self._lattice_size)
+            )
+            # Make a vertex map which accounts for the fact that
+            # second vertex is in the periodic cell.
+            v0 = edge.vertices[0]
+            v1 = edge.vertices[1]
+            vertex_map = {
+                v0: vertices[x][y][z][v0],
+                v1: vertices[cell2_x][cell2_y][cell2_z][v1]
+            }
+            clone = edge.clone(vertex_map)
+            edges.append(clone)
+            # If the edge is not periodic if the cell of the periodic
+            # cell exists.
+            edge_is_periodic = any(
+                dim < 0 or dim >= max_dim
+                for dim, max_dim in zip(periodic_cell, self._lattice_size)
+            )
+            if not edge_is_periodic:
+                clone.periodicity = (0, 0, 0)
+            # If the edge is periodic it should use the position of
+            # the original edge.
+            else:
+                clone.set_position(edge.get_position())
+
+            # Set the aligner edge to the clone.
+            for vertex in vertex_map.values():
+                if vertex.aligner_edge is edge:
+                    vertex.aligner_edge = clone
+        return tuple(edges)
 
     def _before_react(self, mol, vertex_clones, edge_clones):
         if self._periodic:
