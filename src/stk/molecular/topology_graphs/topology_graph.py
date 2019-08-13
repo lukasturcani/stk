@@ -721,8 +721,9 @@ class TopologyGraph:
                 mol.building_block_vertices
             )
 
-        vertex_clones = self._clone_vertices(mol)
-        edge_clones = self._clone_edges(vertex_clones)
+        scale = self._get_scale(mol)
+        vertex_clones = self._clone_vertices(mol, scale)
+        edge_clones = self._clone_edges(vertex_clones, scale)
 
         self._prepare(mol)
         self._place_building_blocks(mol, vertex_clones)
@@ -780,7 +781,7 @@ class TopologyGraph:
 
     def _get_scale(self, mol):
         """
-        Get the scale used for the positions of :attr:`vertices`.
+        Get the scale used for vertex and edge positions.
 
         Parameters
         ----------
@@ -790,10 +791,10 @@ class TopologyGraph:
         Returns
         -------
         :class:`float` or :class:`list` of :class:`float`
-            The value by which the position of each :class:`Vertex` is
-            scaled. Can be a single number if all axes are scaled by
-            the same amount or a :class:`list` of three numbers if
-            each axis is scaled by a different value.
+            The value by which the position of each :class:`Vertex` and
+            is :class:`Edge` is scaled. Can be a single number if all
+            axes are scaled by the same amount or a :class:`list` of
+            three numbers if each axis is scaled by a different value.
 
         Raises
         ------
@@ -805,7 +806,7 @@ class TopologyGraph:
 
         raise NotImplementedError()
 
-    def _clone_vertices(self, mol):
+    def _clone_vertices(self, mol, scale):
         """
         Create clones of :attr:`vertices`.
 
@@ -821,6 +822,12 @@ class TopologyGraph:
         mol : :class:`.ConstructedMolecule`
             The molecule being constructed.
 
+        scale : :class:`float` or :class:`list` of :class:`float`
+            The value by which the position of each :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
+
         Returns
         -------
         :class:`dict`
@@ -829,7 +836,6 @@ class TopologyGraph:
         """
 
         clones = {}
-        scale = self._get_scale(mol)
         for vertex in self.vertices:
             clone = vertex.clone(clear_edges=True)
             clone.set_contructed_molecule(mol)
@@ -837,7 +843,7 @@ class TopologyGraph:
             clones[vertex] = clone
         return clones
 
-    def _clone_edges(self, vertex_clones):
+    def _clone_edges(self, vertex_clones, scale):
         """
         Create clones of :attr:`edges`.
 
@@ -846,6 +852,12 @@ class TopologyGraph:
         vertex_clones : :class:`dict`
             A mapping from the original :attr:`vertices` to the
             clones.
+
+        scale : :class:`float` or :class:`list` of :class:`float`
+            The value by which the position of each :class:`Edge` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
 
         Returns
         -------
@@ -856,7 +868,9 @@ class TopologyGraph:
 
         edges = []
         for edge in self.edges:
-            edges.append(edge.clone(vertex_clones, True))
+            clone = edge.clone(vertex_clones)
+            clone.apply_scale(scale)
+            edges.append(clone)
         return edges
 
     def _before_react(self, mol, vertex_clones, edge_clones):
