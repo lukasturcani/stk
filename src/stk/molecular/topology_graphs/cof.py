@@ -743,9 +743,8 @@ class COF(TopologyGraph):
         ]
 
         # Make a clone of each vertex for each unit cell.
-        vertices = it.product(
-            it.product(xdim, ydim, zdim), self.vertices
-        )
+        cells = it.product(xdim, ydim, zdim)
+        vertices = it.product(cells, self.vertices)
         for cell, vertex in vertices:
             x, y, z = cell
             clone = vertex.clone(clear_edges=True)
@@ -785,42 +784,41 @@ class COF(TopologyGraph):
         """
 
         edges = []
-        # Get an edge for every cell.
+        # Make a clone for each edge for each unit cell.
         xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
-        edges = it.product(it.product(xdim, ydim, zdim), self.edges)
+        cells = it.product(xdim, ydim, zdim)
+        edges = it.product(cells, self.edges)
         for cell, edge in edges:
             x, y, z = cell
             # The cell in which edge.vertices[1] is found.
             cell2 = np.array(cell) + np.array(edge.periodicity)
-            # If cell2 is bigger than lattice_size along any
-            # dimension, treat it periodically - ie wrap around.
+            # Wrap around periodic cells, ie those that are less than 0
+            # or greater than the lattice size along any dimension.
             cell2_x, cell2_y, cell2_z = (
-                dim if dim < 0 else dim % max_dim
+                (dim+max_dim) % max_dim
                 for dim, max_dim in zip(cell2, self._lattice_size)
             )
             # Make a vertex map which accounts for the fact that
-            # second vertex is in the periodic cell.
+            # edge.vertices[1] is in cell2.
             v0 = edge.vertices[0]
             v1 = edge.vertices[1]
             vertex_map = {
                 v0: vertices[x][y][z][v0],
                 v1: vertices[cell2_x][cell2_y][cell2_z][v1]
             }
-            clone = edge.clone(vertex_map)
-            edges.append(clone)
-            # If the edge is not periodic if the cell of the periodic
-            # cell exists.
-            edge_is_periodic = any(
-                dim < 0 or dim >= max_dim
-                for dim, max_dim in zip(periodic_cell, self._lattice_size)
+            # If the edge is not periodic if cell2 is did not have to
+            # wrap around,
+            edge_is_not_periodic = all(
+                dim >= 0 and dim < max_dim
+                for dim, max_dim in zip(cell2, self._lattice_size)
             )
-            if not edge_is_periodic:
+            clone = edge.clone(
+                recalculate_position=edge_is_not_periodic,
+                vertex_map=vertex_map
+            )
+            edges.append(clone)
+            if edge_is_not_periodic:
                 clone.periodicity = (0, 0, 0)
-            # If the edge is periodic it should use the position of
-            # the original edge.
-            else:
-                clone.set_position(edge.get_position())
-
             # Set the aligner edge to the clone.
             for vertex in vertex_map.values():
                 if vertex.aligner_edge is edge:

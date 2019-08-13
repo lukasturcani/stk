@@ -461,12 +461,17 @@ class Edge:
         if not self._custom_position:
             self._position = _position / i
 
-    def clone(self, vertex_map=None):
+    def clone(self, recalculate_position=False, vertex_map=None):
         """
         Return a clone.
 
         Parameters
         ----------
+        recalculate_position : :class:`bool`, optional
+            Toggle if the position of the clone should be reculated
+            from the vertices it connects or if it should inherit
+            the position of the original edge.
+
         vertex_map : :class:`dict`, optional
             If the clone should hold different :class:`.Vertex`
             instances, then a :class:`dict` should be provided, which
@@ -485,11 +490,22 @@ class Edge:
         clone = self.__class__.__new__(self.__class__)
         clone._func_groups = list(self._func_groups)
         clone._custom_position = self._custom_position
-        clone._position = self._position
         clone.periodicity = self.periodicity
         clone.vertices = tuple(
             vertex_map.get(vertex, vertex) for vertex in self.vertices
         )
+
+        if recalculate_position:
+            vertex_positions = (
+                vertex.get_position() for vertex in clone.vertices
+            )
+            clone._position = np.divide(
+                sum(vertex_positions),
+                len(clone.vertices)
+            )
+        else:
+            clone._position = np.array(self._position)
+
         for vertex in clone.vertices:
             vertex.edges.append(clone)
         return clone
