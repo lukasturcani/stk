@@ -615,7 +615,7 @@ class COF(TopologyGraph):
         self._lattice_size = lattice_size
         self._periodic = periodic
 
-        vertex_alignments = self._get_vertex_alignments(
+        vertex_alignments = self._normalize_vertex_alignments(
             vertex_alignments=vertex_alignments
         )
 
@@ -705,7 +705,7 @@ class COF(TopologyGraph):
             processes=processes
         )
 
-    def _get_vertex_alignments(self, vertex_alignments):
+    def _normalize_vertex_alignments(self, vertex_alignments):
         """
         Normalize different `vertex_alignments` input forms.
 
