@@ -615,12 +615,9 @@ class COF(TopologyGraph):
         self._lattice_size = lattice_size
         self._periodic = periodic
 
-        # Convert ints to Vertex and Edge instances.
-        _vertex_alignments = {}
-        for v, e in vertex_alignments.items():
-            v = self.vertices[v] if isinstance(v, int) else v
-            e = v.edges[e] if isinstance(e, int) else e
-        vertex_alignments = _vertex_alignments
+        vertex_alignments = self._get_vertex_alignments(
+            vertex_alignments=vertex_alignments
+        )
 
         xdim, ydim, zdim = (range(dim) for dim in lattice_size)
         # vertex_clones is indexed as vertex_clones[x][y][z]
@@ -707,6 +704,41 @@ class COF(TopologyGraph):
             edges=tuple(edge_clones),
             processes=processes
         )
+
+    def _get_vertex_alignments(self, vertex_alignments):
+        """
+        Normalize different `vertex_alignments` input forms.
+
+        Parameters
+        ----------
+        vertex_alignments : :class:`dict`
+            A mapping from a :class:`.Vertex` in :attr:`vertices`
+            to an :class:`.Edge` connected to it. The :class:`.Edge` is
+            used to align the first :class:`.FunctionalGroup` of a
+            :class:`.BuildingBlock` placed on that vertex. Only
+            vertices which need to have their default edge changed need
+            to be present in the :class:`dict`. If ``None`` then the
+            first :class:`.Edge` in :class:`.Vertex.edges` is for each
+            vertex is used. Changing which :class:`.Edge` is used will
+            mean that the topology graph represents different
+            structural isomers.
+
+            The vertices and edges can also be referred to by their
+            indices.
+
+        Returns
+        -------
+        :class:`dict`
+            `vertex_alignments` but with indices replaced with the
+            vertices and edges they refer to.
+
+        """
+
+        _vertex_alignments = {}
+        for v, e in vertex_alignments.items():
+            v = self.vertices[v] if isinstance(v, int) else v
+            e = v.edges[e] if isinstance(e, int) else e
+        return _vertex_alignments
 
     def _before_react(self, mol, vertex_clones, edge_clones):
         if self._periodic:
