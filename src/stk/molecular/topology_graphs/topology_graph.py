@@ -252,12 +252,21 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def _get_edge_centroid(self, edge_ids=None):
+    def _get_edge_centroid(
+        self,
+        lattice_constants=None,
+        edge_ids=None
+    ):
         """
         Return the centroid of the connected edges.
 
         Parameters
         ----------
+        lattice_constants : :class:`tuple`, optional
+            The a, b and c lattice constants, each written as a
+            :class:`numpy.ndarray` vector. Only used if the edges are
+            periodic.
+
         edge_ids : :class:`iterable` of :class:`int`
             The ids of edges which are used to calculate the centroid.
             If ``None``, then all  the edges in :attr:`edges` are used.
@@ -274,10 +283,17 @@ class Vertex:
 
         edge_positions = []
         for i, edge_id in enumerate(edge_ids, 1):
-            edge_positions.append(self.edges[edge_id].get_position())
+            edge_positions.append(
+                self.edges[edge_id].get_position(lattice_constants)
+            )
         return np.sum(edge_positions, axis=0) / i
 
-    def _get_edge_plane_normal(self, reference, edge_ids=None):
+    def _get_edge_plane_normal(
+        self,
+        reference,
+        lattice_constants=None,
+        edge_ids=None
+    ):
         """
         Get the normal to the plane on which the :attr:`edges` lie.
 
@@ -287,6 +303,11 @@ class Vertex:
             A reference direction vector. The direction of the returned
             normal is set such that its angle with with `reference`
             is always acute.
+
+        lattice_constants : :class:`tuple`, optional
+            The a, b and c lattice constants, each written as a
+            :class:`numpy.ndarray` vector. Only used if the edges are
+            periodic.
 
         edge_ids : :class:`iterable` of :class:`int`
             The ids of edges which are used to calculate the plane.
@@ -321,7 +342,9 @@ class Vertex:
 
         edge_positions = []
         for i, edge_id in enumerate(edge_ids, 1):
-            edge_positions.append(self.edges[edge_id].get_position())
+            edge_positions.append(
+                self.edges[edge_id].get_position(lattice_constants)
+            )
         edge_positions = np.array(edge_positions)
 
         centroid = np.sum(edge_positions, axis=0) / i
@@ -502,9 +525,16 @@ class Edge:
 
         self._func_groups.append(func_group)
 
-    def get_position(self):
+    def get_position(self, lattice_constants=None):
         """
         Return the position.
+
+        Parameters
+        ----------
+        lattice_constants : :class:`tuple`, optional
+            The a, b and c lattice constants, each written as a
+            :class:`numpy.ndarray` vector. Only used if the edge is
+            periodic.
 
         Returns
         -------
@@ -513,7 +543,14 @@ class Edge:
 
         """
 
-        return np.array(self._position)
+        if lattice_constants is None:
+            return np.array(self._position)
+
+        shift = 0
+        dims = zip(lattice_constants, self.periodicity)
+        for lattice_constant, periodicity in dims:
+            shift += lattice_constant*periodicity
+        return self._position + shift
 
     def set_position(self, position):
         """
@@ -539,9 +576,16 @@ class Edge:
     def __repr__(self):
         vertices = ', '.join(str(v.id) for v in self.vertices)
         if self._custom_position:
-            return f'Edge({vertices}, position={self._position})'
+            position = f', position={self._position!r}'
         else:
-            return f'Edge({vertices})'
+            position = ''
+
+        if any(i != 0 for i in self.periodicity):
+            periodicity = f', periodicity={self.periodicity!r}'
+        else:
+            periodicity = ''
+
+        return f'Edge({vertices}{position}{periodicity})'
 
 
 class TopologyGraph:

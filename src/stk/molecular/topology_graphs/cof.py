@@ -136,6 +136,30 @@ class _COFVertex(Vertex):
         )
         return cls(*position, lattice_constants)
 
+    def apply_scale(self, scale):
+        """
+        Scale the position of by `scale`.
+
+        Parameters
+        ----------
+        scale : :class:`float` or :class:`list`of :class:`float`
+            The value by which the position of the :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
+
+        Returns
+        -------
+        :class:`Vertex`
+            The vertex is returned.
+
+        """
+
+        self._lattice_constants = tuple(
+            constant*scale for constant in self._lattice_constants
+        )
+        return super().apply_scale(scale)
+
     def clone(self, clear_edges=False):
         """
         Create a clone of the instance.
@@ -208,16 +232,20 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._position
-        edge_coord = self._get_aligner_edge_position()
-        target = edge_coord - self._get_edge_centroid()
+        edge_coord = self.aligner_edge.get_position(
+            lattice_constants=self._lattice_constants
+        )
+        target = edge_coord - self._get_edge_centroid(
+            lattice_constants=self._lattice_constants
+        )
         building_block.apply_rotation_between_vectors(
             start=start,
             target=target,
             origin=self._position
         )
         start = building_block.get_centroid_centroid_direction_vector()
-        e0_coord = self.edges[0].get_position()
-        e1_coord = self.edges[1].get_position()
+        e0_coord = self.edges[0].get_position(self._lattice_constants)
+        e1_coord = self.edges[1].get_position(self._lattice_constants)
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=self._position,
@@ -257,8 +285,12 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_bonder_centroid - self._position
-        edge_coord = self._get_aligner_edge_position()
-        target = edge_coord - self._get_edge_centroid()
+        edge_coord = self.aligner_edge.get_position(
+            lattice_constants=self._lattice_constants
+        )
+        target = edge_coord - self._get_edge_centroid(
+            lattice_constants=self._lattice_constants
+        )
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=target,
@@ -266,31 +298,6 @@ class _COFVertex(Vertex):
             origin=self._position
         )
         return building_block.get_position_matrix()
-
-    def _get_aligner_edge_position(self):
-        periodic = any(
-            dim != 0 for dim in self.aligner_edge.periodicity
-        )
-        if not periodic:
-            return self.aligner_edge.get_position()
-
-        if self is self.aligner_edge.vertices[0]:
-            other = self.aligner_edge.vertices[1].get_position()
-            periodicity = self.aligner_edge.periodicity
-
-        else:
-            other = self.aligner_edge.vertices[0].get_position()
-            periodicity = -1*np.array(self.aligner_edge.periodicity)
-
-        dims = zip(self._cell, periodicity)
-        other_cell = (dim+shift for dim, shift in dims)
-
-        shift = 0
-        for dim, constant in zip(other_cell, self._lattice_constants):
-            shift += dim*constant
-        other += shift
-
-        return (self._position + other)/2
 
     def assign_func_groups_to_edges(self, building_block, fg_map):
         """
@@ -346,7 +353,9 @@ class _COFVertex(Vertex):
         self.edges[1].assign_func_group(fg_map[fg2])
 
     def _get_edge0_distance(self, building_block):
-        aligner_coord = self.edges[0].get_position()
+        aligner_coord = self.edges[0].get_position(
+            lattice_constants=self._lattice_constants
+        )
 
         def distance(fg):
             fg_coord = building_block.get_centroid(
