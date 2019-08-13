@@ -22,7 +22,8 @@ def test_place_building_block(
         stk.cof.Honeycomb((2, 2, 1)),
         stk.cof.Hexagonal((2, 2, 1)),
         stk.cof.Square((2, 2, 1)),
-        stk.cof.Kagome((2, 2, 1))
+        stk.cof.Kagome((2, 2, 1)),
+        stk.cof.LinkerlessHoneycomb((2, 2, 1))
     )
     building_blocks = {
         2: tmp_amine2,
@@ -32,6 +33,10 @@ def test_place_building_block(
     }
     for topology_graph in topology_graphs:
         for vertex in topology_graph.vertices:
+            print(topology_graph)
+            print(vertex)
+            print(vertex.edges)
+            print()
             bb = building_blocks[len(vertex.edges)]
             vertex.place_building_block(bb)
             assert np.allclose(

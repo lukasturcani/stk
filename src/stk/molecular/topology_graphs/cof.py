@@ -32,7 +32,7 @@ class _COFVertex(Vertex):
 
     """
 
-    def __init__(self, x, y, z, lattice_constants):
+    def __init__(self, x, y, z):
         """
         Initialize a :class:`_COFVertex`.
 
@@ -47,13 +47,9 @@ class _COFVertex(Vertex):
         z : :class:`float`
             The z coordinate.
 
-        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
-            The a, b and c lattice constants, each written as a vector.
-
         """
 
         self.aligner_edge = None
-        self._lattice_constants = lattice_constants
         # (x, y, z) identifying the cell in which the vertex is found.
         self._cell = None
         # id will be set automatically by COF. This is because
@@ -62,7 +58,7 @@ class _COFVertex(Vertex):
         super().__init__(None, x, y, z)
 
     @classmethod
-    def init_at_center(cls, *vertices, lattice_constants):
+    def init_at_center(cls, *vertices):
         """
         Initialize at the center of `vertices`.
 
@@ -70,9 +66,6 @@ class _COFVertex(Vertex):
         ----------
         vertices : :class:`.Vertex`
             Vertices at whose center this vertex should be initialized.
-
-        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
-            The a, b and c lattice constants, each written as a vector.
 
         Returns
         -------
@@ -83,7 +76,7 @@ class _COFVertex(Vertex):
 
         center = sum(vertex.get_position() for vertex in vertices)
         center /= len(vertices)
-        return cls(*center, lattice_constants)
+        return cls(*center)
 
     @classmethod
     def init_at_shifted_center(
@@ -134,31 +127,7 @@ class _COFVertex(Vertex):
             np.sum(positions, axis=0),
             len(positions)
         )
-        return cls(*position, lattice_constants)
-
-    def apply_scale(self, scale):
-        """
-        Scale the position of by `scale`.
-
-        Parameters
-        ----------
-        scale : :class:`float` or :class:`list`of :class:`float`
-            The value by which the position of the :class:`Vertex` is
-            scaled. Can be a single number if all axes are scaled by
-            the same amount or a :class:`list` of three numbers if
-            each axis is scaled by a different value.
-
-        Returns
-        -------
-        :class:`Vertex`
-            The vertex is returned.
-
-        """
-
-        self._lattice_constants = tuple(
-            constant*scale for constant in self._lattice_constants
-        )
-        return super().apply_scale(scale)
+        return cls(*position)
 
     def clone(self, clear_edges=False):
         """
@@ -180,34 +149,7 @@ class _COFVertex(Vertex):
 
         clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
-        clone._lattice_constants = self._lattice_constants
-        clone._cell = self._cell
         return clone
-
-    def set_cell(self, x, y, z):
-        """
-        Set in which cell of the lattice the vertex is found.
-
-        Parameters
-        ----------
-        x : :class:`int`
-            The x position of the cell.
-
-        y : :class:`int`
-            The y position of the cell.
-
-        z : :class:`int`
-            The z position of the cell.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        self._cell = (x, y, z)
-        return self
 
     def place_building_block(self, building_block):
         """
@@ -257,20 +199,16 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._position
-        edge_coord = self.aligner_edge.get_position(
-            lattice_constants=self._lattice_constants
-        )
-        target = edge_coord - self._get_edge_centroid(
-            lattice_constants=self._lattice_constants
-        )
+        edge_coord = self.aligner_edge.get_position(self)
+        target = edge_coord - self._get_edge_centroid()
         building_block.apply_rotation_between_vectors(
             start=start,
             target=target,
             origin=self._position
         )
         start = building_block.get_centroid_centroid_direction_vector()
-        e0_coord = self.edges[0].get_position(self._lattice_constants)
-        e1_coord = self.edges[1].get_position(self._lattice_constants)
+        e0_coord = self.edges[0].get_position(self)
+        e1_coord = self.edges[1].get_position(self)
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=self._position,
@@ -310,12 +248,8 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_bonder_centroid - self._position
-        edge_coord = self.aligner_edge.get_position(
-            lattice_constants=self._lattice_constants
-        )
-        target = edge_coord - self._get_edge_centroid(
-            lattice_constants=self._lattice_constants
-        )
+        edge_coord = self.aligner_edge.get_position(self)
+        target = edge_coord - self._get_edge_centroid()
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=target,
@@ -378,9 +312,7 @@ class _COFVertex(Vertex):
         self.edges[1].assign_func_group(fg_map[fg2])
 
     def _get_edge0_distance(self, building_block):
-        aligner_coord = self.edges[0].get_position(
-            lattice_constants=self._lattice_constants
-        )
+        aligner_coord = self.edges[0].get_position(self)
 
         def distance(fg):
             fg_coord = building_block.get_centroid(
@@ -429,10 +361,7 @@ class _COFVertex(Vertex):
         assert func_groups[0] is building_block.func_groups[0]
 
         edges = sorted(self.edges, key=self._get_edge_angle(axis))
-        aligner_first = all(
-            edges[0].get_position() == self.aligner_edge.get_position()
-        )
-        assert aligner_first
+        assert edges[0] is self.aligner_edge
 
         for edge, func_group in zip(edges, func_groups):
             edge.assign_func_group(fg_map[func_group])
@@ -461,13 +390,13 @@ class _COFVertex(Vertex):
 
     def _get_edge_angle(self, axis):
 
-        aligner_edge_coord = self.aligner_edge.get_position()
+        aligner_edge_coord = self.aligner_edge.get_position(self)
         edge_centroid = self._get_edge_centroid()
         # This axis is used to figure out the clockwise direction.
         aligner_edge_direction = aligner_edge_coord - edge_centroid
 
         def angle(edge):
-            coord = edge.get_position()
+            coord = edge.get_position(self)
             edge_direction = coord - edge_centroid
             theta = vector_angle(
                 vector1=edge_direction,
@@ -923,21 +852,13 @@ class Honeycomb(COF):
     )
 
     _vertices = (
-        _COFVertex(
-            *((1/3)*_a + (1/3)*_b + (1/2)*_c), _lattice_constants
-        ),
-        _COFVertex(
-            *((2/3)*_a + (2/3)*_b + (1/2)*_c), _lattice_constants
-        )
+        _COFVertex(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
+        _COFVertex(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
     )
 
     vertices = (
         *_vertices,
-        _COFVertex.init_at_center(
-            _vertices[0],
-            _vertices[1],
-            lattice_constants=_lattice_constants
-        ),
+        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
         _COFVertex.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[1]),
             shifts=((0, 0, 0), (0, -1, 0)),
@@ -961,6 +882,9 @@ class Honeycomb(COF):
         Edge(vertices[4], vertices[1], periodicity=(-1, 0, 0))
     )
 
+    for edge in edges:
+        edge._lattice_constants = _lattice_constants
+
 
 class Hexagonal(COF):
     _lattice_constants = _a, _b, _c = (
@@ -970,47 +894,19 @@ class Hexagonal(COF):
     )
 
     _vertices = (
-        _COFVertex(
-            *((1/4)*_a + (1/4)*_b + (1/2)*_c), _lattice_constants
-        ),
-        _COFVertex(
-            *((1/4)*_a + (3/4)*_b + (1/2)*_c), _lattice_constants
-        ),
-        _COFVertex(
-            *((3/4)*_a + (1/4)*_b + (1/2)*_c), _lattice_constants
-        ),
-        _COFVertex(
-            *((3/4)*_a + (3/4)*_b + (1/2)*_c), _lattice_constants
-        )
+        _COFVertex(*((1/4)*_a + (1/4)*_b + (1/2)*_c)),
+        _COFVertex(*((1/4)*_a + (3/4)*_b + (1/2)*_c)),
+        _COFVertex(*((3/4)*_a + (1/4)*_b + (1/2)*_c)),
+        _COFVertex(*((3/4)*_a + (3/4)*_b + (1/2)*_c))
     )
 
     vertices = (
         *_vertices,
-        _COFVertex.init_at_center(
-            _vertices[0],
-            _vertices[1],
-            lattice_constants=_lattice_constants
-        ),
-        _COFVertex.init_at_center(
-            _vertices[0],
-            _vertices[2],
-            lattice_constants=_lattice_constants
-        ),
-        _COFVertex.init_at_center(
-            _vertices[1],
-            _vertices[2],
-            lattice_constants=_lattice_constants
-        ),
-        _COFVertex.init_at_center(
-            _vertices[1],
-            _vertices[3],
-            lattice_constants=_lattice_constants
-        ),
-        _COFVertex.init_at_center(
-            _vertices[2],
-            _vertices[3],
-            lattice_constants=_lattice_constants
-        ),
+        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
+        _COFVertex.init_at_center(_vertices[0], _vertices[2]),
+        _COFVertex.init_at_center(_vertices[1], _vertices[2]),
+        _COFVertex.init_at_center(_vertices[1], _vertices[3]),
+        _COFVertex.init_at_center(_vertices[2], _vertices[3]),
         _COFVertex.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[2]),
             shifts=((0, 0, 0), (-1, 0, 0)),
@@ -1086,6 +982,9 @@ class Hexagonal(COF):
         Edge(vertices[15], vertices[0], periodicity=(1, 0, 0))
     )
 
+    for edge in edges:
+        edge._lattice_constants = _lattice_constants
+
 
 class Square(COF):
     _lattice_constants = _a, _b, _c = (
@@ -1095,9 +994,7 @@ class Square(COF):
     )
 
     _vertices = (
-        _COFVertex(
-            *((0.5)*_a + (0.5)*_b + (0.5)*_c), _lattice_constants
-        ),
+        _COFVertex(*((0.5)*_a + (0.5)*_b + (0.5)*_c)),
     )
     vertices = (
         *_vertices,
@@ -1121,6 +1018,9 @@ class Square(COF):
         Edge(vertices[2], vertices[0], periodicity=(0, 1, 0))
     )
 
+    for edge in edges:
+        edge._lattice_constants = _lattice_constants
+
 
 class Kagome(COF):
     _lattice_constants = _a, _b, _c = (
@@ -1130,34 +1030,16 @@ class Kagome(COF):
     )
 
     _vertices = (
-        _COFVertex(
-            *((1/4)*_a + (3/4)*_b + (0.5)*_c), _lattice_constants
-        ),
-        _COFVertex(
-            *((3/4)*_a + (3/4)*_b + (1/2)*_c), _lattice_constants
-        ),
-        _COFVertex(
-            *((3/4)*_a + (1/4)*_b + (1/2)*_c), _lattice_constants
-        )
+        _COFVertex(*((1/4)*_a + (3/4)*_b + (0.5)*_c)),
+        _COFVertex(*((3/4)*_a + (3/4)*_b + (1/2)*_c)),
+        _COFVertex(*((3/4)*_a + (1/4)*_b + (1/2)*_c))
     )
 
     vertices = (
         *_vertices,
-        _COFVertex.init_at_center(
-            _vertices[0],
-            _vertices[1],
-            lattice_constants=_lattice_constants
-        ),
-        _COFVertex.init_at_center(
-            _vertices[0],
-            _vertices[2],
-            lattice_constants=_lattice_constants
-        ),
-        _COFVertex.init_at_center(
-            _vertices[1],
-            _vertices[2],
-            lattice_constants=_lattice_constants
-        ),
+        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
+        _COFVertex.init_at_center(_vertices[0], _vertices[2]),
+        _COFVertex.init_at_center(_vertices[1], _vertices[2]),
         _COFVertex.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[1]),
             shifts=((0, 0, 0), (-1, 0, 0)),
@@ -1194,9 +1076,10 @@ class Kagome(COF):
 
         Edge(vertices[8], vertices[1]),
         Edge(vertices[8], vertices[2], periodicity=(0, 1, 0))
-
-
     )
+
+    for edge in edges:
+        edge._lattice_constants = _lattice_constants
 
 
 class LinkerlessHoneycomb(COF):
@@ -1207,12 +1090,8 @@ class LinkerlessHoneycomb(COF):
     )
 
     vertices = (
-        _COFVertex(
-            *((1/3)*_a + (1/3)*_b + (1/2)*_c), _lattice_constants
-        ),
-        _COFVertex(
-            *((2/3)*_a + (2/3)*_b + (1/2)*_c), _lattice_constants
-        )
+        _COFVertex(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
+        _COFVertex(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
     )
 
     edges = (
@@ -1220,3 +1099,6 @@ class LinkerlessHoneycomb(COF):
         Edge(vertices[0], vertices[1], periodicity=(-1, 0, 0)),
         Edge(vertices[0], vertices[1], periodicity=(0, -1, 0))
     )
+
+    for edge in edges:
+        edge._lattice_constants = _lattice_constants

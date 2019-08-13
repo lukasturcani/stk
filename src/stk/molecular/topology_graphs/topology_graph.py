@@ -95,7 +95,7 @@ class Vertex:
 
     def apply_scale(self, scale):
         """
-        Scale the position of by `scale`.
+        Scale the position by `scale`.
 
         Parameters
         ----------
@@ -252,21 +252,12 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def _get_edge_centroid(
-        self,
-        lattice_constants=None,
-        edge_ids=None
-    ):
+    def _get_edge_centroid(self, edge_ids=None):
         """
         Return the centroid of the connected edges.
 
         Parameters
         ----------
-        lattice_constants : :class:`tuple`, optional
-            The a, b and c lattice constants, each written as a
-            :class:`numpy.ndarray` vector. Only used if the edges are
-            periodic.
-
         edge_ids : :class:`iterable` of :class:`int`
             The ids of edges which are used to calculate the centroid.
             If ``None``, then all  the edges in :attr:`edges` are used.
@@ -284,16 +275,11 @@ class Vertex:
         edge_positions = []
         for i, edge_id in enumerate(edge_ids, 1):
             edge_positions.append(
-                self.edges[edge_id].get_position(lattice_constants)
+                self.edges[edge_id].get_position(self)
             )
         return np.sum(edge_positions, axis=0) / i
 
-    def _get_edge_plane_normal(
-        self,
-        reference,
-        lattice_constants=None,
-        edge_ids=None
-    ):
+    def _get_edge_plane_normal(self, reference, edge_ids=None):
         """
         Get the normal to the plane on which the :attr:`edges` lie.
 
@@ -303,11 +289,6 @@ class Vertex:
             A reference direction vector. The direction of the returned
             normal is set such that its angle with with `reference`
             is always acute.
-
-        lattice_constants : :class:`tuple`, optional
-            The a, b and c lattice constants, each written as a
-            :class:`numpy.ndarray` vector. Only used if the edges are
-            periodic.
 
         edge_ids : :class:`iterable` of :class:`int`
             The ids of edges which are used to calculate the plane.
@@ -343,7 +324,7 @@ class Vertex:
         edge_positions = []
         for i, edge_id in enumerate(edge_ids, 1):
             edge_positions.append(
-                self.edges[edge_id].get_position(lattice_constants)
+                self.edges[edge_id].get_position(self)
             )
         edge_positions = np.array(edge_positions)
 
@@ -418,7 +399,8 @@ class Edge:
         self,
         *vertices,
         position=None,
-        periodicity=(0, 0, 0)
+        periodicity=(0, 0, 0),
+        lattice_constants=None
     ):
         """
         Initialize an :class:`Edge`.
@@ -432,17 +414,29 @@ class Edge:
             The position of the edge. If ``None``, the centroid
             of `vertices` is used.
 
-        periodicity : :class:`tuple` of :class:`int`
+        periodicity : :class:`tuple` of :class:`int`, optional
             The periodicity of the edge. For example, if ``(0, 0, 0)``
             then the edge is not periodic. If, ``(1, 0, -1)`` then the
             edge is periodic across the x axis in the positive
             direction, is not periodic across the y axis and is
             periodic across the z axis in the negative direction.
 
+        lattice_constants : :class:`iterable`, optional
+            If the edge is periodic, the a, b and c lattice constants
+            should be provided as :class:`numpy.ndarray` vectors
+            in Cartesian coordinates.
+
         """
+
+        if lattice_constants is None:
+            lattice_constants = ([0., 0.,  0.] for i in range(3))
 
         self.vertices = vertices
         self.periodicity = periodicity
+        self._lattice_constants = tuple(
+            np.array(constant) for constant in lattice_constants
+        )
+
         # The FunctionalGroup instances which the edge connects.
         # These will belong to the molecules placed on the vertices
         # connected by the edge.
@@ -460,6 +454,32 @@ class Edge:
 
         if not self._custom_position:
             self._position = _position / i
+
+    def apply_scale(self, scale):
+        """
+        Scale the position and lattice constants by `scale`.
+
+        Parameters
+        ----------
+        scale : :class:`float` or :class:`list`of :class:`float`
+            The value by which the position and lattice constants of
+            the :class:`Edge` are scaled. Can be a single number if all
+            axes are scaled by the same amount or a :class:`list` of
+            three numbers if each axis is scaled by a different value.
+
+        Returns
+        -------
+        :class:`Edge`
+            The edge is returned.
+
+
+        """
+
+        self._position *= scale
+        self._lattice_constants = tuple(
+            scale*constant for constant in self._lattice_constants
+        )
+        return self
 
     def clone(self, vertex_map=None, recalculate_position=False):
         """
@@ -541,16 +561,16 @@ class Edge:
 
         self._func_groups.append(func_group)
 
-    def get_position(self, lattice_constants=None):
+    def get_position(self, vertex=None):
         """
         Return the position.
 
         Parameters
         ----------
-        lattice_constants : :class:`tuple`, optional
-            The a, b and c lattice constants, each written as a
-            :class:`numpy.ndarray` vector. Only used if the edge is
-            periodic.
+        vertex : :class:`.Vertex`, optional
+            If the edge is periodic, the position returned will
+            depend on which vertex the edge position is calculated
+            relative to.
 
         Returns
         -------
@@ -559,13 +579,15 @@ class Edge:
 
         """
 
-        if lattice_constants is None:
+        not_periodic = all(dim == 0 for dim in self.periodicity)
+        if vertex is None or not_periodic:
             return np.array(self._position)
 
+        direction = 1 if vertex is self.vertices[0] else -1
+        dims = zip(self._lattice_constants, self.periodicity)
         shift = 0
-        dims = zip(lattice_constants, self.periodicity)
         for lattice_constant, periodicity in dims:
-            shift += lattice_constant*periodicity
+            shift += direction*lattice_constant*periodicity
         return self._position + shift
 
     def set_position(self, position):
@@ -807,9 +829,11 @@ class TopologyGraph:
         """
 
         clones = {}
+        scale = self._get_scale(mol)
         for vertex in self.vertices:
             clone = vertex.clone(clear_edges=True)
             clone.set_contructed_molecule(mol)
+            clone.apply_scale(scale)
             clones[vertex] = clone
         return clones
 
@@ -832,7 +856,7 @@ class TopologyGraph:
 
         edges = []
         for edge in self.edges:
-            edges.append(edge.clone(vertex_clones))
+            edges.append(edge.clone(vertex_clones, True))
         return edges
 
     def _before_react(self, mol, vertex_clones, edge_clones):
@@ -886,10 +910,6 @@ class TopologyGraph:
             )
 
     def _place_building_blocks_serial(self, mol, vertex_clones):
-        scale = self._get_scale(mol)
-        for vertex in vertex_clones.values():
-            vertex.apply_scale(scale)
-
         bb_id = 0
         # Use a shorter alias.
         counter = mol.building_block_counter
