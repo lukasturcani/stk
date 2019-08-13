@@ -7,8 +7,8 @@ import numpy as np
 import itertools as it
 from collections import defaultdict
 
-from ..topology_graph import TopologyGraph, Vertex, Edge
-from ....utilities import vector_angle, flatten
+from .topology_graph import TopologyGraph, Vertex, Edge
+from ...utilities import vector_angle, flatten
 
 
 class _COFVertex(Vertex):

@@ -3,12 +3,18 @@ import os
 from collections import namedtuple
 from os.path import join
 
-from ...._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load
 
 
 test_dir = 'cof_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
+
+
+def test_place_linear_building_block(tmp_amine2):
+
+
+
 
 
 def _test_construction(
