@@ -278,7 +278,7 @@ def test_topologies(
             'num_linkers',
             'num_building_blocks',
             'num_unreacted_linker_fgs',
-            'num_unreacted_building_block_fgs'
+            'num_unreacted_building_block_fgs',
             'periodic'
         ]
     )

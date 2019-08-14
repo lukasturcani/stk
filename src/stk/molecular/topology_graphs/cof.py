@@ -149,6 +149,7 @@ class _COFVertex(Vertex):
 
         clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
+        clone._cell = np.array(self._cell)
         return clone
 
     def place_building_block(self, building_block):
@@ -348,7 +349,6 @@ class _COFVertex(Vertex):
             fg0_direction,
             building_block.get_bonder_plane_normal()
         )
-
         func_groups = sorted(
             building_block.func_groups,
             key=self._get_func_group_angle(
@@ -358,11 +358,7 @@ class _COFVertex(Vertex):
                 axis=axis
             )
         )
-        assert func_groups[0] is building_block.func_groups[0]
-
         edges = sorted(self.edges, key=self._get_edge_angle(axis))
-        assert edges[0] is self.aligner_edge
-
         for edge, func_group in zip(edges, func_groups):
             edge.assign_func_group(fg_map[func_group])
 
@@ -768,7 +764,7 @@ class COF(TopologyGraph):
             return vertex_clones, edge_clones
         return vertex_clones, [
             edge for edge in edge_clones
-            if all(dim == 0 for dim in edge.periodicity)
+            if all(dim == 0 for dim in edge.get_periodicity())
         ]
 
     def _assign_building_blocks_to_vertices(
@@ -845,11 +841,12 @@ class COF(TopologyGraph):
         )
 
         x, y, z = self._lattice_size
-
+        periodic = ', periodic=True' if self._periodic else ''
         return (
             f'cof.{self.__class__.__name__}('
             f'lattice_size=({x}, {y}, {z}), '
-            f'vertex_alignments={{{vertex_alignments}}})'
+            f'vertex_alignments={{{vertex_alignments}}}'
+            f'{periodic})'
         )
 
 

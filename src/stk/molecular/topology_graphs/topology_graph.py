@@ -748,6 +748,7 @@ class TopologyGraph:
 
         self._prepare(mol)
         self._place_building_blocks(mol, vertex_clones)
+
         vertex_clones, edge_clones = (
             self._before_react(mol, vertex_clones, edge_clones)
         )
@@ -755,7 +756,7 @@ class TopologyGraph:
         for edge in edge_clones:
             reactor.add_reaction(
                 func_groups=edge.get_func_groups(),
-                periodicity=edge.periodicity
+                periodicity=tuple(edge.get_periodicity())
             )
         reactor.finalize()
 
