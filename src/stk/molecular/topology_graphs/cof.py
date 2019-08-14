@@ -249,7 +249,7 @@ class _COFVertex(Vertex):
         )
         start = fg_bonder_centroid - self._position
         edge_coord = self.aligner_edge.get_position(self)
-        target = edge_coord - self._get_edge_centroid()
+        target = edge_coord - self._position
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=target,

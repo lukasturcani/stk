@@ -1054,7 +1054,7 @@ def vector_angle(vector1, vector2):
     if np.isclose(term, 1, atol=1e-8):
         return 0.0
     if np.isclose(term, -1, atol=1e-8):
-        return 2*np.pi
+        return np.pi
     return np.arccos(term)
 
 

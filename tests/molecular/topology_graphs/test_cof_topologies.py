@@ -12,6 +12,20 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
+def _alignment(vertex, building_block):
+
+    fg_position = building_block.get_centroid(
+        atom_ids=building_block.func_groups[0].get_bonder_ids()
+    )
+    v1 = stk.normalize_vector(fg_position - vertex.get_position())
+
+    def inner(edge):
+        v2 = edge.get_position(vertex) - vertex.get_position()
+        return v1 @ stk.normalize_vector(v2)
+
+    return inner
+
+
 def test_place_building_block(
     tmp_amine2,
     tmp_aldehyde3,
@@ -40,6 +54,8 @@ def test_place_building_block(
                 b=vertex.get_position(),
                 atol=1e-6
             )
+            aligned = max(vertex.edges, key=_alignment(vertex, bb))
+            assert aligned is vertex.aligner_edge
 
 
 def _test_construction(
