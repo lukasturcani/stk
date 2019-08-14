@@ -3,7 +3,7 @@ import os
 from collections import namedtuple
 from os.path import join
 import numpy as np
-
+from scipy.spatial.distance import euclidean
 
 from ..._test_utilities import _test_dump_and_load
 
@@ -27,10 +27,60 @@ def _alignment(vertex, building_block):
     return inner
 
 
-def test_place_building_block(
+def _test_placement(vertex, bb):
+    vertex.place_building_block(bb)
+    assert np.allclose(
+        a=bb.get_centroid(bb.get_bonder_ids()),
+        b=vertex.get_position(),
+        atol=1e-6
+    )
+    aligned = max(vertex.edges, key=_alignment(vertex, bb))
+    assert aligned is vertex.aligner_edge
+
+
+def _angle(bb, edge, vertex):
+    edge_vector = (
+        edge.get_position(vertex) -
+        bb.get_centroid(bb.get_bonder_ids())
+    )
+
+    def inner(fg):
+        fg_vector = (
+            bb.get_centroid(fg.get_bonder_ids()) -
+            bb.get_centroid(bb.get_bonder_ids())
+        )
+        return stk.vector_angle(fg_vector, edge_vector)
+
+    return inner
+
+
+def _test_assignment(vertex, bb):
+    vertex.assign_func_groups_to_edges(
+        building_block=bb,
+        fg_map={fg: fg for fg in bb.func_groups}
+    )
+    assert (
+        bb.func_groups[0] in
+        vertex.aligner_edge.get_func_groups()
+    )
+    for edge in vertex.edges:
+        closest = min(
+            bb.func_groups,
+            key=_angle(bb, edge, vertex)
+        )
+        assert closest in edge.get_func_groups()
+
+    if len(bb.func_groups) == 2:
+        not_aligner = next(
+            e for e in vertex.edges if e is not vertex.aligner_edge
+        )
+        assert bb.func_groups[1] in not_aligner.get_func_groups()
+
+
+def test_vertex(
     tmp_amine2,
     tmp_aldehyde3,
-    tmp_aldehyde4,
+    tmp_aldehyde4_alt2,
     tmp_aldehyde6
 ):
     topology_graphs = (
@@ -43,28 +93,17 @@ def test_place_building_block(
     building_blocks = {
         2: tmp_amine2,
         3: tmp_aldehyde3,
-        4: tmp_aldehyde4,
+        4: tmp_aldehyde4_alt2,
         6: tmp_aldehyde6
     }
-
     for topology_graph in topology_graphs:
         for vertex in topology_graph.vertices:
             bb = building_blocks[len(vertex.edges)]
-            vertex.place_building_block(bb)
-            assert np.allclose(
-                a=bb.get_centroid(bb.get_bonder_ids()),
-                b=vertex.get_position(),
-                atol=1e-6
-            )
-            aligned = max(vertex.edges, key=_alignment(vertex, bb))
-            assert aligned is vertex.aligner_edge
+            _test_placement(vertex, bb)
+            _test_assignment(vertex, bb)
 
 
-def _test_construction(
-    cof,
-    num_expected_bbs,
-    num_unreacted_fgs
-):
+def _test_construction(cof, num_expected_bbs, num_unreacted_fgs):
     path = join(
         test_dir, f'{cof.topology_graph.__class__.__name__}.mol'
     )
