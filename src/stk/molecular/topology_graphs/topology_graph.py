@@ -583,12 +583,20 @@ class Edge:
         if vertex is None or not_periodic:
             return np.array(self._position)
 
-        direction = 1 if vertex is self.vertices[0] else -1
+        if vertex is self.vertices[0]:
+            direction = 1
+            other = self.vertices[1]
+        else:
+            direction = -1
+            other = self.vertices[0]
+
         dims = zip(self._lattice_constants, self.periodicity)
         shift = 0
         for lattice_constant, periodicity in dims:
             shift += direction*lattice_constant*periodicity
-        return self._position + shift
+
+        other_position = other.get_position() + shift
+        return (vertex.get_position() + other_position) / 2
 
     def set_position(self, position):
         """
