@@ -883,9 +883,6 @@ class Honeycomb(COF):
         Edge(vertices[4], vertices[1], periodicity=(-1, 0, 0))
     )
 
-    for edge in edges:
-        edge._lattice_constants = _lattice_constants
-
 
 class Hexagonal(COF):
     _lattice_constants = _a, _b, _c = (
@@ -983,9 +980,6 @@ class Hexagonal(COF):
         Edge(vertices[15], vertices[0], periodicity=(1, 0, 0))
     )
 
-    for edge in edges:
-        edge._lattice_constants = _lattice_constants
-
 
 class Square(COF):
     _lattice_constants = _a, _b, _c = (
@@ -1018,9 +1012,6 @@ class Square(COF):
         Edge(vertices[2], vertices[0]),
         Edge(vertices[2], vertices[0], periodicity=(0, 1, 0))
     )
-
-    for edge in edges:
-        edge._lattice_constants = _lattice_constants
 
 
 class Kagome(COF):
@@ -1079,9 +1070,6 @@ class Kagome(COF):
         Edge(vertices[8], vertices[2], periodicity=(0, 1, 0))
     )
 
-    for edge in edges:
-        edge._lattice_constants = _lattice_constants
-
 
 class LinkerlessHoneycomb(COF):
     _lattice_constants = _a, _b, _c = (
@@ -1100,6 +1088,3 @@ class LinkerlessHoneycomb(COF):
         Edge(vertices[0], vertices[1], periodicity=(-1, 0, 0)),
         Edge(vertices[0], vertices[1], periodicity=(0, -1, 0))
     )
-
-    for edge in edges:
-        edge._lattice_constants = _lattice_constants

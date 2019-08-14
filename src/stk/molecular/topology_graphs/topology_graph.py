@@ -399,8 +399,7 @@ class Edge:
         self,
         *vertices,
         position=None,
-        periodicity=(0, 0, 0),
-        lattice_constants=None
+        periodicity=(0, 0, 0)
     ):
         """
         Initialize an :class:`Edge`.
@@ -421,21 +420,11 @@ class Edge:
             direction, is not periodic across the y axis and is
             periodic across the z axis in the negative direction.
 
-        lattice_constants : :class:`iterable`, optional
-            If the edge is periodic, the a, b and c lattice constants
-            should be provided as :class:`numpy.ndarray` vectors
-            in Cartesian coordinates.
-
         """
-
-        if lattice_constants is None:
-            lattice_constants = ([0., 0.,  0.] for i in range(3))
 
         self.vertices = vertices
         self.periodicity = periodicity
-        self._lattice_constants = tuple(
-            np.array(constant) for constant in lattice_constants
-        )
+        self._periodic_positions = None
 
         # The FunctionalGroup instances which the edge connects.
         # These will belong to the molecules placed on the vertices
@@ -454,6 +443,30 @@ class Edge:
 
         if not self._custom_position:
             self._position = _position / i
+
+    def set_periodic_positions(self, periodic_positions):
+        """
+        Set the positions of periodic vertices.
+
+        Parameters
+        ----------
+        periodic_positions : :class:`dict`
+            If the edge is periodic, this :class:`dict` should map
+            each vertex in :attr:`vertices` to its position in the
+            the periodic unit cell.
+
+        Returns
+        -------
+        :class:`Edge`
+            The edge.
+
+        """
+
+        self._periodic_positions = {
+            key: np.array(value)
+            for key, value in periodic_positions.items()
+        }
+        return self
 
     def apply_scale(self, scale):
         """
@@ -476,9 +489,6 @@ class Edge:
         """
 
         self._position *= scale
-        self._lattice_constants = tuple(
-            scale*constant for constant in self._lattice_constants
-        )
         return self
 
     def clone(self, vertex_map=None, recalculate_position=False):
@@ -511,9 +521,10 @@ class Edge:
         clone._func_groups = list(self._func_groups)
         clone._custom_position = self._custom_position
         clone.periodicity = self.periodicity
-        clone._lattice_constants = tuple(
-            np.array(constant) for constant in self._lattice_constants
-        )
+        clone._periodic_positions = {
+            key: np.array(val)
+            for key, val in self._periodic_positions.items()
+        }
         clone.vertices = tuple(
             vertex_map.get(vertex, vertex) for vertex in self.vertices
         )
@@ -586,19 +597,8 @@ class Edge:
         if vertex is None or not_periodic:
             return np.array(self._position)
 
-        if vertex is self.vertices[0]:
-            direction = 1
-            other = self.vertices[1]
-        else:
-            direction = -1
-            other = self.vertices[0]
-
-        dims = zip(self._lattice_constants, self.periodicity)
-        shift = 0
-        for lattice_constant, periodicity in dims:
-            shift += direction*lattice_constant*periodicity
-
-        other_position = other.get_position() + shift
+        other = next(v for v in self.vertices if v is not vertex)
+        other_position = self._periodic_positions[other]
         return (vertex.get_position() + other_position) / 2
 
     def set_position(self, position):
