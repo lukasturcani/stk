@@ -218,14 +218,6 @@ def test_multi_bb(
         aldehyde4,
         aldehyde4_alt1
     ]
-    num_expected_bbs = {
-        amine2: 1,
-        amine2_alt1: 1,
-        amine2_alt2: 2,
-        amine2_alt3: 2,
-        aldehyde4: 2,
-        aldehyde4_alt1: 1
-    }
     periodic_unreacted = {bb: 0 for bb in building_blocks}
     island_unreacted = {
         amine2: 0,
@@ -237,18 +229,28 @@ def test_multi_bb(
     }
     for periodic in (True, False):
         kagome = stk.cof.Kagome((3, 3, 1), periodic)
+        di_verts = [v for v in kagome.vertices if len(v.edges) == 2]
+        tetra_verts = [v for v in kagome.vertices if len(v.edges) == 4]
         cof = stk.ConstructedMolecule(
             building_blocks=building_blocks,
             topology_graph=kagome,
             building_block_vertices={
-                amine2: kagome.vertices[3:4],
-                amine2_alt1: kagome.vertices[4:5],
-                amine2_alt2: kagome.vertices[5:7],
-                amine2_alt3: kagome.vertices[7:],
-                aldehyde4: kagome.vertices[:2],
-                aldehyde4_alt1: kagome.vertices[2:3]
+                amine2: di_verts[:4],
+                amine2_alt1: di_verts[4:5],
+                amine2_alt2: di_verts[5:7],
+                amine2_alt3: di_verts[7:],
+                aldehyde4: tetra_verts[:2],
+                aldehyde4_alt1: tetra_verts[2:]
             }
         )
+        num_expected_bbs = {
+            amine2: len(di_verts[:4]),
+            amine2_alt1: len(di_verts[4:5]),
+            amine2_alt2: len(di_verts[5:7]),
+            amine2_alt3: len(di_verts[7:]),
+            aldehyde4: len(tetra_verts[:2]),
+            aldehyde4_alt1: len(tetra_verts[2:])
+        }
         kind = '_periodic' if periodic else ''
         cof.write(join(test_dir, f'multi_bb{kind}.mol'))
         num_unreacted_fgs = (
