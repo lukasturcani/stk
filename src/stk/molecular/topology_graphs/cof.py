@@ -583,6 +583,8 @@ class COF(TopologyGraph):
             for clones in flatten(vertices, {dict})
             for vertex in clones.values()
         )
+        for i, vertex in enumerate(vertices):
+            vertex.id = i
 
         super().__init__(
             vertices=vertices,

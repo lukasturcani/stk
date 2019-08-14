@@ -33,10 +33,6 @@ def test_place_building_block(
     }
     for topology_graph in topology_graphs:
         for vertex in topology_graph.vertices:
-            print(topology_graph)
-            print(vertex)
-            print(vertex.edges)
-            print()
             bb = building_blocks[len(vertex.edges)]
             vertex.place_building_block(bb)
             assert np.allclose(
