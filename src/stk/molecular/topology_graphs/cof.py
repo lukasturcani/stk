@@ -726,10 +726,10 @@ class COF(TopologyGraph):
             # Wrap around periodic cells, ie those that are less than 0
             # or greater than the lattice size along any dimension.
             dims = zip(periodic_cell, self._lattice_size)
-            cell2 = cell2_x, cell2_y, cell2_z = (
+            cell2 = cell2_x, cell2_y, cell2_z = np.array([
                 (dim+max_dim) % max_dim
                 for dim, max_dim in dims
-            )
+            ])
             # Make a vertex map which accounts for the fact that
             # edge.vertices[1] is in cell2.
             v0 = edge.vertices[0]
@@ -738,11 +738,12 @@ class COF(TopologyGraph):
                 v0: vertices[x][y][z][v0],
                 v1: vertices[cell2_x][cell2_y][cell2_z][v1]
             }
-            # If the edge is not periodic if cell2 is did not have to
-            # wrap around,
+            # If the edge is not periodic if periodic_cell is did not
+            # have to wrap around.
+            dims = zip(periodic_cell, self._lattice_size)
             edge_is_not_periodic = all(
                 dim >= 0 and dim < max_dim
-                for dim, max_dim in zip(cell2, self._lattice_size)
+                for dim, max_dim in dims
             )
             clone = edge.clone(
                 vertex_map=vertex_map,
