@@ -527,6 +527,9 @@ class Edge:
         clone._func_groups = list(self._func_groups)
         clone._custom_position = self._custom_position
         clone._periodicity = np.array(self._periodicity)
+        clone._lattice_constants = tuple(
+            np.array(constant) for constant in self._lattice_constants
+        )
         clone.vertices = tuple(
             vertex_map.get(vertex, vertex) for vertex in self.vertices
         )

@@ -519,6 +519,11 @@ class COF(TopologyGraph):
     def __init_subclass__(cls, **kwargs):
         for i, vertex in enumerate(cls.vertices):
             vertex.id = i
+        for edge in cls.edges:
+            edge._lattice_constants = tuple(
+                np.array(constant)
+                for constant in cls._lattice_constants
+            )
         return super().__init_subclass__(**kwargs)
 
     def __init__(
