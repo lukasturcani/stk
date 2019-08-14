@@ -34,11 +34,11 @@ def test_place_building_block(
     tmp_aldehyde6
 ):
     topology_graphs = (
-        # stk.cof.Honeycomb((2, 2, 1)),
+        stk.cof.Honeycomb((2, 2, 1)),
         stk.cof.Hexagonal((2, 2, 1)),
-        # stk.cof.Square((2, 2, 1)),
-        # stk.cof.Kagome((2, 2, 1)),
-        # stk.cof.LinkerlessHoneycomb((2, 2, 1))
+        stk.cof.Square((2, 2, 1)),
+        stk.cof.Kagome((2, 2, 1)),
+        stk.cof.LinkerlessHoneycomb((2, 2, 1))
     )
     building_blocks = {
         2: tmp_amine2,
