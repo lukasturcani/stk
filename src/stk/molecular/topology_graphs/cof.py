@@ -752,8 +752,6 @@ class COF(TopologyGraph):
             edge_clones.append(clone)
             if edge_is_not_periodic:
                 clone.set_periodicity(0, 0, 0)
-            else:
-                clone._lattice_constants = self._lattice_constants
             # Set the aligner edge to the clone.
             for vertex in vertex_map.values():
                 if vertex.aligner_edge is edge:

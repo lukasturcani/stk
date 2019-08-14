@@ -406,7 +406,8 @@ class Edge:
         self,
         *vertices,
         position=None,
-        periodicity=None
+        periodicity=None,
+        lattice_constants=None
     ):
         """
         Initialize an :class:`Edge`.
@@ -428,15 +429,20 @@ class Edge:
             periodic across the z axis in the negative direction. If
             ``None`` then the edge is not periodic.
 
+        lattice_constants : :class:`iterable`, optional
+            If the edge is periodic, the a, b and c lattice
+            constants should be provided as vectors in Cartesian
+            coordiantes.
+
         """
 
         if periodicity is None:
             periodicity = [0, 0, 0]
+        if lattice_constants is None:
+            lattice_constants = ([0, 0, 0] for i in range(3))
 
         self.vertices = vertices
         self._periodicity = np.array(periodicity)
-        self._periodic_positions = {}
-
         # The FunctionalGroup instances which the edge connects.
         # These will belong to the molecules placed on the vertices
         # connected by the edge.
@@ -444,6 +450,9 @@ class Edge:
 
         self._custom_position = position is not None
         self._position = position
+        self._lattice_constants = tuple(
+            np.array(constant) for constant in lattice_constants
+        )
 
         _position = 0
         for i, vertex in enumerate(vertices, 1):
@@ -483,6 +492,9 @@ class Edge:
         """
 
         self._position *= scale
+        self._lattice_constants = tuple(
+            scale*constant for constant in self._lattice_constants
+        )
         return self
 
     def clone(self, vertex_map=None, recalculate_position=False):
