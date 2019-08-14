@@ -424,7 +424,7 @@ class Edge:
 
         self.vertices = vertices
         self.periodicity = periodicity
-        self._periodic_positions = None
+        self._periodic_positions = {}
 
         # The FunctionalGroup instances which the edge connects.
         # These will belong to the molecules placed on the vertices
@@ -470,13 +470,13 @@ class Edge:
 
     def apply_scale(self, scale):
         """
-        Scale the position and lattice constants by `scale`.
+        Scale the position by `scale`.
 
         Parameters
         ----------
         scale : :class:`float` or :class:`list`of :class:`float`
-            The value by which the position and lattice constants of
-            the :class:`Edge` are scaled. Can be a single number if all
+            The value by which the position of
+            the :class:`Edge` is scaled. Can be a single number if all
             axes are scaled by the same amount or a :class:`list` of
             three numbers if each axis is scaled by a different value.
 
@@ -489,6 +489,10 @@ class Edge:
         """
 
         self._position *= scale
+        self._periodic_positions = {
+            key: value*scale
+            for key, value in self._periodic_positions.items()
+        }
         return self
 
     def clone(self, vertex_map=None, recalculate_position=False):
