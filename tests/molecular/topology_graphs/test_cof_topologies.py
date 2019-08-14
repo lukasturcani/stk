@@ -3,7 +3,6 @@ import os
 from collections import namedtuple
 from os.path import join
 import numpy as np
-from scipy.spatial.distance import euclidean
 
 from ..._test_utilities import _test_dump_and_load
 
