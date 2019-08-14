@@ -679,6 +679,7 @@ class COF(TopologyGraph):
         for cell, vertex in vertices:
             x, y, z = cell
             clone = vertex.clone(clear_edges=True)
+            clone.set_cell(x, y, z)
             clone.aligner_edge = vertex_alignments.get(
                 vertex,
                 vertex.edges[0]
@@ -720,12 +721,12 @@ class COF(TopologyGraph):
         for cell, edge in edges:
             x, y, z = cell
             # The cell in which edge.vertices[1] is found.
-            periodicity = np.array(edge.periodicity)
+            periodicity = edge.get_periodicity()
             periodic_cell = np.array(cell) + periodicity
             # Wrap around periodic cells, ie those that are less than 0
             # or greater than the lattice size along any dimension.
             dims = zip(periodic_cell, self._lattice_size)
-            cell2 = cell2_x, cell2_y, cell2_z = np.array([
+            cell2_x, cell2_y, cell2_z = np.array([
                 (dim+max_dim) % max_dim
                 for dim, max_dim in dims
             ])
@@ -750,27 +751,14 @@ class COF(TopologyGraph):
             )
             edge_clones.append(clone)
             if edge_is_not_periodic:
-                clone.periodicity = (0, 0, 0)
+                clone.set_periodicity(0, 0, 0)
             else:
-                periodic_cell2 = cell2 - periodicity
-                periodic_positions = {
-                    vertices[x][y][z][v0]:
-                        self._get_position_in_cell(v0, periodic_cell),
-                    vertices[cell2_x][cell2_y][cell2_z][v1]:
-                        self._get_position_in_cell(v1, periodic_cell2)
-                }
-                clone.set_periodic_positions(periodic_positions)
+                clone._lattice_constants = self._lattice_constants
             # Set the aligner edge to the clone.
             for vertex in vertex_map.values():
                 if vertex.aligner_edge is edge:
                     vertex.aligner_edge = clone
         return tuple(edge_clones)
-
-    def _get_position_in_cell(self, vertex, cell):
-        shift = 0
-        for dim, constant in zip(cell, self._lattice_constants):
-            shift += dim*constant
-        return vertex.get_position()+shift
 
     def _before_react(self, mol, vertex_clones, edge_clones):
         if self._periodic:

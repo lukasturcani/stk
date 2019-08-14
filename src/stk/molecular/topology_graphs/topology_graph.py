@@ -170,6 +170,13 @@ class Vertex:
         self._position = np.array(position)
         return self
 
+    def get_cell(self):
+        return np.array(self._cell)
+
+    def set_cell(self, x, y, z):
+        self._cell = np.array([x, y, z])
+        return self
+
     def set_contructed_molecule(self, mol):
         """
         Set the :class:`.ConstructedMolecule` being constructed.
@@ -399,7 +406,7 @@ class Edge:
         self,
         *vertices,
         position=None,
-        periodicity=(0, 0, 0)
+        periodicity=None
     ):
         """
         Initialize an :class:`Edge`.
@@ -418,12 +425,16 @@ class Edge:
             then the edge is not periodic. If, ``(1, 0, -1)`` then the
             edge is periodic across the x axis in the positive
             direction, is not periodic across the y axis and is
-            periodic across the z axis in the negative direction.
+            periodic across the z axis in the negative direction. If
+            ``None`` then the edge is not periodic.
 
         """
 
+        if periodicity is None:
+            periodicity = [0, 0, 0]
+
         self.vertices = vertices
-        self.periodicity = periodicity
+        self._periodicity = np.array(periodicity)
         self._periodic_positions = {}
 
         # The FunctionalGroup instances which the edge connects.
@@ -444,28 +455,11 @@ class Edge:
         if not self._custom_position:
             self._position = _position / i
 
-    def set_periodic_positions(self, periodic_positions):
-        """
-        Set the positions of periodic vertices.
+    def get_periodicity(self):
+        return np.array(self._periodicity)
 
-        Parameters
-        ----------
-        periodic_positions : :class:`dict`
-            If the edge is periodic, this :class:`dict` should map
-            each vertex in :attr:`vertices` to its position in the
-            the periodic unit cell.
-
-        Returns
-        -------
-        :class:`Edge`
-            The edge.
-
-        """
-
-        self._periodic_positions = {
-            key: np.array(value)
-            for key, value in periodic_positions.items()
-        }
+    def set_periodicity(self, x, y, z):
+        self._periodicity = np.array([x, y, z])
         return self
 
     def apply_scale(self, scale):
@@ -489,10 +483,6 @@ class Edge:
         """
 
         self._position *= scale
-        self._periodic_positions = {
-            key: value*scale
-            for key, value in self._periodic_positions.items()
-        }
         return self
 
     def clone(self, vertex_map=None, recalculate_position=False):
@@ -524,11 +514,7 @@ class Edge:
         clone = self.__class__.__new__(self.__class__)
         clone._func_groups = list(self._func_groups)
         clone._custom_position = self._custom_position
-        clone.periodicity = self.periodicity
-        clone._periodic_positions = {
-            key: np.array(val)
-            for key, val in self._periodic_positions.items()
-        }
+        clone._periodicity = np.array(self._periodicity)
         clone.vertices = tuple(
             vertex_map.get(vertex, vertex) for vertex in self.vertices
         )
@@ -597,13 +583,18 @@ class Edge:
 
         """
 
-        not_periodic = all(dim == 0 for dim in self.periodicity)
+        not_periodic = all(dim == 0 for dim in self._periodicity)
         if vertex is None or not_periodic:
             return np.array(self._position)
 
         other = next(v for v in self.vertices if v is not vertex)
-        other_position = self._periodic_positions[other]
-        return (vertex.get_position() + other_position) / 2
+        direction = 1 if vertex is self.vertices[0] else -1
+        end_cell = vertex.get_cell() + direction*self._periodicity
+        cell_shift = end_cell - other.get_cell()
+        shift = 0
+        for dim, constant in zip(cell_shift, self._lattice_constants):
+            shift += dim*constant
+        return (other.get_position()+shift+vertex.get_position()) / 2
 
     def set_position(self, position):
         """
@@ -633,8 +624,8 @@ class Edge:
         else:
             position = ''
 
-        if any(i != 0 for i in self.periodicity):
-            periodicity = f', periodicity={self.periodicity!r}'
+        if any(i != 0 for i in self._periodicity):
+            periodicity = f', periodicity={tuple(self._periodicity)!r}'
         else:
             periodicity = ''
 
