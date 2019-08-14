@@ -89,6 +89,6 @@ def aldehyde6():
 @pytest.fixture
 def tmp_aldehyde6():
     return stk.BuildingBlock(
-        smiles='O=CC(C=O)(C=O)C(C=O)(C=O)C=O',
+        smiles='O=Cc1c(C=O)c(C=O)c(C=O)c(C=O)c1C=O',
         functional_groups=['aldehyde']
     )
