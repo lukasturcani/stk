@@ -68,15 +68,27 @@ def tmp_periodic_square(tmp_amine2, tmp_aldehyde4):
 
 @pytest.fixture
 def tmp_linkerless_honeycomb(tmp_amine3, tmp_aldehyde3):
+    topology_graph = stk.cof.LinkerlessHoneycomb((3, 3, 1))
+    num_verts = len(topology_graph.vertices)
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine3, tmp_aldehyde3],
-        topology_graph=stk.cof.LinkerlessHoneycomb((3, 3, 1))
+        topology_graph=topology_graph,
+        building_block_vertices={
+            tmp_amine3: topology_graph.vertices[:num_verts//2],
+            tmp_aldehyde3: topology_graph.vertices[num_verts//2:]
+        }
     )
 
 
 @pytest.fixture
 def tmp_periodic_linkerless_honeycomb(tmp_amine3, tmp_aldehyde3):
+    topology_graph = stk.cof.LinkerlessHoneycomb((3, 3, 1), True)
+    num_verts = len(topology_graph.vertices)
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine3, tmp_aldehyde3],
-        topology_graph=stk.cof.LinkerlessHoneycomb((3, 3, 1), True)
+        topology_graph=topology_graph,
+        building_block_vertices={
+            tmp_amine3: topology_graph.vertices[:num_verts//2],
+            tmp_aldehyde3: topology_graph.vertices[num_verts//2:]
+        }
     )

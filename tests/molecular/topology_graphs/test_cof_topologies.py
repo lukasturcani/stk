@@ -285,11 +285,11 @@ def test_topologies(
         ]
     )
     cofs = (
-        COFData(tmp_honeycomb, 3*9, 2*9, 23, 23, False),
+        COFData(tmp_honeycomb, 3*9, 2*9, 6, 6, False),
         COFData(tmp_periodic_honeycomb, 3*9, 2*9, 0, 0, True),
         COFData(tmp_kagome, 6*9, 3*9, 11, 11, False),
         COFData(tmp_periodic_kagome, 6*9, 3*9, 0, 0, True),
-        COFData(tmp_hexagonal, 12*9, 4*9, 34, 34, False),
+        COFData(tmp_hexagonal, 12*9, 4*9, 23, 23, False),
         COFData(tmp_periodic_hexagonal, 12*9, 4*9, 0, 0, True),
         COFData(tmp_square, 2*9, 1*9, 6, 6, False),
         COFData(tmp_periodic_square, 2*9, 1*9, 0, 0, True),
@@ -315,4 +315,4 @@ def test_topologies(
             num_expected_bbs=num_expected_bbs,
             num_unreacted_fgs=num_unreacted_fgs
         )
-        _test_dump_and_load(cof.cof)
+        _test_dump_and_load(test_dir, cof.cof)
