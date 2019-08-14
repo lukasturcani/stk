@@ -677,7 +677,6 @@ class COF(TopologyGraph):
         for cell, vertex in vertices:
             x, y, z = cell
             clone = vertex.clone(clear_edges=True)
-            clone.set_cell(x, y, z)
             clone.aligner_edge = vertex_alignments.get(
                 vertex,
                 vertex.edges[0]

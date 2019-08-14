@@ -820,11 +820,11 @@ def rotation_matrix(vector1, vector2):
     vector2 = normalize_vector(vector2)
 
     # Hande the case where the input and output vectors are equal.
-    if np.array_equal(vector1, vector2):
+    if np.allclose(vector1, vector2, atol=1e-8):
         return np.identity(3)
 
     # Handle the case where the rotation is 180 degrees.
-    if np.array_equal(vector1, np.multiply(vector2, -1)):
+    if np.allclose(vector1, np.multiply(vector2, -1), atol=1e-8):
         # Get a vector orthogonal to `vector1` by finding the smallest
         # component of `vector1` and making that a vector.
         ortho = [0, 0, 0]
@@ -833,17 +833,15 @@ def rotation_matrix(vector1, vector2):
         return rotation_matrix_arbitrary_axis(np.pi, axis)
 
     v = np.cross(vector1, vector2)
-
-    vx = np.array([[0, -v[2], v[1]],
-                   [v[2], 0, -v[0]],
-                   [-v[1], v[0], 0]])
-
+    vx = np.array([
+        [0, -v[2], v[1]],
+        [v[2], 0, -v[0]],
+        [-v[1], v[0], 0]
+    ])
     s = np.linalg.norm(v)
     c = np.dot(vector1, vector2)
     i = np.identity(3)
-
     mult_factor = (1-c)/np.square(s)
-
     return i + vx + np.multiply(np.dot(vx, vx), mult_factor)
 
 
