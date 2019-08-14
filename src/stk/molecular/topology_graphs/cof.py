@@ -683,7 +683,6 @@ class COF(TopologyGraph):
                 vertex,
                 vertex.edges[0]
             )
-
             # Shift the clone so that it's within the cell.
             shift = 0
             for axis, dim in zip(cell, self._lattice_constants):

@@ -55,6 +55,23 @@ def test_place_building_block(
                 atol=1e-6
             )
             aligned = max(vertex.edges, key=_alignment(vertex, bb))
+            print(topology_graph)
+            print(vertex)
+            print(vertex.aligner_edge)
+            print(vertex.edges)
+            start = (
+                bb.get_centroid(
+                    atom_ids=bb.func_groups[0].get_bonder_ids()
+                ) - vertex.get_position()
+            )
+            stop = (
+                vertex.aligner_edge.get_position(vertex) - vertex.get_position()
+            )
+            other  = (
+                aligned.get_position(vertex) - vertex.get_position()
+            )
+            print(stk.vector_angle(start, stop), stk.vector_angle(other, start))
+            print(*(stk.normalize_vector(x) for x in (start, stop, other)))
             assert aligned is vertex.aligner_edge
 
 
