@@ -102,9 +102,15 @@ def test_vertex(
             _test_assignment(vertex, bb)
 
 
-def _test_construction(cof, num_expected_bbs, num_unreacted_fgs):
+def _test_construction(
+    cof,
+    num_expected_bbs,
+    num_unreacted_fgs,
+    periodic
+):
     path = join(
-        test_dir, f'{cof.topology_graph.__class__.__name__}.mol'
+        test_dir,
+        f'{cof.topology_graph.__class__.__name__}_{periodic}.mol'
     )
     cof.write(path)
 
@@ -197,7 +203,8 @@ def test_alignments(amine2_alt3, aldehyde4_alt1):
             _test_construction(
                 cof=cof,
                 num_expected_bbs=num_expected_bbs,
-                num_unreacted_fgs=num_unreacted_fgs
+                num_unreacted_fgs=num_unreacted_fgs,
+                periodic=periodic
             )
             _test_dump_and_load(test_dir, cof)
 
@@ -256,7 +263,12 @@ def test_multi_bb(
         num_unreacted_fgs = (
             periodic_unreacted if periodic else island_unreacted
         )
-        _test_construction(cof, num_expected_bbs, num_unreacted_fgs)
+        _test_construction(
+            cof=cof,
+            num_expected_bbs=num_expected_bbs,
+            num_unreacted_fgs=num_unreacted_fgs,
+            periodic=periodic
+        )
         _test_dump_and_load(test_dir, cof)
 
 
@@ -313,6 +325,7 @@ def test_topologies(
         _test_construction(
             cof=cof.cof,
             num_expected_bbs=num_expected_bbs,
-            num_unreacted_fgs=num_unreacted_fgs
+            num_unreacted_fgs=num_unreacted_fgs,
+            periodic=cof.periodic
         )
         _test_dump_and_load(test_dir, cof.cof)
