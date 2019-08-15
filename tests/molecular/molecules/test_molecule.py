@@ -40,7 +40,7 @@ def test_apply_rotation_about_axis(tmp_amine2):
     tmp_amine2.set_position_matrix(coords)
 
     tmp_amine2.apply_rotation_about_axis(
-        theta=-np.pi/2,
+        angle=-np.pi/2,
         axis=np.array([0, 1, 0]),
         origin=np.array([0, 0, 0])
     )
@@ -73,12 +73,12 @@ def test_apply_rotation_between_vectors(tmp_amine2):
     )
 
 
-def test_apply_rotation_to_minimize_theta(tmp_amine2):
+def test_apply_rotation_to_minimize_angle(tmp_amine2):
     num_atoms = len(tmp_amine2.atoms)
     coords = np.array([[i, 0, 0] for i in range(num_atoms)])
     tmp_amine2.set_position_matrix(coords)
 
-    tmp_amine2.apply_rotation_to_minimize_theta(
+    tmp_amine2.apply_rotation_to_minimize_angle(
         start=np.array([1, 0, 0]),
         target=np.array([0, 0, 1]),
         axis=np.array([0, 1, 0]),
