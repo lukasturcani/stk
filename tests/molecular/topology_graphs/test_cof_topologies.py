@@ -108,9 +108,10 @@ def _test_construction(
     num_unreacted_fgs,
     periodic
 ):
+    is_periodic = '_periodic' if periodic else ''
     path = join(
         test_dir,
-        f'{cof.topology_graph.__class__.__name__}_{periodic}.mol'
+        f'{cof.topology_graph.__class__.__name__}{is_periodic}.mol'
     )
     cof.write(path)
 
