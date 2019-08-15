@@ -89,7 +89,10 @@ class _CageVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone.aligner_edge = self.aligner_edge
+        if self.aligner_edge is None:
+            clone.aligner_edge = None
+        else:
+            clone.aligner_edge = self.aligner_edge.clone()
         clone._neighbor_positions = list(self._neighbor_positions)
         return clone
 
@@ -403,10 +406,14 @@ class _CageVertex(Vertex):
 
     def __str__(self):
         x, y, z = self._position
+        if self.aligner_edge is None:
+            aligner_edge = None
+        else:
+            aligner_edge = self.edges.index(self.aligner_edge)
         return (
             f'Vertex(id={self.id}, '
             f'position={[x, y, z]}, '
-            f'aligner_edge={self.edges.index(self.aligner_edge)})'
+            f'aligner_edge={aligner_edge})'
         )
 
 
@@ -554,22 +561,23 @@ class Cage(TopologyGraph):
 
         vertex_clones = {}
         for vertex in self.vertices:
-            vertex.aligner_edge = vertex_alignments.get(
+            clone = vertex.clone(clear_edges=True)
+            clone.aligner_edge = vertex_alignments.get(
                 vertex,
                 vertex.edges[0]
             )
-            clone = vertex.clone(clear_edges=True)
             vertex_clones[vertex] = clone
 
         edge_clones = {}
         for edge in self.edges:
             edge_clones[edge] = edge.clone(vertex_clones)
 
-        for vertex in vertex_clones.values():
+        vertices = tuple(vertex_clones.values())
+        for vertex in vertices:
             vertex.aligner_edge = edge_clones[vertex.aligner_edge]
 
         super().__init__(
-            vertices=tuple(vertex_clones.values()),
+            vertices=vertices,
             edges=tuple(edge_clones.values()),
             processes=processes
         )
@@ -680,7 +688,6 @@ class Cage(TopologyGraph):
             f'{v.id}: {v.edges.index(v.aligner_edge)}'
             for v in self.vertices
         )
-
         return (
             f'cage.{self.__class__.__name__}('
             f'vertex_alignments={{{vertex_alignments}}})'
