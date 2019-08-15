@@ -149,7 +149,6 @@ class _COFVertex(Vertex):
 
         clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
-        clone._cell = np.array(self._cell)
         return clone
 
     def place_building_block(self, building_block):

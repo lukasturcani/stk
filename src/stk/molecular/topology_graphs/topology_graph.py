@@ -64,6 +64,7 @@ class Vertex:
         self.id = id
         self._position = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
+        self._cell = np.array([0, 0, 0])
         # This holds the ConstructedMolecule that the vertex is used
         # to construct.
         self._mol = None
@@ -135,6 +136,7 @@ class Vertex:
         clone = self.__class__.__new__(self.__class__)
         clone.id = self.id
         clone._position = np.array(self._position)
+        clone._cell = np.array(self._cell)
         clone.edges = [] if clear_edges else list(self.edges)
         return clone
 
