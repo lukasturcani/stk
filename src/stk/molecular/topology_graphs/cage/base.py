@@ -93,6 +93,29 @@ class _CageVertex(Vertex):
         clone._neighbor_positions = list(self._neighbor_positions)
         return clone
 
+    def apply_scale(self, scale):
+        """
+        Scale the position by `scale`.
+
+        Parameters
+        ----------
+        scale : :class:`float` or :class:`list`of :class:`float`
+            The value by which the position of the :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
+
+        Returns
+        -------
+        :class:`Vertex`
+            The vertex is returned.
+
+        """
+
+        self._position *= scale
+        self.aligner_edge.apply_scale(scale)
+        return self
+
     def place_building_block(self, building_block):
         """
         Place `building_block` on the :class:`.Vertex`.
@@ -321,7 +344,6 @@ class _CageVertex(Vertex):
             fg0_direction,
             building_block.get_bonder_plane_normal()
         )
-
         func_groups = sorted(
             building_block.func_groups,
             key=self._get_func_group_angle(
@@ -331,14 +353,7 @@ class _CageVertex(Vertex):
                 axis=axis
             )
         )
-        assert func_groups[0] is building_block.func_groups[0]
-
         edges = sorted(self.edges, key=self._get_edge_angle(axis))
-        aligner_first = all(
-            edges[0].get_position() == self.aligner_edge.get_position()
-        )
-        assert aligner_first
-
         for edge, func_group in zip(edges, func_groups):
             edge.assign_func_group(fg_map[func_group])
 
@@ -534,6 +549,7 @@ class Cage(TopologyGraph):
         for v, e in vertex_alignments.items():
             v = self.vertices[v] if isinstance(v, int) else v
             e = v.edges[e] if isinstance(e, int) else e
+            _vertex_alignments[v] = e
         vertex_alignments = _vertex_alignments
 
         vertex_clones = {}

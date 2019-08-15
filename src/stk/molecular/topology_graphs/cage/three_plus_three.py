@@ -32,9 +32,15 @@ class OnePlusOne(Cage):
 
     )
     edges = (
-        Edge(vertices[0], vertices[1], position=np.array([0, 1, 0])),
-        Edge(vertices[0], vertices[1], position=np.array([0, -1, 1])),
-        Edge(vertices[0], vertices[1], position=np.array([0, -1, -1]))
+        Edge(
+            vertices[0], vertices[1], position=np.array([0., 1., 0.])
+        ),
+        Edge(
+            vertices[0], vertices[1], position=np.array([0., -1., 1.])
+        ),
+        Edge(
+            vertices[0], vertices[1], position=np.array([0., -1., -1.])
+        )
     )
 
     num_windows = 3
