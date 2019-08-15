@@ -40,16 +40,12 @@ class Vertex:
 
     """
 
-    def __init__(self, id, x, y, z):
+    def __init__(self, x, y, z):
         """
         Initialize a :class:`.Vertex`.
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the vertex. This should be its index in
-            :attr:`TopologyGraph.vertices`.
-
         x : :class:`float`
             The x coordinate.
 
@@ -61,7 +57,8 @@ class Vertex:
 
         """
 
-        self.id = id
+        # This is set by TopologyGraph.__init__().
+        self.id = None
         self._position = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
         self._cell = np.array([0, 0, 0])
@@ -70,16 +67,12 @@ class Vertex:
         self._mol = None
 
     @classmethod
-    def init_at_center(cls, id, *vertices):
+    def init_at_center(cls, *vertices):
         """
         Initialize at the center of `vertices`.
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the vertex. This should be its index in
-            :attr:`TopologyGraph.vertices`.
-
         vertices : :class:`.Vertex`
             Vertices at whose center this vertex should be initialized.
 
@@ -92,7 +85,7 @@ class Vertex:
 
         center = sum(vertex.get_position() for vertex in vertices)
         center /= len(vertices)
-        return cls(id, *center)
+        return cls(*center)
 
     def apply_scale(self, scale):
         """
@@ -444,6 +437,8 @@ class Edge:
             lattice_constants = ([0, 0, 0] for i in range(3))
 
         self.vertices = vertices
+        # This will be set by TopologyGraph.__init__.
+        self.id = None
         self._periodicity = np.array(periodicity)
         # The FunctionalGroup instances which the edge connects.
         # These will belong to the molecules placed on the vertices
@@ -529,6 +524,7 @@ class Edge:
             vertex_map = {}
 
         clone = self.__class__.__new__(self.__class__)
+        clone.id = self.id
         clone._func_groups = list(self._func_groups)
         clone._custom_position = self._custom_position
         clone._periodicity = np.array(self._periodicity)
@@ -712,6 +708,10 @@ class TopologyGraph:
         self.vertices = vertices
         self.edges = edges
         self._processes = processes
+        for i, vertex in enumerate(self.vertices):
+            vertex.id = i
+        for i, edge in enumerate(self.edges):
+            edge.id = i
 
     def construct(self, mol, building_blocks):
         """

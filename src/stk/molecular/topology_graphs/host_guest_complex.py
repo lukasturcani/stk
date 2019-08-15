@@ -58,10 +58,10 @@ class _GuestVertex(Vertex):
 
     """
 
-    def __init__(self, id, x, y, z, axis, angle):
+    def __init__(self, x, y, z, axis, angle):
         self._axis = axis
         self._angle = angle
-        super().__init__(id, x, y, z)
+        super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         """
@@ -204,8 +204,8 @@ class Complex(TopologyGraph):
 
         x, y, z = displacement
         vertices = (
-            _HostVertex(0, 0, 0, 0),
-            _GuestVertex(1, x, y, z, axis, angle)
+            _HostVertex(0, 0, 0),
+            _GuestVertex(x, y, z, axis, angle)
         )
         super().__init__(vertices, (), processes)
 

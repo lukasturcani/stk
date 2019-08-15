@@ -47,10 +47,7 @@ class _CageVertex(Vertex):
         # groups on neighbor vertices connected to this vertex.
         self._neighbor_positions = []
         self.aligner_edge = None
-        # id will be set automatically by Cage. This is because
-        # _CageVertex is defined manually in a subclass of Cage
-        # and writing the id for every vertex would be a pain.
-        super().__init__(None, x, y, z)
+        super().__init__(x, y, z)
 
     @classmethod
     def init_at_center(cls, *vertices):

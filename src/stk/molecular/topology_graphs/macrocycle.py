@@ -28,16 +28,12 @@ class _CycleVertex(Vertex):
 
     """
 
-    def __init__(self, id, x, y, z, orientation, angle):
+    def __init__(self, x, y, z, orientation, angle):
         """
         Initialize a :class:`.LinearVertex`.
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the vertex. This should be its index in
-            :attr:`TopologyGraph.vertices`.
-
         x : :class:`float`
             The x coordinate.
 
@@ -60,7 +56,7 @@ class _CycleVertex(Vertex):
 
         self._orientation = orientation
         self._angle = angle
-        super().__init__(id, x, y, z)
+        super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         """
@@ -257,7 +253,6 @@ class Macrocycle(TopologyGraph):
         for i, orientation in enumerate(chain):
             theta = i*angle_diff
             v = _CycleVertex(
-                id=i,
                 x=np.cos(theta),
                 y=np.sin(theta),
                 z=0,

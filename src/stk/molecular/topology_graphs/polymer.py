@@ -27,16 +27,12 @@ class _LinearVertex(Vertex):
 
     """
 
-    def __init__(self, id, x, y, z, orientation):
+    def __init__(self, x, y, z, orientation):
         """
         Initialize a :class:`.LinearVertex`.
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the vertex. This should be its index in
-            :attr:`TopologyGraph.vertices`.
-
         x : :class:`float`
             The x coordinate.
 
@@ -54,7 +50,7 @@ class _LinearVertex(Vertex):
         """
 
         self._orientation = orientation
-        super().__init__(id, x, y, z)
+        super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         """
@@ -368,7 +364,7 @@ class Linear(TopologyGraph):
         edges = []
         for i, orientation in enumerate(body, 1):
             v = _LinearVertex(
-                id=i, x=i, y=0, z=0, orientation=orientation
+                x=i, y=0, z=0, orientation=orientation
             )
             vertices.append(v)
             edges.append(Edge(vertices[i-1], vertices[i]))

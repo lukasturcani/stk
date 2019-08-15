@@ -50,12 +50,7 @@ class _COFVertex(Vertex):
         """
 
         self.aligner_edge = None
-        # (x, y, z) identifying the cell in which the vertex is found.
-        self._cell = None
-        # id will be set automatically by COF. This is because
-        # _COFVertex is defined manually in a subclass of COF
-        # and writing the id for every vertex would be a pain.
-        super().__init__(None, x, y, z)
+        super().__init__(x, y, z)
 
     @classmethod
     def init_at_center(cls, *vertices):
@@ -228,7 +223,8 @@ class _COFVertex(Vertex):
         e0_coord = self.edges[0].get_position(self)
         e1_coord = self.edges[1].get_position(self)
         target = e0_coord - e1_coord
-        if self.aligner_edge is not self.edges[0]:
+
+        if self.aligner_edge.id != self.edges[0].id:
             target *= -1
 
         building_block.apply_rotation_between_vectors(
@@ -435,10 +431,14 @@ class _COFVertex(Vertex):
 
     def __str__(self):
         x, y, z = self._position
+        if self.aligner_edge is not None:
+            aligner_edge = self.edges.index(self.aligner_edge)
+        else:
+            aligner_edge = None
         return (
             f'Vertex(id={self.id}, '
             f'position={[x, y, z]}, '
-            f'aligner_edge={self.edges.index(self.aligner_edge)})'
+            f'aligner_edge={aligner_edge})'
         )
 
 
@@ -542,7 +542,8 @@ class COF(TopologyGraph):
     def __init_subclass__(cls, **kwargs):
         for i, vertex in enumerate(cls.vertices):
             vertex.id = i
-        for edge in cls.edges:
+        for i, edge in enumerate(cls.edges):
+            edge.id = i
             edge._lattice_constants = tuple(
                 np.array(constant)
                 for constant in cls._lattice_constants
@@ -611,9 +612,6 @@ class COF(TopologyGraph):
             for clones in flatten(vertices, {dict})
             for vertex in clones.values()
         )
-        for i, vertex in enumerate(vertices):
-            vertex.id = i
-
         super().__init__(
             vertices=vertices,
             edges=edges,
