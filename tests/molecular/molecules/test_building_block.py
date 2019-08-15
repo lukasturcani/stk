@@ -829,8 +829,9 @@ def test_get_centroid_centroid_direction_vector(tmp_amine4):
     coords[other_ids] = np.zeros((len(other_ids), 3))
     tmp_amine4.set_position_matrix(coords)
 
+    dir_vector = tmp_amine4.get_centroid_centroid_direction_vector()
     assert np.allclose(
-        a=tmp_amine4.get_centroid_centroid_direction_vector(),
+        a=stk.normalize_vector(dir_vector),
         b=[-1, 0, 0],
         atol=1e-8
     )
@@ -845,7 +846,7 @@ def test_get_centroid_centroid_direction_vector(tmp_amine4):
         fg_ids=fg_ids
     )
     assert np.allclose(
-        a=dir_vector,
+        a=stk.normalize_vector(dir_vector),
         b=[1, 0, 0],
         atol=1e-8
     )

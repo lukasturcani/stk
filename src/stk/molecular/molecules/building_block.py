@@ -521,9 +521,7 @@ class BuildingBlock(Molecule):
         centroid = self.get_centroid(
             atom_ids=self.func_groups[fg_ids[0]].get_bonder_ids()
         )
-        normal = self.get_bonder_plane_normal(
-            fg_ids=fg_ids
-        )
+        normal = self.get_bonder_plane_normal(fg_ids=fg_ids)
         d = np.sum(normal * centroid)
         return np.append(normal, d)
 
@@ -690,8 +688,8 @@ class BuildingBlock(Molecule):
         Returns
         -------
         :class:`numpy.ndarray`
-            The normalized direction vector running from the centroid
-            of the bonder atoms to the molecular centroid.
+            The vector running from the centroid of the bonder atoms to
+            the molecular centroid.
 
         """
 
@@ -705,23 +703,7 @@ class BuildingBlock(Molecule):
             atom_ids=self.get_bonder_ids(fg_ids=fg_ids)
         )
         centroid = self.get_centroid()
-        # If the bonder centroid and centroid are in the same position,
-        # the centroid - centroid vector should be orthogonal to the
-        # bonder direction vector.
-        if np.allclose(centroid, bonder_centroid, 1e-5):
-            *_, bvec = next(self.get_bonder_direction_vectors(
-                fg_ids=fg_ids
-            ))
-            # Construct a secondary vector by finding the minimum
-            # component of bvec and setting it to 0.
-            vec2 = list(bvec)
-            minc = min(vec2)
-            vec2[vec2.index(minc)] = 0 if abs(minc) >= 1e-5 else 1
-            # Get a vector orthogonal to bvec and vec2.
-            return normalize_vector(np.cross(bvec, vec2))
-
-        else:
-            return normalize_vector(centroid - bonder_centroid)
+        return centroid - bonder_centroid
 
     def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """

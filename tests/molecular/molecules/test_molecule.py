@@ -53,7 +53,6 @@ def test_apply_rotation_about_axis(tmp_amine2):
 
 
 def test_apply_rotation_between_vectors(tmp_amine2):
-
     assert not np.allclose(
         a=next(tmp_amine2.get_bonder_direction_vectors())[-1],
         b=[1, 0, 0],
@@ -65,7 +64,6 @@ def test_apply_rotation_between_vectors(tmp_amine2):
         target=[1, 0, 0],
         origin=tmp_amine2.get_centroid()
     )
-
     assert np.allclose(
         a=next(tmp_amine2.get_bonder_direction_vectors())[-1],
         b=[1, 0, 0],
