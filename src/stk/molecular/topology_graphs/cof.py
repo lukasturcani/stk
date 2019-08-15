@@ -876,6 +876,24 @@ class COF(TopologyGraph):
 
 
 class Honeycomb(COF):
+    """
+    Represents a honeycomb COF topology graph.
+
+    Building blocks with three and two functional groups are required
+    for this topology graph.
+
+    See :class:`.COF` for more details and examples.
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
+
+    """
+
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
         np.array([0.5, 0.866, 0]),
@@ -915,6 +933,23 @@ class Honeycomb(COF):
 
 
 class Hexagonal(COF):
+    """
+    Represents a hexagonal COF topology graph.
+
+    Building blocks with six and two functional groups are required
+    for this topology graph.
+
+    See :class:`.COF` for more details and examples.
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
+
+    """
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
         np.array([0.5, 0.866, 0]),
@@ -1012,6 +1047,24 @@ class Hexagonal(COF):
 
 
 class Square(COF):
+    """
+    Represents a sqaure COF topology graph.
+
+    Building blocks with four and two functional groups are required
+    for this topology graph.
+
+    See :class:`.COF` for more details and examples.
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
+
+    """
+
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
         np.array([0., 1., 0.]),
@@ -1045,6 +1098,24 @@ class Square(COF):
 
 
 class Kagome(COF):
+    """
+    Represents a kagome COF topology graph.
+
+    Building blocks with four and two functional groups are required
+    for this topology graph.
+
+    See :class:`.COF` for more details and examples.
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
+
+    """
+
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
         np.array([0.5, 0.866, 0.]),
@@ -1102,6 +1173,24 @@ class Kagome(COF):
 
 
 class LinkerlessHoneycomb(COF):
+    """
+    Represents a honeycomb COF topology graph.
+
+    Building blocks with three functional groups are required
+    for this topology graph.
+
+    See :class:`.COF` for more details and examples.
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
+
+    """
+
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
         np.array([0.5, 0.866, 0.]),
