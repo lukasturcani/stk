@@ -26,7 +26,7 @@ class _CageVertex(Vertex):
 
     """
 
-    def __init__(self, x, y, z):
+    def __init__(self, x, y, z, use_bonder_placement=True):
         """
         Initialize a :class:`_CageVertex`.
 
@@ -41,12 +41,19 @@ class _CageVertex(Vertex):
         z : :class:`float`
             The z coordinate.
 
+        use_bonder_placement : :class:`bool`, optional
+            If ``True``the position of the vertex will be updated such
+            that it is in the middle of the neighboring bonder
+            centroids, rather than in the middle of the neighboring
+            vertices.
+
         """
 
         # _neighbor_positions holds the bonder centroids of functional
         # groups on neighbor vertices connected to this vertex.
         self._neighbor_positions = []
         self.aligner_edge = None
+        self._use_bonder_placement = use_bonder_placement
         super().__init__(x, y, z)
 
     @classmethod
@@ -93,6 +100,7 @@ class _CageVertex(Vertex):
             clone.aligner_edge = None
         else:
             clone.aligner_edge = self.aligner_edge.clone()
+        clone._use_bonder_placement = self._use_bonder_placement
         clone._neighbor_positions = list(self._neighbor_positions)
         return clone
 
@@ -137,7 +145,10 @@ class _CageVertex(Vertex):
 
         """
 
-        if len(self._neighbor_positions) == len(self.edges):
+        if (
+            self._use_bonder_placement
+            and len(self._neighbor_positions) == len(self.edges)
+        ):
             self._update_position()
 
         if len(building_block.func_groups) == 2:

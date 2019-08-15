@@ -27,8 +27,8 @@ class OnePlusOne(Cage):
 
     _x = 1
     vertices = (
-        _CageVertex(_x, 0., 0.),
-        _CageVertex(-_x, 0., 0.),
+        _CageVertex(_x, 0., 0., False),
+        _CageVertex(-_x, 0., 0., False),
 
     )
     edges = (
@@ -65,10 +65,10 @@ class TwoPlusTwo(Cage):
 
     _x = 1
     vertices = (
-        _CageVertex(_x, 0, -_x/np.sqrt(2)),
-        _CageVertex(-_x, 0, -_x/np.sqrt(2)),
-        _CageVertex(0, _x, _x/np.sqrt(2)),
-        _CageVertex(0, -_x, _x/np.sqrt(2))
+        _CageVertex(_x, 0, -_x/np.sqrt(2), False),
+        _CageVertex(-_x, 0, -_x/np.sqrt(2), False),
+        _CageVertex(0, _x, _x/np.sqrt(2), False),
+        _CageVertex(0, -_x, _x/np.sqrt(2), False)
     )
 
     edges = (
@@ -104,15 +104,15 @@ class FourPlusFour(Cage):
 
     _x = 1
     vertices = (
-        _CageVertex(-_x, _x, -_x),
-        _CageVertex(-_x, -_x, -_x),
-        _CageVertex(_x, _x, -_x),
-        _CageVertex(_x, -_x, -_x),
+        _CageVertex(-_x, _x, -_x, False),
+        _CageVertex(-_x, -_x, -_x, False),
+        _CageVertex(_x, _x, -_x, False),
+        _CageVertex(_x, -_x, -_x, False),
 
-        _CageVertex(-_x, _x, _x),
-        _CageVertex(-_x, -_x, _x),
-        _CageVertex(_x, _x, _x),
-        _CageVertex(_x, -_x, _x)
+        _CageVertex(-_x, _x, _x, False),
+        _CageVertex(-_x, -_x, _x, False),
+        _CageVertex(_x, _x, _x, False),
+        _CageVertex(_x, -_x, _x, False)
     )
 
     edges = (
