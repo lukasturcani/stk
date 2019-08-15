@@ -702,8 +702,7 @@ class BuildingBlock(Molecule):
         bonder_centroid = self.get_centroid(
             atom_ids=self.get_bonder_ids(fg_ids=fg_ids)
         )
-        centroid = self.get_centroid()
-        return centroid - bonder_centroid
+        return self.get_centroid() - bonder_centroid
 
     def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """
