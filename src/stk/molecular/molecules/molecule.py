@@ -6,7 +6,6 @@ from scipy.spatial.distance import euclidean
 from inspect import signature
 
 from ...utilities import (
-    normalize_vector,
     vector_angle,
     rotation_matrix,
     rotation_matrix_arbitrary_axis,
@@ -251,10 +250,6 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        # Normalize the input direction vectors.
-        start = normalize_vector(start)
-        target = normalize_vector(target)
-
         # Set the origin of the rotation to "origin".
         self.apply_displacement(-origin)
         rot_mat = rotation_matrix(start, target)
@@ -489,9 +484,7 @@ class Molecule(metaclass=_Cached):
             atom_ids = list(atom_ids)
 
         pos = self._position_matrix[:, atom_ids].T
-        return normalize_vector(
-            np.linalg.svd(pos - pos.mean(axis=0))[-1][0]
-        )
+        return np.linalg.svd(pos - pos.mean(axis=0))[-1][0]
 
     def get_maximum_diameter(self, atom_ids=None):
         """

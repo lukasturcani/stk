@@ -19,7 +19,7 @@ from .. import bonds
 from ..bonds import Bond
 from .molecule import Molecule
 from ..functional_groups import fg_types
-from ...utilities import normalize_vector, vector_angle, dedupe
+from ...utilities import vector_angle, dedupe
 
 
 logger = logging.getLogger(__name__)
@@ -669,7 +669,7 @@ class BuildingBlock(Molecule):
         )
         pairs = it.combinations(iterable=centroids, r=2)
         for (id1, c1), (id2, c2) in pairs:
-            yield id2, id1, normalize_vector(c1-c2)
+            yield id2, id1, c1-c2
 
     def get_centroid_centroid_direction_vector(
         self,
