@@ -580,7 +580,11 @@ class BuildingBlock(Molecule):
         cc_vector = self.get_centroid_centroid_direction_vector(
             fg_ids=fg_ids
         )
-        if vector_angle(normal, cc_vector) > np.pi/2:
+        if (
+            # vector_angle is NaN if cc_vector is [0, 0, 0].
+            not np.allclose(cc_vector, [0, 0, 0], atol=1e-5)
+            and vector_angle(normal, cc_vector) > np.pi/2
+        ):
             normal *= -1
         return normal
 
