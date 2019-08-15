@@ -656,6 +656,7 @@ class COF(TopologyGraph):
         for v, e in vertex_alignments.items():
             v = self.vertices[v] if isinstance(v, int) else v
             e = v.edges[e] if isinstance(e, int) else e
+            _vertex_alignments[v] = e
         return _vertex_alignments
 
     def _get_instance_vertices(self, vertex_alignments):
@@ -700,7 +701,6 @@ class COF(TopologyGraph):
             ]
             for i in xdim
         ]
-
         # Make a clone of each vertex for each unit cell.
         cells = it.product(xdim, ydim, zdim)
         vertices = it.product(cells, self.vertices)
