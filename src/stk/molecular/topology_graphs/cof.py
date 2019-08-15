@@ -200,20 +200,22 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._position
-        edge_coord = self.aligner_edge.get_position(self)
-        target = edge_coord - self._get_edge_centroid()
+        e0_coord = self.edges[0].get_position(self)
+        e1_coord = self.edges[1].get_position(self)
+        target = e0_coord - e1_coord
+        if self.aligner_edge is not self.edges[0]:
+            target *= -1
+
         building_block.apply_rotation_between_vectors(
             start=start,
             target=target,
             origin=self._position
         )
         start = building_block.get_centroid_centroid_direction_vector()
-        e0_coord = self.edges[0].get_position(self)
-        e1_coord = self.edges[1].get_position(self)
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=self._position,
-            axis=e0_coord-e1_coord,
+            axis=target,
             origin=self._position,
         )
         return building_block.get_position_matrix()
