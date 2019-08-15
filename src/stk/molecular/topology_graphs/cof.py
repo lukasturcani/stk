@@ -148,8 +148,34 @@ class _COFVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone.aligner_edge = self.aligner_edge
+        if self.aligner_edge is not None:
+            clone.aligner_edge = self.aligner_edge.clone()
+        else:
+            clone.aligner_edge = None
         return clone
+
+    def apply_scale(self, scale):
+        """
+        Scale the position by `scale`.
+
+        Parameters
+        ----------
+        scale : :class:`float` or :class:`list`of :class:`float`
+            The value by which the position of the :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
+
+        Returns
+        -------
+        :class:`Vertex`
+            The vertex is returned.
+
+        """
+
+        self._position *= scale
+        self.aligner_edge.apply_scale(scale)
+        return self
 
     def place_building_block(self, building_block):
         """

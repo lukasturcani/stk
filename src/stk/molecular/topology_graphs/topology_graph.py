@@ -525,6 +525,9 @@ class Edge:
 
         """
 
+        if vertex_map is None:
+            vertex_map = {}
+
         clone = self.__class__.__new__(self.__class__)
         clone._func_groups = list(self._func_groups)
         clone._custom_position = self._custom_position
