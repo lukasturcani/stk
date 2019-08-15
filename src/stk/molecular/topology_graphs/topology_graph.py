@@ -166,9 +166,40 @@ class Vertex:
         return self
 
     def get_cell(self):
+        """
+        Get the cell of the lattice in which the vertex is found.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The cell of the lattice in which the vertex is found.
+
+        """
+
         return np.array(self._cell)
 
     def set_cell(self, x, y, z):
+        """
+        Set the cell of the lattice in which the vertex is found.
+
+        Parameters
+        ----------
+        x : :class:`int`
+            The x position of the cell in the lattice.
+
+        y : :class:`int`
+            The y position of the cell in the lattice.
+
+        z : :class:`int`
+            The z position of the cell in the lattice.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
         self._cell = np.array([x, y, z])
         return self
 
@@ -462,9 +493,44 @@ class Edge:
             self._position = _position / i
 
     def get_periodicity(self):
+        """
+        Get the periodicity of the edge.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The periodicity of the edge. If ``[0, 0, 0]`` the edge is
+            not periodic, if ``[1, 0, -1]`` the edge is periodic going
+            in the postive direction along the x axis, is not periodic
+            across the y axis and is periodic in the negative direction
+            along the z axis.
+
+        """
+
         return np.array(self._periodicity)
 
     def set_periodicity(self, x, y, z):
+        """
+        Set the periodicity  of the edge.
+
+        Parameters
+        ----------
+        x : :class:`int`
+            The periodicity of the edge along the x axis.
+
+        y : :class:`int`
+            The periodicity of the edge along the y axis.
+
+        z : :class:`int`
+            The periodicity of the edge along the z axis.
+
+        Returns
+        -------
+        :class:`.Edge`
+            The edge.
+
+        """
+
         self._periodicity = np.array([x, y, z])
         return self
 
