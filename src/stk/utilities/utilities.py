@@ -788,6 +788,17 @@ def remake(mol):
     return m
 
 
+def orthogonal_vector(vector):
+    ortho = [0, 0, 0]
+    for m, val in enumerate(vector):
+        if not np.allclose(val, 0, atol=1e-8):
+            n = (m+1) % 3
+            break
+    ortho[n] = vector[m]
+    ortho[m] = -vector[n]
+    return ortho
+
+
 def rotation_matrix(vector1, vector2):
     """
     Returns a rotation matrix which transforms `vector1` to `vector2`.
@@ -825,17 +836,10 @@ def rotation_matrix(vector1, vector2):
 
     # Handle the case where the rotation is 180 degrees.
     if np.allclose(vector1, np.multiply(vector2, -1), atol=1e-8):
-        # Get a vector orthogonal to `vector1` by finding the smallest
-        # component of `vector1` and making that a vector.
-        axis = [0, 0, 0]
-
-        for m, val in enumerate(vector1):
-            if not np.allclose(val, 0, atol=1e-8):
-                n = (m+1) % 3
-                break
-        axis[n] = vector1[m]
-        axis[m] = -vector1[n]
-        return rotation_matrix_arbitrary_axis(np.pi, axis)
+        return rotation_matrix_arbitrary_axis(
+            angle=np.pi,
+            axis=orthogonal_vector(vector1)
+        )
 
     v = np.cross(vector1, vector2)
     vx = np.array([
