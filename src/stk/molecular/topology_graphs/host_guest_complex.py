@@ -58,9 +58,36 @@ class _GuestVertex(Vertex):
 
     """
 
-    def __init__(self, x, y, z, axis, angle):
-        self._axis = axis
-        self._angle = angle
+    def __init__(self, x, y, z, start, target):
+        """
+        Intialize a :class:`._GuestVertex`.
+
+        Parameters
+        ----------
+        Parameters
+        ----------
+        x : :class:`float`
+            The x coordinate.
+
+        y : :class:`float`
+            The y coordinate.
+
+        z : :class:`float`
+            The z coordinate.
+
+        start : :class:`numpy.ndarray`
+            A direction vector which gets aligned with `target`.
+
+        target : :class:`numpy.ndarray`
+            A direction vector which determines the rotation applied to
+            the placed building block. A rotation such that
+            `start` is transformed into `target` is applied
+            to the placed building block.
+
+        """
+
+        self._start = np.array(start)
+        self._target = np.array(target)
         super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
@@ -81,8 +108,8 @@ class _GuestVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone._axis = self._axis
-        clone._angle = self._angle
+        clone._start = np.array(self._start)
+        clone._target = np.array(self._target)
         return clone
 
     def place_building_block(self, building_block):
@@ -104,12 +131,11 @@ class _GuestVertex(Vertex):
         """
 
         building_block.set_centroid(self._position)
-        if self._axis is not None:
-            building_block.apply_rotation_about_axis(
-                angle=self._angle,
-                axis=self._axis,
-                origin=self._position
-            )
+        building_block.apply_rotation_between_vectors(
+            start=self._start,
+            target=self._target,
+            origin=self._position
+        )
         return building_block.get_position_matrix()
 
     def assign_func_groups_to_edges(self, building_block, fg_map):
@@ -158,19 +184,21 @@ class Complex(TopologyGraph):
         complex2 = stk.ConstructedMolecule(
             building_blocks=[host, guest],
             topology_graph=stk.host_guest_complex.Complex(
-                axis=[1, 0, 0],
-                angle=3.14/3,
+                # Apply a rotation onto the guest molecule such that
+                # the vector returned by get_direction() has the same
+                # direction as [1, 1, 1].
+                guest_start=guest.get_direction(),
+                guest_target=[1, 1, 1],
                 displacement=[5.3, 2.1, 7.1]
             )
         )
-
 
     """
 
     def __init__(
         self,
-        axis=None,
-        angle=0,
+        guest_start=None,
+        guest_target=None,
         displacement=None,
         processes=1
     ):
@@ -179,11 +207,14 @@ class Complex(TopologyGraph):
 
         Parameters
         ----------
-        axis : :class:`list` of :class:`int`, optional
-            The axis about which the guest is rotated.
+        guest_start : :class:`tuple` of :class:`float`, optional
+            A direction vector which gets aligned with `guest_target`.
 
-        angle : :class:`float`, optional
-            The angle by which the guest is rotated in radians.
+        guest_target : :class:`tuple` of :class:`float`, optional
+            A direction vector which determines the rotation applied to
+            the guest building block. A rotation such that
+            `guest_start` is transformed into `guest_target` is applied
+            to the guest building block.
 
         displacement : :class:`list` of :class:`float`, optional
             The translational offset of the guest from the center of
@@ -193,10 +224,33 @@ class Complex(TopologyGraph):
             The number of parallel processes to create during
             :meth:`construct`.
 
+        Raises
+        ------
+        :class:`TypeError`
+            If `guest_start` or `guest_target` is defined but the other
+            is not.
+
         """
 
-        self._axis = axis
-        self._angle = angle
+        num_nones = sum(
+            1 for vector in (guest_start, guest_target)
+            if vector is None
+        )
+        if num_nones == 1:
+            raise TypeError(
+                'If guest_start or guest_target is defined, '
+                'the other must be too.'
+            )
+
+        if guest_start is not None:
+            start = guest_start = tuple(guest_start)
+            target = guest_target = tuple(guest_target)
+        else:
+            start = target = (1., 0., 0.)
+
+        # Save the values as None, for __repr__.
+        self._guest_start = guest_start
+        self._guest_target = guest_target
         self._displacement = displacement
 
         if displacement is None:
@@ -205,7 +259,7 @@ class Complex(TopologyGraph):
         x, y, z = displacement
         vertices = (
             _HostVertex(0, 0, 0),
-            _GuestVertex(x, y, z, axis, angle)
+            _GuestVertex(x, y, z, start, target)
         )
         super().__init__(vertices, (), processes)
 
@@ -267,7 +321,8 @@ class Complex(TopologyGraph):
 
     def __repr__(self):
         return (
-            f'host_guest_complex.Complex(axis={self._axis!r}, '
-            f'angle={self._angle!r}, '
+            f'host_guest_complex.Complex('
+            f'guest_start={self._guest_start!r}, '
+            f'guest_target={self._guest_target!r}, '
             f'displacement={self._displacement!r})'
         )
