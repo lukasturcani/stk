@@ -36,9 +36,6 @@ def _test_atoms(mol, loaded):
         d1, d2 = dict(vars(a1)), dict(vars(a2))
         bb1, bb2 = d1.pop('building_block'), d2.pop('building_block')
         assert d1 == d2
-        print(bb1._key)
-        print(bb2._key)
-        print()
         assert bb1.is_identical(bb2)
 
 
