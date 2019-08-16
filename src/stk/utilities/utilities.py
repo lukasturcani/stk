@@ -827,9 +827,14 @@ def rotation_matrix(vector1, vector2):
     if np.allclose(vector1, np.multiply(vector2, -1), atol=1e-8):
         # Get a vector orthogonal to `vector1` by finding the smallest
         # component of `vector1` and making that a vector.
-        ortho = [0, 0, 0]
-        ortho[list(vector1).index(min(abs(vector1)))] = 1
-        axis = np.cross(vector1, ortho)
+        axis = [0, 0, 0]
+
+        for m, val in enumerate(vector1):
+            if not np.allclose(val, 0, atol=1e-8):
+                n = (m+1) % 3
+                break
+        axis[n] = vector1[m]
+        axis[m] = -vector1[n]
         return rotation_matrix_arbitrary_axis(np.pi, axis)
 
     v = np.cross(vector1, vector2)
