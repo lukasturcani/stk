@@ -1,6 +1,7 @@
 import stk
 import os
 from os.path import join
+import numpy as np
 
 
 from ..._test_utilities import _test_dump_and_load
@@ -9,6 +10,102 @@ from ..._test_utilities import _test_dump_and_load
 test_dir = 'cage_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
+
+
+def _alignment(vertex, building_block):
+    fg_position = building_block.get_centroid(
+        atom_ids=building_block.func_groups[0].get_bonder_ids()
+    )
+    v1 = stk.normalize_vector(fg_position - vertex.get_position())
+
+    def inner(edge):
+        v2 = edge.get_position(vertex) - vertex.get_position()
+        return v1 @ stk.normalize_vector(v2)
+
+    return inner
+
+
+def _test_placement(vertex, bb):
+    vertex.place_building_block(bb)
+    assert np.allclose(
+        a=bb.get_centroid(bb.get_bonder_ids()),
+        b=vertex.get_position(),
+        atol=1e-8,
+    )
+    aligned = max(vertex.edges, key=_alignment(vertex, bb))
+    assert aligned is vertex.aligner_edge
+
+
+def _angle(bb, edge, vertex):
+    edge_vector = (
+        edge.get_position(vertex) -
+        bb.get_centroid(bb.get_bonder_ids())
+    )
+
+    def inner(fg):
+        fg_vector = (
+            bb.get_centroid(fg.get_bonder_ids()) -
+            bb.get_centroid(bb.get_bonder_ids())
+        )
+        return stk.vector_angle(fg_vector, edge_vector)
+
+    return inner
+
+
+def _test_assignment(vertex, bb):
+    vertex.assign_func_groups_to_edges(
+        building_block=bb,
+        fg_map={fg: fg for fg in bb.func_groups}
+    )
+    assert (
+        bb.func_groups[0] in
+        vertex.aligner_edge.get_func_groups()
+    )
+    for edge in vertex.edges:
+        closest = min(
+            bb.func_groups,
+            key=_angle(bb, edge, vertex)
+        )
+        assert closest in edge.get_func_groups()
+
+
+def test_vertex(
+    tmp_amine2,
+    tmp_aldehyde3,
+    tmp_aldehyde4,
+    tmp_aldehyde5
+):
+    topology_graphs = (
+        stk.cage.SixPlusEight(),
+        stk.cage.OnePlusOne(),
+        stk.cage.TwoPlusTwo(),
+        stk.cage.FourPlusFour(),
+        stk.cage.TwelvePlusThirty(),
+        stk.cage.TwoPlusFour(),
+        stk.cage.ThreePlusSix(),
+        stk.cage.FourPlusEight(),
+        stk.cage.FivePlusTen(),
+        stk.cage.SixPlusTwelve(),
+        stk.cage.EightPlusSixteen(),
+        stk.cage.TenPlusTwenty(),
+        stk.cage.TwoPlusThree(),
+        stk.cage.FourPlusSix(),
+        stk.cage.FourPlusSix2(),
+        stk.cage.SixPlusNine(),
+        stk.cage.EightPlusTwelve(),
+        stk.cage.TwentyPlusThirty()
+    )
+    building_blocks = {
+        2: tmp_amine2,
+        3: tmp_aldehyde3,
+        4: tmp_aldehyde4,
+        5: tmp_aldehyde5
+    }
+    for topology_graph in topology_graphs:
+        for vertex in topology_graph.vertices:
+            bb = building_blocks[len(vertex.edges)]
+            _test_placement(vertex, bb)
+            _test_assignment(vertex, bb)
 
 
 def test_topologies(

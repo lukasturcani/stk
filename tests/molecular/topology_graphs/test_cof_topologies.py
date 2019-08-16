@@ -13,7 +13,6 @@ if not os.path.exists(test_dir):
 
 
 def _alignment(vertex, building_block):
-
     fg_position = building_block.get_centroid(
         atom_ids=building_block.func_groups[0].get_bonder_ids()
     )
@@ -31,7 +30,7 @@ def _test_placement(vertex, bb):
     assert np.allclose(
         a=bb.get_centroid(bb.get_bonder_ids()),
         b=vertex.get_position(),
-        atol=1e-6
+        atol=1e-8
     )
     aligned = max(vertex.edges, key=_alignment(vertex, bb))
     assert aligned is vertex.aligner_edge

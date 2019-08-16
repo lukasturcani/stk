@@ -280,33 +280,64 @@ class _CageVertex(Vertex):
         """
 
         if len(building_block.func_groups) == 2:
-            r = self._assign_func_groups_to_linear_edges(
+            return self._assign_func_groups_to_linear_edges(
                 building_block=building_block,
                 fg_map=fg_map
             )
-        else:
-            r = self._assign_func_groups_to_nonlinear_edges(
+        return self._assign_func_groups_to_nonlinear_edges(
                 building_block=building_block,
                 fg_map=fg_map
             )
+
+    def after_assign_func_groups_to_edges(
+        self,
+        building_block,
+        fg_map
+    ):
+        """
+        Perform operations after functional groups have been assigned.
+
+        This method is always executed serially. It is often useful
+        when data needs to be transferred between vertices, which
+        have been processed independently, in parallel.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is needs to have
+            functional groups assigned to edges.
+
+        fg_map : :class:`dict`
+            A mapping from :class:`.FunctionalGroup` instances in
+            `building_block` to the equivalent
+            :class:`.FunctionalGroup` instances in the molecule being
+            constructed.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
 
         bb_fgs = set(fg_map.values())
-
         for edge in self.edges:
-            for vertex in edge.vertices:
-                if vertex is self:
+            for func_group in edge.get_func_groups():
+                if func_group not in bb_fgs:
                     continue
 
-                for func_group in edge.get_func_groups():
-                    if func_group not in bb_fgs:
+                bonder_position = self._get_molecule_centroid(
+                    atom_ids=func_group.get_bonder_ids()
+                )
+                for vertex in edge.vertices:
+                    if vertex is self:
                         continue
 
-                    vertex._neighbor_positions.append(
-                        self._get_molecule_centroid(
-                            atom_ids=func_group.get_bonder_ids()
-                        )
-                    )
-        return r
+                    vertex._neighbor_positions.append(bonder_position)
+
+        return super().after_assign_func_groups_to_edges(
+            building_block=building_block,
+            fg_map=fg_map
+        )
 
     def _assign_func_groups_to_linear_edges(
         self,

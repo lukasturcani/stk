@@ -131,6 +131,7 @@ class Vertex:
         clone._position = np.array(self._position)
         clone._cell = np.array(self._cell)
         clone.edges = [] if clear_edges else list(self.edges)
+        clone._mol = self._mol
         return clone
 
     def get_position(self):
@@ -284,6 +285,41 @@ class Vertex:
         """
 
         raise NotImplementedError()
+
+    def after_assign_func_groups_to_edges(
+        self,
+        building_block,
+        fg_map
+    ):
+        """
+        Perform operations after functional groups have been assigned.
+
+        This method is always executed serially. It is often useful
+        when data needs to be transferred between vertices, which
+        have been processed independently, in parallel.
+
+        It does nothing by default, but should be overridden when
+        necessary.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is needs to have
+            functional groups assigned to edges.
+
+        fg_map : :class:`dict`
+            A mapping from :class:`.FunctionalGroup` instances in
+            `building_block` to the equivalent
+            :class:`.FunctionalGroup` instances in the molecule being
+            constructed.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        return
 
     def _get_edge_centroid(self, edge_ids=None):
         """
@@ -1057,6 +1093,12 @@ class TopologyGraph:
                 # Assign the functional groups in the contructed
                 # molecule to edges in the topology graph.
                 vertex_clone.assign_func_groups_to_edges(bb, fg_map)
+
+                # Perform additional, miscellaneous operations.
+                vertex_clone.after_assign_func_groups_to_edges(
+                    building_block=bb,
+                    fg_map=fg_map
+                )
 
                 bb.set_position_matrix(original_coords)
                 mol.bonds.extend(b.clone(atom_map) for b in bb.bonds)
