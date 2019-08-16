@@ -16,11 +16,13 @@ def _alignment(vertex, building_block):
     fg_position = building_block.get_centroid(
         atom_ids=building_block.func_groups[0].get_bonder_ids()
     )
-    v1 = stk.normalize_vector(fg_position - vertex.get_position())
+    fg_vector = stk.normalize_vector(
+        fg_position - vertex.get_position()
+    )
 
     def inner(edge):
-        v2 = edge.get_position(vertex) - vertex.get_position()
-        return v1 @ stk.normalize_vector(v2)
+        edge_vector = edge.get_position() - vertex.get_position()
+        return fg_vector @ stk.normalize_vector(edge_vector)
 
     return inner
 
@@ -36,22 +38,6 @@ def _test_placement(vertex, bb):
     assert aligned is vertex.aligner_edge
 
 
-def _angle(bb, edge, vertex):
-    edge_vector = (
-        edge.get_position(vertex) -
-        bb.get_centroid(bb.get_bonder_ids())
-    )
-
-    def inner(fg):
-        fg_vector = (
-            bb.get_centroid(fg.get_bonder_ids()) -
-            bb.get_centroid(bb.get_bonder_ids())
-        )
-        return stk.vector_angle(fg_vector, edge_vector)
-
-    return inner
-
-
 def _test_assignment(vertex, bb):
     vertex.assign_func_groups_to_edges(
         building_block=bb,
@@ -61,12 +47,6 @@ def _test_assignment(vertex, bb):
         bb.func_groups[0] in
         vertex.aligner_edge.get_func_groups()
     )
-    for edge in vertex.edges:
-        closest = min(
-            bb.func_groups,
-            key=_angle(bb, edge, vertex)
-        )
-        assert closest in edge.get_func_groups()
 
 
 def test_vertex(
