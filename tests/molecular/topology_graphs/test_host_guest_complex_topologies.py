@@ -22,8 +22,9 @@ def _test_placement(vertex, bb):
 
 
 def _test_alignment(vertex, bb, target):
+    atom1, atom2 = bb.get_atom_coords([0, 1])
     assert np.allclose(
-        a=bb.get_direction(),
+        a=stk.normalize_vector(atom1 - atom2),
         b=target,
         atol=1e-8
     )
@@ -32,13 +33,15 @@ def _test_alignment(vertex, bb, target):
 def test_vertex(tmp_four_plus_six, tmp_bromine2):
     host = tmp_four_plus_six
     guest = tmp_bromine2
+    atom1, atom2 = guest.get_atom_coords([0, 1])
+    guest_start = stk.normalize_vector(atom1 - atom2)
     complex2 = stk.host_guest_complex.Complex(
-        guest_start=guest.get_direction(),
+        guest_start=guest_start,
         guest_target=[1, 1, 1],
         displacement=[23, 5, 21]
     )
     complexes = (
-        (stk.host_guest_complex.Complex(), guest.get_direction()),
+        (stk.host_guest_complex.Complex(), guest_start),
         (complex2, stk.normalize_vector([1, 1, 1]))
     )
     for complex_, target in complexes:
