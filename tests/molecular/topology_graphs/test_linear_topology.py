@@ -1,7 +1,8 @@
 import os
 import stk
 import numpy as np
-
+from scipy.spatial.distance import euclidean
+from os.path import join
 
 from ..._test_utilities import _test_dump_and_load
 
@@ -9,6 +10,35 @@ from ..._test_utilities import _test_dump_and_load
 test_dir = 'linear_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
+
+
+def _test_placement(vertex, bb):
+    vertex.place_building_block(bb)
+    assert np.allclose(
+        a=vertex.get_position(),
+        b=bb.get_centroid(bb.get_bonder_ids()),
+        atol=1e-8
+    )
+
+
+def _fg_distance(edge, bb):
+    edge_position = edge.get_position()
+
+    def inner(fg):
+        fg_position = bb.get_centroid(fg.get_bonder_ids())
+        return euclidean(edge_position, fg_position)
+
+    return inner
+
+
+def _test_assignment(vertex, bb):
+    vertex.assign_func_groups_to_edges(
+        building_block=bb,
+        fg_map={fg: fg for fg in bb.func_groups}
+    )
+    for edge in vertex.edges:
+        closest = min(bb.func_groups, key=_fg_distance(edge, bb))
+        assert closest in edge.get_func_groups()
 
 
 def test_vertex(tmp_amine2):
@@ -20,36 +50,54 @@ def test_vertex(tmp_amine2):
 
     for vertex in chain.vertices:
         _test_placement(vertex, tmp_amine2)
-        _test_assignment(vertex, tmp-amine2)
+        _test_assignment(vertex, tmp_amine2)
 
-    new_coords = v1.place_building_block(tmp_amine2)
-    assert np.allclose(
-        a=tmp_amine2.get_centroid(tmp_amine2.get_bonder_ids()),
-        b=v1.get_position(),
-        atol=1e-6
+
+def _test_construction(
+    polymer,
+    repeat_units,
+    num_lost_bonds_per_join
+):
+    fg = (
+        next(polymer.get_building_blocks()).func_groups[0].fg_type.name
     )
-    assert np.allclose(
-        a=new_coords,
-        b=tmp_amine2.get_position_matrix(),
-        atol=1e-6
+    polymer.write(join(test_dir, f'polymer_{fg}.mol'))
+
+    for bb in polymer.get_building_blocks():
+        assert (
+            polymer.building_block_counter[bb] == repeat_units
+        )
+
+    monomer_joins = 2*repeat_units - 1
+    bonds_per_join = len(bb.func_groups[0].bonders)
+    assert (
+        len(polymer.construction_bonds) == monomer_joins*bonds_per_join
     )
 
-    new_coords = v2.place_building_block(tmp_amine2)
-    assert np.allclose(
-        a=tmp_amine2.get_centroid(tmp_amine2.get_bonder_ids()),
-        b=v2.get_position(),
-        atol=1e-6
+    deleters_per_join = sum(
+        len(bb.func_groups[0].deleters)
+        for bb in polymer.get_building_blocks()
     )
-    assert np.allclose(
-        a=new_coords,
-        b=tmp_amine2.get_position_matrix(),
-        atol=1e-6
+    num_bb_atoms = sum(
+        len(bb.atoms) for bb in polymer.get_building_blocks()
     )
+    expected_atoms = (
+        num_bb_atoms*repeat_units - deleters_per_join*monomer_joins
+    )
+    assert len(polymer.atoms) == expected_atoms
+
+    num_bb_bonds = sum(
+        len(bb.bonds) for bb in polymer.get_building_blocks()
+    )
+    expected_bonds = (
+        num_bb_bonds*repeat_units -
+        num_lost_bonds_per_join*monomer_joins
+    )
+    assert len(polymer.bonds) == expected_bonds
 
 
 def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
     repeat_units = 3
-    monomer_joins = 2*repeat_units - 1
 
     polymers = (
         stk.ConstructedMolecule(
@@ -70,51 +118,12 @@ def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
         )
 
     )
-
-    for polymer in polymers:
-        _test_construction(polymer)
-
-    _test_dump_and_load(test_dir, p1)
-
-    _test_dump_and_load(test_dir, p2)
-
-    path = os.path.join(test_dir, 'p1.mol')
-    p1.write(path)
-    p2.write(path.replace('1', '2'))
-
-    assert len(p1.construction_bonds) == monomer_joins
-    assert len(p2.construction_bonds) == monomer_joins*2
-
-    num_monomer_atoms = len(amine2.atoms) + len(aldehyde2.atoms)
-
-    # 3 atoms are lost at each join in p1 due to condensation.
-    expected_atoms = num_monomer_atoms*repeat_units - 3*monomer_joins
-    assert len(p1.atoms) == expected_atoms
-
-    # 6 atoms are lost at each join due to condensation.
-    num_monomer_atoms = len(boronic_acid2.atoms) + len(diol2.atoms)
-    expected_atoms = num_monomer_atoms*repeat_units - 6*monomer_joins
-    assert len(p2.atoms) == expected_atoms
-
-    assert p1.building_block_counter[amine2] == repeat_units
-    assert p1.building_block_counter[aldehyde2] == repeat_units
-    assert p2.building_block_counter[boronic_acid2] == repeat_units
-    assert p2.building_block_counter[diol2] == repeat_units
-
-    t1 = stk.polymer.Linear('AB', [1, 1], repeat_units)
-    assert repr(p1.topology_graph) == repr(t1)
-    t2 = stk.polymer.Linear('AB', [0, 0], repeat_units)
-    assert repr(p2.topology_graph) == repr(t2)
-
-    expected_bonds = (
-        len(amine2.bonds)*repeat_units +
-        len(aldehyde2.bonds)*repeat_units -
-        monomer_joins*2
-    )
-    assert len(p1.bonds) == expected_bonds
-    expected_bonds = (
-        len(boronic_acid2.bonds)*repeat_units +
-        len(diol2.bonds)*repeat_units -
-        monomer_joins*4
-    )
-    assert len(p2.bonds) == expected_bonds
+    lost_bonds_per_join = (2, 4)
+    polymer_data = zip(polymers, lost_bonds_per_join)
+    for polymer, num_lost_bonds_per_join in polymer_data:
+        _test_construction(
+            polymer=polymer,
+            repeat_units=repeat_units,
+            num_lost_bonds_per_join=num_lost_bonds_per_join
+        )
+        _test_dump_and_load(test_dir, polymer)

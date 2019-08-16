@@ -360,7 +360,7 @@ class Linear(TopologyGraph):
         self._n = n
 
         head, *body, tail = orientations*n
-        vertices = [_HeadVertex(0, 0, 0, 0, head)]
+        vertices = [_HeadVertex(0, 0, 0, head)]
         edges = []
         for i, orientation in enumerate(body, 1):
             v = _LinearVertex(
@@ -370,7 +370,7 @@ class Linear(TopologyGraph):
             edges.append(Edge(vertices[i-1], vertices[i]))
 
         vertices.append(
-            _TailVertex(len(vertices), len(vertices), 0, 0, tail)
+            _TailVertex(len(vertices), 0, 0, tail)
         )
         edges.append(Edge(vertices[-2], vertices[-1]))
 

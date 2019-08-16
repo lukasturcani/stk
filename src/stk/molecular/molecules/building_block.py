@@ -110,8 +110,6 @@ class BuildingBlock(Molecule):
             functional_groups = ()
 
         mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
-        rdkit.Kekulize(mol)
-
         params = rdkit.ETKDGv2()
         params.randomSeed = random_seed
         for i in range(100):
@@ -322,6 +320,8 @@ class BuildingBlock(Molecule):
         None : :class:`NoneType`
 
         """
+
+        rdkit.Kekulize(mol)
 
         if functional_groups is None:
             functional_groups = ()
@@ -806,8 +806,6 @@ class BuildingBlock(Molecule):
         """
 
         mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
-        rdkit.Kekulize(mol)
-
         params = rdkit.ETKDGv2()
         params.randomSeed = random_seed
         for i in range(100):
@@ -823,8 +821,7 @@ class BuildingBlock(Molecule):
         if functional_groups is None:
             functional_groups = ()
         functional_groups = sorted(functional_groups)
-        mol.UpdatePropertyCache()
-        rdkit.AssignAtomChiralTagsFromStructure(mol)
+        rdkit.SanitizeMol(mol)
         return (
             *functional_groups,
             rdkit.MolToSmiles(mol, canonical=True)
