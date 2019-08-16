@@ -762,12 +762,9 @@ def remake(mol):
 
     """
 
-    rdkit.Kekulize(mol)
     emol = rdkit.EditableMol(rdkit.Mol())
-    for a in mol.GetAtoms():
-        new_atom = rdkit.Atom(a.GetAtomicNum())
-        new_atom.SetFormalCharge(a.GetFormalCharge())
-        emol.AddAtom(new_atom)
+    for atom in mol.GetAtoms():
+        emol.AddAtom(rdkit.Atom(atom.GetAtomicNum()))
 
     for bond in mol.GetBonds():
         emol.AddBond(
@@ -777,14 +774,7 @@ def remake(mol):
         )
 
     m = emol.GetMol()
-    if mol.GetConformers():
-        m.AddConformer(rdkit.Conformer(mol.GetConformer()))
-
-    for a in m.GetAtoms():
-        a.UpdatePropertyCache()
-
-    rdkit.GetSSSR(m)
-
+    m.AddConformer(mol.GetConformer())
     return m
 
 

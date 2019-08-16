@@ -19,7 +19,7 @@ from .. import bonds
 from ..bonds import Bond
 from .molecule import Molecule
 from ..functional_groups import fg_types
-from ...utilities import vector_angle, dedupe
+from ...utilities import vector_angle, dedupe, remake
 
 
 logger = logging.getLogger(__name__)
@@ -179,8 +179,11 @@ class BuildingBlock(Molecule):
                 raise ValueError(
                     f'Unable to initialize from "{ext}" files.'
                 )
-            mol = cls._init_funcs[ext](path)
-            rdkit.Kekulize(mol)
+            # This remake needs to be here because molecules loaded
+            # with rdkit often have issues, because rdkit tries to do
+            # bits of structural analysis like stereocenters. remake
+            # gets rid of all this problematic metadata.
+            mol = remake(cls._init_funcs[ext](path))
 
         return cls.init_from_rdkit_mol(
             mol=mol,
@@ -396,13 +399,9 @@ class BuildingBlock(Molecule):
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
 
-        rdkit_mol = obj.to_rdkit_mol()
-        obj._key = cls._get_key(
-            self=obj,
-            smiles=rdkit.MolToSmiles(rdkit_mol),
-            functional_groups=functional_groups,
-            random_seed=None,
-            use_cache=None
+        obj._key = cls._get_key_from_rdkit_mol(
+            mol=obj.to_rdkit_mol(),
+            functional_groups=functional_groups
         )
 
         if not use_cache:
@@ -807,6 +806,16 @@ class BuildingBlock(Molecule):
         """
 
         mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+        rdkit.Kekulize(mol)
+
+        params = rdkit.ETKDGv2()
+        params.randomSeed = random_seed
+        for i in range(100):
+            failed = rdkit.EmbedMolecule(mol, params) == -1
+            if failed:
+                params.randomSeed += 1
+            else:
+                break
         return self._get_key_from_rdkit_mol(mol, functional_groups)
 
     @staticmethod
@@ -814,6 +823,8 @@ class BuildingBlock(Molecule):
         if functional_groups is None:
             functional_groups = ()
         functional_groups = sorted(functional_groups)
+        mol.UpdatePropertyCache()
+        rdkit.AssignAtomChiralTagsFromStructure(mol)
         return (
             *functional_groups,
             rdkit.MolToSmiles(mol, canonical=True)

@@ -48,14 +48,14 @@ def test_vertex(tmp_four_plus_six, tmp_bromine2):
         _test_alignment(v2, guest, target)
 
 
-def _create_host(amine2, amine2_alt1, aldehyde3):
+def _create_host(amine2, amine2_alt3, aldehyde3):
     four_plus_six = stk.cage.FourPlusSix()
     return stk.ConstructedMolecule(
-        building_blocks=[amine2, amine2_alt1, aldehyde3],
+        building_blocks=[amine2, amine2_alt3, aldehyde3],
         topology_graph=four_plus_six,
         building_block_vertices={
             amine2: four_plus_six.vertices[5:],
-            amine2_alt1: four_plus_six.vertices[4:5],
+            amine2_alt3: four_plus_six.vertices[4:5],
             aldehyde3: four_plus_six.vertices[:4]
         }
     )
@@ -81,12 +81,12 @@ def _test_construction(complex_, i, num_expected_bbs):
 
 def test_host_guest_complex(
     amine2,
-    amine2_alt1,
+    amine2_alt3,
     aldehyde3,
     chained_c60
 ):
 
-    host = _create_host(amine2, amine2_alt1, aldehyde3)
+    host = _create_host(amine2, amine2_alt3, aldehyde3)
     num_expected_bbs = {host: 1, chained_c60: 1}
     n = 3
     for i in range(n):
