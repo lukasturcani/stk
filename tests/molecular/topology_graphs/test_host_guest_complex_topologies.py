@@ -99,7 +99,7 @@ def test_host_guest_complex(
             topology_graph=stk.host_guest_complex.Complex(
                 guest_start=chained_c60.get_direction(),
                 guest_target=[x, y, 0],
-                displacement=[2**i, 0, 0]
+                displacement=[3**i, 0, 0]
             )
         )
         _test_construction(complex_, i, num_expected_bbs)
