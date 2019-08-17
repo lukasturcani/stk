@@ -1,5 +1,24 @@
 import pytest
 import stk
+from os.path import join
+
+
+@pytest.fixture
+def tmp_opt_cc3(tmp_amine2, tmp_aldehyde3):
+    cc3 = stk.ConstructedMolecule(
+        building_blocks=[tmp_amine2, tmp_aldehyde3],
+        topology_graph=stk.cage.FourPlusSix()
+    )
+    cc3.update_from_file(join('..', '..', 'data', 'cc3.mol'))
+    return cc3
+
+
+@pytest.fixture
+def tmp_cc3(tmp_amine2, tmp_aldehyde3):
+    return stk.ConstructedMolecule(
+        building_blocks=[tmp_amine2, tmp_aldehyde3],
+        topology_graph=stk.cage.FourPlusSix()
+    )
 
 
 @pytest.fixture

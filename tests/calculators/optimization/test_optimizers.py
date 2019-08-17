@@ -99,27 +99,27 @@ def test_cache_use(tmp_polymer):
     assert tmp_polymer in opt2._cache
 
 
-def test_cage_optimizer_sequence(tmp_cc3, tmp_cage):
+def test_cage_optimizer_sequence(tmp_opt_cc3, tmp_cc3):
     energy_calculator = stk.MMFFEnergy()
+    init_opt_cc3 = energy_calculator.get_energy(tmp_opt_cc3)
     init_cc3 = energy_calculator.get_energy(tmp_cc3)
-    init_cage = energy_calculator.get_energy(tmp_cage)
 
     mmff = stk.MMFF()
     etkdg = stk.ETKDG()
 
-    # CC3 needs an optimizer with mmff only, because using etkdg will
-    # increase its energy.
+    # opt_cc3 needs an optimizer with mmff only, because using etkdg
+    # will increase its energy.
     sequence1 = stk.CageOptimizerSequence(mmff)
-    sequence1.optimize(tmp_cc3)
+    sequence1.optimize(tmp_opt_cc3)
     sequence2 = stk.CageOptimizerSequence(etkdg, mmff)
-    sequence2.optimize(tmp_cage)
+    sequence2.optimize(tmp_cc3)
 
-    # CC3 should have found all windows so energy should be lowered due
-    # to optimization.
-    assert energy_calculator.get_energy(tmp_cc3) < init_cc3
-    # Cage should have not found all windows so energy should be the
+    # opt_cc3 should have found all windows so energy should be lowered
+    # due to optimization.
+    assert energy_calculator.get_energy(tmp_cc3) < init_opt_cc3
+    # cc3 should have not found all windows so energy should be the
     # same as if no optimization happened.
-    assert energy_calculator.get_energy(tmp_cage) == init_cage
+    assert energy_calculator.get_energy(tmp_cc3) == init_cc3
 
 
 def test_try_catch_optimizer(tmp_amine2):

@@ -136,7 +136,7 @@ def test_forcefield_com_exceptions():
         )
 
 
-def test_md_com_exceptions():
+def test_md_com_exceptions(amine2):
     with pytest.raises(stk.MacroModelInputError):
         mm = stk.MacroModelMD(
             macromodel_path='dummy_path',
@@ -179,7 +179,7 @@ def test_md_com_exceptions():
         eq_time=100000
     )
 
-    mm._generate_com(join(test_dir, 'com_test.mol'))
+    mm._generate_com(amine2, join(test_dir, 'com_test'))
     with open(join(test_dir, 'com_test.com'), 'r') as o:
         comfile = o.read().splitlines()
         expect1 = (
