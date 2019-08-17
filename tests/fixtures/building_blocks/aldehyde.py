@@ -7,7 +7,7 @@ def aldehyde2():
     return stk.BuildingBlock('O=CCC=O', ['aldehyde'])
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_aldehyde2():
     return stk.BuildingBlock('O=CCC=O', ['aldehyde'])
 
@@ -27,7 +27,7 @@ def aldehyde3():
     return stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_aldehyde3():
     return stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
 
@@ -52,7 +52,7 @@ def aldehyde4():
     return stk.BuildingBlock('O=CC(C=O)(C=O)C=O', ['aldehyde'])
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_aldehyde4():
     return stk.BuildingBlock('O=CC(C=O)(C=O)C=O', ['aldehyde'])
 
@@ -62,7 +62,7 @@ def aldehyde4_alt1():
     return stk.BuildingBlock('O=CC(OC=O)(C=O)C=O', ['aldehyde'])
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_aldehyde4_alt2():
     return stk.BuildingBlock(
         smiles='O=Cc1c(C=O)cc(C=O)c(C=O)c1',
@@ -78,7 +78,7 @@ def aldehyde5():
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_aldehyde5():
     return stk.BuildingBlock(
         smiles='O=C[C-]1C(C=O)=C(C=O)C(C=O)=C1C=O',
@@ -94,7 +94,7 @@ def aldehyde6():
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_aldehyde6():
     return stk.BuildingBlock(
         smiles='O=Cc1c(C=O)c(C=O)c(C=O)c(C=O)c1C=O',

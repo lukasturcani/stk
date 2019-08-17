@@ -60,7 +60,7 @@ def population():
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_population():
     bb1, bb2, bb3, bb4, c1, c2, c3, c4 = _population_members()
     return stk.Population(

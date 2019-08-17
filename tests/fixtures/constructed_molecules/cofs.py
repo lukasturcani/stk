@@ -2,7 +2,7 @@ import stk
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_honeycomb(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde3],
@@ -10,7 +10,7 @@ def tmp_honeycomb(tmp_amine2, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_periodic_honeycomb(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde3],
@@ -18,7 +18,7 @@ def tmp_periodic_honeycomb(tmp_amine2, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_kagome(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -26,7 +26,7 @@ def tmp_kagome(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_periodic_kagome(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -34,7 +34,7 @@ def tmp_periodic_kagome(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_hexagonal(tmp_amine2, tmp_aldehyde6):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde6],
@@ -42,7 +42,7 @@ def tmp_hexagonal(tmp_amine2, tmp_aldehyde6):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_periodic_hexagonal(tmp_amine2, tmp_aldehyde6):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde6],
@@ -50,7 +50,7 @@ def tmp_periodic_hexagonal(tmp_amine2, tmp_aldehyde6):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_square(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -58,7 +58,7 @@ def tmp_square(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_periodic_square(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -66,7 +66,7 @@ def tmp_periodic_square(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_linkerless_honeycomb(tmp_amine3, tmp_aldehyde3):
     topology_graph = stk.cof.LinkerlessHoneycomb((3, 3, 1))
     num_verts = len(topology_graph.vertices)
@@ -80,7 +80,7 @@ def tmp_linkerless_honeycomb(tmp_amine3, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_periodic_linkerless_honeycomb(tmp_amine3, tmp_aldehyde3):
     topology_graph = stk.cof.LinkerlessHoneycomb((3, 3, 1), True)
     num_verts = len(topology_graph.vertices)

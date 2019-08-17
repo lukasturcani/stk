@@ -10,7 +10,7 @@ def polymer(amine2, aldehyde2, ab_chain3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_polymer(tmp_amine2, tmp_aldehyde2, tmp_ab_chain3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde2],

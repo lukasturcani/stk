@@ -7,7 +7,7 @@ def amine2():
     return stk.BuildingBlock('NCCCN', ['amine'])
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_amine2():
     return stk.BuildingBlock('NCCCN', ['amine'])
 
@@ -39,7 +39,7 @@ def amine3():
     return stk.BuildingBlock('NCC(CN)CN', ['amine'])
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_amine3():
     return stk.BuildingBlock('NCC(CN)CN', ['amine'])
 
@@ -49,6 +49,6 @@ def amine4():
     return stk.BuildingBlock('NCC(CN)(CN)CN', ['amine'])
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_amine4():
     return stk.BuildingBlock('NCC(CN)(CN)CN', ['amine'])

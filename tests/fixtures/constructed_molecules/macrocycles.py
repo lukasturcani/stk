@@ -2,7 +2,7 @@ import stk
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_macrocycle(tmp_bromine2, tmp_bromine2_alt1):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_bromine2, tmp_bromine2_alt1],

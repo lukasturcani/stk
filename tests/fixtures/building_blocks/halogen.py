@@ -2,12 +2,12 @@ import pytest
 import stk
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_bromine2():
     return stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_bromine2_alt1():
     return stk.BuildingBlock('[Br]CNC[Br]', ['bromine'])
 
