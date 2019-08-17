@@ -138,6 +138,13 @@ def test_get_cached_mol(tmp_amine2, aldehyde2):
                 identity_key=aldehyde2.get_identity_key()
             )
 
+        default = object()
+        cached = stk.BuildingBlock.get_cached_mol(
+            identity_key=aldehyde2.get_identity_key(),
+            default=default
+        )
+        assert default is cached
+
     except Exception:
         raise
 
