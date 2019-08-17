@@ -424,7 +424,7 @@ class Molecule(metaclass=_Cached):
             yield atom_coords
 
     @classmethod
-    def get_cached_mol(cls, identity_key):
+    def get_cached_mol(cls, identity_key, default=None):
         """
         Get a molecule from the cache.
 
@@ -433,6 +433,11 @@ class Molecule(metaclass=_Cached):
         identity_key : :class:`object`
             The identity key of the molecule to return.
 
+        default : :class:`object`, optional
+            Returned if `identity_key` is not found in the cache.
+            If ``None`` an error will be raised if `identity_key` is
+            not found in the cache.
+
         Returns
         -------
         :class:`.Molecule`
@@ -440,7 +445,9 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        return cls._cache[identity_key]
+        if default is None:
+            return cls._cache[identity_key]
+        return cls._cache.get(identity_key, default)
 
     def get_atom_distance(self, atom1_id, atom2_id):
         """
