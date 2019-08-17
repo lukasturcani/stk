@@ -486,6 +486,53 @@ class Molecule(metaclass=_Cached):
         pos = self._position_matrix[:, atom_ids].T
         return np.linalg.svd(pos - pos.mean(axis=0))[-1][0]
 
+    def get_identity_key(self):
+        """
+        Return the identity key.
+
+        The identity key wil be equal for two molecules which
+        ``stk`` sees as identical. The identity key does not take
+        the conformation into account but it does account for
+        isomerism.
+
+        Returns
+        -------
+        :class:`object`
+            A hashable object which represents the identity of the
+            molecule.
+
+        """
+
+        # This is method is lazy.
+        if not hasattr(self._identity_key):
+            self._identity_key = self._get_identity_key()
+        return self._identity_key
+
+    def _get_identity_key(self):
+        """
+        Return the identity key.
+
+        The identity key wil be equal for two molecules which
+        ``stk`` sees as identical. The identity key does not take
+        the conformation into account but it does account for
+        isomerism.
+
+        Returns
+        -------
+        :class:`object`
+            A hashable object which represents the identity of the
+            molecule.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method which needs to be implemented
+            in a subclass.
+
+        """
+
+        raise NotImplementedError()
+
     def get_maximum_diameter(self, atom_ids=None):
         """
         Return the maximum diamater.
