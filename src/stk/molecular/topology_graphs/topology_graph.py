@@ -798,7 +798,13 @@ class TopologyGraph:
 
     """
 
-    def __init__(self, vertices, edges, processes):
+    def __init__(
+        self,
+        vertices,
+        edges,
+        construction_stages,
+        processes
+    ):
         """
         Initialize an instance of :class:`.TopologyGraph`.
 
@@ -810,6 +816,26 @@ class TopologyGraph:
         edges : :class:`tuple` of :class:`.Edge`
             The edges which make up the graph.
 
+        construction_stages : :class:`tuple` of :class:`callable`
+            A collection of callables, each of which takes a
+            :class:`.Vertex` and returns ``True`` or ``False``.
+            If the first :class:`callable` is applied to a  vertex in
+            `vertices`, that vertex is is part of the first
+            construction stage. The second :class:`callable` is then
+            applied to all vertices not in the first stage and those
+            which return ``True`` belong to the second stage and
+            so on.
+
+            Vertices which belong to the same construction stage
+            all place building blocks together in parallel, before
+            placement is done by any vertices which are part of a later
+            stage. This breaks down parallel construction into
+            serial stages if synchronization between stages is needed.
+
+            If the topology graph is performing construction serially,
+            then all vertices which belong to an earlier stage will
+            place their building block before those at a later stage.
+
         processes : :class:`int`
             The number of parallel processes to create during
             :meth:`construct`.
@@ -818,6 +844,7 @@ class TopologyGraph:
 
         self.vertices = vertices
         self.edges = edges
+        self._construction_stages = construction_stages
         self._processes = processes
         for i, vertex in enumerate(self.vertices):
             vertex.id = i
@@ -1050,12 +1077,32 @@ class TopologyGraph:
 
     def _place_building_blocks_serial(self, mol, vertex_clones):
         bb_id = 0
+
+        stages = tuple(
+            [] for i in range(len(self._construction_stages)+1)
+        )
+        for vertex in self.vertices:
+            placed = False
+            for i, stage in enumerate(self._construction_stages):
+                if stage(vertex):
+                    stages[i].append(vertex)
+                    placed = True
+                    break
+            if not placed:
+                stages[-1].append(vertex)
+
+        vertex_building_blocks = {
+            vertex: bb
+            for bb, vertices in mol.building_block_vertices.items()
+            for vertex in vertices
+        }
         # Use a shorter alias.
         counter = mol.building_block_counter
-        for bb, vertices in mol.building_block_vertices.items():
-            original_coords = bb.get_position_matrix()
+        for stage in stages:
+            for vertex in stage:
+                bb = vertex_building_blocks[vertex]
+                original_coords = bb.get_position_matrix()
 
-            for vertex in vertices:
                 # Use a clone of the vertex for positioning so that
                 # state of the originals is not changed.
                 vertex_clone = vertex_clones[vertex]
