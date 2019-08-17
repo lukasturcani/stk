@@ -3,7 +3,6 @@ import os
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 from scipy.spatial.distance import euclidean
-from inspect import signature
 
 from ...utilities import (
     vector_angle,
@@ -21,17 +20,7 @@ class MoleculeSubclassError(Exception):
 
 class _Cached(type):
     def __call__(cls, *args, **kwargs):
-        sig = signature(cls.__init__)
-        sig = sig.bind_partial(cls, *args, **kwargs)
-        sig.apply_defaults()
-        key = cls._get_key(**sig.arguments)
-        if sig.arguments['use_cache'] and key in cls._cache:
-            return cls._cache[key]
-        obj = super().__call__(*args, **kwargs)
-        obj._key = key
-        if sig.arguments['use_cache']:
-            cls._cache[key] = obj
-        return obj
+        return cls._construct(*args, **kwargs)
 
 
 class Molecule(metaclass=_Cached):
@@ -58,6 +47,72 @@ class Molecule(metaclass=_Cached):
     # loading molecules from dict represeentations, as the dict
     # representation will hold the name of the subclass.
     _subclasses = {}
+
+    @classmethod
+    def _construct(cls, *args, **kwargs):
+        """
+        Construct a new instance.
+
+        When a :class:`.Molecule` or its subclass is created with the
+        default initialzer, this method is called instead of
+        :meth:`__init__`.
+
+        .. code-block:: python
+
+            import stk
+
+            # bb is the return value of BuildingBlock._construct()
+            bb = stk.BuildingBlock('NCCN')
+
+        Because of this, :meth:`_construct` takes the same paramters
+        as :meth:`__init__`.
+
+        This method is necessary so that the default initializer can
+        use caching efficiently. For example, in order to get the
+        identity key of a :class:`.BuildingBlock`, the SMILES received
+        need to be converted into an :mod:`rdkit` molecule, which is
+        then used to generate canonical SMILES, which are part of the
+        identity key. If the :class:`.BuildingBlock` is not cached,
+        the SMILES would then need to be passed to
+        :meth:`.BuildingBlock.__init__` so that the new
+        :class:`.BuildingBlock` instance can be made. However,
+        :meth:`.BuildingBlock.__init__` creates an :mod:`rdkit`
+        molecule all over again, which is useless duplication.
+
+        By using :meth:`._construct` the implementation can avoid
+        calling :meth:`.BuildingBlock.__init__` if an :mod:`rdkit`
+        molecule has already been made. Instead,
+        :meth:`.BuildingBlock.init_from_rdkit_mol` can be used.
+
+        Note that for :class:`.ConstructedMolecule` :meth:`._construct`
+        does call :meth:`.ConstructedMolecule.__init__`, because the
+        way the identity key is generated is not duplicated within
+        :meth:`.ConstructedMolecule.__init__`. :meth:`._construct` just
+        gives flexilibty to optimize the implementation, it does force
+        you to call any specific method.
+
+        Parameters
+        ----------
+        *args : :class:`object`
+            The arguments passed to :methd`__init__`.
+
+        **kwargs : :class:`object`
+            The keyword arguments passed to :meth:`__init__`.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The new instance.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method which must be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
 
     def __init__(self, atoms, bonds, position_matrix):
         """
@@ -602,34 +657,6 @@ class Molecule(metaclass=_Cached):
 
         return np.array(self._position_matrix.T)
 
-    def is_identical(self, other):
-        """
-        Check if `other` is identical to `self`.
-
-        Identical means that the two molecules are treated in the same
-        way by every ``stk`` operation.
-
-        Identical molecules do not have to have the same atomic
-        positions, but must have the same atoms, bonds and charges.
-
-        Parameters
-        ----------
-        other : :class:`Molecule`
-            The molecule to check.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if `other` is an identical molecule, from
-            an ``stk`` perspective.
-
-        """
-
-        return (
-            self.__class__ is other.__class__
-            and self._key == other._key
-        )
-
     def set_centroid(self, position, atom_ids=None):
         """
         Set the centroid to `position`.
@@ -708,41 +735,6 @@ class Molecule(metaclass=_Cached):
         with open(path, 'w') as f:
             d = self.to_dict(include_attrs, ignore_missing_attrs)
             json.dump(d, f, indent=4)
-
-    def _get_key(*args, **kwargs):
-        """
-        Return the key used for caching.
-
-        When being implemented by a subclass, this methods needs to be
-        defined as a :func:`staticmethod` and have the same parameters
-        as the :meth:`__init__` method of the subclass.
-
-        Parameters
-        ----------
-        *args : :class:`object`
-            These need to match the arguments of the :meth:`__init__`
-            method of a subclass.
-
-        **kwargs : :class:`object`
-            These need to match the keyword arguments of the
-            :meth`__init__` method of a subclass.
-
-        Returns
-        -------
-        :class:`object`
-            A hashable :class:`object`. This object will be equal
-            for molecules of the same class, which should be treated
-            as identical by ``stk``.
-
-        Raises
-        ------
-        :class:`NotImplementedError`
-            This is a virtual method which needs to be implemented by
-            a subclass.
-
-        """
-
-        raise NotImplementedError()
 
     @classmethod
     def load(cls, path, use_cache=False):
@@ -933,11 +925,11 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        if self._key in self.__class__._cache:
+        if self._identity_key in self.__class__._cache:
             d = dict(vars(self))
-            self.__class__._cache[self._key].__dict__ = d
+            self.__class__._cache[self._identity_key].__dict__ = d
         else:
-            self.__class__._cache[self._key] = self
+            self.__class__._cache[self._identity_key] = self
 
     def update_from_rdkit_mol(self, mol):
         """
