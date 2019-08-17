@@ -61,8 +61,8 @@ def make_reactor():
             mol=mol,
             building_blocks=building_blocks
         )
-        vertex_clones = mol.topology_graph._clone_vertices()
-        edge_clones = mol.topology_graph._clone_edges(vertex_clones)
+        vertex_clones = mol.topology_graph._clone_vertices(mol, 1)
+        edge_clones = mol.topology_graph._clone_edges(vertex_clones, 1)
         mol._edge_clones = edge_clones
 
         mol.topology_graph._prepare(mol)

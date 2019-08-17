@@ -189,9 +189,8 @@ class MAEExtractor:
 
     """
 
-    def __init__(self, file, n=1):
-        name, ext = os.path.splitext(file)
-        self.maegz_path = name + '-out.maegz'
+    def __init__(self, run_name, n=1):
+        self.maegz_path = f'{run_name}-out.maegz'
         self.maegz_to_mae()
         self.extract_conformers(n)
 

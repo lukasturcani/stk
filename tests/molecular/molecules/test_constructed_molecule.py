@@ -63,4 +63,4 @@ def test_get_building_blocks(
     four_plus_six_bbs = Counter(four_plus_six.get_building_blocks())
     assert len(four_plus_six_bbs) == 2
     assert four_plus_six_bbs[amine2] == 1
-    assert four_plus_six[aldehyde3] == 1
+    assert four_plus_six_bbs[aldehyde3] == 1
