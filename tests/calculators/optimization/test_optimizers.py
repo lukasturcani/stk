@@ -17,14 +17,14 @@ def test_is_caching():
 
 
 def test_add_to_cache(tmp_amine2):
-    mmff = stk.MMFF()
+    mmff = stk.MMFF(use_cache=True)
     mmff_energy = stk.MMFFEnergy()
     init_energy = mmff_energy.get_energy(tmp_amine2)
     mmff.add_to_cache(tmp_amine2)
     mmff.optimize(tmp_amine2)
     assert mmff_energy.get_energy(tmp_amine2) == init_energy
 
-    mmff2 = stk.MMFF()
+    mmff2 = stk.MMFF(use_cache=True)
     mmff2.optimize(tmp_amine2)
     assert mmff_energy.get_energy(tmp_amine2) != init_energy
 

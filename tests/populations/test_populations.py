@@ -54,7 +54,7 @@ def test_init_all():
     )
 
     assert len(cages) == 9
-    cages.remove_duplicates(key=lambda mol: mol._key)
+    cages.remove_duplicates(key=lambda mol: mol.get_identity_key())
     assert len(cages) == 6
 
     for cage in cages:
@@ -174,7 +174,7 @@ def test_add_members(tmp_population, population):
 
     tmp_population.add_members(
         molecules=population,
-        duplicate_key=lambda m: m._key
+        duplicate_key=lambda m: m.get_identity_key()
     )
     assert len(population) == len(tmp_population)
 
