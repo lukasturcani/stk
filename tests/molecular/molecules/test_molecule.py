@@ -350,8 +350,26 @@ def test_to_rdkit_mol(tmp_amine2):
 
 
 def test_update_cache(tmp_amine2):
-    tmp_amine2.test_value = np.random.randint(5, 10)
-    tmp_amine2.update_cache()
-    cached = tmp_amine2.__class__._cache[tmp_amine2._key]
-    cached_val = cached.test_value
-    assert cached_val == tmp_amine2.test_value
+    try:
+        cache = dict(stk.BuildingBlock._cache)
+        # Create a cached molecule.
+        cached = stk.BuildingBlock.init_from_rdkit_mol(
+            mol=tmp_amine2.to_rdkit_mol(),
+            functional_groups=['amine'],
+            use_cache=True
+        )
+        assert tmp_amine2 is not cached
+        assert (
+            tmp_amine2.get_identity_key() == cached.get_identity_key()
+        )
+        assert not hasattr(cached, 'test_value')
+
+        tmp_amine2.test_value = 15
+        tmp_amine2.update_cache()
+        assert cached.test_value == tmp_amine2.test_value
+
+    except Exception:
+        raise
+
+    finally:
+        stk.BuildingBlock._cache = cache
