@@ -144,7 +144,9 @@ class _COFVertex(Vertex):
 
         clone = super().clone(clear_edges)
         if self.aligner_edge is not None:
-            clone.aligner_edge = self.aligner_edge.clone()
+            clone.aligner_edge = self.aligner_edge.clone(
+                add_to_vertices=False
+            )
         else:
             clone.aligner_edge = None
         return clone

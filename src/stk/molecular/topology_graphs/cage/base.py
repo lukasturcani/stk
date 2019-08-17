@@ -99,7 +99,9 @@ class _CageVertex(Vertex):
         if self.aligner_edge is None:
             clone.aligner_edge = None
         else:
-            clone.aligner_edge = self.aligner_edge.clone()
+            clone.aligner_edge = self.aligner_edge.clone(
+                add_to_vertices=False
+            )
         clone._use_bonder_placement = self._use_bonder_placement
         clone._neighbor_positions = list(self._neighbor_positions)
         return clone

@@ -596,7 +596,12 @@ class Edge:
         )
         return self
 
-    def clone(self, vertex_map=None, recalculate_position=False):
+    def clone(
+        self,
+        vertex_map=None,
+        recalculate_position=False,
+        add_to_vertices=True
+    ):
         """
         Return a clone.
 
@@ -614,6 +619,10 @@ class Edge:
             Toggle if the position of the clone should be reculated
             from the vertices it connects or if it should inherit
             the position of the original edge.
+
+        add_to_vertices : :class:`bool`, optional
+            Toggles if the clone should be added to
+            :attr:`.Vertex.edges`.
 
         Returns
         -------
@@ -648,8 +657,9 @@ class Edge:
         else:
             clone._position = np.array(self._position)
 
-        for vertex in clone.vertices:
-            vertex.edges.append(clone)
+        if add_to_vertices:
+            for vertex in clone.vertices:
+                vertex.edges.append(clone)
         return clone
 
     def get_func_groups(self):

@@ -689,17 +689,15 @@ class Population:
         """
 
         pop = cls()
-
-        # Shuffle the sublists.
         if random_seed is not None:
             np.random.seed(random_seed)
 
+        # Shuffle the sublists.
         for db in building_blocks:
             np.random.shuffle(db)
 
         # Go through every possible constructed molecule.
         for *bbs, top in it.product(*building_blocks, topology_graphs):
-
             # Generate the random constructed molecule.
             mol = ConstructedMolecule(
                 building_blocks=bbs,
