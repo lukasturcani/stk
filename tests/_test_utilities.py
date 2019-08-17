@@ -36,7 +36,7 @@ def _test_atoms(mol, loaded):
         d1, d2 = dict(vars(a1)), dict(vars(a2))
         bb1, bb2 = d1.pop('building_block'), d2.pop('building_block')
         assert d1 == d2
-        assert bb1.is_identical(bb2)
+        assert bb1.get_identity_key() == bb2.get_identity_key()
 
 
 def _test_bonds(mol, loaded):
@@ -59,7 +59,7 @@ def _test_bbs(mol, loaded):
     bbs1 = list(mol.building_block_vertices.keys())
     bbs2 = list(loaded.building_block_vertices.keys())
     for bb1, bb2 in it.zip_longest(bbs1, bbs2):
-        assert bb1.is_identical(bb2)
+        assert bb1.get_identity_key() == bb2.get_identity_key()
         assert bb1 is not bb2
         bb1_count = mol.building_block_counter[bb1]
         bb2_count = loaded.building_block_counter[bb2]

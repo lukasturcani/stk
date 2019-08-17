@@ -300,7 +300,7 @@ class Complex(TopologyGraph):
         """
 
         return {
-            bb: vertex
+            bb: [vertex]
             for bb, vertex in zip(building_blocks, self.vertices)
         }
 

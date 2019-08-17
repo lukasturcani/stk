@@ -279,7 +279,7 @@ class NRotaxane(TopologyGraph):
             letter: bb for letter, bb in zip(threads, cycles)
         }
         building_block_vertices = {}
-        building_block_vertices[axle].append(self.vertices[0])
+        building_block_vertices[axle] = self.vertices[0:1]
         for letter, vertex in zip(threads, self.vertices[1:]):
             bb = bb_map[letter]
             building_block_vertices[bb] = (

@@ -551,18 +551,6 @@ class ConstructedMolecule(Molecule):
             cls._cache[identity_key] = obj
         return obj
 
-    @staticmethod
-    def _get_hashable_building_block_vertices(
-        topology_graph,
-        building_block_vertices
-    ):
-        for bb in building_block_vertices:
-            vertices = tuple(
-                topology_graph.vertices.index(v)
-                for v in building_block_vertices[bb]
-            )
-            yield bb.get_identity_key(), vertices
-
     @classmethod
     def _get_identity_key_from_components(
         cls,
@@ -608,11 +596,59 @@ class ConstructedMolecule(Molecule):
         bb_keys = frozenset(
             x.get_identity_key() for x in building_blocks
         )
-        vertices = cls._get_hashable_building_block_vertices(
+        vertices = cls._get_sorted_building_block_vertices(
+            building_blocks=building_blocks,
             topology_graph=topology_graph,
             building_block_vertices=building_block_vertices
         )
-        return bb_keys, repr(topology_graph), tuple(sorted(vertices))
+        return bb_keys, repr(topology_graph), tuple(vertices)
+
+    @staticmethod
+    def _get_hashable_building_block_vertices(
+        topology_graph,
+        building_block_vertices,
+        building_block_type
+    ):
+        for bb in building_block_vertices:
+            if isinstance(bb, building_block_type):
+                vertices = tuple(
+                    topology_graph.vertices.index(v)
+                    for v in building_block_vertices[bb]
+                )
+                yield bb.get_identity_key(), vertices
+
+    @classmethod
+    def _get_sorted_building_block_vertices(
+        cls,
+        building_blocks,
+        topology_graph,
+        building_block_vertices
+    ):
+        # The identity key needs to account for which building block
+        # is placed on which vertex. This means that a tuple matching
+        # the identity key of each building block with each vertex
+        # needs to be included. This tuple needs to be sorted so that
+        # the identity key is of a constructed molecule is always the
+        # same. However, the constructed molecule can be constructed
+        # with both BuildingBlocks and other ConstructedMolecules.
+        # They each have differnt types as identity keys which means
+        # they connot be sorted together. As a result, first
+        # sort the identity keys of all buliding blocks of the same
+        # type and then join these sorted tuples togther.
+        # The sorted tuples are joined together in order based on the
+        # names of the classes.
+        building_block_types = sorted(
+            {bb.__class__ for bb in building_blocks},
+            key=lambda cls: cls.__name__
+        )
+        for building_block_type in building_block_types:
+            yield from sorted(
+                cls._get_hashable_building_block_vertices(
+                    topology_graph=topology_graph,
+                    building_block_vertices=building_block_vertices,
+                    building_block_type=building_block_type
+                )
+            )
 
     def __str__(self):
         return (
