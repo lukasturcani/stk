@@ -15,7 +15,7 @@ def test_apply_displacement(tmp_amine2):
     assert np.allclose(
         a=before,
         b=tmp_amine2.get_position_matrix(),
-        atol=1e-6
+        atol=1e-8
     )
 
     tmp_amine2.apply_displacement(np.array([10, 20, 30]))
@@ -23,14 +23,14 @@ def test_apply_displacement(tmp_amine2):
     assert np.allclose(
         a=before+[10, 20, 30],
         b=after,
-        atol=1e-6
+        atol=1e-8
     )
 
     tmp_amine2.apply_displacement(np.array([-10, 20, -30]))
     assert np.allclose(
         a=after+[-10, 20, -30],
         b=tmp_amine2.get_position_matrix(),
-        atol=1e-6
+        atol=1e-8
     )
 
 
@@ -48,7 +48,7 @@ def test_apply_rotation_about_axis(tmp_amine2):
     assert np.allclose(
         a=tmp_amine2.get_position_matrix(),
         b=np.array([[0, 0, i] for i in range(num_atoms)]),
-        atol=1e-6
+        atol=1e-8
     )
 
 
@@ -56,7 +56,7 @@ def test_apply_rotation_between_vectors(tmp_amine2):
     assert not np.allclose(
         a=next(tmp_amine2.get_bonder_direction_vectors())[-1],
         b=[1, 0, 0],
-        atol=1e-6
+        atol=1e-8
     )
 
     tmp_amine2.apply_rotation_between_vectors(
@@ -65,9 +65,11 @@ def test_apply_rotation_between_vectors(tmp_amine2):
         origin=tmp_amine2.get_centroid()
     )
     assert np.allclose(
-        a=next(tmp_amine2.get_bonder_direction_vectors())[-1],
+        a=stk.normalize_vector(
+            next(tmp_amine2.get_bonder_direction_vectors())[-1]
+        ),
         b=[1, 0, 0],
-        atol=1e-6
+        atol=1e-8
     )
 
 
@@ -86,7 +88,7 @@ def test_apply_rotation_to_minimize_angle(tmp_amine2):
     assert np.allclose(
         a=tmp_amine2.get_position_matrix(),
         b=np.array([[0, 0, i] for i in range(num_atoms)]),
-        atol=1e-6
+        atol=1e-8
     )
 
 
@@ -155,7 +157,7 @@ def test_get_centroid(tmp_amine2):
         assert np.allclose(
             a=tmp_amine2.get_centroid(atom_ids=atom_ids),
             b=[2, 2, 2],
-            atol=1e-6
+            atol=1e-8
         )
 
 
@@ -167,7 +169,7 @@ def test_get_direction(tmp_amine2):
     assert np.allclose(
         a=tmp_amine2.get_direction(),
         b=[1, 0, 0],
-        atol=1e-6
+        atol=1e-8
     )
 
     coords[[1, 3]] = [[1, 1, 1], [3, 3, 3]]
@@ -178,7 +180,7 @@ def test_get_direction(tmp_amine2):
         assert np.allclose(
             a=tmp_amine2.get_direction(atom_ids=atom_ids),
             b=stk.normalize_vector([1, 1, 1]),
-            atol=1e-6
+            atol=1e-8
         )
 
 
@@ -189,7 +191,7 @@ def test_get_maximum_diamter(tmp_amine2):
     pos_mat[1] = [0, -50, 0]
     pos_mat[13] = [0, 50, 0]
     tmp_amine2.set_position_matrix(pos_mat)
-    assert abs(tmp_amine2.get_maximum_diameter() - 100) < 1e-6
+    assert abs(tmp_amine2.get_maximum_diameter() - 100) < 1e-8
 
     all_atom_ids = (
         [i for i in range(len(tmp_amine2.atoms)) if i not in {1, 13}],
@@ -211,14 +213,14 @@ def test_get_plane_normal(tmp_amine2):
     assert not np.allclose(
         a=tmp_amine2.get_plane_normal(),
         b=[0, 0, 1],
-        atol=1e-6
+        atol=1e-8
     )
 
     for atom_ids in all_atom_ids:
         assert np.allclose(
             a=tmp_amine2.get_plane_normal(atom_ids),
             b=[0, 0, 1],
-            atol=1e-6
+            atol=1e-8
         )
 
     coords[:, 2] = 0
@@ -226,23 +228,23 @@ def test_get_plane_normal(tmp_amine2):
     assert np.allclose(
         a=tmp_amine2.get_plane_normal(),
         b=[0, 0, 1],
-        atol=1e-6
+        atol=1e-8
     )
 
 
 def test_get_set_position_matrix(tmp_amine2):
     zeros = np.zeros((len(tmp_amine2.atoms), 3))
     tmp_amine2.set_position_matrix(zeros)
-    assert np.allclose(zeros, tmp_amine2.get_position_matrix(), 1e-6)
+    assert np.allclose(zeros, tmp_amine2.get_position_matrix(), 1e-8)
 
     ones = np.ones((len(tmp_amine2.atoms), 3))
     tmp_amine2.set_position_matrix(ones)
-    assert np.allclose(ones, tmp_amine2.get_position_matrix(), 1e-6)
+    assert np.allclose(ones, tmp_amine2.get_position_matrix(), 1e-8)
 
 
 def test_set_centroid(tmp_amine2):
     tmp_amine2.set_centroid([12, 13, 15])
-    assert np.allclose(tmp_amine2.get_centroid(), [12, 13, 15], 1e-6)
+    assert np.allclose(tmp_amine2.get_centroid(), [12, 13, 15], 1e-8)
 
     set_all_atom_ids = ([1, 3], (2, 3), (i for i in [0, 3]))
     get_all_atom_ids = ([1, 3], (2, 3), (i for i in [0, 3]))
@@ -252,12 +254,12 @@ def test_set_centroid(tmp_amine2):
         assert not np.allclose(
             a=tmp_amine2.get_centroid(),
             b=[-12, 4, 160],
-            atol=1e-6
+            atol=1e-8
         )
         assert np.allclose(
             a=tmp_amine2.get_centroid(atom_ids=get_atom_ids),
             b=[-12, 4, 160],
-            atol=1e-6
+            atol=1e-8
         )
 
 
@@ -271,8 +273,8 @@ def test_update_from_rdkit_mol(tmp_amine2):
 
     tmp_amine2.update_from_rdkit_mol(mol)
     after = tmp_amine2.get_position_matrix()
-    assert np.allclose(conf.GetPositions(), after, 1e-6)
-    assert not np.allclose(before, after, 1e-6)
+    assert np.allclose(conf.GetPositions(), after, 1e-8)
+    assert not np.allclose(before, after, 1e-8)
 
 
 def test_update_from_mae(tmp_amine2, mae_path):
