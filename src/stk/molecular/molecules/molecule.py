@@ -640,6 +640,25 @@ class Molecule(metaclass=_Cached):
         centroid = self.get_centroid(atom_ids)
         return np.linalg.svd(pos - centroid)[-1][2, :]
 
+    @classmethod
+    def has_cached_mol(cls, identity_key):
+        """
+        ``True`` if molecule with `identity_key` is cached.
+
+        Parameters
+        ----------
+        identity_key : :class:`object`
+            The identity key of a molecule.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if a molecule with `identity_key` is cached.
+
+        """
+
+        return identity_key in cls._cache
+
     def get_position_matrix(self):
         """
         Return a matrix holding the atomic positions.

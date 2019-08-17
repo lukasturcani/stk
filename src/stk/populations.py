@@ -332,12 +332,18 @@ class Population:
             for i, mol in enumerate(mols):
                 # If the molecule did not exist already, add it to the
                 # cache.
-                if mol._key not in ConstructedMolecule._cache:
-                    ConstructedMolecule._cache[mol._key] = mol
+                if (
+                    not ConstructedMolecule.has_cached_mol(
+                        identity_key=mol.get_identity_key()
+                    )
+                ):
+                    mol.update_cache()
                 # If the molecule did exist already, use the cached
                 # version.
                 else:
-                    mols[i] = ConstructedMolecule._cache[mol._key]
+                    mols[i] = ConstructedMolecule.get_cached_mol(
+                        identity_key=mol.get_identity_key()
+                    )
 
         p = cls(*mols)
         if not duplicates:
