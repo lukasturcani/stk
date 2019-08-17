@@ -423,6 +423,25 @@ class Molecule(metaclass=_Cached):
         for atom_coords in coords:
             yield atom_coords
 
+    @classmethod
+    def get_cached_molecule(cls, identity_key):
+        """
+        Get a molecule from the cache.
+
+        Parameters
+        ----------
+        identity_key : :class:`object`
+            The identity key of the molecule to return.
+
+        Returns
+        -------
+        :class:`.Molucule`
+            The cached molecule.
+
+        """
+
+        return cls._cache[identity_key]
+
     def get_atom_distance(self, atom1_id, atom2_id):
         """
         Return the distance between 2 atoms.
