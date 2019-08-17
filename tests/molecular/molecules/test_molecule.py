@@ -271,6 +271,27 @@ def test_get_set_position_matrix(tmp_amine2):
     assert np.allclose(ones, tmp_amine2.get_position_matrix(), 1e-8)
 
 
+def test_has_cached_mol(tmp_amine2, aldehyde2):
+    try:
+        stk.BuildingBlock._cache = {}
+        tmp_amine2.update_cache()
+        is_cached = stk.BuildingBlock.has_cached_mol(
+            identity_key=tmp_amine2.get_identity_key()
+        )
+        assert is_cached
+
+        is_cached = stk.BuildingBlock.has_cached_mol(
+            identity_key=aldehyde2.get_identity_key()
+        )
+        assert not is_cached
+
+    except Exception:
+        raise
+
+    finally:
+        stk.BuildingBlock._cache = {}
+
+
 def test_set_centroid(tmp_amine2):
     tmp_amine2.set_centroid([12, 13, 15])
     assert np.allclose(tmp_amine2.get_centroid(), [12, 13, 15], 1e-8)
