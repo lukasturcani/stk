@@ -265,7 +265,7 @@ class Macrocycle(TopologyGraph):
                 edges.append(Edge(vertices[i-1], vertices[i]))
 
         edges.append(Edge(vertices[0], vertices[-1]))
-        super().__init__(tuple(vertices), tuple(edges), processes)
+        super().__init__(tuple(vertices), tuple(edges), (), processes)
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """

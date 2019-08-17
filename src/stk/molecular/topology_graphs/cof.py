@@ -616,6 +616,7 @@ class COF(TopologyGraph):
         super().__init__(
             vertices=vertices,
             edges=edges,
+            construction_stages=(),
             processes=processes
         )
 

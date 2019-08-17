@@ -619,9 +619,18 @@ class Cage(TopologyGraph):
         for vertex in vertices:
             vertex.aligner_edge = edge_clones[vertex.aligner_edge]
 
+        vertex_types = sorted(
+            set(len(v.edges) for v in self.vertices),
+            reverse=True
+        )
         super().__init__(
             vertices=vertices,
             edges=tuple(edge_clones.values()),
+            stages=tuple(
+                lambda vertex, vertex_type=vt:
+                    len(vertex.edges) == vertex_type
+                for vt in vertex_types
+            ),
             processes=processes
         )
 

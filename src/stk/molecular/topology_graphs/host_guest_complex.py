@@ -261,7 +261,7 @@ class Complex(TopologyGraph):
             _HostVertex(0, 0, 0),
             _GuestVertex(x, y, z, start, target)
         )
-        super().__init__(vertices, (), processes)
+        super().__init__(vertices, (), (), processes)
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """

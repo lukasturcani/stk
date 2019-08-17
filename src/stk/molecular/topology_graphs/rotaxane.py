@@ -235,7 +235,7 @@ class NRotaxane(TopologyGraph):
                     orientation=orientation
                 )
             )
-        super().__init__(tuple(vertices), (), processes)
+        super().__init__(tuple(vertices), (), (), processes)
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """
