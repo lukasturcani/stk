@@ -84,13 +84,6 @@ class Molecule(metaclass=_Cached):
         molecule has already been made. Instead,
         :meth:`.BuildingBlock.init_from_rdkit_mol` can be used.
 
-        Note that for :class:`.ConstructedMolecule` :meth:`._construct`
-        does call :meth:`.ConstructedMolecule.__init__`, because the
-        way the identity key is generated is not duplicated within
-        :meth:`.ConstructedMolecule.__init__`. :meth:`._construct` just
-        gives flexilibty to optimize the implementation, it does force
-        you to call any specific method.
-
         Parameters
         ----------
         *args : :class:`object`
