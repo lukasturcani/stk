@@ -9,6 +9,26 @@ if not os.path.exists(odir):
     os.mkdir(odir)
 
 
+def test_is_caching():
+    caching = stk.NullOptimizer(use_cache=True)
+    assert caching.is_caching()
+    not_caching = stk.NullOptimizer(use_cache=False)
+    assert not not_caching.is_caching()
+
+
+def test_add_to_cache(tmp_amine2):
+    mmff = stk.MMFF()
+    mmff_energy = stk.MMFFEnergy()
+    init_energy = mmff_energy.get_energy(tmp_amine2)
+    mmff.add_to_cache(tmp_amine2)
+    mmff.optimize(tmp_amine2)
+    assert mmff_energy.get_energy(tmp_amine2) == init_energy
+
+    mmff2 = stk.MMFF()
+    mmff2.optimize(tmp_amine2)
+    assert mmff_energy.get_energy(tmp_amine2) != init_energy
+
+
 def test_raising_optimizer(tmp_polymer):
     mmff = stk.MMFF()
     always_raiser = stk.RaisingOptimizer(
