@@ -2,26 +2,43 @@ import pytest
 import stk
 from os.path import join
 
+data_dir = join('..', 'data')
 
-@pytest.fixture
-def tmp_opt_cc3(tmp_amine2, tmp_aldehyde3):
-    cc3 = stk.ConstructedMolecule(
-        building_blocks=[tmp_amine2, tmp_aldehyde3],
-        topology_graph=stk.cage.FourPlusSix()
+
+@pytest.fixture(scope='function')
+def tmp_cc3():
+    amine = stk.BuildingBlock.init_from_file(
+        path=join(data_dir, 'cc3_amine.mol'),
+        functional_groups=['amine']
     )
-    cc3.update_from_file(join('..', '..', 'data', 'cc3.mol'))
-    return cc3
-
-
-@pytest.fixture
-def tmp_cc3(tmp_amine2, tmp_aldehyde3):
+    aldehyde = stk.BuildingBlock.init_from_file(
+        path=join(data_dir, 'cc3_aldehyde.mol'),
+        functional_groups=['aldehyde']
+    )
     return stk.ConstructedMolecule(
-        building_blocks=[tmp_amine2, tmp_aldehyde3],
+        building_blocks=[amine, aldehyde],
         topology_graph=stk.cage.FourPlusSix()
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
+def tmp_opt_cc3():
+    amine = stk.BuildingBlock.init_from_file(
+        path=join(data_dir, 'cc3_amine.mol'),
+        functional_groups=['amine']
+    )
+    aldehyde = stk.BuildingBlock.init_from_file(
+        path=join(data_dir, 'cc3_aldehyde.mol'),
+        functional_groups=['aldehyde']
+    )
+    cc3 = stk.ConstructedMolecule(
+        building_blocks=[amine, aldehyde],
+        topology_graph=stk.cage.FourPlusSix()
+    )
+    return cc3.update_from_file(join(data_dir, 'cc3.mol'))
+
+
+@pytest.fixture(scope='function')
 def tmp_six_plus_eight(tmp_amine3, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine3, tmp_aldehyde4],
@@ -29,7 +46,7 @@ def tmp_six_plus_eight(tmp_amine3, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_one_plus_one(tmp_amine3, tmp_aldehyde3):
     topology_graph = stk.cage.OnePlusOne()
     return stk.ConstructedMolecule(
@@ -42,7 +59,7 @@ def tmp_one_plus_one(tmp_amine3, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_two_plus_two(tmp_amine3, tmp_aldehyde3):
     topology_graph = stk.cage.TwoPlusTwo()
     return stk.ConstructedMolecule(
@@ -55,7 +72,7 @@ def tmp_two_plus_two(tmp_amine3, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_four_plus_four(tmp_amine3, tmp_aldehyde3):
     topology_graph = stk.cage.FourPlusFour()
     return stk.ConstructedMolecule(
@@ -68,7 +85,7 @@ def tmp_four_plus_four(tmp_amine3, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_twelve_plus_thirty(tmp_amine2, tmp_aldehyde5):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde5],
@@ -76,7 +93,7 @@ def tmp_twelve_plus_thirty(tmp_amine2, tmp_aldehyde5):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_two_plus_four(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -84,7 +101,7 @@ def tmp_two_plus_four(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_three_plus_six(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -92,7 +109,7 @@ def tmp_three_plus_six(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_four_plus_eight(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -100,7 +117,7 @@ def tmp_four_plus_eight(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_five_plus_ten(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -108,7 +125,7 @@ def tmp_five_plus_ten(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_six_plus_twelve(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -116,7 +133,7 @@ def tmp_six_plus_twelve(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_eight_plus_sixteen(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -124,7 +141,7 @@ def tmp_eight_plus_sixteen(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_ten_plus_twenty(tmp_amine2, tmp_aldehyde4):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde4],
@@ -132,7 +149,7 @@ def tmp_ten_plus_twenty(tmp_amine2, tmp_aldehyde4):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_two_plus_three(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde3],
@@ -140,7 +157,7 @@ def tmp_two_plus_three(tmp_amine2, tmp_aldehyde3):
     )
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def four_plus_six(amine2, aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[amine2, aldehyde3],
@@ -148,7 +165,7 @@ def four_plus_six(amine2, aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_four_plus_six(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde3],
@@ -156,7 +173,7 @@ def tmp_four_plus_six(tmp_amine2, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_four_plus_six2(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde3],
@@ -164,7 +181,7 @@ def tmp_four_plus_six2(tmp_amine2, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_six_plus_nine(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde3],
@@ -172,7 +189,7 @@ def tmp_six_plus_nine(tmp_amine2, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_eight_plus_twelve(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde3],
@@ -180,7 +197,7 @@ def tmp_eight_plus_twelve(tmp_amine2, tmp_aldehyde3):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def tmp_twenty_plus_thirty(tmp_amine2, tmp_aldehyde3):
     return stk.ConstructedMolecule(
         building_blocks=[tmp_amine2, tmp_aldehyde3],

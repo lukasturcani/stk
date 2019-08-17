@@ -653,13 +653,13 @@ class MacroModelForceField(_MacroModel):
         line6 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
-            self._com_line(*line1),
-            self._com_line(*line2),
-            self._com_line(*line3),
+            self._get_com_line(*line1),
+            self._get_com_line(*line2),
+            self._get_com_line(*line3),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
-            self._com_line(*line4),
-            self._com_line(*line5),
-            self._com_line(*line6)
+            self._get_com_line(*line4),
+            self._get_com_line(*line5),
+            self._get_com_line(*line6)
         ])
 
         # If `restricted` is ``False`` do not add a fix block.
@@ -767,7 +767,7 @@ class MacroModelForceField(_MacroModel):
             atom1_id = bond.atom1.id + 1
             atom2_id = bond.atom2.id + 1
             args = ('FXDI', atom1_id, atom2_id, 0, 0, 99999, 0, 0, 0)
-            fix_block += self._com_line(*args)
+            fix_block += self._get_com_line(*args)
             fix_block += '\n'
 
         return fix_block
@@ -802,7 +802,7 @@ class MacroModelForceField(_MacroModel):
         for atom_ids in paths:
             atom_ids = [i+1 for i in atom_ids]
             args = ('FXBA', *atom_ids, 99999, 0, 0, 0, 0)
-            fix_block += self._com_line(*args)
+            fix_block += self._get_com_line(*args)
             fix_block += '\n'
 
         return fix_block
@@ -837,7 +837,7 @@ class MacroModelForceField(_MacroModel):
         for atom_ids in paths:
             atom_ids = [i+1 for i in atom_ids]
             args = ('FXTA', *atom_ids, 99999, 361, 0, 0)
-            fix_block += self._com_line(*args)
+            fix_block += self._get_com_line(*args)
             fix_block += '\n'
 
         return fix_block
@@ -1152,21 +1152,21 @@ class MacroModelMD(_MacroModel):
         line13 = ('END', 0, 1, 0, 0, 0, 0, 0, 0)
 
         com_block = "\n".join([
-            self._com_line(*line1),
-            self._com_line(*line2),
+            self._get_com_line(*line1),
+            self._get_com_line(*line2),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
-            self._com_line(*line3),
-            self._com_line(*line4),
-            self._com_line(*line5),
-            self._com_line(*line6),
-            self._com_line(*line7),
-            self._com_line(*line8),
-            self._com_line(*line9),
-            self._com_line(*line10),
+            self._get_com_line(*line3),
+            self._get_com_line(*line4),
+            self._get_com_line(*line5),
+            self._get_com_line(*line6),
+            self._get_com_line(*line7),
+            self._get_com_line(*line8),
+            self._get_com_line(*line9),
+            self._get_com_line(*line10),
             '!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!',
-            self._com_line(*line11),
-            self._com_line(*line12),
-            self._com_line(*line13),
+            self._get_com_line(*line11),
+            self._get_com_line(*line12),
+            self._get_com_line(*line13),
         ])
 
         com_block = self._fix_params(mol, com_block)
@@ -1252,7 +1252,7 @@ class MacroModelMD(_MacroModel):
             atom1_id = bond.atom1.id + 1
             atom2_id = bond.atom2.id + 1
             args = ('FXDI', atom1_id, atom2_id, 0, 0, 99999, 0, 0, 0)
-            fix_block += self._com_line(*args)
+            fix_block += self._get_com_line(*args)
             fix_block += '\n'
 
         return fix_block
@@ -1286,7 +1286,7 @@ class MacroModelMD(_MacroModel):
             if frozenset(atom_ids) in self._restricted_bond_angles:
                 atom_ids = [i+1 for i in atom_ids]
                 args = ('FXBA', *atom_ids, 99999, 0, 0, 0, 0)
-                fix_block += self._com_line(*args)
+                fix_block += self._get_com_line(*args)
                 fix_block += '\n'
 
         return fix_block
@@ -1321,7 +1321,7 @@ class MacroModelMD(_MacroModel):
             if frozenset(atom_ids) in self._restricted_torsional_angles:
                 atom_ids = [i+1 for i in atom_ids]
                 args = ('FXTA', *atom_ids, 99999, 361, 0, 0)
-                fix_block += self._com_line(*args)
+                fix_block += self._get_com_line(*args)
                 fix_block += '\n'
 
         return fix_block
