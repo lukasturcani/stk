@@ -763,7 +763,9 @@ def remake(mol):
 
     emol = rdkit.EditableMol(rdkit.Mol())
     for atom in mol.GetAtoms():
-        emol.AddAtom(rdkit.Atom(atom.GetAtomicNum()))
+        new = rdkit.Atom(atom.GetAtomicNum())
+        new.SetFormalCharge(atom.GetFormalCharge())
+        emol.AddAtom(new)
 
     for bond in mol.GetBonds():
         emol.AddBond(

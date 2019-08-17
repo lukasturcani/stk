@@ -802,7 +802,7 @@ def test_get_bonder_direction_vectors(tmp_amine4):
     for i, (id1, id2, v) in enumerate(dir_vectors):
         # Calculate the expected direction vector based on ids.
         d = stk.normalize_vector(np.array([id2]*3) - np.array([id1]*3))
-        assert np.allclose(d, v, atol=1e-8)
+        assert np.allclose(d, stk.normalize_vector(v), atol=1e-8)
     assert i == 5
 
     # Test explicitly setting fg_ids.
@@ -812,7 +812,7 @@ def test_get_bonder_direction_vectors(tmp_amine4):
     for i, (id1, id2, v) in enumerate(dir_vectors):
         # Calculate the expected direction vector based on ids.
         d = stk.normalize_vector(np.array([id2]*3) - np.array([id1]*3))
-        assert np.allclose(d, v, atol=1e-8)
+        assert np.allclose(d, stk.normalize_vector(v), atol=1e-8)
     assert i == 0
 
 
