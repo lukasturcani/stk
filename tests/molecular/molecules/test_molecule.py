@@ -126,7 +126,7 @@ def test_get_atom_distance(tmp_amine2):
 
 def test_get_cached_mol(tmp_amine2, aldehyde2):
     try:
-        cache = dict(stk.BuildingBlock._cache)
+        stk.BuildingBlock._cache = {}
         tmp_amine2.update_cache()
         cached = stk.BuildingBlock.get_cached_mol(
             identity_key=tmp_amine2.get_identity_key()
@@ -142,7 +142,7 @@ def test_get_cached_mol(tmp_amine2, aldehyde2):
         raise
 
     finally:
-        stk.BuildingBlock._cache = cache
+        stk.BuildingBlock._cache = {}
 
 
 def test_get_center_of_mass(tmp_amine2):
