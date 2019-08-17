@@ -424,7 +424,7 @@ class Molecule(metaclass=_Cached):
             yield atom_coords
 
     @classmethod
-    def get_cached_molecule(cls, identity_key):
+    def get_cached_mol(cls, identity_key):
         """
         Get a molecule from the cache.
 
@@ -435,7 +435,7 @@ class Molecule(metaclass=_Cached):
 
         Returns
         -------
-        :class:`.Molucule`
+        :class:`.Molecule`
             The cached molecule.
 
         """

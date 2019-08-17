@@ -2,6 +2,7 @@ import numpy as np
 import stk
 import os
 from os.path import join
+import pytest
 
 
 test_dir = 'molecule_tests_output'
@@ -121,6 +122,27 @@ def test_get_atom_distance(tmp_amine2):
     for i in range(1, num_atoms):
         assert tmp_amine2.get_atom_distance(i-1, i) == 1
         assert tmp_amine2.get_atom_distance(i, i-1) == 1
+
+
+def test_get_cached_mol(tmp_amine2, aldehyde2):
+    try:
+        cache = dict(stk.BuildingBlock._cache)
+        tmp_amine2.update_cache()
+        cached = stk.BuildingBlock.get_cached_mol(
+            identity_key=tmp_amine2.get_identity_key()
+        )
+        assert cached is tmp_amine2
+
+        with pytest.raises(KeyError):
+            stk.BuildingBlock.get_cached_mol(
+                identity_key=aldehyde2.get_identity_key()
+            )
+
+    except Exception:
+        raise
+
+    finally:
+        stk.BuildingBlock._cache = cache
 
 
 def test_get_center_of_mass(tmp_amine2):
