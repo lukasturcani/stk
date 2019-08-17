@@ -943,7 +943,7 @@ class Population:
         sorted_opt = sorted(optimized, key=lambda m: repr(m))
         sorted_pop = sorted(self, key=lambda m: repr(m))
         for old, new in zip(sorted_pop, sorted_opt):
-            assert old.identity_key() == new.identity_key()
+            assert old.get_identity_key() == new.get_identity_key()
             old.__dict__ = dict(vars(new))
             if optimizer.is_caching():
                 optimizer.add_to_cache(old)
