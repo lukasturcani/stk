@@ -346,6 +346,8 @@ class ConstructedMolecule(Molecule):
         for id_, func_group in enumerate(obj.func_groups):
             func_group.id = id_
 
+        return obj
+
     def get_building_blocks(self):
         """
         Yield the building blocks.
@@ -554,7 +556,7 @@ class ConstructedMolecule(Molecule):
         topology_graph,
         building_block_vertices
     ):
-        for bb in enumerate(building_block_vertices):
+        for bb in building_block_vertices:
             vertices = tuple(
                 topology_graph.vertices.index(v)
                 for v in building_block_vertices[bb]

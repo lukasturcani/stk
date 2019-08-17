@@ -626,7 +626,7 @@ class Cage(TopologyGraph):
         super().__init__(
             vertices=vertices,
             edges=tuple(edge_clones.values()),
-            stages=tuple(
+            construction_stages=tuple(
                 lambda vertex, vertex_type=vt:
                     len(vertex.edges) == vertex_type
                 for vt in vertex_types

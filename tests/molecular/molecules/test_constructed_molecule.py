@@ -34,7 +34,7 @@ def test_init(amine2, aldehyde2):
     assert polymer is not polymer4
 
 
-def test_is_identical(polymer, tmp_polymer):
+def test_get_identity_key(polymer, tmp_polymer):
     assert polymer is not tmp_polymer
     assert polymer.get_identity_key() == tmp_polymer.get_identity_key()
 

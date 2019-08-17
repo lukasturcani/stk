@@ -613,12 +613,7 @@ class COF(TopologyGraph):
             for clones in flatten(vertices, {dict})
             for vertex in clones.values()
         )
-        super().__init__(
-            vertices=vertices,
-            edges=edges,
-            construction_stages=(),
-            processes=processes
-        )
+        super().__init__(vertices, edges, (), processes)
 
     def _normalize_vertex_alignments(self, vertex_alignments):
         """
