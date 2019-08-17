@@ -1,42 +1,88 @@
 import os
 import stk
+import numpy as np
+import rdkit.Chem.AllChem as rdkit
+from os.path import join
+
+from ..._test_utilities import _test_dump_and_load
+
 
 test_dir = 'rotaxane_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
-    repeat_units = 3
+def _test_axle_placement(vertex,  bb):
+    vertex.place_building_block(bb)
+    assert np.allclose(
+        a=vertex.get_position(),
+        b=bb.get_centroid(),
+        atol=1e-8
+    )
 
-    c1 = stk.Macrocycle([amine2, aldehyde2],
-                        stk.Cyclic('AB', [0, 0], repeat_units))
 
-    c2 = stk.Macrocycle([boronic_acid2, diol2],
-                        stk.Cyclic('AB', [0, 0], repeat_units))
+def _cycle_atoms(bb):
+    rdkit_mol = bb.to_rdkit_mol()
+    return max(rdkit.GetSymmSSSR(rdkit_mol), key=len)
 
-    axle = stk.Polymer([amine2, aldehyde2],
-                       stk.Linear('AB', [0, 0], repeat_units, 'h'))
 
-    r1 = stk.Rotaxane([c1, c2, axle],
-                      stk.NRotaxane('ABA', [0, 1, 1], 1))
+def _test_cycle_placement(vertex, bb):
+    vertex.place_building_block(bb)
+    cycle_atoms = _cycle_atoms(bb)
+    assert np.allclose(
+        a=vertex.get_position(),
+        b=bb.get_centroid(cycle_atoms),
+        atol=1e-8
+    )
+    assert np.allclose(
+        a=[1, 0, 0],
+        b=bb.get_plane_normal(cycle_atoms),
+        atol=1e-8
+    )
 
-    path = os.path.join(test_dir, 'rotaxane.mol')
-    r1.write(path)
 
-    # No bonds should be made in rotaxane but atoms should be added.
+def test_vertex(tmp_polymer, tmp_macrocycle):
+    rotaxane = stk.rotaxane.NRotaxane('A', [0], 4)
+    axle, *cycles = rotaxane.vertices
+    _test_axle_placement(axle, tmp_polymer)
+    for vertex in cycles:
+        _test_cycle_placement(vertex, tmp_macrocycle)
 
-    assert r1.bonds_made == 0
 
-    assert (r1.mol.GetNumAtoms() == axle.mol.GetNumAtoms() +
-            c1.mol.GetNumAtoms()*2 + c2.mol.GetNumAtoms())
+def _test_construction(test_dir, num_expected_bbs, rotaxane):
+    rotaxane.write(join(test_dir, 'rotaxane.mol'))
 
-    assert r1.bb_counter[c1] == 2
-    assert r1.bb_counter[c2] == 1
-    assert r1.bb_counter[axle] == 1
+    assert len(rotaxane.building_block_counter) == 2
+    for bb in num_expected_bbs:
+        assert (
+            rotaxane.building_block_counter[bb] == num_expected_bbs[bb]
+        )
 
-    assert r1.topology == stk.NRotaxane('ABA', [0, 1, 1], 1)
+    assert len(rotaxane.construction_bonds) == 0
+    num_bb_atoms = sum(
+        len(bb.atoms)*rotaxane.building_block_counter[bb]
+        for bb in rotaxane.get_building_blocks()
+    )
+    assert len(rotaxane.atoms) == num_bb_atoms
+    num_bb_bonds = sum(
+        len(bb.bonds)*rotaxane.building_block_counter[bb]
+        for bb in rotaxane.get_building_blocks()
+    )
+    assert len(rotaxane.bonds) == num_bb_bonds
 
-    assert (r1.mol.GetNumBonds() ==
-            c1.mol.GetNumBonds()*2 + c2.mol.GetNumBonds() +
-            axle.mol.GetNumBonds())
+
+def test_construction(tmp_rotaxane):
+    polymer = next(
+        bb for bb in tmp_rotaxane.get_building_blocks()
+        if isinstance(bb.topology_graph, stk.polymer.Linear)
+    )
+    cycle = next(
+        bb for bb in tmp_rotaxane.get_building_blocks()
+        if bb is not polymer
+    )
+    num_expected_bbs = {
+        polymer: 1,
+        cycle: 5
+    }
+    _test_construction(test_dir, num_expected_bbs, tmp_rotaxane)
+    _test_dump_and_load(test_dir, tmp_rotaxane)

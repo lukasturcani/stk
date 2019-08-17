@@ -69,9 +69,9 @@ class _CycleVertex(Vertex):
 
     """
 
-    def __init__(self, id, x, y, z, orientation):
+    def __init__(self, x, y, z, orientation):
         self._orientation = orientation
-        super().__init__(id, x, y, z)
+        super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         """
@@ -223,13 +223,12 @@ class NRotaxane(TopologyGraph):
         self._orientations = orientations
         self._n = n
 
-        vertices = [_AxleVertex(0, 0, 0, 0)]
+        vertices = [_AxleVertex(0, 0, 0)]
         threads = orientations * n
         distance = 1 / (len(threads)-1)
         for i, orientation in enumerate(threads):
             vertices.append(
                 _CycleVertex(
-                    id=i+1,
                     x=(i*distance) - 0.5,
                     y=0,
                     z=0,
