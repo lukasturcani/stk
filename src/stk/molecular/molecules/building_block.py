@@ -106,6 +106,18 @@ class BuildingBlock(Molecule):
 
         """
 
+        # This method does not get called, See _construct().
+        raise RuntimeError('This method should not be getting called.')
+
+    @classmethod
+    def _construct(
+        cls,
+        smiles,
+        functional_groups=None,
+        random_seed=4,
+        use_cache=False
+    ):
+        obj = cls.__new__(cls)
         if functional_groups is None:
             functional_groups = ()
 
@@ -127,10 +139,20 @@ class BuildingBlock(Molecule):
             )
             logger.warning(msg)
 
-        return self._init_from_rdkit_mol(
+        identity_key = cls._get_identity_key_from_rdkit_mol(
             mol=mol,
             functional_groups=functional_groups
         )
+        if use_cache and identity_key in cls._cache:
+            return cls._cache[identity_key]
+        obj._init_from_rdkit_mol(
+            mol=mol,
+            functional_groups=functional_groups,
+            identity_key=identity_key
+        )
+        if use_cache:
+            cls._cache[identity_key] = obj
+        return obj
 
     @classmethod
     def init_from_file(
@@ -284,16 +306,19 @@ class BuildingBlock(Molecule):
 
         """
 
-        key = cls._get_key_from_rdkit_mol(mol, functional_groups)
+        key = cls._get_identity_key_from_rdkit_mol(
+            mol=mol,
+            functional_groups=functional_groups
+        )
         if use_cache and key in cls._cache:
             return cls._cache[key]
 
         bb = cls.__new__(cls)
-        bb._key = key
         cls._init_from_rdkit_mol(
             self=bb,
             mol=mol,
-            functional_groups=functional_groups
+            functional_groups=functional_groups,
+            identity_key=key
         )
 
         if use_cache:
@@ -301,7 +326,12 @@ class BuildingBlock(Molecule):
 
         return bb
 
-    def _init_from_rdkit_mol(self, mol, functional_groups):
+    def _init_from_rdkit_mol(
+        self,
+        mol,
+        functional_groups,
+        identity_key
+    ):
         """
         Initialize from an :mod:`rdkit` molecule.
 
@@ -315,13 +345,14 @@ class BuildingBlock(Molecule):
             added to :attr:`func_groups`. If ``None`, then no
             functional groups are added.
 
+        identity_key : :class:`tuple`
+            The identity key of the molecule.
+
         Returns
         -------
         None : :class:`NoneType`
 
         """
-
-        rdkit.Kekulize(mol)
 
         if functional_groups is None:
             functional_groups = ()
@@ -340,7 +371,7 @@ class BuildingBlock(Molecule):
         )
         position_matrix = mol.GetConformer().GetPositions()
 
-        super().__init__(atoms, bonds, position_matrix)
+        super().__init__(atoms, bonds, position_matrix, identity_key)
 
         fg_makers = (fg_types[name] for name in functional_groups)
         self.func_groups = tuple(
@@ -375,11 +406,15 @@ class BuildingBlock(Molecule):
         """
 
         d = dict(mol_dict)
+        identity_key = eval(d.pop('identity_key'))
+        if use_cache and identity_key in cls._cache:
+            return cls._cache[identity_key]
+
         d.pop('class')
         functional_groups = d.pop('func_groups')
 
         obj = cls.__new__(cls)
-
+        obj._identity_key = identity_key
         obj._position_matrix = np.array(d.pop('position_matrix')).T
         # If the cache is not being used, make sure to update all the
         # atoms and attributes to those in the dict.
@@ -395,23 +430,12 @@ class BuildingBlock(Molecule):
             for fg_maker in fg_makers
             for func_group in fg_maker.get_functional_groups(obj)
         )
-
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
 
-        obj._key = cls._get_key_from_rdkit_mol(
-            mol=obj.to_rdkit_mol(),
-            functional_groups=functional_groups
-        )
-
-        if not use_cache:
-            return obj
-        else:
-            if obj._key in cls._cache:
-                return cls._cache[obj._key]
-            else:
-                cls._cache[obj._key] = obj
-                return obj
+        if use_cache:
+            cls._cache[identity_key] = obj
+        return obj
 
     def get_bonder_ids(self, fg_ids=None):
         """
@@ -747,7 +771,8 @@ class BuildingBlock(Molecule):
             'func_groups': fgs,
             'position_matrix': self.get_position_matrix().tolist(),
             'atoms': repr(self.atoms),
-            'bonds': repr(bonds)
+            'bonds': repr(bonds),
+            'identity_key': repr(self._identity_key)
         }
 
         if ignore_missing_attrs:
@@ -765,62 +790,13 @@ class BuildingBlock(Molecule):
         return d
 
     @staticmethod
-    def _get_key(
-        self,
-        smiles,
-        functional_groups,
-        random_seed,
-        use_cache
-    ):
-        """
-        Return the key used for caching.
-
-        Parameters
-        ----------
-        smiles : :class:`str`
-            A SMILES string of the molecule.
-
-        functional_groups : :class:`list` of :class:`str`, optional
-            The name of the functional groups which are to have atoms
-            tagged. If ``None``, no tagging is done.
-
-        random_seed : :class:`int`, optional
-            Random seed passed to :func:`rdkit.ETKDGv2`
-
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`BuildingBlock` does not
-            yet exist the created one will be added to the cache.
-
-        Returns
-        -------
-        :class:`tuple`
-            The key used for caching the molecule. Has the form
-
-            .. code-block:: python
-
-                ('amine', 'bromine', 'InChIString')
-
-        """
-
-        mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
-        params = rdkit.ETKDGv2()
-        params.randomSeed = random_seed
-        for i in range(100):
-            failed = rdkit.EmbedMolecule(mol, params) == -1
-            if failed:
-                params.randomSeed += 1
-            else:
-                break
-        return self._get_key_from_rdkit_mol(mol, functional_groups)
-
-    @staticmethod
-    def _get_key_from_rdkit_mol(mol, functional_groups):
+    def _get_identity_key_from_rdkit_mol(mol, functional_groups):
         if functional_groups is None:
             functional_groups = ()
         functional_groups = sorted(functional_groups)
+
+        # Don't modify the original molecule.
+        mol = rdkit.Mol(mol)
         rdkit.SanitizeMol(mol)
         return (
             *functional_groups,

@@ -114,7 +114,7 @@ class Molecule(metaclass=_Cached):
 
         raise NotImplementedError()
 
-    def __init__(self, atoms, bonds, position_matrix):
+    def __init__(self, atoms, bonds, position_matrix, identity_key):
         """
         Initialize a :class:`Molecule`.
 
@@ -130,6 +130,11 @@ class Molecule(metaclass=_Cached):
             A ``(n, 3)`` matrix holding the position of every atom in
             the :class:`.Molecule`.
 
+        identity_key : :class:`object`
+            The identity key of the molecule. Molecules which
+            ``stk`` sees as identical will have the same identity key.
+            Must be hashable.
+
         """
 
         self.atoms = atoms
@@ -137,6 +142,7 @@ class Molecule(metaclass=_Cached):
         # A (3, n) numpy.ndarray holding the position of every atom in
         # the molecule.
         self._position_matrix = position_matrix.T
+        self._identity_key = identity_key
 
     @classmethod
     def init_from_dict(self, mol_dict, use_cache=False):
@@ -558,35 +564,7 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        # This is method is lazy.
-        if not hasattr(self._identity_key):
-            self._identity_key = self._get_identity_key()
         return self._identity_key
-
-    def _get_identity_key(self):
-        """
-        Return the identity key.
-
-        The identity key wil be equal for two molecules which
-        ``stk`` sees as identical. The identity key does not take
-        the conformation into account but it does account for
-        isomerism.
-
-        Returns
-        -------
-        :class:`object`
-            A hashable object which represents the identity of the
-            molecule.
-
-        Raises
-        ------
-        :class:`NotImplementedError`
-            This is a virtual method which needs to be implemented
-            in a subclass.
-
-        """
-
-        raise NotImplementedError()
 
     def get_maximum_diameter(self, atom_ids=None):
         """
