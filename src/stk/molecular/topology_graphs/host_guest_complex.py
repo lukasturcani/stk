@@ -263,23 +263,12 @@ class Complex(TopologyGraph):
         )
         super().__init__(vertices, (), processes)
 
-    def _assign_building_blocks_to_vertices(
-        self,
-        mol,
-        building_blocks
-    ):
+    def assign_building_blocks_to_vertices(self, building_blocks):
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        Assignment is done by modifying
-        :attr:`.ConstructedMolecule.building_block_vertices`.
-
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` instance being
-            constructed.
-
         building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
@@ -290,13 +279,30 @@ class Complex(TopologyGraph):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            Maps the `building_blocks`, to the
+            :class:`~.topologies.base.Vertex` objects in
+            :attr:`vertices` they are placed on during construction.
+            The :class:`dict` has the form
+
+            .. code-block:: python
+
+                building_block_vertices = {
+                    BuildingBlock(...): [Vertex(...), Vertex(...)],
+                    BuildingBlock(...): [
+                        Vertex(...),
+                        Vertex(...),
+                        Vertex(...),
+                    ]
+                    ConstructedMolecule(...): [Vertex(...)]
+                }
 
         """
 
-        host, guest = building_blocks
-        mol.building_block_vertices[host].append(self.vertices[0])
-        mol.building_block_vertices[guest].append(self.vertices[1])
+        return {
+            bb: vertex
+            for bb, vertex in zip(building_blocks, self.vertices)
+        }
 
     def _get_scale(self, mol):
         """

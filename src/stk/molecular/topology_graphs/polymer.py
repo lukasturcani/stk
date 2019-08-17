@@ -376,23 +376,12 @@ class Linear(TopologyGraph):
 
         super().__init__(tuple(vertices), tuple(edges), processes)
 
-    def _assign_building_blocks_to_vertices(
-        self,
-        mol,
-        building_blocks
-    ):
+    def assign_building_blocks_to_vertices(self, building_blocks):
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        Assignment is done by modifying
-        :attr:`.ConstructedMolecule.building_block_vertices`.
-
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` instance being
-            constructed.
-
         building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
@@ -403,7 +392,23 @@ class Linear(TopologyGraph):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            Maps the `building_blocks`, to the
+            :class:`~.topologies.base.Vertex` objects in
+            :attr:`vertices` they are placed on during construction.
+            The :class:`dict` has the form
+
+            .. code-block:: python
+
+                building_block_vertices = {
+                    BuildingBlock(...): [Vertex(...), Vertex(...)],
+                    BuildingBlock(...): [
+                        Vertex(...),
+                        Vertex(...),
+                        Vertex(...),
+                    ]
+                    ConstructedMolecule(...): [Vertex(...)]
+                }
 
         """
 
@@ -411,9 +416,14 @@ class Linear(TopologyGraph):
         bb_map = {
             letter: bb for letter, bb in zip(polymer, building_blocks)
         }
+        building_block_vertices = {}
         for letter, vertex in zip(polymer, self.vertices):
             bb = bb_map[letter]
-            mol.building_block_vertices[bb].append(vertex)
+            building_block_vertices[bb] = (
+                building_block_vertices.get(bb, [])
+            )
+            building_block_vertices[bb].append(vertex)
+        return building_block_vertices
 
     def _get_scale(self, mol):
         """

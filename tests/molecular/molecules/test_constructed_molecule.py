@@ -36,8 +36,7 @@ def test_init(amine2, aldehyde2):
 
 def test_is_identical(polymer, tmp_polymer):
     assert polymer is not tmp_polymer
-    assert polymer.is_identical(tmp_polymer)
-    assert tmp_polymer.is_identical(polymer)
+    assert polymer.get_identity_key() == tmp_polymer.get_identity_key()
 
 
 def test_get_building_blocks(

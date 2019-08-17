@@ -5,7 +5,6 @@ Defines COF topologies.
 
 import numpy as np
 import itertools as it
-from collections import defaultdict
 
 from .topology_graph import TopologyGraph, Vertex, Edge
 from ...utilities import vector_angle, flatten
@@ -794,26 +793,12 @@ class COF(TopologyGraph):
             if all(dim == 0 for dim in edge.get_periodicity())
         ]
 
-    def _assign_building_blocks_to_vertices(
-        self,
-        mol,
-        building_blocks
-    ):
+    def assign_building_blocks_to_vertices(self, building_blocks):
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        This method will assign a random building block with the
-        correct amount of functional groups to each vertex.
-
-        Assignment is done by modifying
-        :attr:`.ConstructedMolecule.building_block_vertices`.
-
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` instance being
-            constructed.
-
         building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
@@ -824,17 +809,51 @@ class COF(TopologyGraph):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            Maps the `building_blocks`, to the
+            :class:`~.topologies.base.Vertex` objects in
+            :attr:`vertices` they are placed on during construction.
+            The :class:`dict` has the form
+
+            .. code-block:: python
+
+                building_block_vertices = {
+                    BuildingBlock(...): [Vertex(...), Vertex(...)],
+                    BuildingBlock(...): [
+                        Vertex(...),
+                        Vertex(...),
+                        Vertex(...),
+                    ]
+                    ConstructedMolecule(...): [Vertex(...)]
+                }
+
+        Raises
+        ------
+        :class:`ValueError`
+            If there is more than one building with a given number
+            of functional groups.
 
         """
 
-        bb_by_degree = defaultdict(list)
+        bb_by_degree = {}
         for bb in building_blocks:
-            bb_by_degree[len(bb.func_groups)].append(bb)
+            num_fgs = len(bb.func_groups)
+            if num_fgs in bb_by_degree:
+                raise ValueError(
+                    'If there are multiple building blocks with the '
+                    'same number of functional groups, '
+                    'building_block_vertices must be set explicitly.'
+                )
+            bb_by_degree[num_fgs] = bb
 
+        building_block_vertices = {}
         for vertex in self.vertices:
-            bb = np.random.choice(bb_by_degree[len(vertex.edges)])
-            mol.building_block_vertices[bb].append(vertex)
+            bb = bb_by_degree[len(vertex.edges)]
+            building_block_vertices[bb] = (
+                building_block_vertices.get(bb, [])
+            )
+            building_block_vertices[bb].append(vertex)
+        return building_block_vertices
 
     def _get_scale(self, mol):
         """

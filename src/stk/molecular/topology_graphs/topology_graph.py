@@ -19,7 +19,6 @@ topology graph has the vertices and edges it wants, simply run
 """
 
 import numpy as np
-from collections import defaultdict
 
 from ..reactor import Reactor
 from ...utilities import vector_angle
@@ -825,7 +824,7 @@ class TopologyGraph:
         for i, edge in enumerate(self.edges):
             edge.id = i
 
-    def construct(self, mol, building_blocks):
+    def construct(self, mol):
         """
         Construct a :class:`.ConstructedMolecule`.
 
@@ -835,29 +834,11 @@ class TopologyGraph:
             The :class:`.ConstructedMolecule` instance which needs to
             be constructed.
 
-        building_blocks : :class:`list` of :class:`.Molecule`
-            The :class:`.BuildingBlock` and
-            :class:`ConstructedMolecule` instances which
-            represent the building block molecules used for
-            construction. Only one instance is present per building
-            block molecule, even if multiples of that building block
-            join up to form the :class:`ConstructedMolecule`.
-
         Returns
         -------
         None : :class:`NoneType`
 
         """
-
-        if mol.building_block_vertices is None:
-            mol.building_block_vertices = defaultdict(list)
-            self._assign_building_blocks_to_vertices(
-                mol=mol,
-                building_blocks=building_blocks
-            )
-            mol.building_block_vertices = dict(
-                mol.building_block_vertices
-            )
 
         scale = self._get_scale(mol)
         vertex_clones = self._clone_vertices(mol, scale)
@@ -879,23 +860,12 @@ class TopologyGraph:
 
         self._clean_up(mol)
 
-    def _assign_building_blocks_to_vertices(
-        self,
-        mol,
-        building_blocks
-    ):
+    def assign_building_blocks_to_vertices(self, building_blocks):
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        Assignment is done by modifying
-        :attr:`.ConstructedMolecule.building_block_vertices`.
-
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` instance being
-            constructed.
-
         building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
@@ -906,7 +876,23 @@ class TopologyGraph:
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            Maps the `building_blocks`, to the
+            :class:`~.topologies.base.Vertex` objects in
+            :attr:`vertices` they are placed on during construction.
+            The :class:`dict` has the form
+
+            .. code-block:: python
+
+                building_block_vertices = {
+                    BuildingBlock(...): [Vertex(...), Vertex(...)],
+                    BuildingBlock(...): [
+                        Vertex(...),
+                        Vertex(...),
+                        Vertex(...),
+                    ]
+                    ConstructedMolecule(...): [Vertex(...)]
+                }
 
         Raises
         ------

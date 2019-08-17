@@ -178,6 +178,12 @@ class ConstructedMolecule(Molecule):
         building_block_vertices=None,
         use_cache=False
     ):
+        if building_block_vertices is None:
+            building_block_vertices = (
+                topology_graph.assign_building_blocks_to_vertices(
+                    building_blocks=building_blocks
+                )
+            )
         identity_key = cls._get_identity_key_from_components(
             building_blocks=building_blocks,
             topology_graph=topology_graph,
@@ -222,14 +228,15 @@ class ConstructedMolecule(Molecule):
 
         building_block_vertices : :class:`dict`, optional
             Maps the :class:`.Molecule` in  `building_blocks` to the
-            :class:`~.topologies.base.Vertex` in `topology_graph`.
-            Each :class:`.BuildingBlock` and
-            :class:`ConstructedMolecule` can be mapped to multiple
-            :class:`~.topologies.base.Vertex` objects. See the
-            examples section in the :class:`.ConstructedMolecule`
-            class docstring to help understand how this parameter
-            is used. If ``None``, building block molecules will be
-            assigned to vertices at random.
+            :class:`~.topologies.base.Vertex` instances in
+            `topology_graph` it is placed on. Each
+            :class:`.BuildingBlock` and :class:`ConstructedMolecule`
+            can be mapped to multiple :class:`~.topologies.base.Vertex`
+            objects. See the examples section in the
+            :class:`.ConstructedMolecule` class docstring to help
+            understand how this parameter is used. If ``None``,
+            building block molecules will be assigned to vertices at
+            random.
 
         use_cache : :class:`bool`, optional
             If ``True``, a new :class:`.ConstructedMolecule` will
@@ -268,7 +275,7 @@ class ConstructedMolecule(Molecule):
             Defines the topology graph of the
             :class:`ConstructedMolecule` and constructs it.
 
-        building_block_vertices : :class:`dict`, optional
+        building_block_vertices : :class:`dict`
             Maps the :class:`.Molecule` in  `building_blocks` to the
             :class:`~.topologies.base.Vertex` in `topology_graph`.
             Each :class:`.BuildingBlock` and
@@ -292,9 +299,6 @@ class ConstructedMolecule(Molecule):
 
         obj = cls.__new__(cls)
         obj._identity_key = identity_key
-        # If building_block_vertices is "None" then
-        # topology_graph.construct() is responsible for creating the
-        # dict.
         obj.building_block_vertices = building_block_vertices
         obj.topology_graph = topology_graph
         obj.atoms = []
@@ -307,7 +311,7 @@ class ConstructedMolecule(Molecule):
         obj._position_matrix = []
 
         try:
-            topology_graph.construct(obj, building_blocks)
+            topology_graph.construct(obj)
 
         except Exception as ex:
             errormsg = (
