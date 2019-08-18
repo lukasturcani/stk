@@ -20,6 +20,7 @@ topology graph has the vertices and edges it wants, simply run
 
 import numpy as np
 import pathos
+from collections import namedtuple
 
 from ..reactor import Reactor
 from ...utilities import vector_angle
@@ -755,6 +756,18 @@ class Edge:
         return f'Edge({vertices}{position}{periodicity})'
 
 
+PlacementResult = namedtuple(
+    'PlacementResult',
+    ['building_block', 'vertex', 'assignments']
+)
+
+
+def _place_building_blocks(vertex, building_block):
+    vertex.place_building_block(building_block)
+    assignments = vertex.assign_func_groups_to_edges(building_block)
+    return PlacementResult(building_block, vertex, assignments)
+
+
 class TopologyGraph:
     """
     Represents topology graphs of :class:`.ConstructedMolecule`.
@@ -1190,36 +1203,24 @@ class TopologyGraph:
                     mol._position_matrix.extend(
                         result_bb.get_position_matrix()
                     )
-                    atom_map = self._get_atom_map(
-                        mol=mol,
-                        bb=bb,
-                        bb_id=bb_id
-                    )
-                    assignments = vertex.assign_func_groups_to_edges(bb)
-
-                for instance_vertex in stage:
-                    vertex = vertices[instance_vertex.id]
-                    bb = vertex_building_blocks[instance_vertex]
-                    original_coords = bb.get_position_matrix()
-
-                    mol._position_matrix.extend(
-                        vertex.place_building_block(bb)
-                    )
                     atom_map = self._assign_func_groups_to_edges(
                         mol=mol,
-                        vertex=vertex,
                         bb=bb,
                         bb_id=bb_id,
-                        edges=edges
-                    )
-                    # Perform additional, miscellaneous operations.
-                    vertex.after_assign_func_groups_to_edges(
-                        building_block=bb,
-                        func_groups=mol.func_groups[-len(bb.func_groups):]
+                        edges=edges,
+                        assignments=result.assignments
                     )
 
-                    bb.set_position_matrix(original_coords)
-                    mol.bonds.extend(b.clone(atom_map) for b in bb.bonds)
+                    # Perform additional, miscellaneous operations.
+                    vertex = vertices[result.vertex.id]
+                    num_fgs = len(bb.func_groups)
+                    vertex.after_assign_func_groups_to_edges(
+                        building_block=result_bb,
+                        func_groups=mol.func_groups[-num_fgs:]
+                    )
+                    mol.bonds.extend(
+                        b.clone(atom_map) for b in bb.bonds
+                    )
                     counter.update([bb])
                     bb_id += 1
 
