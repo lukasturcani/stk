@@ -16,7 +16,7 @@ def test_random_building_block(
         building_blocks=[amine2, aldehyde2_alt1],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    assert mutant._key == expected._key
+    assert mutant.get_identity_key() == expected.get_identity_key()
 
 
 def test_similar_building_block(
@@ -37,14 +37,14 @@ def test_similar_building_block(
         building_blocks=[amine2, aldehyde2_alt1],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    assert mutant._key == expected._key
+    assert mutant.get_identity_key() == expected.get_identity_key()
 
     mutant = mutator.mutate(polymer)
     expected = stk.ConstructedMolecule(
         building_blocks=[amine2, aldehyde2_alt2],
         topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
     )
-    assert mutant._key == expected._key
+    assert mutant.get_identity_key() == expected.get_identity_key()
 
 
 def test_random_topology_graph(polymer):
@@ -61,8 +61,11 @@ def test_random_topology_graph(polymer):
     mutator = stk.RandomTopologyGraph([chain1, chain2])
     mutant = mutator.mutate(polymer)
 
-    expected = {expected1._key, expected2._key}
-    assert mutant._key in expected
+    expected = {
+        expected1.get_identity_key(),
+        expected2.get_identity_key()
+    }
+    assert mutant.get_identity_key() in expected
 
 
 def test_random_mutation(polymer):
@@ -78,11 +81,11 @@ def test_random_mutation(polymer):
         building_blocks=list(polymer.building_block_vertices.keys()),
         topology_graph=chain1
     )
-    assert mutant1._key == expected1._key
+    assert mutant1.get_identity_key() == expected1.get_identity_key()
 
     expected2 = stk.ConstructedMolecule(
         building_blocks=list(polymer.building_block_vertices.keys()),
         topology_graph=chain2
     )
     mutant2 = mutator2.mutate(polymer)
-    assert mutant2._key == expected2._key
+    assert mutant2.get_identity_key() == expected2.get_identity_key()

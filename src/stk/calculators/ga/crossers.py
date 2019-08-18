@@ -354,8 +354,8 @@ class GeneticRecombination(Crosser):
         for mol in mols:
             for allele in mol.building_block_vertices:
                 gene = genes[self._key(allele)]
-                if allele._key not in gene:
-                    gene[allele._key] = allele
+                if allele.get_identity_key() not in gene:
+                    gene[allele.get_identity_key()] = allele
 
         if self._random_seed is not None:
             np.random.seed(self._random_seed)
@@ -371,7 +371,8 @@ class GeneticRecombination(Crosser):
         parents = {
             (
                 *tuple(sorted(
-                    bb._key for bb in mol.building_block_vertices
+                    bb.get_identity_key()
+                    for bb in mol.building_block_vertices
                 )),
                 repr(mol.topology_graph)
             )
@@ -381,7 +382,7 @@ class GeneticRecombination(Crosser):
             # Do not yield the parents.
             mol = (
                 *tuple(sorted(
-                    bb._key for bb in building_blocks
+                    bb.get_identity_key() for bb in building_blocks
                 )),
                 repr(top)
             )
@@ -503,7 +504,7 @@ class Jumble(Crosser):
         cls = mols[0].__class__
         building_blocks = dedupe(
             (bb for mol in mols for bb in mol.building_block_vertices),
-            key=lambda bb: bb._key
+            key=lambda bb: bb.get_identity_key()
         )
 
         if self._duplicate_building_blocks:
@@ -527,7 +528,8 @@ class Jumble(Crosser):
         parents = {
             (
                 *tuple(sorted(
-                    bb._key for bb in mol.building_block_vertices
+                    bb.get_identity_key()
+                    for bb in mol.building_block_vertices
                 )),
                 repr(mol.topology_graph)
             )
@@ -536,7 +538,10 @@ class Jumble(Crosser):
 
         for bbs, top in product:
             # Do not yield the parents.
-            mol = (*tuple(sorted(bb._key for bb in bbs)), repr(top))
+            mol = (
+                *tuple(sorted(bb.get_identity_key() for bb in bbs)),
+                repr(top)
+            )
             if mol in parents:
                 continue
 

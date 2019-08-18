@@ -386,8 +386,10 @@ def test_contains(tmp_population, population):
     assert all(m in population for m in population.clone())
 
 
-def test_calculate_member_fitness(fitness_calculator,
-                                  tmp_polymer_pop):
+def test_calculate_member_fitness(
+    fitness_calculator,
+    tmp_polymer_pop
+):
 
     pop = stk.GAPopulation(*tmp_polymer_pop)
     for mol in pop:
@@ -400,7 +402,7 @@ def test_calculate_member_fitness(fitness_calculator,
 
     with pytest.raises(stk.RaisingFitnessCalculatorError):
         calc = stk.RaisingFitnessCalculator(
-                    fitness_calculator=fitness_calculator,
-                    fail_chance=1
+            fitness_calculator=fitness_calculator,
+            fail_chance=1
         )
         pop.calculate_member_fitness(calc)

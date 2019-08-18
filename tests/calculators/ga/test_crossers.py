@@ -26,15 +26,17 @@ def test_random_crossover(polymer, polymer_alt1):
 
 def _test_cohort(cohort, parents, duplicates):
     topologies = set()
-    parents = {parent._key for parent in parents}
+    parents = {parent.get_identity_key() for parent in parents}
     bb_counts = Counter()
     for mol1 in cohort:
-        assert mol1._key not in parents
+        assert mol1.get_identity_key() not in parents
         bb_counts.update([len(mol1.building_block_vertices)])
         topologies.add(repr(mol1.topology_graph))
         for mol2 in cohort:
             if mol1 is not mol2:
-                assert not mol1.is_identical(mol2)
+                assert (
+                    mol1.get_identity_key() != mol2.get_identity_key()
+                )
     assert len(topologies) == 2
 
     if duplicates:
