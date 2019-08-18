@@ -19,6 +19,7 @@ topology graph has the vertices and edges it wants, simply run
 """
 
 import numpy as np
+import pathos
 
 from ..reactor import Reactor
 from ...utilities import vector_angle
@@ -1106,18 +1107,15 @@ class TopologyGraph:
     def _assign_func_groups_to_edges(
         self,
         mol,
-        vertex,
         bb,
         bb_id,
-        edges
+        edges,
+        assignments
     ):
         atom_map = self._get_atom_map(mol, bb, bb_id)
         mol.func_groups.extend(
             fg.clone(atom_map) for fg in bb.func_groups
         )
-        # Assign the functional groups in the constructed
-        # molecule to edges in the topology graph.
-        assignments = vertex.assign_func_groups_to_edges(bb)
         num_fgs = len(bb.func_groups)
         for fg_id, edge_id in assignments.items():
             edges[edge_id].assign_func_group(
@@ -1146,10 +1144,10 @@ class TopologyGraph:
                 )
                 atom_map = self._assign_func_groups_to_edges(
                     mol=mol,
-                    vertex=vertex,
                     bb=bb,
                     bb_id=bb_id,
-                    edges=edges
+                    edges=edges,
+                    assignments=vertex.assign_func_groups_to_edges(bb)
                 )
                 # Perform additional, miscellaneous operations.
                 vertex.after_assign_func_groups_to_edges(
@@ -1163,7 +1161,67 @@ class TopologyGraph:
                 bb_id += 1
 
     def _place_building_blocks_parallel(self, mol, vertices, edges):
-        raise NotImplementedError('TODO')
+        bb_id = 0
+
+        vertex_building_blocks = {
+            vertex: bb
+            for bb, vertices in mol.building_block_vertices.items()
+            for vertex in vertices
+        }
+        bb_map = {
+            bb.get_identity_key(): bb
+            for bb in mol.get_building_blocks()
+        }
+        # Use a shorter alias.
+        counter = mol.building_block_counter
+        with pathos.pools.ProcessPool(self._processes) as pool:
+            for stage in self._stages:
+                verts = []
+                bbs = []
+                for instance_vertex in stage:
+                    verts.append(vertices[instance_vertex.id])
+                    bbs.append(vertex_building_blocks[instance_vertex])
+                results = pool.map(_place_building_blocks, verts, bbs)
+
+                for result in results:
+                    result_bb = result.building_block
+                    bb = bb_map[result_bb.get_identity_key()]
+
+                    mol._position_matrix.extend(
+                        result_bb.get_position_matrix()
+                    )
+                    atom_map = self._get_atom_map(
+                        mol=mol,
+                        bb=bb,
+                        bb_id=bb_id
+                    )
+                    assignments = vertex.assign_func_groups_to_edges(bb)
+
+                for instance_vertex in stage:
+                    vertex = vertices[instance_vertex.id]
+                    bb = vertex_building_blocks[instance_vertex]
+                    original_coords = bb.get_position_matrix()
+
+                    mol._position_matrix.extend(
+                        vertex.place_building_block(bb)
+                    )
+                    atom_map = self._assign_func_groups_to_edges(
+                        mol=mol,
+                        vertex=vertex,
+                        bb=bb,
+                        bb_id=bb_id,
+                        edges=edges
+                    )
+                    # Perform additional, miscellaneous operations.
+                    vertex.after_assign_func_groups_to_edges(
+                        building_block=bb,
+                        func_groups=mol.func_groups[-len(bb.func_groups):]
+                    )
+
+                    bb.set_position_matrix(original_coords)
+                    mol.bonds.extend(b.clone(atom_map) for b in bb.bonds)
+                    counter.update([bb])
+                    bb_id += 1
 
     def _clean_up(self, mol):
         mol._position_matrix = np.array(mol._position_matrix).T
