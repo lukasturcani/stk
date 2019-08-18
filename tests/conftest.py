@@ -62,12 +62,20 @@ def make_reactor():
                 building_blocks=building_blocks
             )
         )
-        vertex_clones = mol.topology_graph._clone_vertices(mol, 1)
-        edge_clones = mol.topology_graph._clone_edges(vertex_clones, 1)
+        vertex_clones = tuple(
+            mol.topology_graph._get_vertex_clones(mol, 1)
+        )
+        edge_clones = tuple(
+            mol.topology_graph._get_edge_clones(vertex_clones, 1)
+        )
         mol._edge_clones = edge_clones
 
         mol.topology_graph._prepare(mol)
-        mol.topology_graph._place_building_blocks(mol, vertex_clones)
+        mol.topology_graph._place_building_blocks(
+            mol=mol,
+            vertices=vertex_clones,
+            edges=edge_clones
+        )
         return stk.molecular.reactor.Reactor(mol)
 
     return inner
