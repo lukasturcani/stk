@@ -147,18 +147,19 @@ class _CycleVertex(Vertex):
 
         Returns
         -------
-        :class:`tuple`
-            For each functional group in `building_block`, the edge
-            id of the :class:`.Edge` assigned to it.
+        :class:`dict`
+            A mapping from the id of a functional group in
+            `building_block` to the id of the edge in :attr:`edges` it
+            is assigned to.
 
         """
 
-        return tuple(
-            e.id for e in sorted(
+        return {
+            fg_id: e.id for fg_id, e in enumerate(sorted(
                 self.edges,
                 key=lambda e: self._fg0_distance(building_block, e)
-            )
-        )
+            ))
+        }
 
     def _fg0_distance(self, building_block, e):
         fg_position = building_block.get_centroid(

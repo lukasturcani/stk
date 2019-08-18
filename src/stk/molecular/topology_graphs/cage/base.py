@@ -266,9 +266,10 @@ class _CageVertex(Vertex):
 
         Returns
         -------
-        :class:`tuple`
-            For each functional group in `building_block`, the edge
-            id of the :class:`.Edge` assigned to it.
+        :class:`dict`
+            A mapping from the id of a functional group in
+            `building_block` to the id of the edge in :attr:`edges` it
+            is assigned to.
 
         """
 
@@ -329,12 +330,12 @@ class _CageVertex(Vertex):
         )
 
     def _assign_func_groups_to_linear_edges(self, building_block):
-        return tuple(
-            e.id for e in sorted(
+        return {
+            fg_id: e.id for fg_id, e in enumerate(sorted(
                 self.edges,
                 key=self._get_fg0_distance(building_block)
-            )
-        )
+            ))
+        }
 
     def _get_fg0_distance(self, building_block):
         fg_coord = building_block.get_centroid(
@@ -377,7 +378,7 @@ class _CageVertex(Vertex):
                 axis=axis
             )
         )
-        assignments = [None]*len(building_block.func_groups)
+        assignments = {}
         edges = sorted(self.edges, key=self._get_edge_angle(axis))
         for edge, fg_id in zip(edges, func_groups):
             assignments[fg_id] = edge.id

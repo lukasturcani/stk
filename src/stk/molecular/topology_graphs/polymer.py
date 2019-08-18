@@ -139,9 +139,10 @@ class _LinearVertex(Vertex):
 
         Returns
         -------
-        :class:`tuple`
-            For each functional group in `building_block`, the edge
-            id of the :class:`.Edge` assigned to it.
+        :class:`dict`
+            A mapping from the id of a functional group in
+            `building_block` to the id of the edge in :attr:`edges` it
+            is assigned to.
 
         """
 
@@ -152,10 +153,10 @@ class _LinearVertex(Vertex):
                 atom_ids=func_groups[fg_id].get_bonder_ids()
             )[0]
         )
-        assignments = [None, None]
-        assignments[fg1] = self.edges[0].id
-        assignments[fg2] = self.edges[1].id
-        return assignments
+        return {
+            fg1: self.edges[0].id,
+            fg2: self.edges[1].id
+        }
 
     def __str__(self):
         x, y, z = self._position
@@ -244,9 +245,10 @@ class _TerminalVertex(_LinearVertex):
 
         Returns
         -------
-        :class:`tuple`
-            For each functional group in `building_block`, the edge
-            id of the :class:`.Edge` assigned to it.
+        :class:`dict`
+            A mapping from the id of a functional group in
+            `building_block` to the id of the edge in :attr:`edges` it
+            is assigned to.
 
         Raises
         ------
@@ -265,12 +267,10 @@ class _TerminalVertex(_LinearVertex):
                 )[0]
             )
             fg_index = 0 if self._cap_direction == 1 else -1
-            assignments = [None, None]
-            assignments[fgs[fg_index]] = self.edges[0].id
-            return assignments
+            return {fgs[fg_index]: self.edges[0].id}
 
         elif len(building_block.func_groups) == 1:
-            return (self.edges[0].id, )
+            return {0: self.edges[0].id}
 
         else:
             raise ValueError(

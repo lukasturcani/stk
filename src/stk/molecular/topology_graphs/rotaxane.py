@@ -51,7 +51,7 @@ class _AxleVertex(Vertex):
         return building_block.get_position_matrix()
 
     def assign_func_groups_to_edges(self, building_block):
-        return tuple()
+        return {}
 
 
 class _CycleVertex(Vertex):
@@ -129,7 +129,7 @@ class _CycleVertex(Vertex):
         return building_block.get_position_matrix()
 
     def assign_func_groups_to_edges(self, building_block):
-        return tuple()
+        return {}
 
     def __str__(self):
         x, y, z = self._position
