@@ -7,7 +7,7 @@ import numpy as np
 from ..._test_utilities import _test_dump_and_load
 
 
-test_dir = 'host_guest_complex_topology_tests_output'
+test_dir = 'host_guest_topology_tests_output'
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
@@ -35,13 +35,13 @@ def test_vertex(tmp_four_plus_six, tmp_bromine2):
     guest = tmp_bromine2
     atom1, atom2 = guest.get_atom_coords([0, 1])
     guest_start = stk.normalize_vector(atom1 - atom2)
-    complex2 = stk.host_guest_complex.Complex(
+    complex2 = stk.host_guest.Complex(
         guest_start=guest_start,
         guest_target=[1, 1, 1],
         displacement=[23, 5, 21]
     )
     complexes = (
-        (stk.host_guest_complex.Complex(), guest_start),
+        (stk.host_guest.Complex(), guest_start),
         (complex2, stk.normalize_vector([1, 1, 1]))
     )
     for complex_, target in complexes:
@@ -82,7 +82,7 @@ def _test_construction(complex_, i, num_expected_bbs):
     assert len(complex_.bonds) == bb_bonds
 
 
-def test_host_guest_complex(
+def test_complex(
     amine2,
     amine2_alt3,
     aldehyde3,
@@ -96,7 +96,7 @@ def test_host_guest_complex(
         x, y = np.cos(i*2*np.pi/n), np.sin(i*2*np.pi/n)
         complex_ = stk.ConstructedMolecule(
             building_blocks=[host, chained_c60],
-            topology_graph=stk.host_guest_complex.Complex(
+            topology_graph=stk.host_guest.Complex(
                 guest_start=chained_c60.get_direction(),
                 guest_target=[x, y, 0],
                 displacement=[3**i, 0, 0]

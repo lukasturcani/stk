@@ -174,7 +174,7 @@ class Complex(TopologyGraph):
         )
         complex1 = stk.ConstructedMolecule(
             building_blocks=[host, guest],
-            topology_graph=stk.host_guest_complex.Complex()
+            topology_graph=stk.host_guest.Complex()
         )
 
     Change the position and orientation of the guest
@@ -183,7 +183,7 @@ class Complex(TopologyGraph):
 
         complex2 = stk.ConstructedMolecule(
             building_blocks=[host, guest],
-            topology_graph=stk.host_guest_complex.Complex(
+            topology_graph=stk.host_guest.Complex(
                 # Apply a rotation onto the guest molecule such that
                 # the vector returned by get_direction() has the same
                 # direction as [1, 1, 1].
@@ -327,7 +327,7 @@ class Complex(TopologyGraph):
 
     def __repr__(self):
         return (
-            f'host_guest_complex.Complex('
+            f'host_guest.Complex('
             f'guest_start={self._guest_start!r}, '
             f'guest_target={self._guest_target!r}, '
             f'displacement={self._displacement!r})'

@@ -34,9 +34,36 @@ def test_init(amine2, aldehyde2):
     assert polymer is not polymer4
 
 
-def test_get_identity_key(polymer, tmp_polymer):
+def test_get_identity_key(
+    polymer,
+    tmp_polymer,
+    amine2,
+    aldehyde3,
+    amine2_alt1
+):
     assert polymer is not tmp_polymer
     assert polymer.get_identity_key() == tmp_polymer.get_identity_key()
+
+    four_plus_six = stk.cage.FourPlusSix()
+    cage1 = stk.ConstructedMolecule(
+        building_blocks=[amine2, aldehyde3, amine2_alt1],
+        topology_graph=four_plus_six,
+        building_block_vertices={
+            aldehyde3: four_plus_six.vertices[:4],
+            amine2: four_plus_six.vertices[4:6],
+            amine2_alt1: four_plus_six.vertices[6:]
+        }
+    )
+    cage2 = stk.ConstructedMolecule(
+        building_blocks=[amine2, aldehyde3, amine2_alt1],
+        topology_graph=four_plus_six,
+        building_block_vertices={
+            aldehyde3: four_plus_six.vertices[:4],
+            amine2: four_plus_six.vertices[4:5],
+            amine2_alt1: four_plus_six.vertices[5:]
+        }
+    )
+    assert cage1.get_identity_key() != cage2.get_identity_key()
 
 
 def test_get_building_blocks(
