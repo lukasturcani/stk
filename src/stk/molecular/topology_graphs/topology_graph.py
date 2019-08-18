@@ -1108,6 +1108,23 @@ class TopologyGraph:
             mol.atoms.append(atom_clone)
         return atom_map
 
+    def _assign_func_groups_to_edges(self, mol, vertex, bb, bb_id):
+        atom_map = self._get_atom_map(mol, bb, bb_id)
+
+        # Create a map from each functional group in the
+        # building block to a clone of that functional group
+        # in the constructed molecule.
+        fg_map = {
+            fg: fg.clone(atom_map) for fg in bb.func_groups
+        }
+        mol.func_groups.extend(fg_map.values())
+
+        # Assign the functional groups in the contructed
+        # molecule to edges in the topology graph.
+        vertex.assign_func_groups_to_edges(bb, fg_map)
+
+        return atom_map, fg_map
+
     def _place_building_blocks_serial(self, mol, vertices, edges):
         bb_id = 0
 
@@ -1127,20 +1144,12 @@ class TopologyGraph:
                 mol._position_matrix.extend(
                     vertex.place_building_block(bb)
                 )
-                atom_map = self._get_atom_map(mol, bb, bb_id)
-
-                # Create a map from each functional group in the
-                # building block to a clone of that functional group
-                # in the constructed molecule.
-                fg_map = {
-                    fg: fg.clone(atom_map) for fg in bb.func_groups
-                }
-                mol.func_groups.extend(fg_map.values())
-
-                # Assign the functional groups in the contructed
-                # molecule to edges in the topology graph.
-                vertex.assign_func_groups_to_edges(bb, fg_map)
-
+                atom_map, fg_map = self._assign_func_groups_to_edges(
+                    mol=mol,
+                    vertex=vertex,
+                    bb=bb,
+                    bb_id=bb_id
+                )
                 # Perform additional, miscellaneous operations.
                 vertex.after_assign_func_groups_to_edges(
                     building_block=bb,
