@@ -69,9 +69,9 @@ class _CycleVertex(Vertex):
 
     """
 
-    def __init__(self, id, x, y, z, orientation):
+    def __init__(self, x, y, z, orientation):
         self._orientation = orientation
-        super().__init__(id, x, y, z)
+        super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         """
@@ -223,38 +223,26 @@ class NRotaxane(TopologyGraph):
         self._orientations = orientations
         self._n = n
 
-        vertices = [_AxleVertex(0, 0, 0, 0)]
+        vertices = [_AxleVertex(0, 0, 0)]
         threads = orientations * n
         distance = 1 / (len(threads)-1)
         for i, orientation in enumerate(threads):
             vertices.append(
                 _CycleVertex(
-                    id=i+1,
                     x=(i*distance) - 0.5,
                     y=0,
                     z=0,
                     orientation=orientation
                 )
             )
-        super().__init__(tuple(vertices), (), processes)
+        super().__init__(tuple(vertices), (), (), processes)
 
-    def _assign_building_blocks_to_vertices(
-        self,
-        mol,
-        building_blocks
-    ):
+    def assign_building_blocks_to_vertices(self, building_blocks):
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        Assignment is done by modifying
-        :attr:`.ConstructedMolecule.building_block_vertices`.
-
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` instance being
-            constructed.
-
         building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
@@ -265,7 +253,23 @@ class NRotaxane(TopologyGraph):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            Maps the `building_blocks`, to the
+            :class:`~.topologies.base.Vertex` objects in
+            :attr:`vertices` they are placed on during construction.
+            The :class:`dict` has the form
+
+            .. code-block:: python
+
+                building_block_vertices = {
+                    BuildingBlock(...): [Vertex(...), Vertex(...)],
+                    BuildingBlock(...): [
+                        Vertex(...),
+                        Vertex(...),
+                        Vertex(...),
+                    ]
+                    ConstructedMolecule(...): [Vertex(...)]
+                }
 
         """
 
@@ -274,10 +278,15 @@ class NRotaxane(TopologyGraph):
         bb_map = {
             letter: bb for letter, bb in zip(threads, cycles)
         }
-        mol.building_block_vertices[axle].append(self.vertices[0])
+        building_block_vertices = {}
+        building_block_vertices[axle] = self.vertices[0:1]
         for letter, vertex in zip(threads, self.vertices[1:]):
             bb = bb_map[letter]
-            mol.building_block_vertices[bb].append(vertex)
+            building_block_vertices[bb] = (
+                building_block_vertices.get(bb, [])
+            )
+            building_block_vertices[bb].append(vertex)
+        return building_block_vertices
 
     def _get_scale(self, mol):
         """

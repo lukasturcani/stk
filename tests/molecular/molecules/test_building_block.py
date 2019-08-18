@@ -802,7 +802,7 @@ def test_get_bonder_direction_vectors(tmp_amine4):
     for i, (id1, id2, v) in enumerate(dir_vectors):
         # Calculate the expected direction vector based on ids.
         d = stk.normalize_vector(np.array([id2]*3) - np.array([id1]*3))
-        assert np.allclose(d, v, atol=1e-8)
+        assert np.allclose(d, stk.normalize_vector(v), atol=1e-8)
     assert i == 5
 
     # Test explicitly setting fg_ids.
@@ -812,7 +812,7 @@ def test_get_bonder_direction_vectors(tmp_amine4):
     for i, (id1, id2, v) in enumerate(dir_vectors):
         # Calculate the expected direction vector based on ids.
         d = stk.normalize_vector(np.array([id2]*3) - np.array([id1]*3))
-        assert np.allclose(d, v, atol=1e-8)
+        assert np.allclose(d, stk.normalize_vector(v), atol=1e-8)
     assert i == 0
 
 
@@ -829,8 +829,9 @@ def test_get_centroid_centroid_direction_vector(tmp_amine4):
     coords[other_ids] = np.zeros((len(other_ids), 3))
     tmp_amine4.set_position_matrix(coords)
 
+    dir_vector = tmp_amine4.get_centroid_centroid_direction_vector()
     assert np.allclose(
-        a=tmp_amine4.get_centroid_centroid_direction_vector(),
+        a=stk.normalize_vector(dir_vector),
         b=[-1, 0, 0],
         atol=1e-8
     )
@@ -845,17 +846,15 @@ def test_get_centroid_centroid_direction_vector(tmp_amine4):
         fg_ids=fg_ids
     )
     assert np.allclose(
-        a=dir_vector,
+        a=stk.normalize_vector(dir_vector),
         b=[1, 0, 0],
         atol=1e-8
     )
 
 
-def test_is_identical(amine2, amine2_conf1, amine2_alt1):
-    assert amine2.is_identical(amine2_conf1)
-    assert amine2_conf1.is_identical(amine2)
-    assert not amine2.is_identical(amine2_alt1)
-    assert not amine2_conf1.is_identical(amine2_alt1)
+def test_get_identity_key(amine2, amine2_conf1, amine2_alt1):
+    assert amine2.get_identity_key() == amine2_conf1.get_identity_key()
+    assert amine2.get_identity_key() != amine2_alt1.get_identity_key()
 
 
 def test_dump_and_load(tmp_amine2):

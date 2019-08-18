@@ -9,6 +9,26 @@ if not os.path.exists(odir):
     os.mkdir(odir)
 
 
+def test_is_caching():
+    caching = stk.NullOptimizer(use_cache=True)
+    assert caching.is_caching()
+    not_caching = stk.NullOptimizer(use_cache=False)
+    assert not not_caching.is_caching()
+
+
+def test_add_to_cache(tmp_amine2):
+    mmff = stk.MMFF(use_cache=True)
+    mmff_energy = stk.MMFFEnergy()
+    init_energy = mmff_energy.get_energy(tmp_amine2)
+    mmff.add_to_cache(tmp_amine2)
+    mmff.optimize(tmp_amine2)
+    assert mmff_energy.get_energy(tmp_amine2) == init_energy
+
+    mmff2 = stk.MMFF(use_cache=True)
+    mmff2.optimize(tmp_amine2)
+    assert mmff_energy.get_energy(tmp_amine2) != init_energy
+
+
 def test_raising_optimizer(tmp_polymer):
     mmff = stk.MMFF()
     always_raiser = stk.RaisingOptimizer(
@@ -99,27 +119,22 @@ def test_cache_use(tmp_polymer):
     assert tmp_polymer in opt2._cache
 
 
-def test_cage_optimizer_sequence(tmp_cc3, tmp_cage):
+def test_cage_optimizer_sequence(tmp_opt_cc3, tmp_cc3):
     energy_calculator = stk.MMFFEnergy()
+    init_opt_cc3 = energy_calculator.get_energy(tmp_opt_cc3)
     init_cc3 = energy_calculator.get_energy(tmp_cc3)
-    init_cage = energy_calculator.get_energy(tmp_cage)
 
     mmff = stk.MMFF()
-    etkdg = stk.ETKDG()
+    sequence = stk.CageOptimizerSequence(mmff)
+    sequence.optimize(tmp_opt_cc3)
+    sequence.optimize(tmp_cc3)
 
-    # CC3 needs an optimizer with mmff only, because using etkdg will
-    # increase its energy.
-    sequence1 = stk.CageOptimizerSequence(mmff)
-    sequence1.optimize(tmp_cc3)
-    sequence2 = stk.CageOptimizerSequence(etkdg, mmff)
-    sequence2.optimize(tmp_cage)
-
-    # CC3 should have found all windows so energy should be lowered due
-    # to optimization.
-    assert energy_calculator.get_energy(tmp_cc3) < init_cc3
-    # Cage should have not found all windows so energy should be the
+    # opt_cc3 should have found all windows so energy should be lowered
+    # due to optimization.
+    assert energy_calculator.get_energy(tmp_opt_cc3) < init_opt_cc3
+    # cc3 should have not found all windows so energy should be the
     # same as if no optimization happened.
-    assert energy_calculator.get_energy(tmp_cage) == init_cage
+    assert energy_calculator.get_energy(tmp_cc3) == init_cc3
 
 
 def test_try_catch_optimizer(tmp_amine2):

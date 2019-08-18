@@ -332,12 +332,18 @@ class Population:
             for i, mol in enumerate(mols):
                 # If the molecule did not exist already, add it to the
                 # cache.
-                if mol._key not in ConstructedMolecule._cache:
-                    ConstructedMolecule._cache[mol._key] = mol
+                if (
+                    not ConstructedMolecule.has_cached_mol(
+                        identity_key=mol.get_identity_key()
+                    )
+                ):
+                    mol.update_cache()
                 # If the molecule did exist already, use the cached
                 # version.
                 else:
-                    mols[i] = ConstructedMolecule._cache[mol._key]
+                    mols[i] = ConstructedMolecule.get_cached_mol(
+                        identity_key=mol.get_identity_key()
+                    )
 
         p = cls(*mols)
         if not duplicates:
@@ -689,17 +695,15 @@ class Population:
         """
 
         pop = cls()
-
-        # Shuffle the sublists.
         if random_seed is not None:
             np.random.seed(random_seed)
 
+        # Shuffle the sublists.
         for db in building_blocks:
             np.random.shuffle(db)
 
         # Go through every possible constructed molecule.
         for *bbs, top in it.product(*building_blocks, topology_graphs):
-
             # Generate the random constructed molecule.
             mol = ConstructedMolecule(
                 building_blocks=bbs,
@@ -939,10 +943,10 @@ class Population:
         sorted_opt = sorted(optimized, key=lambda m: repr(m))
         sorted_pop = sorted(self, key=lambda m: repr(m))
         for old, new in zip(sorted_pop, sorted_opt):
-            assert old.is_identical(new)
+            assert old.get_identity_key() == new.get_identity_key()
             old.__dict__ = dict(vars(new))
-            if optimizer._use_cache:
-                optimizer._cache.add(old)
+            if optimizer.is_caching():
+                optimizer.add_to_cache(old)
 
     def _optimize_serial(self, optimizer):
         for member in self:

@@ -17,17 +17,17 @@ macromodel = pytest.mark.skipif(
     reason="Only run when explicitly asked.")
 
 
-outdir = 'macromodel_tests_output'
-if not os.path.exists(outdir):
-    os.mkdir(outdir)
+test_dir = 'macromodel_tests_output'
+if not os.path.exists(test_dir):
+    os.mkdir(test_dir)
 
 
 @macromodel
-def test_restricted_force_field(tmp_tetrahedron, macromodel_path):
+def test_restricted_force_field(tmp_four_plus_six, macromodel_path):
 
     mm_energy = stk.MacroModelEnergy(macromodel_path, force_field=16)
-    init_energy = mm_energy.get_energy(tmp_tetrahedron)
-    tmp_tetrahedron.write(join(outdir, 'rmm_ff_before.mol'))
+    init_energy = mm_energy.get_energy(tmp_four_plus_six)
+    tmp_four_plus_six.write(join(test_dir, 'rmm_ff_before.mol'))
 
     mm = stk.MacroModelForceField(
         macromodel_path=macromodel_path,
@@ -36,18 +36,18 @@ def test_restricted_force_field(tmp_tetrahedron, macromodel_path):
         minimum_gradient=1,
         force_field=16
     )
-    mm.optimize(tmp_tetrahedron)
-    tmp_tetrahedron.write(join(outdir, 'rmm_ff_after.mol'))
+    mm.optimize(tmp_four_plus_six)
+    tmp_four_plus_six.write(join(test_dir, 'rmm_ff_after.mol'))
 
-    assert mm_energy.get_energy(tmp_tetrahedron) < init_energy
+    assert mm_energy.get_energy(tmp_four_plus_six) < init_energy
 
 
 @macromodel
-def test_unrestricted_force_field(tmp_tetrahedron, macromodel_path):
+def test_unrestricted_force_field(tmp_four_plus_six, macromodel_path):
 
     mm_energy = stk.MacroModelEnergy(macromodel_path, force_field=16)
-    init_energy = mm_energy.get_energy(tmp_tetrahedron)
-    tmp_tetrahedron.write(join(outdir, 'umm_ff_before.mol'))
+    init_energy = mm_energy.get_energy(tmp_four_plus_six)
+    tmp_four_plus_six.write(join(test_dir, 'umm_ff_before.mol'))
 
     mm = stk.MacroModelForceField(
         macromodel_path=macromodel_path,
@@ -56,22 +56,22 @@ def test_unrestricted_force_field(tmp_tetrahedron, macromodel_path):
         minimum_gradient=1,
         force_field=16
     )
-    mm.optimize(tmp_tetrahedron)
-    tmp_tetrahedron.write(join(outdir, 'umm_ff_after.mol'))
+    mm.optimize(tmp_four_plus_six)
+    tmp_four_plus_six.write(join(test_dir, 'umm_ff_after.mol'))
 
-    assert mm_energy.get_energy(tmp_tetrahedron) < init_energy
+    assert mm_energy.get_energy(tmp_four_plus_six) < init_energy
 
 
 @macromodel
-def test_restricted_md(tmp_tetrahedron, macromodel_path):
+def test_restricted_md(tmp_four_plus_six, macromodel_path):
 
     mm_energy = stk.MacroModelEnergy(macromodel_path, force_field=16)
-    init_energy = mm_energy.get_energy(tmp_tetrahedron)
-    tmp_tetrahedron.write(join(outdir, 'rmm_md_before.mol'))
+    init_energy = mm_energy.get_energy(tmp_four_plus_six)
+    tmp_four_plus_six.write(join(test_dir, 'rmm_md_before.mol'))
 
     # Freeze one of the bonders.
-    bonder = tmp_tetrahedron.func_groups[0].bonders[0].id
-    rdkit_mol = tmp_tetrahedron.to_rdkit_mol()
+    bonder = tmp_four_plus_six.func_groups[0].bonders[0].id
+    rdkit_mol = tmp_four_plus_six.to_rdkit_mol()
     restricted_bonds = []
     for neighbor in rdkit_mol.GetAtomWithIdx(bonder).GetNeighbors():
         restricted_bonds.append(frozenset((bonder, neighbor.GetIdx())))
@@ -87,18 +87,18 @@ def test_restricted_md(tmp_tetrahedron, macromodel_path):
         force_field=16,
         restricted_bonds=restricted_bonds
     )
-    mm.optimize(tmp_tetrahedron)
-    tmp_tetrahedron.write(join(outdir, 'rmm_md_after.mol'))
+    mm.optimize(tmp_four_plus_six)
+    tmp_four_plus_six.write(join(test_dir, 'rmm_md_after.mol'))
 
-    assert mm_energy.get_energy(tmp_tetrahedron) < init_energy
+    assert mm_energy.get_energy(tmp_four_plus_six) < init_energy
 
 
 @macromodel
-def test_unrestricted_md(tmp_tetrahedron, macromodel_path):
+def test_unrestricted_md(tmp_four_plus_six, macromodel_path):
 
     mm_energy = stk.MacroModelEnergy(macromodel_path, force_field=16)
-    init_energy = mm_energy.get_energy(tmp_tetrahedron)
-    tmp_tetrahedron.write(join(outdir, 'umm_md_before.mol'))
+    init_energy = mm_energy.get_energy(tmp_four_plus_six)
+    tmp_four_plus_six.write(join(test_dir, 'umm_md_before.mol'))
 
     mm = stk.MacroModelMD(
         macromodel_path=macromodel_path,
@@ -110,10 +110,10 @@ def test_unrestricted_md(tmp_tetrahedron, macromodel_path):
         time_step=0.1,
         force_field=16
     )
-    mm.optimize(tmp_tetrahedron)
-    tmp_tetrahedron.write(join(outdir, 'umm_md_after.mol'))
+    mm.optimize(tmp_four_plus_six)
+    tmp_four_plus_six.write(join(test_dir, 'umm_md_after.mol'))
 
-    assert mm_energy.get_energy(tmp_tetrahedron) < init_energy
+    assert mm_energy.get_energy(tmp_four_plus_six) < init_energy
 
 
 @macromodel
@@ -136,7 +136,7 @@ def test_forcefield_com_exceptions():
         )
 
 
-def test_md_com_exceptions(tmp_cc3):
+def test_md_com_exceptions(amine2):
     with pytest.raises(stk.MacroModelInputError):
         mm = stk.MacroModelMD(
             macromodel_path='dummy_path',
@@ -173,16 +173,14 @@ def test_md_com_exceptions(tmp_cc3):
             minimum_gradient=0.00001
         )
 
-    tmp_cc3._file = join(outdir, 'com_test.mol')
-
     mm = stk.MacroModelMD(
         macromodel_path='dummy_path',
         simulation_time=100000,
         eq_time=100000
     )
 
-    mm._generate_com(tmp_cc3)
-    with open(join(outdir, 'com_test.com'), 'r') as o:
+    mm._generate_com(amine2, join(test_dir, 'com_test'))
+    with open(join(test_dir, 'com_test.com'), 'r') as o:
         comfile = o.read().splitlines()
         expect1 = (
             ' MDYN       0      0      0      0     1.0000 -10'

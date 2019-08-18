@@ -29,9 +29,9 @@ class TwoPlusThree(Cage):
         _CageVertex(0, 0, 1),
         _CageVertex(0, 0, -1),
 
-        _CageVertex(-1, -0.5*np.sqrt(3), 0),
-        _CageVertex(1, -0.5*np.sqrt(3), 0),
-        _CageVertex(0, 0.5*np.sqrt(3), 0)
+        _CageVertex(-1, -0.5*np.sqrt(3), 0, False),
+        _CageVertex(1, -0.5*np.sqrt(3), 0, False),
+        _CageVertex(0, 0.5*np.sqrt(3), 0, False)
 
     )
 
@@ -127,10 +127,10 @@ class FourPlusSix2(Cage):
         _CageVertex(1, 0, -1),
         _CageVertex(-1, 0, -1),
 
-        _CageVertex(0, -1, 1),
-        _CageVertex(0, 1, 1),
-        _CageVertex(0, -1, -1),
-        _CageVertex(0, 1, -1)
+        _CageVertex(0, -1, 1, False),
+        _CageVertex(0, 1, 1, False),
+        _CageVertex(0, -1, -1, False),
+        _CageVertex(0, 1, -1, False)
     )
 
     vertices = (

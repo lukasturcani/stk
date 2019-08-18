@@ -90,6 +90,36 @@ class Optimizer:
         cls.optimize = _add_cache_use(cls.optimize)
         return super().__init_subclass__(**kwargs)
 
+    def is_caching(self):
+        """
+        ``True`` if the optimizer has caching turned on.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if the optimizer has caching turned on.
+
+        """
+
+        return self._use_cache
+
+    def add_to_cache(self, mol):
+        """
+        Add a molecule to the cache.
+
+        Parameter
+        ---------
+        mol : :class:`.Molecule`
+            The molecule to be added to the cache.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self._cache.add(mol)
+
     def optimize(self, mol):
         """
         Optimize `mol`.

@@ -30,10 +30,10 @@ class TwoPlusFour(Cage):
         _CageVertex(0, 0, -1),
         _CageVertex(0, 0, 1),
 
-        _CageVertex(2, 0, 0),
-        _CageVertex(-2, 0, 0),
-        _CageVertex(0, 2, 0),
-        _CageVertex(0, -2, 0)
+        _CageVertex(2, 0, 0, False),
+        _CageVertex(-2, 0, 0, False),
+        _CageVertex(0, 2, 0, False),
+        _CageVertex(0, -2, 0, False)
     )
 
     edges = (
@@ -69,18 +69,18 @@ class ThreePlusSix(Cage):
 
     _x = 1
     vertices = (
-        _CageVertex(-2*_x, -_x*np.sqrt(3), 0),
-        _CageVertex(2*_x, -_x*np.sqrt(3), 0),
-        _CageVertex(0, _x*np.sqrt(3), 0),
+        _CageVertex(-2*_x, -_x*np.sqrt(3), 0, False),
+        _CageVertex(2*_x, -_x*np.sqrt(3), 0, False),
+        _CageVertex(0, _x*np.sqrt(3), 0, False),
 
-        _CageVertex(0, -2*_x*np.sqrt(3), _x),
-        _CageVertex(0, -2*_x*np.sqrt(3), -_x),
+        _CageVertex(0, -2*_x*np.sqrt(3), _x, False),
+        _CageVertex(0, -2*_x*np.sqrt(3), -_x, False),
 
-        _CageVertex(2*_x, 0, _x),
-        _CageVertex(2*_x, 0, -_x),
+        _CageVertex(2*_x, 0, _x, False),
+        _CageVertex(2*_x, 0, -_x, False),
 
-        _CageVertex(-2*_x, 0, -_x),
-        _CageVertex(-2*_x, 0, -_x),
+        _CageVertex(-2*_x, 0, _x, False),
+        _CageVertex(-2*_x, 0, -_x, False),
     )
 
     edges = (
@@ -125,23 +125,23 @@ class FourPlusEight(Cage):
     """
 
     vertices = (
-        _CageVertex(-1, -1, 0),
-        _CageVertex(-1, 1, 0),
+        _CageVertex(-1, -1, 0, False),
+        _CageVertex(-1, 1, 0, False),
 
-        _CageVertex(1, -1, 0),
-        _CageVertex(1, 1, 0),
+        _CageVertex(1, -1, 0, False),
+        _CageVertex(1, 1, 0, False),
 
-        _CageVertex(-2, 0, 1),
-        _CageVertex(-2, 0, -1),
+        _CageVertex(-2, 0, 1, False),
+        _CageVertex(-2, 0, -1, False),
 
-        _CageVertex(0, 2, 1),
-        _CageVertex(0, 2, -1),
+        _CageVertex(0, 2, 1, False),
+        _CageVertex(0, 2, -1, False),
 
-        _CageVertex(0, -2, 1),
-        _CageVertex(0, -2, -1),
+        _CageVertex(0, -2, 1, False),
+        _CageVertex(0, -2, -1, False),
 
-        _CageVertex(2, 0, 1),
-        _CageVertex(2, 0, -1)
+        _CageVertex(2, 0, 1, False),
+        _CageVertex(2, 0, -1, False)
 
     )
 
@@ -197,27 +197,27 @@ class FivePlusTen(Cage):
     _s2 = np.sin(4*np.pi/5)
 
     vertices = (
-        _CageVertex(0, 1, 0),
-        _CageVertex(_s1, _c1, 0),
-        _CageVertex(_s2, -_c2, 0),
+        _CageVertex(0, 1, 0, False),
+        _CageVertex(_s1, _c1, 0, False),
+        _CageVertex(_s2, -_c2, 0, False),
 
-        _CageVertex(-_s2, -_c2, 0),
-        _CageVertex(-_s1, _c1, 0),
+        _CageVertex(-_s2, -_c2, 0, False),
+        _CageVertex(-_s1, _c1, 0, False),
 
-        _CageVertex(_s1, 1+_c1, 0.5),
-        _CageVertex(_s1, 1+_c1, -0.5),
+        _CageVertex(_s1, 1+_c1, 0.5, False),
+        _CageVertex(_s1, 1+_c1, -0.5, False),
 
-        _CageVertex(_s1+_s2, _c1-_c2, 0.5),
-        _CageVertex(_s1+_s2, _c1-_c2, -0.5),
+        _CageVertex(_s1+_s2, _c1-_c2, 0.5, False),
+        _CageVertex(_s1+_s2, _c1-_c2, -0.5, False),
 
-        _CageVertex(0, -2*_c2, 0.5),
-        _CageVertex(0, -2*_c2, -0.5),
+        _CageVertex(0, -2*_c2, 0.5, False),
+        _CageVertex(0, -2*_c2, -0.5, False),
 
-        _CageVertex(-_s2-_s1, -_c2+_c1, 0.5),
-        _CageVertex(-_s2-_s1, -_c2+_c1, -0.5),
+        _CageVertex(-_s2-_s1, -_c2+_c1, 0.5, False),
+        _CageVertex(-_s2-_s1, -_c2+_c1, -0.5, False),
 
-        _CageVertex(-_s1, 1+_c1, 0.5),
-        _CageVertex(-_s1, 1+_c1, -0.5),
+        _CageVertex(-_s1, 1+_c1, 0.5, False),
+        _CageVertex(-_s1, 1+_c1, -0.5, False),
 
     )
 
@@ -242,9 +242,9 @@ class FivePlusTen(Cage):
         Edge(vertices[12], vertices[3]),
         Edge(vertices[12], vertices[4]),
 
-        Edge(vertices[13], vertices[5]),
+        Edge(vertices[13], vertices[4]),
         Edge(vertices[13], vertices[0]),
-        Edge(vertices[14], vertices[5]),
+        Edge(vertices[14], vertices[4]),
         Edge(vertices[14], vertices[0])
 
     )

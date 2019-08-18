@@ -57,12 +57,13 @@ def make_reactor():
         mol.building_block_counter = Counter()
         mol._position_matrix = []
         mol.building_block_vertices = defaultdict(list)
-        mol.topology_graph._assign_building_blocks_to_vertices(
-            mol=mol,
-            building_blocks=building_blocks
+        mol.building_block_vertices = (
+            topology_graph.assign_building_blocks_to_vertices(
+                building_blocks=building_blocks
+            )
         )
-        vertex_clones = mol.topology_graph._clone_vertices()
-        edge_clones = mol.topology_graph._clone_edges(vertex_clones)
+        vertex_clones = mol.topology_graph._clone_vertices(mol, 1)
+        edge_clones = mol.topology_graph._clone_edges(vertex_clones, 1)
         mol._edge_clones = edge_clones
 
         mol.topology_graph._prepare(mol)

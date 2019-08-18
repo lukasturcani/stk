@@ -189,9 +189,8 @@ class MAEExtractor:
 
     """
 
-    def __init__(self, file, n=1):
-        name, ext = os.path.splitext(file)
-        self.maegz_path = name + '-out.maegz'
+    def __init__(self, run_name, n=1):
+        self.maegz_path = f'{run_name}-out.maegz'
         self.maegz_to_mae()
         self.extract_conformers(n)
 
@@ -762,12 +761,11 @@ def remake(mol):
 
     """
 
-    rdkit.Kekulize(mol)
     emol = rdkit.EditableMol(rdkit.Mol())
-    for a in mol.GetAtoms():
-        new_atom = rdkit.Atom(a.GetAtomicNum())
-        new_atom.SetFormalCharge(a.GetFormalCharge())
-        emol.AddAtom(new_atom)
+    for atom in mol.GetAtoms():
+        new = rdkit.Atom(atom.GetAtomicNum())
+        new.SetFormalCharge(atom.GetFormalCharge())
+        emol.AddAtom(new)
 
     for bond in mol.GetBonds():
         emol.AddBond(
@@ -777,15 +775,19 @@ def remake(mol):
         )
 
     m = emol.GetMol()
-    if mol.GetConformers():
-        m.AddConformer(rdkit.Conformer(mol.GetConformer()))
-
-    for a in m.GetAtoms():
-        a.UpdatePropertyCache()
-
-    rdkit.GetSSSR(m)
-
+    m.AddConformer(mol.GetConformer())
     return m
+
+
+def orthogonal_vector(vector):
+    ortho = [0, 0, 0]
+    for m, val in enumerate(vector):
+        if not np.allclose(val, 0, atol=1e-8):
+            n = (m+1) % 3
+            break
+    ortho[n] = vector[m]
+    ortho[m] = -vector[n]
+    return ortho
 
 
 def rotation_matrix(vector1, vector2):
@@ -820,30 +822,26 @@ def rotation_matrix(vector1, vector2):
     vector2 = normalize_vector(vector2)
 
     # Hande the case where the input and output vectors are equal.
-    if np.array_equal(vector1, vector2):
+    if np.allclose(vector1, vector2, atol=1e-8):
         return np.identity(3)
 
     # Handle the case where the rotation is 180 degrees.
-    if np.array_equal(vector1, np.multiply(vector2, -1)):
-        # Get a vector orthogonal to `vector1` by finding the smallest
-        # component of `vector1` and making that a vector.
-        ortho = [0, 0, 0]
-        ortho[list(vector1).index(min(abs(vector1)))] = 1
-        axis = np.cross(vector1, ortho)
-        return rotation_matrix_arbitrary_axis(np.pi, axis)
+    if np.allclose(vector1, np.multiply(vector2, -1), atol=1e-8):
+        return rotation_matrix_arbitrary_axis(
+            angle=np.pi,
+            axis=orthogonal_vector(vector1)
+        )
 
     v = np.cross(vector1, vector2)
-
-    vx = np.array([[0, -v[2], v[1]],
-                   [v[2], 0, -v[0]],
-                   [-v[1], v[0], 0]])
-
+    vx = np.array([
+        [0, -v[2], v[1]],
+        [v[2], 0, -v[0]],
+        [-v[1], v[0], 0]
+    ])
     s = np.linalg.norm(v)
     c = np.dot(vector1, vector2)
     i = np.identity(3)
-
     mult_factor = (1-c)/np.square(s)
-
     return i + vx + np.multiply(np.dot(vx, vx), mult_factor)
 
 
@@ -1053,10 +1051,10 @@ def vector_angle(vector1, vector2):
     # This if statement prevents returns of NaN due to floating point
     # incurracy.
     term = numerator/denominator
-    if np.isclose(term, 1, atol=1e-8):
+    if np.isclose(term, 1, atol=1e-12):
         return 0.0
-    if np.isclose(term, -1, atol=1e-8):
-        return 2*np.pi
+    if np.isclose(term, -1, atol=1e-12):
+        return np.pi
     return np.arccos(term)
 
 

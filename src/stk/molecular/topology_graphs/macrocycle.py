@@ -28,16 +28,12 @@ class _CycleVertex(Vertex):
 
     """
 
-    def __init__(self, id, x, y, z, orientation, angle):
+    def __init__(self, x, y, z, orientation, angle):
         """
         Initialize a :class:`.LinearVertex`.
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the vertex. This should be its index in
-            :attr:`TopologyGraph.vertices`.
-
         x : :class:`float`
             The x coordinate.
 
@@ -60,7 +56,7 @@ class _CycleVertex(Vertex):
 
         self._orientation = orientation
         self._angle = angle
-        super().__init__(id, x, y, z)
+        super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         """
@@ -257,7 +253,6 @@ class Macrocycle(TopologyGraph):
         for i, orientation in enumerate(chain):
             theta = i*angle_diff
             v = _CycleVertex(
-                id=i,
                 x=np.cos(theta),
                 y=np.sin(theta),
                 z=0,
@@ -270,25 +265,14 @@ class Macrocycle(TopologyGraph):
                 edges.append(Edge(vertices[i-1], vertices[i]))
 
         edges.append(Edge(vertices[0], vertices[-1]))
-        super().__init__(tuple(vertices), tuple(edges), processes)
+        super().__init__(tuple(vertices), tuple(edges), (), processes)
 
-    def _assign_building_blocks_to_vertices(
-        self,
-        mol,
-        building_blocks
-    ):
+    def assign_building_blocks_to_vertices(self, building_blocks):
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        Assignment is done by modifying
-        :attr:`.ConstructedMolecule.building_block_vertices`.
-
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` instance being
-            constructed.
-
         building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
@@ -299,7 +283,23 @@ class Macrocycle(TopologyGraph):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            Maps the `building_blocks`, to the
+            :class:`~.topologies.base.Vertex` objects in
+            :attr:`vertices` they are placed on during construction.
+            The :class:`dict` has the form
+
+            .. code-block:: python
+
+                building_block_vertices = {
+                    BuildingBlock(...): [Vertex(...), Vertex(...)],
+                    BuildingBlock(...): [
+                        Vertex(...),
+                        Vertex(...),
+                        Vertex(...),
+                    ]
+                    ConstructedMolecule(...): [Vertex(...)]
+                }
 
         """
 
@@ -307,9 +307,14 @@ class Macrocycle(TopologyGraph):
         bb_map = {
             letter: bb for letter, bb in zip(polymer, building_blocks)
         }
+        building_block_vertices = {}
         for letter, vertex in zip(polymer, self.vertices):
             bb = bb_map[letter]
-            mol.building_block_vertices[bb].append(vertex)
+            building_block_vertices[bb] = (
+                building_block_vertices.get(bb, [])
+            )
+            building_block_vertices[bb].append(vertex)
+        return building_block_vertices
 
     def _get_scale(self, mol):
         """

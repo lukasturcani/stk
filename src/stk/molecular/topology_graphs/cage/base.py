@@ -1,5 +1,4 @@
 import numpy as np
-from collections import defaultdict
 
 from ..topology_graph import TopologyGraph, Vertex
 from ....utilities import vector_angle
@@ -26,7 +25,7 @@ class _CageVertex(Vertex):
 
     """
 
-    def __init__(self, x, y, z):
+    def __init__(self, x, y, z, use_bonder_placement=True):
         """
         Initialize a :class:`_CageVertex`.
 
@@ -41,16 +40,20 @@ class _CageVertex(Vertex):
         z : :class:`float`
             The z coordinate.
 
+        use_bonder_placement : :class:`bool`, optional
+            If ``True``the position of the vertex will be updated such
+            that it is in the middle of the neighboring bonder
+            centroids, rather than in the middle of the neighboring
+            vertices.
+
         """
 
         # _neighbor_positions holds the bonder centroids of functional
         # groups on neighbor vertices connected to this vertex.
         self._neighbor_positions = []
         self.aligner_edge = None
-        # id will be set automatically by Cage. This is because
-        # _CageVertex is defined manually in a subclass of Cage
-        # and writing the id for every vertex would be a pain.
-        super().__init__(None, x, y, z)
+        self._use_bonder_placement = use_bonder_placement
+        super().__init__(x, y, z)
 
     @classmethod
     def init_at_center(cls, *vertices):
@@ -92,9 +95,38 @@ class _CageVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone.aligner_edge = self.aligner_edge
+        if self.aligner_edge is None:
+            clone.aligner_edge = None
+        else:
+            clone.aligner_edge = self.aligner_edge.clone(
+                add_to_vertices=False
+            )
+        clone._use_bonder_placement = self._use_bonder_placement
         clone._neighbor_positions = list(self._neighbor_positions)
         return clone
+
+    def apply_scale(self, scale):
+        """
+        Scale the position by `scale`.
+
+        Parameters
+        ----------
+        scale : :class:`float` or :class:`list`of :class:`float`
+            The value by which the position of the :class:`Vertex` is
+            scaled. Can be a single number if all axes are scaled by
+            the same amount or a :class:`list` of three numbers if
+            each axis is scaled by a different value.
+
+        Returns
+        -------
+        :class:`Vertex`
+            The vertex is returned.
+
+        """
+
+        self._position *= scale
+        self.aligner_edge.apply_scale(scale)
+        return self
 
     def place_building_block(self, building_block):
         """
@@ -114,7 +146,10 @@ class _CageVertex(Vertex):
 
         """
 
-        if len(self._neighbor_positions) == len(self.edges):
+        if (
+            self._use_bonder_placement
+            and len(self._neighbor_positions) == len(self.edges)
+        ):
             self._update_position()
 
         if len(building_block.func_groups) == 2:
@@ -246,33 +281,64 @@ class _CageVertex(Vertex):
         """
 
         if len(building_block.func_groups) == 2:
-            r = self._assign_func_groups_to_linear_edges(
+            return self._assign_func_groups_to_linear_edges(
                 building_block=building_block,
                 fg_map=fg_map
             )
-        else:
-            r = self._assign_func_groups_to_nonlinear_edges(
+        return self._assign_func_groups_to_nonlinear_edges(
                 building_block=building_block,
                 fg_map=fg_map
             )
+
+    def after_assign_func_groups_to_edges(
+        self,
+        building_block,
+        fg_map
+    ):
+        """
+        Perform operations after functional groups have been assigned.
+
+        This method is always executed serially. It is often useful
+        when data needs to be transferred between vertices, which
+        have been processed independently, in parallel.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block molecule which is needs to have
+            functional groups assigned to edges.
+
+        fg_map : :class:`dict`
+            A mapping from :class:`.FunctionalGroup` instances in
+            `building_block` to the equivalent
+            :class:`.FunctionalGroup` instances in the molecule being
+            constructed.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
 
         bb_fgs = set(fg_map.values())
-
         for edge in self.edges:
-            for vertex in edge.vertices:
-                if vertex is self:
+            for func_group in edge.get_func_groups():
+                if func_group not in bb_fgs:
                     continue
 
-                for func_group in edge.get_func_groups():
-                    if func_group not in bb_fgs:
+                bonder_position = self._get_molecule_centroid(
+                    atom_ids=func_group.get_bonder_ids()
+                )
+                for vertex in edge.vertices:
+                    if vertex is self:
                         continue
 
-                    vertex._neighbor_positions.append(
-                        self._get_molecule_centroid(
-                            atom_ids=func_group.get_bonder_ids()
-                        )
-                    )
-        return r
+                    vertex._neighbor_positions.append(bonder_position)
+
+        return super().after_assign_func_groups_to_edges(
+            building_block=building_block,
+            fg_map=fg_map
+        )
 
     def _assign_func_groups_to_linear_edges(
         self,
@@ -324,7 +390,6 @@ class _CageVertex(Vertex):
             fg0_direction,
             building_block.get_bonder_plane_normal()
         )
-
         func_groups = sorted(
             building_block.func_groups,
             key=self._get_func_group_angle(
@@ -334,14 +399,7 @@ class _CageVertex(Vertex):
                 axis=axis
             )
         )
-        assert func_groups[0] is building_block.func_groups[0]
-
         edges = sorted(self.edges, key=self._get_edge_angle(axis))
-        aligner_first = all(
-            edges[0].get_position() == self.aligner_edge.get_position()
-        )
-        assert aligner_first
-
         for edge, func_group in zip(edges, func_groups):
             edge.assign_func_group(fg_map[func_group])
 
@@ -391,10 +449,14 @@ class _CageVertex(Vertex):
 
     def __str__(self):
         x, y, z = self._position
+        if self.aligner_edge is None:
+            aligner_edge = None
+        else:
+            aligner_edge = self.edges.index(self.aligner_edge)
         return (
             f'Vertex(id={self.id}, '
             f'position={[x, y, z]}, '
-            f'aligner_edge={self.edges.index(self.aligner_edge)})'
+            f'aligner_edge={aligner_edge})'
         )
 
 
@@ -537,50 +599,47 @@ class Cage(TopologyGraph):
         for v, e in vertex_alignments.items():
             v = self.vertices[v] if isinstance(v, int) else v
             e = v.edges[e] if isinstance(e, int) else e
+            _vertex_alignments[v] = e
         vertex_alignments = _vertex_alignments
 
         vertex_clones = {}
         for vertex in self.vertices:
-            vertex.aligner_edge = vertex_alignments.get(
+            clone = vertex.clone(clear_edges=True)
+            clone.aligner_edge = vertex_alignments.get(
                 vertex,
                 vertex.edges[0]
             )
-            clone = vertex.clone(clear_edges=True)
             vertex_clones[vertex] = clone
 
         edge_clones = {}
         for edge in self.edges:
             edge_clones[edge] = edge.clone(vertex_clones)
 
-        for vertex in vertex_clones.values():
+        vertices = tuple(vertex_clones.values())
+        for vertex in vertices:
             vertex.aligner_edge = edge_clones[vertex.aligner_edge]
 
+        vertex_types = sorted(
+            set(len(v.edges) for v in self.vertices),
+            reverse=True
+        )
         super().__init__(
-            vertices=tuple(vertex_clones.values()),
+            vertices=vertices,
             edges=tuple(edge_clones.values()),
+            construction_stages=tuple(
+                lambda vertex, vertex_type=vt:
+                    len(vertex.edges) == vertex_type
+                for vt in vertex_types
+            ),
             processes=processes
         )
 
-    def _assign_building_blocks_to_vertices(
-        self,
-        mol,
-        building_blocks
-    ):
+    def assign_building_blocks_to_vertices(self, building_blocks):
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        This method will assign a random building block with the
-        correct amount of functional groups to each vertex.
-
-        Assignment is done by modifying
-        :attr:`.ConstructedMolecule.building_block_vertices`.
-
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` instance being
-            constructed.
-
         building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
@@ -591,17 +650,51 @@ class Cage(TopologyGraph):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            Maps the `building_blocks`, to the
+            :class:`~.topologies.base.Vertex` objects in
+            :attr:`vertices` they are placed on during construction.
+            The :class:`dict` has the form
+
+            .. code-block:: python
+
+                building_block_vertices = {
+                    BuildingBlock(...): [Vertex(...), Vertex(...)],
+                    BuildingBlock(...): [
+                        Vertex(...),
+                        Vertex(...),
+                        Vertex(...),
+                    ]
+                    ConstructedMolecule(...): [Vertex(...)]
+                }
+
+        Raises
+        ------
+        :class:`ValueError`
+            If there is more than one building with a given number
+            of functional groups.
 
         """
 
-        bb_by_degree = defaultdict(list)
+        bb_by_degree = {}
         for bb in building_blocks:
-            bb_by_degree[len(bb.func_groups)].append(bb)
+            num_fgs = len(bb.func_groups)
+            if num_fgs in bb_by_degree:
+                raise ValueError(
+                    'If there are multiple building blocks with the '
+                    'same number of functional groups, '
+                    'building_block_vertices must be set explicitly.'
+                )
+            bb_by_degree[num_fgs] = bb
 
+        building_block_vertices = {}
         for vertex in self.vertices:
-            bb = np.random.choice(bb_by_degree[len(vertex.edges)])
-            mol.building_block_vertices[bb].append(vertex)
+            bb = bb_by_degree[len(vertex.edges)]
+            building_block_vertices[bb] = (
+                building_block_vertices.get(bb, [])
+            )
+            building_block_vertices[bb].append(vertex)
+        return building_block_vertices
 
     def _prepare(self, mol):
         """
@@ -667,7 +760,6 @@ class Cage(TopologyGraph):
             f'{v.id}: {v.edges.index(v.aligner_edge)}'
             for v in self.vertices
         )
-
         return (
             f'cage.{self.__class__.__name__}('
             f'vertex_alignments={{{vertex_alignments}}})'

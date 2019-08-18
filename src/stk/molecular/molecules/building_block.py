@@ -19,7 +19,7 @@ from .. import bonds
 from ..bonds import Bond
 from .molecule import Molecule
 from ..functional_groups import fg_types
-from ...utilities import normalize_vector, vector_angle, dedupe
+from ...utilities import vector_angle, dedupe, remake
 
 
 logger = logging.getLogger(__name__)
@@ -106,12 +106,22 @@ class BuildingBlock(Molecule):
 
         """
 
+        # This method does not get called, See _construct().
+        raise RuntimeError('This method should not be getting called.')
+
+    @classmethod
+    def _construct(
+        cls,
+        smiles,
+        functional_groups=None,
+        random_seed=4,
+        use_cache=False
+    ):
+        obj = cls.__new__(cls)
         if functional_groups is None:
             functional_groups = ()
 
         mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
-        rdkit.Kekulize(mol)
-
         params = rdkit.ETKDGv2()
         params.randomSeed = random_seed
         for i in range(100):
@@ -129,10 +139,20 @@ class BuildingBlock(Molecule):
             )
             logger.warning(msg)
 
-        return self._init_from_rdkit_mol(
+        identity_key = cls._get_identity_key_from_rdkit_mol(
             mol=mol,
             functional_groups=functional_groups
         )
+        if use_cache and identity_key in cls._cache:
+            return cls._cache[identity_key]
+        obj._init_from_rdkit_mol(
+            mol=mol,
+            functional_groups=functional_groups,
+            identity_key=identity_key
+        )
+        if use_cache:
+            cls._cache[identity_key] = obj
+        return obj
 
     @classmethod
     def init_from_file(
@@ -179,8 +199,11 @@ class BuildingBlock(Molecule):
                 raise ValueError(
                     f'Unable to initialize from "{ext}" files.'
                 )
-            mol = cls._init_funcs[ext](path)
-            rdkit.Kekulize(mol)
+            # This remake needs to be here because molecules loaded
+            # with rdkit often have issues, because rdkit tries to do
+            # bits of structural analysis like stereocenters. remake
+            # gets rid of all this problematic metadata.
+            mol = remake(cls._init_funcs[ext](path))
 
         return cls.init_from_rdkit_mol(
             mol=mol,
@@ -283,16 +306,19 @@ class BuildingBlock(Molecule):
 
         """
 
-        key = cls._get_key_from_rdkit_mol(mol, functional_groups)
+        key = cls._get_identity_key_from_rdkit_mol(
+            mol=mol,
+            functional_groups=functional_groups
+        )
         if use_cache and key in cls._cache:
             return cls._cache[key]
 
         bb = cls.__new__(cls)
-        bb._key = key
         cls._init_from_rdkit_mol(
             self=bb,
             mol=mol,
-            functional_groups=functional_groups
+            functional_groups=functional_groups,
+            identity_key=key
         )
 
         if use_cache:
@@ -300,7 +326,12 @@ class BuildingBlock(Molecule):
 
         return bb
 
-    def _init_from_rdkit_mol(self, mol, functional_groups):
+    def _init_from_rdkit_mol(
+        self,
+        mol,
+        functional_groups,
+        identity_key
+    ):
         """
         Initialize from an :mod:`rdkit` molecule.
 
@@ -313,6 +344,9 @@ class BuildingBlock(Molecule):
             The names of the functional group types which are to be
             added to :attr:`func_groups`. If ``None`, then no
             functional groups are added.
+
+        identity_key : :class:`tuple`
+            The identity key of the molecule.
 
         Returns
         -------
@@ -337,7 +371,7 @@ class BuildingBlock(Molecule):
         )
         position_matrix = mol.GetConformer().GetPositions()
 
-        super().__init__(atoms, bonds, position_matrix)
+        super().__init__(atoms, bonds, position_matrix, identity_key)
 
         fg_makers = (fg_types[name] for name in functional_groups)
         self.func_groups = tuple(
@@ -372,11 +406,15 @@ class BuildingBlock(Molecule):
         """
 
         d = dict(mol_dict)
+        identity_key = eval(d.pop('identity_key'))
+        if use_cache and identity_key in cls._cache:
+            return cls._cache[identity_key]
+
         d.pop('class')
         functional_groups = d.pop('func_groups')
 
         obj = cls.__new__(cls)
-
+        obj._identity_key = identity_key
         obj._position_matrix = np.array(d.pop('position_matrix')).T
         # If the cache is not being used, make sure to update all the
         # atoms and attributes to those in the dict.
@@ -392,27 +430,12 @@ class BuildingBlock(Molecule):
             for fg_maker in fg_makers
             for func_group in fg_maker.get_functional_groups(obj)
         )
-
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
 
-        rdkit_mol = obj.to_rdkit_mol()
-        obj._key = cls._get_key(
-            self=obj,
-            smiles=rdkit.MolToSmiles(rdkit_mol),
-            functional_groups=functional_groups,
-            random_seed=None,
-            use_cache=None
-        )
-
-        if not use_cache:
-            return obj
-        else:
-            if obj._key in cls._cache:
-                return cls._cache[obj._key]
-            else:
-                cls._cache[obj._key] = obj
-                return obj
+        if use_cache:
+            cls._cache[identity_key] = obj
+        return obj
 
     def get_bonder_ids(self, fg_ids=None):
         """
@@ -521,9 +544,7 @@ class BuildingBlock(Molecule):
         centroid = self.get_centroid(
             atom_ids=self.func_groups[fg_ids[0]].get_bonder_ids()
         )
-        normal = self.get_bonder_plane_normal(
-            fg_ids=fg_ids
-        )
+        normal = self.get_bonder_plane_normal(fg_ids=fg_ids)
         d = np.sum(normal * centroid)
         return np.append(normal, d)
 
@@ -582,7 +603,11 @@ class BuildingBlock(Molecule):
         cc_vector = self.get_centroid_centroid_direction_vector(
             fg_ids=fg_ids
         )
-        if vector_angle(normal, cc_vector) > np.pi/2:
+        if (
+            # vector_angle is NaN if cc_vector is [0, 0, 0].
+            not np.allclose(cc_vector, [0, 0, 0], atol=1e-5)
+            and vector_angle(normal, cc_vector) > np.pi/2
+        ):
             normal *= -1
         return normal
 
@@ -667,7 +692,7 @@ class BuildingBlock(Molecule):
         )
         pairs = it.combinations(iterable=centroids, r=2)
         for (id1, c1), (id2, c2) in pairs:
-            yield id2, id1, normalize_vector(c1-c2)
+            yield id2, id1, c1-c2
 
     def get_centroid_centroid_direction_vector(
         self,
@@ -690,8 +715,8 @@ class BuildingBlock(Molecule):
         Returns
         -------
         :class:`numpy.ndarray`
-            The normalized direction vector running from the centroid
-            of the bonder atoms to the molecular centroid.
+            The vector running from the centroid of the bonder atoms to
+            the molecular centroid.
 
         """
 
@@ -704,24 +729,7 @@ class BuildingBlock(Molecule):
         bonder_centroid = self.get_centroid(
             atom_ids=self.get_bonder_ids(fg_ids=fg_ids)
         )
-        centroid = self.get_centroid()
-        # If the bonder centroid and centroid are in the same position,
-        # the centroid - centroid vector should be orthogonal to the
-        # bonder direction vector.
-        if np.allclose(centroid, bonder_centroid, 1e-5):
-            *_, bvec = next(self.get_bonder_direction_vectors(
-                fg_ids=fg_ids
-            ))
-            # Construct a secondary vector by finding the minimum
-            # component of bvec and setting it to 0.
-            vec2 = list(bvec)
-            minc = min(vec2)
-            vec2[vec2.index(minc)] = 0 if abs(minc) >= 1e-5 else 1
-            # Get a vector orthogonal to bvec and vec2.
-            return normalize_vector(np.cross(bvec, vec2))
-
-        else:
-            return normalize_vector(centroid - bonder_centroid)
+        return self.get_centroid() - bonder_centroid
 
     def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
         """
@@ -763,7 +771,8 @@ class BuildingBlock(Molecule):
             'func_groups': fgs,
             'position_matrix': self.get_position_matrix().tolist(),
             'atoms': repr(self.atoms),
-            'bonds': repr(bonds)
+            'bonds': repr(bonds),
+            'identity_key': repr(self._identity_key)
         }
 
         if ignore_missing_attrs:
@@ -781,54 +790,14 @@ class BuildingBlock(Molecule):
         return d
 
     @staticmethod
-    def _get_key(
-        self,
-        smiles,
-        functional_groups,
-        random_seed,
-        use_cache
-    ):
-        """
-        Return the key used for caching.
-
-        Parameters
-        ----------
-        smiles : :class:`str`
-            A SMILES string of the molecule.
-
-        functional_groups : :class:`list` of :class:`str`, optional
-            The name of the functional groups which are to have atoms
-            tagged. If ``None``, no tagging is done.
-
-        random_seed : :class:`int`, optional
-            Random seed passed to :func:`rdkit.ETKDGv2`
-
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`BuildingBlock` does not
-            yet exist the created one will be added to the cache.
-
-        Returns
-        -------
-        :class:`tuple`
-            The key used for caching the molecule. Has the form
-
-            .. code-block:: python
-
-                ('amine', 'bromine', 'InChIString')
-
-        """
-
-        mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
-        return self._get_key_from_rdkit_mol(mol, functional_groups)
-
-    @staticmethod
-    def _get_key_from_rdkit_mol(mol, functional_groups):
+    def _get_identity_key_from_rdkit_mol(mol, functional_groups):
         if functional_groups is None:
             functional_groups = ()
         functional_groups = sorted(functional_groups)
+
+        # Don't modify the original molecule.
+        mol = rdkit.Mol(mol)
+        rdkit.SanitizeMol(mol)
         return (
             *functional_groups,
             rdkit.MolToSmiles(mol, canonical=True)

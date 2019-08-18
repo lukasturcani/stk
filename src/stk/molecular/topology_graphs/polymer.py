@@ -27,16 +27,12 @@ class _LinearVertex(Vertex):
 
     """
 
-    def __init__(self, id, x, y, z, orientation):
+    def __init__(self, x, y, z, orientation):
         """
         Initialize a :class:`.LinearVertex`.
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the vertex. This should be its index in
-            :attr:`TopologyGraph.vertices`.
-
         x : :class:`float`
             The x coordinate.
 
@@ -54,7 +50,7 @@ class _LinearVertex(Vertex):
         """
 
         self._orientation = orientation
-        super().__init__(id, x, y, z)
+        super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         """
@@ -364,39 +360,28 @@ class Linear(TopologyGraph):
         self._n = n
 
         head, *body, tail = orientations*n
-        vertices = [_HeadVertex(0, 0, 0, 0, head)]
+        vertices = [_HeadVertex(0, 0, 0, head)]
         edges = []
         for i, orientation in enumerate(body, 1):
             v = _LinearVertex(
-                id=i, x=i, y=0, z=0, orientation=orientation
+                x=i, y=0, z=0, orientation=orientation
             )
             vertices.append(v)
             edges.append(Edge(vertices[i-1], vertices[i]))
 
         vertices.append(
-            _TailVertex(len(vertices), len(vertices), 0, 0, tail)
+            _TailVertex(len(vertices), 0, 0, tail)
         )
         edges.append(Edge(vertices[-2], vertices[-1]))
 
-        super().__init__(tuple(vertices), tuple(edges), processes)
+        super().__init__(tuple(vertices), tuple(edges), (), processes)
 
-    def _assign_building_blocks_to_vertices(
-        self,
-        mol,
-        building_blocks
-    ):
+    def assign_building_blocks_to_vertices(self, building_blocks):
         """
         Assign `building_blocks` to :attr:`vertices`.
 
-        Assignment is done by modifying
-        :attr:`.ConstructedMolecule.building_block_vertices`.
-
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule`
-            The :class:`.ConstructedMolecule` instance being
-            constructed.
-
         building_blocks : :class:`list` of :class:`.Molecule`
             The :class:`.BuildingBlock` and
             :class:`ConstructedMolecule` instances which
@@ -407,7 +392,23 @@ class Linear(TopologyGraph):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            Maps the `building_blocks`, to the
+            :class:`~.topologies.base.Vertex` objects in
+            :attr:`vertices` they are placed on during construction.
+            The :class:`dict` has the form
+
+            .. code-block:: python
+
+                building_block_vertices = {
+                    BuildingBlock(...): [Vertex(...), Vertex(...)],
+                    BuildingBlock(...): [
+                        Vertex(...),
+                        Vertex(...),
+                        Vertex(...),
+                    ]
+                    ConstructedMolecule(...): [Vertex(...)]
+                }
 
         """
 
@@ -415,9 +416,14 @@ class Linear(TopologyGraph):
         bb_map = {
             letter: bb for letter, bb in zip(polymer, building_blocks)
         }
+        building_block_vertices = {}
         for letter, vertex in zip(polymer, self.vertices):
             bb = bb_map[letter]
-            mol.building_block_vertices[bb].append(vertex)
+            building_block_vertices[bb] = (
+                building_block_vertices.get(bb, [])
+            )
+            building_block_vertices[bb].append(vertex)
+        return building_block_vertices
 
     def _get_scale(self, mol):
         """

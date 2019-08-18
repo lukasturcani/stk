@@ -3,10 +3,8 @@ import os
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 from scipy.spatial.distance import euclidean
-from inspect import signature
 
 from ...utilities import (
-    normalize_vector,
     vector_angle,
     rotation_matrix,
     rotation_matrix_arbitrary_axis,
@@ -22,17 +20,7 @@ class MoleculeSubclassError(Exception):
 
 class _Cached(type):
     def __call__(cls, *args, **kwargs):
-        sig = signature(cls.__init__)
-        sig = sig.bind_partial(cls, *args, **kwargs)
-        sig.apply_defaults()
-        key = cls._get_key(**sig.arguments)
-        if sig.arguments['use_cache'] and key in cls._cache:
-            return cls._cache[key]
-        obj = super().__call__(*args, **kwargs)
-        obj._key = key
-        if sig.arguments['use_cache']:
-            cls._cache[key] = obj
-        return obj
+        return cls._construct(*args, **kwargs)
 
 
 class Molecule(metaclass=_Cached):
@@ -60,7 +48,66 @@ class Molecule(metaclass=_Cached):
     # representation will hold the name of the subclass.
     _subclasses = {}
 
-    def __init__(self, atoms, bonds, position_matrix):
+    @classmethod
+    def _construct(cls, *args, **kwargs):
+        """
+        Construct a new instance.
+
+        When a :class:`.Molecule` or its subclass is created with the
+        default initialzer, this method is called instead of
+        :meth:`__init__`.
+
+        .. code-block:: python
+
+            import stk
+
+            # bb is the return value of BuildingBlock._construct()
+            bb = stk.BuildingBlock('NCCN')
+
+        Because of this, :meth:`_construct` takes the same paramters
+        as :meth:`__init__`.
+
+        This method is necessary so that the default initializer can
+        use caching efficiently. For example, in order to get the
+        identity key of a :class:`.BuildingBlock`, the SMILES received
+        need to be converted into an :mod:`rdkit` molecule, which is
+        then used to generate canonical SMILES, which are part of the
+        identity key. If the :class:`.BuildingBlock` is not cached,
+        the SMILES would then need to be passed to
+        :meth:`.BuildingBlock.__init__` so that the new
+        :class:`.BuildingBlock` instance can be made. However,
+        :meth:`.BuildingBlock.__init__` creates an :mod:`rdkit`
+        molecule all over again, which is useless duplication.
+
+        By using :meth:`._construct` the implementation can avoid
+        calling :meth:`.BuildingBlock.__init__` if an :mod:`rdkit`
+        molecule has already been made. Instead,
+        :meth:`.BuildingBlock.init_from_rdkit_mol` can be used.
+
+        Parameters
+        ----------
+        *args : :class:`object`
+            The arguments passed to :methd`__init__`.
+
+        **kwargs : :class:`object`
+            The keyword arguments passed to :meth:`__init__`.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The new instance.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method which must be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
+
+    def __init__(self, atoms, bonds, position_matrix, identity_key):
         """
         Initialize a :class:`Molecule`.
 
@@ -76,6 +123,11 @@ class Molecule(metaclass=_Cached):
             A ``(n, 3)`` matrix holding the position of every atom in
             the :class:`.Molecule`.
 
+        identity_key : :class:`object`
+            The identity key of the molecule. Molecules which
+            ``stk`` sees as identical will have the same identity key.
+            Must be hashable.
+
         """
 
         self.atoms = atoms
@@ -83,6 +135,7 @@ class Molecule(metaclass=_Cached):
         # A (3, n) numpy.ndarray holding the position of every atom in
         # the molecule.
         self._position_matrix = position_matrix.T
+        self._identity_key = identity_key
 
     @classmethod
     def init_from_dict(self, mol_dict, use_cache=False):
@@ -251,10 +304,6 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        # Normalize the input direction vectors.
-        start = normalize_vector(start)
-        target = normalize_vector(target)
-
         # Set the origin of the rotation to "origin".
         self.apply_displacement(-origin)
         rot_mat = rotation_matrix(start, target)
@@ -374,6 +423,32 @@ class Molecule(metaclass=_Cached):
         for atom_coords in coords:
             yield atom_coords
 
+    @classmethod
+    def get_cached_mol(cls, identity_key, default=None):
+        """
+        Get a molecule from the cache.
+
+        Parameters
+        ----------
+        identity_key : :class:`object`
+            The identity key of the molecule to return.
+
+        default : :class:`object`, optional
+            Returned if `identity_key` is not found in the cache.
+            If ``None`` an error will be raised if `identity_key` is
+            not found in the cache.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The cached molecule.
+
+        """
+
+        if default is None:
+            return cls._cache[identity_key]
+        return cls._cache.get(identity_key, default)
+
     def get_atom_distance(self, atom1_id, atom2_id):
         """
         Return the distance between 2 atoms.
@@ -489,9 +564,26 @@ class Molecule(metaclass=_Cached):
             atom_ids = list(atom_ids)
 
         pos = self._position_matrix[:, atom_ids].T
-        return normalize_vector(
-            np.linalg.svd(pos - pos.mean(axis=0))[-1][0]
-        )
+        return np.linalg.svd(pos - pos.mean(axis=0))[-1][0]
+
+    def get_identity_key(self):
+        """
+        Return the identity key.
+
+        The identity key wil be equal for two molecules which
+        ``stk`` sees as identical. The identity key does not take
+        the conformation into account but it does account for
+        isomerism.
+
+        Returns
+        -------
+        :class:`object`
+            A hashable object which represents the identity of the
+            molecule.
+
+        """
+
+        return self._identity_key
 
     def get_maximum_diameter(self, atom_ids=None):
         """
@@ -548,6 +640,25 @@ class Molecule(metaclass=_Cached):
         centroid = self.get_centroid(atom_ids)
         return np.linalg.svd(pos - centroid)[-1][2, :]
 
+    @classmethod
+    def has_cached_mol(cls, identity_key):
+        """
+        ``True`` if molecule with `identity_key` is cached.
+
+        Parameters
+        ----------
+        identity_key : :class:`object`
+            The identity key of a molecule.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if a molecule with `identity_key` is cached.
+
+        """
+
+        return identity_key in cls._cache
+
     def get_position_matrix(self):
         """
         Return a matrix holding the atomic positions.
@@ -561,34 +672,6 @@ class Molecule(metaclass=_Cached):
         """
 
         return np.array(self._position_matrix.T)
-
-    def is_identical(self, other):
-        """
-        Check if `other` is identical to `self`.
-
-        Identical means that the two molecules are treated in the same
-        way by every ``stk`` operation.
-
-        Identical molecules do not have to have the same atomic
-        positions, but must have the same atoms, bonds and charges.
-
-        Parameters
-        ----------
-        other : :class:`Molecule`
-            The molecule to check.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if `other` is an identical molecule, from
-            an ``stk`` perspective.
-
-        """
-
-        return (
-            self.__class__ is other.__class__
-            and self._key == other._key
-        )
 
     def set_centroid(self, position, atom_ids=None):
         """
@@ -668,41 +751,6 @@ class Molecule(metaclass=_Cached):
         with open(path, 'w') as f:
             d = self.to_dict(include_attrs, ignore_missing_attrs)
             json.dump(d, f, indent=4)
-
-    def _get_key(*args, **kwargs):
-        """
-        Return the key used for caching.
-
-        When being implemented by a subclass, this methods needs to be
-        defined as a :func:`staticmethod` and have the same parameters
-        as the :meth:`__init__` method of the subclass.
-
-        Parameters
-        ----------
-        *args : :class:`object`
-            These need to match the arguments of the :meth:`__init__`
-            method of a subclass.
-
-        **kwargs : :class:`object`
-            These need to match the keyword arguments of the
-            :meth`__init__` method of a subclass.
-
-        Returns
-        -------
-        :class:`object`
-            A hashable :class:`object`. This object will be equal
-            for molecules of the same class, which should be treated
-            as identical by ``stk``.
-
-        Raises
-        ------
-        :class:`NotImplementedError`
-            This is a virtual method which needs to be implemented by
-            a subclass.
-
-        """
-
-        raise NotImplementedError()
 
     @classmethod
     def load(cls, path, use_cache=False):
@@ -893,11 +941,11 @@ class Molecule(metaclass=_Cached):
 
         """
 
-        if self._key in self.__class__._cache:
+        if self._identity_key in self.__class__._cache:
             d = dict(vars(self))
-            self.__class__._cache[self._key].__dict__ = d
+            self.__class__._cache[self._identity_key].__dict__ = d
         else:
-            self.__class__._cache[self._key] = self
+            self.__class__._cache[self._identity_key] = self
 
     def update_from_rdkit_mol(self, mol):
         """

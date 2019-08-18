@@ -34,10 +34,9 @@ def test_init(amine2, aldehyde2):
     assert polymer is not polymer4
 
 
-def test_is_identical(polymer, tmp_polymer):
+def test_get_identity_key(polymer, tmp_polymer):
     assert polymer is not tmp_polymer
-    assert polymer.is_identical(tmp_polymer)
-    assert tmp_polymer.is_identical(polymer)
+    assert polymer.get_identity_key() == tmp_polymer.get_identity_key()
 
 
 def test_get_building_blocks(
@@ -63,4 +62,4 @@ def test_get_building_blocks(
     four_plus_six_bbs = Counter(four_plus_six.get_building_blocks())
     assert len(four_plus_six_bbs) == 2
     assert four_plus_six_bbs[amine2] == 1
-    assert four_plus_six[aldehyde3] == 1
+    assert four_plus_six_bbs[aldehyde3] == 1
