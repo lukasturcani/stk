@@ -131,9 +131,13 @@ class _CycleVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
+    def assign_func_groups_to_edges(self, building_block):
         """
         Assign functional groups to edges.
+
+        Each :class:`.FunctionalGroup` of the `building_block` needs
+        to be associated with one of the :class:`.Edge` instances in
+        :attr:`edges`.
 
         Parameters
         ----------
@@ -141,30 +145,26 @@ class _CycleVertex(Vertex):
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
-        fg_map : :class:`dict`
-            A mapping from :class:`.FunctionalGroup` instances in
-            `building_block` to the equivalent
-            :class:`.FunctionalGroup` instances in the molecule being
-            constructed.
-
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`tuple`
+            For each functional group in `building_block`, the edge
+            id of the :class:`.Edge` assigned to it.
 
         """
 
-        fg1, fg2 = sorted(
-            building_block.func_groups,
-            key=lambda fg: self._edge0_distance(building_block, fg)
+        return tuple(
+            e.id for e in sorted(
+                self.edges,
+                key=lambda e: self._fg0_distance(building_block, e)
+            )
         )
-        self.edges[0].assign_func_group(fg_map[fg1])
-        self.edges[1].assign_func_group(fg_map[fg2])
 
-    def _edge0_distance(self, building_block, func_group):
+    def _fg0_distance(self, building_block, e):
         fg_position = building_block.get_centroid(
-            atom_ids=func_group.get_bonder_ids()
+            atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
-        return euclidean(self.edges[0].get_position(), fg_position)
+        return euclidean(e.get_position(), fg_position)
 
     def __str__(self):
         x, y, z = self._position
