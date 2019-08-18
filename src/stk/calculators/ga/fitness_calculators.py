@@ -157,6 +157,39 @@ class FitnessCalculator:
         )
         return super().__init_subclass__(**kwargs)
 
+    def is_caching(self):
+        """
+        ``True`` if the optimizer has caching turned on.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if the optimizer has caching turned on.
+
+        """
+
+        return self._use_cache
+
+    def add_to_cache(self, mol, fitness):
+        """
+        Add the `fitness` of `mol` to the cache.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule whose `fitness` should be added to the cache.
+
+        fitness : :class:`object`
+            The fitness value to be added to the cache.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self._cache[mol] = fitness
+
     def get_fitness(self, mol):
         """
         Get the fitness value of `mol`.

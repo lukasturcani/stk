@@ -1422,10 +1422,10 @@ class GAPopulation(Population):
         sorted_opt = sorted(evaluated, key=lambda m: repr(m))
         sorted_pop = sorted(self, key=lambda m: repr(m))
         for old, new in zip(sorted_pop, sorted_opt):
-            assert old.is_identical(new)
+            assert old.get_identity_key() == new.get_identity_key()
             old.__dict__ = dict(vars(new))
-            if fitness_calculator._use_cache:
-                fitness_calculator._cache[old] = new.fitness
+            if fitness_calculator.is_caching():
+                fitness_calculator.add_to_cache(old, new.fitness)
 
     def get_mutants(self):
         """
