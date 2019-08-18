@@ -441,6 +441,10 @@ class Edge:
 
     Attributes
     ----------
+    id : :class:`int`
+        The id of the edge. Matches the index of the edge in
+        :attr:`.TopologyGraph.edges`.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which the :class:`Edge` connects.
 
