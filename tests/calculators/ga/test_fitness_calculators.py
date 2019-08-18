@@ -16,6 +16,18 @@ def test_property_vector(tmp_amine2):
     assert fitness_calculator.get_fitness(tmp_amine2) == [1, 2, 3, 4]
 
 
+def test_is_caching():
+    assert stk.PropertyVector(use_cache=True).is_caching()
+    assert not stk.PropertyVector(use_cache=False).is_caching()
+
+
+def test_add_to_cache(tmp_amine2):
+    calculator = stk.PropertyVector(use_cache=True)
+    fitness = object()
+    calculator.add_to_cache(tmp_amine2, fitness)
+    assert calculator.get_fitness(tmp_amine2) is fitness
+
+
 def test_cache_use(tmp_amine2):
     calls = 0
     things = [_Thing(), _Thing(), _Thing(), _Thing()]
