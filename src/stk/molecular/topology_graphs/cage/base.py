@@ -371,7 +371,7 @@ class _CageVertex(Vertex):
             building_block.get_bonder_plane_normal()
         )
         func_groups = sorted(
-            building_block.func_groups,
+            range(len(building_block.func_groups)),
             key=self._get_func_group_angle(
                 building_block=building_block,
                 fg0_direction=fg0_direction,
@@ -381,8 +381,8 @@ class _CageVertex(Vertex):
         )
         assignments = [None]*len(building_block.func_groups)
         edges = sorted(self.edges, key=self._get_edge_angle(axis))
-        for edge, func_group in zip(edges, func_groups):
-            assignments[building_block.func_groups.index(func_group)] = edge.id
+        for edge, fg_id in zip(edges, func_groups):
+            assignments[fg_id] = edge.id
         return assignments
 
     @staticmethod
@@ -393,7 +393,8 @@ class _CageVertex(Vertex):
         axis
     ):
 
-        def angle(func_group):
+        def angle(fg_id):
+            func_group = building_block.func_groups[fg_id]
             coord = building_block.get_centroid(
                 atom_ids=func_group.get_bonder_ids()
             )
