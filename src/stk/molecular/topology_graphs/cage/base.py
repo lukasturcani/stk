@@ -283,7 +283,7 @@ class _CageVertex(Vertex):
     def after_assign_func_groups_to_edges(
         self,
         building_block,
-        fg_map
+        func_groups
     ):
         """
         Perform operations after functional groups have been assigned.
@@ -298,11 +298,9 @@ class _CageVertex(Vertex):
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
-        fg_map : :class:`dict`
-            A mapping from :class:`.FunctionalGroup` instances in
-            `building_block` to the equivalent
-            :class:`.FunctionalGroup` instances in the molecule being
-            constructed.
+        func_groups : :class:`tuple` of :class:`.FunctionalGroup`
+            The functional group clones added to the constructed
+            molecule.
 
         Returns
         -------
@@ -310,7 +308,7 @@ class _CageVertex(Vertex):
 
         """
 
-        bb_fgs = set(fg_map.values())
+        bb_fgs = set(func_groups)
         for edge in self.edges:
             for func_group in edge.get_func_groups():
                 if func_group not in bb_fgs:
@@ -327,7 +325,7 @@ class _CageVertex(Vertex):
 
         return super().after_assign_func_groups_to_edges(
             building_block=building_block,
-            fg_map=fg_map
+            func_groups=func_groups
         )
 
     def _assign_func_groups_to_linear_edges(self, building_block):
