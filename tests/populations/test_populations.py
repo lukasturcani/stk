@@ -386,19 +386,17 @@ def test_contains(tmp_population, population):
     assert all(m in population for m in population.clone())
 
 
-def test_calculate_member_fitness(
-    fitness_calculator,
-    tmp_polymer_pop
-):
+def test_calculate_member_fitness(tmp_population):
 
-    pop = stk.GAPopulation(*tmp_polymer_pop)
+    pop = stk.GAPopulation(*tmp_population)
     for mol in pop:
         assert not hasattr(mol, 'fitness')
 
+    fitness_calculator = stk.PropertyVector(lambda m: 12)
     pop.calculate_member_fitness(fitness_calculator)
 
     for mol in pop:
-        assert mol.fitness == 12
+        assert mol.fitness == [12]
 
     with pytest.raises(stk.RaisingFitnessCalculatorError):
         calc = stk.RaisingFitnessCalculator(
