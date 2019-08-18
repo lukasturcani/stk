@@ -42,7 +42,8 @@ def _angle(bb, edge, vertex):
         bb.get_centroid(bb.get_bonder_ids())
     )
 
-    def inner(fg):
+    def inner(fg_id):
+        fg = bb.func_groups[fg_id]
         fg_vector = (
             bb.get_centroid(fg.get_bonder_ids()) -
             bb.get_centroid(bb.get_bonder_ids())
@@ -53,26 +54,20 @@ def _angle(bb, edge, vertex):
 
 
 def _test_assignment(vertex, bb):
-    vertex.assign_func_groups_to_edges(
-        building_block=bb,
-        fg_map={fg: fg for fg in bb.func_groups}
-    )
-    assert (
-        bb.func_groups[0] in
-        vertex.aligner_edge.get_func_groups()
-    )
+    assignments = vertex.assign_func_groups_to_edges(bb)
+    assert assignments[0] == vertex.aligner_edge.id
     for edge in vertex.edges:
         closest = min(
-            bb.func_groups,
+            range(len(bb.func_groups)),
             key=_angle(bb, edge, vertex)
         )
-        assert closest in edge.get_func_groups()
+        assert assignments[closest] == edge.id
 
     if len(bb.func_groups) == 2:
         not_aligner = next(
             e for e in vertex.edges if e is not vertex.aligner_edge
         )
-        assert bb.func_groups[1] in not_aligner.get_func_groups()
+        assert assignments[1] == not_aligner.id
 
 
 def test_vertex(
