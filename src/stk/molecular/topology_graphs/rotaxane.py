@@ -50,8 +50,8 @@ class _AxleVertex(Vertex):
         building_block.set_centroid(self._position)
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
-        return
+    def assign_func_groups_to_edges(self, building_block):
+        return tuple()
 
 
 class _CycleVertex(Vertex):
@@ -128,8 +128,8 @@ class _CycleVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
-        return
+    def assign_func_groups_to_edges(self, building_block):
+        return tuple()
 
     def __str__(self):
         x, y, z = self._position

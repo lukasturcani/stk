@@ -1119,9 +1119,10 @@ class TopologyGraph:
         assignments = vertex.assign_func_groups_to_edges(bb)
         num_fgs = len(bb.func_groups)
         for fg_id, edge_id in enumerate(assignments):
-            edges[edge_id].assign_func_group(
-                func_group=mol.func_groups[-num_fgs+fg_id]
-            )
+            if edge_id is not None:
+                edges[edge_id].assign_func_group(
+                    func_group=mol.func_groups[-num_fgs+fg_id]
+                )
         return atom_map
 
     def _place_building_blocks_serial(self, mol, vertices, edges):

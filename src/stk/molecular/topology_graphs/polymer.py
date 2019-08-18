@@ -123,9 +123,13 @@ class _LinearVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
+    def assign_func_groups_to_edges(self, building_block):
         """
         Assign functional groups to edges.
+
+        Each :class:`.FunctionalGroup` of the `building_block` needs
+        to be associated with one of the :class:`.Edge` instances in
+        :attr:`edges`.
 
         Parameters
         ----------
@@ -133,26 +137,25 @@ class _LinearVertex(Vertex):
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
-        fg_map : :class:`dict`
-            A mapping from :class:`.FunctionalGroup` instances in
-            `building_block` to the equivalent
-            :class:`.FunctionalGroup` instances in the molecule being
-            constructed.
-
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`tuple`
+            For each functional group in `building_block`, the edge
+            id of the :class:`.Edge` assigned to it.
 
         """
 
+        func_groups = building_block.func_groups
         fg1, fg2 = sorted(
-            building_block.func_groups,
-            key=lambda fg: building_block.get_centroid(
-                atom_ids=fg.get_bonder_ids()
+            range(len(building_block.func_groups)),
+            key=lambda fg_id: building_block.get_centroid(
+                atom_ids=func_groups[fg_id].get_bonder_ids()
             )[0]
         )
-        self.edges[0].assign_func_group(fg_map[fg1])
-        self.edges[1].assign_func_group(fg_map[fg2])
+        assignments = [None, None]
+        assignments[fg1] = self.edges[0].id
+        assignments[fg2] = self.edges[1].id
+        return assignments
 
     def __str__(self):
         x, y, z = self._position
@@ -225,25 +228,25 @@ class _TerminalVertex(_LinearVertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
+    def assign_func_groups_to_edges(self, building_block):
         """
         Assign functional groups to edges.
+
+        Each :class:`.FunctionalGroup` of the `building_block` needs
+        to be associated with one of the :class:`.Edge` instances in
+        :attr:`edges`.
 
         Parameters
         ----------
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
-            functional groups assigned to
-
-        fg_map : :class:`dict`
-            A mapping from :class:`.FunctionalGroup` instances in
-            `building_block` to the equivalent
-            :class:`.FunctionalGroup` instances in the molecule being
-            constructed.
+            functional groups assigned to edges.
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`tuple`
+            For each functional group in `building_block`, the edge
+            id of the :class:`.Edge` assigned to it.
 
         Raises
         ------
@@ -254,25 +257,26 @@ class _TerminalVertex(_LinearVertex):
         """
 
         if len(building_block.func_groups) == 2:
+            func_groups = building_block.func_groups
             fgs = sorted(
-                building_block.func_groups,
-                key=lambda fg: building_block.get_centroid(
-                    atom_ids=fg.get_bonder_ids()
+                range(len(func_groups)),
+                key=lambda fg_id: building_block.get_centroid(
+                    atom_ids=func_groups[fg_id].get_bonder_ids()
                 )[0]
             )
             fg_index = 0 if self._cap_direction == 1 else -1
-            fg = fgs[fg_index]
+            assignments = [None, None]
+            assignments[fgs[fg_index]] = self.edges[0].id
+            return assignments
 
         elif len(building_block.func_groups) == 1:
-            fg = building_block.func_groups[0]
+            return (self.edges[0].id, )
 
         else:
             raise ValueError(
                 'The building block of a polymer '
                 'must have 1 or 2 functional groups.'
             )
-
-        self.edges[0].assign_func_group(fg_map[fg])
 
 
 class _HeadVertex(_TerminalVertex):
