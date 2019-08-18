@@ -216,7 +216,7 @@ class _MacroModel(Optimizer):
 
             # If optimization fails because the license is not found,
             # rerun the function.
-            if self._license_found(output, mol):
+            if self._license_found(run_name, output, mol):
                 incomplete = False
 
         # Make sure the .maegz file created by the optimization is
@@ -261,7 +261,7 @@ class _MacroModel(Optimizer):
             )
 
             # Keep re-running the function until license is found.
-            if self._license_found(out.stdout):
+            if self._license_found(run_name, out.stdout):
                 incomplete = False
 
         # This loop causes the function to wait until the job has been
@@ -392,7 +392,8 @@ class _MacroModel(Optimizer):
                 )
 
             # Keep re-running the function until license is found.
-            if self._license_found(convrt_return.stdout):
+            run_name, _ = os.path.splitext(input_path)
+            if self._license_found(run_name, convrt_return.stdout):
                 incomplete = False
 
         # If force field failed, raise.
