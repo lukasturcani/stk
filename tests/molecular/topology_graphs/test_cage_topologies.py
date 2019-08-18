@@ -39,14 +39,8 @@ def _test_placement(vertex, bb):
 
 
 def _test_assignment(vertex, bb):
-    vertex.assign_func_groups_to_edges(
-        building_block=bb,
-        fg_map={fg: fg for fg in bb.func_groups}
-    )
-    assert (
-        bb.func_groups[0] in
-        vertex.aligner_edge.get_func_groups()
-    )
+    assignments = vertex.assign_func_groups_to_edges(bb)
+    assert assignments[0] == vertex.aligner_edge.id
 
 
 def test_vertex(

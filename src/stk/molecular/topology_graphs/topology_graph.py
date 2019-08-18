@@ -247,17 +247,13 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
+    def assign_func_groups_to_edges(self, building_block):
         """
         Assign functional groups to edges.
 
         Each :class:`.FunctionalGroup` of the `building_block` needs
         to be associated with one of the :class:`.Edge` instances in
-        :attr:`edges`. Then, using `fg_map`, the
-        :class:`FunctionalGroup` instances in the molecule being
-        constructed need to be assigned to those edges. This is
-        because bonds need to be formed between functional groups of
-        the molecule being constructed, not the `building_block`.
+        :attr:`edges`.
 
         Parameters
         ----------
@@ -265,15 +261,11 @@ class Vertex:
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
-        fg_map : :class:`dict`
-            A mapping from :class:`.FunctionalGroup` instances in
-            `building_block` to the equivalent
-            :class:`.FunctionalGroup` instances in the molecule being
-            constructed.
-
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`tuple`
+            For each functional group in `building_block`, the edge
+            id of the :class:`.Edge` assigned to it.
 
         Raises
         ------
@@ -1108,7 +1100,14 @@ class TopologyGraph:
             mol.atoms.append(atom_clone)
         return atom_map
 
-    def _assign_func_groups_to_edges(self, mol, vertex, bb, bb_id):
+    def _assign_func_groups_to_edges(
+        self,
+        mol,
+        vertex,
+        bb,
+        bb_id,
+        edges
+    ):
         atom_map = self._get_atom_map(mol, bb, bb_id)
 
         # Create a map from each functional group in the
@@ -1121,7 +1120,12 @@ class TopologyGraph:
 
         # Assign the functional groups in the contructed
         # molecule to edges in the topology graph.
-        vertex.assign_func_groups_to_edges(bb, fg_map)
+        assignments = vertex.assign_func_groups_to_edges(bb)
+        num_fgs = len(bb.func_groups)
+        for fg_id, edge_id in enumerate(assignments):
+            edges[edge_id].assign_func_group(
+                func_group=mol.func_groups[-num_fgs+fg_id]
+            )
 
         return atom_map, fg_map
 
@@ -1148,7 +1152,8 @@ class TopologyGraph:
                     mol=mol,
                     vertex=vertex,
                     bb=bb,
-                    bb_id=bb_id
+                    bb_id=bb_id,
+                    edges=edges
                 )
                 # Perform additional, miscellaneous operations.
                 vertex.after_assign_func_groups_to_edges(

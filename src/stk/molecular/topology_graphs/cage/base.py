@@ -250,17 +250,13 @@ class _CageVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
+    def assign_func_groups_to_edges(self, building_block):
         """
         Assign functional groups to edges.
 
         Each :class:`.FunctionalGroup` of the `building_block` needs
         to be associated with one of the :class:`.Edge` instances in
-        :attr:`edges`. Then, using `fg_map`, the
-        :class:`FunctionalGroup` instances in the molecule being
-        constructed need to be assigned to those edges. This is
-        because bonds need to be formed between functional groups of
-        the molecule being constructed, not the `building_block`.
+        :attr:`edges`.
 
         Parameters
         ----------
@@ -268,26 +264,20 @@ class _CageVertex(Vertex):
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
-        fg_map : :class:`dict`
-            A mapping from :class:`.FunctionalGroup` instances in
-            `building_block` to the equivalent
-            :class:`.FunctionalGroup` instances in the molecule being
-            constructed.
-
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`tuple`
+            For each functional group in `building_block`, the edge
+            id of the :class:`.Edge` assigned to it.
 
         """
 
         if len(building_block.func_groups) == 2:
             return self._assign_func_groups_to_linear_edges(
-                building_block=building_block,
-                fg_map=fg_map
+                building_block=building_block
             )
         return self._assign_func_groups_to_nonlinear_edges(
-                building_block=building_block,
-                fg_map=fg_map
+                building_block=building_block
             )
 
     def after_assign_func_groups_to_edges(
@@ -340,36 +330,26 @@ class _CageVertex(Vertex):
             fg_map=fg_map
         )
 
-    def _assign_func_groups_to_linear_edges(
-        self,
-        building_block,
-        fg_map
-    ):
-
-        fg1, fg2 = sorted(
-            building_block.func_groups,
-            key=self._get_edge0_distance(building_block)
-        )
-        self.edges[0].assign_func_group(fg_map[fg1])
-        self.edges[1].assign_func_group(fg_map[fg2])
-
-    def _get_edge0_distance(self, building_block):
-        aligner_coord = self.edges[0].get_position()
-
-        def distance(fg):
-            fg_coord = building_block.get_centroid(
-                atom_ids=fg.get_bonder_ids()
+    def _assign_func_groups_to_linear_edges(self, building_block):
+        return tuple(
+            e.id for e in sorted(
+                self.edges,
+                key=self._get_fg0_distance(building_block)
             )
-            displacement = aligner_coord - fg_coord
+        )
+
+    def _get_fg0_distance(self, building_block):
+        fg_coord = building_block.get_centroid(
+            atom_ids=building_block.func_groups[0].get_bonder_ids()
+        )
+
+        def distance(edge):
+            displacement = edge.get_position() - fg_coord
             return np.linalg.norm(displacement)
 
         return distance
 
-    def _assign_func_groups_to_nonlinear_edges(
-        self,
-        building_block,
-        fg_map
-    ):
+    def _assign_func_groups_to_nonlinear_edges(self, building_block):
         # The idea is to order the functional groups in building_block
         # by their angle from func_groups[0] and the bonder centroid,
         #  going in the clockwise direction.
@@ -399,9 +379,11 @@ class _CageVertex(Vertex):
                 axis=axis
             )
         )
+        assignments = [None]*len(building_block.func_groups)
         edges = sorted(self.edges, key=self._get_edge_angle(axis))
         for edge, func_group in zip(edges, func_groups):
-            edge.assign_func_group(fg_map[func_group])
+            assignments[building_block.func_groups.index(func_group)] = edge.id
+        return assignments
 
     @staticmethod
     def _get_func_group_angle(
