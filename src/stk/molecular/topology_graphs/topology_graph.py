@@ -1097,6 +1097,17 @@ class TopologyGraph:
                 edges=edges
             )
 
+    def _get_atom_map(self, mol, bb, bb_id):
+        atom_map = {}
+        for atom in bb.atoms:
+            atom_clone = atom.clone()
+            atom_clone.id = len(mol.atoms)
+            atom_clone.building_block = bb
+            atom_clone.building_block_id = bb_id
+            atom_map[atom] = atom_clone
+            mol.atoms.append(atom_clone)
+        return atom_map
+
     def _place_building_blocks_serial(self, mol, vertices, edges):
         bb_id = 0
 
@@ -1113,24 +1124,10 @@ class TopologyGraph:
                 bb = vertex_building_blocks[instance_vertex]
                 original_coords = bb.get_position_matrix()
 
-                # Get the coordinates of the building block when
-                # placed on the vertex clone.
-                coords = vertex.place_building_block(bb)
-                # Add the coordinates to the constructed molecule.
-                mol._position_matrix.extend(coords)
-
-                # Create a map from each atom in the building block to
-                # a clone of that atom in the constructed molecule.
-                atom_map = {}
-                for atom in bb.atoms:
-                    atom_clone = atom.clone()
-                    atom_clone.id = len(mol.atoms)
-                    atom_map[atom] = atom_clone
-
-                    atom_clone.building_block = bb
-                    atom_clone.building_block_id = bb_id
-
-                    mol.atoms.append(atom_clone)
+                mol._position_matrix.extend(
+                    vertex.place_building_block(bb)
+                )
+                atom_map = self._get_atom_map(mol, bb, bb_id)
 
                 # Create a map from each functional group in the
                 # building block to a clone of that functional group
