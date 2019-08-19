@@ -54,8 +54,6 @@ class FourPlusSix(Cage):
 
     See :class:`.Cage` for more details and examples.
 
-    .. image::
-
     Attributes
     ----------
     vertices : :class:`tuple` of :class:`.Vertex`

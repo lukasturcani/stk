@@ -180,7 +180,7 @@ class Reactor:
 
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule
+        mol : :class:`.ConstructedMolecule`
             The molecule on which the reactor adds and removes atoms
             and bonds.
 

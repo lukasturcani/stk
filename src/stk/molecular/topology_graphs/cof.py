@@ -517,7 +517,7 @@ class COF(TopologyGraph):
     instances into `building_blocks` as you like. If you do not
     assign where each building block is placed with
     `building_block_vertices`, they will be placed on the
-    :atttr:`vertices` of the :class:`.COF` at random. Random
+    :attr:`vertices` of the :class:`.COF` at random. Random
     placement will account for the fact that the length of
     :attr:`.BuildingBlock.func_groups` needs to match the number of
     edges connected to a vertex.
