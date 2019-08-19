@@ -123,7 +123,7 @@ class ConstructedMolecule(Molecule):
         benzene = stk.BuildingBlock('c1ccccc1')
         cage_complex = stk.ConstructedMolecule(
             building_blocks=[cage1, benzene],
-            topology_graph=stk.host_guest_complex.Complex()
+            topology_graph=stk.host_guest.Complex()
         )
 
     During initialization it is possible to force building blocks to
