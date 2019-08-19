@@ -112,7 +112,7 @@ Molecules used by ``stk`` can be optimized both before and after
 construction. Optimization is performed by optimizers_, which implement
 the :meth:`~.Optimizer.optimize` method.
 
-.. _optimizers: stk.calculators.optimization.html
+.. _optimizers: stk.calculators.optimization.optimizers.html
 
 .. code-block:: python
 
@@ -173,7 +173,7 @@ Calculating Molecular Energy
 
 The energy of molecules can be calculated with `energy calculators`_.
 
-.. _`energy calculators`: stk.calculators.energy.html
+.. _`energy calculators`: stk.calculators.energy.energy_calculators.html
 
 All energy calculators define the :meth:`~.EnergyCalculator.get_energy`
 method, which is used to calculate the energy

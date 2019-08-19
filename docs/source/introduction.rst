@@ -33,7 +33,7 @@ Among other things, ``stk`` allows you to construct molecules like this
 
 .. image:: https://i.imgur.com/HI5cciM.png
 
-among many others.
+and many others.
 
 The key idea behind ``stk`` is that the construction of a molecule can
 be broken down into two fundamental pieces of information, its
@@ -80,7 +80,7 @@ undergo structure optimization. There is no single correct way to go
 about this, because the appropriate methodology for structure
 optimization will depend various factors, such as the nature of the
 constructed molecule, the desired accuracy and time constraints.
-``stk`` provides a objects called optimizers, which provide a simple
+``stk`` provides objects called optimizers, which provide a simple
 and consistent interface to different optimization methodologies, and
 can act as an API for external chemistry software. Alternatively,
 ``stk`` allows you to write constructed molecules in common chemical
