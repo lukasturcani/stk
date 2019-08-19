@@ -172,7 +172,43 @@ with the ETKDG algorithm before running a UFF optimization
 Calculating Molecular Energy
 ============================
 
+The energy of molecules can be calculated with energy calculators,
+you can see the available ones here_.
 
+.. _here: stk.calculators.energy
+
+All energy calculators define the :meth:`~.EnergyCalculator.get_energy`
+method, which is used to calculate the energy
+
+.. code-block:: python
+
+    import stk
+
+    mmff = stk.MMFFEnergy()
+    bb = stk.BuildingBlock('BrCCBr', ['bromine'])
+    bb_energy = mmff.get_energy(bb)
+
+    polymer = stk.ConstructedMolecule(
+        building_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 15)
+    )
+    polymer_energy = mmff.get_energy(polymer)
+
+Much like optimizers, energy calculators support a *use_cache*
+option. If this is turned on the energy calculator will not
+calculate the energy of a molecule twice. Instead, if the same
+molecule is passed a second time, the previous value will be returned
+from memory
+
+.. code-block:: python
+
+    mmff = stk.MMFF()
+    caching_mmff = stk.MMFFEnergy(use_cache=True)
+    bb_energy = caching_mmff.get_energy(bb)
+    mmff.optimize(bb)
+    # bb_energy2 is equal to bb_energy even though the structure
+    # changed, since the old value was returned from memory.
+    bb_energy2 = caching_mmff.get_energy(bb)
 
 Using Multiple Functional Groups
 ================================
