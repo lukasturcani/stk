@@ -2,6 +2,8 @@
 Rotaxane
 ========
 
+#. :class:`.NRotaxane`
+
 """
 
 

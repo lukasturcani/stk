@@ -2,6 +2,8 @@
 Host Guest Complex
 ==================
 
+#. :class:`.Complex`
+
 """
 
 
