@@ -21,14 +21,14 @@ and selects building blocks which have the most atoms.
 .. code-block:: python
 
     # #####################################################################
-        # Imports.
+    # Imports.
     # #####################################################################
 
     import stk
     import logging
 
     # #####################################################################
-    # Run EA serially.
+    # Run GA serially.
     # #####################################################################
 
     processes = 1
@@ -50,9 +50,9 @@ and selects building blocks which have the most atoms.
     ]
 
     topology_graphs = [
-        stk.polymer.Linear('A', [0], 3),
-        stk.polymer.Linear('A', [0], 6),
-        stk.polymer.Linear('A', [0], 12)
+        stk.polymer.Linear('A', 3),
+        stk.polymer.Linear('A', 6),
+        stk.polymer.Linear('A', 12)
     ]
 
     population = stk.EAPopulation.init_random(
@@ -135,7 +135,7 @@ and selects building blocks which have the most atoms.
     # Exit condition.
     # #####################################################################
 
-    exiter = stk.NumGenerations(25)
+    terminator = stk.NumGenerations(25)
 
     # #####################################################################
     # Make plotters.
@@ -168,7 +168,8 @@ and selects building blocks which have the most atoms.
     )
 
 
-Running the genetic algorithm with this input file::
+
+Running the evolutionary algorithm with this input file::
 
     $ python -m stk.ea big_monomers.py
 
@@ -354,8 +355,8 @@ which shows the time, the level of the message which can be, in order of
 priority DEBUG, INFO, WARNING, ERROR or CRITICAL, the module where
 the message originated and finally the message itself.
 
-Genetic algorithm input file variables.
-.......................................
+Evolutionary algorithm input file variables.
+............................................
 
 This section lists the variables that need to be defined in the EA
 input file, along with a description of each variable.
