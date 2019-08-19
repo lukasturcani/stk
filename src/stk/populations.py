@@ -1459,7 +1459,7 @@ class EAPopulation(Population):
 
         Returns
         -------
-        :class:`.GAPopulation`
+        :class:`.EAPopulation`
             The next generation.
 
         """
@@ -1468,7 +1468,7 @@ class EAPopulation(Population):
         next_gen = cls(*(
             mol for mol, in self._generation_selector.select(self)
         ))
-        next_gen.set_ga_tools(
+        next_gen.set_ea_tools(
             generation_selector=self._generation_selector,
             mutation_selector=self._mutation_selector,
             crossover_selector=self._crossover_selector,
