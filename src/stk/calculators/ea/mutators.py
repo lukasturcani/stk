@@ -66,6 +66,23 @@ class Mutator:
 
         self._use_cache = use_cache
 
+    def set_cache_use(self, use_cache):
+        """
+        Set cache use on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the cache is to be used.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self._use_cache = use_cache
+
     def mutate(self, mol):
         """
         Return a mutant of `mol`.
@@ -178,6 +195,25 @@ class RandomMutation(Mutator):
         self._mutators = mutators
         self._weights = weights
         self._random_seed = random_seed
+
+    def set_cache_use(self, use_cache):
+        """
+        Set cache use on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the cache is to be used.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        for mutator in self._mutators:
+            mutator.set_cache_use(use_cache)
+        super().set_cache_use(use_cache)
 
     def mutate(self, mol):
         """

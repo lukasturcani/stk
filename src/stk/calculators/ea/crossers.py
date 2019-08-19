@@ -55,6 +55,23 @@ class Crosser:
 
         self._use_cache = use_cache
 
+    def set_cache_use(self, use_cache):
+        """
+        Set cache use on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the cache is to be used.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self._use_cache = use_cache
+
     def cross(self, *mols):
         """
         Cross `mols`.
@@ -157,6 +174,25 @@ class RandomCrossover(Crosser):
         self._crossers = crossers
         self._weights = weights
         super().__init__(use_cache=False)
+
+    def set_cache_use(self, use_cache):
+        """
+        Set cache use on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the cache is to be used.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        for crosser in self._crossers:
+            crosser.set_cache_use(use_cache)
+        super().set_cache_use(use_cache)
 
     def cross(self, *mols):
         """

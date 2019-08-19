@@ -266,10 +266,10 @@ def ea_run(filename, input_file):
     )
 
     # EA should always use the cache.
-    optimizer._use_cache = True
-    fitness_calculator._use_cache = True
-    crosser._use_cache = True
-    mutator._use_cache = True
+    optimizer.set_cache_use(True)
+    fitness_calculator.set_cache_use(True)
+    crosser.set_cache_use(True)
+    mutator.set_cache_use(True)
 
     # 2. Set up the directory structure.
 
