@@ -9,7 +9,7 @@
    :maxdepth: 2
 
    Developer Guide <developer_guide>
-   Cookbook <cookbook>
+   One Two Three <cookbook>
 
 .. toctree::
     :hidden:
