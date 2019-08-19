@@ -28,9 +28,9 @@ building_blocks = [
 ]
 
 topology_graphs = [
-    stk.polymer.Linear('A', [0], 3),
-    stk.polymer.Linear('A', [0], 6),
-    stk.polymer.Linear('A', [0], 12)
+    stk.polymer.Linear('A', 3),
+    stk.polymer.Linear('A', 6),
+    stk.polymer.Linear('A', 12)
 ]
 
 population = stk.EAPopulation.init_random(
