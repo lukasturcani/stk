@@ -1,4 +1,4 @@
-"""
+""":module: stk
 Defines the :class:`BuildingBlock` class.
 
 """
