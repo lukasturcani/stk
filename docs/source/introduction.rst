@@ -113,7 +113,7 @@ constructed with the following code
     cage = stk.ConstructedMolecule(
         building_blocks=[bb1, bb2, bb3, bb4],
         topology_graph=tetrahedron,
-        # Because there a multiple building blocks with the same
+        # Because there are multiple building blocks with the same
         # number of functional groups, they need to be explicitly
         # placed on vertices, as there are multiple valid combinations.
         building_block_vertices={
@@ -150,7 +150,7 @@ edge to align with, the building block will be rotated
     cage = stk.ConstructedMolecule(
         building_blocks=[bb1, bb2, bb3, bb4],
         topology_graph=tetrahedron,
-        # Because there a multiple building blocks with the same
+        # Because there are multiple building blocks with the same
         # number of functional groups, they need to be explicitly
         # placed on vertices, as there are multiple valid combinations.
         building_block_vertices={
@@ -187,7 +187,10 @@ structural isomers of a single cage in one swoop
             building_blocks=[bb1, bb2, bb3, bb4],
             topology_graph=tetrahedron,
             building_block_vertices={
-
+                bb1: tetrahedron.vertices[:1],
+                bb2: tetrahedron.vertices[1:4],
+                bb3: tetrahedron.vertices[4:5],
+                bb4: tetrahedron.vertices[5:]
             }
         )
         isomer.write(f'cage_isomer_{i}.mol')
