@@ -1,5 +1,9 @@
+========
+Cookbook
+========
+
 Extending Calculators
-=============================
+=====================
 
 This guide takes the form a cookbook. Common problems are presented
 followed by a suggested solution.
