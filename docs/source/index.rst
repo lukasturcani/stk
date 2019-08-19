@@ -11,6 +11,7 @@ GitHub: https://www.github.com/lukasturcani/stk
 Slack: https://t.co/LCPzWhvsVO
 
 .. toctree::
+    :hidden:
     :caption: Molecules
     :maxdepth: 2
 
@@ -19,6 +20,7 @@ Slack: https://t.co/LCPzWhvsVO
 
 
 .. toctree::
+    :hidden:
     :caption: Topology Graphs
     :maxdepth: 2
 
@@ -31,6 +33,7 @@ Slack: https://t.co/LCPzWhvsVO
     stk.molecular.topology_graphs.rotaxane
 
 .. toctree::
+    :hidden:
     :caption: Genetic Algoirthm
     :maxdepth: 2
 
