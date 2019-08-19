@@ -4,12 +4,13 @@
    contain the root `toctree` directive.
 
 .. toctree::
-   :hidden:
-   :caption: stk
-   :maxdepth: 2
+    :hidden:
+    :caption: stk
+    :maxdepth: 2
 
-   Developer Guide <developer_guide>
-   One Two Three <cookbook>
+    Introduction <index>
+    Cookbook <cookbook>
+    Developer Guide <developer_guide>
 
 .. toctree::
     :hidden:
@@ -47,7 +48,7 @@
     Plotting <stk.calculators.ga.plotters>
 
 Welcome to ``stk``!
--------------------
+===================
 
 GitHub: https://www.github.com/lukasturcani/stk
 
