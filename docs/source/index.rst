@@ -3,14 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. toctree::
-    :hidden:
-    :caption: stk
-    :maxdepth: 2
 
-    Introduction <index>
-    Cookbook <cookbook>
-    Developer Guide <developer_guide>
 
 .. toctree::
     :hidden:
