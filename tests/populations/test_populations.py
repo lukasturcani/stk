@@ -388,7 +388,7 @@ def test_contains(tmp_population, population):
 
 def test_calculate_member_fitness(tmp_population):
 
-    pop = stk.GAPopulation(*tmp_population)
+    pop = stk.EAPopulation(*tmp_population)
     for mol in pop:
         assert not hasattr(mol, 'fitness')
 
