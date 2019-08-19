@@ -34,6 +34,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.imgmath',
     'sphinx.ext.githubpages',
+    'sphinx.ext.napoleon',
     'numpydoc'
     ]
 
