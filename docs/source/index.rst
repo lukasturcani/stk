@@ -3,14 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ``stk``'s documentation!
-===================================
-
-GitHub: https://www.github.com/lukasturcani/stk
-
-Slack: https://t.co/LCPzWhvsVO
-
-
 .. toctree::
     :hidden:
     :caption: stk
@@ -43,10 +35,18 @@ Slack: https://t.co/LCPzWhvsVO
 
 .. toctree::
     :hidden:
-    :caption: Genetic Algoirthm
+    :caption: Genetic Algorithm
     :maxdepth: 2
 
     <stk.calculators.ga.fitness_calculators>
+
+Welcome to ``stk``!
+===================
+
+GitHub: https://www.github.com/lukasturcani/stk
+
+Slack: https://t.co/LCPzWhvsVO
+
 
 Overview
 --------
