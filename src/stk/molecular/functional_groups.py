@@ -11,8 +11,8 @@ functional groups are performed.
 
 .. _`adding functional groups`:
 
-Extending stk: Adding more functional groups.
----------------------------------------------
+Adding more functional groups.
+------------------------------
 
 During initialization of a :class:`.BuildingBlock` instance, the
 names of :class:`.FGType` instances are supplied. These are used to
