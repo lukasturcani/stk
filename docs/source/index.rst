@@ -6,7 +6,7 @@
 .. toctree::
    :hidden:
    :caption: stk
-   :maxdepth: 2
+   :maxdepth: 1
 
    Cookbook <cookbook>
    Developer Guide <developer_guide>
