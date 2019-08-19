@@ -36,7 +36,8 @@ class BuildingBlock(Molecule):
     construction. Available functional group types can be seen in
     :attr:`functional_group_types`. Additional functional groups
     can be added at runtime by adding a :class:`.FGType` instance
-    into :data:`stk.fg_types`.
+    into :data:`stk.fg_types`. See :ref:`adding functional groups` for
+    an example.
 
     Attributes
     ----------
@@ -54,7 +55,7 @@ class BuildingBlock(Molecule):
 
     # Put this here so that available functional groups appear in the
     # compiled documentation.
-    functional_group_types = fg_types
+    functional_group_types = list(fg_types.keys())
 
     # Maps file extensions to functions which can be used to
     # create an rdkit molecule from that file type.
