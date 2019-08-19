@@ -1,5 +1,5 @@
 """
-.. module:: Building Block
+.. module:: building_block
 
 
 Defines the :class:`BuildingBlock` class.
