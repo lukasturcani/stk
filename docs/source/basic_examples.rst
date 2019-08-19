@@ -113,7 +113,7 @@ construction. Optimization is performed by optimizers, which implement
 the :meth:`~.Optimizer.optimize` method. Check here_ for a list of
 available optimizers.
 
-.. _here: stk.calculators.optimizers.html
+.. _here: stk.calculators.optimization.html
 
 .. code-block:: python
 
@@ -148,7 +148,7 @@ second optimization from being run on the same molecule twice
     # Run an optimization again.
     mmff.optimize(bb)
 
-    caching_mff = stk.MMFF(use_cache=True)
+    caching_mmff = stk.MMFF(use_cache=True)
     # Runs an optimization.
     caching_mmff.optimize(bb)
     # Does not run an optimization, returns immediately.
