@@ -272,6 +272,8 @@ your CPU cores, place them into a :class:`.Population`
 
 .. code-block:: python
 
+    import stk
+
     bb1 = stk.BuildingBlock('NCCCN')
     bb2 = stk.BuildingBlock('BrCCBr', ['bromine'])
     polymer = stk.ConstructedMolecule(
@@ -391,3 +393,55 @@ and load it too
 
 Caching
 =======
+
+A powerful but dangerous feature of ``stk`` use the molecular cache.
+Every constructor for a :class:`.BuildingBlock` or a
+:class:`.ConstructedMolecule` has a *use_cache* option. If
+this is set to ``True`` and an identical molecule has already been
+loaded or constructed by ``stk``, then ``stk`` will not create a
+new instance but return the existing one from memory. In the case of
+:class:`.BuildingBlock` it can mean that the memory footprint is
+dramatically reduced, while in the case of
+:class:`.ConstructedMolecule` it means that expensive constructions do
+not have to be repeated.
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock('BrCCBr', ['bromine'])
+    # bb and bb2 are separate instances because when bb was created it
+    # was not added to the cache.
+    bb2 = stk.BuildingBlock('BrCCBr', ['bromine'], use_cache=True)
+    # bb2 and bb3 are different names for the same object, as
+    # both bb2 and bb3 had use_cache set to True.
+    bb3 = stk.BuildingBlock('BrCCBr', ['bromine'], use_cache=True)
+    # bb4 is a completely new instance.
+    bb4 = stk.BuildingBlock('BrCCBr', ['bromine'])
+
+
+    polymer = stk.ConstructedMolecule(
+        building_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 5)
+    )
+    # polymer2 is a separate instance.
+    polymer2 = stk.ConstructedMolecule(
+        building_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 5),
+        use_cache=True
+    )
+    # polymer2 and polymer3 are different names for the same object as
+    # both polymer2 and polymer3 had use_cache set to True.
+    # No construction was carried out when making polymer3, it was
+    # returned directly from memory.
+    polymer3 = stk.ConstructedMolecule(
+        building_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 5),
+        use_cache=True
+    )
+    # polymer4 is a completely new instance, construction was
+    # done from scratch.
+    polymer4 = stk.ConstructedMolecule(
+        building_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 5)
+    )
