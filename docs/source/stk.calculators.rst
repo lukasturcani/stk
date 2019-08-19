@@ -1,11 +1,6 @@
 stk.calculators package
 =======================
 
-.. automodule:: stk.calculators
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Subpackages
 -----------
 
@@ -15,3 +10,11 @@ Subpackages
    stk.calculators.electronic_property
    stk.calculators.energy
    stk.calculators.optimization
+
+Module contents
+---------------
+
+.. automodule:: stk.calculators
+   :members:
+   :undoc-members:
+   :show-inheritance:
