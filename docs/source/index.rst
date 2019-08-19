@@ -15,8 +15,8 @@ Slack: https://t.co/LCPzWhvsVO
     :caption: Molecules
     :maxdepth: 2
 
-    stk.molecular.molecules.building_block
-    stk.molecular.molecules.constructed_molecule
+    Building Block <stk.molecular.molecules.building_block>
+    Constructed Molecule <stk.molecular.molecules.constructed_molecule>
 
 
 .. toctree::
