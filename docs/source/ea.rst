@@ -1,126 +1,89 @@
-``stk`` includes a genetic algorithm which
-can be used to evolve molecules that fulfil user defined design criteria.
-The genetic algorithm can be run from the command line using::
+Evoluationary Algorithm
+=======================
 
-    $ python -m stk.ga input_file.py
+
+``stk`` includes an evolutionary algorithm which
+can be used to evolve molecules that fulfil user defined design criteria.
+The evolutionary algorithm can be run from the command line using::
+
+    $ python -m stk.ea input_file.py
 
 The input file is a simple python script which defines the
-calculators the genetic algorithm should use, as well as some optional
+calculators the evolutionary algorithm should use, as well as some optional
 parameters.
 
-The genetic algorithm automatically works with any molecules that ``stk``
-uses, both :class:`.StructUnit` and :class:`.MacroMolecule` objects.
+The evolutionary algorithm automatically works with any molecules that ``stk``
+uses, both :class:`.BuildingBlock` and :class:`.ConstructedMolecule` objects.
 
-Take for example the following input file which runs the GA on polymers
+Take for example the following input file which runs the EA on polymers
 and selects building blocks which have the most atoms.
 
 .. code-block:: python
 
     # #####################################################################
-    # Imports.
+        # Imports.
     # #####################################################################
 
     import stk
     import logging
 
     # #####################################################################
-    # Set the number of cores to use.
+    # Run GA serially.
     # #####################################################################
 
-    # This argument is optional, will default to use all CPU cores on
-    # your PC.
     processes = 1
 
     # #####################################################################
     # Set logging level.
     # #####################################################################
 
-    # This argument is optional, will default to logging.INFO
     logging_level = logging.DEBUG
-
-    # #####################################################################
-    # Toggle the writing of a log file.
-    # #####################################################################
-
-    # This argument is optional, will default to True.
-    log_file = True
-
-    # #####################################################################
-    # Toggle the dumping of generated molecules.
-    # #####################################################################
-
-    # This argument is optional, will default to True.
-    database_dump = True
-
-    # #####################################################################
-    # Toggle the dumping of GA generations.
-    # #####################################################################
-
-    # This argument is optional, will default to True.
-    progress_dump = True
-
-    # #####################################################################
-    # Toggle the dumping of molecules at every generation.
-    # #####################################################################
-
-    # This argument is optional, will default to False.
-    debug_dumps = False
-
-    # #####################################################################
-    # Make a tar archive of the output.
-    # #####################################################################
-
-    # This argument is optional, will default to False.
-    tar_output = True
 
     # #####################################################################
     # Initial population.
     # #####################################################################
 
-    # Only the "population" variable must be defined in the input file.
-    # The other variables defined in this section are to make the code
-    # more readable.
-
     carbon = 'C'
     building_blocks = [
-        stk.StructUnit2.smiles_init(f'[Br]{carbon*i}[Br]', ['bromine'])
+        stk.BuildingBlock(f'[Br]{carbon*i}[Br]', ['bromine'])
         for i in range(2, 27)
     ]
 
-    topologies = [
-        stk.Linear('A', [0], 3),
-        stk.Linear('A', [0], 6),
-        stk.Linear('A', [0], 12)
+    topology_graphs = [
+        stk.polymer.Linear('A', [0], 3),
+        stk.polymer.Linear('A', [0], 6),
+        stk.polymer.Linear('A', [0], 12)
     ]
 
-    # population holds the initial population of the GA.
-    population = stk.GAPopulation.init_random(stk.Polymer,
-                                              [building_blocks],
-                                              topologies,
-                                              25)
+    population = stk.GAPopulation.init_random(
+        building_blocks=[building_blocks],
+        topology_graphs=topology_graphs,
+        size=25,
+        use_cache=True
+    )
 
     # #####################################################################
     # Selector for selecting the next generation.
     # #####################################################################
 
     generation_selector = stk.SelectorSequence(
-        stk.Fittest(num=3, duplicates=False),
-        stk.Roulette(num=22, duplicates=False)
+        stk.Fittest(num_batches=3, duplicates=False),
+        stk.Roulette(num_batches=22, duplicates=False)
     )
 
     # #####################################################################
     # Selector for selecting parents.
     # #####################################################################
 
-    crossover_selector = stk.AboveAverage(num=5, batch_size=2)
+    crossover_selector = stk.AboveAverage(num_batches=5, batch_size=2)
 
     # #####################################################################
     # Selector for selecting molecules for mutation.
     # #####################################################################
 
     mutation_selector = stk.SelectorFunnel(
-        stk.AboveAverage(num=10, duplicates=False),
-        stk.Roulette(num=5)
+        stk.AboveAverage(num_batches=10, duplicates=False),
+        stk.Roulette(num_batches=5)
     )
 
     # #####################################################################
@@ -134,7 +97,7 @@ and selects building blocks which have the most atoms.
     # #####################################################################
 
     mutator = stk.RandomMutation(
-        stk.RandomTopology(topologies),
+        stk.RandomTopologyGraph(topology_graphs),
         stk.RandomBuildingBlock(building_blocks, lambda mol: True),
         stk.SimilarBuildingBlock(building_blocks, lambda mol: True, False)
     )
@@ -143,19 +106,15 @@ and selects building blocks which have the most atoms.
     # Optimizer.
     # #####################################################################
 
-    # Remember to set use_cache to True for the GA.
-    optimizer = stk.MMFF(use_cache=True)
+    optimizer = stk.NullOptimizer(use_cache=True)
 
     # #####################################################################
     # Fitness calculator.
     # #####################################################################
 
 
-    def num_atoms(mol, conformer):
-        n_atoms = mol.mol.GetNumAtoms()
-        # Save the number of atoms in an attribute for later plotting.
-        mol.num_atoms = n_atoms
-        return n_atoms
+    def num_atoms(mol):
+        return len(mol.atoms)
 
 
     fitness_calculator = stk.PropertyVector(num_atoms)
@@ -163,8 +122,6 @@ and selects building blocks which have the most atoms.
     # #####################################################################
     # Fitness normalizer.
     # #####################################################################
-
-    # This is an optional argument, will default to NullFitnessNormalizer.
 
     # The PropertyVector fitness calculator will set the fitness as
     # [n_atoms] use the Sum() fitness normalizer to convert the fitness to
@@ -184,26 +141,31 @@ and selects building blocks which have the most atoms.
     # Make plotters.
     # #####################################################################
 
-    # This is an optional argument, no plotting will be made by default.
-
     plotters = [
-        stk.ProgressPlotter(filename='fitness_plot',
-                            attr='fitness',
-                            y_label='Fitness',
-                            default=1e-4),
-        stk.ProgressPlotter(filename='atom_number_plot',
-                            attr='num_atoms',
-                            y_label='Number of Atoms',
-                            default=0)
+        stk.ProgressPlotter(
+            filename='fitness_plot',
+            property_fn=lambda mol: mol.fitness,
+            y_label='Fitness',
+        ),
+        stk.ProgressPlotter(
+            filename='atom_number_plot',
+            property_fn=lambda mol: len(mol.atoms),
+            y_label='Number of Atoms',
+        )
     ]
 
-    stk.SelectionPlotter(filename='generational_selection',
-                         selector=generation_selector)
-    stk.SelectionPlotter(filename='crossover_selection',
-                         selector=crossover_selector)
-    stk.SelectionPlotter(filename='mutation_selection',
-                         selector=mutation_selector)
-
+    stk.SelectionPlotter(
+        filename='generational_selection',
+        selector=generation_selector
+    )
+    stk.SelectionPlotter(
+        filename='crossover_selection',
+        selector=crossover_selector
+    )
+    stk.SelectionPlotter(
+        filename='mutation_selection',
+        selector=mutation_selector
+    )
 
 
 Running the genetic algorithm with this input file::
@@ -238,7 +200,7 @@ will produce the following directory structure::
     |   |   |-- output.tgz
 
 A glance at the evolutionary progress plot in
-``scratch/fitness_plot.png`` will show us how well our GA did.
+``scratch/fitness_plot.png`` will show us how well our EA did.
 
 .. image:: figures/epp.png
 
@@ -300,7 +262,7 @@ The evolutionary algorithm can also be run multiple times in a row::
 
     $ python -m stk.ea -l 5 big_monomers.py
 
-which will run the GA 5 separate times adding 5 more subfolders to the
+which will run the EA 5 separate times adding 5 more subfolders to the
 directory structure::
 
     |-- stk_ea_runs
@@ -344,9 +306,9 @@ not used, simply load the molecules in the input file.
     stk.Population.load('dumped_molecules.json',
                         stk.Molecule.from_dict)
 
-The output of a single GA consists of a number of files and
+The output of a single EA consists of a number of files and
 directories. The ``scratch`` directory holds any files created during
-the GA run. For example, the ``.png`` files showing
+the EA run. For example, the ``.png`` files showing
 how frequently a member of the population was selected for mutation,
 crossover and generational selection. For example, this is a
 mutation counter
@@ -361,10 +323,10 @@ The ``final_pop`` directory holds the ``.mol`` files holding the
 structures of the last generation of molecules.
 The file ``big_monomers.py`` is a copy of the input file. The ``database.json``
 file is a population dump file which holds every molecule produced by
-the GA during the run. ``progress.json`` is also a population dump file.
+the EA during the run. ``progress.json`` is also a population dump file.
 This population holds
-every generation of the GA as a subpopulation. This is quite useful
-if you want to analyse the output of the GA generation-wise.
+every generation of the EA as a subpopulation. This is quite useful
+if you want to analyse the output of the EA generation-wise.
 
 ``errors.log`` is a file which contains every exception and its
 traceback encountered by the GA during its run.
@@ -377,7 +339,7 @@ the run.
 This means if you want to share you entire run output you can just
 share this file.
 
-Finally, when running the GA the progress will be printed into
+Finally, when running the EA the progress will be printed into
 stderr. The message should be relatively straightforward, such as
 
 ::
