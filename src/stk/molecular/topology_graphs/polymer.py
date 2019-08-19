@@ -323,6 +323,32 @@ class Linear(TopologyGraph):
     edges : :class:`tuple` of :class:`.Edge`
         The edges which make up the topology graph.
 
+    Examples
+    --------
+    Linear polymers require building blocks with functional groups
+
+    .. code-block:: python
+
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', ['amine'])
+        bb2 = stk.BuildingBlock('O=CCC=O', ['aldehyde'])
+        polymer = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2],
+            topology_graph=stk.polymer.Linear('AB', 12)
+        )
+
+    However building blocks with a single functional group can
+    also be provided as capping units
+
+    .. code-block: python
+
+        bb3 = stk.BuildingBlock('CCN', ['amine'])
+        polymer = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2, bb3],
+            topology_graph=stk.polymer.Linear('ABABC', 1)
+        )
+
     """
 
     def __init__(

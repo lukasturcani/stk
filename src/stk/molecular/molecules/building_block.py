@@ -31,7 +31,12 @@ class BuildingBlock(Molecule):
 
     A :class:`BuildingBlock` can represent either an entire molecule or
     a molecular fragments used to construct a
-    :class:`.ConstructedMolecule`.
+    :class:`.ConstructedMolecule`. The building block uses
+    :attr:`func_groups` to identify which atoms are modified during
+    construction. Available functional group types can be seen in
+    :attr:`functional_group_types`. Additional functional groups
+    can be added at runtime by adding a :class:`.FGType` instance
+    into :data:`stk.fg_types`.
 
     Attributes
     ----------
@@ -46,6 +51,10 @@ class BuildingBlock(Molecule):
         id of a :class:`.FunctionalGroup` is its index.
 
     """
+
+    # Put this here so that available functional groups appear in the
+    # compiled documentation.
+    functional_group_types = fg_types
 
     # Maps file extensions to functions which can be used to
     # create an rdkit molecule from that file type.
