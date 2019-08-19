@@ -14,6 +14,6 @@ Module contents
 ---------------
 
 .. automodule:: stk.calculators.energy
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

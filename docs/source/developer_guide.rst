@@ -1,5 +1,5 @@
-Developer's guide.
-==================
+Developer Guide
+===============
 
 ``stk`` is a fairly simple library. The key design principle is
 modularity and atomicity. The basic dependency structure is that
