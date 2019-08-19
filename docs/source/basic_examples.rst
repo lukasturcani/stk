@@ -109,11 +109,10 @@ Optimizing Molecular Structures
 ===============================
 
 Molecules used by ``stk`` can be optimized both before and after
-construction. Optimization is performed by optimizers, which implement
-the :meth:`~.Optimizer.optimize` method. Check here_ for a list of
-available optimizers.
+construction. Optimization is performed by optimizers_, which implement
+the :meth:`~.Optimizer.optimize` method.
 
-.. _here: stk.calculators.optimization.html
+.. _optimizers: stk.calculators.optimization.html
 
 .. code-block:: python
 
@@ -172,10 +171,9 @@ with the ETKDG algorithm before running a UFF optimization
 Calculating Molecular Energy
 ============================
 
-The energy of molecules can be calculated with energy calculators,
-you can see the available ones here_.
+The energy of molecules can be calculated with `energy calculators`_.
 
-.. _here: stk.calculators.energy.html
+.. _`energy calculators`: stk.calculators.energy.html
 
 All energy calculators define the :meth:`~.EnergyCalculator.get_energy`
 method, which is used to calculate the energy
