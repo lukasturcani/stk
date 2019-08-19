@@ -1,5 +1,5 @@
-Evoluationary Algorithm
-=======================
+Evolutionary Algorithm
+======================
 
 
 ``stk`` includes an evolutionary algorithm which
