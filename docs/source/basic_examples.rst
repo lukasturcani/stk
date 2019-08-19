@@ -208,13 +208,50 @@ from memory
     # changed, since the old value was returned from memory.
     bb_energy2 = caching_mmff.get_energy(bb)
 
+
 Using Multiple Functional Groups
 ================================
+
+Sometimes you may have a :class:`.BuildingBlock` where multiple
+functional groups should be used during construction. To allow this
+you can pass the names of any number of functional groups to the
+:class:`.BuildingBlock`
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock('ICCBr', ['bromine', 'iodine'])
+    polymer = stk.ConstructedMolecule(
+        bulding_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 10)
+    )
 
 
 Removing Extra Functional Groups
 ================================
 
+Some building blocks may have too many functional groups to be used
+with a topology graph. For example a :class:`.Linear` topology graph
+requires two functional groups on a :class:`.BuildingBlock`.
+If there are more than two it is not clear which of the functional
+groups should be used to form bonds during construction, as they are
+all equivalent to ``stk``. However, it is possible to resolve this
+ambguity by removing the extra functional groups
+
+.. code-block:: python
+
+    import stk
+
+    # This buildingb block has 5 functional groups.
+    bb = stk.BuildingBlock('BrCC(Br)CC(Br)CC(Br)CC(Br)CC', ['bromine'])
+    # Keep only the first 2 functional groups.
+    bb.func_groups = bb.func_groups[:2]
+    # bb can now be used to construct linear polymers.
+    polymer = stk.ConstructedMolecule(
+        bulding_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 10)
+    )
 
 Constructing Molecules in Bulk
 =============================
