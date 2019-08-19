@@ -90,6 +90,23 @@ class Optimizer:
         cls.optimize = _add_cache_use(cls.optimize)
         return super().__init_subclass__(**kwargs)
 
+    def set_cache_use(self, use_cache):
+        """
+        Set cache use on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the cache is to be used.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        self._use_cache = use_cache
+
     def is_caching(self):
         """
         ``True`` if the optimizer has caching turned on.
