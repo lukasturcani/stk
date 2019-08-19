@@ -63,7 +63,11 @@ structure file:
 
 .. code-block:: python
 
-    monomer1 = StructUnit2('monomer1.mol', ['bromine'])
+    import stk
+    monomer1 = stk.BuildingBlock.init_from_file(
+        path='monomer1.mol',
+        functional_groups=['bromine']
+    )
     monomer2 = StructUnit2('monomer2.mol', ['bromine'])
     monomer3 = StructUnit2('monomer3.mol', ['bromine'])
 
