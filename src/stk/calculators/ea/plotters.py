@@ -15,8 +15,8 @@ work, look at the documentation of the individual plotters. For example
 
 .. _`adding plotters`:
 
-Extending stk: Making new plotters.
------------------------------------
+Making New Plotters
+-------------------
 
 New plotters should inherit :class:`Plotter` and define a
 :meth:`~Plotter.plot` method. Note that plotters do no necessarily have

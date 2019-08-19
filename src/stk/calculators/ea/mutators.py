@@ -19,7 +19,7 @@ or :class:`RandomMutation`.
 
 .. _`adding mutators`:
 
-Making new mutators
+Making New Mutators
 -------------------
 
 Mutators must simple inherit the :class:`.Mutator` class and define a

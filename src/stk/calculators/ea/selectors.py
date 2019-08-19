@@ -24,7 +24,7 @@ this can happen are given in the documentation of these two classes.
 
 .. _`adding selectors`:
 
-Making new selectors
+Making New Selectors
 --------------------
 
 When a new :class:`Selector` class is made it must inherit

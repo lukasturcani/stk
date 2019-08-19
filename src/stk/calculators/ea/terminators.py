@@ -16,8 +16,8 @@ EA has been fulfilled.
 
 .. _`adding Terminators`:
 
-Making new Terminators
-------------------
+Making New Terminators
+----------------------
 
 A new :class:`Terminator` class should inherit :class:`Terminator` and
 define an :meth:`~Terminator.terminate` method, which takes progress

@@ -25,7 +25,7 @@ multiple :class:`FitnessNormalizer` can be chained using
 
 .. _`adding fitness normalizers`:
 
-Making new fitness normalizers
+Making New Fitness Normalizers
 ------------------------------
 
 A new class inheriting :class:`FitnessNormalizer` must be made.

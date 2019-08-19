@@ -39,7 +39,7 @@ by the mean fitness across the population.
 
 .. _`adding fitness calculators`:
 
-Making new fitness calculators
+Making New Fitness Calculators
 ------------------------------
 
 A new class inheriting :class:`FitnessCalculator` must be created.
