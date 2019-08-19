@@ -175,6 +175,8 @@ structural isomers of a single cage in one swoop
     import itertools as it
 
     edges = [v.edges for v in stk.cage.FourPlusSix.vertices]
+    # Create 5184 structural isomers.
+    isomers = []
     for i, aligners in enumerate(it.product(*edges)):
         tetrahedron = stk.cage.FourPlusSix(
             vertex_alignments={
@@ -193,7 +195,7 @@ structural isomers of a single cage in one swoop
                 bb4: tetrahedron.vertices[5:]
             }
         )
-        isomer.write(f'cage_isomer_{i}.mol')
+        isomers.append(isomer)
 
 
 The second major benefit of the topology graph is that the vertices and
