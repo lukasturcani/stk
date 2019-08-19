@@ -145,6 +145,8 @@ class BuildingBlock(Molecule):
         )
         if use_cache and identity_key in cls._cache:
             return cls._cache[identity_key]
+
+        rdkit.Kekulize(mol)
         obj._init_from_rdkit_mol(
             mol=mol,
             functional_groups=functional_groups,
