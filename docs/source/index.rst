@@ -42,8 +42,8 @@
    :maxdepth: 2
 
    Introduction <calculators>
-   Optimizers <stk.calculators.optimization>
-   Energy Calculators <stk.calculators.energy>
+   Optimizers <stk.calculators.optimization.optimizers>
+   Energy Calculators <stk.calculators.energy.energy_calculators>
 
 .. toctree::
    :hidden:
