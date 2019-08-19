@@ -51,13 +51,13 @@
    :maxdepth: 2
 
    Introduction <stk.ga>
-   Fitness Calculators <stk.calculators.ga.fitness_calculators>
-   Fitness Normalizers <stk.calculators.ga.fitness_normalizers>
-   Selection <stk.calculators.ga.selectors>
-   Mutation <stk.calculators.ga.mutators>
-   Crossover <stk.calculators.ga.crossers>
-   Termination <stk.calculators.ga.exiters>
-   Plotting <stk.calculators.ga.plotters>
+   Fitness Calculators <stk.calculators.ea.fitness_calculators>
+   Fitness Normalizers <stk.calculators.ea.fitness_normalizers>
+   Selection <stk.calculators.ea.selectors>
+   Mutation <stk.calculators.ea.mutators>
+   Crossover <stk.calculators.ea.crossers>
+   Termination <stk.calculators.ea.exiters>
+   Plotting <stk.calculators.ea.plotters>
 
 
 ===================
