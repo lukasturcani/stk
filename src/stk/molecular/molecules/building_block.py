@@ -1,4 +1,8 @@
 """
+Building Block
+==============
+
+
 Defines the :class:`BuildingBlock` class.
 
 """
