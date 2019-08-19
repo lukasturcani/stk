@@ -487,7 +487,7 @@ class BuildingBlock(Molecule):
         Yields
         ------
         :class:`numpy.ndarray`
-            The centroid of a functional groups
+            The centroid of a functional group.
 
         """
 
@@ -523,7 +523,7 @@ class BuildingBlock(Molecule):
         Parameters
         ----------
         fg_ids : :class:`iterable` of :class:`int`
-            The ids of functional groups used to contruct the plane.
+            The ids of functional groups used to construct the plane.
             If there are more than three, a plane of best fit through
             the bonder centroids of the functional groups will be made.
             If ``None``, all functional groups in the
@@ -568,7 +568,7 @@ class BuildingBlock(Molecule):
         Parameters
         ----------
         fg_ids  : :class:`iterable` of :class:`int`, optional
-            The ids of functional groups used to contruct the plane.
+            The ids of functional groups used to construct the plane.
             If there are more than three, a plane of best fit through
             the bonder centroids of the functional groups will be made.
             If ``None``, all functional groups in the
