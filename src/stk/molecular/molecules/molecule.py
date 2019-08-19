@@ -409,8 +409,7 @@ class Molecule(metaclass=_Cached):
         Yields
         ------
         :class:`numpy.ndarray`
-            An array holding the x, y and z coordinates of the
-            next atom.
+            The x, y and z coordinates of an atom.
 
         """
 
