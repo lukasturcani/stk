@@ -1,6 +1,4 @@
 """
-Defines tools for dealing with functional groups.
-
 Functional Groups
 =================
 
