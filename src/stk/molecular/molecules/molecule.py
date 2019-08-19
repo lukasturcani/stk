@@ -1193,7 +1193,8 @@ class Molecule(metaclass=_Cached):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`.Molecule`
+            The molecule.
 
         """
 
@@ -1207,6 +1208,7 @@ class Molecule(metaclass=_Cached):
         _, ext = os.path.splitext(path)
         write_func = write_funcs[ext]
         write_func(path, atom_ids)
+        return self
 
     def _write_mdl_mol_file(self, path, atom_ids):
         """
