@@ -4,4 +4,5 @@ psutil
 pandas
 seaborn
 pathos
+setuptools
 numpy
