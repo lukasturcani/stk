@@ -58,3 +58,10 @@
    Crossover <stk.calculators.ga.crossers>
    Termination <stk.calculators.ga.exiters>
    Plotting <stk.calculators.ga.plotters>
+
+
+===================
+Welcome to ``stk``!
+===================
+
+You are probably looking for the :doc:`introduction`.
