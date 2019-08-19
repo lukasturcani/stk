@@ -1,12 +1,6 @@
 """
-Topology Graphs
-===============
-
-
-.. _`adding topology graphs`:
-
-Adding new topology graphs.
----------------------------
+Adding Topology Graphs
+======================
 
 To add a new topology graph a new subclass of :class:`.TopologyGraph`
 must be added, which implements its virtual methods. Similarly,
@@ -17,7 +11,7 @@ subclass, together with :class:`.Edge` instances. Once your
 topology graph has the vertices and edges it wants, simply run
 :meth:`.TopologyGraph.__init__` and you're done.
 
-The subclass can also create `construction_stages` if the parallel
+The subclass can also create `construction_stages` if parallel
 construction needs to be broken down into separate stages. However,
 if this is not the case, then an empty :class:`tuple` can simply be
 passed.
