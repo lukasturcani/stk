@@ -335,7 +335,7 @@ class MAEExtractor:
 
 def archive_output():
     """
-    Places the ``output`` folder into ``stk_ga_runs``.
+    Places the ``output`` folder into ``stk_ea_runs``.
 
     This function assumes that the ``output`` folder is in the current
     working directory.
@@ -349,14 +349,14 @@ def archive_output():
     if 'output' not in os.listdir():
         return
 
-    # Make the ``stk_ga_runs`` folder if it does not exist already.
-    if 'stk_ga_runs' not in os.listdir():
-        os.mkdir('stk_ga_runs')
+    # Make the ``stk_ea_runs`` folder if it does not exist already.
+    if 'stk_ea_runs' not in os.listdir():
+        os.mkdir('stk_ea_runs')
 
     # Find out with what number the ``output`` folder should be
-    # labelled within ``stk_ga_runs``.
-    num = len(os.listdir('stk_ga_runs'))
-    new_dir = os.path.join('stk_ga_runs', str(num))
+    # labelled within ``stk_ea_runs``.
+    num = len(os.listdir('stk_ea_runs'))
+    new_dir = os.path.join('stk_ea_runs', str(num))
     os.rename('output', new_dir)
 
 
