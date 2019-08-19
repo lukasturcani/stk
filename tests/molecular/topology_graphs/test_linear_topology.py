@@ -44,8 +44,7 @@ def _test_assignment(vertex, bb):
 def test_vertex(tmp_amine2):
     chain = stk.polymer.Linear(
         repeating_unit='AB',
-        orientations=[0, 0],
-        n=3
+        num_repeating_units=3
     )
 
     for vertex in chain.vertices:
@@ -105,15 +104,14 @@ def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
             topology_graph=stk.polymer.Linear(
                 repeating_unit='AB',
                 orientations=[1, 1],
-                n=repeat_units
+                num_repeating_units=repeat_units
             )
         ),
         stk.ConstructedMolecule(
             building_blocks=[boronic_acid2, diol2],
             topology_graph=stk.polymer.Linear(
                 repeating_unit='AB',
-                orientations=[0, 0],
-                n=repeat_units
+                num_repeating_units=repeat_units
             )
         )
 

@@ -546,7 +546,7 @@ class Cage(TopologyGraph):
             vertex.id = i
         return super().__init_subclass__(**kwargs)
 
-    def __init__(self, vertex_alignments=None, processes=1):
+    def __init__(self, vertex_alignments=None, num_processes=1):
         """
         Initialize a :class:`.Cage`.
 
@@ -567,7 +567,7 @@ class Cage(TopologyGraph):
             The vertices and edges can also be referred to by their
             indices.
 
-        processes : :class:`int`, optional
+        num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
 
@@ -613,7 +613,7 @@ class Cage(TopologyGraph):
                     len(vertex.edges) == vertex_type
                 for vt in vertex_types
             ),
-            processes=processes
+            num_processes=num_processes
         )
 
     def assign_building_blocks_to_vertices(self, building_blocks):

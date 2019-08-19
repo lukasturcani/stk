@@ -125,7 +125,7 @@ def _test_reaction(
 def test_react_any_single(make_reactor, amine2):
     reactor = make_reactor(
         building_blocks=[amine2, amine2],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+        topology_graph=stk.polymer.Linear('AB', 3)
     )
     _test_reaction(
         reactor=reactor,
@@ -140,7 +140,7 @@ def test_react_any_single(make_reactor, amine2):
 def test_react_any_double(make_reactor, amine2, aldehyde2):
     reactor = make_reactor(
         building_blocks=[amine2, aldehyde2],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+        topology_graph=stk.polymer.Linear('AB', 3)
     )
     _test_reaction(
         reactor=reactor,
@@ -159,7 +159,7 @@ def test_react_diol_with_dihalogen(
 ):
     reactor = make_reactor(
         building_blocks=[diol2, difluorene_dibromine],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+        topology_graph=stk.polymer.Linear('AB', 3)
     )
     _test_reaction(
         reactor=reactor,
@@ -178,7 +178,7 @@ def test_react_boronic_acid_with_diol(
 ):
     reactor = make_reactor(
         building_blocks=[boronic_acid2, diol2],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+        topology_graph=stk.polymer.Linear('AB', 3)
     )
     _test_reaction(
         reactor=reactor,
@@ -193,7 +193,7 @@ def test_react_boronic_acid_with_diol(
 def test_react_ring_amine_with_ring_amine(make_reactor, ring_amine):
     reactor = make_reactor(
         building_blocks=[ring_amine, ring_amine],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+        topology_graph=stk.polymer.Linear('AB', 3)
     )
     _test_reaction(
         reactor=reactor,

@@ -10,7 +10,7 @@ def _population_members():
 
     c1 = stk.ConstructedMolecule(
         building_blocks=[bb2],
-        topology_graph=stk.polymer.Linear('A', [0], 3)
+        topology_graph=stk.polymer.Linear('A', 3)
     )
     c2 = stk.ConstructedMolecule(
         building_blocks=[bb1, bb4],
@@ -22,7 +22,7 @@ def _population_members():
     )
     c4 = stk.ConstructedMolecule(
         building_blocks=[bb2, bb3],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3)
+        topology_graph=stk.polymer.Linear('AB', 3)
     )
 
     return bb1, bb2, bb3, bb4, c1, c2, c3, c4

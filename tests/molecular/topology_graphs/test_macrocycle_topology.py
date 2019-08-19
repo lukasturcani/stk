@@ -46,8 +46,7 @@ def _test_assignment(vertex, bb):
 def test_vertex(tmp_amine2):
     cycle = stk.macrocycle.Macrocycle(
         repeating_unit='AB',
-        orientations=[0, 0],
-        n=3
+        num_repeating_units=3
     )
     for vertex in cycle.vertices:
         _test_placement(vertex, tmp_amine2)

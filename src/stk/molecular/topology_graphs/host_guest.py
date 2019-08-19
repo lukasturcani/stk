@@ -200,7 +200,7 @@ class Complex(TopologyGraph):
         guest_start=None,
         guest_target=None,
         displacement=None,
-        processes=1
+        num_processes=1
     ):
         """
         Initialize an instance of :class:`.Complex`.
@@ -220,7 +220,7 @@ class Complex(TopologyGraph):
             The translational offset of the guest from the center of
             the host cavity.
 
-        processes : :class:`int`, optional
+        num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
 
@@ -261,7 +261,7 @@ class Complex(TopologyGraph):
             _HostVertex(0, 0, 0),
             _GuestVertex(x, y, z, start, target)
         )
-        super().__init__(vertices, (), (), processes)
+        super().__init__(vertices, (), (), num_processes)
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """

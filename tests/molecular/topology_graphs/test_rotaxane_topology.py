@@ -42,7 +42,7 @@ def _test_cycle_placement(vertex, bb):
 
 
 def test_vertex(tmp_polymer, tmp_macrocycle):
-    rotaxane = stk.rotaxane.NRotaxane('A', [0], 4)
+    rotaxane = stk.rotaxane.NRotaxane('A', 4)
     axle, *cycles = rotaxane.vertices
     _test_axle_placement(axle, tmp_polymer)
     for vertex in cycles:

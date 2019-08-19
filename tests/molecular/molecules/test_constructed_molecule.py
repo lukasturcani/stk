@@ -9,26 +9,26 @@ if not os.path.exists('constructed_molecule_tests_output'):
 def test_init(amine2, aldehyde2):
     polymer = stk.ConstructedMolecule(
         building_blocks=[amine2, aldehyde2],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3),
+        topology_graph=stk.polymer.Linear('AB', 3),
         use_cache=True
     )
     polymer2 = stk.ConstructedMolecule(
         building_blocks=[amine2, aldehyde2],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3),
+        topology_graph=stk.polymer.Linear('AB', 3),
         use_cache=True
     )
     assert polymer is polymer2
 
     polymer3 = stk.ConstructedMolecule(
         building_blocks=[amine2, aldehyde2],
-        topology_graph=stk.polymer.Linear('AB', [0, 0], 3),
+        topology_graph=stk.polymer.Linear('AB', 3),
         use_cache=False
     )
     assert polymer is not polymer3
 
     polymer4 = stk.ConstructedMolecule(
         building_blocks=[amine2, aldehyde2],
-        topology_graph=stk.polymer.Linear('AB', [1, 0.5], 3),
+        topology_graph=stk.polymer.Linear('AB', 3, (1, 0.5)),
         use_cache=True
     )
     assert polymer is not polymer4
