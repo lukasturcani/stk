@@ -175,7 +175,7 @@ Calculating Molecular Energy
 The energy of molecules can be calculated with energy calculators,
 you can see the available ones here_.
 
-.. _here: stk.calculators.energy
+.. _here: stk.calculators.energy.html
 
 All energy calculators define the :meth:`~.EnergyCalculator.get_energy`
 method, which is used to calculate the energy
