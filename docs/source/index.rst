@@ -10,6 +10,14 @@ GitHub: https://www.github.com/lukasturcani/stk
 
 Slack: https://t.co/LCPzWhvsVO
 
+
+.. toctree::
+    :hidden:
+    :caption: stk
+    :maxdepth: 2
+
+    Intoduction <index>
+
 .. toctree::
     :hidden:
     :caption: Molecules
@@ -24,20 +32,20 @@ Slack: https://t.co/LCPzWhvsVO
     :caption: Topology Graphs
     :maxdepth: 2
 
-    stk.molecular.topology_graphs.topology_graph
-    stk.molecular.topology_graphs.polymer
-    stk.molecular.topology_graphs.cage
-    stk.molecular.topology_graphs.cof
-    stk.molecular.topology_graphs.host_guest
-    stk.molecular.topology_graphs.macrocycle
-    stk.molecular.topology_graphs.rotaxane
+    Topology Graph <stk.molecular.topology_graphs.topology_graph>
+    Polymer <stk.molecular.topology_graphs.polymer>
+    Organic Cage <stk.molecular.topology_graphs.cage>
+    Covalent Organic Framework <stk.molecular.topology_graphs.cof>
+    Host Guest Complex <stk.molecular.topology_graphs.host_guest>
+    Macrocycle <stk.molecular.topology_graphs.macrocycle>
+    Rotaxane <stk.molecular.topology_graphs.rotaxane>
 
 .. toctree::
     :hidden:
     :caption: Genetic Algoirthm
     :maxdepth: 2
 
-    stk.calculators.ga.fitness_calculators
+    <stk.calculators.ga.fitness_calculators>
 
 Overview
 --------
