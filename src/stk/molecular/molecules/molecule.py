@@ -735,7 +735,7 @@ class Molecule(metaclass=_Cached):
 
         include_attrs : :class:`list` of :class:`str`, optional
             The names of attributes of the molecule to be added to
-            the :class:`dict`. Each attribute is saved as a string
+            the representation. Each attribute is saved as a string
             using :func:`repr`.
 
         ignore_missing_attrs : :class:`bool`, optional
