@@ -254,11 +254,35 @@ ambguity by removing the extra functional groups
     )
 
 Constructing Molecules in Bulk
-=============================
+==============================
+
+If you have a bunch of building blocks and topologies and you want
+to create all possible :class:`.ConstructedMolecule` instances, use
+:meth:`.Population.init_all`.
+
+If you want to create a random population of a finite size, use
+:meth:`.Population.init_random`.
 
 
 Optimizing Molecules in Bulk
 ============================
+
+To optimize a bunch of molecules at the same time, in parallel across
+your CPU cores, place them into a :class:`.Population`
+
+.. code-block:: python
+
+    bb1 = stk.BuildingBlock('NCCCN')
+    bb2 = stk.BuildingBlock('BrCCBr', ['bromine'])
+    polymer = stk.ConstructedMolecule(
+        building_blocks=[bb2],
+        topology_graph=stk.polymer.Linear('A', 12)
+    )
+    pop = stk.Population(bb1, bb2, polymer)
+
+    mmff = stk.MMFF()
+    # Optimization done on all molecules in parallel.
+    pop.optimize(mmff)
 
 
 Converting between :mod:`rdkit` Molecules
