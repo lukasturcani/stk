@@ -258,7 +258,7 @@ if you want to experiment with automated molecular design you can look
 into how to write an input file for the evolutionary algorithm. If
 ``stk`` does not have a topology graph for a molecule you would like to
 construct, you can always implement a new one yourself. Alternatively,
-if you like to request an extension to
+if you would like to request an extension to
 ``stk``, or you have any other question about ``stk``, feel free to
 message me on your favourite platform or file an issue on GitHub.
 
