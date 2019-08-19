@@ -262,4 +262,4 @@ about ``stk`` feel free to message me on your favourite platform or
 file an issue on GitHub.
 
 
-.. _`basic examples`: basic_examples
+.. _`basic examples`: basic_examples.rst
