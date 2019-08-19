@@ -1,11 +1,6 @@
 stk.calculators.energy package
 ==============================
 
-.. automodule:: stk.calculators.energy
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Submodules
 ----------
 
@@ -14,3 +9,11 @@ Submodules
    stk.calculators.energy.energy_calculators
    stk.calculators.energy.macromodel
    stk.calculators.energy.mopac
+
+Module contents
+---------------
+
+.. automodule:: stk.calculators.energy
+   :members:
+   :undoc-members:
+   :show-inheritance:
