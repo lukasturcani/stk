@@ -9,13 +9,18 @@ Adding new topology graphs.
 ---------------------------
 
 To add a new topology graph a new subclass of :class:`.TopologyGraph`
-must be added, which implements it's virtual methods. Similarly,
+must be added, which implements its virtual methods. Similarly,
 a new subclass of :class:`.Vertex` must also be made and its virtual
 methods implemented. When the new subclass of :class:`.TopologyGraph`
 is initialized, it must create instances of the :class:`.Vertex`
 subclass, together with :class:`.Edge` instances. Once your
 topology graph has the vertices and edges it wants, simply run
-``super().__init__(vertices, edges, num_processes)`` and you're done.
+:meth:`.TopologyGraph.__init__` and you're done.
+
+The subclass can also create `construction_stages` if the parallel
+construction needs to be broken down into separate stages. However,
+if this is not the case, then an empty :class:`tuple` can simply be
+passed.
 
 
 """
