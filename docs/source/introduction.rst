@@ -251,15 +251,16 @@ What Next?
 A good thing to look at are some `basic examples`_, which will allow
 you to get a feel for ``stk``. Further examples of molecular
 construction can be seen by looking at the different topology graphs.
-The documentation of the various classes in ``stk`` contains usage
+The documentation of the various topology graph classes in ``stk``
+also contains usage
 examples. More advanced examples can be seen in the `cookbook`_ and
 if you want to experiment with automated molecular design you can look
-into who to write an input file for the evolutionary algorithm.
-Finally, if you would like to be able to construct a new type of
-molecule with ``stk`` or you have some other features you would like to
-see but can't implement yourself or you have any other question
-about ``stk`` feel free to message me on your favourite platform or
-file an issue on GitHub.
+into how to write an input file for the evolutionary algorithm. If
+``stk`` does not have a topology graph for a molecule you would like to
+construct, you can always implement a new one yourself and send me a
+pull request. Alternatively, if you like to request an extension to
+``stk``, or you have any other question about ``stk``, feel free to
+message me on your favourite platform or file an issue on GitHub.
 
 
 .. _`basic examples`: basic_examples.html
