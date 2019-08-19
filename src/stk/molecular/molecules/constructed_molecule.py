@@ -1,6 +1,9 @@
 """
 Defines :class:`ConstructedMolecule`.
 
+Constructed Molecule
+====================
+
 """
 
 import logging
