@@ -1,5 +1,6 @@
 """
-Defines rotaxane topologies.
+Rotaxane
+========
 
 """
 

@@ -1,5 +1,8 @@
 """
-Defines topologies of polymers.
+Polymer
+=======
+
+#. :class:`.Linear`
 
 """
 

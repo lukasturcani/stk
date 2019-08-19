@@ -1,5 +1,7 @@
 """
-Defines :class:`.TopologyGraph` and related classes.
+Topology Graphs
+===============
+
 
 .. _`adding topology graphs`:
 

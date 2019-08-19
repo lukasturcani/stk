@@ -1,5 +1,14 @@
 """
-Defines COF topologies.
+Covalent Organic Framework
+==========================
+
+For usage examples see :class:`.COF`.
+
+#. :class:`Honeycomb`
+#. :class:`Hexagonal`
+#. :class:`Square`
+#. :class:`Kagome`
+#. :class:`LinkerlessHoneycomb`
 
 """
 

@@ -1,5 +1,6 @@
 """
-Defines macrocycle topologies.
+Macrocycle
+==========
 
 """
 
