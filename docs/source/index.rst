@@ -117,25 +117,47 @@ construction.
 
 To use ``stk`` you only have to choose which building blocks and
 topology graph you wish to use and ``stk`` will take care of everything
-else.
+else, take for example the construction of an organic cage
 
-.. figure:: https://
+.. code-block:: python
 
-    The general construction workflow of ``stk``.
+    import stk
+
+    polymer = stk.ConstructedMolecule(
+        building_blocks=[
+            stk.BuildingBlock('BrCCBr', ['bromine']),
+            stk.BuildingBlock('BrCNCBr', ['bromine'])
+        ],
+        topology_graph=stk.polymer.Linear(
+            repeating_unit='AB',
+            num_repeating_units=20
+        )
+    )
+    # You can write the molecule to a file if you want to view it.
+    polymer.write('polymer.mol')
+
+which will produce
+
+.. figure::
+
 
 Because the topology graph is an idealized representation of the
 constructed molecule, the bonds formed during construction often have
 unrealistic lengths. This means that constructed molecules will need to
-undergo structure optimization. There is single correct way to go about
-this, because the appropriate methodology for structure optimization
-will depend various factors, such as the nature of the constructed
-molecule, the desired accuracy and time constraints. ``stk`` provides a
-objects called optimizers, which provide a simple and consistent
-interface to different optimization methodologies, and can act as an
-API for external chemistry software. Alternatively, ``stk`` allows you
-to write constructed molecules in common chemical formats, which can be
-used as input for computational chemistry software, if you wish to do
-this manually.
+undergo structure optimization. There is no single correct way to go
+about this, because the appropriate methodology for structure
+optimization will depend various factors, such as the nature of the
+constructed molecule, the desired accuracy and time constraints.
+``stk`` provides a objects called optimizers, which provide a simple
+and consistent interface to different optimization methodologies, and
+can act as an API for external chemistry software. Alternatively,
+``stk`` allows you to write constructed molecules in common chemical
+file formats, which can be used as input for computational chemistry
+software, if you wish to do this manually.
+
+.. figure:: https://
+
+    The general construction workflow of ``stk``.
 
 The abstraction provided by the topology graph has a number of
 powerful benefits. Firstly, because every vertex is responsible for the
@@ -144,26 +166,88 @@ different structural isomers of the constructed molecule. The vertex
 can be told to perform different transformations on the building block,
 so that its orientation in the constructed molecule changes. For the
 end user, selecting the transformation and therefore structural isomer
-extremely easy. Take the example of an organic cage, which can be
+is extremely easy. Take the example of an organic cage, which can be
 constructed with the following code
 
 .. code-block:: python
 
-    import stk
-
     bb1 = stk.BuildingBlock()
     bb2 = stk.BuildingBlock()
     bb3 = stk.BuildingBlock()
+    bb4 = stk.BuildingBlock()
     tetrahedron = stk.cage.FourPlusSix(
 
     )
     cage = stk.ConstructedMolecule(
-        building_blocks=[bb1, bb2, bb3],
+        building_blocks=[bb1, bb2, bb3, bb4],
+        topology_graph=tetrahedron,
+        # Because there a multiple building blocks with the same
+        # number of functional groups, they need to be explicitly
+        # placed on vertices, as there are multiple valid combinations.
+        building_block_vertices={
+
+        }
+    )
+    # You can write the molecule to a file if you want to view it.
+    cage.write('cage.mol')
+
+and looks like this
+
+.. figure::
+
+
+You can see that the green atoms on adjacent building blocks
+point toward the same edge. However, by specifying a different
+edge to align with, the building block will be rotated
+
+.. code-block:: python
+
+    bb1 = stk.BuildingBlock()
+    bb2 = stk.BuildingBlock()
+    bb3 = stk.BuildingBlock()
+    bb4 = stk.BuildingBlock()
+    tetrahedron = stk.cage.FourPlusSix(
+
+    )
+    cage = stk.ConstructedMolecule(
+        building_blocks=[bb1, bb2, bb3, bb4],
         topology_graph=tetrahedron,
         building_block_vertices={
 
         }
     )
+    # You can write the molecule to a file if you want to view it.
+    cage.write('cage_isomer.mol')
+
+.. figure::
+
+
+The same thing can be done to any other building block on the cage to
+perform a rotation on it. You can also write a loop, to create all the
+structural isomers of a single cage in one swoop
+
+.. code-block:: python
+
+    import itertools as it
+
+    edges = [v.edges for v in stk.FourPlusSix.vertices]
+    for i, aligners in enumerate(it.product(*edges)):
+        tetrahedron = stk.cage.FourPlusSix(
+            vertex_alignments={
+                vertex: edge
+                for vertex, edge
+                in zip(stk.cage.FourPlusSix.vertices, aligners)
+            }
+        )
+        isomer = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2, bb3, bb4],
+            topology_graph=tetrahedron,
+            building_block_vertices={
+
+            }
+        )
+        isomer.write(f'cage_isomer_{i}.mol')
+
 
 The second major benefit of the topology graph is that the vertices and
 edges can hold additional state useful for the construction of a
@@ -176,7 +260,8 @@ will construct periodic bonds instead of regular ones.
 
 The third benefit of the topology graph is that it allows users to
 easily modify the construction of molecules by placing different
-building blocks on different vertices. The user can
+building blocks on different vertices. The user can use the
+*building_block_vertices* parameter with any topology graph.
 
 The fourth benefit of the topology graph is that the construction of
 a molecule is broken down into a independent steps. Each vertex
