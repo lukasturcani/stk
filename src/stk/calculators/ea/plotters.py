@@ -1,18 +1,16 @@
 """
-Defines plotters.
+Plotting
+========
 
-Plotters are calculators which produce graphs. They generally do this
+#. :class:`.ProgressPlotter`
+#. :class:`.SelectionPlotter`
+
+Plotting is done by :class:`.Plotter` objects. Plotters are calculators
+which produce graphs. They generally do this
 by decorating other calculators to hook into them, collect data from
 them and then plot the results. To see examples of how to use plotters
 work, look at the documentation of the individual plotters. For example
 :class:`SelectionPlotter` and :class:`ProgressPlotter`.
-
-
-Available plotters.
--------------------
-
-#. :class:`.ProgressPlotter`
-#. :class:`.SelectionPlotter`
 
 
 .. _`adding plotters`:

@@ -46,9 +46,9 @@ rootlogger.addHandler(streamhandler)
 logger = logging.getLogger(__name__)
 
 
-class GAHistory:
+class EAHistory:
     """
-    Deals with logging the GA's history.
+    Deals with logging the EA's history.
 
     Attributes
     ----------
@@ -62,12 +62,12 @@ class GAHistory:
     database_dump : :class:`bool`
         Toggles dumping of :attr:`dp_pop`.
 
-    progress : :class:`.GAPopulation`
+    progress : :class:`.EAPopulation`
         A population where each subpopulation is a generation of the
-        GA.
+        EA.
 
-    db_pop : :class:`.GAPopulation` or :class:`NoneType`
-        A population which holds every molecule made by the GA.
+    db_pop : :class:`.EAPopulation` or :class:`NoneType`
+        A population which holds every molecule made by the EA.
 
     """
 
@@ -82,8 +82,8 @@ class GAHistory:
         self.log_file = log_file
         self.progress_dump = progress_dump
         self.database_dump = database_dump
-        self.progress = stk.GAPopulation()
-        self.db_pop = stk.GAPopulation()
+        self.progress = stk.EAPopulation()
+        self.db_pop = stk.EAPopulation()
 
     def db(self, mols):
         """
@@ -93,8 +93,8 @@ class GAHistory:
 
         Parameters
         ----------
-        mols : :class:`.GAPopulation`
-            A group of molecules made by the GA.
+        mols : :class:`.EAPopulation`
+            A group of molecules made by the EA.
 
         Returns
         -------
@@ -107,12 +107,12 @@ class GAHistory:
 
     def dump(self):
         """
-        Creates output files for the GA run.
+        Creates output files for the EA run.
 
         The following files are created:
 
             progress.log
-                This file holds the progress of the GA in text form.
+                This file holds the progress of the EA in text form.
                 Each generation is reprented by the names of the
                 molecules and their key and fitness.
 
@@ -122,7 +122,7 @@ class GAHistory:
 
             database.json
                 A population dump file holding every molecule made by
-                the GA. Only made if :attr:`db_pop` is not ``None``.
+                the EA. Only made if :attr:`db_pop` is not ``None``.
 
         """
 
@@ -151,9 +151,9 @@ class GAHistory:
         Parameters
         ----------
         logger : :class:`Logger`
-            The logger object recording the GA.
+            The logger object recording the EA.
 
-        pop : :class:`.GAPopulation`
+        pop : :class:`.EAPopulation`
             A population which is to be added to the log.
 
         Returns
@@ -199,9 +199,9 @@ class GAHistory:
             )
 
 
-def ga_run(filename, input_file):
+def ea_run(filename, input_file):
     """
-    Runs the GA.
+    Runs the EA.
 
     """
 
@@ -215,7 +215,7 @@ def ga_run(filename, input_file):
     generation_selector = input_file.generation_selector
     mutation_selector = input_file.mutation_selector
     crossover_selector = input_file.crossover_selector
-    exiter = input_file.exiter
+    terminator = input_file.terminator
 
     progress_dump_filename = join('..', 'pop_dumps', 'progress.json')
     database_dump_filename = join('..', 'pop_dumps', 'progress.json')
@@ -257,7 +257,7 @@ def ga_run(filename, input_file):
         logging_level = input_file.logging_level
     rootlogger.setLevel(logging_level)
 
-    pop.set_ga_tools(
+    pop.set_ea_tools(
         generation_selector=generation_selector,
         mutation_selector=mutation_selector,
         crossover_selector=crossover_selector,
@@ -265,9 +265,11 @@ def ga_run(filename, input_file):
         crosser=crosser
     )
 
-    # GA optimizer and fitness calculator should always use the cache.
+    # EA should always use the cache.
     optimizer._use_cache = True
     fitness_calculator._use_cache = True
+    crosser._use_cache = True
+    mutator._use_cache = True
 
     # 2. Set up the directory structure.
 
@@ -276,7 +278,7 @@ def ga_run(filename, input_file):
     # open.This closes them. If this is not done, directories may not
     # be possible to move.
     stk.kill_macromodel()
-    # Move any ``output`` dir in the cwd into ``stk_ga_runs``.
+    # Move any ``output`` dir in the cwd into ``stk_ea_runs``.
     stk.archive_output()
     os.mkdir('output')
     os.chdir('output')
@@ -288,12 +290,12 @@ def ga_run(filename, input_file):
     # Copy the input script into the ``output`` folder.
     shutil.copyfile(filename, basename(filename))
     # Make the ``scratch`` directory which acts as the working
-    # directory during the GA run.
+    # directory during the EA run.
     os.mkdir('scratch')
     os.chdir('scratch')
     open('errors.log', 'w').close()
 
-    history = GAHistory(
+    history = EAHistory(
         fitness_calculator=fitness_calculator,
         log_file=log_file,
         database_dump=database_dump,
@@ -301,7 +303,7 @@ def ga_run(filename, input_file):
     )
     progress = history.progress
 
-    # 3. Run the GA.
+    # 3. Run the EA.
     id_ = pop.set_mol_ids(0)
     logger.info('Optimizing the population.')
     pop.optimize(optimizer, processes)
@@ -319,7 +321,7 @@ def ga_run(filename, input_file):
     history.db(pop)
 
     gen = 0
-    while not exiter.exit(progress):
+    while not terminator.terminate(progress):
         gen += 1
         logger.info(f'Starting generation {gen}.')
 
@@ -399,12 +401,12 @@ def ga_run(filename, input_file):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(prog='python -m stk.ga')
+    parser = argparse.ArgumentParser(prog='python -m stk.ea')
 
     parser.add_argument('input_file', type=str)
     parser.add_argument(
         '-l', '--loops', type=int, default=1,
-        help='The number times the GA should be run.'
+        help='The number times the EA should be run.'
     )
 
     args = parser.parse_args()
@@ -412,4 +414,4 @@ if __name__ == '__main__':
     input_file = loader.load_module()
 
     for x in range(args.loops):
-        ga_run(args.input_file, input_file)
+        ea_run(args.input_file, input_file)

@@ -1,5 +1,9 @@
 """
-Module for defining fitness calculators.
+Fitness Calculators
+===================
+
+#. :class:`.PropertyVector`
+#. :class:`.RaisingFitnessCalculator`
 
 Fitness calculators are classes which inherit
 :class:`FitnessCalculator` and define a
@@ -32,17 +36,11 @@ existing fitness values based on all the fitness values in a
 population, for example by dividing the fitness value of all molecules
 by the mean fitness across the population.
 
-Available fitness calculators.
-------------------------------
-
-#. :class:`.PropertyVector`
-#. :class:`.RaisingFitnessCalculator`
-
 
 .. _`adding fitness calculators`:
 
-Extending stk: Making new fitness calculators.
-----------------------------------------------
+Making new fitness calculators
+------------------------------
 
 A new class inheriting :class:`FitnessCalculator` must be created.
 The class must define a :meth:`~FitnessCalculator.get_fitness` method,

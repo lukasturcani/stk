@@ -4,4 +4,4 @@ from .mutators import *
 from .fitness_normalizers import *
 from .plotters import *
 from .selectors import *
-from .exiters import *
+from .terminators import *

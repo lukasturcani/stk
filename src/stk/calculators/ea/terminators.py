@@ -1,29 +1,30 @@
 """
-Defines :class:`Exiter` classes.
+Termination
+===========
 
-:class:`Exiter` objects check to see if an exit condition for the GA
-has been fulfilled.
-
-Available exiters.
-------------------
 
 #. :class:`.NumGenerations`
 #. :class:`.MoleculePresent`
 #. :class:`.FitnessPlateau`
-#. :class:`.AnyExiter`
-#. :class:`.AllExiters`
+#. :class:`.AnyTerminator`
+#. :class:`.AllTerminators`
 
-.. _`adding exiters`:
 
-Extending stk: Making new exiters.
-----------------------------------
 
-A new :class:`Exiter` class should inherit :class:`Exiter` and
-define an :meth:`~Exiter.exit` method, which takes progress population
-as its only argument and returns ``True`` or ``False`` depending on if
-an exit condition has been satisfied. The progress population is a
-:class:`.Population` instance which holds each GA generation as a
-subpopulation.
+:class:`Terminator` objects check to see if an exit condition for the
+EA has been fulfilled.
+
+.. _`adding Terminators`:
+
+Making new Terminators
+------------------
+
+A new :class:`Terminator` class should inherit :class:`Terminator` and
+define an :meth:`~Terminator.terminate` method, which takes progress
+population as its only argument and returns ``True`` or ``False``
+depending on if an exit condition has been satisfied. The progress
+population is a :class:`.Population` instance which holds each EA
+generation as a subpopulation.
 
 """
 
@@ -32,15 +33,15 @@ import rdkit.Chem.AllChem as rdkit
 from functools import partial
 
 
-class Exiter:
+class Terminator:
     """
-    Checks if the exit criterion for the GA has been satisfied.
+    Checks if the exit criterion for the EA has been satisfied.
 
     """
 
-    def exit(self, progress):
+    def terminate(self, progress):
         """
-        Check to see the the GA should stop.
+        Check to see the the EA should stop.
 
         Parameters
         ----------
@@ -51,34 +52,34 @@ class Exiter:
         Returns
         -------
         :class:`bool`
-            ``True`` if the GA should stop and ``False`` otherwise.
+            ``True`` if the EA should stop and ``False`` otherwise.
 
         """
 
         raise NotImplementedError()
 
 
-class AnyExiter(Exiter):
+class AnyTerminator(Terminator):
     """
-    Checks if any :class:`Exiter` has satisfied its exit condition.
+    Checks if any :class:`Terminator` has satisfied its exit condition.
 
     """
 
-    def __init__(self, *exiters):
+    def __init__(self, *Terminators):
         """
-        Initialize a :class:`AnyExiter` instance.
+        Initialize a :class:`AnyTerminator` instance.
 
         Parameters
         ----------
-        *exiters : :class:`Exiter`
-            :class:`Exiter` objects which are checked to see if their
+        *Terminators : :class:`Terminator`
+            :class:`Terminator` objects which are checked to see if their
             exit conditions have been satisfied.
 
         """
 
-        self._exiters = exiters
+        self._Terminators = Terminators
 
-    def exit(self, progress):
+    def terminate(self, progress):
         """
         Check to see if any exit condition has been satisfied.
 
@@ -90,35 +91,38 @@ class AnyExiter(Exiter):
         Returns
         -------
         :class:`bool`
-            ``True`` if any :class:`Exiter` in :attr:`exiters` has
+            ``True`` if any :class:`Terminator` in :attr:`Terminators` has
             satisfied its exit condition.
 
         """
 
-        return any(exiter.exit(progress) for exiter in self._exiters)
+        return any(
+            Terminator.terminate(progress)
+            for Terminator in self._Terminators
+        )
 
 
-class AllExiters(Exiter):
+class AllTerminators(Terminator):
     """
-    Checks if all :class:`Exiter` objects return ``True``.
+    Checks if all :class:`Terminator` objects return ``True``.
 
     """
 
-    def __init__(self, *exiters):
+    def __init__(self, *Terminators):
         """
-        Initialize a :class:`AllExiter` instance.
+        Initialize a :class:`AllTerminator` instance.
 
         Parameters
         ----------
-        *exiters : :class:`Exiter`
-            :class:`Exiter` objects which are checked to see if their
+        *Terminators : :class:`Terminator`
+            :class:`Terminator` objects which are checked to see if their
             exit conditions have been satisfied.
 
         """
 
-        self._exiters = exiters
+        self._Terminators = Terminators
 
-    def exit(self, progress):
+    def terminate(self, progress):
         """
         Checks to see if all exit conditions have been satisfied.
 
@@ -130,17 +134,20 @@ class AllExiters(Exiter):
         Returns
         -------
         :class:`bool`
-            ``True`` if all :class:`Exiter` objects in :attr:`exiters`
+            ``True`` if all :class:`Terminator` objects in :attr:`Terminators`
             have satisfied its exit condition.
 
         """
 
-        return all(exiter.exit(progress) for exiter in self._exiters)
+        return all(
+            Terminator.terminate(progress)
+            for Terminator in self._Terminators
+        )
 
 
-class NumGenerations(Exiter):
+class NumGenerations(Terminator):
     """
-    Stop the GA after a certain number of generations.
+    Stop the EA after a certain number of generations.
 
     """
 
@@ -151,13 +158,13 @@ class NumGenerations(Exiter):
         Parameters
         ----------
         num_generations : :class:`int`
-            The number of generations after which the GA should stop.
+            The number of generations after which the EA should stop.
 
         """
 
         self._num_generations = num_generations
 
-    def exit(self, progress):
+    def terminate(self, progress):
         """
         Check if a number of generations has passed.
 
@@ -175,9 +182,9 @@ class NumGenerations(Exiter):
         return len(progress.subpopulations) >= self._num_generations
 
 
-class MoleculePresent(Exiter):
+class MoleculePresent(Terminator):
     """
-    Stops the GA if a specific molecule has been found.
+    Stops the EA if a specific molecule has been found.
 
     """
 
@@ -188,7 +195,7 @@ class MoleculePresent(Exiter):
         Parameters
         ----------
         mol : :class:`.Molecule`
-            A molecule which if present in any of the GA's generations
+            A molecule which if present in any of the EA's generations
             causes it to stop running.
 
         """
@@ -199,7 +206,7 @@ class MoleculePresent(Exiter):
             mol.to_rdkit_mol()
         )
 
-    def exit(self, progress):
+    def terminate(self, progress):
         """
         Return ``True`` if :attr:`mol` is in `progress`.
 
@@ -230,7 +237,7 @@ class MoleculePresent(Exiter):
         return rdkit.MolToInchi(mol1) == rdkit.MolToInchi(mol2)
 
 
-class FitnessPlateau(Exiter):
+class FitnessPlateau(Terminator):
     """
     Checks if the fittest molecules remain the same.
 
@@ -255,7 +262,7 @@ class FitnessPlateau(Exiter):
         self._num_generations = num_generations
         self._top_members = top_members
 
-    def exit(self, progress):
+    def terminate(self, progress):
         """
         Check if the fittest molecules changed between generations.
 
@@ -272,7 +279,7 @@ class FitnessPlateau(Exiter):
 
         """
 
-        # Check that the GA has run for more than num_gens generations.
+        # Check that the EA has run for more than num_gens generations.
         if len(progress.subpopulations) >= self._num_generations:
             gens = set()
             for i in range(self._num_generations):

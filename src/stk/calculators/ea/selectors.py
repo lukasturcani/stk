@@ -1,6 +1,15 @@
 """
-Defines :class:`Selector` classes.
+Selection
+=========
 
+#. :class:`.Fittest`
+#. :class:`.Roulette`
+#. :class:`.AboveAverage`
+#. :class:`SelectorSequence`
+#. :class:`.SelectorFunnel`
+
+
+Selection is carried out by :class:`Selector` objects.
 Selectors are objects with a :meth:`~Selector.select`
 method, which is used to select molecules from a :class:`.Population`.
 Examples of how :class:`Selector` classes can be used is given their
@@ -12,19 +21,11 @@ processes, such as stochastic sampling, using
 :class:`.SelectorSequence` or :class:`SelectorFunnel`. Examples of how
 this can happen are given in the documentation of these two classes.
 
-Available selectors.
---------------------
-
-#. :class:`.Fittest`
-#. :class:`.Roulette`
-#. :class:`.AboveAverage`
-#. :class:`SelectorSequence`
-#. :class:`.SelectorFunnel`
 
 .. _`adding selectors`:
 
-Extending stk: Making new selectors.
-------------------------------------
+Making new selectors
+--------------------
 
 When a new :class:`Selector` class is made it must inherit
 :class:`Selector` and define a :meth:`~Selection.select` method.

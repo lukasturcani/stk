@@ -1311,9 +1311,9 @@ class Population:
         return str(self)
 
 
-class GAPopulation(Population):
+class EAPopulation(Population):
     """
-    A population which also carries out genetic algorithm operations.
+    A population which also carries out evolutionary operations.
 
     Attributes
     ----------
@@ -1328,7 +1328,7 @@ class GAPopulation(Population):
 
     """
 
-    def set_ga_tools(
+    def set_ea_tools(
         self,
         generation_selector,
         mutation_selector,
@@ -1368,7 +1368,7 @@ class GAPopulation(Population):
     def calculate_member_fitness(
         self,
         fitness_calculator,
-        processes=None
+        num_processes=None
     ):
         """
         Calculates the fitness values of molecules.
@@ -1379,7 +1379,7 @@ class GAPopulation(Population):
             The :class:`.FitnessCalculator` used to calculate the
             fitness.
 
-        processes : :class:`int`, optional
+        num_processes : :class:`int`, optional
             The number of processes to create. If ``1`` then fitness
             values are calculated serially.
 
@@ -1389,12 +1389,12 @@ class GAPopulation(Population):
 
         """
 
-        if processes == 1:
+        if num_processes == 1:
             self._calculate_fitness_serial(fitness_calculator)
         else:
             self._calculate_fitness_parallel(
                 fitness_calculator=fitness_calculator,
-                processes=processes
+                num_processes=num_processes
             )
 
     def _calculate_fitness_serial(self, fitness_calculator):
@@ -1404,7 +1404,7 @@ class GAPopulation(Population):
     def _calculate_fitness_parallel(
         self,
         fitness_calculator,
-        processes
+        num_processes
     ):
 
         fitness_fn = _Guard(
@@ -1414,7 +1414,7 @@ class GAPopulation(Population):
 
         # Apply the function to every member of the population, in
         # parallel.
-        with pathos.pools.ProcessPool(processes) as pool:
+        with pathos.pools.ProcessPool(num_processes) as pool:
             evaluated = pool.map(fitness_fn, self)
 
         # If anything returned an exception, raise it.

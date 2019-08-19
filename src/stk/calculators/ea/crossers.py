@@ -1,23 +1,22 @@
 """
-Defines crossers.
-
-Crossers are objects which take a group of molecules and recombine
-them to produce offspring molecules. How crossers are used can be
-seen in the documentation of the various :class:`Crosser` classes,
-for example :class:`GeneticRecombination`,
-:class:`Jumble` or :class:`RandomCrossover`.
-
-Available crossers.
--------------------
+Crossover
+=========
 
 #. :class:`.RandomCrossover`
 #. :class:`.GeneticRecombination`
 #. :class:`.Jumble`
 
+Crossover is implement through :class:`Crosser` objects. Crossers take
+a group of molecules and recombine
+them to produce offspring molecules. How crossers are used can be
+seen in the documentation of the various :class:`Crosser` classes,
+for example :class:`GeneticRecombination`,
+:class:`Jumble` or :class:`RandomCrossover`.
+
 .. _`adding crossers`:
 
-Extending stk: Making new crossers.
------------------------------------
+Making New Crossers
+-------------------
 
 To add a new :class:`Crosser`, make a new class which inherits
 :class:`Crosser` and defines a method called

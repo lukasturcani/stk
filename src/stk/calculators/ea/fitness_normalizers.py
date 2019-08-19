@@ -1,5 +1,14 @@
 """
-Module for defining fitness normalizers.
+Fitness Normalizers
+===================
+
+#. :class:`.NullFitnessNormalizer`
+#. :class:`.Power`
+#. :class:`.Multiply`
+#. :class:`.Sum`
+#. :class:`.ScaleByMean`
+#. :class:`.ShiftUp`
+#. :class:`.NormalizerSequence`
 
 Fitness normalizers are classes which are responsible for normalizing
 the fitness values in a :class:`.Population`. They analyze the
@@ -13,22 +22,11 @@ documention of the classes which inherit it, for example
 multiple :class:`FitnessNormalizer` can be chained using
 :meth:`.NormalizerSequence`.
 
-Available fitness normalizers.
-------------------------------
-
-#. :class:`.NullFitnessNormalizer`
-#. :class:`.Power`
-#. :class:`.Multiply`
-#. :class:`.Sum`
-#. :class:`.ScaleByMean`
-#. :class:`.ShiftUp`
-#. :class:`.NormalizerSequence`
-
 
 .. _`adding fitness normalizers`:
 
-Extending stk: Making new fitness normalizers.
-----------------------------------------------
+Making new fitness normalizers
+------------------------------
 
 A new class inheriting :class:`FitnessNormalizer` must be made.
 The class must define a :meth:`~FitnessNormalizer.normalize` method,

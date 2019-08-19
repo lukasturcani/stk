@@ -1,7 +1,13 @@
 """
-Defines mutators.
+Mutation
+========
 
-Mutators are objects which mutate molecules. They inherit
+#. :class:`RandomBuildingBlock`
+#. :class:`.SimilarBuildingBlock`
+#. :class:`.RandomTopology`
+#. :class:`.RandomMutation`
+
+Mutation is carried by :class:`.Mutator` objects. They inherit
 :class:`.Mutator` and define a method :meth:`~Mutator.mutate`. This
 method must take a single molecule and return a mutant.
 
@@ -10,19 +16,11 @@ the various :class:`Mutator` classes, for example
 :class:`RandomBuildingBlock`, :class:`SimilarBuildingBlock`
 or :class:`RandomMutation`.
 
-Available mutators.
--------------------
-
-#. :class:`RandomBuildingBlock`
-#. :class:`.SimilarBuildingBlock`
-#. :class:`.RandomTopology`
-#. :class:`.RandomMutation`
-
 
 .. _`adding mutators`:
 
-Extending stk: Making new mutators.
------------------------------------
+Making new mutators
+-------------------
 
 Mutators must simple inherit the :class:`.Mutator` class and define a
 method called :meth:`~Mutatator.mutate`, which take a single molecule
