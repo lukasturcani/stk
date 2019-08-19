@@ -252,7 +252,7 @@ A good thing to look at are some `basic examples`_, which will allow
 you to get a feel for ``stk``. Further examples of molecular
 construction can be seen by looking at the different topology graphs.
 The documentation of the various classes in ``stk`` contains usage
-examples. More advanced examples can be seen in the :ref:`cookbook` and
+examples. More advanced examples can be seen in the `cookbook`_ and
 if you want to experiment with automated molecular design you can look
 into who to write an input file for the evolutionary algorithm.
 Finally, if you would like to be able to construct a new type of
@@ -262,4 +262,5 @@ about ``stk`` feel free to message me on your favourite platform or
 file an issue on GitHub.
 
 
-.. _`basic examples`: basic_examples.rst
+.. _`basic examples`: basic_examples.html
+.. _`cookbook`: cookbook.html
