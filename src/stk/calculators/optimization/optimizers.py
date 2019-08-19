@@ -107,8 +107,8 @@ class Optimizer:
         """
         Add a molecule to the cache.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         mol : :class:`.Molecule`
             The molecule to be added to the cache.
 
