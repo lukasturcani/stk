@@ -4,7 +4,7 @@ from os.path import join
 
 
 def get_version():
-    with open(join('stk', '__init__.py'), 'r') as f:
+    with open(join('src', 'stk', '__init__.py'), 'r') as f:
         content = f.read()
     p = re.compile(r'^__version__ = [\'"]([^\'\"]*)[\'"]', re.M)
     return p.search(content).group(1)
