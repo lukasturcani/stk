@@ -50,7 +50,7 @@
    :caption: Evolutionary Algorithm
    :maxdepth: 2
 
-   Introduction <stk.ea>
+   Introduction <ea>
    Fitness Calculators <stk.calculators.ea.fitness_calculators>
    Fitness Normalizers <stk.calculators.ea.fitness_normalizers>
    Selection <stk.calculators.ea.selectors>
