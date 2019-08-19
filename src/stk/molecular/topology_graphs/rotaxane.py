@@ -326,7 +326,7 @@ class NRotaxane(TopologyGraph):
         return (
             f'rotaxane.NRotaxane('
             f'{self._repeating_unit!r}, '
-            f'{self._orientations!r}, '
-            f'{self._num_repeating_units}'
+            f'{self._num_repeating_units}, '
+            f'{self._orientations!r}'
             f')'
         )

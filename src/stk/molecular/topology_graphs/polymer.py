@@ -343,6 +343,10 @@ class Linear(TopologyGraph):
             building block molecules in the order they are passed to
             :meth:`.ConstructedMolecule.__init__`.
 
+        num_repeating_units : :class:`int`
+            The number of repeating units which are used to make the
+            polymer.
+
         orientations : :class:`tuple` of :class:`float`
             For each character in the repeating unit, a value
             between ``0`` and ``1`` (both inclusive) must be given in
@@ -354,10 +358,6 @@ class Linear(TopologyGraph):
             chain with a preference for head-to-head or head-to-tail if
             a number between ``0`` and ``1`` is chosen. If ``None``
             then ``0`` is picked in all cases.
-
-        num_repeating_units : :class:`int`
-            The number of repeating units which are used to make the
-            polymer.
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
@@ -393,7 +393,7 @@ class Linear(TopologyGraph):
         super().__init__(
             vertices=tuple(vertices),
             edges=tuple(edges),
-            stages=(),
+            construction_stages=(),
             num_processes=num_processes
         )
 
@@ -473,6 +473,6 @@ class Linear(TopologyGraph):
     def __repr__(self):
         return (
             f'polymer.Linear({self._repeating_unit!r}, '
-            f'{self._orientations!r}, '
-            f'{self._num_repeating_units!r})'
+            f'{self._num_repeating_units!r}, '
+            f'{self._orientations!r})'
         )

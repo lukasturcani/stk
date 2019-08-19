@@ -281,7 +281,7 @@ class Macrocycle(TopologyGraph):
         super().__init__(
             vertices=tuple(vertices),
             edges=tuple(edges),
-            stages=(),
+            construction_stages=(),
             num_processes=num_processes
         )
 
@@ -362,6 +362,6 @@ class Macrocycle(TopologyGraph):
     def __repr__(self):
         return (
             f'macrocycle.Macrocycle({self._repeating_unit!r}, '
-            f'{self._orientations!r}, '
-            f'{self._num_repeating_units!r})'
+            f'{self._num_repeating_units!r}, '
+            f'{self._orientations!r})'
         )
