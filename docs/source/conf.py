@@ -44,7 +44,7 @@ autodoc_default_options = {
     'show-inheritance': True,
 }
 
-add_module_names = False
+# add_module_names = False
 # numpydoc_show_class_members = False
 
 

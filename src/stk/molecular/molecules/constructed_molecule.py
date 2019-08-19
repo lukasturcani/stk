@@ -1,6 +1,4 @@
 """
-Defines :class:`ConstructedMolecule`.
-
 Constructed Molecule
 ====================
 
