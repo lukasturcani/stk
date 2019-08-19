@@ -203,12 +203,18 @@ class Macrocycle(TopologyGraph):
                 stk.BuildingBlock('NCCN', ['amine']),
                 stk.BuildingBlock('O=CCC=O', ['aldehyde'])
             ],
-            topology_graph=stk.macrocycle.Macrocycle('AB', (0, 0), 5)
+            topology_graph=stk.macrocycle.Macrocycle('AB', 5)
         )
 
     """
 
-    def __init__(self, repeating_unit, orientations, n, processes=1):
+    def __init__(
+        self,
+        repeating_unit,
+        num_repeating_units,
+        orientations=None,
+        num_processes=1
+    ):
         """
         Initialize a :class:`Macrocycle` instance.
 
@@ -220,7 +226,11 @@ class Macrocycle(TopologyGraph):
             building block molecules in the order they are passed to
             :meth:`.ConstructedMolecule.__init__`.
 
-        orientations : :class:`tuple` of :class:`float`
+        num_repeating_units : :class:`int`
+            The number of repeating units which are used to make the
+            macrocycle.
+
+        orientations : :class:`tuple` of :class:`float`, optional
             For each character in the repeating unit, a value
             between ``0`` and ``1`` (both inclusive) must be given in
             a :class:`tuplet`. It indicates the probability that each
@@ -229,24 +239,26 @@ class Macrocycle(TopologyGraph):
             ``1`` it is guaranteed to flip. This allows the user to
             create head-to-head or head-to-tail chains, as well as
             chain with a preference for head-to-head or head-to-tail if
-            a number between ``0`` and ``1`` is chosen.
+            a number between ``0`` and ``1`` is chosen. If ``None``
+            then ``0` is picked in every case.
 
-        n : :class:`int`
-            The number of repeating units which are used to make the
-            macrocycle.
-
-        processes : :class:`int`, optional
+        num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
 
         """
 
+        if orientations is None:
+            orientations = tuple(
+                0. for i in range(len(repeating_unit))
+            )
+
         # Keep these for __repr__
         self._repeating_unit = repeating_unit
         self._orientations = orientations
-        self._n = n
+        self._num_repeating_units = num_repeating_units
 
-        chain = orientations*n
+        chain = orientations*num_repeating_units
         # Each monomer in the macrocycle is separated by angle_diff.
         angle_diff = (2*np.pi)/len(chain)
         vertices = []
@@ -266,7 +278,12 @@ class Macrocycle(TopologyGraph):
                 edges.append(Edge(vertices[i-1], vertices[i]))
 
         edges.append(Edge(vertices[0], vertices[-1]))
-        super().__init__(tuple(vertices), tuple(edges), (), processes)
+        super().__init__(
+            vertices=tuple(vertices),
+            edges=tuple(edges),
+            stages=(),
+            num_processes=num_processes
+        )
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """
@@ -304,7 +321,7 @@ class Macrocycle(TopologyGraph):
 
         """
 
-        polymer = self._repeating_unit*self._n
+        polymer = self._repeating_unit*self._num_repeating_units
         bb_map = {
             letter: bb for letter, bb in zip(polymer, building_blocks)
         }
@@ -336,7 +353,8 @@ class Macrocycle(TopologyGraph):
 
         """
 
-        return len(self._repeating_unit)*self._n*0.25*max(
+        length = len(self._repeating_unit)*self._num_repeating_units
+        return length*0.25*max(
             bb.get_maximum_diameter()
             for bb in mol.building_block_vertices
         )
@@ -345,5 +363,5 @@ class Macrocycle(TopologyGraph):
         return (
             f'macrocycle.Macrocycle({self._repeating_unit!r}, '
             f'{self._orientations!r}, '
-            f'{self._n!r})'
+            f'{self._num_repeating_units!r})'
         )

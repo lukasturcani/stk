@@ -325,7 +325,13 @@ class Linear(TopologyGraph):
 
     """
 
-    def __init__(self, repeating_unit, orientations, n, processes=1):
+    def __init__(
+        self,
+        repeating_unit,
+        num_repeating_units,
+        orientations=None,
+        num_processes=1
+    ):
         """
         Initialize a :class:`Linear` instance.
 
@@ -346,24 +352,30 @@ class Linear(TopologyGraph):
             ``1`` it is guaranteed to flip. This allows the user to
             create head-to-head or head-to-tail chains, as well as
             chain with a preference for head-to-head or head-to-tail if
-            a number between ``0`` and ``1`` is chosen.
+            a number between ``0`` and ``1`` is chosen. If ``None``
+            then ``0`` is picked in all cases.
 
-        n : :class:`int`
+        num_repeating_units : :class:`int`
             The number of repeating units which are used to make the
             polymer.
 
-        processes : :class:`int`, optional
+        num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
 
         """
 
+        if orientations is None:
+            orientations = tuple(
+                0. for i in range(len(repeating_unit))
+            )
+
         # Keep these for __repr__
         self._repeating_unit = repeating_unit
         self._orientations = orientations
-        self._n = n
+        self._num_repeating_units = num_repeating_units
 
-        head, *body, tail = orientations*n
+        head, *body, tail = orientations*num_repeating_units
         vertices = [_HeadVertex(0, 0, 0, head)]
         edges = []
         for i, orientation in enumerate(body, 1):
@@ -378,7 +390,12 @@ class Linear(TopologyGraph):
         )
         edges.append(Edge(vertices[-2], vertices[-1]))
 
-        super().__init__(tuple(vertices), tuple(edges), (), processes)
+        super().__init__(
+            vertices=tuple(vertices),
+            edges=tuple(edges),
+            stages=(),
+            num_processes=num_processes
+        )
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """
@@ -416,7 +433,7 @@ class Linear(TopologyGraph):
 
         """
 
-        polymer = self._repeating_unit*self._n
+        polymer = self._repeating_unit*self._num_repeating_units
         bb_map = {
             letter: bb for letter, bb in zip(polymer, building_blocks)
         }
@@ -457,5 +474,5 @@ class Linear(TopologyGraph):
         return (
             f'polymer.Linear({self._repeating_unit!r}, '
             f'{self._orientations!r}, '
-            f'{self._n!r})'
+            f'{self._num_repeating_units!r})'
         )

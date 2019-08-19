@@ -13,7 +13,7 @@ methods implemented. When the new subclass of :class:`.TopologyGraph`
 is initialized, it must create instances of the :class:`.Vertex`
 subclass, together with :class:`.Edge` instances. Once your
 topology graph has the vertices and edges it wants, simply run
-``super().__init__(vertices, edges, processes)`` and you're done.
+``super().__init__(vertices, edges, num_processes)`` and you're done.
 
 
 """
@@ -812,7 +812,7 @@ class TopologyGraph:
         vertices,
         edges,
         construction_stages,
-        processes
+        num_processes
     ):
         """
         Initialize an instance of :class:`.TopologyGraph`.
@@ -845,7 +845,7 @@ class TopologyGraph:
             then all vertices which belong to an earlier stage will
             place their building block before those at a later stage.
 
-        processes : :class:`int`
+        num_processes : :class:`int`
             The number of parallel processes to create during
             :meth:`construct`.
 
@@ -855,7 +855,7 @@ class TopologyGraph:
         self.edges = edges
         self._construction_stages = construction_stages
         self._set_stages()
-        self._processes = processes
+        self._num_processes = num_processes
         for i, vertex in enumerate(self.vertices):
             vertex.id = i
         for i, edge in enumerate(self.edges):
@@ -1093,7 +1093,7 @@ class TopologyGraph:
 
         """
 
-        if self._processes == 1:
+        if self._num_processes == 1:
             return self._place_building_blocks_serial(
                 mol=mol,
                 vertices=vertices,
@@ -1187,7 +1187,7 @@ class TopologyGraph:
         }
         # Use a shorter alias.
         counter = mol.building_block_counter
-        with pathos.pools.ProcessPool(self._processes) as pool:
+        with pathos.pools.ProcessPool(self._num_processes) as pool:
             for stage in self._stages:
                 verts = []
                 bbs = []

@@ -171,23 +171,29 @@ class NRotaxane(TopologyGraph):
             building_blocks=[
                 stk.BuildingBlock('[Br]CC[Br]', ['bromine'])
             ],
-            topology_graph=stk.macrocycle.Macrocycle('A', [0], 5)
+            topology_graph=stk.macrocycle.Macrocycle('A', 5)
         )
         axle = stk.ConstructedMolecule(
             building_blocks=[
                 stk.BuildingBlock('NCCN', ['amine']),
                 stk.BuildingBlock('O=CCC=O', ['aldehyde'])
             ],
-            topology_graph=stk.polymer.Linear('AB', [0, 0], 7)
+            topology_graph=stk.polymer.Linear('AB', 7)
         )
         rotaxane = stk.ConstructedMolecule(
             building_blocks=[axle, cycle],
-            topology_graph=stk.rotaxane.NRotaxane('A', [0], 3)
+            topology_graph=stk.rotaxane.NRotaxane('A', 3)
         )
 
     """
 
-    def __init__(self, repeating_unit, orientations, n, processes=1):
+    def __init__(
+        self,
+        repeating_unit,
+        num_repeating_units,
+        orientations=None,
+        num_processes=1
+    ):
         """
         Initialize a :class:`NRotaxane` instance.
 
@@ -199,7 +205,10 @@ class NRotaxane(TopologyGraph):
             building block molecules in the order they are passed to
             :meth:`.ConstructedMolecule.__init__`.
 
-        orientations : :class:`tuple` of :class:`float`
+        num_repeating_units : :class:`int`
+            The number of repeating units threaded along the axle.
+
+        orientations : :class:`tuple` of :class:`float`, optional
             For each character in the repeating unit, a value
             between ``0`` and ``1`` (both inclusive) must be given in
             a :class:`tuple`. It indicates the probability that each
@@ -208,23 +217,26 @@ class NRotaxane(TopologyGraph):
             flip. If ``1`` it is guaranteed to flip. This allows the
             user to create head-to-head or head-to-tail chains, as well
             as chain with a preference for head-to-head or head-to-tail
-            if a number between ``0`` and ``1`` is chosen.
+            if a number between ``0`` and ``1`` is chosen. If
+            ``None`` then defaults to ``0`` in every case.
 
-        n : :class:`int`
-            The number of repeating units threaded along the axle.
-
-        processes : :class:`int`, optional
+        num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
 
         """
 
+        if orientations is None:
+            orientations = tuple(
+                0. for i in range(len(repeating_unit))
+            )
+
         self._repeating_unit = repeating_unit
         self._orientations = orientations
-        self._n = n
+        self._num_repeating_units = num_repeating_units
 
         vertices = [_AxleVertex(0, 0, 0)]
-        threads = orientations * n
+        threads = orientations * num_repeating_units
         distance = 1 / (len(threads)-1)
         for i, orientation in enumerate(threads):
             vertices.append(
@@ -235,7 +247,7 @@ class NRotaxane(TopologyGraph):
                     orientation=orientation
                 )
             )
-        super().__init__(tuple(vertices), (), (), processes)
+        super().__init__(tuple(vertices), (), (), num_processes)
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """
@@ -273,7 +285,7 @@ class NRotaxane(TopologyGraph):
 
         """
 
-        threads = self._repeating_unit*self._n
+        threads = self._repeating_unit*self._num_repeating_units
         axle, *cycles = building_blocks
         bb_map = {
             letter: bb for letter, bb in zip(threads, cycles)
@@ -315,6 +327,6 @@ class NRotaxane(TopologyGraph):
             f'rotaxane.NRotaxane('
             f'{self._repeating_unit!r}, '
             f'{self._orientations!r}, '
-            f'{self._n}'
+            f'{self._num_repeating_units}'
             f')'
         )

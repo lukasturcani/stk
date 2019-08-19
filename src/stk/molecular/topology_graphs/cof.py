@@ -540,7 +540,7 @@ class COF(TopologyGraph):
         lattice_size,
         periodic=False,
         vertex_alignments=None,
-        processes=1
+        num_processes=1
     ):
         """
         Initialize a :class:`.COF`.
@@ -574,7 +574,7 @@ class COF(TopologyGraph):
             the class attribute :attr:`vertices` while the edges are
             referred to by their index in :attr:`.Vertex.edges`.
 
-        processes : :class:`int`, optional
+        num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
 
@@ -597,7 +597,7 @@ class COF(TopologyGraph):
             for clones in flatten(vertices, {dict})
             for vertex in clones.values()
         )
-        super().__init__(vertices, edges, (), processes)
+        super().__init__(vertices, edges, (), num_processes)
 
     def _normalize_vertex_alignments(self, vertex_alignments):
         """
