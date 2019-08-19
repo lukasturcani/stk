@@ -261,8 +261,108 @@ Optimizing Molecules in Bulk
 ============================
 
 
+Converting between :mod:`rdkit` Molecules
+=========================================
+
+:mod:`rdkit` is a popular and powerful cheminformatics library which
+provides many useful tools for molecular analysis. To take advantage
+of it ``stk`` can convert its molecules into those of :mod:`rdkit`
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock('ICCBr', ['bromine', 'iodine'])
+    bb_rdkit = bb.to_rdkit_mol()
+
+    polymer = stk.ConstructedMolecule(
+        bulding_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 10)
+    )
+    polymer_rdkit = polymer.to_rdkit_mol()
+
+``stk`` also allows you to update the structure of molecules from
+:mod:`rdkit` molecules
+
+.. code-block:: python
+
+    # Update structure of bb to match structure of bb_rdkit.
+    bb.update_from_rdkit_mol(bb_rdkit)
+    # Update structure of polymer to match structure of polymer_rdkit.
+    polymer.update_from_rdkit_mol(polymer_rdkit)
+
+
+Finally, ``stk`` allows initialization of new building blocks from
+:mod:`rdkit` molecules directly
+
+.. code-block:: python
+
+    bb2 = stk.BuildingBlock.init_from_rdkit_mol(bb_rdkit)
+
+
 Saving Molecules
 ================
+
+The simplest way to save molecules is to write them to a file
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock('ICCBr', ['bromine', 'iodine'])
+    bb.write('bb.mol')
+
+    polymer = stk.ConstructedMolecule(
+        bulding_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 10)
+    )
+    polymer.write('polymer.mol')
+
+However, writing to regular chemical file format is lossy. This is
+because :class:`.BuildingBlock` and :class:`.ConstructedMolecule`
+contain data that is not held by these files. :class:`.BuildingBlock`
+holds information about which functional groups are to be used
+during construction and :class:`.ConstructedMolecule` holds information
+about which building blocks molecules and topology graph were used to
+construct it. While a :class:`.BuildingBlock` can be initialized from
+chemical file formats a :class:`.ConstructedMolecule` cannot, as there
+is no way to recover the information regarding building blocks and
+the topology graph.
+
+If you wish to be able to fully recover :class:`.BuildingBlock` and
+:class:`.ConstructedMolecule` instances, you can write them as
+JSON files
+
+.. code-block:: python
+
+    bb.dump('bb.dump')
+    polymer.dump('polymer.dump')
+
+These can then be loaded in a later session
+
+.. code-block:: python
+
+    recovered_bb = stk.Molecule.load('bb.dump')
+    recovered_polymer = stk.Molecule.load('polymer.dump')
+
+Using the :meth:`.Molecule.load` method means you do not have to know
+if the molecule in the file was a :class:`.BuildingBlock` or a
+:class:`.ConstructedMolecule`, the correct class be determined
+for you automatically.
+
+You can write and dump molecules in bulk with a :class:`.Population`
+
+.. code-block:: python
+
+    pop = stk.Population(bb, polymer)
+    pop.write('my_pop')
+    pop.dump('population.dump')
+
+and load it too
+
+.. code-block:: python
+
+    recovered_pop = stk.Population.load('population.dump')
 
 
 Caching
