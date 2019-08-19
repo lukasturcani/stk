@@ -248,7 +248,7 @@ algorithm, which can make use of the construction facilities in
 What Next?
 ----------
 
-A good thing to look at are some :ref:`basic examples`, which will allow
+A good thing to look at are some `basic examples`_, which will allow
 you to get a feel for ``stk``. Further examples of molecular
 construction can be seen by looking at the different topology graphs.
 The documentation of the various classes in ``stk`` contains usage
@@ -260,3 +260,6 @@ molecule with ``stk`` or you have some other features you would like to
 see but can't implement yourself or you have any other question
 about ``stk`` feel free to message me on your favourite platform or
 file an issue on GitHub.
+
+
+.. _`basic examples`: :ref:`basic_examples`
