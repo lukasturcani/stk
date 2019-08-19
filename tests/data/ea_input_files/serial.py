@@ -33,7 +33,7 @@ topology_graphs = [
     stk.polymer.Linear('A', [0], 12)
 ]
 
-population = stk.GAPopulation.init_random(
+population = stk.EAPopulation.init_random(
     building_blocks=[building_blocks],
     topology_graphs=topology_graphs,
     size=25,
