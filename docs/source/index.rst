@@ -47,9 +47,9 @@
     Termination <stk.calculators.ga.exiters>
     Plotting <stk.calculators.ga.plotters>
 
-===================
-Welcome to ``stk``!
-===================
+============
+Introduction
+============
 
 GitHub: https://www.github.com/lukasturcani/stk
 
