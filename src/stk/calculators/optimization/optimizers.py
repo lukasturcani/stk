@@ -624,7 +624,7 @@ class XTBConvergenceError(XTBOptimizerError):
 
 class XTB(Optimizer):
     """
-    Uses GFN-xTB to optimize molecules.
+    Uses GFN-xTB [1]_ to optimize molecules.
 
     Notes
     -----
