@@ -12,6 +12,6 @@ Module contents
 ---------------
 
 .. automodule:: stk.utilities
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

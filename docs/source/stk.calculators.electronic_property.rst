@@ -13,6 +13,6 @@ Module contents
 ---------------
 
 .. automodule:: stk.calculators.electronic_property
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

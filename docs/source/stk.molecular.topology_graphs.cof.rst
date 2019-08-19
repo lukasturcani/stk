@@ -1,7 +1,7 @@
-stk.calculators.optimization.mopac module
+stk.molecular.topology\_graphs.cof module
 =========================================
 
-.. automodule:: stk.calculators.optimization.mopac
+.. automodule:: stk.molecular.topology_graphs.cof
    :members:
    :undoc-members:
    :show-inheritance:

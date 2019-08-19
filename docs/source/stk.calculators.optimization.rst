@@ -14,6 +14,6 @@ Module contents
 ---------------
 
 .. automodule:: stk.calculators.optimization
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

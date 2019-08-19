@@ -39,8 +39,8 @@ class _HostVertex(Vertex):
         building_block.set_centroid(self._position)
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
-        return
+    def assign_func_groups_to_edges(self, building_block):
+        return dict()
 
 
 class _GuestVertex(Vertex):
@@ -138,8 +138,8 @@ class _GuestVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
-        return
+    def assign_func_groups_to_edges(self, building_block):
+        return dict()
 
 
 class Complex(TopologyGraph):

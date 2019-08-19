@@ -24,7 +24,8 @@ def _test_placement(vertex, bb):
 def _fg_distance(edge, bb):
     edge_position = edge.get_position()
 
-    def inner(fg):
+    def inner(fg_id):
+        fg = bb.func_groups[fg_id]
         fg_position = bb.get_centroid(fg.get_bonder_ids())
         return euclidean(edge_position, fg_position)
 
@@ -32,13 +33,12 @@ def _fg_distance(edge, bb):
 
 
 def _test_assignment(vertex, bb):
-    vertex.assign_func_groups_to_edges(
-        building_block=bb,
-        fg_map={fg: fg for fg in bb.func_groups}
-    )
+    assignments = vertex.assign_func_groups_to_edges(bb)
     for edge in vertex.edges:
-        closest = min(bb.func_groups, key=_fg_distance(edge, bb))
-        assert closest in edge.get_func_groups()
+        closest = min(
+            range(len(bb.func_groups)), key=_fg_distance(edge, bb)
+        )
+        assert assignments[closest] == edge.id
 
 
 def test_vertex(tmp_amine2):

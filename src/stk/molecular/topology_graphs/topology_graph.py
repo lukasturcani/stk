@@ -19,6 +19,8 @@ topology graph has the vertices and edges it wants, simply run
 """
 
 import numpy as np
+import pathos
+from collections import namedtuple
 
 from ..reactor import Reactor
 from ...utilities import vector_angle
@@ -247,17 +249,13 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def assign_func_groups_to_edges(self, building_block, fg_map):
+    def assign_func_groups_to_edges(self, building_block):
         """
         Assign functional groups to edges.
 
         Each :class:`.FunctionalGroup` of the `building_block` needs
         to be associated with one of the :class:`.Edge` instances in
-        :attr:`edges`. Then, using `fg_map`, the
-        :class:`FunctionalGroup` instances in the molecule being
-        constructed need to be assigned to those edges. This is
-        because bonds need to be formed between functional groups of
-        the molecule being constructed, not the `building_block`.
+        :attr:`edges`.
 
         Parameters
         ----------
@@ -265,15 +263,12 @@ class Vertex:
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
-        fg_map : :class:`dict`
-            A mapping from :class:`.FunctionalGroup` instances in
-            `building_block` to the equivalent
-            :class:`.FunctionalGroup` instances in the molecule being
-            constructed.
-
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            A mapping from the id of a functional group in
+            `building_block` to the id of the edge in :attr:`edges` it
+            is assigned to.
 
         Raises
         ------
@@ -288,7 +283,7 @@ class Vertex:
     def after_assign_func_groups_to_edges(
         self,
         building_block,
-        fg_map
+        func_groups
     ):
         """
         Perform operations after functional groups have been assigned.
@@ -306,11 +301,9 @@ class Vertex:
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
-        fg_map : :class:`dict`
-            A mapping from :class:`.FunctionalGroup` instances in
-            `building_block` to the equivalent
-            :class:`.FunctionalGroup` instances in the molecule being
-            constructed.
+        func_groups : :class:`tuple` of :class:`.FunctionalGroup`
+            The functional group clones added to the constructed
+            molecule.
 
         Returns
         -------
@@ -451,6 +444,10 @@ class Edge:
 
     Attributes
     ----------
+    id : :class:`int`
+        The id of the edge. Matches the index of the edge in
+        :attr:`.TopologyGraph.edges`.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which the :class:`Edge` connects.
 
@@ -759,6 +756,18 @@ class Edge:
         return f'Edge({vertices}{position}{periodicity})'
 
 
+PlacementResult = namedtuple(
+    'PlacementResult',
+    ['building_block', 'vertex', 'assignments']
+)
+
+
+def _place_building_blocks(vertex, building_block):
+    vertex.place_building_block(building_block)
+    assignments = vertex.assign_func_groups_to_edges(building_block)
+    return PlacementResult(building_block, vertex, assignments)
+
+
 class TopologyGraph:
     """
     Represents topology graphs of :class:`.ConstructedMolecule`.
@@ -845,11 +854,26 @@ class TopologyGraph:
         self.vertices = vertices
         self.edges = edges
         self._construction_stages = construction_stages
+        self._set_stages()
         self._processes = processes
         for i, vertex in enumerate(self.vertices):
             vertex.id = i
         for i, edge in enumerate(self.edges):
             edge.id = i
+
+    def _set_stages(self):
+        self._stages = tuple(
+            [] for i in range(len(self._construction_stages)+1)
+        )
+        for vertex in self.vertices:
+            placed = False
+            for i, stage in enumerate(self._construction_stages):
+                if stage(vertex):
+                    self._stages[i].append(vertex)
+                    placed = True
+                    break
+            if not placed:
+                self._stages[-1].append(vertex)
 
     def construct(self, mol):
         """
@@ -868,17 +892,15 @@ class TopologyGraph:
         """
 
         scale = self._get_scale(mol)
-        vertex_clones = self._clone_vertices(mol, scale)
-        edge_clones = self._clone_edges(vertex_clones, scale)
+        vertices = tuple(self._get_vertex_clones(mol, scale))
+        edges = tuple(self._get_edge_clones(vertices, scale))
 
         self._prepare(mol)
-        self._place_building_blocks(mol, vertex_clones)
+        self._place_building_blocks(mol, vertices, edges)
 
-        vertex_clones, edge_clones = (
-            self._before_react(mol, vertex_clones, edge_clones)
-        )
+        vertices, edges = self._before_react(mol, vertices, edges)
         reactor = Reactor(mol)
-        for edge in edge_clones:
+        for edge in edges:
             reactor.add_reaction(
                 func_groups=edge.get_func_groups(),
                 periodicity=tuple(edge.get_periodicity())
@@ -958,9 +980,12 @@ class TopologyGraph:
 
         raise NotImplementedError()
 
-    def _clone_vertices(self, mol, scale):
+    def _get_vertex_clones(self, mol, scale):
         """
-        Create clones of :attr:`vertices`.
+        Yield clones of :attr:`vertices`.
+
+        The order of yielded clones corresponds to the order in
+        :attr:`vertices`
 
         Notes
         -----
@@ -980,30 +1005,30 @@ class TopologyGraph:
             the same amount or a :class:`list` of three numbers if
             each axis is scaled by a different value.
 
-        Returns
+        Yields
         -------
-        :class:`dict`
-            A mapping from the original :attr:`vertices` to the clones.
+        :class:`.Vertex`
+            A vertex clone.
 
         """
 
-        clones = {}
         for vertex in self.vertices:
             clone = vertex.clone(clear_edges=True)
             clone.set_contructed_molecule(mol)
             clone.apply_scale(scale)
-            clones[vertex] = clone
-        return clones
+            yield clone
 
-    def _clone_edges(self, vertex_clones, scale):
+    def _get_edge_clones(self, vertices, scale):
         """
-        Create clones of :attr:`edges`.
+        Yield clones of :attr:`edges`.
+
+        The order of yielded edges corresponds to the order in
+        :attr:`edges`.
 
         Parameters
         ----------
-        vertex_clones : :class:`dict`
-            A mapping from the original :attr:`vertices` to the
-            clones.
+        vertices : :class:`tuple` of :class:`.Vertex`
+            Clones of :attr:`vertices`.
 
         scale : :class:`float` or :class:`list` of :class:`float`
             The value by which the position of each :class:`Edge` is
@@ -1011,22 +1036,24 @@ class TopologyGraph:
             the same amount or a :class:`list` of three numbers if
             each axis is scaled by a different value.
 
-        Returns
+        Yields
         -------
-        :class:`list` of :class:`.Edge`
-            The cloned :attr:`edges`.
+        :class:`.Edge`
+            An edge clone.
 
         """
 
-        edges = []
+        vertex_clones = {
+            original: clone
+            for original, clone in zip(self.vertices, vertices)
+        }
         for edge in self.edges:
             clone = edge.clone(vertex_clones)
             clone.apply_scale(scale)
-            edges.append(clone)
-        return edges
+            yield clone
 
-    def _before_react(self, mol, vertex_clones, edge_clones):
-        return vertex_clones, edge_clones
+    def _before_react(self, mol, vertices, edges):
+        return vertices, edges
 
     def _prepare(self, mol):
         """
@@ -1045,7 +1072,7 @@ class TopologyGraph:
 
         return
 
-    def _place_building_blocks(self, mol, vertex_clones):
+    def _place_building_blocks(self, mol, vertices, edges):
         """
         Place building blocks in `mol` on :attr:`vertices`.
 
@@ -1054,9 +1081,11 @@ class TopologyGraph:
         mol : :class:`.ConstructedMolecule`
             The molecule being constructed.
 
-        vertex_clones : :class:`dict`
-            A mapping from :attr:`vertices` to their clones being used
-            for a particular :meth:`construct` call.
+        vertices : :class:`tuple` of :class:`.Vertex`
+            The vertex clones used for construction.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            The edge clones used for construction.
 
         Returns
         -------
@@ -1067,29 +1096,48 @@ class TopologyGraph:
         if self._processes == 1:
             return self._place_building_blocks_serial(
                 mol=mol,
-                vertex_clones=vertex_clones
+                vertices=vertices,
+                edges=edges
             )
         else:
             return self._place_building_blocks_parallel(
                 mol=mol,
-                vertex_clones=vertex_clones
+                vertices=vertices,
+                edges=edges
             )
 
-    def _place_building_blocks_serial(self, mol, vertex_clones):
-        bb_id = 0
+    def _get_atom_map(self, mol, bb, bb_id):
+        atom_map = {}
+        for atom in bb.atoms:
+            atom_clone = atom.clone()
+            atom_clone.id = len(mol.atoms)
+            atom_clone.building_block = bb
+            atom_clone.building_block_id = bb_id
+            atom_map[atom] = atom_clone
+            mol.atoms.append(atom_clone)
+        return atom_map
 
-        stages = tuple(
-            [] for i in range(len(self._construction_stages)+1)
+    def _assign_func_groups_to_edges(
+        self,
+        mol,
+        bb,
+        bb_id,
+        edges,
+        assignments
+    ):
+        atom_map = self._get_atom_map(mol, bb, bb_id)
+        mol.func_groups.extend(
+            fg.clone(atom_map) for fg in bb.func_groups
         )
-        for vertex in self.vertices:
-            placed = False
-            for i, stage in enumerate(self._construction_stages):
-                if stage(vertex):
-                    stages[i].append(vertex)
-                    placed = True
-                    break
-            if not placed:
-                stages[-1].append(vertex)
+        num_fgs = len(bb.func_groups)
+        for fg_id, edge_id in assignments.items():
+            edges[edge_id].assign_func_group(
+                func_group=mol.func_groups[-num_fgs+fg_id]
+            )
+        return atom_map
+
+    def _place_building_blocks_serial(self, mol, vertices, edges):
+        bb_id = 0
 
         vertex_building_blocks = {
             vertex: bb
@@ -1098,49 +1146,26 @@ class TopologyGraph:
         }
         # Use a shorter alias.
         counter = mol.building_block_counter
-        for stage in stages:
-            for vertex in stage:
-                bb = vertex_building_blocks[vertex]
+        for stage in self._stages:
+            for instance_vertex in stage:
+                vertex = vertices[instance_vertex.id]
+                bb = vertex_building_blocks[instance_vertex]
                 original_coords = bb.get_position_matrix()
 
-                # Use a clone of the vertex for positioning so that
-                # state of the originals is not changed.
-                vertex_clone = vertex_clones[vertex]
-                # Get the coordinates of the building block when
-                # placed on the vertex clone.
-                coords = vertex_clone.place_building_block(bb)
-                # Add the coordinates to the constructed molecule.
-                mol._position_matrix.extend(coords)
-
-                # Create a map from each atom in the building block to
-                # a clone of that atom in the constructed molecule.
-                atom_map = {}
-                for atom in bb.atoms:
-                    atom_clone = atom.clone()
-                    atom_clone.id = len(mol.atoms)
-                    atom_map[atom] = atom_clone
-
-                    atom_clone.building_block = bb
-                    atom_clone.building_block_id = bb_id
-
-                    mol.atoms.append(atom_clone)
-
-                # Create a map from each functional group in the
-                # building block to a clone of that functional group
-                # in the constructed molecule.
-                fg_map = {
-                    fg: fg.clone(atom_map) for fg in bb.func_groups
-                }
-                mol.func_groups.extend(fg_map.values())
-
-                # Assign the functional groups in the contructed
-                # molecule to edges in the topology graph.
-                vertex_clone.assign_func_groups_to_edges(bb, fg_map)
-
+                mol._position_matrix.extend(
+                    vertex.place_building_block(bb)
+                )
+                atom_map = self._assign_func_groups_to_edges(
+                    mol=mol,
+                    bb=bb,
+                    bb_id=bb_id,
+                    edges=edges,
+                    assignments=vertex.assign_func_groups_to_edges(bb)
+                )
                 # Perform additional, miscellaneous operations.
-                vertex_clone.after_assign_func_groups_to_edges(
+                vertex.after_assign_func_groups_to_edges(
                     building_block=bb,
-                    fg_map=fg_map
+                    func_groups=mol.func_groups[-len(bb.func_groups):]
                 )
 
                 bb.set_position_matrix(original_coords)
@@ -1148,8 +1173,56 @@ class TopologyGraph:
                 counter.update([bb])
                 bb_id += 1
 
-    def _place_building_blocks_parallel(self, mol, vertices):
-        raise NotImplementedError('TODO')
+    def _place_building_blocks_parallel(self, mol, vertices, edges):
+        bb_id = 0
+
+        vertex_building_blocks = {
+            vertex: bb
+            for bb, vertices in mol.building_block_vertices.items()
+            for vertex in vertices
+        }
+        bb_map = {
+            bb.get_identity_key(): bb
+            for bb in mol.get_building_blocks()
+        }
+        # Use a shorter alias.
+        counter = mol.building_block_counter
+        with pathos.pools.ProcessPool(self._processes) as pool:
+            for stage in self._stages:
+                verts = []
+                bbs = []
+                for instance_vertex in stage:
+                    verts.append(vertices[instance_vertex.id])
+                    bbs.append(vertex_building_blocks[instance_vertex])
+                results = pool.map(_place_building_blocks, verts, bbs)
+
+                for result in results:
+                    result_bb = result.building_block
+                    bb = bb_map[result_bb.get_identity_key()]
+
+                    mol._position_matrix.extend(
+                        result_bb.get_position_matrix()
+                    )
+                    atom_map = self._assign_func_groups_to_edges(
+                        mol=mol,
+                        bb=bb,
+                        bb_id=bb_id,
+                        edges=edges,
+                        assignments=result.assignments
+                    )
+
+                    # Perform additional, miscellaneous operations.
+                    vertex = vertices[result.vertex.id]
+                    num_fgs = len(bb.func_groups)
+                    vertex.after_assign_func_groups_to_edges(
+                        building_block=result_bb,
+                        func_groups=mol.func_groups[-num_fgs:]
+                    )
+                    mol.bonds.extend(
+                        b.clone(atom_map) for b in bb.bonds
+                    )
+                    counter.update([bb])
+                    bb_id += 1
 
     def _clean_up(self, mol):
         mol._position_matrix = np.array(mol._position_matrix).T
