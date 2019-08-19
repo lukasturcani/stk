@@ -41,7 +41,7 @@
     <stk.calculators.ga.fitness_calculators>
 
 Welcome to ``stk``!
-===================
+-------------------
 
 GitHub: https://www.github.com/lukasturcani/stk
 
