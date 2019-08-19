@@ -5,8 +5,8 @@ Topology Graphs
 
 .. _`adding topology graphs`:
 
-Extending ``stk``: Adding new topology graphs.
-----------------------------------------------
+Adding new topology graphs.
+---------------------------
 
 To add a new topology graph a new subclass of :class:`.TopologyGraph`
 must be added, which implements it's virtual methods. Similarly,

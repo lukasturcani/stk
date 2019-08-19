@@ -28,13 +28,13 @@
    :caption: Topology Graphs
    :maxdepth: 2
 
-   Introduction <stk.molecular.topology_graphs.topology_graph>
    Polymer <stk.molecular.topology_graphs.polymer>
    Organic Cage <stk.molecular.topology_graphs.cage.base>
    Covalent Organic Framework <stk.molecular.topology_graphs.cof>
    Host Guest Complex <stk.molecular.topology_graphs.host_guest>
    Macrocycle <stk.molecular.topology_graphs.macrocycle>
    Rotaxane <stk.molecular.topology_graphs.rotaxane>
+   Adding Topology Graphs <stk.molecular.topology_graphs.topology_graph>
 
 .. toctree::
    :hidden:
