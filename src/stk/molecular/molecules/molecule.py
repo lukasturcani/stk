@@ -288,11 +288,11 @@ class Molecule(metaclass=_Cached):
         Parameters
         ----------
         start : :class:`numpy.ndarray`
-            A vector which is to be rotated so that it transforms to
+            A vector which is to be rotated so that it transforms into
             the `target` vector.
 
-        targert : :class:`numpy.ndarray`
-            This array holds the vector, onto which `start` is rotated.
+        target : :class:`numpy.ndarray`
+            The vector onto which `start` is rotated.
 
         origin : :class:`numpy.ndarray`
             The point about which the rotation occurs.
