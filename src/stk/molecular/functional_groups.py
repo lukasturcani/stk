@@ -1,6 +1,9 @@
 """
 Defines tools for dealing with functional groups.
 
+Functional Groups
+=================
+
 The purpose of functional groups is to identify which atoms of a
 building block are modified during construction. See
 :class:`.FunctionalGroup` for more details.
