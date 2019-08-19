@@ -37,7 +37,14 @@
     :caption: Genetic Algorithm
     :maxdepth: 2
 
+    Introduction <stk.ga>
     Fitness Calculators <stk.calculators.ga.fitness_calculators>
+    Fitness Normalizers <stk.calculators.ga.fitness_normalizers>
+    Selection <stk.calculators.ga.selectors>
+    Mutation <stk.calculators.ga.mutators>
+    Crossover <stk.calculators.ga.crossers>
+    Termination <stk.calculators.ga.exiters>
+    Plotting <stk.calculators.ga.plotters>
 
 Welcome to ``stk``!
 -------------------
