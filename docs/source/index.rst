@@ -31,7 +31,7 @@
     :caption: Genetic Algorithm
     :maxdepth: 2
 
-    <stk.calculators.ga.fitness_calculators>
+    Fitness Calculators <stk.calculators.ga.fitness_calculators>
 
 Welcome to ``stk``!
 -------------------
