@@ -224,9 +224,9 @@ def ea_run(filename, input_file):
     if hasattr(input_file, 'fitness_normalizer'):
         fitness_normalizer = input_file.fitness_normalizer
 
-    processes = psutil.cpu_count()
-    if hasattr(input_file, 'processes'):
-        processes = input_file.processes
+    num_processes = psutil.cpu_count()
+    if hasattr(input_file, 'num_processes'):
+        num_processes = input_file.num_processes
 
     plotters = []
     if hasattr(input_file, 'plotters'):
@@ -306,10 +306,10 @@ def ea_run(filename, input_file):
     # 3. Run the EA.
     id_ = pop.set_mol_ids(0)
     logger.info('Optimizing the population.')
-    pop.optimize(optimizer, processes)
+    pop.optimize(optimizer, num_processes)
 
     logger.info('Calculating the fitness of population members.')
-    pop.calculate_member_fitness(fitness_calculator, processes)
+    pop.calculate_member_fitness(fitness_calculator, num_processes)
 
     logger.info('Normalizing fitness values.')
     fitness_normalizer.normalize(pop)
@@ -352,10 +352,10 @@ def ea_run(filename, input_file):
             )
 
         logger.info('Optimizing the population.')
-        pop.optimize(optimizer, processes)
+        pop.optimize(optimizer, num_processes)
 
         logger.info('Calculating the fitness of population members.')
-        pop.calculate_member_fitness(fitness_calculator, processes)
+        pop.calculate_member_fitness(fitness_calculator, num_processes)
 
         logger.info('Normalizing fitness values.')
         fitness_normalizer.normalize(pop)
@@ -378,7 +378,10 @@ def ea_run(filename, input_file):
     stk.kill_macromodel()
 
     history.dump()
-    progress.calculate_member_fitness(fitness_calculator, processes)
+    progress.calculate_member_fitness(
+        fitness_calculator=fitness_calculator,
+        num_processes=num_processes
+    )
     # Keep the fitness of failed molecules as None. Plotters can ignore
     # these values to make better graphs.
     handle_failed = fitness_normalizer._handle_failed
