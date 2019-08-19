@@ -113,7 +113,7 @@ fitness_normalizer = stk.NormalizerSequence(
 # Exit condition.
 # #####################################################################
 
-exiter = stk.NumGenerations(25)
+terminator = stk.NumGenerations(25)
 
 # #####################################################################
 # Make plotters.
