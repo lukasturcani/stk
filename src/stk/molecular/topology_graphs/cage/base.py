@@ -1,3 +1,31 @@
+"""
+Organic Cage
+============
+
+For usage examples see :class:`.Cage`.
+
+#. :class:`.TwoPlusThree`
+#. :class:`.FourPlusSix`
+#. :class:`.FourPlusSix2`
+#. :class:`.SixPlusNine`
+#. :class:`.EightPlusTwelve`
+#. :class:`.TwentyPlusThirty`
+#. :class:`.TwoPlusFour`
+#. :class:`.ThreePlusSix`
+#. :class:`.FourPlusEight`
+#. :class:`.FivePlusTen`
+#. :class:`.SixPlusTwelve`
+#. :class:`.EightPlusSixteen`
+#. :class:`.TenPlusTwenty`
+#. :class:`.SixPlusEight`
+#. :class:`.OnePlusOne`
+#. :class:`.TwoPlusTwo`
+#. :class:`.FourPlusFour`
+#. :class:`.TwelvePlusThirty`
+
+"""
+
+
 import numpy as np
 
 from ..topology_graph import TopologyGraph, Vertex

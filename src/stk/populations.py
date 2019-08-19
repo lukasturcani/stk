@@ -1,5 +1,9 @@
 """
-Defines :class:`Population`.
+Populations
+===========
+
+:class:`.Population` objects are container specialized to perform
+operations on groups of ``stk`` molecules, often in parallel.
 
 """
 
@@ -200,7 +204,7 @@ class Population:
         cls,
         building_blocks,
         topology_graphs,
-        processes=None,
+        num_processes=None,
         duplicates=False,
         use_cache=False
     ):
@@ -258,7 +262,7 @@ class Population:
         topology_graphs : :class:`list` of :class:`.TopologyGraph`
             The topology graphs of `.ConstructedMolecule` being made.
 
-        processes : :class:`int`, optional
+        num_processes : :class:`int`, optional
             The number of parallel processes to create when
             constructing the molecules. If ``None``, creates a process
             for each core on the computer.
@@ -324,7 +328,7 @@ class Population:
             bbs.append(mol_bbs),
             topologies.append(topology)
 
-        with pathos.pools.ProcessPool(processes) as pool:
+        with pathos.pools.ProcessPool(num_processes) as pool:
             mols = pool.map(ConstructedMolecule, bbs, topologies)
 
         # Update the cache.
@@ -926,12 +930,12 @@ class Population:
 
         return cls.init_from_list(pop_list, use_cache)
 
-    def _optimize_parallel(self, optimizer, processes):
+    def _optimize_parallel(self, optimizer, num_processes):
         opt_fn = _Guard(optimizer, optimizer.optimize)
 
         # Apply the function to every member of the population, in
         # parallel.
-        with pathos.pools.ProcessPool(processes) as pool:
+        with pathos.pools.ProcessPool(num_processes) as pool:
             optimized = pool.map(opt_fn, self)
 
         # If anything failed, raise an error.
@@ -952,12 +956,12 @@ class Population:
         for member in self:
             optimizer.optimize(member)
 
-    def optimize(self, optimizer, processes=None):
+    def optimize(self, optimizer, num_processes=None):
         """
         Optimize the structures of molecules in the population.
 
         The molecules are optimized serially or in parallel depending
-        if `processes` is ``1`` or more. The serial version may be
+        if `num_processes` is ``1`` or more. The serial version may be
         faster in cases where all molecules have already been
         optimized and the `optimizer` will skip them.
         In this case creating a parallel process pool creates
@@ -968,7 +972,7 @@ class Population:
         optimizer : :class:`.Optimizer`
             The optimizer used to carry out the optimizations.
 
-        processes : :class:`int`, optional
+        num_processes : :class:`int`, optional
             The number of parallel processes to create. Optimization
             will run serially if ``1``. If ``None``, creates a
             process for each core on the computer.
@@ -979,13 +983,13 @@ class Population:
 
         """
 
-        if processes is None:
-            processes = psutil.cpu_count()
+        if num_processes is None:
+            num_processes = psutil.cpu_count()
 
-        if processes == 1:
+        if num_processes == 1:
             self._optimize_serial(optimizer)
         else:
-            self._optimize_parallel(optimizer, processes)
+            self._optimize_parallel(optimizer, num_processes)
 
     def remove_duplicates(self, across_subpopulations=True, key=id):
         """
