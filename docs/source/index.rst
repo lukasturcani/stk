@@ -6,7 +6,7 @@
 .. toctree::
    :hidden:
    :caption: stk
-   :maxdepth: 2
+   :maxdepth: 0
 
    Introduction <index>
    Cookbook <cookbook>
