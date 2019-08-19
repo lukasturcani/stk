@@ -1,5 +1,5 @@
 :author: Lukas Turcani
-:documentation: https://lukasturcani.github.io/stk_docs/html/introduction.html
+:Documentation: https://lukasturcani.github.io/stk_docs/html/introduction.html
 
 .. figure:: docs/source/figures/stk.png
 
