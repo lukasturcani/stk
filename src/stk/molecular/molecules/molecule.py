@@ -489,7 +489,7 @@ class Molecule(metaclass=_Cached):
         Returns
         -------
         :class:`numpy.ndarray`
-            An array holding the coordinates of the center of mass.
+            The coordinates of the center of mass.
 
         References
         ----------
