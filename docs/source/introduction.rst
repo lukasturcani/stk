@@ -248,12 +248,12 @@ algorithm, which can make use of the construction facilities in
 What Next?
 ----------
 
-A good thing to look at are some `basic examples`_, which will allow
+A good thing to look at are some :ref:`basic examples`, which will allow
 you to get a feel for ``stk``. Further examples of molecular
 construction can be seen by looking at the different topology graphs.
 The documentation of the various classes in ``stk`` contains usage
-examples. More advanced examples can be seen in the `cookbook`_ and if
-you want to experiment with automated molecular design you can look
+examples. More advanced examples can be seen in the :ref:`cookbook` and
+if you want to experiment with automated molecular design you can look
 into who to write an input file for the evolutionary algorithm.
 Finally, if you would like to be able to construct a new type of
 molecule with ``stk`` or you have some other features you would like to
