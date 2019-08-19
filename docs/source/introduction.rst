@@ -32,24 +32,9 @@ For quick navigation through the modules of ``stk``, use
 
 Among other things, ``stk`` allows you to construct molecules like this
 
-.. figure::
+.. image:: https://i.imgur.com/HI5cciM.png
 
-    Organic cages constructed by ``stk``.
-
-this
-
-.. figure::
-
-    Covalent organic frameworks constructed by ``stk``.
-
-this
-
-.. figure::
-
-    Rotaxane constructed by ``stk``.
-
-and many more.
-
+among many others.
 
 The key idea behind ``stk`` is that the construction of a molecule can
 be broken down into two fundamental pieces of information, its
@@ -103,7 +88,7 @@ can act as an API for external chemistry software. Alternatively,
 file formats, which can be used as input for computational chemistry
 software, if you wish to do this manually.
 
-.. figure:: https://
+.. figure:: https://i.imgur.com/UlCnTj9.png
 
     The general construction workflow of ``stk``.
 
