@@ -41,7 +41,7 @@
    :caption: Calculators
    :maxdepth: 2
 
-   Introduction <stk.calculators>
+   Introduction <calculators>
    Optimizers <stk.calculators.optimization>
    Energy Calculators <stk.calculators.energy>
 
