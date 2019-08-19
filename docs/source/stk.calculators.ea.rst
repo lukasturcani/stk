@@ -1,11 +1,6 @@
 stk.calculators.ea package
 ==========================
 
-.. automodule:: stk.calculators.ea
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Submodules
 ----------
 
@@ -18,3 +13,11 @@ Submodules
    stk.calculators.ea.plotters
    stk.calculators.ea.selectors
    stk.calculators.ea.terminators
+
+Module contents
+---------------
+
+.. automodule:: stk.calculators.ea
+   :members:
+   :undoc-members:
+   :show-inheritance:
