@@ -15,6 +15,7 @@ setup(name='stk',
       author_email='lukasturcani93@gmail.com',
       url='https://www.github.com/lukasturcani/stk',
       version=get_version(),
+      package_dir={'': 'src'},
       packages=[
           'stk',
           'stk.utilities',
