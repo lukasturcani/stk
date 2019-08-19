@@ -11,18 +11,40 @@ GitHub: https://www.github.com/lukasturcani/stk
 Slack: https://t.co/LCPzWhvsVO
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :caption: Molecules
+    :maxdepth: 2
+
+    stk.molecular.molecules.building_block
+    stk.molecular.molecules.constructed_molecule
+
+
+.. toctree::
+    :caption: Topology Graphs
+    :maxdepth: 2
+
+    stk.molecular.topology_graphs.topology_graph
+    stk.molecular.topology_graphs.polymer
+    stk.molecular.topology_graphs.cage
+    stk.molecular.topology_graphs.cof
+    stk.molecular.topology_graphs.host_guest
+    stk.molecular.topology_graphs.macrocycle
+    stk.molecular.topology_graphs.rotaxane
+
+.. toctree::
+    :caption: Genetic Algoirthm
+    :maxdepth: 2
+
+    stk.calculators.ga.fitness_calculators
 
 Overview
 --------
 
-``stk`` is a Python library for building, manipulating, analyzing and
-automatic design of molecules, including a genetic algorithm.
+``stk`` is a Python library for which allows the construction,
+manipulation and automatic design of molecules. Automated design is
+achieved through a genetic algorithm.
 
-For quick navigation through the modules use :ref:`modindex`.
-For a closer look at the genetic algorithm, start with
-`Automated Molecular Design with Genetic Algorithms`_.
+For quick navigation through the modules of ``stk``, use
+:ref:`modindex`.
 
 Basic Examples
 --------------
