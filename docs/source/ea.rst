@@ -28,7 +28,7 @@ and selects building blocks which have the most atoms.
     import logging
 
     # #####################################################################
-    # Run GA serially.
+    # Run EA serially.
     # #####################################################################
 
     processes = 1
@@ -55,7 +55,7 @@ and selects building blocks which have the most atoms.
         stk.polymer.Linear('A', [0], 12)
     ]
 
-    population = stk.GAPopulation.init_random(
+    population = stk.EAPopulation.init_random(
         building_blocks=[building_blocks],
         topology_graphs=topology_graphs,
         size=25,
@@ -329,7 +329,7 @@ every generation of the EA as a subpopulation. This is quite useful
 if you want to analyse the output of the EA generation-wise.
 
 ``errors.log`` is a file which contains every exception and its
-traceback encountered by the GA during its run.
+traceback encountered by the EA during its run.
 
 ``progress.log`` is a file which lists which molecules make up each
 generation, and their respective fitness values.
@@ -346,7 +346,7 @@ stderr. The message should be relatively straightforward, such as
 
     ======================================================================
 
-    17:42:20 - INFO - stk.ga.mutation - Using random_bb.
+    17:42:20 - INFO - stk.ea.mutation - Using random_bb.
 
     ======================================================================
 
@@ -357,13 +357,13 @@ the message originated and finally the message itself.
 Genetic algorithm input file variables.
 .......................................
 
-This section lists the variables that need to be defined in the GA
+This section lists the variables that need to be defined in the EA
 input file, along with a description of each variable.
 
 * :data:`population` - :class:`.EAPopulation` - **mandatory** -
-  The initial population of the GA.
+  The initial population of the EA.
 * :data:`optimizer` - :class:`.Optimizer` - **mandatory** - The
-  optimizer used to optimize the molecules created by the GA.
+  optimizer used to optimize the molecules created by the EA.
 * :data:`fitness_calculator` - :class:`.FitnessCalculator` -
   **mandatory** - The fitness calculator used to calculate fitness of
   molecules.
@@ -387,29 +387,29 @@ input file, along with a description of each variable.
   normalizer which normalizes fitness values each generation.
 * :data:`num_processes` - :class:`int` -
   *optional, default =* :func:`psutil.cpu_count` - The number of CPU
-  cores the GA should use.
+  cores the EA should use.
 * :data:`plotters` - :class:`list` of :class:`.Plotter` -
   *optional, default =* ``[]`` - Plotters which are used to plot graphs
-  at the end of the GA.
+  at the end of the EA.
 * :data:`log_file` - :class:`bool` -
   *optional, default =* ``True`` - Toggles whether a log file which
   lists which molecules are present in each generation should be made.
 * :data:`database_dump` - :class:`bool` -
   *optional, default =* ``True`` - Toggles whether a
-  :class:`.Population` JSON file should be made at the end of the GA
-  run. It will hold every molecule made by the GA.
+  :class:`.Population` JSON file should be made at the end of the EA
+  run. It will hold every molecule made by the EA.
 * :data:`progress_dump` - :class:`bool` -
   *optional, default =* ``True`` - Toggles whether a
-  :class:`.Population` JSON file should be made at the end of the GA
-  run. It will hold every generation of the GA as a separate
+  :class:`.Population` JSON file should be made at the end of the EA
+  run. It will hold every generation of the EA as a separate
   subpopulation.
 * :data:`debug_dumps` - :class:`bool` -
   *optional, default =* ``False`` - If ``True`` a database and progress
   dump is made after every generation rather than just the end. This is
-  nice for debugging but can seriously slow down the GA.
+  nice for debugging but can seriously slow down the EA.
 * :data:`tar_output` - :class:`bool` -
   *optional, default =* ``False`` - If ``True`` then a compressed tar
   archive of the output folder will be made.
 * :data:`logging_level` - :class:`int` -
   *optional, default =* ``logging.INFO`` - Sets the logging level in
-  the GA.
+  the EA.
