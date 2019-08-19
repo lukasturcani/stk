@@ -1,6 +1,11 @@
 stk.molecular.topology\_graphs package
 ======================================
 
+.. automodule:: stk.molecular.topology_graphs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -19,11 +24,3 @@ Submodules
    stk.molecular.topology_graphs.polymer
    stk.molecular.topology_graphs.rotaxane
    stk.molecular.topology_graphs.topology_graph
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.topology_graphs
-   :members:
-   :undoc-members:
-   :show-inheritance:
