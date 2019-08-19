@@ -89,6 +89,7 @@ file formats, which can be used as input for computational chemistry
 software, if you wish to do this manually.
 
 .. figure:: https://i.imgur.com/UlCnTj9.png
+    :align: center
 
     The general construction workflow of ``stk``.
 
