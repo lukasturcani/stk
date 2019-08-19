@@ -236,7 +236,7 @@ class BuildingBlock(Molecule):
 
         functional_groups : :class:`iterable` of :class:`str`, optional
             The names of the functional group types which are to be
-            added to :attr:`func_groups`. If ``None`, then no
+            added to :attr:`func_groups`. If ``None``, then no
             functional groups are added.
 
         use_cache : :class:`bool`, optional
