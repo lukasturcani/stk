@@ -1,7 +1,7 @@
-stk.calculators.ga.fitness\_normalizers module
+stk.molecular.molecules.building\_block module
 ==============================================
 
-.. automodule:: stk.calculators.ga.fitness_normalizers
+.. automodule:: stk.molecular.molecules.building_block
    :members:
    :undoc-members:
    :show-inheritance:

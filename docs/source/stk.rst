@@ -6,9 +6,9 @@ Subpackages
 
 .. toctree::
 
-    stk.calculators
-    stk.molecular
-    stk.utilities
+   stk.calculators
+   stk.molecular
+   stk.utilities
 
 Submodules
 ----------
@@ -22,6 +22,6 @@ Module contents
 ---------------
 
 .. automodule:: stk
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

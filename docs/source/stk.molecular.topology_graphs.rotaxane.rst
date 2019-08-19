@@ -1,7 +1,7 @@
-stk.calculators.ga.fitness\_normalizers module
+stk.molecular.topology\_graphs.rotaxane module
 ==============================================
 
-.. automodule:: stk.calculators.ga.fitness_normalizers
+.. automodule:: stk.molecular.topology_graphs.rotaxane
    :members:
    :undoc-members:
    :show-inheritance:
