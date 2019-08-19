@@ -94,11 +94,19 @@ Among other things, ``stk`` allows you to construct molecules like this
 
 .. figure::
 
+    Organic cages constructed by ``stk``.
+
 this
 
 .. figure::
 
+    Covalent organic frameworks constructed by ``stk``.
+
 this
+
+.. figure::
+
+    Rotaxane constructed by ``stk``.
 
 and many more.
 
@@ -129,8 +137,8 @@ else, take for example the construction of an organic cage
             stk.BuildingBlock('BrCNCBr', ['bromine'])
         ],
         topology_graph=stk.polymer.Linear(
-            repeating_unit='AB',
-            num_repeating_units=20
+            repeating_unit='ABBBA',
+            num_repeating_units=2
         )
     )
     # You can write the molecule to a file if you want to view it.
@@ -138,7 +146,7 @@ else, take for example the construction of an organic cage
 
 which will produce
 
-.. figure::
+.. image:: https://imgur.com/XmKRRun
 
 
 Because the topology graph is an idealized representation of the
