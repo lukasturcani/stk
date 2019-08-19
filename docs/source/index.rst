@@ -16,7 +16,9 @@ Slack: https://t.co/LCPzWhvsVO
     :caption: stk
     :maxdepth: 2
 
-    Intoduction <index>
+    Introduction <index>
+    Cookbook <cookbook>
+    Developer Guide <developer_guide>
 
 .. toctree::
     :hidden:
@@ -25,7 +27,6 @@ Slack: https://t.co/LCPzWhvsVO
 
     Building Block <stk.molecular.molecules.building_block>
     Constructed Molecule <stk.molecular.molecules.constructed_molecule>
-
 
 .. toctree::
     :hidden:
