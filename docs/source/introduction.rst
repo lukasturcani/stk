@@ -50,7 +50,7 @@ construction.
 
 To use ``stk`` you only have to choose which building blocks and
 topology graph you wish to use and ``stk`` will take care of everything
-else, take for example the construction of an organic cage
+else, take for example the construction of a linear polymer
 
 .. code-block:: python
 
@@ -100,17 +100,52 @@ different structural isomers of the constructed molecule. The vertex
 can be told to perform different transformations on the building block,
 so that its orientation in the constructed molecule changes. For the
 end user, selecting the transformation and therefore structural isomer
-is extremely easy. Take the example of an organic cage, which can be
+is relatively easy. Take the example of an organic cage, which can be
 constructed with the following code
 
 .. code-block:: python
 
-    bb1 = stk.BuildingBlock()
-    bb2 = stk.BuildingBlock()
-    bb3 = stk.BuildingBlock()
-    bb4 = stk.BuildingBlock()
-    tetrahedron = stk.cage.FourPlusSix(
+    bb1 = stk.BuildingBlock('O=CC(C=O)C(Cl)C=O', ['aldehyde'])
+    bb2 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
+    bb3 = stk.BuildingBlock('NCC(Cl)N', ['amine'])
+    bb4 = stk.BuildingBlock('NCCN', ['amine'])
+    tetrahedron = stk.cage.FourPlusSix()
+    cage = stk.ConstructedMolecule(
+        building_blocks=[bb1, bb2, bb3, bb4],
+        topology_graph=tetrahedron,
+        # Because there a multiple building blocks with the same
+        # number of functional groups, they need to be explicitly
+        # placed on vertices, as there are multiple valid combinations.
+        building_block_vertices={
+            bb1: tetrahedron.vertices[:1],
+            bb2: tetrahedron.vertices[1:4],
+            bb3: tetrahedron.vertices[4:5],
+            bb4: tetrahedron.vertices[5:]
+        }
+    )
+    # You can write the molecule to a file if you want to view it.
+    cage.write('cage.mol')
 
+and looks like this
+
+.. figure:: https://i.imgur.com/MAFrzAl.png
+
+
+You can see that the green atoms on adjacent building blocks
+point toward the different edges. However, by specifying a different
+edge to align with, the building block will be rotated
+
+.. code-block:: python
+
+    bb1 = stk.BuildingBlock('O=CC(C=O)C(Cl)C=O', ['aldehyde'])
+    bb2 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
+    bb3 = stk.BuildingBlock('NCC(Cl)N', ['amine'])
+    bb4 = stk.BuildingBlock('NCCN', ['amine'])
+    tetrahedron = stk.cage.FourPlusSix(
+        vertex_alignments={
+            stk.cage.FourPlusSix.vertices[0]:
+                stk.cage.FourPlusSix.vertices[0].edges[2]
+        }
     )
     cage = stk.ConstructedMolecule(
         building_blocks=[bb1, bb2, bb3, bb4],
@@ -119,41 +154,16 @@ constructed with the following code
         # number of functional groups, they need to be explicitly
         # placed on vertices, as there are multiple valid combinations.
         building_block_vertices={
-
-        }
-    )
-    # You can write the molecule to a file if you want to view it.
-    cage.write('cage.mol')
-
-and looks like this
-
-.. figure::
-
-
-You can see that the green atoms on adjacent building blocks
-point toward the same edge. However, by specifying a different
-edge to align with, the building block will be rotated
-
-.. code-block:: python
-
-    bb1 = stk.BuildingBlock()
-    bb2 = stk.BuildingBlock()
-    bb3 = stk.BuildingBlock()
-    bb4 = stk.BuildingBlock()
-    tetrahedron = stk.cage.FourPlusSix(
-
-    )
-    cage = stk.ConstructedMolecule(
-        building_blocks=[bb1, bb2, bb3, bb4],
-        topology_graph=tetrahedron,
-        building_block_vertices={
-
+            bb1: tetrahedron.vertices[:1],
+            bb2: tetrahedron.vertices[1:4],
+            bb3: tetrahedron.vertices[4:5],
+            bb4: tetrahedron.vertices[5:]
         }
     )
     # You can write the molecule to a file if you want to view it.
     cage.write('cage_isomer.mol')
 
-.. figure::
+.. figure:: https://i.imgur.com/cg9n69u.png
 
 
 The same thing can be done to any other building block on the cage to
@@ -164,7 +174,7 @@ structural isomers of a single cage in one swoop
 
     import itertools as it
 
-    edges = [v.edges for v in stk.FourPlusSix.vertices]
+    edges = [v.edges for v in stk.cage.FourPlusSix.vertices]
     for i, aligners in enumerate(it.product(*edges)):
         tetrahedron = stk.cage.FourPlusSix(
             vertex_alignments={
