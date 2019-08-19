@@ -1072,7 +1072,7 @@ def is_valid_xtb_solvent(gfn_version, solvent):
         GFN parameterization version. Can be: ``0``, ``1`` or ``2``.
 
     solvent : :class:`str`
-        Solvent being tested.
+        Solvent being tested [1]_.
 
     Returns
     -------
