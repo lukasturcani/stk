@@ -3,6 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+============
+Introduction
+============
+
+GitHub: https://www.github.com/lukasturcani/stk
+
+Slack: https://t.co/LCPzWhvsVO
+
+
 .. toctree::
     :hidden:
     :caption: stk
@@ -46,14 +55,6 @@
     Crossover <stk.calculators.ga.crossers>
     Termination <stk.calculators.ga.exiters>
     Plotting <stk.calculators.ga.plotters>
-
-============
-Introduction
-============
-
-GitHub: https://www.github.com/lukasturcani/stk
-
-Slack: https://t.co/LCPzWhvsVO
 
 
 Overview
