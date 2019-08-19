@@ -320,7 +320,7 @@ class UFFEnergy(EnergyCalculator):
 
 class XTBEnergy(EnergyCalculator):
     """
-    Uses GFN-xTB to calculate energy and other properties.
+    Uses GFN-xTB [1]_ to calculate energy and other properties.
 
     By default, :meth:`get_energy` will extract other properties of the
     :class:`.Molecule` passed to :meth:`get_energy`, which
