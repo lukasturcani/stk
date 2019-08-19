@@ -1,4 +1,4 @@
-.. automodule:: stk.calculators.ga.selectors
+.. automodule:: stk.calculators.ea.selectors
    :members:
    :undoc-members:
    :show-inheritance:

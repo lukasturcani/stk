@@ -1,4 +1,4 @@
-.. automodule:: stk.calculators.ga.plotters
+.. automodule:: stk.calculators.ea.crossers
    :members:
    :undoc-members:
    :show-inheritance:
