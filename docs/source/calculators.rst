@@ -1,5 +1,5 @@
-Introduction
-============
+Calculators
+===========
 
 ``stk`` makes extensive use of calculator objects. Calculators are a
 very general pattern for performing operations on molecules. All
