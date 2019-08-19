@@ -1,5 +1,5 @@
 :author: Lukas Turcani
-:documentation: https://lukasturcani.github.io/stk_docs/html/introduction.html
+:Documentation: https://lukasturcani.github.io/stk_docs/html/introduction.html
 
 .. figure:: docs/source/figures/stk.png
 
@@ -23,7 +23,7 @@ To get ``stk``, you can install it with pip::
 
     $ pip install stk
 
-Make sure you also install :mod:`rdkit`, which is a dependency::
+Make sure you also install rdkit, which is a dependency::
 
     $ conda install -c rdkit rdkit
 
