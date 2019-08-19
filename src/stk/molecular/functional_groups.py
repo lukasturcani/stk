@@ -1,6 +1,10 @@
 """
 Defines tools for dealing with functional groups.
 
+The purpose of functional groups is to identify which atoms of a
+building block are modified during construction. See
+:class:`.FunctionalGroup` for more details.
+
 See the documentation of :class:`.Reactor` to see how reactions between
 functional groups are performed.
 
@@ -198,10 +202,10 @@ class FGType:
     def __repr__(self):
         func_group_smarts = rdkit.MolToSmarts(self._func_group)
         bonder_smarts = [
-            rdkit.MolToSmarts(mol) for mol in self._bonders
+            rdkit.MolToSmarts(mol) for mol, _ in self._bonders
         ]
         deleter_smarts = [
-            rdkit.MolToSmarts(mol) for mol in self._deleters
+            rdkit.MolToSmarts(mol) for mol, _ in self._deleters
         ]
         return (
             f'FGType(\n'
