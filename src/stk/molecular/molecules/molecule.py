@@ -222,7 +222,7 @@ class Molecule(metaclass=_Cached):
         Returns
         -------
         :class:`.Molecule`
-            The molecule is returned.
+            The molecule.
 
         """
 
@@ -249,7 +249,7 @@ class Molecule(metaclass=_Cached):
         Returns
         -------
         :class:`.Molecule`
-            The molecule is returned.
+            The molecule.
 
         """
 
@@ -300,7 +300,7 @@ class Molecule(metaclass=_Cached):
         Returns
         -------
         :class:`.Molecule`
-            The molecule is returned.
+            The molecule.
 
         """
 
@@ -347,7 +347,7 @@ class Molecule(metaclass=_Cached):
         Returns
         -------
         :class:`.Molecule`
-            The molecule is returned.
+            The molecule.
 
         """
 
@@ -690,7 +690,7 @@ class Molecule(metaclass=_Cached):
         Returns
         -------
         :class:`Molecule`
-            The molecule is returned.
+            The molecule.
 
         """
 
@@ -711,7 +711,7 @@ class Molecule(metaclass=_Cached):
         Returns
         -------
         :class:`Molecule`
-            The molecule is returned.
+            The molecule.
 
         """
 
@@ -959,7 +959,7 @@ class Molecule(metaclass=_Cached):
         Returns
         -------
         :class:`.Molecule`
-            The molecule is returned.
+            The molecule.
 
         """
 

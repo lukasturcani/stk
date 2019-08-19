@@ -187,6 +187,11 @@ class BuildingBlock(Molecule):
             and a cached, identical :class:`BuildingBlock` does not
             yet exist the created one will be added to the cache.
 
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The building block.
+
         Raises
         ------
         :class:`ValueError`
