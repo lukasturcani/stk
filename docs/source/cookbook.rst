@@ -1,4 +1,4 @@
-Modifying ``stk`` Calculators
+Extending Calculators
 =============================
 
 This guide takes the form a cookbook. Common problems are presented
