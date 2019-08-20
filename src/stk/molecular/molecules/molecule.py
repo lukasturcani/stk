@@ -632,15 +632,17 @@ class Molecule(metaclass=_Cached):
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
-        elif not isinstance(atom_ids, (list, tuple)):
-            atom_ids = list(atom_ids)
+        # atom_ids needs to be sorted so that the same reference vector
+        # is always created for equivalent inputs.
+        elif not isinstance(atom_ids, range):
+            atom_ids = sorted(atom_ids)
 
         pos = self._position_matrix[:, atom_ids].T
         centroid = self.get_centroid(atom_ids)
         # Normal must always be acute with reference vector. This
         # ensures the normal is always the same, even if the molecule
         # is rotated.
-        atom1, atom2 = self.get_atom_coords(sorted(atom_ids)[:2])
+        atom1, atom2 = self.get_atom_coords(atom_ids[:2])
         reference = atom1 - atom2
         normal = np.linalg.svd(pos - centroid)[-1][2, :]
         if (
