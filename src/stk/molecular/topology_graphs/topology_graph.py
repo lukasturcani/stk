@@ -523,7 +523,7 @@ class Edge:
 
         _position = 0
         for i, vertex in enumerate(vertices, 1):
-            vertex.add_edge.append(self)
+            vertex.add_edge(self)
 
             if not self._custom_position:
                 _position += vertex.get_position()

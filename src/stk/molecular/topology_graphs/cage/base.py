@@ -42,14 +42,13 @@ class _CageVertex(Vertex):
         The id of the vertex. This should be its index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
-
-    aligner_edge : :class:`.Edge`
-        The :class:`.Edge` in :attr:`edges`, which is used to align the
+    aligner_edge : :class:`int`
+        The of the edge which is used to align the
         :class:`.BuildingBlock` placed on the vertex. The first
         :class:`.FunctionalGroup` in :attr:`.BuildingBlock.func_groups`
         is rotated such that it lies exactly on this :class:`.Edge`.
+        Must be between ``0`` and the number of edges the vertex is
+        connected to.
 
     """
 
@@ -104,15 +103,9 @@ class _CageVertex(Vertex):
         center /= len(vertices)
         return cls(*center)
 
-    def clone(self, clear_edges=False):
+    def clone(self):
         """
-        Create a clone of the instance.
-
-        Parameters
-        ----------
-        clear_edges : :class:`bool`, optional
-            If ``True`` the :attr:`edges` attribute of the clone will
-            be empty.
+        Return a clone.
 
         Returns
         -------
@@ -122,41 +115,13 @@ class _CageVertex(Vertex):
 
         """
 
-        clone = super().clone(clear_edges)
-        if self.aligner_edge is None:
-            clone.aligner_edge = None
-        else:
-            clone.aligner_edge = self.aligner_edge.clone(
-                add_to_vertices=False
-            )
+        clone = super().clone()
+        clone.aligner_edge = self.aligner_edge
         clone._use_bonder_placement = self._use_bonder_placement
         clone._neighbor_positions = list(self._neighbor_positions)
         return clone
 
-    def apply_scale(self, scale):
-        """
-        Scale the position by `scale`.
-
-        Parameters
-        ----------
-        scale : :class:`float` or :class:`list`of :class:`float`
-            The value by which the position of the :class:`Vertex` is
-            scaled. Can be a single number if all axes are scaled by
-            the same amount or a :class:`list` of three numbers if
-            each axis is scaled by a different value.
-
-        Returns
-        -------
-        :class:`Vertex`
-            The vertex is returned.
-
-        """
-
-        self._position *= scale
-        self.aligner_edge.apply_scale(scale)
-        return self
-
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -165,6 +130,14 @@ class _CageVertex(Vertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -176,13 +149,21 @@ class _CageVertex(Vertex):
 
         if (
             self._use_bonder_placement
-            and len(self._neighbor_positions) == len(self.edges)
+            and len(self._neighbor_positions) == len(self._edge_ids)
         ):
             self._update_position()
 
         if len(building_block.func_groups) == 2:
-            return self._place_linear_building_block(building_block)
-        return self._place_nonlinear_building_block(building_block)
+            return self._place_linear_building_block(
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
+            )
+        return self._place_nonlinear_building_block(
+            building_block=building_block,
+            vertices=vertices,
+            edges=edges
+        )
 
     def _update_position(self):
         self._position = np.divide(
@@ -190,7 +171,12 @@ class _CageVertex(Vertex):
             len(self._neighbor_positions)
         )
 
-    def _place_linear_building_block(self, building_block):
+    def _place_linear_building_block(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -199,6 +185,14 @@ class _CageVertex(Vertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -216,7 +210,8 @@ class _CageVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._position
-        edge_coord = self.aligner_edge.get_position()
+        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        edge_coord = aligner_edge.get_position()
         target = edge_coord - self._get_edge_centroid()
         building_block.apply_rotation_between_vectors(
             start=start,
@@ -224,8 +219,8 @@ class _CageVertex(Vertex):
             origin=self._position
         )
         start = building_block.get_centroid_centroid_direction_vector()
-        e0_coord = self.edges[0].get_position()
-        e1_coord = self.edges[1].get_position()
+        e0_coord = edges[self._edge_ids[0]].get_position()
+        e1_coord = edges[self._edge_ids[0]].get_position()
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=self._position,
@@ -234,7 +229,12 @@ class _CageVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def _place_nonlinear_building_block(self, building_block):
+    def _place_nonlinear_building_block(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -243,6 +243,14 @@ class _CageVertex(Vertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -256,8 +264,10 @@ class _CageVertex(Vertex):
             position=self._position,
             atom_ids=building_block.get_bonder_ids()
         )
+        connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
         edge_normal = self._get_edge_plane_normal(
-            reference=self._get_edge_centroid()
+            reference=self._get_edge_centroid(connected_edges),
+            edges=connected_edges
         )
         building_block.apply_rotation_between_vectors(
             start=building_block.get_bonder_plane_normal(),
@@ -268,8 +278,9 @@ class _CageVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_bonder_centroid - self._position
-        edge_coord = self.aligner_edge.get_position()
-        target = edge_coord - self._get_edge_centroid()
+        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        edge_coord = aligner_edge.get_position()
+        target = edge_coord - self._get_edge_centroid(connected_edges)
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=target,
@@ -278,7 +289,12 @@ class _CageVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Assign functional groups to edges.
 
@@ -292,6 +308,14 @@ class _CageVertex(Vertex):
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
+
         Returns
         -------
         :class:`dict`
@@ -303,15 +327,21 @@ class _CageVertex(Vertex):
 
         if len(building_block.func_groups) == 2:
             return self._assign_func_groups_to_linear_edges(
-                building_block=building_block
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
             )
         return self._assign_func_groups_to_nonlinear_edges(
-                building_block=building_block
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
             )
 
     def after_assign_func_groups_to_edges(
         self,
         building_block,
+        vertices,
+        edges,
         func_groups
     ):
         """
@@ -327,6 +357,14 @@ class _CageVertex(Vertex):
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
+
         func_groups : :class:`tuple` of :class:`.FunctionalGroup`
             The functional group clones added to the constructed
             molecule.
@@ -338,15 +376,15 @@ class _CageVertex(Vertex):
         """
 
         bb_fgs = set(func_groups)
-        for edge in self.edges:
-            for func_group in edge.get_func_groups():
+        for edge_id in self._edge_ids:
+            for func_group in edges[edge_id].get_func_groups():
                 if func_group not in bb_fgs:
                     continue
 
                 bonder_position = self._get_molecule_centroid(
                     atom_ids=func_group.get_bonder_ids()
                 )
-                for vertex in edge.vertices:
+                for vertex in edges[edge_id].vertices:
                     if vertex is self:
                         continue
 
@@ -354,29 +392,41 @@ class _CageVertex(Vertex):
 
         return super().after_assign_func_groups_to_edges(
             building_block=building_block,
+            vertices=vertices,
+            edges=edges,
             func_groups=func_groups
         )
 
-    def _assign_func_groups_to_linear_edges(self, building_block):
+    def _assign_func_groups_to_linear_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         return {
-            fg_id: e.id for fg_id, e in enumerate(sorted(
-                self.edges,
-                key=self._get_fg0_distance(building_block)
+            fg_id: edge_id for fg_id, edge_id in enumerate(sorted(
+                self._edge_ids,
+                key=self._get_fg0_distance(building_block, edges)
             ))
         }
 
-    def _get_fg0_distance(self, building_block):
+    def _get_fg0_distance(self, building_block, edges):
         fg_coord = building_block.get_centroid(
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
 
-        def distance(edge):
-            displacement = edge.get_position() - fg_coord
+        def distance(edge_id):
+            displacement = edges[edge_id].get_position() - fg_coord
             return np.linalg.norm(displacement)
 
         return distance
 
-    def _assign_func_groups_to_nonlinear_edges(self, building_block):
+    def _assign_func_groups_to_nonlinear_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         # The idea is to order the functional groups in building_block
         # by their angle from func_groups[0] and the bonder centroid,
         #  going in the clockwise direction.
@@ -407,7 +457,10 @@ class _CageVertex(Vertex):
             )
         )
         assignments = {}
-        edges = sorted(self.edges, key=self._get_edge_angle(axis))
+        edges = sorted(
+            self._edge_ids,
+            key=self._get_edge_angle(axis, edges)
+        )
         for edge, fg_id in zip(edges, func_groups):
             assignments[fg_id] = edge.id
         return assignments
@@ -435,15 +488,16 @@ class _CageVertex(Vertex):
 
         return angle
 
-    def _get_edge_angle(self, axis):
-
-        aligner_edge_coord = self.aligner_edge.get_position()
-        edge_centroid = self._get_edge_centroid()
+    def _get_edge_angle(self, axis, edges):
+        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        aligner_edge_coord = aligner_edge.get_position()
+        connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
+        edge_centroid = self._get_edge_centroid(connected_edges)
         # This axis is used to figure out the clockwise direction.
         aligner_edge_direction = aligner_edge_coord - edge_centroid
 
-        def angle(edge):
-            coord = edge.get_position()
+        def angle(edge_id):
+            coord = edges[edge_id].get_position()
             edge_direction = coord - edge_centroid
             theta = vector_angle(
                 vector1=edge_direction,
@@ -459,14 +513,10 @@ class _CageVertex(Vertex):
 
     def __str__(self):
         x, y, z = self._position
-        if self.aligner_edge is None:
-            aligner_edge = None
-        else:
-            aligner_edge = self.edges.index(self.aligner_edge)
         return (
             f'Vertex(id={self.id}, '
             f'position={[x, y, z]}, '
-            f'aligner_edge={aligner_edge})'
+            f'aligner_edge={self.aligner_edge})'
         )
 
 
@@ -511,12 +561,11 @@ class Cage(TopologyGraph):
 
     .. code-block:: python
 
-        v0 = stk.cage.FourPlusSix.vertices[0]
-        v2 = stk.cage.FourPlusSix.vertices[2]
         tetrahedron = stk.cage.FourPlusSix(
             vertex_alignments={
-                v0: v0.edges[1],
-                v2: v2.edges[2]
+                0: 1,
+                2: 2,
+                1: 1
             }
         )
         cage2 = stk.ConstructedMolecule(
@@ -524,24 +573,28 @@ class Cage(TopologyGraph):
             topology_graph=tetrahedron
         )
 
+    The paramter maps the :attr:`~.Vertex.id` of vertex to a number
+    between 0 (inclusive) and the number of edges the vertex is
+    connected to (exclusive). So a vertex connected to three edges
+    can be mapped to ``0``, ``1``
+
     By changing which edge each vertex is aligned with, a different
     structural isomer of the cage can be formed.
 
     Note the in the `vertex_alignments` parameter the class vertices
-    and edges are used, however when the `building_block_vertices`
+    are used, however when the `building_block_vertices`
     parameter is used, the instance vertices are used. **These are not
     interchangeable!**
 
     .. code-block:: python
 
-        # Use the class vertices and edges to set vertex_alignments
+        # Use the class vertices to set vertex_alignments
         # and create a topology graph.
-        v0 = stk.cage.FourPlusSix.vertices[0]
-        v2 = stk.cage.FourPlusSix.vertices[2]
         tetrahedron = stk.cage.FourPlusSix(
             vertex_alignments={
-                v0: v0.edges[1],
-                v2: v2.edges[2]
+                0: 1,
+                2: 2,
+                1: 1
             }
         )
         bb3 = stk.BuildingBlock('NCOCN', ['amine'])
@@ -559,13 +612,8 @@ class Cage(TopologyGraph):
 
     The example above also demonstrates how cages with many building
     blocks can be built. You can add as many :class:`.BuildingBlock`
-    instances into `building_blocks` as you like. If you do not
-    assign where each building block is placed with
-    `building_block_vertices`, they will be placed on the
-    :attr:`vertices` of the :class:`.Cage` at random. Random
-    placement will account for the fact that the length of
-    :attr:`.BuildingBlock.func_groups` needs to match the number of
-    edges connected to a vertex.
+    instances into `building_blocks` as you like, but you also have to
+    place then with `building_block_vertices`.
 
     """
 
@@ -592,8 +640,8 @@ class Cage(TopologyGraph):
             mean that the topology graph represents different
             structural isomers.
 
-            The vertices and edges can also be referred to by their
-            indices.
+            The vertices can also be referred to by their
+            :attr:`~.Vertex.id`.
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
@@ -608,7 +656,6 @@ class Cage(TopologyGraph):
         _vertex_alignments = {}
         for v, e in vertex_alignments.items():
             v = self.vertices[v] if isinstance(v, int) else v
-            e = v.edges[e] if isinstance(e, int) else e
             _vertex_alignments[v] = e
         vertex_alignments = _vertex_alignments
 
