@@ -25,6 +25,7 @@ calculators, take for example a :class:`.Mutator` such as
         stk.cage.EightPlusTwelve(),
         stk.cage.FourPlusSix(),
         stk.cage.TwentyPlusThirty()
+    ]
 
     random_top = RandomTopologyGraph(topology_graphs)
 
