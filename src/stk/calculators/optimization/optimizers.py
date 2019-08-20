@@ -139,12 +139,6 @@ class Optimizer:
     """
     A base class for optimizers.
 
-    Attributes
-    ----------
-    use_cache : :class:`bool`
-        If ``True`` :meth:`optimize` will not run twice on the same
-        molecule.
-
     """
 
     def __init__(self, use_cache=False):
