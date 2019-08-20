@@ -29,9 +29,6 @@ class _COFVertex(Vertex):
         The id of the vertex. This should be its index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
-
     aligner_edge : :class:`.Edge`
         The :class:`.Edge` in :attr:`edges`, which is used to align the
         :class:`.BuildingBlock` placed on the vertex. The first
@@ -132,57 +129,27 @@ class _COFVertex(Vertex):
         )
         return cls(*position)
 
-    def clone(self, clear_edges=False):
+    def clone(self):
         """
-        Create a clone of the instance.
-
-        Parameters
-        ----------
-        clear_edges : :class:`bool`, optional
-            If ``True`` the :attr:`edges` attribute of the clone will
-            be empty.
+        Return a clone.
 
         Returns
         -------
         :class:`Vertex`
-            A clone with the same position but not connected to any
-            :class:`.Edge` objects.
+            The clone.
 
         """
 
-        clone = super().clone(clear_edges)
-        if self.aligner_edge is not None:
-            clone.aligner_edge = self.aligner_edge.clone(
-                add_to_vertices=False
-            )
-        else:
-            clone.aligner_edge = None
+        clone = super().clone()
+        clone.aligner_edge = self.aligner_edge
         return clone
 
-    def apply_scale(self, scale):
-        """
-        Scale the position by `scale`.
-
-        Parameters
-        ----------
-        scale : :class:`float` or :class:`list`of :class:`float`
-            The value by which the position of the :class:`Vertex` is
-            scaled. Can be a single number if all axes are scaled by
-            the same amount or a :class:`list` of three numbers if
-            each axis is scaled by a different value.
-
-        Returns
-        -------
-        :class:`Vertex`
-            The vertex is returned.
-
-        """
-
-        self._position *= scale
-        self.aligner_edge.apply_scale(scale)
-        return self
-
-    def place_building_block(self, building_block):
+    def place_building_block(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -191,6 +158,14 @@ class _COFVertex(Vertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -201,10 +176,23 @@ class _COFVertex(Vertex):
         """
 
         if len(building_block.func_groups) == 2:
-            return self._place_linear_building_block(building_block)
-        return self._place_nonlinear_building_block(building_block)
+            return self._place_linear_building_block(
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
+            )
+        return self._place_nonlinear_building_block(
+            building_block=building_block,
+            vertices=vertices,
+            edges=edges
+        )
 
-    def _place_linear_building_block(self, building_block):
+    def _place_linear_building_block(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -213,6 +201,14 @@ class _COFVertex(Vertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -230,11 +226,11 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._position
-        e0_coord = self.edges[0].get_position(self)
-        e1_coord = self.edges[1].get_position(self)
+        e0_coord = edges[self._edge_ids[0]].get_position(self)
+        e1_coord = edges[self._edge_ids[1]].get_position(self)
         target = e0_coord - e1_coord
 
-        if self.aligner_edge.id != self.edges[0].id:
+        if self._edge_ids[self.aligner_edge] != self._edge_ids[0]:
             target *= -1
 
         building_block.apply_rotation_between_vectors(
@@ -251,7 +247,12 @@ class _COFVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def _place_nonlinear_building_block(self, building_block):
+    def _place_nonlinear_building_block(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -260,6 +261,14 @@ class _COFVertex(Vertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -282,7 +291,9 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_bonder_centroid - self._position
-        edge_coord = self.aligner_edge.get_position(self)
+
+        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        edge_coord = aligner_edge.get_position(self)
         target = edge_coord - self._position
         building_block.apply_rotation_to_minimize_angle(
             start=start,
@@ -292,7 +303,12 @@ class _COFVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Assign functional groups to edges.
 
@@ -306,6 +322,14 @@ class _COFVertex(Vertex):
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
+
         Returns
         -------
         :class:`dict`
@@ -317,32 +341,46 @@ class _COFVertex(Vertex):
 
         if len(building_block.func_groups) == 2:
             return self._assign_func_groups_to_linear_edges(
-                building_block=building_block
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
             )
         return self._assign_func_groups_to_nonlinear_edges(
-                building_block=building_block
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
             )
 
-    def _assign_func_groups_to_linear_edges(self, building_block):
+    def _assign_func_groups_to_linear_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         return {
-            fg_id: e.id for fg_id, e in enumerate(sorted(
-                self.edges,
-                key=self._get_fg0_distance(building_block)
+            fg_id: edge_id for fg_id, edge_id in enumerate(sorted(
+                self._edge_ids,
+                key=self._get_fg0_distance(building_block, edges)
             ))
         }
 
-    def _get_fg0_distance(self, building_block):
+    def _get_fg0_distance(self, building_block, edges):
         fg_coord = building_block.get_centroid(
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
 
-        def distance(edge):
-            displacement = edge.get_position(self) - fg_coord
+        def distance(edge_id):
+            displacement = edges[edge_id].get_position(self) - fg_coord
             return np.linalg.norm(displacement)
 
         return distance
 
-    def _assign_func_groups_to_nonlinear_edges(self, building_block):
+    def _assign_func_groups_to_nonlinear_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         # The idea is to order the functional groups in building_block
         # by their angle from func_groups[0] and the bonder centroid,
         #  going in the clockwise direction.
@@ -372,10 +410,13 @@ class _COFVertex(Vertex):
                 axis=axis
             )
         )
-        edges = sorted(self.edges, key=self._get_edge_angle(axis))
+        edge_ids = sorted(
+            self._edge_ids,
+            key=self._get_edge_angle(axis, vertices, edges)
+        )
         assignments = {}
-        for edge, fg_id in zip(edges, func_groups):
-            assignments[fg_id] = edge.id
+        for edge_id, fg_id in zip(edge_ids, func_groups):
+            assignments[fg_id] = edge_id
         return assignments
 
     @staticmethod
@@ -401,15 +442,17 @@ class _COFVertex(Vertex):
 
         return angle
 
-    def _get_edge_angle(self, axis):
+    def _get_edge_angle(self, axis, vertices, edges):
 
-        aligner_edge_coord = self.aligner_edge.get_position(self)
-        edge_centroid = self._get_edge_centroid()
+        aligner_edge = edges[self._edge_ids[self.alinger_edge]]
+        aligner_edge_coord = aligner_edge.get_position(vertices, self)
+        connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
+        edge_centroid = self._get_edge_centroid(connected_edges)
         # This axis is used to figure out the clockwise direction.
         aligner_edge_direction = aligner_edge_coord - edge_centroid
 
         def angle(edge):
-            coord = edge.get_position(self)
+            coord = edge.get_position(vertices, self)
             edge_direction = coord - edge_centroid
             theta = vector_angle(
                 vector1=edge_direction,
@@ -425,14 +468,10 @@ class _COFVertex(Vertex):
 
     def __str__(self):
         x, y, z = self._position
-        if self.aligner_edge is not None:
-            aligner_edge = self.edges.index(self.aligner_edge)
-        else:
-            aligner_edge = None
         return (
             f'Vertex(id={self.id}, '
             f'position={[x, y, z]}, '
-            f'aligner_edge={aligner_edge})'
+            f'aligner_edge={self.aligner_edge})'
         )
 
 
@@ -454,8 +493,8 @@ class COF(TopologyGraph):
 
     Examples
     --------
-    :class:`COF` instances can be made without supplying
-    additional arguments (using :class:`.Honeycomb` as an example)
+    :class:`COF` instances can be made by supplying only
+    the lattice siz (using :class:`.Honeycomb` as an example)
 
     .. code-block:: python
 
@@ -473,64 +512,40 @@ class COF(TopologyGraph):
 
     .. code-block:: python
 
-        v0 = stk.cof.Honeycomb.vertices[0]
-        v2 = stk.cof.Honeycomb.vertices[2]
         lattice = stk.cof.Honeycomb(
             lattice_size=(2, 2, 1),
-            vertex_alignments={
-                v0: v0.edges[1],
-                v2: v2.edges[2]
-            }
+            vertex_alignments={0: 1, 2: 2}
         )
         cof2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2],
             topology_graph=lattice
         )
 
-    By changing which edge each vertex is aligned with, a different
-    structural isomer of the COF can be formed.
+    The parameter maps the :attr:`~.Vertex.id` of a vertex to a number
+    between 0 (inclusive) and the number of edges the vertex is
+    connected to (exclusive). So a vertex connected to three edges
+    can be mapped to ``0``, ``1`` or ``2``.
 
-    Note the in the `vertex_alignments` parameter the class vertices
-    and edges are used, however when the `building_block_vertices`
-    parameter is used, the instance vertices are used. **These are not
-    interchangeable!**
+    You can also build COFs with multiple building blocks, but you
+    have to assign each building block to a vertex with
+    `building_block_vertices`.
 
     .. code-block:: python
 
-        # Use the class vertices and edges to set vertex_alignments
-        # and create a topology graph.
-        v0 = stk.cof.Honeycomb.vertices[0]
-        v2 = stk.cof.Honeycomb.vertices[2]
         lattice = stk.cof.Honeycomb(
             lattice_size=(2, 2, 1),
-            vertex_alignments={
-                v0: v0.edges[1],
-                v2: v2.edges[2]
-            }
+            vertex_alignments={0: 1, 2: 2}
         )
         bb3 = stk.BuildingBlock('NCOCN', ['amine'])
         cof2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
             topology_graph=lattice
-            # Use the instance vertices in the building_block_vertices
-            # parameter.
             building_block_vertices={
                 bb1: lattice.vertices[:2],
                 bb2: lattice.vertices[4:],
                 bb3: lattice.vertices[2:4]
             }
         )
-
-    The example above also demonstrates how COFs with many building
-    blocks can be built. You can add as many :class:`.BuildingBlock`
-    instances into `building_blocks` as you like. If you do not
-    assign where each building block is placed with
-    `building_block_vertices`, they will be placed on the
-    :attr:`vertices` of the :class:`.COF` at random. Random
-    placement will account for the fact that the length of
-    :attr:`.BuildingBlock.func_groups` needs to match the number of
-    edges connected to a vertex.
-
     """
 
     def __init_subclass__(cls, **kwargs):

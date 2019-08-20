@@ -110,8 +110,7 @@ class _CageVertex(Vertex):
         Returns
         -------
         :class:`Vertex`
-            A clone with the same position but not connected to any
-            :class:`.Edge` objects.
+            The clone.
 
         """
 
@@ -565,18 +564,14 @@ class Cage(TopologyGraph):
     .. code-block:: python
 
         tetrahedron = stk.cage.FourPlusSix(
-            vertex_alignments={
-                0: 1,
-                2: 2,
-                1: 1
-            }
+            vertex_alignments={0: 1, 1: 1, 2: 2}
         )
         cage2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2],
             topology_graph=tetrahedron
         )
 
-    The parameter maps the :attr:`~.Vertex.id` of vertex to a number
+    The parameter maps the :attr:`~.Vertex.id` of a vertex to a number
     between 0 (inclusive) and the number of edges the vertex is
     connected to (exclusive). So a vertex connected to three edges
     can be mapped to ``0``, ``1`` or ``2``.
