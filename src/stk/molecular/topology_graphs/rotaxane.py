@@ -240,11 +240,13 @@ class NRotaxane(TopologyGraph):
 
         vertices = [_AxleVertex(0, 0, 0)]
         threads = orientations * num_repeating_units
-        distance = 1 / (len(threads)-1)
+        distance = 1 / (len(threads)+1)
+        if len(threads) != 1:
+            distance *= 0.8
         for i, orientation in enumerate(threads):
             vertices.append(
                 _CycleVertex(
-                    x=(i*distance) - 0.5,
+                    x=i*distance,
                     y=0,
                     z=0,
                     orientation=orientation
