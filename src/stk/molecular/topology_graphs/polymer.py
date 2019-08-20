@@ -221,7 +221,7 @@ class _TerminalVertex(_LinearVertex):
             position=self._position,
             atom_ids=building_block.get_bonder_ids(fg_ids=(0, )),
         )
-        centroid_vector = next(
+        centroid_vector = (
             building_block.get_centroid_centroid_direction_vector()
         )
         building_block.apply_rotation_between_vectors(
