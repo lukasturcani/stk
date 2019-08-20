@@ -60,7 +60,7 @@ class Vertex:
         self.id = None
         self._position = np.array([x, y, z], dtype=np.dtype('float64'))
         # Holds the ids of edges the Vertex is connected to.
-        self._edges = set()
+        self._edge_ids = set()
         self._cell = np.array([0, 0, 0])
         # This holds the ConstructedMolecule that the vertex is used
         # to construct.
@@ -130,7 +130,7 @@ class Vertex:
         clone.id = self.id
         clone._position = np.array(self._position)
         clone._cell = np.array(self._cell)
-        clone._edges = set() if clear_edges else set(self._edges)
+        clone._edge_ids = set() if clear_edges else set(self._edge_ids)
         clone._mol = self._mol
         return clone
 
@@ -163,7 +163,7 @@ class Vertex:
 
         """
 
-        self._edges.add(edge.id)
+        self._edge_ids.add(edge.id)
         return self
 
     def get_connected_edges(self, edges):
@@ -183,7 +183,7 @@ class Vertex:
 
         """
 
-        yield from filter(lambda e: e.id in self._edges, edges)
+        yield from filter(lambda e: e.id in self._edge_ids, edges)
 
     def get_connected_edge_ids(self):
         """
@@ -196,7 +196,7 @@ class Vertex:
 
         """
 
-        yield from self._edges
+        yield from self._edge_ids
 
     def set_position(self, position):
         """
@@ -273,7 +273,7 @@ class Vertex:
 
         self._mol = mol
 
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -282,6 +282,12 @@ class Vertex:
         building_block : :class:`.Molecule`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph.
 
         Returns
         -------
@@ -299,7 +305,12 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Assign functional groups to edges.
 
@@ -312,6 +323,12 @@ class Vertex:
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to edges.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph.
 
         Returns
         -------
@@ -333,6 +350,8 @@ class Vertex:
     def after_assign_func_groups_to_edges(
         self,
         building_block,
+        vertices,
+        edges,
         func_groups
     ):
         """
@@ -350,6 +369,12 @@ class Vertex:
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to edges.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph.
 
         func_groups : :class:`tuple` of :class:`.FunctionalGroup`
             The functional group clones added to the constructed
@@ -520,7 +545,7 @@ class Edge:
         if lattice_constants is None:
             lattice_constants = ([0, 0, 0] for i in range(3))
 
-        self._vertices = set(v.id for v in vertices)
+        self._vertex_ids = set(v.id for v in vertices)
         # This will be set by TopologyGraph.__init__.
         self.id = None
         self._periodicity = np.array(periodicity)
@@ -688,7 +713,7 @@ class Edge:
 
         """
 
-        yield from filter(lambda v: v.id in self._vertices, vertices)
+        yield from filter(lambda v: v.id in self._vertex_ids, vertices)
 
     def get_connected_vertex_ids(self):
         """
@@ -701,7 +726,7 @@ class Edge:
 
         """
 
-        yield from self._vertices
+        yield from self._vertex_ids
 
     def get_func_groups(self):
         """
