@@ -246,7 +246,7 @@ class NRotaxane(TopologyGraph):
         for i, orientation in enumerate(threads):
             vertices.append(
                 _CycleVertex(
-                    x=i*distance,
+                    x=i*distance*len(threads),
                     y=0,
                     z=0,
                     orientation=orientation
