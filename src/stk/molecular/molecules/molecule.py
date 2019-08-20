@@ -640,7 +640,7 @@ class Molecule(metaclass=_Cached):
         # Normal must always be acute with reference vector. This
         # ensures the normal is always the same, even if the molecule
         # is rotated.
-        atom1, atom2 = self.get_atom_coords([0, 1])
+        atom1, atom2 = self.get_atom_coords(atom_ids[:2])
         reference = atom1 - atom2
         normal = np.linalg.svd(pos - centroid)[-1][2, :]
         if (
