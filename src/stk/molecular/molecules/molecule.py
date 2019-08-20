@@ -637,7 +637,19 @@ class Molecule(metaclass=_Cached):
 
         pos = self._position_matrix[:, atom_ids].T
         centroid = self.get_centroid(atom_ids)
-        return np.linalg.svd(pos - centroid)[-1][2, :]
+        # Normal must always be acute with reference vector. This
+        # ensures the normal is always the same, even if the molecule
+        # is rotated.
+        atom1, atom2 = self.get_atom_coords([0, 1])
+        reference = atom1 - atom2
+        normal = np.linalg.svd(pos - centroid)[-1][2, :]
+        if (
+            # vector_angle is NaN if cc_vector is [0, 0, 0].
+            not np.allclose(reference, [0, 0, 0], atol=1e-5)
+            and vector_angle(normal, reference) > np.pi/2
+        ):
+            normal *= -1
+        return normal
 
     @classmethod
     def has_cached_mol(cls, identity_key):
