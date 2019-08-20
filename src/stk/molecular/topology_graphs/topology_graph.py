@@ -60,7 +60,7 @@ class Vertex:
         self.id = None
         self._position = np.array([x, y, z], dtype=np.dtype('float64'))
         # Holds the ids of edges the Vertex is connected to.
-        self._edge_ids = set()
+        self._edge_ids = []
         self._cell = np.array([0, 0, 0])
         # This holds the ConstructedMolecule that the vertex is used
         # to construct.
@@ -130,7 +130,7 @@ class Vertex:
         clone.id = self.id
         clone._position = np.array(self._position)
         clone._cell = np.array(self._cell)
-        clone._edge_ids = set() if clear_edges else set(self._edge_ids)
+        clone._edge_ids = [] if clear_edges else list(self._edge_ids)
         clone._mol = self._mol
         return clone
 
@@ -163,40 +163,8 @@ class Vertex:
 
         """
 
-        self._edge_ids.add(edge.id)
+        self._edge_ids.append(edge.id)
         return self
-
-    def get_connected_edges(self, edges):
-        """
-        Yield connected edges.
-
-        Parameters
-        ----------
-        edges : :class:`iterable` of :class:`.Edge`
-            A collection of edges which may or may not be connected to
-            the vertex.
-
-        Yields
-        ------
-        :class:`.Edge`
-            A connected edge from `edges`.
-
-        """
-
-        yield from filter(lambda e: e.id in self._edge_ids, edges)
-
-    def get_connected_edge_ids(self):
-        """
-        Yield the ids of connected edges.
-
-        Yields
-        ------
-        :class:`int`
-            The :attr:`~.Edge.id` of a connected edge.
-
-        """
-
-        yield from self._edge_ids
 
     def set_position(self, position):
         """
@@ -284,10 +252,12 @@ class Vertex:
             vertex.
 
         vertices : :class:`tuple` of :class:`.Vertex`
-            All vertices in the topology graph.
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
 
         edges : :class:`tuple` of :class:`.Edge`
-            All edges in the topology graph.
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -325,10 +295,12 @@ class Vertex:
             functional groups assigned to edges.
 
         vertices : :class:`tuple` of :class:`.Vertex`
-            All vertices in the topology graph.
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
 
         edges : :class:`tuple` of :class:`.Edge`
-            All edges in the topology graph.
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -371,10 +343,12 @@ class Vertex:
             functional groups assigned to edges.
 
         vertices : :class:`tuple` of :class:`.Vertex`
-            All vertices in the topology graph.
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
 
         edges : :class:`tuple` of :class:`.Edge`
-            All edges in the topology graph.
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         func_groups : :class:`tuple` of :class:`.FunctionalGroup`
             The functional group clones added to the constructed
@@ -545,7 +519,7 @@ class Edge:
         if lattice_constants is None:
             lattice_constants = ([0, 0, 0] for i in range(3))
 
-        self._vertex_ids = set(v.id for v in vertices)
+        self._vertex_ids = [v.id for v in vertices]
         # This will be set by TopologyGraph.__init__.
         self.id = None
         self._periodicity = np.array(periodicity)
@@ -695,38 +669,6 @@ class Edge:
             clone._position = np.array(self._position)
 
         return clone
-
-    def get_connected_vertices(self, vertices):
-        """
-        Yield connected vertices.
-
-        Parameters
-        ----------
-        vertices : :class:`iterable` of :class:`.Vertex`
-            A collection of vertices, some of which may be connected
-            to the edge.
-
-        Yields
-        ------
-        :class:`.Vertex`
-            A connected vertex from `vertices`.
-
-        """
-
-        yield from filter(lambda v: v.id in self._vertex_ids, vertices)
-
-    def get_connected_vertex_ids(self):
-        """
-        Yield the ids of connected vertices.
-
-        Yields
-        ------
-        :class:`int`
-            The :class:`~.Vertex.id` of a connected vertex.
-
-        """
-
-        yield from self._vertex_ids
 
     def get_func_groups(self):
         """
