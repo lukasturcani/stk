@@ -124,7 +124,7 @@ class Vertex:
         clone.id = self.id
         clone._position = np.array(self._position)
         clone._cell = np.array(self._cell)
-        clone._edge_ids = list(self._edge_ids)
+        clone._edge_ids = tuple(self._edge_ids)
         clone._mol = self._mol
         return clone
 
@@ -153,6 +153,19 @@ class Vertex:
         """
 
         return len(self._edge_ids)
+
+    def get_edge_ids(self):
+        """
+        Yield the ids of connected edges.
+
+        Yields
+        ------
+        :class:`int`
+            The :class:`~.Edge.id` of a connected edge.
+
+        """
+
+        yield from self._edge_ids
 
     def add_edge(self, edge):
         """
@@ -192,7 +205,7 @@ class Vertex:
 
         """
 
-        self._edge_ids = [edge.id for edge in self._edge_ids]
+        self._edge_ids = tuple(edge.id for edge in self._edge_ids)
         return self
 
     def set_position(self, position):
@@ -662,7 +675,9 @@ class Edge:
 
         """
 
-        self._vertex_ids = [vertex.id for vertex in self._vertex_ids]
+        self._vertex_ids = tuple(
+            vertex.id for vertex in self._vertex_ids
+        )
         return self
 
     def clone(self):
@@ -684,7 +699,7 @@ class Edge:
         clone._lattice_constants = tuple(
             np.array(constant) for constant in self._lattice_constants
         )
-        clone._vertex_ids = list(self._vertex_ids)
+        clone._vertex_ids = tuple(self._vertex_ids)
         clone._position = np.array(self._position)
         return clone
 
@@ -795,7 +810,7 @@ class Edge:
         return repr(self)
 
     def __repr__(self):
-        vertices = ', '.join(str(id_) for id_ in self.vertex_ids)
+        vertices = ', '.join(str(id_) for id_ in self._vertex_ids)
         if self._custom_position:
             position = f', position={self._position!r}'
         else:

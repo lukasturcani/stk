@@ -54,7 +54,12 @@ class _OnePlusOneVertex(_CageVertex):
         clone._edge_normal = list(self._edge_normal)
         return clone
 
-    def _place_nonlinear_building_block(self, building_block):
+    def _place_nonlinear_building_block(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -63,6 +68,14 @@ class _OnePlusOneVertex(_CageVertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -85,8 +98,10 @@ class _OnePlusOneVertex(_CageVertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_bonder_centroid - self._position
-        edge_coord = self.aligner_edge.get_position()
-        target = edge_coord - self._get_edge_centroid()
+        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        edge_coord = aligner_edge.get_position()
+        connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
+        target = edge_coord - self._get_edge_centroid(connected_edges)
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=target,
