@@ -56,7 +56,7 @@
    Selection <stk.calculators.ea.selectors>
    Mutation <stk.calculators.ea.mutators>
    Crossover <stk.calculators.ea.crossers>
-   Termination <stk.calculators.ea.exiters>
+   Termination <stk.calculators.ea.terminators>
    Plotting <stk.calculators.ea.plotters>
 
 
