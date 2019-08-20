@@ -39,25 +39,18 @@ class _OnePlusOneVertex(_CageVertex):
         self._edge_normal = edge_normal
         super().__init__(x, y, z, use_bonder_placement)
 
-    def clone(self, clear_edges=False):
+    def clone(self):
         """
-        Create a clone of the instance.
-
-        Parameters
-        ----------
-        clear_edges : :class:`bool`, optional
-            If ``True`` the :attr:`edges` attribute of the clone will
-            be empty.
+        Return a clone.
 
         Returns
         -------
         :class:`Vertex`
-            A clone with the same position but not connected to any
-            :class:`.Edge` objects.
+            The clone.
 
         """
 
-        clone = super().clone(clear_edges)
+        clone = super().clone()
         clone._edge_normal = list(self._edge_normal)
         return clone
 
