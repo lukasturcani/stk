@@ -212,7 +212,8 @@ class _CageVertex(Vertex):
         start = fg_centroid - self._position
         aligner_edge = edges[self._edge_ids[self.aligner_edge]]
         edge_coord = aligner_edge.get_position()
-        target = edge_coord - self._get_edge_centroid()
+        connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
+        target = edge_coord - self._get_edge_centroid(connected_edges)
         building_block.apply_rotation_between_vectors(
             start=start,
             target=target,
@@ -459,12 +460,12 @@ class _CageVertex(Vertex):
             )
         )
         assignments = {}
-        edges = sorted(
+        edge_ids = sorted(
             self._edge_ids,
             key=self._get_edge_angle(axis, edges)
         )
-        for edge, fg_id in zip(edges, func_groups):
-            assignments[fg_id] = edge.id
+        for edge_id, fg_id in zip(edge_ids, func_groups):
+            assignments[fg_id] = edge_id
         return assignments
 
     @staticmethod
@@ -611,6 +612,8 @@ class Cage(TopologyGraph):
     def __init_subclass__(cls, **kwargs):
         for i, vertex in enumerate(cls.vertices):
             vertex.id = i
+        for i, edge in enumerate(cls.edges):
+            edge.id = i
         return super().__init_subclass__(**kwargs)
 
     def __init__(self, vertex_alignments=None, num_processes=1):

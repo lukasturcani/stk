@@ -542,7 +542,7 @@ class Edge:
         if lattice_constants is None:
             lattice_constants = ([0, 0, 0] for i in range(3))
 
-        self._vertex_ids = [v.id for v in vertices]
+        self._vertex_ids = vertices
         # This will be set by TopologyGraph.__init__.
         self.id = None
         self._periodicity = np.array(periodicity)
@@ -646,6 +646,23 @@ class Edge:
         self._lattice_constants = tuple(
             scale*constant for constant in self._lattice_constants
         )
+        return self
+
+    def finalize(self):
+        """
+        Finish construction.
+
+        Needs to be called on every edge as the last part of
+        :class:`.TopologyGraph` construction.
+
+        Returns
+        -------
+        :class:`.Edge`
+            The edge.
+
+        """
+
+        self._vertex_ids = [vertex.id for vertex in self._vertex_ids]
         return self
 
     def clone(self):
@@ -896,6 +913,9 @@ class TopologyGraph:
             edge.id = i
         for i, vertex in enumerate(self.vertices):
             vertex.id = i
+        for edge in self.edges:
+            edge.finalize()
+        for vertex in self.vertices:
             vertex.finalize()
 
     def _set_stages(self):
