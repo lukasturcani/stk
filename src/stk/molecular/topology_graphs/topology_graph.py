@@ -109,15 +109,9 @@ class Vertex:
         self._position *= scale
         return self
 
-    def clone(self, clear_edges=False):
+    def clone(self):
         """
         Return a clone.
-
-        Parameters
-        ----------
-        clear_edges : :class:`bool`, optional
-            If ``True`` the :attr:`edges` attribute of the clone will
-            be empty.
 
         Returns
         -------
@@ -130,7 +124,7 @@ class Vertex:
         clone.id = self.id
         clone._position = np.array(self._position)
         clone._cell = np.array(self._cell)
-        clone._edge_ids = [] if clear_edges else list(self._edge_ids)
+        clone._edge_ids = list(self._edge_ids)
         clone._mol = self._mol
         return clone
 
@@ -471,13 +465,6 @@ class Edge:
         The id of the edge. Matches the index of the edge in
         :attr:`.TopologyGraph.edges`.
 
-    periodicity : :class:`tuple` of :class:`int`
-        The periodicity of the edge. For example, if ``(0, 0, 0)``
-        then the edge is not periodic. If, ``(1, 0, -1)`` then the
-        edge is periodic across the x axis in the positive direction,
-        is not periodic across the y axis and is periodic across the
-        z axis in the negative direction.
-
     """
 
     def __init__(
@@ -586,6 +573,19 @@ class Edge:
         self._periodicity = np.array([x, y, z])
         return self
 
+    def is_periodic(self):
+        """
+        Return ``True`` if periodic.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if periodic.
+
+        """
+
+        return any(i != 0 for i in self._periodicity)
+
     def apply_scale(self, scale):
         """
         Scale the position by `scale`.
@@ -612,28 +612,9 @@ class Edge:
         )
         return self
 
-    def clone(
-        self,
-        vertex_map=None,
-        recalculate_position=False
-    ):
+    def clone(self):
         """
         Return a clone.
-
-        Parameters
-        ----------
-        vertex_map : :class:`dict`, optional
-            If the clone should hold different :class:`.Vertex`
-            instances, then a :class:`dict` should be provided, which
-            maps vertices in the current :class:`.Edge` to the
-            vertices which should be used in the clone. Only
-            vertices which need to be remapped need to be present in
-            the `vertex_map`.
-
-        recalculate_position : :class:`bool`, optional
-            Toggle if the position of the clone should be reculated
-            from the vertices it connects or if it should inherit
-            the position of the original edge.
 
         Returns
         -------
@@ -641,9 +622,6 @@ class Edge:
             The clone.
 
         """
-
-        if vertex_map is None:
-            vertex_map = {}
 
         clone = self.__class__.__new__(self.__class__)
         clone.id = self.id
@@ -653,21 +631,8 @@ class Edge:
         clone._lattice_constants = tuple(
             np.array(constant) for constant in self._lattice_constants
         )
-        clone.vertices = tuple(
-            vertex_map.get(vertex, vertex) for vertex in self.vertices
-        )
-
-        if recalculate_position:
-            vertex_positions = (
-                vertex.get_position() for vertex in clone.vertices
-            )
-            clone._position = np.divide(
-                sum(vertex_positions),
-                len(clone.vertices)
-            )
-        else:
-            clone._position = np.array(self._position)
-
+        clone._vertex_ids = list(self._vertex_ids)
+        clone._position = np.array(self._position)
         return clone
 
     def get_func_groups(self):
@@ -701,13 +666,18 @@ class Edge:
 
         self._func_groups.append(func_group)
 
-    def get_position(self, vertex=None):
+    def get_position(self, vertices=None, reference=None):
         """
         Return the position.
 
         Parameters
         ----------
-        vertex : :class:`.Vertex`, optional
+        vertices : :class:`tuple` of :class:`.Vertex`, optional
+            All the vertices in the topology graph. Index of each
+            vertex must be equal to :class:`~.Vertex.id`. Only needs
+            to be supplied if `reference` is supplied
+
+        reference : :class:`.Vertex`, optional
             If the edge is periodic, the position returned will
             depend on which vertex the edge position is calculated
             relative to.
@@ -719,18 +689,23 @@ class Edge:
 
         """
 
-        not_periodic = all(dim == 0 for dim in self._periodicity)
-        if vertex is None or not_periodic:
+        if reference is None or not self.is_periodic():
             return np.array(self._position)
 
-        other = next(v for v in self.vertices if v is not vertex)
-        direction = 1 if vertex is self.vertices[0] else -1
-        end_cell = vertex.get_cell() + direction*self._periodicity
+        other = vertices[
+            next(v for v in self._vertices if v != reference.id)
+        ]
+        direction = (
+            1 if reference is vertices[self._vertex_ids[0]] else -1
+        )
+        end_cell = reference.get_cell() + direction*self._periodicity
         cell_shift = end_cell - other.get_cell()
         shift = 0
         for dim, constant in zip(cell_shift, self._lattice_constants):
             shift += dim*constant
-        return (other.get_position()+shift+vertex.get_position()) / 2
+        return (
+            (other.get_position()+shift+reference.get_position()) / 2
+        )
 
     def set_position(self, position):
         """
@@ -754,7 +729,7 @@ class Edge:
         return repr(self)
 
     def __repr__(self):
-        vertices = ', '.join(str(v.id) for v in self.vertices)
+        vertices = ', '.join(str(id_) for id_ in self.vertex_ids)
         if self._custom_position:
             position = f', position={self._position!r}'
         else:
@@ -905,7 +880,7 @@ class TopologyGraph:
 
         scale = self._get_scale(mol)
         vertices = tuple(self._get_vertex_clones(mol, scale))
-        edges = tuple(self._get_edge_clones(vertices, scale))
+        edges = tuple(self._get_edge_clones(scale))
 
         self._prepare(mol)
         self._place_building_blocks(mol, vertices, edges)
@@ -1025,12 +1000,14 @@ class TopologyGraph:
         """
 
         for vertex in self.vertices:
-            clone = vertex.clone(clear_edges=True)
-            clone.set_contructed_molecule(mol)
-            clone.apply_scale(scale)
-            yield clone
+            yield (
+                vertex
+                .clone()
+                .set_contructed_molecule(mol)
+                .apply_scale(scale)
+            )
 
-    def _get_edge_clones(self, vertices, scale):
+    def _get_edge_clones(self, scale):
         """
         Yield clones of :attr:`edges`.
 
@@ -1039,9 +1016,6 @@ class TopologyGraph:
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`.Vertex`
-            Clones of :attr:`vertices`.
-
         scale : :class:`float` or :class:`list` of :class:`float`
             The value by which the position of each :class:`Edge` is
             scaled. Can be a single number if all axes are scaled by
@@ -1055,14 +1029,8 @@ class TopologyGraph:
 
         """
 
-        vertex_clones = {
-            original: clone
-            for original, clone in zip(self.vertices, vertices)
-        }
         for edge in self.edges:
-            clone = edge.clone(vertex_clones)
-            clone.apply_scale(scale)
-            yield clone
+            yield edge.clone().apply_scale(scale)
 
     def _before_react(self, mol, vertices, edges):
         return vertices, edges
