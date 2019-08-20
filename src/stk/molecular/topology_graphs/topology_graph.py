@@ -37,9 +37,6 @@ class Vertex:
         The id of the vertex. This should be its index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
-
     """
 
     def __init__(self, x, y, z):
@@ -62,7 +59,8 @@ class Vertex:
         # This is set by TopologyGraph.__init__().
         self.id = None
         self._position = np.array([x, y, z], dtype=np.dtype('float64'))
-        self.edges = []
+        # Holds the ids of edges the Vertex is connected to.
+        self._edges = set()
         self._cell = np.array([0, 0, 0])
         # This holds the ConstructedMolecule that the vertex is used
         # to construct.
@@ -132,7 +130,7 @@ class Vertex:
         clone.id = self.id
         clone._position = np.array(self._position)
         clone._cell = np.array(self._cell)
-        clone.edges = [] if clear_edges else list(self.edges)
+        clone._edges = set() if clear_edges else set(self._edges)
         clone._mol = self._mol
         return clone
 
@@ -148,6 +146,57 @@ class Vertex:
         """
 
         return np.array(self._position)
+
+    def add_edge(self, edge):
+        """
+        Connect to an `edge`.
+
+        Parameters
+        ----------
+        edge : :class:`.Edge`
+            An edge to which the vertex should be connected.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
+        self._edges.add(edge.id)
+        return self
+
+    def get_connected_edges(self, edges):
+        """
+        Yield connected edges.
+
+        Parameters
+        ----------
+        edges : :class:`iterable` of :class:`.Edge`
+            A collection of edges which may or may not be connected to
+            the vertex.
+
+        Yields
+        ------
+        :class:`.Edge`
+            A connected edge from `edges`.
+
+        """
+
+        yield from filter(lambda e: e.id in self._edges, edges)
+
+    def get_connected_edge_ids(self):
+        """
+        Yield the ids of connected edges.
+
+        Yields
+        ------
+        :class:`int`
+            The :attr:`~.Edge.id` of a connected edge.
+
+        """
+
+        yield from self._edges
 
     def set_position(self, position):
         """
@@ -314,15 +363,14 @@ class Vertex:
 
         return
 
-    def _get_edge_centroid(self, edge_ids=None):
+    def _get_edge_centroid(self, edges):
         """
-        Return the centroid of the connected edges.
+        Return the centroid of `edges`.
 
         Parameters
         ----------
-        edge_ids : :class:`iterable` of :class:`int`
-            The ids of edges which are used to calculate the centroid.
-            If ``None``, then all  the edges in :attr:`edges` are used.
+        edges : :class:`iterable` of :class:`.Edge`
+            The edges which are used to calculate the centroid.
 
         Returns
         -------
@@ -331,19 +379,14 @@ class Vertex:
 
         """
 
-        if edge_ids is None:
-            edge_ids = range(len(self.edges))
-
         edge_positions = []
-        for i, edge_id in enumerate(edge_ids, 1):
-            edge_positions.append(
-                self.edges[edge_id].get_position(self)
-            )
+        for i, edge in enumerate(edges, 1):
+            edge_positions.append(edge.get_position(self))
         return np.sum(edge_positions, axis=0) / i
 
-    def _get_edge_plane_normal(self, reference, edge_ids=None):
+    def _get_edge_plane_normal(self, reference, edges):
         """
-        Get the normal to the plane on which the :attr:`edges` lie.
+        Get the normal to the plane on which `edges` lie.
 
         Parameters
         ----------
@@ -352,11 +395,10 @@ class Vertex:
             normal is set such that its angle with with `reference`
             is always acute.
 
-        edge_ids : :class:`iterable` of :class:`int`
-            The ids of edges which are used to calculate the plane.
+        edges : :class:`iterable` of :class:`.Edge`
+            The edges which are used to calculate the plane.
             If there are more than three, a plane of best fit across
-            edges is returned. If ``None``, then all  the edges in
-            :attr:`edges` are used.
+            `edges` is returned.
 
         Returns
         -------
@@ -364,30 +406,11 @@ class Vertex:
             A unit vector which describes the normal to the plane of
             the edges.
 
-        Raises
-        ------
-        :class:`ValueError`
-            If there are not at least 3 edges, which is necessary to
-            define a plane.
-
         """
 
-        if edge_ids is None:
-            edge_ids = range(len(self.edges))
-        else:
-            # The iterable is used mutliple times.
-            edge_ids = list(edge_ids)
-
-        if len(edge_ids) < 3:
-            raise ValueError(
-                'At least 3 edges are necessary to create a plane.'
-            )
-
         edge_positions = []
-        for i, edge_id in enumerate(edge_ids, 1):
-            edge_positions.append(
-                self.edges[edge_id].get_position(self)
-            )
+        for i, edge in enumerate(edges, 1):
+            edge_positions.append(edge.get_position(self))
         edge_positions = np.array(edge_positions)
 
         centroid = np.sum(edge_positions, axis=0) / i
@@ -449,9 +472,6 @@ class Edge:
         The id of the edge. Matches the index of the edge in
         :attr:`.TopologyGraph.edges`.
 
-    vertices : :class:`tuple` of :class:`.Vertex`
-        The vertices which the :class:`Edge` connects.
-
     periodicity : :class:`tuple` of :class:`int`
         The periodicity of the edge. For example, if ``(0, 0, 0)``
         then the edge is not periodic. If, ``(1, 0, -1)`` then the
@@ -500,7 +520,7 @@ class Edge:
         if lattice_constants is None:
             lattice_constants = ([0, 0, 0] for i in range(3))
 
-        self.vertices = vertices
+        self._vertices = set(v.id for v in vertices)
         # This will be set by TopologyGraph.__init__.
         self.id = None
         self._periodicity = np.array(periodicity)
@@ -517,7 +537,7 @@ class Edge:
 
         _position = 0
         for i, vertex in enumerate(vertices, 1):
-            vertex.edges.append(self)
+            vertex.add_edge.append(self)
 
             if not self._custom_position:
                 _position += vertex.get_position()
@@ -596,8 +616,7 @@ class Edge:
     def clone(
         self,
         vertex_map=None,
-        recalculate_position=False,
-        add_to_vertices=True
+        recalculate_position=False
     ):
         """
         Return a clone.
@@ -616,10 +635,6 @@ class Edge:
             Toggle if the position of the clone should be reculated
             from the vertices it connects or if it should inherit
             the position of the original edge.
-
-        add_to_vertices : :class:`bool`, optional
-            Toggles if the clone should be added to
-            :attr:`.Vertex.edges`.
 
         Returns
         -------
@@ -654,10 +669,39 @@ class Edge:
         else:
             clone._position = np.array(self._position)
 
-        if add_to_vertices:
-            for vertex in clone.vertices:
-                vertex.edges.append(clone)
         return clone
+
+    def get_connected_vertices(self, vertices):
+        """
+        Yield connected vertices.
+
+        Parameters
+        ----------
+        vertices : :class:`iterable` of :class:`.Vertex`
+            A collection of vertices, some of which may be connected
+            to the edge.
+
+        Yields
+        ------
+        :class:`.Vertex`
+            A connected vertex from `vertices`.
+
+        """
+
+        yield from filter(lambda v: v.id in self._vertices, vertices)
+
+    def get_connected_vertex_ids(self):
+        """
+        Yield the ids of connected vertices.
+
+        Yields
+        ------
+        :class:`int`
+            The :class:`~.Vertex.id` of a connected vertex.
+
+        """
+
+        yield from self._vertices
 
     def get_func_groups(self):
         """
