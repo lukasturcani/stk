@@ -221,7 +221,7 @@ class _CageVertex(Vertex):
         )
         start = building_block.get_centroid_centroid_direction_vector()
         e0_coord = edges[self._edge_ids[0]].get_position()
-        e1_coord = edges[self._edge_ids[0]].get_position()
+        e1_coord = edges[self._edge_ids[1]].get_position()
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=self._position,
