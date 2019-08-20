@@ -384,11 +384,13 @@ class _CageVertex(Vertex):
                 bonder_position = self._get_molecule_centroid(
                     atom_ids=func_group.get_bonder_ids()
                 )
-                for vertex in edges[edge_id].vertices:
-                    if vertex is self:
+                for vertex_id in edges[edge_id].get_vertex_ids():
+                    if vertex_id == self.id:
                         continue
 
-                    vertex._neighbor_positions.append(bonder_position)
+                    vertices[vertex_id]._neighbor_positions.append(
+                        bonder_position
+                    )
 
         return super().after_assign_func_groups_to_edges(
             building_block=building_block,
@@ -573,47 +575,36 @@ class Cage(TopologyGraph):
             topology_graph=tetrahedron
         )
 
-    The paramter maps the :attr:`~.Vertex.id` of vertex to a number
+    The parameter maps the :attr:`~.Vertex.id` of vertex to a number
     between 0 (inclusive) and the number of edges the vertex is
     connected to (exclusive). So a vertex connected to three edges
-    can be mapped to ``0``, ``1``
+    can be mapped to ``0``, ``1`` or ``2``.
 
     By changing which edge each vertex is aligned with, a different
     structural isomer of the cage can be formed.
 
-    Note the in the `vertex_alignments` parameter the class vertices
-    are used, however when the `building_block_vertices`
-    parameter is used, the instance vertices are used. **These are not
-    interchangeable!**
+    You can also build cages with multiple building blocks, but you
+    have to assign each building block to a vertex with
+    `building_block_vertices`.
 
-    .. code-block:: python
+    bb1 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
+    bb2 = stk.BuildingBlock('O=CC(Cl)(C=O)C=O', ['aldehyde'])
+    bb3 = stk.BuildingBlock('NCCN', ['amine'])
+    bb4 = stk.BuildingBlock('NCC(Cl)N', ['amine'])
+    bb5 = stk.BuildingBlock('NCCCCN', ['amine'])
 
-        # Use the class vertices to set vertex_alignments
-        # and create a topology graph.
-        tetrahedron = stk.cage.FourPlusSix(
-            vertex_alignments={
-                0: 1,
-                2: 2,
-                1: 1
-            }
-        )
-        bb3 = stk.BuildingBlock('NCOCN', ['amine'])
-        cage2 = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2, bb3],
-            topology_graph=tetrahedron
-            # Use the instance vertices in the building_block_vertices
-            # parameter.
-            building_block_vertices={
-                bb1: tetrahedron.vertices[:2],
-                bb2: tetrahedron.vertices[4:],
-                bb3: tetrahedron.vertices[2:4]
-            }
-        )
-
-    The example above also demonstrates how cages with many building
-    blocks can be built. You can add as many :class:`.BuildingBlock`
-    instances into `building_blocks` as you like, but you also have to
-    place then with `building_block_vertices`.
+    tetrahedron = stk.cage.FourPlusSix()
+    cage = stk.ConstructedMolecule(
+        building_blocks=[bb1, bb2, bb3, bb4, bb5],
+        topology_graph=tetrahedron,
+        building_block_vertices={
+            bb1: tetrahedron.vertices[:2],
+            bb2: tetrahedron.vertices[2:4],
+            bb3: tetrahedron.vertices[4:5],
+            bb4: tetrahedron.vertices[5:6],
+            bb5: tetrahedron.vertices[6:]
+        }
+    )
 
     """
 
@@ -629,19 +620,18 @@ class Cage(TopologyGraph):
         Parameters
         ----------
         vertex_alignments : :class:`dict`, optional
-            A mapping from a :class:`.Vertex` in :attr:`vertices`
-            to an :class:`.Edge` connected to it. The :class:`.Edge` is
-            used to align the first :class:`.FunctionalGroup` of a
-            :class:`.BuildingBlock` placed on that vertex. Only
-            vertices which need to have their default edge changed need
-            to be present in the :class:`dict`. If ``None`` then the
-            first :class:`.Edge` in :class:`.Vertex.edges` is for each
-            vertex is used. Changing which :class:`.Edge` is used will
+            A mapping from the :attr:`.Vertex.id` of a :class:`.Vertex`
+            :attr:`vertices` to an :class:`.Edge` connected to it.
+            The :class:`.Edge` is used to align the first
+            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+            placed on that vertex. Only vertices which need to have
+            their default edge changed need to be present in the
+            :class:`dict`. If ``None`` then the default edge is used
+            for each vertex. Changing which :class:`.Edge` is used will
             mean that the topology graph represents different
-            structural isomers.
-
-            The vertices can also be referred to by their
-            :attr:`~.Vertex.id`.
+            structural isomers. The edge is refered to by a number
+            between ``0`` (inclusive) and the number of edges the
+            vertex is connected to (exclusive).
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
@@ -652,40 +642,20 @@ class Cage(TopologyGraph):
         if vertex_alignments is None:
             vertex_alignments = {}
 
-        # Convert ints to Vertex and Edge instances.
-        _vertex_alignments = {}
-        for v, e in vertex_alignments.items():
-            v = self.vertices[v] if isinstance(v, int) else v
-            _vertex_alignments[v] = e
-        vertex_alignments = _vertex_alignments
-
-        vertex_clones = {}
-        for vertex in self.vertices:
-            clone = vertex.clone(clear_edges=True)
-            clone.aligner_edge = vertex_alignments.get(
-                vertex,
-                vertex.edges[0]
-            )
-            vertex_clones[vertex] = clone
-
-        edge_clones = {}
-        for edge in self.edges:
-            edge_clones[edge] = edge.clone(vertex_clones)
-
-        vertices = tuple(vertex_clones.values())
+        vertices = tuple(vertex.clone() for vertex in self.vertices)
         for vertex in vertices:
-            vertex.aligner_edge = edge_clones[vertex.aligner_edge]
-
+            vertex.aligner_edge = vertex_alignments.get(vertex.id, 0)
+        edges = tuple(edge.clone() for edge in self.edges)
         vertex_types = sorted(
-            set(len(v.edges) for v in self.vertices),
+            set(v.get_num_edges() for v in self.vertices),
             reverse=True
         )
         super().__init__(
             vertices=vertices,
-            edges=tuple(edge_clones.values()),
+            edges=edges,
             construction_stages=tuple(
                 lambda vertex, vertex_type=vt:
-                    len(vertex.edges) == vertex_type
+                    vertex.get_num_edges() == vertex_type
                 for vt in vertex_types
             ),
             num_processes=num_processes
@@ -746,7 +716,7 @@ class Cage(TopologyGraph):
 
         building_block_vertices = {}
         for vertex in self.vertices:
-            bb = bb_by_degree[len(vertex.edges)]
+            bb = bb_by_degree[vertex.get_num_edges()]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
             )
@@ -814,7 +784,7 @@ class Cage(TopologyGraph):
 
     def __repr__(self):
         vertex_alignments = ', '.join(
-            f'{v.id}: {v.edges.index(v.aligner_edge)}'
+            f'{v.id}: {v.aligner_edge}'
             for v in self.vertices
         )
         return (

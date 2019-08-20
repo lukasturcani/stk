@@ -141,6 +141,19 @@ class Vertex:
 
         return np.array(self._position)
 
+    def get_num_edges(self):
+        """
+        Return the number of connceted edge.
+
+        Returns
+        -------
+        :class:`int`
+            The number of connected edges.
+
+        """
+
+        return len(self._edge_ids)
+
     def add_edge(self, edge):
         """
         Connect to an `edge`.
@@ -647,6 +660,19 @@ class Edge:
         """
 
         return tuple(self._func_groups)
+
+    def get_vertex_ids(self):
+        """
+        Get the ids of connected vertices.
+
+        Yields
+        ------
+        :class:`int`
+            The id of a connected vertex.
+
+        """
+
+        yield from self._vertex_ids
 
     def assign_func_group(self, func_group):
         """
