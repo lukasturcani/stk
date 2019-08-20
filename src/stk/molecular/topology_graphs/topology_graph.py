@@ -158,6 +158,10 @@ class Vertex:
         """
         Connect to an `edge`.
 
+        Notes
+        -----
+        This method can only be called before :meth:`finalize`.
+
         Parameters
         ----------
         edge : :class:`.Edge`
@@ -170,7 +174,25 @@ class Vertex:
 
         """
 
-        self._edge_ids.append(edge.id)
+        # The edge will get converted to its id by finalize().
+        self._edge_ids.append(edge)
+        return self
+
+    def finalize(self):
+        """
+        Finish construction.
+
+        Needs to be called on every vertex as the last part of
+        :class:`.TopologyGraph` construction.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The vertex.
+
+        """
+
+        self._edge_ids = [edge.id for edge in self._edge_ids]
         return self
 
     def set_position(self, position):
@@ -247,6 +269,7 @@ class Vertex:
         """
 
         self._mol = mol
+        return self
 
     def place_building_block(self, building_block, vertices, edges):
         """
@@ -869,10 +892,11 @@ class TopologyGraph:
         self._construction_stages = construction_stages
         self._set_stages()
         self._num_processes = num_processes
-        for i, vertex in enumerate(self.vertices):
-            vertex.id = i
         for i, edge in enumerate(self.edges):
             edge.id = i
+        for i, vertex in enumerate(self.vertices):
+            vertex.id = i
+            vertex.finalize()
 
     def _set_stages(self):
         self._stages = tuple(
