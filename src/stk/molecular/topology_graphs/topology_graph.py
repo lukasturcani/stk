@@ -1133,18 +1133,25 @@ class TopologyGraph:
                 original_coords = bb.get_position_matrix()
 
                 mol._position_matrix.extend(
-                    vertex.place_building_block(bb)
+                    vertex.place_building_block(bb, vertices, edges)
+                )
+                assignments = vertex.assign_func_groups_to_edges(
+                    building_block=bb,
+                    vertices=vertices,
+                    edges=edges
                 )
                 atom_map = self._assign_func_groups_to_edges(
                     mol=mol,
                     bb=bb,
                     bb_id=bb_id,
                     edges=edges,
-                    assignments=vertex.assign_func_groups_to_edges(bb)
+                    assignments=assignments
                 )
                 # Perform additional, miscellaneous operations.
                 vertex.after_assign_func_groups_to_edges(
                     building_block=bb,
+                    vertices=vertices,
+                    edges=edges,
                     func_groups=mol.func_groups[-len(bb.func_groups):]
                 )
 
