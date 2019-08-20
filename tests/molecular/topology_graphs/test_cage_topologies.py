@@ -139,11 +139,8 @@ def test_topologies(
 def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
     building_blocks = [amine2, amine2_alt3, aldehyde3, aldehyde3_alt3]
     for fg in range(3):
-        v4 = stk.cage.FourPlusSix.vertices[3]
         four_plus_six = stk.cage.FourPlusSix(
-            vertex_alignments={
-                v4: v4.edges[fg]
-            },
+            vertex_alignments={3: fg},
         )
         c = stk.ConstructedMolecule(
             building_blocks=building_blocks,
@@ -157,11 +154,8 @@ def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
         )
         c.write(join(test_dir, f'4p6_valignment_{fg}.mol'))
 
-    v10 = stk.cage.FourPlusSix.vertices[9]
     four_plus_six = stk.cage.FourPlusSix(
-        vertex_alignments={
-            v10: v10.edges[1]
-        }
+        vertex_alignments={9: 1}
     )
     c = stk.ConstructedMolecule(
         building_blocks=building_blocks,
