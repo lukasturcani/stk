@@ -707,8 +707,8 @@ class COF(TopologyGraph):
         edges = it.product(cells, self.edges)
         for cell, edge in edges:
             x, y, z = cell
-            # The cell in which edge.vertices[1] is found.
             periodicity = edge.get_periodicity()
+            # The cell in which the second vertex of the edge is found.
             periodic_cell = np.array(cell) + periodicity
             # Wrap around periodic cells, ie those that are less than 0
             # or greater than the lattice size along any dimension.
@@ -718,9 +718,10 @@ class COF(TopologyGraph):
                 for dim, max_dim in dims
             ])
             # Make a vertex map which accounts for the fact that
-            # edge.vertices[1] is in cell2.
-            v0 = edge.vertices[0]
-            v1 = edge.vertices[1]
+            # v1 is in cell2.
+            # get_vertex_ids() returns vertex objects because finalize
+            # has not been called yet.
+            v0, v1 = edge.get_vertex_ids()
             vertex_map = {
                 v0: vertices[x][y][z][v0],
                 v1: vertices[cell2_x][cell2_y][cell2_z][v1]
@@ -732,10 +733,7 @@ class COF(TopologyGraph):
                 dim >= 0 and dim < max_dim
                 for dim, max_dim in dims
             )
-            clone = edge.clone(
-                vertex_map=vertex_map,
-                recalculate_position=edge_is_not_periodic
-            )
+            clone = edge.clone(vertex_map)
             edge_clones.append(clone)
             if edge_is_not_periodic:
                 clone.set_periodicity(0, 0, 0)

@@ -513,6 +513,11 @@ class Edge:
     """
     Represents an edge in a topology graph.
 
+    Note that some methods of this class will behave differently
+    before and after :meth:`finalize` is called. Methods will switch
+    from returning :class:`.Vertex` objects to returning :class:`int`
+    objects.
+
     Attributes
     ----------
     id : :class:`int`
@@ -685,9 +690,19 @@ class Edge:
         )
         return self
 
-    def clone(self):
+    def clone(self, vertex_map=None):
         """
         Return a clone.
+
+        Parameters
+        ----------
+        vertex_map : :class:`dict`, optional
+            Maps the current vertices in the edge to the ones which
+            the clone should hold. If :meth:`clone` is getting called
+            before :meth:`finalize` has been called, the keys and
+            values should be :class:`.Vertex` objects. After
+            :meth:`finalize` has been called they should be
+            :class:`int` objects.
 
         Returns
         -------
@@ -695,6 +710,9 @@ class Edge:
             The clone.
 
         """
+
+        if vertex_map is None:
+            vertex_map = {}
 
         clone = self.__class__.__new__(self.__class__)
         clone.id = self.id
@@ -704,7 +722,9 @@ class Edge:
         clone._lattice_constants = tuple(
             np.array(constant) for constant in self._lattice_constants
         )
-        clone._vertex_ids = tuple(self._vertex_ids)
+        clone._vertex_ids = tuple(
+            vertex_map.get(v, v) for v in self._vertex_ids
+        )
         clone._position = np.array(self._position)
         return clone
 
@@ -723,7 +743,10 @@ class Edge:
 
     def get_vertex_ids(self):
         """
-        Get the ids of connected vertices.
+        Get the connected vertices.
+
+        If this method is called before :meth:`finalize`, the
+        :class:`.Vertex` objects will be yielded instead.
 
         Yields
         ------
