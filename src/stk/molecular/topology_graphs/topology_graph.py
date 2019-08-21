@@ -109,9 +109,14 @@ class Vertex:
         self._position *= scale
         return self
 
-    def clone(self):
+    def clone(self, clear_edges=False):
         """
         Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            ``True`` if the clone should not be connected to any edges.
 
         Returns
         -------

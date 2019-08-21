@@ -129,18 +129,22 @@ class _COFVertex(Vertex):
         )
         return cls(*position)
 
-    def clone(self):
+    def clone(self, clear_edges=False):
         """
         Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            ``True`` if the clone should not be connected to any edges.
 
         Returns
         -------
         :class:`Vertex`
             The clone.
-
         """
 
-        clone = super().clone()
+        clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
         return clone
 
@@ -546,6 +550,7 @@ class COF(TopologyGraph):
                 bb3: lattice.vertices[2:4]
             }
         )
+
     """
 
     def __init_subclass__(cls, **kwargs):
@@ -581,22 +586,18 @@ class COF(TopologyGraph):
             groups on the ends of the lattice will be unreacted.
 
         vertex_alignments : :class:`dict`, optional
-            A mapping from a :class:`.Vertex`, in the class
-            attribute :attr:`vertices`, to an :class:`.Edge`, in the
-            class attribute :attr:`edges`, connected to it.
+            A mapping from the :attr:`.Vertex.id` of a :class:`.Vertex`
+            :attr:`vertices` to an :class:`.Edge` connected to it.
             The :class:`.Edge` is used to align the first
             :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
             placed on that vertex. Only vertices which need to have
-            their default alignment changed need to be present in the
-            :class:`dict`. If ``None`` then the first :class:`.Edge`
-            in :attr:`.Vertex.edges` is used for each vertex. Changing
-            which :class:`.Edge` is used will mean that the topology
-            graph will represent a different structural isomer.
-
-            The vertices and edges can also be referred to by their
-            indices. The vertices are referred to by their index in
-            the class attribute :attr:`vertices` while the edges are
-            referred to by their index in :attr:`.Vertex.edges`.
+            their default edge changed need to be present in the
+            :class:`dict`. If ``None`` then the default edge is used
+            for each vertex. Changing which :class:`.Edge` is used will
+            mean that the topology graph represents different
+            structural isomers. The edge is refered to by a number
+            between ``0`` (inclusive) and the number of edges the
+            vertex is connected to (exclusive).
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
@@ -606,9 +607,6 @@ class COF(TopologyGraph):
 
         if vertex_alignments is None:
             vertex_alignments = {}
-        vertex_alignments = self._normalize_vertex_alignments(
-            vertex_alignments=vertex_alignments
-        )
 
         self._lattice_size = lattice_size
         self._periodic = periodic
@@ -623,45 +621,6 @@ class COF(TopologyGraph):
         )
         super().__init__(vertices, edges, (), num_processes)
 
-    def _normalize_vertex_alignments(self, vertex_alignments):
-        """
-        Normalize different `vertex_alignments` input forms.
-
-        Parameters
-        ----------
-        vertex_alignments : :class:`dict`
-            A mapping from a :class:`.Vertex`, in the class
-            attribute :attr:`vertices`, to an :class:`.Edge`, in the
-            class attribute :attr:`edges`, connected to it.
-            The :class:`.Edge` is used to align the first
-            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
-            placed on that vertex. Only vertices which need to have
-            their default alignment changed need to be present in the
-            :class:`dict`. If ``None`` then the first :class:`.Edge`
-            in :attr:`.Vertex.edges` is used for each vertex. Changing
-            which :class:`.Edge` is used will mean that the topology
-            graph will represent a different structural isomer.
-
-            The vertices and edges can also be referred to by their
-            indices. The vertices are referred to by their index in
-            the class attribute :attr:`vertices` while the edges are
-            referred to by their index in :attr:`.Vertex.edges`.
-
-        Returns
-        -------
-        :class:`dict`
-            `vertex_alignments` but with indices replaced with the
-            vertices and edges they refer to.
-
-        """
-
-        _vertex_alignments = {}
-        for v, e in vertex_alignments.items():
-            v = self.vertices[v] if isinstance(v, int) else v
-            e = v.edges[e] if isinstance(e, int) else e
-            _vertex_alignments[v] = e
-        return _vertex_alignments
-
     def _get_instance_vertices(self, vertex_alignments):
         """
         Create the vertices of the topology graph instance.
@@ -669,17 +628,18 @@ class COF(TopologyGraph):
         Parameters
         ---------
         vertex_alignments : :class:`dict`
-            A mapping from a :class:`.Vertex`, in the class
-            attribute :attr:`vertices`, to an :class:`.Edge`, in the
-            class attribute :attr:`edges`, connected to it.
+            A mapping from the :attr:`.Vertex.id` of a :class:`.Vertex`
+            :attr:`vertices` to an :class:`.Edge` connected to it.
             The :class:`.Edge` is used to align the first
             :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
             placed on that vertex. Only vertices which need to have
-            their default alignment changed need to be present in the
-            :class:`dict`. If ``None`` then the first :class:`.Edge`
-            in :attr:`.Vertex.edges` is used for each vertex. Changing
-            which :class:`.Edge` is used will mean that the topology
-            graph will represent a different structural isomer.
+            their default edge changed need to be present in the
+            :class:`dict`. If ``None`` then the default edge is used
+            for each vertex. Changing which :class:`.Edge` is used will
+            mean that the topology graph represents different
+            structural isomers. The edge is refered to by a number
+            between ``0`` (inclusive) and the number of edges the
+            vertex is connected to (exclusive).
 
         Returns
         -------
@@ -709,12 +669,8 @@ class COF(TopologyGraph):
         vertices = it.product(cells, self.vertices)
         for cell, vertex in vertices:
             x, y, z = cell
-            clone = vertex.clone(clear_edges=True)
-            clone.set_cell(x, y, z)
-            clone.aligner_edge = vertex_alignments.get(
-                vertex,
-                vertex.edges[0]
-            )
+            clone = vertex.clone(True).set_cell(x, y, z)
+            clone.aligner_edge = vertex_alignments.get(vertex, 0)
             # Shift the clone so that it's within the cell.
             shift = 0
             for axis, dim in zip(cell, self._lattice_constants):
@@ -783,19 +739,15 @@ class COF(TopologyGraph):
             edge_clones.append(clone)
             if edge_is_not_periodic:
                 clone.set_periodicity(0, 0, 0)
-            # Set the aligner edge to the clone.
-            for vertex in vertex_map.values():
-                if vertex.aligner_edge is edge:
-                    vertex.aligner_edge = clone
+
         return tuple(edge_clones)
 
-    def _before_react(self, mol, vertex_clones, edge_clones):
+    def _before_react(self, mol, vertices, edges):
         if self._periodic:
-            return vertex_clones, edge_clones
-        return vertex_clones, [
-            edge for edge in edge_clones
-            if all(dim == 0 for dim in edge.get_periodicity())
-        ]
+            return vertices, edges
+        return vertices, tuple(
+            edge for edge in edges if not edge.is_periodic()
+        )
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """
@@ -852,7 +804,7 @@ class COF(TopologyGraph):
 
         building_block_vertices = {}
         for vertex in self.vertices:
-            bb = bb_by_degree[len(vertex.edges)]
+            bb = bb_by_degree[vertex.get_num_edges()]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
             )
@@ -885,7 +837,7 @@ class COF(TopologyGraph):
 
     def __repr__(self):
         vertex_alignments = ', '.join(
-            f'{v.id}: {v.edges.index(v.aligner_edge)}'
+            f'{v.id}: {v.aligner_edge}'
             # Only get the vertices in the first unit cell.
             for v in self.vertices[:len(self.__class__.vertices)]
         )

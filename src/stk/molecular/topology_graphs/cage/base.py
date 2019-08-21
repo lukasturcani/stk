@@ -103,9 +103,14 @@ class _CageVertex(Vertex):
         center /= len(vertices)
         return cls(*center)
 
-    def clone(self):
+    def clone(self, clear_edges=False):
         """
         Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            ``True`` if the clone should not be connected to any edges.
 
         Returns
         -------
@@ -114,7 +119,7 @@ class _CageVertex(Vertex):
 
         """
 
-        clone = super().clone()
+        clone = super().clone(clear_edges)
         clone.aligner_edge = self.aligner_edge
         clone._use_bonder_placement = self._use_bonder_placement
         clone._neighbor_positions = list(self._neighbor_positions)
