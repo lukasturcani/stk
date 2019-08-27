@@ -1,27 +1,24 @@
 stk package
 ===========
 
+.. automodule:: stk
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
 .. toctree::
 
-    stk.calculators
-    stk.molecular
-    stk.utilities
+   stk.calculators
+   stk.molecular
+   stk.utilities
 
 Submodules
 ----------
 
 .. toctree::
 
-   stk.ga
+   stk.ea
    stk.populations
-
-Module contents
----------------
-
-.. automodule:: stk
-    :members:
-    :undoc-members:
-    :show-inheritance:

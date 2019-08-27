@@ -30,28 +30,22 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-extensions = ['sphinx.ext.autodoc',
+extensions = [
+    'sphinx.ext.autodoc',
     'sphinx.ext.imgmath',
     'sphinx.ext.githubpages',
-    'sphinx.ext.napoleon']
+    'sphinx.ext.napoleon',
+    'numpydoc'
+    ]
 
 autodoc_default_options = {
-    'private-members': True,
-    'special_members': True,
+    'special-members': '__init__',
     'inherited-members': True,
-    'show-inheritance': True
+    'show-inheritance': True,
 }
 
-
-# Document __init__.
-def skip(app, what, name, obj, would_skip, options):
-    if name == "__init__":
-        return False
-    return would_skip
-
-
-def setup(app):
-    app.connect("autodoc-skip-member", skip)
+add_module_names = False
+# numpydoc_show_class_members = False
 
 
 # Add any paths that contain templates here, relative to this directory.

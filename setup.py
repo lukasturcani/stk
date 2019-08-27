@@ -1,10 +1,10 @@
-from distutils.core import setup
+from setuptools import find_packages, setup
 import re
 from os.path import join
 
 
 def get_version():
-    with open(join('stk', '__init__.py'), 'r') as f:
+    with open(join('src', 'stk', '__init__.py'), 'r') as f:
         content = f.read()
     p = re.compile(r'^__version__ = [\'"]([^\'\"]*)[\'"]', re.M)
     return p.search(content).group(1)
@@ -15,27 +15,16 @@ setup(name='stk',
       author_email='lukasturcani93@gmail.com',
       url='https://www.github.com/lukasturcani/stk',
       version=get_version(),
-      packages=[
-          'stk',
-          'stk.utilities',
-          'stk.molecular',
-          'stk.molecular.molecules',
-          'stk.molecular.topologies',
-          'stk.molecular.topologies.cage',
-          'stk.calculators',
-          'stk.calculators.electronic_property',
-          'stk.calculators.energy',
-          'stk.calculators.optimization'
-      ],
+      package_dir={'': 'src'},
+      packages=find_packages(where='src'),
       install_requires=[
-          'networkx',
           'scipy',
           'matplotlib',
-          'scikit-learn',
           'psutil',
-          'pywindowx',
           'pandas',
           'pathos',
-          'seaborn'
+          'seaborn',
+          'numpy',
+          'setuptools'
        ],
       python_requires='>=3.6')
