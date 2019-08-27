@@ -1,6 +1,11 @@
 stk.calculators.optimization package
 ====================================
 
+.. automodule:: stk.calculators.optimization
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -9,11 +14,3 @@ Submodules
    stk.calculators.optimization.macromodel
    stk.calculators.optimization.mopac
    stk.calculators.optimization.optimizers
-
-Module contents
----------------
-
-.. automodule:: stk.calculators.optimization
-    :members:
-    :undoc-members:
-    :show-inheritance:
