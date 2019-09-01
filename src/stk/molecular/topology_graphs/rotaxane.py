@@ -188,6 +188,21 @@ class NRotaxane(TopologyGraph):
             topology_graph=stk.rotaxane.NRotaxane('A', 3)
         )
 
+    The repeating unit can also be specified through the indices of
+    the building blocks
+
+    .. code-block:: python
+
+        # r1 and r2 are different ways to write the same thing.
+        r1 = stk.ConstructedMolecule(
+            building_blocks=[axle, cycle, cycle2, cycle3],
+            topology_graph=stk.rotaxane.NRotaxane('ACB', 3)
+        )
+        r2 = stk.ConstructedMolecule(
+            building_blocks=[axle, cycle, cycle2, cycle3],
+            topology_graph=stk.rotaxane.NRotaxane((1, 3, 2), 3)
+        )
+
     """
 
     def __init__(
@@ -202,11 +217,14 @@ class NRotaxane(TopologyGraph):
 
         Parameters
         ----------
-        repeating_unit : :class:`str`
+        repeating_unit : :class:`str` or :class:`tuple` of :class:`int`
             A string specifying the repeating unit of the macrocycles.
-            For example, ``'AB'`` or ``'ABB'``. Letters are assigned to
-            building block molecules in the order they are passed to
-            :meth:`.ConstructedMolecule.__init__`.
+            For example, ``'AB'`` or ``'ABB'``. The first macrocycle
+            passed to `building_blocks` is ``'A'`` and so on.
+
+            The repeating unit can also be specified by the indices of
+            `building_blocks`, for example ``'ABB'`` can be
+            written as ``(1, 2, 2)``.
 
         num_repeating_units : :class:`int`
             The number of repeating units threaded along the axle.
@@ -234,7 +252,9 @@ class NRotaxane(TopologyGraph):
                 0. for i in range(len(repeating_unit))
             )
 
-        self._repeating_unit = repeating_unit
+        self._repeating_unit = self._normalize_repeating_unit(
+            repeating_unit=repeating_unit
+        )
         self._orientations = orientations
         self._num_repeating_units = num_repeating_units
 
@@ -251,6 +271,13 @@ class NRotaxane(TopologyGraph):
                 )
             )
         super().__init__(tuple(vertices), (), (), num_processes)
+
+    @staticmethod
+    def _normalize_repeating_unit(repeating_unit):
+        if isinstance(repeating_unit, tuple):
+            return repeating_unit
+        base = ord('A')-1
+        return tuple(ord(letter)-base for letter in repeating_unit)
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """
@@ -290,13 +317,10 @@ class NRotaxane(TopologyGraph):
 
         threads = self._repeating_unit*self._num_repeating_units
         axle, *cycles = building_blocks
-        bb_map = {
-            letter: bb for letter, bb in zip(threads, cycles)
-        }
         building_block_vertices = {}
         building_block_vertices[axle] = self.vertices[0:1]
-        for letter, vertex in zip(threads, self.vertices[1:]):
-            bb = bb_map[letter]
+        for bb_index, vertex in zip(threads, self.vertices[1:]):
+            bb = building_blocks[bb_index]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
             )
