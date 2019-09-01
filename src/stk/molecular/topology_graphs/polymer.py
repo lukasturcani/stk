@@ -352,6 +352,21 @@ class Linear(TopologyGraph):
             topology_graph=stk.polymer.Linear('ABABC', 1)
         )
 
+    The repeating unit can also be specified through the indices of
+    the building blocks
+
+    .. code-block:: python
+
+        # p1 and p2 are different ways to write the same thing.
+        p1 = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2, bb3],
+            topology_graph=stk.polymer.Linear('ACB', 3)
+        )
+        p2 = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2, bb3],
+            topology_graph=stk.polymer.Linear((0, 2, 1), 3)
+        )
+
     """
 
     def __init__(
@@ -366,11 +381,14 @@ class Linear(TopologyGraph):
 
         Parameters
         ----------
-        repeating_unit : :class:`str`
+        repeating_unit : :class:`str` or :class:`tuple` of :class:`int`
             A string specifying the repeating unit of the polymer.
-            For example, ``'AB'`` or ``'ABB'``. Letters are assigned to
-            building block molecules in the order they are passed to
-            :meth:`.ConstructedMolecule.__init__`.
+            For example, ``'AB'`` or ``'ABB'``. The first building
+            block passed to `building_blocks` is ``'A'`` and so on.
+
+            The repeating unit can also be specified by the indices of
+            `building_blocks`, for example ``'ABB'`` can be
+            written as ``(0, 1, 1)``.
 
         num_repeating_units : :class:`int`
             The number of repeating units which are used to make the
@@ -400,7 +418,9 @@ class Linear(TopologyGraph):
             )
 
         # Keep these for __repr__
-        self._repeating_unit = repeating_unit
+        self._repeating_unit = self._normalize_repeating_unit(
+            repeating_unit=repeating_unit
+        )
         self._orientations = orientations
         self._num_repeating_units = num_repeating_units
 
@@ -425,6 +445,14 @@ class Linear(TopologyGraph):
             construction_stages=(),
             num_processes=num_processes
         )
+
+    @staticmethod
+    def _normalize_repeating_unit(repeating_unit):
+        if isinstance(repeating_unit, tuple):
+            return repeating_unit
+
+        base = ord('A')
+        return tuple(ord(letter)-base for letter in repeating_unit)
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """
@@ -463,12 +491,9 @@ class Linear(TopologyGraph):
         """
 
         polymer = self._repeating_unit*self._num_repeating_units
-        bb_map = {
-            letter: bb for letter, bb in zip(polymer, building_blocks)
-        }
         building_block_vertices = {}
-        for letter, vertex in zip(polymer, self.vertices):
-            bb = bb_map[letter]
+        for bb_index, vertex in zip(polymer, self.vertices):
+            bb = building_blocks[bb_index]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
             )
