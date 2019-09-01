@@ -71,18 +71,33 @@ def _test_construction(test_dir, num_expected_bbs, rotaxane):
     assert len(rotaxane.bonds) == num_bb_bonds
 
 
-def test_construction(tmp_rotaxane):
-    polymer = next(
-        bb for bb in tmp_rotaxane.get_building_blocks()
-        if isinstance(bb.topology_graph, stk.polymer.Linear)
-    )
-    cycle = next(
-        bb for bb in tmp_rotaxane.get_building_blocks()
-        if bb is not polymer
-    )
-    num_expected_bbs = {
-        polymer: 1,
-        cycle: 5
+def _tmp_rotaxane_expected_bbs(tmp_rotaxane):
+    bbs = tmp_rotaxane.get_building_blocks()
+    return {
+        next(bbs): 1,
+        next(bbs): 5
     }
-    _test_construction(test_dir, num_expected_bbs, tmp_rotaxane)
-    _test_dump_and_load(test_dir, tmp_rotaxane)
+
+
+def _tmp_rotaxane_alt1_expected_bbs(tmp_rotaxane_alt1):
+    bbs = tmp_rotaxane_alt1.get_building_blocks()
+    return {
+        next(bbs): 1,
+        next(bbs): 10,
+        next(bbs): 5
+    }
+
+
+def test_construction(tmp_rotaxane, tmp_rotaxane_alt1):
+    rotaxanes = (
+        tmp_rotaxane,
+        tmp_rotaxane_alt1
+    )
+    expected_bbs = (
+        _tmp_rotaxane_expected_bbs(tmp_rotaxane),
+        _tmp_rotaxane_alt1_expected_bbs(tmp_rotaxane_alt1)
+    )
+
+    for rotaxane, num_expected_bbs in zip(rotaxanes, expected_bbs):
+        _test_construction(test_dir, num_expected_bbs, rotaxane)
+        _test_dump_and_load(test_dir, rotaxane)
