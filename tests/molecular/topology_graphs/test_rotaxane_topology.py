@@ -49,10 +49,14 @@ def test_vertex(tmp_polymer, tmp_macrocycle):
         _test_cycle_placement(vertex, tmp_macrocycle)
 
 
-def _test_construction(test_dir, num_expected_bbs, rotaxane):
+def _test_construction(test_dir, rotaxane_data):
+    rotaxane = rotaxane_data.rotaxane
+    num_expected_bbs = rotaxane_data.num_expected_bbs
     rotaxane.write(join(test_dir, 'rotaxane.mol'))
 
-    assert len(rotaxane.building_block_counter) == 2
+    assert (
+        len(rotaxane.building_block_counter) == len(num_expected_bbs)
+    )
     for bb in num_expected_bbs:
         assert (
             rotaxane.building_block_counter[bb] == num_expected_bbs[bb]
@@ -71,33 +75,50 @@ def _test_construction(test_dir, num_expected_bbs, rotaxane):
     assert len(rotaxane.bonds) == num_bb_bonds
 
 
-def _tmp_rotaxane_expected_bbs(tmp_rotaxane):
-    bbs = tmp_rotaxane.get_building_blocks()
-    return {
-        next(bbs): 1,
-        next(bbs): 5
-    }
+class _RotaxaneData:
+    def __init__(
+        self,
+        rotaxane,
+        num_expected_bbs
+    ):
+        self.rotaxane = rotaxane
+        self.num_expected_bbs = num_expected_bbs
 
 
-def _tmp_rotaxane_alt1_expected_bbs(tmp_rotaxane_alt1):
-    bbs = tmp_rotaxane_alt1.get_building_blocks()
-    return {
-        next(bbs): 1,
-        next(bbs): 10,
-        next(bbs): 5
-    }
-
-
-def test_construction(tmp_rotaxane, tmp_rotaxane_alt1):
+def test_construction(
+    tmp_polymer,
+    tmp_macrocycle,
+    tmp_macrocycle_alt1
+):
     rotaxanes = (
-        tmp_rotaxane,
-        tmp_rotaxane_alt1
-    )
-    expected_bbs = (
-        _tmp_rotaxane_expected_bbs(tmp_rotaxane),
-        _tmp_rotaxane_alt1_expected_bbs(tmp_rotaxane_alt1)
+        _RotaxaneData(
+            rotaxane=stk.ConstructedMolecule(
+                building_blocks=[tmp_polymer, tmp_macrocycle],
+                topology_graph=stk.rotaxane.NRotaxane('A', 5)
+            ),
+            num_expected_bbs={
+                tmp_polymer: 1,
+                tmp_macrocycle: 5
+            }
+        ),
+
+        _RotaxaneData(
+            rotaxane=stk.ConstructedMolecule(
+                building_blocks=[
+                    tmp_polymer,
+                    tmp_macrocycle,
+                    tmp_macrocycle_alt1
+                ],
+                topology_graph=stk.rotaxane.NRotaxane('AAB', 5)
+            ),
+            num_expected_bbs={
+                tmp_polymer: 1,
+                tmp_macrocycle: 10,
+                tmp_macrocycle_alt1: 5
+            }
+        )
     )
 
-    for rotaxane, num_expected_bbs in zip(rotaxanes, expected_bbs):
-        _test_construction(test_dir, num_expected_bbs, rotaxane)
-        _test_dump_and_load(test_dir, rotaxane)
+    for rotaxane in rotaxanes:
+        _test_construction(test_dir, rotaxane)
+        _test_dump_and_load(test_dir, rotaxane.rotaxane)
