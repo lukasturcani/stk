@@ -52,17 +52,14 @@ def test_vertex(tmp_amine2):
         _test_assignment(vertex, tmp_amine2)
 
 
-def _test_construction(polymer_data):
+def _test_construction(filename, polymer_data):
     polymer = polymer_data.polymer
     num_expected_bbs = polymer_data.num_expected_bbs
     num_repeating_units = polymer_data.num_repeating_units
     num_atoms_lost_per_join = polymer_data.num_atoms_lost_per_join
     num_bonds_lost_per_join = polymer_data.num_bonds_lost_per_join
 
-    fg = (
-        next(polymer.get_building_blocks()).func_groups[0].fg_type.name
-    )
-    polymer.write(join(test_dir, f'polymer_{fg}.mol'))
+    polymer.write(join(test_dir, filename))
 
     for bb in polymer.get_building_blocks():
         assert (
@@ -194,6 +191,6 @@ def test_construction(
 
     )
 
-    for polymer_data in polymers:
-        _test_construction(polymer_data)
+    for i, polymer_data in enumerate(polymers):
+        _test_construction(f'{i}.mol', polymer_data)
         _test_dump_and_load(test_dir, polymer_data.polymer)

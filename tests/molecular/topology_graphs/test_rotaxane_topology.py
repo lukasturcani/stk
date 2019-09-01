@@ -49,10 +49,10 @@ def test_vertex(tmp_polymer, tmp_macrocycle):
         _test_cycle_placement(vertex, tmp_macrocycle)
 
 
-def _test_construction(test_dir, rotaxane_data):
+def _test_construction(test_dir, filename, rotaxane_data):
     rotaxane = rotaxane_data.rotaxane
     num_expected_bbs = rotaxane_data.num_expected_bbs
-    rotaxane.write(join(test_dir, 'rotaxane.mol'))
+    rotaxane.write(join(test_dir, filename))
 
     assert (
         len(rotaxane.building_block_counter) == len(num_expected_bbs)
@@ -116,9 +116,20 @@ def test_construction(
                 tmp_macrocycle: 10,
                 tmp_macrocycle_alt1: 5
             }
-        )
+        ),
+
+        _RotaxaneData(
+            rotaxane=stk.ConstructedMolecule(
+                building_blocks=[tmp_polymer, tmp_macrocycle],
+                topology_graph=stk.rotaxane.NRotaxane('A', 1)
+            ),
+            num_expected_bbs={
+                tmp_polymer: 1,
+                tmp_macrocycle: 1
+            }
+        ),
     )
 
-    for rotaxane in rotaxanes:
-        _test_construction(test_dir, rotaxane)
+    for i, rotaxane in enumerate(rotaxanes):
+        _test_construction(test_dir, f'{i}.mol', rotaxane)
         _test_dump_and_load(test_dir, rotaxane.rotaxane)
