@@ -121,6 +121,10 @@ def test_construction(
 ):
     num_repeating_units = 3
 
+    bb1 = stk.BuildingBlock('BrCCC', ['bromine'])
+    bb2 = stk.BuildingBlock('BrCCCBr', ['bromine'])
+    bb3 = stk.BuildingBlock('BrCCN', ['bromine'])
+
     polymers = (
         _PolymerData(
             polymer=stk.ConstructedMolecule(
@@ -173,6 +177,17 @@ def test_construction(
                 tmp_bromine2: 2*num_repeating_units,
                 tmp_bromine2_alt1: num_repeating_units
             },
+            num_atoms_lost_per_join=2,
+            num_bonds_lost_per_join=1
+        ),
+
+        _PolymerData(
+            polymer=stk.ConstructedMolecule(
+                building_blocks=[bb1, bb2, bb3],
+                topology_graph=stk.polymer.Linear('ABC', 1)
+            ),
+            num_repeating_units=1,
+            num_expected_bbs={bb1: 1, bb2: 1, bb3: 1},
             num_atoms_lost_per_join=2,
             num_bonds_lost_per_join=1
         ),
