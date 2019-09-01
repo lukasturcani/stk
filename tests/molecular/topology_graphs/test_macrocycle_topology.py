@@ -85,6 +85,12 @@ def _test_construction(tmp_macrocycle):
     assert len(tmp_macrocycle.bonds) == expected_bonds
 
 
-def test_construction(tmp_macrocycle):
-    _test_construction(tmp_macrocycle)
-    _test_dump_and_load(test_dir, tmp_macrocycle)
+def test_construction(tmp_macrocycle, tmp_macrocycle_alt1):
+    macrocycles = (
+        tmp_macrocycle,
+        tmp_macrocycle_alt1
+    )
+
+    for macrocycle in macrocycles:
+        _test_construction(macrocycle)
+        _test_dump_and_load(test_dir, macrocycle)
