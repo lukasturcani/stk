@@ -113,10 +113,18 @@ def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
                 repeating_unit='AB',
                 num_repeating_units=repeat_units
             )
-        )
+        ),
+        stk.ConstructedMolecule(
+            building_blocks=[amine2, aldehyde2],
+            topology_graph=stk.polymer.Linear(
+                repeating_unit='AAB',
+                orientations=[1, 1],
+                num_repeating_units=repeat_units
+            )
+        ),
 
     )
-    lost_bonds_per_join = (2, 4)
+    lost_bonds_per_join = (2, 4, 2)
     polymer_data = zip(polymers, lost_bonds_per_join)
     for polymer, num_lost_bonds_per_join in polymer_data:
         _test_construction(
