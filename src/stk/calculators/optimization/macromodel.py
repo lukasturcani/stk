@@ -867,7 +867,7 @@ class MacroModelMD(_MacroModel):
         restricted_bond_angles=None,
         restricted_torsional_angles=None,
         use_cache=False
-        ):
+    ):
         """
         Initialize a :class:`.MacroModelMD` instance.
 
