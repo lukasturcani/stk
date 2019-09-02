@@ -850,22 +850,24 @@ class MacroModelMD(_MacroModel):
 
     """
 
-    def __init__(self,
-                 macromodel_path,
-                 output_dir=None,
-                 timeout=None,
-                 force_field=16,
-                 temperature=750,
-                 conformers=50,
-                 time_step=1,
-                 eq_time=10,
-                 simulation_time=200,
-                 maximum_iterations=2500,
-                 minimum_gradient=0.05,
-                 restricted_bonds=None,
-                 restricted_bond_angles=None,
-                 restricted_torsional_angles=None,
-                 use_cache=False):
+    def __init__(
+        self,
+        macromodel_path,
+        output_dir=None,
+        timeout=None,
+        force_field=16,
+        temperature=750,
+        conformers=50,
+        time_step=1,
+        eq_time=10,
+        simulation_time=200,
+        maximum_iterations=2500,
+        minimum_gradient=0.05,
+        restricted_bonds=None,
+        restricted_bond_angles=None,
+        restricted_torsional_angles=None,
+        use_cache=False
+        ):
         """
         Initialize a :class:`.MacroModelMD` instance.
 
