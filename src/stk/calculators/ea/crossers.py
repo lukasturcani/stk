@@ -155,7 +155,7 @@ class RandomCrossover(Crosser):
 
     """
 
-    def __init__(self, *crossers, weights=None):
+    def __init__(self, *crossers, weights=None, random_seed=None):
         """
         Initialize a :class:`RandomCrossover` instance.
 
@@ -169,10 +169,14 @@ class RandomCrossover(Crosser):
             The probability that each :class:`Crosser` will be selected
             to carry out a crossover.
 
+        random_seed : :class:`int`, optional
+            The random seed to use.
+
         """
 
         self._crossers = crossers
         self._weights = weights
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=False)
 
     def set_cache_use(self, use_cache):
@@ -210,7 +214,10 @@ class RandomCrossover(Crosser):
 
         """
 
-        crosser = np.random.choice(self._crossers, p=self._weights)
+        crosser = self._generator.choice(
+            a=self._crossers,
+            p=self._weights
+        )
         yield from crosser.cross(*mols)
 
 
@@ -362,7 +369,7 @@ class GeneticRecombination(Crosser):
         """
 
         self._key = key
-        self._random_seed = random_seed
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
     def cross(self, *mols):
@@ -392,16 +399,13 @@ class GeneticRecombination(Crosser):
                 if allele.get_identity_key() not in gene:
                     gene[allele.get_identity_key()] = allele
 
-        if self._random_seed is not None:
-            np.random.seed(self._random_seed)
-
         genes = {
-            gene: np.random.permutation(list(alleles.values()))
+            gene: self._generator.permutation(list(alleles.values()))
             for gene, alleles in genes.items()
         }
         tops = dedupe((mol.topology_graph for mol in mols), key=repr)
         product = list(it.product(*genes.values(), tops))
-        np.random.shuffle(product)
+        self._generator.shuffle(product)
 
         parents = {
             (
@@ -517,7 +521,7 @@ class Jumble(Crosser):
         n = num_offspring_building_blocks
         self._num_offspring_building_blocks = n
         self._duplicate_building_blocks = duplicate_building_blocks
-        self._random_seed = random_seed
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
     def cross(self, *mols):
@@ -555,10 +559,7 @@ class Jumble(Crosser):
             key=repr
         )
         product = list(it.product(building_block_groups, topologies))
-
-        if self._random_seed is not None:
-            np.random.seed(self._random_seed)
-        np.random.shuffle(product)
+        self._generator.shuffle(product)
 
         parents = {
             (
