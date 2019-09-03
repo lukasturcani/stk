@@ -194,7 +194,7 @@ class RandomMutation(Mutator):
 
         self._mutators = mutators
         self._weights = weights
-        self._random_seed = random_seed
+        self._generator = np.random.RandomState(random_seed)
 
     def set_cache_use(self, use_cache):
         """
@@ -231,9 +231,10 @@ class RandomMutation(Mutator):
 
         """
 
-        if self._random_seed is not None:
-            np.random.seed(self._random_seed)
-        mutator = np.random.choice(self._mutators, p=self._weights)
+        mutator = self._generator.choice(
+            a=self._mutators,
+            p=self._weights
+        )
         return mutator.mutate(mol)
 
 
@@ -321,7 +322,7 @@ class RandomBuildingBlock(Mutator):
         self._building_blocks = building_blocks
         self._key = key
         self._duplicate_building_blocks = duplicate_building_blocks
-        self._random_seed = random_seed
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
     def mutate(self, mol):
@@ -340,14 +341,11 @@ class RandomBuildingBlock(Mutator):
 
         """
 
-        if self._random_seed is not None:
-            np.random.seed(self._random_seed)
-
         # Choose the building block which undergoes mutation.
         valid_bbs = [
             bb for bb in mol.building_block_vertices if self._key(bb)
         ]
-        chosen_bb = np.random.choice(valid_bbs)
+        chosen_bb = self._generator.choice(valid_bbs)
 
         # If the mutant can have more than one of the same building
         # block, prevent only the building block getting replaced
@@ -366,7 +364,7 @@ class RandomBuildingBlock(Mutator):
         ]
 
         # Choose a replacement building block.
-        replacement = np.random.choice(mols)
+        replacement = self._generator.choice(mols)
 
         # Build the new ConstructedMolecule.
         new_bbs = [
@@ -466,7 +464,7 @@ class SimilarBuildingBlock(Mutator):
         self._key = key
         self._duplicate_building_blocks = duplicate_building_blocks
         self._similar_bbs = {}
-        self._random_seed = random_seed
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
     def mutate(self, mol):
@@ -485,9 +483,6 @@ class SimilarBuildingBlock(Mutator):
 
         """
 
-        if self._random_seed is not None:
-            np.random.seed(self._random_seed)
-
         if mol not in self._similar_bbs:
             # Maps the mol to a dict. The dict maps each
             # building block of the mol to an iterator.
@@ -499,7 +494,7 @@ class SimilarBuildingBlock(Mutator):
         valid_bbs = [
             bb for bb in mol.building_block_vertices if self._key(bb)
         ]
-        chosen_bb = np.random.choice(valid_bbs)
+        chosen_bb = self._generator.choice(valid_bbs)
 
         # If the building block has not been chosen before, create an
         # iterator yielding similar molecules from `building_blocks`
@@ -607,7 +602,7 @@ class RandomTopologyGraph(Mutator):
         """
 
         self._topology_graphs = topology_graphs
-        self._random_seed = random_seed
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
     def mutate(self, mol):
@@ -626,14 +621,11 @@ class RandomTopologyGraph(Mutator):
 
         """
 
-        if self._random_seed is not None:
-            np.random.seed(self._random_seed)
-
         tops = [
             x for x in self._topology_graphs
             if repr(x) != repr(mol.topology_graph)
         ]
-        topology_graph = np.random.choice(tops)
+        topology_graph = self._generator.choice(tops)
         return mol.__class__(
             building_blocks=list(mol.building_block_vertices.keys()),
             topology_graph=topology_graph,
