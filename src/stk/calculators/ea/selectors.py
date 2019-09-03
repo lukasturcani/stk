@@ -553,7 +553,7 @@ class Roulette(Selector):
 
         """
 
-        self._random_seed = random_seed
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(
             num_batches=num_batches,
             duplicates=duplicates,
@@ -577,9 +577,6 @@ class Roulette(Selector):
             A batch of selected molecules.
 
         """
-
-        if self._random_seed is not None:
-            np.random.seed(self._random_seed)
 
         if not self._duplicates:
             valid_pop = [
@@ -608,7 +605,7 @@ class Roulette(Selector):
                 total = sum(mol.fitness for mol in valid_pop)
                 weights = [mol.fitness / total for mol in valid_pop]
 
-            selected = tuple(np.random.choice(
+            selected = tuple(self._generator.choice(
                 a=valid_pop,
                 size=self._batch_size,
                 replace=False,
