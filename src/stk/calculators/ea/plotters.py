@@ -367,6 +367,7 @@ class SelectionPlotter(Plotter):
         sm = plt.cm.ScalarMappable(cmap='magma_r', norm=norm)
         sm.set_array([])
 
+        df.to_csv(f'{self._filename}_{self._plots}.csv')
         ax = sns.scatterplot(
             x=self._x_label,
             y='Number of times selected',
