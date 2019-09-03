@@ -37,7 +37,7 @@ and selects building blocks which have the most atoms.
     # Run GA serially.
     # #####################################################################
 
-    processes = 1
+    num_processes = 1
 
     # #####################################################################
     # Set logging level.
@@ -180,17 +180,22 @@ and selects building blocks which have the most atoms.
 
     stk.SelectionPlotter(
         filename='generational_selection',
-        selector=generation_selector
+        selector=generation_selector,
+        molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+        x_label='Molecule: id - fitness value'
     )
     stk.SelectionPlotter(
         filename='crossover_selection',
-        selector=crossover_selector
+        selector=crossover_selector,
+        molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+        x_label='Molecule: id - fitness value'
     )
     stk.SelectionPlotter(
         filename='mutation_selection',
-        selector=mutation_selector
+        selector=mutation_selector,
+        molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+        x_label='Molecule: id - fitness value'
     )
-
 
 
 Running the evolutionary algorithm with this input file::
