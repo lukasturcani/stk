@@ -184,11 +184,11 @@ def test_md_com_exceptions(amine2):
         comfile = o.read().splitlines()
         expect1 = (
             ' MDYN       0      0      0      0     1.0000 -10'
-            '00.0000   300.0000     0.0000'
+            '00.0000   750.0000     0.0000'
         )
         expect2 = (
             ' MDYN       1      0      0      0     1.0000 -10'
-            '00.0000   300.0000     0.0000'
+            '00.0000   750.0000     0.0000'
         )
         assert comfile[5] == expect1
         assert comfile[7] == expect2
