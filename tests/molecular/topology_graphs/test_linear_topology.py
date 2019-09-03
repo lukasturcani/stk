@@ -52,76 +52,145 @@ def test_vertex(tmp_amine2):
         _test_assignment(vertex, tmp_amine2)
 
 
-def _test_construction(
-    polymer,
-    repeat_units,
-    num_lost_bonds_per_join
-):
-    fg = (
-        next(polymer.get_building_blocks()).func_groups[0].fg_type.name
-    )
-    polymer.write(join(test_dir, f'polymer_{fg}.mol'))
+def _test_construction(filename, polymer_data):
+    polymer = polymer_data.polymer
+    num_expected_bbs = polymer_data.num_expected_bbs
+    num_repeating_units = polymer_data.num_repeating_units
+    num_atoms_lost_per_join = polymer_data.num_atoms_lost_per_join
+    num_bonds_lost_per_join = polymer_data.num_bonds_lost_per_join
+
+    polymer.write(join(test_dir, filename))
 
     for bb in polymer.get_building_blocks():
         assert (
-            polymer.building_block_counter[bb] == repeat_units
+            polymer.building_block_counter[bb] == num_expected_bbs[bb]
         )
 
-    monomer_joins = 2*repeat_units - 1
+    repeat_unit_size = len(polymer.topology_graph._repeating_unit)
+    monomer_joins = repeat_unit_size*num_repeating_units - 1
     bonds_per_join = len(bb.func_groups[0].bonders)
     assert (
         len(polymer.construction_bonds) == monomer_joins*bonds_per_join
     )
 
-    deleters_per_join = sum(
-        len(bb.func_groups[0].deleters)
+    num_bb_atoms = sum(
+        len(bb.atoms)*num_expected_bbs[bb]
         for bb in polymer.get_building_blocks()
     )
-    num_bb_atoms = sum(
-        len(bb.atoms) for bb in polymer.get_building_blocks()
-    )
     expected_atoms = (
-        num_bb_atoms*repeat_units - deleters_per_join*monomer_joins
+        num_bb_atoms - num_atoms_lost_per_join*monomer_joins
     )
     assert len(polymer.atoms) == expected_atoms
 
     num_bb_bonds = sum(
-        len(bb.bonds) for bb in polymer.get_building_blocks()
+        len(bb.bonds)*num_expected_bbs[bb]
+        for bb in polymer.get_building_blocks()
     )
     expected_bonds = (
-        num_bb_bonds*repeat_units -
-        num_lost_bonds_per_join*monomer_joins
+        num_bb_bonds - num_bonds_lost_per_join*monomer_joins
     )
     assert len(polymer.bonds) == expected_bonds
 
 
-def test_construction(amine2, aldehyde2, boronic_acid2, diol2):
-    repeat_units = 3
+class _PolymerData:
+    def __init__(
+        self,
+        polymer,
+        num_repeating_units,
+        num_expected_bbs,
+        num_atoms_lost_per_join,
+        num_bonds_lost_per_join
+    ):
+        self.polymer = polymer
+        self.num_repeating_units = num_repeating_units
+        self.num_expected_bbs = num_expected_bbs
+        self.num_atoms_lost_per_join = num_atoms_lost_per_join
+        self.num_bonds_lost_per_join = num_bonds_lost_per_join
+
+
+def test_construction(
+    amine2,
+    aldehyde2,
+    boronic_acid2,
+    diol2,
+    tmp_bromine2,
+    tmp_bromine2_alt1
+):
+    num_repeating_units = 3
+
+    bb1 = stk.BuildingBlock('BrCCC', ['bromine'])
+    bb2 = stk.BuildingBlock('BrCCCBr', ['bromine'])
+    bb3 = stk.BuildingBlock('BrCCN', ['bromine'])
 
     polymers = (
-        stk.ConstructedMolecule(
-            building_blocks=[amine2, aldehyde2],
-            topology_graph=stk.polymer.Linear(
-                repeating_unit='AB',
-                orientations=[1, 1],
-                num_repeating_units=repeat_units
-            )
+        _PolymerData(
+            polymer=stk.ConstructedMolecule(
+                building_blocks=[amine2, aldehyde2],
+                topology_graph=stk.polymer.Linear(
+                    repeating_unit='AB',
+                    orientations=[1, 1],
+                    num_repeating_units=num_repeating_units
+                )
+            ),
+            num_repeating_units=num_repeating_units,
+            num_expected_bbs={
+                amine2: num_repeating_units,
+                aldehyde2: num_repeating_units
+            },
+            num_atoms_lost_per_join=3,
+            num_bonds_lost_per_join=2
         ),
-        stk.ConstructedMolecule(
-            building_blocks=[boronic_acid2, diol2],
-            topology_graph=stk.polymer.Linear(
-                repeating_unit='AB',
-                num_repeating_units=repeat_units
-            )
-        )
+
+        _PolymerData(
+            polymer=stk.ConstructedMolecule(
+                building_blocks=[boronic_acid2, diol2],
+                topology_graph=stk.polymer.Linear(
+                    repeating_unit='AB',
+                    num_repeating_units=num_repeating_units
+                )
+            ),
+            num_repeating_units=num_repeating_units,
+            num_expected_bbs={
+                boronic_acid2: num_repeating_units,
+                diol2: num_repeating_units
+            },
+            num_atoms_lost_per_join=6,
+            num_bonds_lost_per_join=4
+        ),
+
+        _PolymerData(
+            polymer=stk.ConstructedMolecule(
+                building_blocks=[
+                    tmp_bromine2,
+                    tmp_bromine2_alt1
+                ],
+                topology_graph=stk.polymer.Linear(
+                    repeating_unit='AAB',
+                    num_repeating_units=num_repeating_units
+                )
+            ),
+            num_repeating_units=num_repeating_units,
+            num_expected_bbs={
+                tmp_bromine2: 2*num_repeating_units,
+                tmp_bromine2_alt1: num_repeating_units
+            },
+            num_atoms_lost_per_join=2,
+            num_bonds_lost_per_join=1
+        ),
+
+        _PolymerData(
+            polymer=stk.ConstructedMolecule(
+                building_blocks=[bb1, bb2, bb3],
+                topology_graph=stk.polymer.Linear('ABC', 1)
+            ),
+            num_repeating_units=1,
+            num_expected_bbs={bb1: 1, bb2: 1, bb3: 1},
+            num_atoms_lost_per_join=2,
+            num_bonds_lost_per_join=1
+        ),
 
     )
-    lost_bonds_per_join = (2, 4)
-    polymer_data = zip(polymers, lost_bonds_per_join)
-    for polymer, num_lost_bonds_per_join in polymer_data:
-        _test_construction(
-            polymer=polymer,
-            repeat_units=repeat_units,
-            num_lost_bonds_per_join=num_lost_bonds_per_join
-        )
-        _test_dump_and_load(test_dir, polymer)
+
+    for i, polymer_data in enumerate(polymers):
+        _test_construction(f'{i}.mol', polymer_data)
+        _test_dump_and_load(test_dir, polymer_data.polymer)

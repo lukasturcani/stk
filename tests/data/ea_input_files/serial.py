@@ -6,10 +6,16 @@ import stk
 import logging
 
 # #####################################################################
+# Pick a random seed.
+# #####################################################################
+
+random_seed = 12
+
+# #####################################################################
 # Run GA serially.
 # #####################################################################
 
-processes = 1
+num_processes = 1
 
 # #####################################################################
 # Set logging level.
@@ -37,7 +43,8 @@ population = stk.EAPopulation.init_random(
     building_blocks=[building_blocks],
     topology_graphs=topology_graphs,
     size=25,
-    use_cache=True
+    use_cache=True,
+    random_seed=random_seed
 )
 
 # #####################################################################
@@ -46,7 +53,11 @@ population = stk.EAPopulation.init_random(
 
 generation_selector = stk.SelectorSequence(
     stk.Fittest(num_batches=3, duplicates=False),
-    stk.Roulette(num_batches=22, duplicates=False)
+    stk.Roulette(
+        num_batches=22,
+        duplicates=False,
+        random_seed=random_seed
+    )
 )
 
 # #####################################################################
@@ -61,23 +72,36 @@ crossover_selector = stk.AboveAverage(num_batches=5, batch_size=2)
 
 mutation_selector = stk.SelectorFunnel(
     stk.AboveAverage(num_batches=10, duplicates=False),
-    stk.Roulette(num_batches=5)
+    stk.Roulette(num_batches=5, random_seed=random_seed)
 )
 
 # #####################################################################
 # Crosser.
 # #####################################################################
 
-crosser = stk.Jumble(num_offspring_building_blocks=3)
+crosser = stk.Jumble(
+    num_offspring_building_blocks=3,
+    random_seed=random_seed
+)
 
 # #####################################################################
 # Mutator.
 # #####################################################################
 
 mutator = stk.RandomMutation(
-    stk.RandomTopologyGraph(topology_graphs),
-    stk.RandomBuildingBlock(building_blocks, lambda mol: True),
-    stk.SimilarBuildingBlock(building_blocks, lambda mol: True, False)
+    stk.RandomTopologyGraph(topology_graphs, random_seed=random_seed),
+    stk.RandomBuildingBlock(
+        building_blocks=building_blocks,
+        key=lambda mol: True,
+        random_seed=random_seed
+    ),
+    stk.SimilarBuildingBlock(
+        building_blocks=building_blocks,
+        key=lambda mol: True,
+        duplicate_building_blocks=False,
+        random_seed=random_seed
+    ),
+    random_seed=random_seed
 )
 
 # #####################################################################
@@ -134,13 +158,19 @@ plotters = [
 
 stk.SelectionPlotter(
     filename='generational_selection',
-    selector=generation_selector
+    selector=generation_selector,
+    molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+    x_label='Molecule: id - fitness value'
 )
 stk.SelectionPlotter(
     filename='crossover_selection',
-    selector=crossover_selector
+    selector=crossover_selector,
+    molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+    x_label='Molecule: id - fitness value'
 )
 stk.SelectionPlotter(
     filename='mutation_selection',
-    selector=mutation_selector
+    selector=mutation_selector,
+    molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+    x_label='Molecule: id - fitness value'
 )

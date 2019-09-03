@@ -209,6 +209,25 @@ class Macrocycle(TopologyGraph):
             topology_graph=stk.macrocycle.Macrocycle('AB', 5)
         )
 
+    The repeating unit can also be specified through the indices of
+    the building blocks
+
+    .. code-block:: python
+
+        bb1 = stk.BuildingBlock('BrCCBr', ['bromine'])
+        bb2 = stk.BuildingBlock('BrCNCBr', ['bromine'])
+        bb3 = stk.BuildingBlock('BrCNNCBr', ['bromine'])
+
+        # c1 and c2 are different ways to write the same thing.
+        c1 = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2, bb3],
+            topology_graph=stk.macrocycle.Macrocycle('ACB', 3)
+        )
+        c2 = stk.ConstructedMolecule(
+            building_blocks=[bb1, bb2, bb3],
+            topology_graph=stk.macrocycle.Macrocycle((0, 2, 1), 3)
+        )
+
     """
 
     def __init__(
@@ -223,11 +242,14 @@ class Macrocycle(TopologyGraph):
 
         Parameters
         ----------
-        repeating_unit : :class:`str`
+        repeating_unit : :class:`str` or :class:`tuple` of :class:`int`
             A string specifying the repeating unit of the macrocycle.
-            For example, ``'AB'`` or ``'ABB'``. Letters are assigned to
-            building block molecules in the order they are passed to
-            :meth:`.ConstructedMolecule.__init__`.
+            For example, ``'AB'`` or ``'ABB'``. The first building
+            block passed to `building_blocks` is ``'A'`` and so on.
+
+            The repeating unit can also be specified by the indices of
+            `building_blocks`, for example ``'ABB'`` can be
+            written as ``(0, 1, 1)``.
 
         num_repeating_units : :class:`int`
             The number of repeating units which are used to make the
@@ -257,7 +279,9 @@ class Macrocycle(TopologyGraph):
             )
 
         # Keep these for __repr__
-        self._repeating_unit = repeating_unit
+        self._repeating_unit = self._normalize_repeating_unit(
+            repeating_unit=repeating_unit
+        )
         self._orientations = orientations
         self._num_repeating_units = num_repeating_units
 
@@ -287,6 +311,13 @@ class Macrocycle(TopologyGraph):
             construction_stages=(),
             num_processes=num_processes
         )
+
+    @staticmethod
+    def _normalize_repeating_unit(repeating_unit):
+        if isinstance(repeating_unit, tuple):
+            return repeating_unit
+        base = ord('A')
+        return tuple(ord(letter)-base for letter in repeating_unit)
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """
@@ -325,12 +356,9 @@ class Macrocycle(TopologyGraph):
         """
 
         polymer = self._repeating_unit*self._num_repeating_units
-        bb_map = {
-            letter: bb for letter, bb in zip(polymer, building_blocks)
-        }
         building_block_vertices = {}
-        for letter, vertex in zip(polymer, self.vertices):
-            bb = bb_map[letter]
+        for bb_index, vertex in zip(polymer, self.vertices):
+            bb = building_blocks[bb_index]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
             )
