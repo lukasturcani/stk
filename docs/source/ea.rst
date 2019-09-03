@@ -120,7 +120,7 @@ and selects building blocks which have the most atoms.
         stk.SimilarBuildingBlock(
             building_blocks=building_blocks,
             key=lambda mol: True,
-            duplicates=False,
+            duplicate_building_blocks=False,
             random_seed=random_seed
         ),
         random_seed=random_seed
