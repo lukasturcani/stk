@@ -15,7 +15,7 @@ random_seed = 12
 # Run GA serially.
 # #####################################################################
 
-processes = 1
+num_processes = 1
 
 # #####################################################################
 # Set logging level.
@@ -158,13 +158,19 @@ plotters = [
 
 stk.SelectionPlotter(
     filename='generational_selection',
-    selector=generation_selector
+    selector=generation_selector,
+    molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+    x_label='Molecule: id - fitness value'
 )
 stk.SelectionPlotter(
     filename='crossover_selection',
-    selector=crossover_selector
+    selector=crossover_selector,
+    molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+    x_label='Molecule: id - fitness value'
 )
 stk.SelectionPlotter(
     filename='mutation_selection',
-    selector=mutation_selector
+    selector=mutation_selector,
+    molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+    x_label='Molecule: id - fitness value'
 )
