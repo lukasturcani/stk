@@ -431,7 +431,9 @@ _fg_types = (
 
     FGType(
         name='primary_amine',
-        func_group_smarts='[N;$(NC);!$(NC=*);!$(NC#*);!$(NC(-[O,N,S]))]([H])[H]',
+        func_group_smarts=(
+            '[N;$(NC);!$(NC=*);!$(NC#*);!$(NC(-[O,N,S]))]([H])[H]'
+        ),
         bonder_smarts=['[$([N]([H])[H])]'],
         deleter_smarts=['[$([H][N][H])]']*2
     ),
