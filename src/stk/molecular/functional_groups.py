@@ -430,6 +430,13 @@ _fg_types = (
     ),
 
     FGType(
+        name='primary_amine',
+        func_group_smarts='[N;$(NC);!$(NC=*);!$(NC#*);!$(NC(-[O,N,S]))]([H])[H]',
+        bonder_smarts=['[$([N]([H])[H])]'],
+        deleter_smarts=['[$([H][N][H])]']*2
+    ),
+
+    FGType(
         name='aldehyde',
         func_group_smarts='[C](=[O])[H]',
         bonder_smarts=['[$([C](=[O])[H])]'],
