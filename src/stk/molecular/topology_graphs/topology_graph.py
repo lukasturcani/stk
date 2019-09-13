@@ -27,21 +27,10 @@ from ..reactor import Reactor
 from ...utilities import vector_angle
 
 
-class Vertex:
-    """
-    Represents a vertex in a :class:`.TopologyGraph`.
-
-    Attributes
-    ----------
-    id : :class:`int`
-        The id of the vertex. This should be its index in
-        :attr:`TopologyGraph.vertices`.
-
-    """
-
+class VertexData:
     def __init__(self, x, y, z):
         """
-        Initialize a :class:`.Vertex`.
+        Initialize a :class:`.VertexData` instance.
 
         Parameters
         ----------
@@ -58,34 +47,83 @@ class Vertex:
 
         # This is set by TopologyGraph.__init__().
         self.id = None
-        self._position = np.array([x, y, z], dtype=np.dtype('float64'))
-        # Holds the ids of edges the Vertex is connected to.
-        self._edge_ids = []
-        self._cell = np.array([0, 0, 0])
-        # This holds the ConstructedMolecule that the vertex is used
-        # to construct.
-        self._mol = None
+        self.position = np.array([x, y, z], dtype=np.dtype('float64'))
+        # Holds connected EdgeData instances.
+        self.edges = []
+        self.cell = np.array([0, 0, 0])
 
     @classmethod
-    def init_at_center(cls, *vertices):
+    def init_at_center(cls, *vertex_data):
         """
-        Initialize at the center of `vertices`.
+        Initialize at the center of other vertices.
 
         Parameters
         ----------
-        vertices : :class:`.Vertex`
+        vertex_data : :class:`.VertexData`
             Vertices at whose center this vertex should be initialized.
 
         Returns
         -------
-        :class:`.Vertex`
+        :class:`.VertexData`
             The vertex.
 
         """
 
-        center = sum(vertex.get_position() for vertex in vertices)
-        center /= len(vertices)
+        center = sum(vertex.position for vertex in vertex_data)
+        center /= len(vertex_data)
         return cls(*center)
+
+    def get_vertex(self):
+        """
+        Get a vertex from the data.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            A vertex initialized from the data.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method which needs to be implemented in
+            a subclass.
+
+        """
+
+        raise NotImplementedError()
+
+
+class Vertex:
+    """
+    Represents a vertex in a :class:`.TopologyGraph`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    """
+
+    def __init__(self, data):
+        """
+        Initialize a :class:`.Vertex`.
+
+        Parameters
+        ----------
+        data : :class:`.VertexData`
+            Holds the vertex data.
+
+        """
+
+        self.id = data.id
+        self._position = np.array(data.position)
+        # Holds the ids of edges the Vertex is connected to.
+        self._edge_ids = [edge_data.id for edge_data in data.edges]
+        self._cell = np.array(data.cell)
+        # This holds the ConstructedMolecule that the vertex is used
+        # to construct.
+        self._mol = None
 
     def apply_scale(self, scale):
         """
@@ -129,7 +167,7 @@ class Vertex:
         clone.id = self.id
         clone._position = np.array(self._position)
         clone._cell = np.array(self._cell)
-        clone._edge_ids = tuple(self._edge_ids)
+        clone._edge_ids = [] if clear_edges else list(self._edge_ids)
         clone._mol = self._mol
         return clone
 
@@ -172,66 +210,6 @@ class Vertex:
 
         yield from self._edge_ids
 
-    def add_edge(self, edge):
-        """
-        Connect to an `edge`.
-
-        Notes
-        -----
-        This method can only be called before :meth:`finalize`.
-
-        Parameters
-        ----------
-        edge : :class:`.Edge`
-            An edge to which the vertex should be connected.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        # The edge will get converted to its id by finalize().
-        self._edge_ids.append(edge)
-        return self
-
-    def finalize(self):
-        """
-        Finish construction.
-
-        Needs to be called on every vertex as the last part of
-        :class:`.TopologyGraph` construction.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        self._edge_ids = tuple(edge.id for edge in self._edge_ids)
-        return self
-
-    def set_position(self, position):
-        """
-        Set the position of the vertex.
-
-        Parameters
-        ----------
-        :class:`numpy.ndarray`
-            The new position of the vertex.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        self._position = np.array(position)
-        return self
-
     def get_cell(self):
         """
         Get the cell of the lattice in which the vertex is found.
@@ -244,31 +222,6 @@ class Vertex:
         """
 
         return np.array(self._cell)
-
-    def set_cell(self, x, y, z):
-        """
-        Set the cell of the lattice in which the vertex is found.
-
-        Parameters
-        ----------
-        x : :class:`int`
-            The x position of the cell in the lattice.
-
-        y : :class:`int`
-            The y position of the cell in the lattice.
-
-        z : :class:`int`
-            The z position of the cell in the lattice.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        self._cell = np.array([x, y, z])
-        return self
 
     def set_contructed_molecule(self, mol):
         """
@@ -509,6 +462,81 @@ class Vertex:
         return str(self)
 
 
+class EdgeData:
+    def __init__(
+        self,
+        *vertex_data,
+        position=None,
+        periodicity=None,
+        lattice_constants=None
+    ):
+        """
+        Initialize an :class:`EdgeData` instance.
+
+        Parameters
+        ----------
+        *vertex_data : :class:`.VertexData`
+            The vertices which the :class:`Edge` connects.
+
+        position : :class:`numpy.ndarray`, optional
+            The position of the edge. If ``None``, the centroid
+            of `vertex_data` is used.
+
+        periodicity : :class:`tuple` of :class:`int`, optional
+            The periodicity of the edge. For example, if ``(0, 0, 0)``
+            then the edge is not periodic. If, ``(1, 0, -1)`` then the
+            edge is periodic across the x axis in the positive
+            direction, is not periodic across the y axis and is
+            periodic across the z axis in the negative direction. If
+            ``None`` then the edge is not periodic.
+
+        lattice_constants : :class:`iterable`, optional
+            If the edge is periodic, the a, b and c lattice
+            constants should be provided as vectors in Cartesian
+            coordiantes.
+
+        """
+
+        if periodicity is None:
+            periodicity = [0, 0, 0]
+        if lattice_constants is None:
+            lattice_constants = ([0, 0, 0] for i in range(3))
+
+        self.vertices = vertex_data
+        # This will be set by TopologyGraph.__init__.
+        self.id = None
+        self.periodicity = np.array(periodicity)
+
+        self._custom_position = position is not None
+        self._position = position
+        self._lattice_constants = tuple(
+            np.array(constant) for constant in lattice_constants
+        )
+
+        _position = 0
+        for i, vertex in enumerate(vertex_data, 1):
+            vertex.add_edge(self)
+
+            if not self._custom_position:
+                _position += vertex.get_position()
+
+        if not self._custom_position:
+            self._position = _position / i
+
+    def get_edge(self):
+        """
+        Get an :class:`.Edge` from the data.
+
+        Returns
+        -------
+        :class:`Edge`
+            The edge.
+
+        """
+
+        return Edge(self)
+
+
 class Edge:
     """
     Represents an edge in a topology graph.
@@ -526,13 +554,7 @@ class Edge:
 
     """
 
-    def __init__(
-        self,
-        *vertices,
-        position=None,
-        periodicity=None,
-        lattice_constants=None
-    ):
+    def __init__(self, data):
         """
         Initialize an :class:`Edge`.
 
@@ -607,31 +629,6 @@ class Edge:
 
         return np.array(self._periodicity)
 
-    def set_periodicity(self, x, y, z):
-        """
-        Set the periodicity  of the edge.
-
-        Parameters
-        ----------
-        x : :class:`int`
-            The periodicity of the edge along the x axis.
-
-        y : :class:`int`
-            The periodicity of the edge along the y axis.
-
-        z : :class:`int`
-            The periodicity of the edge along the z axis.
-
-        Returns
-        -------
-        :class:`.Edge`
-            The edge.
-
-        """
-
-        self._periodicity = np.array([x, y, z])
-        return self
-
     def is_periodic(self):
         """
         Return ``True`` if periodic.
@@ -668,22 +665,6 @@ class Edge:
         self._position *= scale
         self._lattice_constants = tuple(
             scale*constant for constant in self._lattice_constants
-        )
-        return self
-
-    def finalize(self):
-        """
-        Finish construction.
-
-        Returns
-        -------
-        :class:`.Edge`
-            The edge.
-
-        """
-
-        self._vertex_ids = tuple(
-            vertex.id for vertex in self._vertex_ids
         )
         return self
 
@@ -794,24 +775,6 @@ class Edge:
         return (
             (other.get_position()+shift+reference.get_position()) / 2
         )
-
-    def set_position(self, position):
-        """
-        Set the position.
-
-        Parameters
-        ----------
-        position : :class:`numpy.ndarray`
-            The new position of the edge.
-
-        Returns
-        -------
-        :class:`Edge`
-            The edge.
-
-        """
-
-        self._position = np.array(position)
 
     def __str__(self):
         return repr(self)
