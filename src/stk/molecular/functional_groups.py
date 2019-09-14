@@ -634,16 +634,24 @@ def assign_metal_fgs(building_block, coordination_info):
             atoms=tuple(
                 building_block.atoms[id_]
                 for id_ in coordination_info[fg]['atom_ids']
+                if id_ is not None
             ),
             bonders=tuple(
                 building_block.atoms[id_]
                 for id_ in coordination_info[fg]['bonder_ids']
+                if id_ is not None
             ),
             deleters=tuple(
                 building_block.atoms[id_]
                 for id_ in coordination_info[fg]['deleter_ids']
+                if id_ is not None
             ),
-            fg_type='metal'
+            fg_type=FGType(
+                name='metal',
+                func_group_smarts='',
+                bonder_smarts=[],
+                deleter_smarts=([])
+            ),
         )
         func_groups.append(new_fg)
 

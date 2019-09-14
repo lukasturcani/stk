@@ -17,24 +17,24 @@ def main():
     # metal.set_position_matrix(np.array([0, 0, 0]))
     metal_coord_info = {
         0: {
-            'atom_ids': 0,
-            'bonder_ids': 0,
-            'deleter_ids': None
+            'atom_ids': [0],
+            'bonder_ids': [0],
+            'deleter_ids': [None]
         },
         1: {
-            'atom_ids': 0,
-            'bonder_ids': 0,
-            'deleter_ids': None
+            'atom_ids': [0],
+            'bonder_ids': [0],
+            'deleter_ids': [None]
         },
         2: {
-            'atom_ids': 0,
-            'bonder_ids': 0,
-            'deleter_ids': None
+            'atom_ids': [0],
+            'bonder_ids': [0],
+            'deleter_ids': [None]
         },
         3: {
-            'atom_ids': 0,
-            'bonder_ids': 0,
-            'deleter_ids': None
+            'atom_ids': [0],
+            'bonder_ids': [0],
+            'deleter_ids': [None]
         },
     }
     metal = stk.assign_metal_fgs(
