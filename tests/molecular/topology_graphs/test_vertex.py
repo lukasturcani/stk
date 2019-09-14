@@ -61,4 +61,44 @@ def test_apply_scale(tmp_vertex):
 
 
 def test_clone(vertex):
+    clone = vertex.clone()
+    assert clone.id == vertex.id
+    assert all(clone.get_position() == vertex.get_position())
+    assert all(clone.get_cell() == vertex.get_cell())
+    assert list(clone.get_edge_ids()) == list(vertex.get_edge_ids())
+
+    clone = vertex.clone(True)
+    assert clone.id == vertex.id
+    assert all(clone.get_position() == vertex.get_position())
+    assert all(clone.get_cell() == vertex.get_cell())
+    assert list(clone.get_edge_ids()) != list(vertex.get_edge_ids())
+    assert list(clone.get_edge_ids()) == []
+
+
+def test_get_position():
+    vertex = stk.Vertex(stk.VertexData(1, 2, 3))
+    assert all(vertex.get_position() == [1, 2, 3])
+
+
+def test_get_num_edges(vertex):
+    assert vertex.get_num_edges() == 3
+
+
+def test_get_edge_ids(vertex):
+    assert list(vertex.get_edge_ids()) == [12, 24, 36]
+
+
+def test_get_cell(vertex):
+    assert all(vertex.get_cell() == [3, 4, 12])
+
+
+def test_get_edge_centroid():
+    assert False
+
+
+def test_get_edge_plane_normal():
+    assert False
+
+
+def test_get_molecule_centroid():
     assert False
