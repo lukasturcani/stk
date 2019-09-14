@@ -903,6 +903,7 @@ class Molecule(metaclass=_Cached):
         rdkit_conf = rdkit.Conformer(len(self.atoms))
         for atom_id, atom_coord in enumerate(self._position_matrix.T):
             rdkit_conf.SetAtomPosition(atom_id, atom_coord)
+            mol.GetAtomWithIdx(atom_id).SetNoImplicit(True)
         mol.AddConformer(rdkit_conf)
         return mol
 
