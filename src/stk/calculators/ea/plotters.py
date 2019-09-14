@@ -113,7 +113,7 @@ class ProgressPlotter(Plotter):
             file extensions.
 
         propety_fn : :class:`callable`
-            A :class:`callable` which takes a :class:`.Molecule
+            A :class:`callable` which takes a :class:`.Molecule`
             object and returns a property value of that molecule,
             which is used for the plot. The :class:`callable` must
             return a valid value for each :class:`.Molecule` in the

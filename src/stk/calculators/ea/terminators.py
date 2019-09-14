@@ -20,7 +20,7 @@ Making New Terminators
 ----------------------
 
 A new :class:`Terminator` class should inherit :class:`Terminator` and
-define an :meth:`~Terminator.terminate` method, which takes progress
+define an :meth:`~Terminator.terminate` method, which takes a progress
 population as its only argument and returns ``True`` or ``False``
 depending on if an exit condition has been satisfied. The progress
 population is a :class:`.Population` instance which holds each EA
