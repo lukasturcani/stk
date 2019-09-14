@@ -547,7 +547,7 @@ class Cage(TopologyGraph):
         bb3 = stk.BuildingBlock('NCOCN', ['amine'])
         cage2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
-            topology_graph=tetrahedron
+            topology_graph=tetrahedron,
             # Use the instance vertices in the building_block_vertices
             # parameter.
             building_block_vertices={
