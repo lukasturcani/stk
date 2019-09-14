@@ -48,3 +48,17 @@ def test_init_vertex():
     assert all(vertex.get_position() == [10, 20, 30])
     assert list(vertex.get_edge_ids()) == [100, 200]
     assert all(vertex.get_cell() == [0, 0, 0])
+
+
+def test_apply_scale(tmp_vertex):
+    initial_position = tmp_vertex.get_position()
+    tmp_vertex.apply_scale(2)
+    assert all(tmp_vertex.get_position() == initial_position*2)
+
+    initial_position = tmp_vertex.get_position()
+    tmp_vertex.apply_scale([2, 4, 3])
+    assert all(tmp_vertex.get_position() == initial_position*[2, 4, 3])
+
+
+def test_clone(vertex):
+    assert False
