@@ -3,16 +3,18 @@
 # Distributed under the terms of the MIT License.
 import stk
 import numpy as np
+from rdkit.Chem import AllChem as Chem
 
 
 def main():
     print('testing script')
-    metal = stk.BuildingBlock(
-        '[Pd+2]',
+    m = Chem.MolFromSmiles('[Pb+2]')
+    m.AddConformer(Chem.Conformer(m.GetNumAtoms()))
+    metal = stk.BuildingBlock.init_from_rdkit_mol(
+        m,
         functional_groups=None,
-        embed=False
     )
-    metal.set_position_matrix(np.array([0, 0, 0]))
+    # metal.set_position_matrix(np.array([0, 0, 0]))
     metal_coord_info = {
         0: {
             'atom_ids': 0,
@@ -46,6 +48,8 @@ def main():
     print(metal)
     print(ligand)
 
+    import sys
+    sys.exit()
     sqpl = stk.metal_complex.SquarePlanar()
     pdl2_sqpl_complex = stk.ConstructedMolecule(
         building_blocks=[metal, ligand],

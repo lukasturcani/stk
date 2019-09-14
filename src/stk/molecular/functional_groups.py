@@ -600,3 +600,55 @@ _fg_types = (
 )
 
 fg_types = {fg_type.name: fg_type for fg_type in _fg_types}
+
+
+def assign_metal_fgs(building_block, coordination_info):
+    """
+    Assigns :attr:`func_groups` attribute to a metal building block.
+
+    Parameters
+    ----------
+    building_block : :class:`stk.BuildingBlock`
+        Building block to add :attr:`func_groups` attribute to.
+
+    coordination_info : :class:`dict`
+        Dictionary with information required for :attr:`func_groups`.
+        For each coordination bond, there should be an entry as so:
+
+        .. code-block:: python
+            coordination_info[0] = {
+                'atom_ids': 0,
+                'bonder_ids': 0,
+                'deleter_ids': None
+            }
+
+    Returns
+    -------
+    building_block : :class:`stk.BuildingBlock`
+        Building block with :attr:`func_groups` attribute.
+
+    """
+    func_groups = []
+    for fg in coordination_info:
+        new_fg = FunctionalGroup(
+            atoms=tuple(
+                building_block.atoms[id_]
+                for id_ in coordination_info[fg]['atom_ids']
+            ),
+            bonders=tuple(
+                building_block.atoms[id_]
+                for id_ in coordination_info[fg]['bonder_ids']
+            ),
+            deleters=tuple(
+                building_block.atoms[id_]
+                for id_ in coordination_info[fg]['deleter_ids']
+            ),
+            fg_type='metal'
+        )
+        func_groups.append(new_fg)
+
+    building_block.func_groups = tuple(
+        func_group for func_group in func_groups
+    )
+
+    return building_block
