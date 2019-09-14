@@ -28,6 +28,26 @@ from ...utilities import vector_angle
 
 
 class VertexData:
+    """
+    Holds the data used to initialize a :class:`.Vertex`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This is equal to the index of the vertex
+        in :attr:`.TopologyGraph.vertices`.
+
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
+
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
+
+    """
+
     def __init__(self, x, y, z):
         """
         Initialize a :class:`.VertexData` instance.
@@ -112,7 +132,7 @@ class Vertex:
         Parameters
         ----------
         data : :class:`.VertexData`
-            Holds the vertex data.
+            The vertex data.
 
         """
 
@@ -463,6 +483,39 @@ class Vertex:
 
 
 class EdgeData:
+    """
+    Holds data used to initialize a :class:`.Edge`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the edge. This is equal the index of the edge in
+        :attr:`.TopologyGraph.edges`.
+
+    vertices : :class:`list` of :class:`.VertexData`
+        The vertices connected to the edge.
+
+    periodicity : :class:`tuple` of :class:`int`
+        The periodicity of the edge. For example, if ``(0, 0, 0)``
+        then the edge is not periodic. If, ``(1, 0, -1)`` then the
+        edge is periodic across the x axis in the positive
+        direction, is not periodic across the y axis and is
+        periodic across the z axis in the negative direction.
+
+    lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+        The a, b and c lattice constants as vectors in Cartesian
+        coordinates.
+
+    position : :class:`numpy.ndarray`
+        The position of the edge.
+
+    custom_position : :class:`bool`
+        ``True`` if the :attr:`position` of the edge was set manually.
+        ``False``if the position of the edge is the centroid of the
+        connected :attr:`vertices`.
+
+    """
+
     def __init__(
         self,
         *vertex_data,
@@ -493,7 +546,7 @@ class EdgeData:
         lattice_constants : :class:`iterable`, optional
             If the edge is periodic, the a, b and c lattice
             constants should be provided as vectors in Cartesian
-            coordiantes.
+            coordinates.
 
         """
 
@@ -506,22 +559,21 @@ class EdgeData:
         # This will be set by TopologyGraph.__init__.
         self.id = None
         self.periodicity = np.array(periodicity)
-
-        self._custom_position = position is not None
-        self._position = position
-        self._lattice_constants = tuple(
+        self.custom_position = position is not None
+        self.position = position
+        self.lattice_constants = tuple(
             np.array(constant) for constant in lattice_constants
         )
 
         _position = 0
         for i, vertex in enumerate(vertex_data, 1):
-            vertex.add_edge(self)
+            vertex.edges.append(self)
 
-            if not self._custom_position:
-                _position += vertex.get_position()
+            if not self.custom_position:
+                _position += vertex.position
 
-        if not self._custom_position:
-            self._position = _position / i
+        if not self.custom_position:
+            self.position = _position / i
 
     def get_edge(self):
         """
@@ -560,57 +612,25 @@ class Edge:
 
         Parameters
         ----------
-        *vertices : :class:`.Vertex`
-            The vertices which the :class:`Edge` connects.
-
-        position : :class:`numpy.ndarray`, optional
-            The position of the edge. If ``None``, the centroid
-            of `vertices` is used.
-
-        periodicity : :class:`tuple` of :class:`int`, optional
-            The periodicity of the edge. For example, if ``(0, 0, 0)``
-            then the edge is not periodic. If, ``(1, 0, -1)`` then the
-            edge is periodic across the x axis in the positive
-            direction, is not periodic across the y axis and is
-            periodic across the z axis in the negative direction. If
-            ``None`` then the edge is not periodic.
-
-        lattice_constants : :class:`iterable`, optional
-            If the edge is periodic, the a, b and c lattice
-            constants should be provided as vectors in Cartesian
-            coordiantes.
+        data : :class:`.EdgeData`
+            The edge data.
 
         """
 
-        if periodicity is None:
-            periodicity = [0, 0, 0]
-        if lattice_constants is None:
-            lattice_constants = ([0, 0, 0] for i in range(3))
-
-        self._vertex_ids = vertices
+        self._vertex_ids = [vertex.id for vertex in data.vertices]
         # This will be set by TopologyGraph.__init__.
         self.id = None
-        self._periodicity = np.array(periodicity)
+        self._periodicity = np.array(data.periodicity)
         # The FunctionalGroup instances which the edge connects.
         # These will belong to the molecules placed on the vertices
         # connected by the edge.
         self._func_groups = []
 
-        self._custom_position = position is not None
-        self._position = position
+        self._custom_position = data.custom_position
+        self._position = np.array(data.position)
         self._lattice_constants = tuple(
-            np.array(constant) for constant in lattice_constants
+            np.array(constant) for constant in data.lattice_constants
         )
-
-        _position = 0
-        for i, vertex in enumerate(vertices, 1):
-            vertex.add_edge(self)
-
-            if not self._custom_position:
-                _position += vertex.get_position()
-
-        if not self._custom_position:
-            self._position = _position / i
 
     def get_periodicity(self):
         """
