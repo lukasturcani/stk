@@ -24,18 +24,27 @@ def test_init_at_center():
 
 
 def test_init_vertex():
-    data = stk.VertexData(1, 2, 3, np.array([10, 4, 2]))
-    vertex = stk.Vertex(12, data)
+    vdata = stk.VertexData(1, 2, 3, np.array([10, 4, 2]))
+    e1, e2, e3 = (
+        stk.EdgeData(vdata), stk.EdgeData(vdata), stk.EdgeData(vdata)
+    )
+    e1.id = 12
+    e2.id = 24
+    e3.id = 36
+    vertex = stk.Vertex(vdata)
 
-    assert vertex.id == 12
+    assert vertex.id is None
     assert all(vertex.get_position() == [1, 2, 3])
     assert list(vertex.get_edge_ids()) == [12, 24, 36]
     assert all(vertex.get_cell() == [10, 4, 2])
 
-    data = stk.VertexData(10, 20, 30)
-    vertex = stk.Vertex(21, data)
+    vdata = stk.VertexData(10, 20, 30)
+    e1, e2 = stk.EdgeData(vdata), stk.EdgeData(vdata)
+    e1.id = 100
+    e2.id = 200
+    vertex = stk.Vertex(vdata)
 
-    assert vertex.id == 21
+    assert vertex.id is None
     assert all(vertex.get_position() == [10, 20, 30])
-    assert list(vertex.get_edge_ids()) == []
+    assert list(vertex.get_edge_ids()) == [100, 200]
     assert all(vertex.get_cell() == [0, 0, 0])
