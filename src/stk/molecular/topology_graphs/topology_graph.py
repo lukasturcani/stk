@@ -33,10 +33,6 @@ class VertexData:
 
     Attributes
     ----------
-    id : :class:`int`
-        The id of the vertex. This is equal to the index of the vertex
-        in :attr:`.TopologyGraph.vertices`.
-
     position : :class:`numpy.ndarray`
         The position of the vertex.
 
@@ -65,8 +61,6 @@ class VertexData:
 
         """
 
-        # This is set by TopologyGraph.__init__().
-        self.id = None
         self.position = np.array([x, y, z], dtype=np.dtype('float64'))
         # Holds connected EdgeData instances.
         self.edges = []
@@ -93,9 +87,14 @@ class VertexData:
         center /= len(vertex_data)
         return cls(*center)
 
-    def get_vertex(self):
+    def get_vertex(self, id):
         """
         Get a vertex from the data.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The :attr:`~.Vertex.id` assigned to the vertex.
 
         Returns
         -------
@@ -125,18 +124,22 @@ class Vertex:
 
     """
 
-    def __init__(self, data):
+    def __init__(self, id, data):
         """
         Initialize a :class:`.Vertex`.
 
         Parameters
         ----------
+        id : :class:`int`
+            The id of the vertex. This should be its index in
+            :attr:`TopologyGraph.vertices`.
+
         data : :class:`.VertexData`
             The vertex data.
 
         """
 
-        self.id = data.id
+        self.id = id
         self._position = np.array(data.position)
         # Holds the ids of edges the Vertex is connected to.
         self._edge_ids = [edge_data.id for edge_data in data.edges]
@@ -575,9 +578,14 @@ class EdgeData:
         if not self.custom_position:
             self.position = _position / i
 
-    def get_edge(self):
+    def get_edge(self, id):
         """
         Get an :class:`.Edge` from the data.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The :attr:`~.Edge.id` assigned to the edge.
 
         Returns
         -------
@@ -586,7 +594,7 @@ class EdgeData:
 
         """
 
-        return Edge(self)
+        return Edge(id, self)
 
 
 class Edge:
@@ -606,20 +614,23 @@ class Edge:
 
     """
 
-    def __init__(self, data):
+    def __init__(self, id, data):
         """
         Initialize an :class:`Edge`.
 
         Parameters
         ----------
+        id : :class:`int`
+            The id of the edge. Matches the index of the edge in
+            :attr:`.TopologyGraph.edges`.
+
         data : :class:`.EdgeData`
             The edge data.
 
         """
 
         self._vertex_ids = [vertex.id for vertex in data.vertices]
-        # This will be set by TopologyGraph.__init__.
-        self.id = None
+        self.id = id
         self._periodicity = np.array(data.periodicity)
         # The FunctionalGroup instances which the edge connects.
         # These will belong to the molecules placed on the vertices
@@ -867,8 +878,8 @@ class TopologyGraph:
 
     def __init__(
         self,
-        vertices,
-        edges,
+        vertex_data,
+        edge_data,
         construction_stages,
         num_processes
     ):
@@ -877,10 +888,10 @@ class TopologyGraph:
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`.Vertex`
+        vertices : :class:`tuple` of :class:`.VertexData`
             The vertices which make up the graph.
 
-        edges : :class:`tuple` of :class:`.Edge`
+        edges : :class:`tuple` of :class:`.EdgeData`
             The edges which make up the graph.
 
         construction_stages : :class:`tuple` of :class:`callable`
@@ -909,19 +920,15 @@ class TopologyGraph:
 
         """
 
-        self.vertices = vertices
-        self.edges = edges
+        self.vertices = tuple(
+            data.get_vertex(i) for i, data in enumerate(vertex_data)
+        )
+        self.edges = tuple(
+            data.get_edge(i) for i, data in enumerate(edge_data)
+        )
         self._construction_stages = construction_stages
         self._set_stages()
         self._num_processes = num_processes
-        for i, edge in enumerate(self.edges):
-            edge.id = i
-        for i, vertex in enumerate(self.vertices):
-            vertex.id = i
-        for edge in self.edges:
-            edge.finalize()
-        for vertex in self.vertices:
-            vertex.finalize()
 
     def _set_stages(self):
         self._stages = tuple(
