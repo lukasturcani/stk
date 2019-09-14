@@ -589,6 +589,14 @@ _fg_types = (
         )
     ),
 
+    # Metal interacting functional groups.
+
+    FGType(
+        name='pyridine_N_metal',
+        func_group_smarts='[#6]~[#7X2]~[#6]',
+        bonder_smarts=['[$([#7X2]~[#6])]'],
+        deleter_smarts=([])
+    ),
 )
 
 fg_types = {fg_type.name: fg_type for fg_type in _fg_types}
