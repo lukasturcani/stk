@@ -99,7 +99,7 @@ def test_get_edge_centroid(
     # Non-periodic.
     vertices, edges = graph_components
     assert all(
-        vertices[0]._get_edge_centroid((e1, e2), vertices) == [0, 0, 0]
+        vertices[0]._get_edge_centroid(edges, vertices) == [0, 0, 0]
     )
 
     # Periodic.
@@ -109,7 +109,7 @@ def test_get_edge_centroid(
     )
     expected /= 3
     assert all(
-        vertices[0]._get_edge_centroid((e1, e2), vertices) == expected
+        vertices[0]._get_edge_centroid(edges, vertices) == expected
     )
 
 
@@ -133,9 +133,20 @@ def test_get_edge_plane_normal(
         plane_edges=edges,
         vertices=vertices
     )
-    expected_angle = angle_theta([0, 1, 0], [0, 2, 0])
-    assert angle_theta(plane, [0, 0, 1]) == expceted_angle
+    expected_angle = stk.angle_theta([0, 1, 0], [0, 2, 0])
+    assert (
+        abs(stk.angle_theta(plane, [0, 0, 1]) - expected_angle) < 1e-12
+    )
 
 
-def test_get_molecule_centroid(tmp_vertex, ...):
-    assert False
+def test_get_molecule_centroid(tmp_vertex, tmp_amine3):
+    tmp_vertex.set_contructed_molecule(tmp_amine3)
+
+    tmp_amine3.set_centroid(np.array([1, 2, 3]))
+    tmp_amine3._position_matrix = tmp_amine3._position_matrix.T
+    assert all(tmp_vertex._get_molecule_centroid() == [1, 2, 3])
+
+    tmp_amine3._position_matrix = tmp_amine3._position_matrix.T
+    tmp_amine3.set_centroid(np.array([10, 20, 30]), (1, 2, 3))
+    tmp_amine3._position_matrix = tmp_amine3._position_matrix.T
+    assert all(tmp_vertex._get_molecule_centroid() == [10, 20, 30])
