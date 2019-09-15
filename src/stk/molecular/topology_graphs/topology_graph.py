@@ -638,7 +638,7 @@ class EdgeData:
         """
 
         clone = self.__class__.__new__(self.__class__)
-        clone.id = self.ikd
+        clone.id = self.id
         clone.vertices = tuple(
             vertex_map.get(v, v) for v in self.vertices
         )
