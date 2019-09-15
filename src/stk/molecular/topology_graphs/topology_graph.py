@@ -1032,13 +1032,13 @@ class TopologyGraph:
 
         """
 
+        self._set_data_ids(vertex_data)
+        self._set_data_ids(edge_data)
         self.vertices = tuple(
-            data.get_vertex()
-            for data in self._set_data_ids(vertex_data)
+            data.get_vertex() for data in vertex_data
         )
         self.edges = tuple(
-            data.get_edge()
-            for data in self._set_data_ids(edge_data)
+            data.get_edge() for data in edge_data
         )
         self._construction_stages = construction_stages
         self._set_stages()
@@ -1047,7 +1047,6 @@ class TopologyGraph:
     def _set_data_ids(self, data):
         for i, data in enumerate(data):
             data.id = i
-            yield data
 
     def _set_stages(self):
         self._stages = tuple(
