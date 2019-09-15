@@ -92,12 +92,47 @@ def test_get_cell(vertex):
     assert all(vertex.get_cell() == [3, 4, 12])
 
 
-def test_get_edge_centroid():
-    assert False
+def test_get_edge_centroid(v):
+    # Non-periodic.
+    vdata1, vdata2, vdata3 = vertex_data = (
+        stk.VertexData(0, 0, 0),
+        stk.VertexData(-1, -2, -3),
+        stk.VertexData(1, 2, 3)
+    )
+    for i, vertex in enumerate(vertex_data):
+        vertex.id = i
+    vertices = tuple(stk.Vertex(data) for data in vertex_data)
+
+    e1 = stk.EdgeData(vdata1, vdata2).get_edge()
+    e2 = stk.EdgeData(vdata1, vdata3).get_edge()
+
+    assert all(
+        vertices[0]._get_edge_centroid(vertices, (e1, e2)) == [0, 0, 0]
+    )
+
+    # Periodic.
+    vdata1, vdata2, vdata3 = vertex_data = (
+        stk.VertexData(0, 0, 0),
+        stk.VertexData(-1, -2, -3),
+        stk.VertexData(1, 2, 3)
+    )
+    for i, vertex in enumerate(vertex_data):
+        vertex.id = i
+    vertices = tuple(stk.Vertex(data) for data in vertex_data)
+
+    e1 = stk.EdgeData(vdata1, vdata2).get_edge()
+    e2 = stk.EdgeData(vdata1, vdata3).get_edge()
+
+    assert all(
+        vertices[0]._get_edge_centroid(vertices, (e1, e2)) == [0, 0, 0]
+    )
 
 
 def test_get_edge_plane_normal():
+    # Non-periodic.
     assert False
+
+    # Periodic.
 
 
 def test_get_molecule_centroid():

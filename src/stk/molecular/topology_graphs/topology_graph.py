@@ -348,9 +348,9 @@ class Vertex:
     def after_assign_func_groups_to_edges(
         self,
         building_block,
+        func_groups,
         vertices,
-        edges,
-        func_groups
+        edges
     ):
         """
         Perform operations after functional groups have been assigned.
@@ -368,6 +368,10 @@ class Vertex:
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
+        func_groups : :class:`tuple` of :class:`.FunctionalGroup`
+            The functional group clones added to the constructed
+            molecule.
+
         vertices : :class:`tuple` of :class:`.Vertex`
             All vertices in the topology graph. The index of each
             vertex must match its :class:`~.Vertex.id`.
@@ -375,10 +379,6 @@ class Vertex:
         edges : :class:`tuple` of :class:`.Edge`
             All edges in the topology graph. The index of each
             edge must match its :class:`~.Edge.id`.
-
-        func_groups : :class:`tuple` of :class:`.FunctionalGroup`
-            The functional group clones added to the constructed
-            molecule.
 
         Returns
         -------
@@ -388,14 +388,18 @@ class Vertex:
 
         return
 
-    def _get_edge_centroid(self, edges):
+    def _get_edge_centroid(self, centroid_edges, vertices):
         """
         Return the centroid of `edges`.
 
         Parameters
         ----------
-        edges : :class:`iterable` of :class:`.Edge`
+        centroid_edges : :class:`iterable` of :class:`.Edge`
             The edges which are used to calculate the centroid.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All the vertices in the topology graph. Index of each
+            vertex must be equal to its :class:`~.Vertex.id`.
 
         Returns
         -------
@@ -405,11 +409,11 @@ class Vertex:
         """
 
         edge_positions = []
-        for i, edge in enumerate(edges, 1):
-            edge_positions.append(edge.get_position(self))
+        for i, edge in enumerate(centroid_edges, 1):
+            edge_positions.append(edge.get_position(self, vertices))
         return np.sum(edge_positions, axis=0) / i
 
-    def _get_edge_plane_normal(self, reference, edges):
+    def _get_edge_plane_normal(self, reference, plane_edges, vertices):
         """
         Get the normal to the plane on which `edges` lie.
 
@@ -420,10 +424,14 @@ class Vertex:
             normal is set such that its angle with with `reference`
             is always acute.
 
-        edges : :class:`iterable` of :class:`.Edge`
+        plane_edges : :class:`iterable` of :class:`.Edge`
             The edges which are used to calculate the plane.
             If there are more than three, a plane of best fit across
             `edges` is returned.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All the vertices in the topology graph. Index of each
+            vertex must be equal to its :class:`~.Vertex.id`.
 
         Returns
         -------
@@ -434,8 +442,8 @@ class Vertex:
         """
 
         edge_positions = []
-        for i, edge in enumerate(edges, 1):
-            edge_positions.append(edge.get_position(self))
+        for i, edge in enumerate(plane_edges, 1):
+            edge_positions.append(edge.get_position(self, vertices))
         edge_positions = np.array(edge_positions)
 
         centroid = np.sum(edge_positions, axis=0) / i
@@ -759,21 +767,21 @@ class Edge:
 
         self._func_groups.append(func_group)
 
-    def get_position(self, vertices=None, reference=None):
+    def get_position(self, reference=None, vertices=None):
         """
         Return the position.
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`.Vertex`, optional
-            All the vertices in the topology graph. Index of each
-            vertex must be equal to :class:`~.Vertex.id`. Only needs
-            to be supplied if `reference` is supplied
-
         reference : :class:`.Vertex`, optional
             If the edge is periodic, the position returned will
             depend on which vertex the edge position is calculated
             relative to.
+
+        vertices : :class:`tuple` of :class:`.Vertex`, optional
+            All the vertices in the topology graph. Index of each
+            vertex must be equal to its :class:`~.Vertex.id`. Only
+            needs to be supplied if `reference` is supplied.
 
         Returns
         -------
@@ -786,7 +794,7 @@ class Edge:
             return np.array(self._position)
 
         other = vertices[
-            next(v for v in self._vertices if v != reference.id)
+            next(v for v in self._vertex_ids if v != reference.id)
         ]
         direction = (
             1 if reference is vertices[self._vertex_ids[0]] else -1
@@ -913,8 +921,14 @@ class TopologyGraph:
 
         """
 
-        self.vertices = tuple(self._set_data_ids(vertex_data))
-        self.edges = tuple(self._set_data_ids(edge_data))
+        self.vertices = tuple(
+            data.get_vertex()
+            for data in self._set_data_ids(vertex_data)
+        )
+        self.edges = tuple(
+            data.get_edge()
+            for data in self._set_data_ids(edge_data)
+        )
         self._construction_stages = construction_stages
         self._set_stages()
         self._num_processes = num_processes
@@ -1226,9 +1240,9 @@ class TopologyGraph:
                 # Perform additional, miscellaneous operations.
                 vertex.after_assign_func_groups_to_edges(
                     building_block=bb,
+                    func_groups=mol.func_groups[-len(bb.func_groups):],
                     vertices=vertices,
-                    edges=edges,
-                    func_groups=mol.func_groups[-len(bb.func_groups):]
+                    edges=edges
                 )
 
                 bb.set_position_matrix(original_coords)
@@ -1279,7 +1293,9 @@ class TopologyGraph:
                     num_fgs = len(bb.func_groups)
                     vertex.after_assign_func_groups_to_edges(
                         building_block=result_bb,
-                        func_groups=mol.func_groups[-num_fgs:]
+                        func_groups=mol.func_groups[-num_fgs:],
+                        vertices=vertices,
+                        edges=edges
                     )
                     mol.bonds.extend(
                         b.clone(atom_map) for b in bb.bonds
