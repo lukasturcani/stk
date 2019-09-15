@@ -612,7 +612,7 @@ class COF(TopologyGraph):
             vertex.id = i
         for i, edge in enumerate(cls.edge_data):
             edge.id = i
-            edge._lattice_constants = tuple(
+            edge.lattice_constants = tuple(
                 np.array(constant)
                 for constant in cls._lattice_constants
             )
