@@ -544,6 +544,12 @@ class MetalComplex(TopologyGraph):
     """
     Represents single-molecule metal complex topology graphs.
 
+    MetalComplex topologies are added by creating a subclass which
+    defines the :attr:`vertices` and :attr:`edges` of the topology
+    as class attributes.
+
+    This class is modelled after :class:`Cage` and its subclasses.
+
     Attributes
     ----------
     vertices : :class:`tuple` of :class:`.Vertex`
@@ -557,6 +563,80 @@ class MetalComplex(TopologyGraph):
 
 
     """
+
+    def __init_subclass__(cls, **kwargs):
+        for i, vertex in enumerate(cls.vertices):
+            vertex.id = i
+        return super().__init_subclass__(**kwargs)
+
+    def __init__(self, vertex_alignments=None,
+                 unsatured_vertices=None, num_processes=1):
+        """
+        Initialize a :class:`.MetalComplex`.
+
+        Parameters
+        ----------
+        vertex_alignments : :class:`dict`, optional
+            A mapping from a :class:`.Vertex` in :attr:`vertices`
+            to an :class:`.Edge` connected to it. The :class:`.Edge` is
+            used to align the first :class:`.FunctionalGroup` of a
+            :class:`.BuildingBlock` placed on that vertex. Only
+            vertices which need to have their default edge changed need
+            to be present in the :class:`dict`. If ``None`` then the
+            first :class:`.Edge` in :class:`.Vertex.edges` is for each
+            vertex is used. Changing which :class:`.Edge` is used will
+            mean that the topology graph represents different
+            structural isomers.
+
+            The vertices and edges can also be referred to by their
+            indices.
+        num_processes : :class:`int`, optional
+            The number of parallel processes to create during
+            :meth:`construct`.
+
+        """
+        if vertex_alignments is None:
+            vertex_alignments = {}
+
+        # Convert ints to Vertex and Edge instances.
+        _vertex_alignments = {}
+        for v, e in vertex_alignments.items():
+            v = self.vertices[v] if isinstance(v, int) else v
+            e = v.edges[e] if isinstance(e, int) else e
+            _vertex_alignments[v] = e
+        vertex_alignments = _vertex_alignments
+
+        vertex_clones = {}
+        for vertex in self.vertices:
+            clone = vertex.clone(clear_edges=True)
+            clone.aligner_edge = vertex_alignments.get(
+                vertex,
+                vertex.edges[0]
+            )
+            vertex_clones[vertex] = clone
+
+        edge_clones = {}
+        for edge in self.edges:
+            edge_clones[edge] = edge.clone(vertex_clones)
+
+        vertices = tuple(vertex_clones.values())
+        for vertex in vertices:
+            vertex.aligner_edge = edge_clones[vertex.aligner_edge]
+
+        vertex_types = sorted(
+            set(len(v.edges) for v in self.vertices),
+            reverse=True
+        )
+        super().__init__(
+            vertices=vertices,
+            edges=tuple(edge_clones.values()),
+            construction_stages=tuple(
+                lambda vertex, vertex_type=vt:
+                    len(vertex.edges) == vertex_type
+                for vt in vertex_types
+            ),
+            num_processes=num_processes
+        )
 
     def _get_scale(self, mol):
         """
@@ -579,7 +659,23 @@ class MetalComplex(TopologyGraph):
 
         return max(
             bb.get_maximum_diameter()
-            for bb in mol.building_block_vertices[1:]
+            for bb in mol.building_block_vertices
+        )
+
+    def _clean_up(self, mol):
+        print(
+            'here you should determine how many FGs remain, and assign'
+        )
+        return super()._clean_up(mol)
+
+    def __repr__(self):
+        vertex_alignments = ', '.join(
+            f'{v.id}: {v.edges.index(v.aligner_edge)}'
+            for v in self.vertices
+        )
+        return (
+            f'MetalComplex.{self.__class__.__name__}('
+            f'vertex_alignments={{{vertex_alignments}}})'
         )
 
 
