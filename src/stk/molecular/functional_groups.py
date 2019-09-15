@@ -592,6 +592,13 @@ _fg_types = (
     # Metal interacting functional groups.
 
     FGType(
+        name="amine_metal",
+        func_group_smarts="[N]([H])[H]",
+        bonder_smarts=["[$([N]([H])[H])]"],
+        deleter_smarts=[]
+    ),
+
+    FGType(
         name='pyridine_N_metal',
         func_group_smarts='[#6]~[#7X2]~[#6]',
         bonder_smarts=['[$([#7X2]~[#6])]'],
