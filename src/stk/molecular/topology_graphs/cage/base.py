@@ -659,9 +659,9 @@ class Cage(TopologyGraph):
     """
 
     def __init_subclass__(cls, **kwargs):
-        for i, vertex in enumerate(cls.vertices):
+        for i, vertex in enumerate(cls.vertex_data):
             vertex.id = i
-        for i, edge in enumerate(cls.edges):
+        for i, edge in enumerate(cls.edge_data):
             edge.id = i
         return super().__init_subclass__(**kwargs)
 
