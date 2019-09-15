@@ -57,6 +57,9 @@ class _CageVertexData(VertexData):
         z : :class:`float`
             The z coordinate.
 
+        cell : :class:`numpy.ndarray`, optional
+            The unit cell in which the vertex is found.
+
         aligner_edge : :class:`int`, optional
             The edge which is used to align the :class:`.BuildingBlock`
             placed on the vertex. The first :class:`.FunctionalGroup`

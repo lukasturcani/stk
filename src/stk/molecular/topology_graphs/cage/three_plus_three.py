@@ -5,14 +5,23 @@ Defines cages made from building blocks with 3 functional groups.
 
 import numpy as np
 
-from .base import Cage,  _CageVertex
-from ..topology_graph import Edge
+from .base import Cage,  _CageVertexData, _CageVertex
+from ..topology_graph import EdgeData
 
 
-class _OnePlusOneVertex(_CageVertex):
-    def __init__(self, x, y, z, edge_normal, use_bonder_placement=True):
+class _OnePlusOneVertexData(_CageVertexData):
+    def __init__(
+        self,
+        x,
+        y,
+        z,
+        edge_normal,
+        cell=None,
+        aligner_edge=None,
+        use_bonder_placement=True
+    ):
         """
-        Initialize a :class:`_CageVertex`.
+        Initialize a :class:`_OnePlusOneVertexData` instance.
 
         Parameters
         ----------
@@ -28,6 +37,16 @@ class _OnePlusOneVertex(_CageVertex):
         edge_normal : :class:`list` of :class:`int`
             The edge plane normal to use.
 
+        cell : :class:`numpy.ndarray`, optional
+            The unit cell in which the vertex is found.
+
+        aligner_edge : :class:`int`, optional
+            The edge which is used to align the :class:`.BuildingBlock`
+            placed on the vertex. The first :class:`.FunctionalGroup`
+            in :attr:`.BuildingBlock.func_groups` is rotated such that
+            it lies exactly on this :class:`.Edge`. Must be between
+            ``0`` and the number of edges the vertex is connected to.
+
         use_bonder_placement : :class:`bool`, optional
             If ``True``the position of the vertex will be updated such
             that it is in the middle of the neighboring bonder
@@ -36,8 +55,21 @@ class _OnePlusOneVertex(_CageVertex):
 
         """
 
-        self._edge_normal = edge_normal
-        super().__init__(x, y, z, use_bonder_placement)
+        self.edge_normal = edge_normal
+        super().__init__(
+            x=x,
+            y=y,
+            z=z,
+            cell=cell,
+            aligner_edge=aligner_edge,
+            use_bonder_placement=use_bonder_placement
+        )
+
+    def get_vertex(self):
+        return _OnePlusOneVertex(self)
+
+
+class _OnePlusOneVertex(_CageVertex):
 
     def clone(self, clear_edges=False):
         """
@@ -124,6 +156,14 @@ class OnePlusOne(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -134,18 +174,18 @@ class OnePlusOne(Cage):
 
     _x = 1
     vertices = (
-        _OnePlusOneVertex(_x, 0., 0., [1, 0, 0], False),
-        _OnePlusOneVertex(-_x, 0., 0., [-1, 0, 0], False),
+        _OnePlusOneVertexData(_x, 0., 0., [1, 0, 0], False),
+        _OnePlusOneVertexData(-_x, 0., 0., [-1, 0, 0], False),
 
     )
     edges = (
-        Edge(
+        EdgeData(
             vertices[0], vertices[1], position=np.array([0., 1., 0.])
         ),
-        Edge(
+        EdgeData(
             vertices[0], vertices[1], position=np.array([0., -1., 1.])
         ),
-        Edge(
+        EdgeData(
             vertices[0], vertices[1], position=np.array([0., -1., -1.])
         )
     )
@@ -172,21 +212,21 @@ class TwoPlusTwo(Cage):
 
     _x = 1
     vertices = (
-        _CageVertex(_x, 0, -_x/np.sqrt(2), False),
-        _CageVertex(-_x, 0, -_x/np.sqrt(2), False),
-        _CageVertex(0, _x, _x/np.sqrt(2), False),
-        _CageVertex(0, -_x, _x/np.sqrt(2), False)
+        _CageVertexData(_x, 0, -_x/np.sqrt(2), False),
+        _CageVertexData(-_x, 0, -_x/np.sqrt(2), False),
+        _CageVertexData(0, _x, _x/np.sqrt(2), False),
+        _CageVertexData(0, -_x, _x/np.sqrt(2), False)
     )
 
     edges = (
-        Edge(vertices[0], vertices[1]),
-        Edge(vertices[0], vertices[2]),
-        Edge(vertices[0], vertices[3]),
+        EdgeData(vertices[0], vertices[1]),
+        EdgeData(vertices[0], vertices[2]),
+        EdgeData(vertices[0], vertices[3]),
 
-        Edge(vertices[1], vertices[2]),
-        Edge(vertices[1], vertices[3]),
+        EdgeData(vertices[1], vertices[2]),
+        EdgeData(vertices[1], vertices[3]),
 
-        Edge(vertices[2], vertices[3])
+        EdgeData(vertices[2], vertices[3])
     )
 
     num_windows = 4
@@ -211,30 +251,30 @@ class FourPlusFour(Cage):
 
     _x = 1
     vertices = (
-        _CageVertex(-_x, _x, -_x, False),
-        _CageVertex(-_x, -_x, -_x, False),
-        _CageVertex(_x, _x, -_x, False),
-        _CageVertex(_x, -_x, -_x, False),
+        _CageVertexData(-_x, _x, -_x, False),
+        _CageVertexData(-_x, -_x, -_x, False),
+        _CageVertexData(_x, _x, -_x, False),
+        _CageVertexData(_x, -_x, -_x, False),
 
-        _CageVertex(-_x, _x, _x, False),
-        _CageVertex(-_x, -_x, _x, False),
-        _CageVertex(_x, _x, _x, False),
-        _CageVertex(_x, -_x, _x, False)
+        _CageVertexData(-_x, _x, _x, False),
+        _CageVertexData(-_x, -_x, _x, False),
+        _CageVertexData(_x, _x, _x, False),
+        _CageVertexData(_x, -_x, _x, False)
     )
 
     edges = (
-        Edge(vertices[0], vertices[1]),
-        Edge(vertices[0], vertices[2]),
-        Edge(vertices[0], vertices[4]),
-        Edge(vertices[1], vertices[3]),
-        Edge(vertices[1], vertices[5]),
-        Edge(vertices[2], vertices[6]),
-        Edge(vertices[2], vertices[3]),
-        Edge(vertices[3], vertices[7]),
-        Edge(vertices[4], vertices[6]),
-        Edge(vertices[4], vertices[5]),
-        Edge(vertices[5], vertices[7]),
-        Edge(vertices[6], vertices[7])
+        EdgeData(vertices[0], vertices[1]),
+        EdgeData(vertices[0], vertices[2]),
+        EdgeData(vertices[0], vertices[4]),
+        EdgeData(vertices[1], vertices[3]),
+        EdgeData(vertices[1], vertices[5]),
+        EdgeData(vertices[2], vertices[6]),
+        EdgeData(vertices[2], vertices[3]),
+        EdgeData(vertices[3], vertices[7]),
+        EdgeData(vertices[4], vertices[6]),
+        EdgeData(vertices[4], vertices[5]),
+        EdgeData(vertices[5], vertices[7]),
+        EdgeData(vertices[6], vertices[7])
     )
 
     num_windows = 6
