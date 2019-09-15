@@ -675,7 +675,7 @@ class MetalComplex(TopologyGraph):
         )
 
 
-class SquarePlanar(MetalComplex):
+class SquarePlanarMonodentate(MetalComplex):
     """
     Represents a square planar metal complex topology graph.
 
@@ -700,8 +700,38 @@ class SquarePlanar(MetalComplex):
     )
 
     edges = (
-        Edge(vertices[0], vertices[1], position=[0, 0.5, 0]),
-        Edge(vertices[0], vertices[2], position=[0, 0, 0.5]),
-        Edge(vertices[0], vertices[3], position=[0, -0.5, 0]),
-        Edge(vertices[0], vertices[4], position=[0, 0, 0.5]),
+        Edge(vertices[0], vertices[1], position=[0, 0.2, 0]),
+        Edge(vertices[0], vertices[2], position=[0, 0, 0.2]),
+        Edge(vertices[0], vertices[3], position=[0, -0.2, 0]),
+        Edge(vertices[0], vertices[4], position=[0, 0, 0.2]),
+    )
+
+
+class SquarePlanarBidentate(MetalComplex):
+    """
+    Represents a square planar metal complex topology graph.
+
+    See :class:`.MetalComplex` for more details and examples.
+
+    Attributes
+    ----------
+    vertices : :class:`tuple` of :class:`.Vertex`
+        The vertices which make up the topology graph.
+
+    edges : :class:`tuple` of :class:`.Edge`
+        The edges which make up the topology graph.
+
+    """
+
+    vertices = (
+        _MetalComplexVertex(0, 0, 0),
+        _MetalComplexVertex(0, 1, 0),
+        _MetalComplexVertex(0, -1, 0)
+    )
+
+    edges = (
+        Edge(vertices[0], vertices[1], position=[0.2, 0.2, 0]),
+        Edge(vertices[0], vertices[1], position=[-0.2, 0.2, 0]),
+        Edge(vertices[0], vertices[2], position=[0.2, -0.2, 0]),
+        Edge(vertices[0], vertices[2], position=[-0.2, -0.2, 0])
     )
