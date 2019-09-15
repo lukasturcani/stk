@@ -48,7 +48,7 @@ class VertexData:
 
     """
 
-    def __init__(self, x, y, z, cell=None):
+    def __init__(self, x, y, z):
         """
         Initialize a :class:`.VertexData` instance.
 
@@ -63,19 +63,13 @@ class VertexData:
         z : :class:`float`
             The z coordinate.
 
-        cell : :class:`numpy.ndarray`, optional
-            The unit cell in which the vertex is found.
-
         """
-
-        if cell is None:
-            cell = [0, 0, 0]
 
         # Set by TopologyGraph.__init__.
         self.id = None
         self.position = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
-        self.cell = np.array(cell)
+        self.cell = np.array([0, 0, 0])
 
     @classmethod
     def init_at_center(cls, *vertex_data):
@@ -134,8 +128,8 @@ class VertexData:
         """
 
         clone = self.__class__.__new__(self.__class__)
-        clone.position = list(self.position)
         clone.id = self.id
+        clone.position = list(self.position)
         clone.edges = [] if clear_edges else list(self.edges)
         clone.cell = np.array(self.cell)
         return clone

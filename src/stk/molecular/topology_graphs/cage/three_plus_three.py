@@ -16,8 +16,6 @@ class _OnePlusOneVertexData(_CageVertexData):
         y,
         z,
         edge_normal,
-        cell=None,
-        aligner_edge=None,
         use_bonder_placement=True
     ):
         """
@@ -37,16 +35,6 @@ class _OnePlusOneVertexData(_CageVertexData):
         edge_normal : :class:`list` of :class:`int`
             The edge plane normal to use.
 
-        cell : :class:`numpy.ndarray`, optional
-            The unit cell in which the vertex is found.
-
-        aligner_edge : :class:`int`, optional
-            The edge which is used to align the :class:`.BuildingBlock`
-            placed on the vertex. The first :class:`.FunctionalGroup`
-            in :attr:`.BuildingBlock.func_groups` is rotated such that
-            it lies exactly on this :class:`.Edge`. Must be between
-            ``0`` and the number of edges the vertex is connected to.
-
         use_bonder_placement : :class:`bool`, optional
             If ``True``the position of the vertex will be updated such
             that it is in the middle of the neighboring bonder
@@ -60,16 +48,38 @@ class _OnePlusOneVertexData(_CageVertexData):
             x=x,
             y=y,
             z=z,
-            cell=cell,
-            aligner_edge=aligner_edge,
             use_bonder_placement=use_bonder_placement
         )
+
+    def clone(self, clear_edges=False):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            ``True`` if the clone should not be connected to any edges.
+
+        Returns
+        -------
+        :class:`_OnePlusOneVertexData`
+            The clone.
+
+        """
+
+        clone = super().clone(clear_edges)
+        clone.edge_normal = list(self.edge_normal)
+        return clone
 
     def get_vertex(self):
         return _OnePlusOneVertex(self)
 
 
 class _OnePlusOneVertex(_CageVertex):
+
+    def __init__(self, data):
+        self._edge_normal = list(data.edge_normal)
+        super().__init__(data)
 
     def clone(self, clear_edges=False):
         """
@@ -135,7 +145,7 @@ class _OnePlusOneVertex(_CageVertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_bonder_centroid - self._position
-        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        aligner_edge = edges[self._edge_ids[self._aligner_edge]]
         edge_coord = aligner_edge.get_position()
         connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
         target = edge_coord - self._get_edge_centroid(connected_edges)

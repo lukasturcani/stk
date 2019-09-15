@@ -33,16 +33,40 @@ from ....utilities import vector_angle
 
 
 class _CageVertexData(VertexData):
+    """
+    Holds the data of a cage vertex.
 
-    def __init__(
-        self,
-        x,
-        y,
-        z,
-        cell=None,
-        aligner_edge=None,
-        use_bonder_placement=True
-    ):
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. Must match the index in
+        :attr:`TopologyGraph.vertices`.
+
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
+
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
+
+    aligner_edge : :class:`int`
+        The edge which is used to align the :class:`.BuildingBlock`
+        placed on the vertex. The first :class:`.FunctionalGroup`
+        in :attr:`.BuildingBlock.func_groups` is rotated such that
+        it lies exactly on this :class:`.Edge`. Must be between
+        ``0`` and the number of edges the vertex is connected to.
+
+    use_bonder_placement : :class:`bool`, optional
+        If ``True``the position of the vertex will be updated such
+        that it is in the middle of the neighboring bonder
+        centroids, rather than in the middle of the neighboring
+        vertices.
+
+    """
+
+    def __init__(self, x, y, z, use_bonder_placement=True):
         """
         Initialize a :class:`_CageVertexData` instance.
 
@@ -57,16 +81,6 @@ class _CageVertexData(VertexData):
         z : :class:`float`
             The z coordinate.
 
-        cell : :class:`numpy.ndarray`, optional
-            The unit cell in which the vertex is found.
-
-        aligner_edge : :class:`int`, optional
-            The edge which is used to align the :class:`.BuildingBlock`
-            placed on the vertex. The first :class:`.FunctionalGroup`
-            in :attr:`.BuildingBlock.func_groups` is rotated such that
-            it lies exactly on this :class:`.Edge`. Must be between
-            ``0`` and the number of edges the vertex is connected to.
-
         use_bonder_placement : :class:`bool`, optional
             If ``True``the position of the vertex will be updated such
             that it is in the middle of the neighboring bonder
@@ -75,9 +89,9 @@ class _CageVertexData(VertexData):
 
         """
 
-        self.aligner_edge = aligner_edge
+        self.aligner_edge = None
         self.use_bonder_placement = use_bonder_placement
-        super().__init__(x, y, z, cell)
+        super().__init__(x, y, z)
 
     @classmethod
     def init_at_center(cls, *vertex_data):
@@ -85,6 +99,27 @@ class _CageVertexData(VertexData):
         obj.aligner_edge = None
         obj.use_bonder_placement = True
         return obj
+
+    def clone(self, clear_edges=False):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            ``True`` if the clone should not be connected to any edges.
+
+        Returns
+        -------
+        :class:`_CageVertexData`
+            The clone.
+
+        """
+
+        clone = super().clone(clear_edges)
+        clone.aligner_edge = self.aligner_edge
+        clone.use_bonder_placement = self.use_bonder_placement
+        return clone
 
     def get_vertex(self):
         return _CageVertex(self)
