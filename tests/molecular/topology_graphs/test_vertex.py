@@ -99,7 +99,7 @@ def test_get_edge_centroid(
     # Non-periodic.
     vertices, edges = graph_components
     assert all(
-        vertices[0]._get_edge_centroid(edges, vertices) == [0, 0, 0]
+        vertices[0]._get_edge_centroid((e1, e2), vertices) == [0, 0, 0]
     )
 
     # Periodic.
@@ -109,16 +109,32 @@ def test_get_edge_centroid(
     )
     expected /= 3
     assert all(
-        vertices[0]._get_edge_centroid(edges, vertices) == expected
+        vertices[0]._get_edge_centroid((e1, e2), vertices) == expected
     )
 
 
-def test_get_edge_plane_normal():
+def test_get_edge_plane_normal(
+    graph_components_alt1,
+    periodic_graph_components_alt1
+):
     # Non-periodic.
-    assert False
+    vertices, edges = graph_components_alt1
+    plane = vertices[0]._get_edge_plane_normal(
+        reference=[0, 0, 1],
+        plane_edges=edges,
+        vertices=vertices
+    )
+    assert all(plane == [0, 0, 1])
 
     # Periodic.
+    vertices, edges = periodic_graph_components_alt1
+    plane = vertices[0]._get_edge_plane_normal(
+        reference=...,
+        plane_edges=...,
+        vertices=...
+    )
+    assert all(plane == ...)
 
 
-def test_get_molecule_centroid():
+def test_get_molecule_centroid(tmp_vertex, ...):
     assert False
