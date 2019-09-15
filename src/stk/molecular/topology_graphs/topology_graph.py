@@ -84,7 +84,7 @@ class VertexData:
 
         Parameters
         ----------
-        vertex_data : :class:`.VertexData`
+        *vertex_data : :class:`.VertexData`
             Vertices at whose center this vertex should be initialized.
 
         Returns
