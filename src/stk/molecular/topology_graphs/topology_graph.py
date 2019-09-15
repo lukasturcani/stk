@@ -69,13 +69,13 @@ class VertexData:
         """
 
         if cell is None:
-            cell = np.array([0, 0, 0])
+            cell = [0, 0, 0]
 
         # Set by TopologyGraph.__init__.
         self.id = None
         self.position = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
-        self.cell = cell
+        self.cell = np.array(cell)
 
     @classmethod
     def init_at_center(cls, *vertex_data):
