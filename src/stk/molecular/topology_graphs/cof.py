@@ -394,17 +394,24 @@ class _COFVertex(Vertex):
         return {
             fg_id: edge_id for fg_id, edge_id in enumerate(sorted(
                 self._edge_ids,
-                key=self._get_fg0_distance(building_block, edges)
+                key=self._get_fg0_distance(
+                    building_block=building_block,
+                    vertices=vertices,
+                    edges=edges
+                )
             ))
         }
 
-    def _get_fg0_distance(self, building_block, edges):
+    def _get_fg0_distance(self, building_block, vertices, edges):
         fg_coord = building_block.get_centroid(
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
 
         def distance(edge_id):
-            displacement = edges[edge_id].get_position(self) - fg_coord
+            displacement = edges[edge_id].get_position(
+                reference=self,
+                vertices=vertices
+            ) - fg_coord
             return np.linalg.norm(displacement)
 
         return distance
@@ -481,12 +488,15 @@ class _COFVertex(Vertex):
         aligner_edge = edges[self._edge_ids[self.alinger_edge]]
         aligner_edge_coord = aligner_edge.get_position(vertices, self)
         connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
-        edge_centroid = self._get_edge_centroid(connected_edges)
+        edge_centroid = self._get_edge_centroid(
+            centroid_edges=connected_edges,
+            vertices=vertices
+        )
         # This axis is used to figure out the clockwise direction.
         aligner_edge_direction = aligner_edge_coord - edge_centroid
 
         def angle(edge):
-            coord = edge.get_position(vertices, self)
+            coord = edge.get_position(self, vertices)
             edge_direction = coord - edge_centroid
             theta = vector_angle(
                 vector1=edge_direction,
@@ -648,17 +658,17 @@ class COF(TopologyGraph):
         self._lattice_size = lattice_size
         self._periodic = periodic
 
-        vertices = self._get_instance_vertices(vertex_alignments)
-        edges = self._get_instance_edges(vertices)
+        vertex_data = self._get_vertex_data(vertex_alignments)
+        edge_data = self.get_edge_data(vertex_data)
 
-        vertices = tuple(
+        vertex_data = tuple(
             vertex
-            for clones in flatten(vertices, {dict})
+            for clones in flatten(vertex_data, {dict})
             for vertex in clones.values()
         )
-        super().__init__(vertices, edges, (), num_processes)
+        super().__init__(vertex_data, edge_data, (), num_processes)
 
-    def _get_instance_vertices(self, vertex_alignments):
+    def _get_vertex_data(self, vertex_alignments):
         """
         Create the vertex data of the topology graph instance.
 
@@ -715,15 +725,15 @@ class COF(TopologyGraph):
             vertex_clones[x][y][z][vertex] = clone
         return vertex_clones
 
-    def _get_instance_edges(self, vertices):
+    def _get_edge_data(self, vertex_data):
         """
         Create the edge data of the topology graph instance.
 
         Parameters
         ----------
-        vertices : :class:`list`
+        vertex_data : :class:`list`
             A nested :class:`list` which can be indexed as
-            ``vertices[x][y][z]``, which will return a :class:`dict`
+            ``vertex_data[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
             the vertices in :attr:`vertex_data` to the clones for that
             unit cell.
@@ -755,8 +765,8 @@ class COF(TopologyGraph):
             # v1 is in cell2.
             v0, v1 = edge.vertices
             vertex_map = {
-                v0: vertices[x][y][z][v0],
-                v1: vertices[cell2_x][cell2_y][cell2_z][v1]
+                v0: vertex_data[x][y][z][v0],
+                v1: vertex_data[cell2_x][cell2_y][cell2_z][v1]
             }
             # If the edge is not periodic if periodic_cell is did not
             # have to wrap around.

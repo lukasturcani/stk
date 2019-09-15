@@ -416,7 +416,7 @@ class Vertex:
 
     def _get_edge_centroid(self, centroid_edges, vertices):
         """
-        Return the centroid of `edges`.
+        Return the centroid of `centroid_edges`.
 
         Parameters
         ----------
