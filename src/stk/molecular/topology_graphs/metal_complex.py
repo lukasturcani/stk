@@ -37,7 +37,7 @@ class _MetalComplexVertex(Vertex):
 
     """
 
-    def __init__(self, x, y, z, use_bonder_placement=True):
+    def __init__(self, x, y, z):
         """
         Initialize a :class:`_MetalComplexVertex`.
 
@@ -52,19 +52,9 @@ class _MetalComplexVertex(Vertex):
         z : :class:`float`
             The z coordinate.
 
-        use_bonder_placement : :class:`bool`, optional
-            If ``True``the position of the vertex will be updated such
-            that it is in the middle of the neighboring bonder
-            centroids, rather than in the middle of the neighboring
-            vertices.
-
         """
 
-        # _neighbor_positions holds the bonder centroids of functional
-        # groups on neighbor vertices connected to this vertex.
-        self._neighbor_positions = []
         self.aligner_edge = None
-        self._use_bonder_placement = use_bonder_placement
         super().__init__(x, y, z)
 
     @classmethod
@@ -113,8 +103,6 @@ class _MetalComplexVertex(Vertex):
             clone.aligner_edge = self.aligner_edge.clone(
                 add_to_vertices=False
             )
-        clone._use_bonder_placement = self._use_bonder_placement
-        clone._neighbor_positions = list(self._neighbor_positions)
         return clone
 
     def apply_scale(self, scale):
@@ -158,12 +146,6 @@ class _MetalComplexVertex(Vertex):
 
         """
 
-        if (
-            self._use_bonder_placement
-            and len(self._neighbor_positions) == len(self.edges)
-        ):
-            self._update_position()
-
         bb_fg_names = list(set((
             i.fg_type.name for i in building_block.func_groups
         )))
@@ -175,12 +157,6 @@ class _MetalComplexVertex(Vertex):
         elif len(building_block.func_groups) == 2:
             return self._place_linear_building_block(building_block)
         return self._place_nonlinear_building_block(building_block)
-
-    def _update_position(self):
-        self._position = np.divide(
-            np.sum(self._neighbor_positions, axis=0),
-            len(self._neighbor_positions)
-        )
 
     def _place_metal_atom(self, building_block):
         """
@@ -409,14 +385,9 @@ class _MetalComplexVertex(Vertex):
                 if func_group not in bb_fgs:
                     continue
 
-                bonder_position = self._get_molecule_centroid(
-                    atom_ids=func_group.get_bonder_ids()
-                )
                 for vertex in edge.vertices:
                     if vertex is self:
                         continue
-
-                    vertex._neighbor_positions.append(bonder_position)
 
         return super().after_assign_func_groups_to_edges(
             building_block=building_block,
