@@ -724,7 +724,7 @@ class COF(TopologyGraph):
             x, y, z = cell
             clone = vertex.clone(True)
             clone.cell = np.array(cell)
-            clone.aligner_edge = vertex_alignments.get(vertex, 0)
+            clone.aligner_edge = vertex_alignments.get(vertex.id, 0)
             # Shift the clone so that it's within the cell.
             for axis, dim in zip(cell, self._lattice_constants):
                 clone.position += axis * dim
