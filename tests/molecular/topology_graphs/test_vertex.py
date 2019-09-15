@@ -144,9 +144,13 @@ def test_get_molecule_centroid(tmp_vertex, tmp_amine3):
 
     tmp_amine3.set_centroid(np.array([1, 2, 3]))
     tmp_amine3._position_matrix = tmp_amine3._position_matrix.T
-    assert all(tmp_vertex._get_molecule_centroid() == [1, 2, 3])
+    assert np.allclose(
+        a=tmp_vertex._get_molecule_centroid(),
+        b=[1, 2, 3],
+        atol=1e-12
+    )
 
-    expected = np.array([10, 20, 30])
+    expected = np.array([10., 20., 30.])
     tmp_amine3._position_matrix = tmp_amine3._position_matrix.T
     tmp_amine3.set_centroid(expected, (1, 2, 3))
     tmp_amine3._position_matrix = tmp_amine3._position_matrix.T

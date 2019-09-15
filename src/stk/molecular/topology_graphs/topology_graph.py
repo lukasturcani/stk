@@ -501,7 +501,7 @@ class Vertex:
         """
 
         if atom_ids is None:
-            atom_ids = range(len(self.atoms))
+            atom_ids = range(len(self._mol.atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 

@@ -71,11 +71,10 @@ def graph_components_alt1():
 
 @pytest.fixture(scope='session')
 def periodic_graph_components():
-    vdata1, vdata2, vdata3, vdata4 = vertex_data = (
+    vdata1, vdata2, vdata3 = vertex_data = (
         stk.VertexData(0, 0, 0),
-        stk.VertexData(1, 0, 0),
-        stk.VertexData(-1, 0, 0),
-        stk.VertexData(0, 1, 0)
+        stk.VertexData(-1, -2, -3),
+        stk.VertexData(1, 2, 3)
     )
     for i, vertex in enumerate(vertex_data):
         vertex.id = i

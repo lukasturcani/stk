@@ -19,7 +19,8 @@ def _get_periodic_position(cof, vertex1, vertex2, edge):
 def test_get_position():
     hexagonal = stk.cof.Hexagonal((2, 2, 1))
     for vertex in hexagonal.vertices:
-        for edge in vertex.edges:
+        for edge_id in vertex.get_edge_ids():
+            edge = hexagonal.edges[edge_id]
             periodic = any(dim != 0 for dim in edge.get_periodicity())
             edge_position = edge.get_position(vertex)
             if periodic:
