@@ -696,16 +696,16 @@ class SquarePlanar(MetalComplex):
     """
 
     vertices = (
-        Vertex(0, 0, 0),
-        Vertex(0, 1, 0),
-        Vertex(0, 0, 1),
-        Vertex(0, -1, 0),
-        Vertex(0, 0, -1),
+        _MetalComplexVertex(0, 0, 0),
+        _MetalComplexVertex(0, 1, 0),
+        _MetalComplexVertex(0, 0, 1),
+        _MetalComplexVertex(0, -1, 0),
+        _MetalComplexVertex(0, 0, -1),
     )
 
     edges = (
-        Edge(vertices[0], vertices[1]),
-        Edge(vertices[0], vertices[2]),
-        Edge(vertices[0], vertices[3]),
-        Edge(vertices[0], vertices[4]),
+        Edge(vertices[0], vertices[1], position=[0, 0.5, 0]),
+        Edge(vertices[0], vertices[2], position=[0, 0, 0.5]),
+        Edge(vertices[0], vertices[3], position=[0, -0.5, 0]),
+        Edge(vertices[0], vertices[4], position=[0, 0, 0.5]),
     )
