@@ -590,11 +590,36 @@ class MetalComplex(TopologyGraph):
 
             The vertices and edges can also be referred to by their
             indices.
+
+        unsaturated_vertices : :class:`list` of :class:`int`, optional
+            A list of the unsaturated sites on the metal complexes to
+            be built. The integers correspond to vertex ids.
+
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
 
         """
+        # Metal complexes can have unsaturated sites.
+        # Need to remove information about the sites that will not
+        # react from stage, self.vertices and self.edges.
+
+        if unsatured_vertices is not None:
+            self.old_vertices = self.vertices
+            self.old_edges = self.edges
+            self.vertices = tuple(
+                i for i in self.old_vertices
+                if i.id not in unsatured_vertices
+            )
+            used_edges = [
+                i for i in self.edges
+                if set(i.vertices).issubset(set(self.vertices))
+            ]
+            self.edges = tuple(i for i in used_edges)
+        print('---init----')
+        print(self.vertices)
+        print(self.edges)
+        print('---init----')
         if vertex_alignments is None:
             vertex_alignments = {}
 
