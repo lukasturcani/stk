@@ -263,8 +263,12 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._position
-        e0_coord = edges[self._edge_ids[0]].get_position(self)
-        e1_coord = edges[self._edge_ids[1]].get_position(self)
+        e0_coord = (
+            edges[self._edge_ids[0]].get_position(self, vertices)
+        )
+        e1_coord = (
+            edges[self._edge_ids[1]].get_position(self, vertices)
+        )
         target = e0_coord - e1_coord
 
         if self._edge_ids[self._aligner_edge] != self._edge_ids[0]:
@@ -330,7 +334,7 @@ class _COFVertex(Vertex):
         start = fg_bonder_centroid - self._position
 
         aligner_edge = edges[self._edge_ids[self._aligner_edge]]
-        edge_coord = aligner_edge.get_position(self)
+        edge_coord = aligner_edge.get_position(self, vertices)
         target = edge_coord - self._position
         building_block.apply_rotation_to_minimize_angle(
             start=start,
@@ -488,8 +492,8 @@ class _COFVertex(Vertex):
 
     def _get_edge_angle(self, axis, vertices, edges):
 
-        aligner_edge = edges[self._edge_ids[self.alinger_edge]]
-        aligner_edge_coord = aligner_edge.get_position(vertices, self)
+        aligner_edge = edges[self._edge_ids[self._aligner_edge]]
+        aligner_edge_coord = aligner_edge.get_position(self, vertices)
         connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
         edge_centroid = self._get_edge_centroid(
             centroid_edges=connected_edges,
@@ -498,8 +502,8 @@ class _COFVertex(Vertex):
         # This axis is used to figure out the clockwise direction.
         aligner_edge_direction = aligner_edge_coord - edge_centroid
 
-        def angle(edge):
-            coord = edge.get_position(self, vertices)
+        def angle(edge_id):
+            coord = edges[edge_id].get_position(self, vertices)
             edge_direction = coord - edge_centroid
             theta = vector_angle(
                 vector1=edge_direction,
