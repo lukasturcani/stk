@@ -21,7 +21,7 @@ from ...utilities import vector_angle, flatten
 
 class _COFVertexData(VertexData):
 
-    def __init__(self, x, y, z, cell=None, aligner_edge=None):
+    def __init__(self, x, y, z):
         """
         Initialize a :class:`.VertexData` instance.
 
@@ -36,20 +36,10 @@ class _COFVertexData(VertexData):
         z : :class:`float`
             The z coordinate.
 
-        cell : :class:`numpy.ndarray`, optional
-            The unit cell in which the vertex is found.
-
-        aligner_edge : :class:`int`, optional
-            The edge which is used to align the :class:`.BuildingBlock`
-            placed on the vertex. The first :class:`.FunctionalGroup`
-            in :attr:`.BuildingBlock.func_groups` is rotated such that
-            it lies exactly on this :class:`.Edge`. Must be between
-            ``0`` and the number of edges the vertex is connected to.
-
         """
 
-        self.aligner_edge = aligner_edge
-        super().__init__(x, y, z, cell)
+        self.aligner_edge = None
+        super().__init__(x, y, z)
 
     @classmethod
     def init_at_center(cls, *vertex_data):
@@ -560,9 +550,9 @@ class COF(TopologyGraph):
             building_blocks=[bb1, bb2, bb3],
             topology_graph=lattice
             building_block_vertices={
-                bb1: lattice.vertices[:2],
-                bb2: lattice.vertices[4:],
-                bb3: lattice.vertices[2:4]
+                bb1: lattice.vertex_data[:2],
+                bb2: lattice.vertex_data[4:],
+                bb3: lattice.vertex_data[2:4]
             }
         )
 
@@ -660,7 +650,7 @@ class COF(TopologyGraph):
         -------
         :class:`list`
             A nested :class:`list` which can be indexed as
-            ``vertices[x][y][z]``, which will return a :class:`dict`
+            ``vertex_data[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
             the vertices in the class attribute :attr:`vertices` to
             the instance clones, for that unit cell.
@@ -703,7 +693,7 @@ class COF(TopologyGraph):
         ----------
         vertices : :class:`list`
             A nested :class:`list` which can be indexed as
-            ``vertices[x][y][z]``, which will return a :class:`dict`
+            ``vertex_data[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
             the vertices in the class attribute :attr:`vertices` to
             the instance clones, for that unit cell.
@@ -738,8 +728,8 @@ class COF(TopologyGraph):
             # has not been called yet.
             v0, v1 = edge.get_vertex_ids()
             vertex_map = {
-                v0: vertices[x][y][z][v0],
-                v1: vertices[cell2_x][cell2_y][cell2_z][v1]
+                v0: vertex_data[x][y][z][v0],
+                v1: vertex_data[cell2_x][cell2_y][cell2_z][v1]
             }
             # If the edge is not periodic if periodic_cell is did not
             # have to wrap around.
@@ -818,10 +808,10 @@ class COF(TopologyGraph):
         building_block_vertices = {}
         for vertex in self.vertices:
             bb = bb_by_degree[vertex.get_num_edges()]
-            building_block_vertices[bb] = (
+            building_block_vertex_data[bb] = (
                 building_block_vertices.get(bb, [])
             )
-            building_block_vertices[bb].append(vertex)
+            building_block_vertex_data[bb].append(vertex)
         return building_block_vertices
 
     def _get_scale(self, mol):
@@ -852,7 +842,7 @@ class COF(TopologyGraph):
         vertex_alignments = ', '.join(
             f'{v.id}: {v.aligner_edge}'
             # Only get the vertices in the first unit cell.
-            for v in self.vertices[:len(self.__class__.vertices)]
+            for v in self.vertex_data[:len(self.__class__.vertices)]
         )
 
         x, y, z = self._lattice_size
@@ -876,6 +866,14 @@ class Honeycomb(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -890,35 +888,37 @@ class Honeycomb(COF):
         np.array([0, 0, 5/1.7321])
     )
 
-    _vertices = (
+    _vertex_data = (
         _COFVertexData(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
         _COFVertexData(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
     )
 
-    vertices = (
-        *_vertices,
-        _COFVertexData.init_at_center(_vertices[0], _vertices[1]),
+    vertex_data = (
+        *_vertex_data,
+        _COFVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[1]
+        ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[1]),
+            vertex_data=(_vertex_data[0], _vertex_data[1]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[1]),
+            vertex_data=(_vertex_data[0], _vertex_data[1]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         )
     )
 
-    edges = (
-        Edge(vertices[2], vertices[0]),
-        Edge(vertices[2], vertices[1]),
+    edge_data = (
+        Edge(vertex_data[2], vertex_data[0]),
+        Edge(vertex_data[2], vertex_data[1]),
 
-        Edge(vertices[3], vertices[0]),
-        Edge(vertices[3], vertices[1], periodicity=(0, -1, 0)),
+        Edge(vertex_data[3], vertex_data[0]),
+        Edge(vertex_data[3], vertex_data[1], periodicity=(0, -1, 0)),
 
-        Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[1], periodicity=(-1, 0, 0))
+        Edge(vertex_data[4], vertex_data[0]),
+        Edge(vertex_data[4], vertex_data[1], periodicity=(-1, 0, 0))
     )
 
 
@@ -933,6 +933,14 @@ class Hexagonal(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -940,99 +948,100 @@ class Hexagonal(COF):
         The edges which make up the topology graph.
 
     """
+
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
         np.array([0.5, 0.866, 0]),
         np.array([0, 0, 5/1.7321])
     )
 
-    _vertices = (
+    _vertex_data = (
         _COFVertexData(*((1/4)*_a + (1/4)*_b + (1/2)*_c)),
         _COFVertexData(*((1/4)*_a + (3/4)*_b + (1/2)*_c)),
         _COFVertexData(*((3/4)*_a + (1/4)*_b + (1/2)*_c)),
         _COFVertexData(*((3/4)*_a + (3/4)*_b + (1/2)*_c))
     )
 
-    vertices = (
-        *_vertices,
-        _COFVertexData.init_at_center(_vertices[0], _vertices[1]),
-        _COFVertexData.init_at_center(_vertices[0], _vertices[2]),
-        _COFVertexData.init_at_center(_vertices[1], _vertices[2]),
-        _COFVertexData.init_at_center(_vertices[1], _vertices[3]),
-        _COFVertexData.init_at_center(_vertices[2], _vertices[3]),
+    vertex_data = (
+        *_vertex_data,
+        _COFVertexData.init_at_center(_vertex_data[0], _vertex_data[1]),
+        _COFVertexData.init_at_center(_vertex_data[0], _vertex_data[2]),
+        _COFVertexData.init_at_center(_vertex_data[1], _vertex_data[2]),
+        _COFVertexData.init_at_center(_vertex_data[1], _vertex_data[3]),
+        _COFVertexData.init_at_center(_vertex_data[2], _vertex_data[3]),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[2]),
+            vertex_data=(_vertex_data[0], _vertex_data[2]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[1]),
+            vertex_data=(_vertex_data[0], _vertex_data[1]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[3]),
+            vertex_data=(_vertex_data[0], _vertex_data[3]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[2], _vertices[1]),
+            vertex_data=(_vertex_data[2], _vertex_data[1]),
             shifts=((0, 0, 0), (1, -1, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[2], _vertices[3]),
+            vertex_data=(_vertex_data[2], _vertex_data[3]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[1], _vertices[3]),
+            vertex_data=(_vertex_data[1], _vertex_data[3]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[3], _vertices[0]),
+            vertex_data=(_vertex_data[3], _vertex_data[0]),
             shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants
         )
     )
 
-    edges = (
-        Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[1]),
+    edge_data = (
+        Edge(vertex_data[4], vertex_data[0]),
+        Edge(vertex_data[4], vertex_data[1]),
 
-        Edge(vertices[5], vertices[0]),
-        Edge(vertices[5], vertices[2]),
+        Edge(vertex_data[5], vertex_data[0]),
+        Edge(vertex_data[5], vertex_data[2]),
 
-        Edge(vertices[6], vertices[1]),
-        Edge(vertices[6], vertices[2]),
+        Edge(vertex_data[6], vertex_data[1]),
+        Edge(vertex_data[6], vertex_data[2]),
 
-        Edge(vertices[7], vertices[1]),
-        Edge(vertices[7], vertices[3]),
+        Edge(vertex_data[7], vertex_data[1]),
+        Edge(vertex_data[7], vertex_data[3]),
 
-        Edge(vertices[8], vertices[2]),
-        Edge(vertices[8], vertices[3]),
+        Edge(vertex_data[8], vertex_data[2]),
+        Edge(vertex_data[8], vertex_data[3]),
 
-        Edge(vertices[9], vertices[0]),
-        Edge(vertices[9], vertices[2], periodicity=(-1, 0, 0)),
+        Edge(vertex_data[9], vertex_data[0]),
+        Edge(vertex_data[9], vertex_data[2], periodicity=(-1, 0, 0)),
 
-        Edge(vertices[10], vertices[0]),
-        Edge(vertices[10], vertices[1], periodicity=(0, -1, 0)),
+        Edge(vertex_data[10], vertex_data[0]),
+        Edge(vertex_data[10], vertex_data[1], periodicity=(0, -1, 0)),
 
-        Edge(vertices[11], vertices[0]),
-        Edge(vertices[11], vertices[3], periodicity=(0, -1, 0)),
+        Edge(vertex_data[11], vertex_data[0]),
+        Edge(vertex_data[11], vertex_data[3], periodicity=(0, -1, 0)),
 
-        Edge(vertices[12], vertices[2]),
-        Edge(vertices[12], vertices[1], periodicity=(1, -1, 0)),
+        Edge(vertex_data[12], vertex_data[2]),
+        Edge(vertex_data[12], vertex_data[1], periodicity=(1, -1, 0)),
 
-        Edge(vertices[13], vertices[2]),
-        Edge(vertices[13], vertices[3], periodicity=(0, -1, 0)),
+        Edge(vertex_data[13], vertex_data[2]),
+        Edge(vertex_data[13], vertex_data[3], periodicity=(0, -1, 0)),
 
-        Edge(vertices[14], vertices[1]),
-        Edge(vertices[14], vertices[3], periodicity=(-1, 0, 0)),
+        Edge(vertex_data[14], vertex_data[1]),
+        Edge(vertex_data[14], vertex_data[3], periodicity=(-1, 0, 0)),
 
-        Edge(vertices[15], vertices[3]),
-        Edge(vertices[15], vertices[0], periodicity=(1, 0, 0))
+        Edge(vertex_data[15], vertex_data[3]),
+        Edge(vertex_data[15], vertex_data[0], periodicity=(1, 0, 0))
     )
 
 
@@ -1047,6 +1056,14 @@ class Square(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -1061,29 +1078,29 @@ class Square(COF):
         np.array([0., 0., 1.])
     )
 
-    _vertices = (
+    _vertex_data = (
         _COFVertexData(*((0.5)*_a + (0.5)*_b + (0.5)*_c)),
     )
-    vertices = (
-        *_vertices,
+    vertex_data = (
+        *_vertex_data,
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[0]),
+            vertex_data=(_vertex_data[0], _vertex_data[0]),
             shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[0]),
+            vertex_data=(_vertex_data[0], _vertex_data[0]),
             shifts=((0, 0, 0), (0, 1, 0)),
             lattice_constants=_lattice_constants
         )
 
     )
 
-    edges = (
-        Edge(vertices[1], vertices[0]),
-        Edge(vertices[1], vertices[0], periodicity=(1, 0, 0)),
-        Edge(vertices[2], vertices[0]),
-        Edge(vertices[2], vertices[0], periodicity=(0, 1, 0))
+    edge_data = (
+        Edge(vertex_data[1], vertex_data[0]),
+        Edge(vertex_data[1], vertex_data[0], periodicity=(1, 0, 0)),
+        Edge(vertex_data[2], vertex_data[0]),
+        Edge(vertex_data[2], vertex_data[0], periodicity=(0, 1, 0))
     )
 
 
@@ -1098,6 +1115,14 @@ class Kagome(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -1112,53 +1137,53 @@ class Kagome(COF):
         np.array([0., 0., 5/1.7321])
     )
 
-    _vertices = (
+    _vertex_data = (
         _COFVertexData(*((1/4)*_a + (3/4)*_b + (0.5)*_c)),
         _COFVertexData(*((3/4)*_a + (3/4)*_b + (1/2)*_c)),
         _COFVertexData(*((3/4)*_a + (1/4)*_b + (1/2)*_c))
     )
 
-    vertices = (
-        *_vertices,
-        _COFVertexData.init_at_center(_vertices[0], _vertices[1]),
-        _COFVertexData.init_at_center(_vertices[0], _vertices[2]),
-        _COFVertexData.init_at_center(_vertices[1], _vertices[2]),
+    vertex_data = (
+        *_vertex_data,
+        _COFVertexData.init_at_center(_vertex_data[0], _vertex_data[1]),
+        _COFVertexData.init_at_center(_vertex_data[0], _vertex_data[2]),
+        _COFVertexData.init_at_center(_vertex_data[1], _vertex_data[2]),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[1]),
+            vertex_data=(_vertex_data[0], _vertex_data[1]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[2]),
+            vertex_data=(_vertex_data[0], _vertex_data[2]),
             shifts=((0, 0, 0), (-1, 1, 0)),
             lattice_constants=_lattice_constants
         ),
         _COFVertexData.init_at_shifted_center(
-            vertices=(_vertices[1], _vertices[2]),
+            vertex_data=(_vertex_data[1], _vertex_data[2]),
             shifts=((0, 0, 0), (0, 1, 0)),
             lattice_constants=_lattice_constants
         )
 
     )
 
-    edges = (
-        Edge(vertices[3], vertices[0]),
-        Edge(vertices[3], vertices[1]),
+    edge_data = (
+        Edge(vertex_data[3], vertex_data[0]),
+        Edge(vertex_data[3], vertex_data[1]),
 
-        Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[2]),
+        Edge(vertex_data[4], vertex_data[0]),
+        Edge(vertex_data[4], vertex_data[2]),
 
-        Edge(vertices[5], vertices[1]),
-        Edge(vertices[5], vertices[2]),
+        Edge(vertex_data[5], vertex_data[1]),
+        Edge(vertex_data[5], vertex_data[2]),
 
-        Edge(vertices[6], vertices[0]),
-        Edge(vertices[6], vertices[1], periodicity=(-1, 0, 0)),
+        Edge(vertex_data[6], vertex_data[0]),
+        Edge(vertex_data[6], vertex_data[1], periodicity=(-1, 0, 0)),
 
-        Edge(vertices[7], vertices[0]),
-        Edge(vertices[7], vertices[2], periodicity=(-1, 1, 0)),
+        Edge(vertex_data[7], vertex_data[0]),
+        Edge(vertex_data[7], vertex_data[2], periodicity=(-1, 1, 0)),
 
-        Edge(vertices[8], vertices[1]),
-        Edge(vertices[8], vertices[2], periodicity=(0, 1, 0))
+        Edge(vertex_data[8], vertex_data[1]),
+        Edge(vertex_data[8], vertex_data[2], periodicity=(0, 1, 0))
     )
 
 
@@ -1173,6 +1198,14 @@ class LinkerlessHoneycomb(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -1187,13 +1220,13 @@ class LinkerlessHoneycomb(COF):
         np.array([0., 0., 5/1.7321])
     )
 
-    vertices = (
+    vertex_data = (
         _COFVertexData(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
         _COFVertexData(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
     )
 
-    edges = (
-        Edge(vertices[0], vertices[1]),
-        Edge(vertices[0], vertices[1], periodicity=(-1, 0, 0)),
-        Edge(vertices[0], vertices[1], periodicity=(0, -1, 0))
+    edge_data = (
+        Edge(vertex_data[0], vertex_data[1]),
+        Edge(vertex_data[0], vertex_data[1], periodicity=(-1, 0, 0)),
+        Edge(vertex_data[0], vertex_data[1], periodicity=(0, -1, 0))
     )
