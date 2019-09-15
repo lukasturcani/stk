@@ -4,7 +4,8 @@ from .topology_graphs import (
     polymer,
     rotaxane,
     cage,
-    host_guest
+    host_guest,
+    metal_complex
 )
 from .topology_graphs.topology_graph import *
 from .functional_groups import *
