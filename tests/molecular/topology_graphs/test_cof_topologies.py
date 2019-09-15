@@ -12,28 +12,34 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def _alignment(vertex, building_block):
+def _alignment(vertex, building_block, vertices, edges):
     fg_position = building_block.get_centroid(
         atom_ids=building_block.func_groups[0].get_bonder_ids()
     )
     v1 = stk.normalize_vector(fg_position - vertex.get_position())
 
-    def inner(edge):
-        v2 = edge.get_position(vertex) - vertex.get_position()
+    def inner(edge_id):
+        v2 = (
+            edges[edge_id].get_position(vertex, vertices) -
+            vertex.get_position()
+        )
         return v1 @ stk.normalize_vector(v2)
 
     return inner
 
 
-def _test_placement(vertex, bb):
-    vertex.place_building_block(bb)
+def _test_placement(vertex, bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     assert np.allclose(
         a=bb.get_centroid(bb.get_bonder_ids()),
         b=vertex.get_position(),
         atol=1e-8
     )
-    aligned = max(vertex.edges, key=_alignment(vertex, bb))
-    assert aligned is vertex.aligner_edge
+    aligned = max(
+        vertex.get_edge_ids(),
+        key=_alignment(vertex, bb, vertices, edges)
+    )
+    assert aligned == vertex.get_aligner_edge()
 
 
 def _angle(bb, edge, vertex):
@@ -53,21 +59,24 @@ def _angle(bb, edge, vertex):
     return inner
 
 
-def _test_assignment(vertex, bb):
-    assignments = vertex.assign_func_groups_to_edges(bb)
-    assert assignments[0] == vertex.aligner_edge.id
-    for edge in vertex.edges:
+def _test_assignment(vertex, bb, vertices, edges):
+    assignments = (
+        vertex.assign_func_groups_to_edges(bb, vertices, edges)
+    )
+    assert assignments[0] == vertex.get_aligner_edge()
+    for edge_id in vertex.get_edge_ids():
         closest = min(
             range(len(bb.func_groups)),
-            key=_angle(bb, edge, vertex)
+            key=_angle(bb, edges[edge_id], vertex)
         )
-        assert assignments[closest] == edge.id
+        assert assignments[closest] == edge_id
 
     if len(bb.func_groups) == 2:
         not_aligner = next(
-            e for e in vertex.edges if e is not vertex.aligner_edge
+            e for e in vertex.get_edge_ids()
+            if e is not vertex.get_aligner_edge()
         )
-        assert assignments[1] == not_aligner.id
+        assert assignments[1] == not_aligner
 
 
 def test_vertex(
@@ -90,10 +99,13 @@ def test_vertex(
         6: tmp_aldehyde6
     }
     for topology_graph in topology_graphs:
+        vertices = topology_graph.vertices
+        edges = topology_graph.edges
+
         for vertex in topology_graph.vertices:
             bb = building_blocks[vertex.get_num_edges()]
-            _test_placement(vertex, bb)
-            _test_assignment(vertex, bb)
+            _test_placement(vertex, bb, vertices, edges)
+            _test_assignment(vertex, bb, vertices, edges)
 
 
 def _test_construction(
