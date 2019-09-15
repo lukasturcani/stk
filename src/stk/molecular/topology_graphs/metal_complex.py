@@ -175,11 +175,7 @@ class _MetalComplexVertex(Vertex):
             placed.
 
         """
-
-        building_block.set_centroid(
-            position=self._position
-        )
-        print('placed', building_block.get_position_matrix())
+        building_block.set_centroid(position=self._position)
         return building_block.get_position_matrix()
 
     def _place_cap_building_block(self, building_block):
@@ -199,27 +195,19 @@ class _MetalComplexVertex(Vertex):
             placed.
 
         """
-
         building_block.set_centroid(position=self._position)
         fg_centroid = building_block.get_centroid(
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
-        print('ff', fg_centroid)
         start = fg_centroid - self._position
-        print(self._position)
-        print('s', start)
-        print(self.aligner_edge)
         edge_coord = self.aligner_edge.get_position()
-        print('e', edge_coord)
-        print('ge', self._get_edge_centroid())
-        target = edge_coord
-        print('t', target)
+        target = edge_coord - self._position
         building_block.apply_rotation_between_vectors(
             start=start,
             target=target,
-            origin=self._position
+            origin=building_block.get_centroid()
         )
-        input()
+
         return building_block.get_position_matrix()
 
     def _place_linear_building_block(self, building_block):
