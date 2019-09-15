@@ -789,8 +789,8 @@ class Cage(TopologyGraph):
             bb_by_degree[num_fgs] = bb
 
         building_block_vertices = {}
-        for vertex in self.vertex_data:
-            bb = bb_by_degree[len(vertex.edges)]
+        for vertex in self.vertices:
+            bb = bb_by_degree[vertex.get_num_edges()]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
             )
