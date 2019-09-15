@@ -646,12 +646,6 @@ class MetalComplex(TopologyGraph):
             for bb in mol.building_block_vertices
         )
 
-    def _clean_up(self, mol):
-        print(
-            'here you should determine how many FGs remain, and assign'
-        )
-        return super()._clean_up(mol)
-
     def __repr__(self):
         vertex_alignments = ', '.join(
             f'{v.id}: {v.edges.index(v.aligner_edge)}'
