@@ -15,83 +15,26 @@ For usage examples see :class:`.COF`.
 import numpy as np
 import itertools as it
 
-from .topology_graph import TopologyGraph, Vertex, Edge
+from .topology_graph import TopologyGraph, VertexData, Vertex, Edge
 from ...utilities import vector_angle, flatten
 
 
-class _COFVertex(Vertex):
-    """
-    Represents a vertex of a :class:`.COF`.
-
-    Attributes
-    ----------
-    id : :class:`int`
-        The id of the vertex. This should be its index in
-        :attr:`TopologyGraph.vertices`.
-
-    aligner_edge : :class:`.Edge`
-        The :class:`.Edge` in :attr:`edges`, which is used to align the
-        :class:`.BuildingBlock` placed on the vertex. The first
-        :class:`.FunctionalGroup` in :attr:`.BuildingBlock.func_groups`
-        is rotated such that it lies exactly on this :class:`.Edge`.
-
-    """
-
-    def __init__(self, x, y, z):
-        """
-        Initialize a :class:`_COFVertex`.
-
-        Parameters
-        ----------
-        x : :class:`float`
-            The x coordinate.
-
-        y : :class:`float`
-            The y coordinate.
-
-        z : :class:`float`
-            The z coordinate.
-
-        """
-
-        self.aligner_edge = None
-        super().__init__(x, y, z)
-
-    @classmethod
-    def init_at_center(cls, *vertices):
-        """
-        Initialize at the center of `vertices`.
-
-        Parameters
-        ----------
-        vertices : :class:`.Vertex`
-            Vertices at whose center this vertex should be initialized.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        center = sum(vertex.get_position() for vertex in vertices)
-        center /= len(vertices)
-        return cls(*center)
+class _COFVertexData(VertexData):
 
     @classmethod
     def init_at_shifted_center(
         cls,
-        vertices,
+        vertex_data,
         shifts,
         lattice_constants
     ):
         """
-        Initialize at the center of shifted `vertices`.
+        Initialize at the center of shifted `vertex_data`.
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`_COFVertex`
-            The vertics at whose center this vertex should be
+        vertex_data : :class:`tuple` of :class:`.VertexData`
+            The vertices at whose center this vertex should be
             intialized.
 
         shifts : :class:`tuple`
@@ -116,7 +59,7 @@ class _COFVertex(Vertex):
         """
 
         positions = []
-        for vertex, shift in zip(vertices, shifts):
+        for vertex, shift in zip(vertex_data, shifts):
             total_shift = 0
             for dim_shift, constant in zip(shift, lattice_constants):
                 total_shift += dim_shift * constant
@@ -128,6 +71,42 @@ class _COFVertex(Vertex):
             len(positions)
         )
         return cls(*position)
+
+    def get_vertex(self):
+        return _COFVertex(self)
+
+
+class _COFVertex(Vertex):
+    """
+    Represents a vertex of a :class:`.COF`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    aligner_edge : :class:`.Edge`
+        The :class:`.Edge` in :attr:`edges`, which is used to align the
+        :class:`.BuildingBlock` placed on the vertex. The first
+        :class:`.FunctionalGroup` in :attr:`.BuildingBlock.func_groups`
+        is rotated such that it lies exactly on this :class:`.Edge`.
+
+    """
+
+    def __init__(self, data):
+        """
+        Initialize a :class:`_COFVertex`.
+
+        Parameters
+        ----------
+        data : :class:`_COFVertexData`
+            The vertex data.
+
+        """
+
+        self.aligner_edge = None
+        super().__init__(data)
 
     def clone(self, clear_edges=False):
         """
@@ -876,19 +855,19 @@ class Honeycomb(COF):
     )
 
     _vertices = (
-        _COFVertex(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
-        _COFVertex(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
+        _COFVertexData(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
+        _COFVertexData(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
     )
 
     vertices = (
         *_vertices,
-        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_center(_vertices[0], _vertices[1]),
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[1]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[1]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
@@ -932,50 +911,50 @@ class Hexagonal(COF):
     )
 
     _vertices = (
-        _COFVertex(*((1/4)*_a + (1/4)*_b + (1/2)*_c)),
-        _COFVertex(*((1/4)*_a + (3/4)*_b + (1/2)*_c)),
-        _COFVertex(*((3/4)*_a + (1/4)*_b + (1/2)*_c)),
-        _COFVertex(*((3/4)*_a + (3/4)*_b + (1/2)*_c))
+        _COFVertexData(*((1/4)*_a + (1/4)*_b + (1/2)*_c)),
+        _COFVertexData(*((1/4)*_a + (3/4)*_b + (1/2)*_c)),
+        _COFVertexData(*((3/4)*_a + (1/4)*_b + (1/2)*_c)),
+        _COFVertexData(*((3/4)*_a + (3/4)*_b + (1/2)*_c))
     )
 
     vertices = (
         *_vertices,
-        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
-        _COFVertex.init_at_center(_vertices[0], _vertices[2]),
-        _COFVertex.init_at_center(_vertices[1], _vertices[2]),
-        _COFVertex.init_at_center(_vertices[1], _vertices[3]),
-        _COFVertex.init_at_center(_vertices[2], _vertices[3]),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_center(_vertices[0], _vertices[1]),
+        _COFVertexData.init_at_center(_vertices[0], _vertices[2]),
+        _COFVertexData.init_at_center(_vertices[1], _vertices[2]),
+        _COFVertexData.init_at_center(_vertices[1], _vertices[3]),
+        _COFVertexData.init_at_center(_vertices[2], _vertices[3]),
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[2]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[1]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[3]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[2], _vertices[1]),
             shifts=((0, 0, 0), (1, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[2], _vertices[3]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[1], _vertices[3]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[3], _vertices[0]),
             shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants
@@ -1047,16 +1026,16 @@ class Square(COF):
     )
 
     _vertices = (
-        _COFVertex(*((0.5)*_a + (0.5)*_b + (0.5)*_c)),
+        _COFVertexData(*((0.5)*_a + (0.5)*_b + (0.5)*_c)),
     )
     vertices = (
         *_vertices,
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[0]),
             shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[0]),
             shifts=((0, 0, 0), (0, 1, 0)),
             lattice_constants=_lattice_constants
@@ -1098,27 +1077,27 @@ class Kagome(COF):
     )
 
     _vertices = (
-        _COFVertex(*((1/4)*_a + (3/4)*_b + (0.5)*_c)),
-        _COFVertex(*((3/4)*_a + (3/4)*_b + (1/2)*_c)),
-        _COFVertex(*((3/4)*_a + (1/4)*_b + (1/2)*_c))
+        _COFVertexData(*((1/4)*_a + (3/4)*_b + (0.5)*_c)),
+        _COFVertexData(*((3/4)*_a + (3/4)*_b + (1/2)*_c)),
+        _COFVertexData(*((3/4)*_a + (1/4)*_b + (1/2)*_c))
     )
 
     vertices = (
         *_vertices,
-        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
-        _COFVertex.init_at_center(_vertices[0], _vertices[2]),
-        _COFVertex.init_at_center(_vertices[1], _vertices[2]),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_center(_vertices[0], _vertices[1]),
+        _COFVertexData.init_at_center(_vertices[0], _vertices[2]),
+        _COFVertexData.init_at_center(_vertices[1], _vertices[2]),
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[1]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[0], _vertices[2]),
             shifts=((0, 0, 0), (-1, 1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
+        _COFVertexData.init_at_shifted_center(
             vertices=(_vertices[1], _vertices[2]),
             shifts=((0, 0, 0), (0, 1, 0)),
             lattice_constants=_lattice_constants
@@ -1173,8 +1152,8 @@ class LinkerlessHoneycomb(COF):
     )
 
     vertices = (
-        _COFVertex(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
-        _COFVertex(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
+        _COFVertexData(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
+        _COFVertexData(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
     )
 
     edges = (
