@@ -92,39 +92,24 @@ def test_get_cell(vertex):
     assert all(vertex.get_cell() == [3, 4, 12])
 
 
-def test_get_edge_centroid(v):
+def test_get_edge_centroid(
+    graph_components,
+    periodic_graph_components
+):
     # Non-periodic.
-    vdata1, vdata2, vdata3 = vertex_data = (
-        stk.VertexData(0, 0, 0),
-        stk.VertexData(-1, -2, -3),
-        stk.VertexData(1, 2, 3)
-    )
-    for i, vertex in enumerate(vertex_data):
-        vertex.id = i
-    vertices = tuple(stk.Vertex(data) for data in vertex_data)
-
-    e1 = stk.EdgeData(vdata1, vdata2).get_edge()
-    e2 = stk.EdgeData(vdata1, vdata3).get_edge()
-
+    vertices, edges = graph_components
     assert all(
-        vertices[0]._get_edge_centroid(vertices, (e1, e2)) == [0, 0, 0]
+        vertices[0]._get_edge_centroid(edges, vertices) == [0, 0, 0]
     )
 
     # Periodic.
-    vdata1, vdata2, vdata3 = vertex_data = (
-        stk.VertexData(0, 0, 0),
-        stk.VertexData(-1, -2, -3),
-        stk.VertexData(1, 2, 3)
+    vertices, edges = periodic_graph_components
+    expected = (
+        sum(e.get_position() for e in edges) + np.array([1, 0, 0])
     )
-    for i, vertex in enumerate(vertex_data):
-        vertex.id = i
-    vertices = tuple(stk.Vertex(data) for data in vertex_data)
-
-    e1 = stk.EdgeData(vdata1, vdata2).get_edge()
-    e2 = stk.EdgeData(vdata1, vdata3).get_edge()
-
+    expected /= 3
     assert all(
-        vertices[0]._get_edge_centroid(vertices, (e1, e2)) == [0, 0, 0]
+        vertices[0]._get_edge_centroid(edges, vertices) == expected
     )
 
 
