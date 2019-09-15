@@ -395,9 +395,9 @@ class _CageVertex(Vertex):
     def after_assign_func_groups_to_edges(
         self,
         building_block,
+        func_groups,
         vertices,
-        edges,
-        func_groups
+        edges
     ):
         """
         Perform operations after functional groups have been assigned.
@@ -412,6 +412,10 @@ class _CageVertex(Vertex):
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
+        func_groups : :class:`tuple` of :class:`.FunctionalGroup`
+            The functional group clones added to the constructed
+            molecule.
+
         vertices : :class:`tuple` of :class:`.Vertex`
             All vertices in the topology graph. The index of each
             vertex must match its :class:`~.Vertex.id`.
@@ -419,10 +423,6 @@ class _CageVertex(Vertex):
         edges : :class:`tuple` of :class:`.Edge`
             All edges in the topology graph. The index of each
             edge must match its :class:`~.Edge.id`.
-
-        func_groups : :class:`tuple` of :class:`.FunctionalGroup`
-            The functional group clones added to the constructed
-            molecule.
 
         Returns
         -------
@@ -449,9 +449,9 @@ class _CageVertex(Vertex):
 
         return super().after_assign_func_groups_to_edges(
             building_block=building_block,
+            func_groups=func_groups,
             vertices=vertices,
-            edges=edges,
-            func_groups=func_groups
+            edges=edges
         )
 
     def _assign_func_groups_to_linear_edges(
@@ -581,8 +581,7 @@ class Cage(TopologyGraph):
     Represents a cage topology graph.
 
     Cage topologies are added by creating a subclass which defines the
-    :attr:`vertices` and :attr:`edges` of the topology as class
-    attributes.
+    :attr:`vertex_data` and :attr:`edge_data` class attributes.
 
     A :class:`Cage` subclass will add the attributes
     :attr:`num_windows` and :attr:`num_window_types` to each
@@ -702,17 +701,19 @@ class Cage(TopologyGraph):
         if vertex_alignments is None:
             vertex_alignments = {}
 
-        vertices = tuple(vertex.clone() for vertex in self.vertices)
-        for vertex in vertices:
+        vertex_data = {data: data.clone() for data in self.vertex_data}
+        for vertex in vertex_data.values():
             vertex.aligner_edge = vertex_alignments.get(vertex.id, 0)
-        edges = tuple(edge.clone() for edge in self.edges)
+        edge_data = (
+            edge.clone(vertex_data) for edge in self.edge_data
+        )
         vertex_types = sorted(
-            set(v.get_num_edges() for v in vertices),
+            {len(v.edges) for v in vertex_data},
             reverse=True
         )
         super().__init__(
-            vertices=vertices,
-            edges=edges,
+            vertex_data=vertex_data.values(),
+            edge_data=edge_data,
             construction_stages=tuple(
                 lambda vertex, vertex_type=vt:
                     vertex.get_num_edges() == vertex_type
@@ -775,8 +776,8 @@ class Cage(TopologyGraph):
             bb_by_degree[num_fgs] = bb
 
         building_block_vertices = {}
-        for vertex in self.vertices:
-            bb = bb_by_degree[vertex.get_num_edges()]
+        for vertex in self.vertex_data:
+            bb = bb_by_degree[len(vertex.edges)]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
             )

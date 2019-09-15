@@ -970,10 +970,10 @@ class TopologyGraph:
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`.VertexData`
+        vertices : :class:`iterable` of :class:`.VertexData`
             The vertices which make up the graph.
 
-        edges : :class:`tuple` of :class:`.EdgeData`
+        edges : :class:`iterable` of :class:`.EdgeData`
             The edges which make up the graph.
 
         construction_stages : :class:`tuple` of :class:`callable`
