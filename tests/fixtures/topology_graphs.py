@@ -113,7 +113,7 @@ def periodic_graph_components_alt1():
         stk.EdgeData(
             vdata1,
             vdata4,
-            periodicity=[...],
+            periodicity=[0, 0, 1],
             lattice_constants=(
                 np.array([1, 0, 0]),
                 np.array([0, 1, 0]),

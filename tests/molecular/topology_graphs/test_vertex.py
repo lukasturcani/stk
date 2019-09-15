@@ -129,11 +129,12 @@ def test_get_edge_plane_normal(
     # Periodic.
     vertices, edges = periodic_graph_components_alt1
     plane = vertices[0]._get_edge_plane_normal(
-        reference=...,
-        plane_edges=...,
-        vertices=...
+        reference=[0, 0, 1],
+        plane_edges=edges,
+        vertices=vertices
     )
-    assert all(plane == ...)
+    expected_angle = angle_theta([0, 1, 0], [0, 2, 0])
+    assert angle_theta(plane, [0, 0, 1]) == expceted_angle
 
 
 def test_get_molecule_centroid(tmp_vertex, ...):
