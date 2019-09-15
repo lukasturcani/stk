@@ -134,7 +134,7 @@ def test_get_edge_plane_normal(
         plane_edges=edges,
         vertices=vertices
     )
-    expected_angle = stk.vector_angle([0, 1, 0], [0, 2, 0])
+    expected_angle = stk.vector_angle([0, 1, 0], [0, 1, 1])
     result_angle = stk.vector_angle(plane, [0, 0, 1])
     assert abs(result_angle - expected_angle) < 1e-12
 
