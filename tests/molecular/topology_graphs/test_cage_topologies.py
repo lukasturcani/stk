@@ -40,7 +40,7 @@ def _test_placement(vertex, bb, vertices, edges):
         vertex.get_edge_ids(),
         key=_alignment(vertex, bb, edges)
     )
-    assert aligned is vertex._edge_ids[vertex.aligner_edge]
+    assert aligned is vertex._edge_ids[vertex.get_aligner_edge()]
 
 
 def _test_assignment(vertex, bb, vertices, edges):
@@ -49,7 +49,9 @@ def _test_assignment(vertex, bb, vertices, edges):
         vertices=vertices,
         edges=edges
     )
-    assert assignments[0] == vertex._edge_ids[vertex.aligner_edge]
+    assert (
+        assignments[0] == vertex._edge_ids[vertex.get_aligner_edge()]
+    )
 
 
 def test_vertex(

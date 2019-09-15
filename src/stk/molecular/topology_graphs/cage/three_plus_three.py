@@ -148,7 +148,10 @@ class _OnePlusOneVertex(_CageVertex):
         aligner_edge = edges[self._edge_ids[self._aligner_edge]]
         edge_coord = aligner_edge.get_position()
         connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
-        target = edge_coord - self._get_edge_centroid(connected_edges)
+        target = edge_coord - self._get_edge_centroid(
+            centroid_edges=connected_edges,
+            vertices=vertices
+        )
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=target,

@@ -148,7 +148,7 @@ class _CageVertex(Vertex):
         # it lies exactly on this :class:`.Edge`. Must be between
         # ``0`` and the number of edges the vertex is connected to.
         self._aligner_edge = data.aligner_edge
-        super.__init__(data)
+        super().__init__(data)
 
     def clone(self, clear_edges=False):
         """
@@ -267,7 +267,10 @@ class _CageVertex(Vertex):
         aligner_edge = edges[self._edge_ids[self._aligner_edge]]
         edge_coord = aligner_edge.get_position()
         connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
-        target = edge_coord - self._get_edge_centroid(connected_edges)
+        target = edge_coord - self._get_edge_centroid(
+            centroid_edges=connected_edges,
+            vertices=vertices
+        )
         building_block.apply_rotation_between_vectors(
             start=start,
             target=target,
@@ -321,8 +324,12 @@ class _CageVertex(Vertex):
         )
         connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
         edge_normal = self._get_edge_plane_normal(
-            reference=self._get_edge_centroid(connected_edges),
-            edges=connected_edges
+            reference=self._get_edge_centroid(
+                centroid_edges=connected_edges,
+                vertices=vertices
+            ),
+            plane_edges=connected_edges,
+            vertices=vertices
         )
         building_block.apply_rotation_between_vectors(
             start=building_block.get_bonder_plane_normal(),
@@ -335,7 +342,10 @@ class _CageVertex(Vertex):
         start = fg_bonder_centroid - self._position
         aligner_edge = edges[self._edge_ids[self._aligner_edge]]
         edge_coord = aligner_edge.get_position()
-        target = edge_coord - self._get_edge_centroid(connected_edges)
+        target = edge_coord - self._get_edge_centroid(
+            centroid_edges=connected_edges,
+            vertices=vertices
+        )
         building_block.apply_rotation_to_minimize_angle(
             start=start,
             target=target,
@@ -516,7 +526,7 @@ class _CageVertex(Vertex):
         assignments = {}
         edge_ids = sorted(
             self._edge_ids,
-            key=self._get_edge_angle(axis, edges)
+            key=self._get_edge_angle(axis, vertices, edges)
         )
         for edge_id, fg_id in zip(edge_ids, func_groups):
             assignments[fg_id] = edge_id
@@ -545,11 +555,14 @@ class _CageVertex(Vertex):
 
         return angle
 
-    def _get_edge_angle(self, axis, edges):
+    def _get_edge_angle(self, axis, vertices, edges):
         aligner_edge = edges[self._edge_ids[self._aligner_edge]]
         aligner_edge_coord = aligner_edge.get_position()
         connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
-        edge_centroid = self._get_edge_centroid(connected_edges)
+        edge_centroid = self._get_edge_centroid(
+            centroid_edges=connected_edges,
+            vertices=vertices
+        )
         # This axis is used to figure out the clockwise direction.
         aligner_edge_direction = aligner_edge_coord - edge_centroid
 
