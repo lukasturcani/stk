@@ -778,7 +778,7 @@ class COF(TopologyGraph):
                 dim >= 0 and dim < max_dim
                 for dim, max_dim in dims
             )
-            clone = edge.clone(vertex_map)
+            clone = edge.clone(vertex_map, True, True)
             edge_clones.append(clone)
             if edge_is_not_periodic:
                 clone.periodicity = np.array([0, 0, 0])
