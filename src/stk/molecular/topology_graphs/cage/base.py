@@ -43,7 +43,7 @@ class _CageVertex(Vertex):
         :attr:`TopologyGraph.vertices`.
 
     aligner_edge : :class:`int`
-        The of the edge which is used to align the
+        The edge which is used to align the
         :class:`.BuildingBlock` placed on the vertex. The first
         :class:`.FunctionalGroup` in :attr:`.BuildingBlock.func_groups`
         is rotated such that it lies exactly on this :class:`.Edge`.

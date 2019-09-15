@@ -21,12 +21,49 @@ from ...utilities import vector_angle, flatten
 
 class _COFVertexData(VertexData):
 
+    def __init__(self, x, y, z, cell=None, aligner_edge=None):
+        """
+        Initialize a :class:`.VertexData` instance.
+
+        Parameters
+        ----------
+        x : :class:`float`
+            The x coordinate.
+
+        y : :class:`float`
+            The y coordinate.
+
+        z : :class:`float`
+            The z coordinate.
+
+        cell : :class:`numpy.ndarray`, optional
+            The unit cell in which the vertex is found.
+
+        aligner_edge : :class:`int`, optional
+            The edge which is used to align the :class:`.BuildingBlock`
+            placed on the vertex. The first :class:`.FunctionalGroup`
+            in :attr:`.BuildingBlock.func_groups` is rotated such that
+            it lies exactly on this :class:`.Edge`. Must be between
+            ``0`` and the number of edges the vertex is connected to.
+
+        """
+
+        self.aligner_edge = aligner_edge
+        super().__init__(x, y, z, cell)
+
+    @classmethod
+    def init_at_center(cls, *vertex_data):
+        obj = super().init_at_center(*vertex_data)
+        obj.aligner_edge = None
+        return obj
+
     @classmethod
     def init_at_shifted_center(
         cls,
         vertex_data,
         shifts,
-        lattice_constants
+        lattice_constants,
+        aligner_edge=None
     ):
         """
         Initialize at the center of shifted `vertex_data`.
@@ -105,7 +142,7 @@ class _COFVertex(Vertex):
 
         """
 
-        self.aligner_edge = None
+        self.aligner_edge = data.aligner_edge
         super().__init__(data)
 
     def clone(self, clear_edges=False):
