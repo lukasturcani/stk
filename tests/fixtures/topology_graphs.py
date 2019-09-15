@@ -5,7 +5,8 @@ import numpy as np
 
 @pytest.fixture(scope='function')
 def tmp_vertex():
-    vdata = stk.VertexData(1, 2, 3, np.array(3, 4, 12))
+    vdata = stk.VertexData(1, 2, 3)
+    vdata.cell = np.array([3, 4, 12])
     vdata.id = 10
     e1, e2, e3 = (
         stk.EdgeData(vdata), stk.EdgeData(vdata), stk.EdgeData(vdata)
@@ -18,7 +19,8 @@ def tmp_vertex():
 
 @pytest.fixture(scope='session')
 def vertex():
-    vdata = stk.VertexData(1, 2, 3, np.array(3, 4, 12))
+    vdata = stk.VertexData(1, 2, 3)
+    vdata.cell = np.array([3, 4, 12])
     vdata.id = 10
     e1, e2, e3 = (
         stk.EdgeData(vdata), stk.EdgeData(vdata), stk.EdgeData(vdata)
@@ -69,7 +71,7 @@ def graph_components_alt1():
 
 @pytest.fixture(scope='session')
 def periodic_graph_components():
-    vdata1, vdata2, vdata3 = vertex_data = (
+    vdata1, vdata2, vdata3, vdata4 = vertex_data = (
         stk.VertexData(0, 0, 0),
         stk.VertexData(1, 0, 0),
         stk.VertexData(-1, 0, 0),

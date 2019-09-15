@@ -24,7 +24,8 @@ def test_init_at_center():
 
 
 def test_init_vertex():
-    vdata = stk.VertexData(1, 2, 3, np.array([10, 4, 2]))
+    vdata = stk.VertexData(1, 2, 3)
+    vdata.cell = np.array([10, 4, 2])
     e1, e2, e3 = (
         stk.EdgeData(vdata), stk.EdgeData(vdata), stk.EdgeData(vdata)
     )
