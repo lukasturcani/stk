@@ -183,20 +183,26 @@ class OnePlusOne(Cage):
     """
 
     _x = 1
-    vertices = (
+    vertex_data = (
         _OnePlusOneVertexData(_x, 0., 0., [1, 0, 0], False),
         _OnePlusOneVertexData(-_x, 0., 0., [-1, 0, 0], False),
 
     )
-    edges = (
+    edge_data = (
         EdgeData(
-            vertices[0], vertices[1], position=np.array([0., 1., 0.])
+            vertex_data[0],
+            vertex_data[1],
+            position=np.array([0., 1., 0.])
         ),
         EdgeData(
-            vertices[0], vertices[1], position=np.array([0., -1., 1.])
+            vertex_data[0],
+            vertex_data[1],
+            position=np.array([0., -1., 1.])
         ),
         EdgeData(
-            vertices[0], vertices[1], position=np.array([0., -1., -1.])
+            vertex_data[0],
+            vertex_data[1],
+            position=np.array([0., -1., -1.])
         )
     )
 
@@ -212,6 +218,14 @@ class TwoPlusTwo(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -221,22 +235,22 @@ class TwoPlusTwo(Cage):
     """
 
     _x = 1
-    vertices = (
+    vertex_data = (
         _CageVertexData(_x, 0, -_x/np.sqrt(2), False),
         _CageVertexData(-_x, 0, -_x/np.sqrt(2), False),
         _CageVertexData(0, _x, _x/np.sqrt(2), False),
         _CageVertexData(0, -_x, _x/np.sqrt(2), False)
     )
 
-    edges = (
-        EdgeData(vertices[0], vertices[1]),
-        EdgeData(vertices[0], vertices[2]),
-        EdgeData(vertices[0], vertices[3]),
+    edge_data = (
+        EdgeData(vertex_data[0], vertex_data[1]),
+        EdgeData(vertex_data[0], vertex_data[2]),
+        EdgeData(vertex_data[0], vertex_data[3]),
 
-        EdgeData(vertices[1], vertices[2]),
-        EdgeData(vertices[1], vertices[3]),
+        EdgeData(vertex_data[1], vertex_data[2]),
+        EdgeData(vertex_data[1], vertex_data[3]),
 
-        EdgeData(vertices[2], vertices[3])
+        EdgeData(vertex_data[2], vertex_data[3])
     )
 
     num_windows = 4
@@ -251,6 +265,14 @@ class FourPlusFour(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -260,7 +282,7 @@ class FourPlusFour(Cage):
     """
 
     _x = 1
-    vertices = (
+    vertex_data = (
         _CageVertexData(-_x, _x, -_x, False),
         _CageVertexData(-_x, -_x, -_x, False),
         _CageVertexData(_x, _x, -_x, False),
@@ -272,19 +294,19 @@ class FourPlusFour(Cage):
         _CageVertexData(_x, -_x, _x, False)
     )
 
-    edges = (
-        EdgeData(vertices[0], vertices[1]),
-        EdgeData(vertices[0], vertices[2]),
-        EdgeData(vertices[0], vertices[4]),
-        EdgeData(vertices[1], vertices[3]),
-        EdgeData(vertices[1], vertices[5]),
-        EdgeData(vertices[2], vertices[6]),
-        EdgeData(vertices[2], vertices[3]),
-        EdgeData(vertices[3], vertices[7]),
-        EdgeData(vertices[4], vertices[6]),
-        EdgeData(vertices[4], vertices[5]),
-        EdgeData(vertices[5], vertices[7]),
-        EdgeData(vertices[6], vertices[7])
+    edge_data = (
+        EdgeData(vertex_data[0], vertex_data[1]),
+        EdgeData(vertex_data[0], vertex_data[2]),
+        EdgeData(vertex_data[0], vertex_data[4]),
+        EdgeData(vertex_data[1], vertex_data[3]),
+        EdgeData(vertex_data[1], vertex_data[5]),
+        EdgeData(vertex_data[2], vertex_data[6]),
+        EdgeData(vertex_data[2], vertex_data[3]),
+        EdgeData(vertex_data[3], vertex_data[7]),
+        EdgeData(vertex_data[4], vertex_data[6]),
+        EdgeData(vertex_data[4], vertex_data[5]),
+        EdgeData(vertex_data[5], vertex_data[7]),
+        EdgeData(vertex_data[6], vertex_data[7])
     )
 
     num_windows = 6
