@@ -594,9 +594,9 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        bb_keys = frozenset(
+        bb_keys = tuple(sorted(
             x.get_identity_key() for x in building_blocks
-        )
+        ))
         vertices = cls._get_sorted_building_block_vertices(
             building_blocks=building_blocks,
             topology_graph=topology_graph,
