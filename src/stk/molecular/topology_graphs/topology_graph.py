@@ -665,7 +665,7 @@ class EdgeData:
             vertex_positions = (
                 vertex.position for vertex in clone.vertices
             )
-            clone._position = np.divide(
+            clone.position = np.divide(
                 sum(vertex_positions),
                 len(clone.vertices)
             )
