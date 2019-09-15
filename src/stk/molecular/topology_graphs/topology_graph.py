@@ -118,10 +118,10 @@ class VertexData:
         raise NotImplementedError()
 
     def __str__(self):
-        x, y, z = self.position
+        position = self.position.tolist()
         cell_id = self.cell.tolist()
         cell = '' if cell_id == [0, 0, 0] else f', cell={cell_id}'
-        return f'VertexData({x}, {y}, {z}{cell})'
+        return f'VertexData(id={self.id}, position={position}{cell})'
 
     def __repr__(self):
         return str(self)
@@ -629,7 +629,7 @@ class EdgeData:
         else:
             periodicity = ''
 
-        return f'Edge({vertices}{position}{periodicity})'
+        return f'EdgeData({vertices}{position}{periodicity})'
 
 
 class Edge:

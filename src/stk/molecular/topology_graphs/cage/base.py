@@ -83,6 +83,9 @@ class _CageVertexData(VertexData):
         obj.use_bonder_placement = True
         return obj
 
+    def get_vertex(self):
+        return _CageVertex(self)
+
 
 class _CageVertex(Vertex):
     """
