@@ -699,6 +699,7 @@ class EdgeData:
         vertices = ', '.join(
             str(vertex.id) for vertex in self.vertices
         )
+        id_ = '' if self.id is None else f', id={self.id}'
         if self.custom_position:
             position = f', position={self.position!r}'
         else:
@@ -709,7 +710,7 @@ class EdgeData:
         else:
             periodicity = ''
 
-        return f'EdgeData({vertices}{position}{periodicity})'
+        return f'EdgeData({vertices}{id_}{position}{periodicity})'
 
 
 class Edge:
