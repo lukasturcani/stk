@@ -106,9 +106,10 @@ def test_get_edge_centroid(
     # Periodic.
     vertices, edges = periodic_graph_components
     expected = (
-        sum(e.get_position() for e in edges) + np.array([1, 0, 0])
+        edges[0].get_position() +
+        edges[1].get_position(vertices[0], vertices)
     )
-    expected /= 3
+    expected /= 2
     assert all(
         vertices[0]._get_edge_centroid(edges, vertices) == expected
     )
