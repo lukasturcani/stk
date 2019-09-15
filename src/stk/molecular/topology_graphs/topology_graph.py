@@ -117,6 +117,29 @@ class VertexData:
 
         raise NotImplementedError()
 
+    def clone(self, clear_edges=False):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            ``True`` if the clone should not be connected to any edges.
+
+        Returns
+        -------
+        :class:`VertexData`
+            The clone.
+
+        """
+
+        clone = self.__class__.__new__(self.__class__)
+        clone.position = list(self.position)
+        clone.id = self.id
+        clone.edges = [] if clear_edges else list(self.edges)
+        clone.cell = np.array(self.cell)
+        return clone
+
     def __str__(self):
         position = self.position.tolist()
         cell_id = self.cell.tolist()
