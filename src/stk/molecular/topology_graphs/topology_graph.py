@@ -616,6 +616,40 @@ class EdgeData:
         if not self.custom_position:
             self.position = _position / i
 
+    def clone(self, vertex_map=None):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        vertex_map : :class:`dict`
+            If the clone should hold different :class:`.VertexData`
+            instances, then a :class:`dict` should be provided, which
+            maps vertex data in the current :class:`.EdgeData` to the
+            vertex data instances which should be used in the clone.
+            Only vertex data instances which need to be changed need
+            to be present in the `vertex_map`.
+
+        Returns
+        -------
+        :class:`EdgeData`
+            The clone.
+
+        """
+
+        clone = self.__class__.__new__(self.__class__)
+        clone.id = self.ikd
+        clone.vertices = tuple(
+            vertex_map.get(v, v) for v in self.vertices
+        )
+        clone.periodicity = np.array(self.periodicity)
+        clone.custom_position = self.custom_position
+        clone.position = np.array(self.position)
+        clone.lattice_constants = tuple(
+            np.array(constant) for constant in self.lattice_constants
+        )
+        return clone
+
     def get_edge(self):
         """
         Get an :class:`.Edge` from the data.

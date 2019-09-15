@@ -20,6 +20,32 @@ from ...utilities import vector_angle, flatten
 
 
 class _COFVertexData(VertexData):
+    """
+    Holds data for a COF vertex.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. Must match the index in
+        :attr:`TopologyGraph.vertices`.
+
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
+
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
+
+    aligner_edge : :class:`int`
+        The edge which is used to align the :class:`.BuildingBlock`
+        placed on the vertex. The first :class:`.FunctionalGroup`
+        in :attr:`.BuildingBlock.func_groups` is rotated such that
+        it lies exactly on this :class:`.Edge`. Must be between
+        ``0`` and the number of edges the vertex is connected to.
+
+    """
 
     def __init__(self, x, y, z):
         """
@@ -98,6 +124,11 @@ class _COFVertexData(VertexData):
         )
         return cls(*position)
 
+    def clone(self, clear_edges=False):
+        clone = super().clone(clear_edges)
+        clone.aligner_edge = self.aligner_edge
+        return clone
+
     def get_vertex(self):
         return _COFVertex(self)
 
@@ -152,12 +183,7 @@ class _COFVertex(Vertex):
         clone._aligner_edge = self._aligner_edge
         return clone
 
-    def place_building_block(
-        self,
-        building_block,
-        vertices,
-        edges
-    ):
+    def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -238,7 +264,7 @@ class _COFVertex(Vertex):
         e1_coord = edges[self._edge_ids[1]].get_position(self)
         target = e0_coord - e1_coord
 
-        if self._edge_ids[self.aligner_edge] != self._edge_ids[0]:
+        if self._edge_ids[self._aligner_edge] != self._edge_ids[0]:
             target *= -1
 
         building_block.apply_rotation_between_vectors(
@@ -300,7 +326,7 @@ class _COFVertex(Vertex):
         )
         start = fg_bonder_centroid - self._position
 
-        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        aligner_edge = edges[self._edge_ids[self._aligner_edge]]
         edge_coord = aligner_edge.get_position(self)
         target = edge_coord - self._position
         building_block.apply_rotation_to_minimize_angle(
@@ -475,11 +501,10 @@ class _COFVertex(Vertex):
         return angle
 
     def __str__(self):
-        x, y, z = self._position
         return (
             f'Vertex(id={self.id}, '
-            f'position={[x, y, z]}, '
-            f'aligner_edge={self.aligner_edge})'
+            f'position={self._position.tolist()}, '
+            f'aligner_edge={self._aligner_edge})'
         )
 
 
@@ -493,6 +518,14 @@ class COF(TopologyGraph):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -502,7 +535,7 @@ class COF(TopologyGraph):
     Examples
     --------
     :class:`COF` instances can be made by supplying only
-    the lattice siz (using :class:`.Honeycomb` as an example)
+    the lattice size (using :class:`.Honeycomb` as an example)
 
     .. code-block:: python
 
@@ -549,9 +582,9 @@ class COF(TopologyGraph):
             building_blocks=[bb1, bb2, bb3],
             topology_graph=lattice
             building_block_vertices={
-                bb1: lattice.vertex_data[:2],
-                bb2: lattice.vertex_data[4:],
-                bb3: lattice.vertex_data[2:4]
+                bb1: lattice.verices[:2],
+                bb2: lattice.verices[4:],
+                bb3: lattice.verices[2:4]
             }
         )
 
@@ -627,7 +660,7 @@ class COF(TopologyGraph):
 
     def _get_instance_vertices(self, vertex_alignments):
         """
-        Create the vertices of the topology graph instance.
+        Create the vertex data of the topology graph instance.
 
         Parameters
         ---------
@@ -651,9 +684,8 @@ class COF(TopologyGraph):
             A nested :class:`list` which can be indexed as
             ``vertices[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
-            the vertices in the class attribute :attr:`vertices` to
-            the instance clones, for that unit cell.
-
+            the vertices in :attr:`vertex_data` to its clone for that
+            unit cell.
 
         """
 
@@ -670,23 +702,22 @@ class COF(TopologyGraph):
         ]
         # Make a clone of each vertex for each unit cell.
         cells = it.product(xdim, ydim, zdim)
-        vertices = it.product(cells, self.vertices)
+        vertices = it.product(cells, self.vertex_data)
         for cell, vertex in vertices:
             x, y, z = cell
-            clone = vertex.clone(True).set_cell(x, y, z)
+            clone = vertex.clone(True)
+            clone.cell = np.array(cell)
             clone.aligner_edge = vertex_alignments.get(vertex, 0)
             # Shift the clone so that it's within the cell.
-            shift = 0
             for axis, dim in zip(cell, self._lattice_constants):
-                shift += axis * dim
-            clone.set_position(clone.get_position()+shift)
+                clone.position += axis * dim
 
             vertex_clones[x][y][z][vertex] = clone
         return vertex_clones
 
     def _get_instance_edges(self, vertices):
         """
-        Create the edges in the topology graph instance.
+        Create the edge data of the topology graph instance.
 
         Parameters
         ----------
@@ -694,13 +725,13 @@ class COF(TopologyGraph):
             A nested :class:`list` which can be indexed as
             ``vertices[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
-            the vertices in the class attribute :attr:`vertices` to
-            the instance clones, for that unit cell.
+            the vertices in :attr:`vertex_data` to the clones for that
+            unit cell.
 
         Returns
         -------
-        :class:`tuple` of :class:`.Edge`
-            The edges of the topology graph instance.
+        :class:`tuple` of :class:`.EdgeData`
+            The edge data of the topology graph instance.
 
         """
 
@@ -708,12 +739,11 @@ class COF(TopologyGraph):
         # Make a clone for each edge for each unit cell.
         xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
         cells = it.product(xdim, ydim, zdim)
-        edges = it.product(cells, self.edges)
+        edges = it.product(cells, self.edge_data)
         for cell, edge in edges:
             x, y, z = cell
-            periodicity = edge.get_periodicity()
             # The cell in which the second vertex of the edge is found.
-            periodic_cell = np.array(cell) + periodicity
+            periodic_cell = np.array(cell) + edge.periodicity
             # Wrap around periodic cells, ie those that are less than 0
             # or greater than the lattice size along any dimension.
             dims = zip(periodic_cell, self._lattice_size)
@@ -723,9 +753,7 @@ class COF(TopologyGraph):
             ])
             # Make a vertex map which accounts for the fact that
             # v1 is in cell2.
-            # get_vertex_ids() returns vertex objects because finalize
-            # has not been called yet.
-            v0, v1 = edge.get_vertex_ids()
+            v0, v1 = edge.vertices
             vertex_map = {
                 v0: vertices[x][y][z][v0],
                 v1: vertices[cell2_x][cell2_y][cell2_z][v1]
@@ -740,7 +768,7 @@ class COF(TopologyGraph):
             clone = edge.clone(vertex_map)
             edge_clones.append(clone)
             if edge_is_not_periodic:
-                clone.set_periodicity(0, 0, 0)
+                clone.periodicity = np.array([0, 0, 0])
 
         return tuple(edge_clones)
 
