@@ -133,10 +133,9 @@ def test_get_edge_plane_normal(
         plane_edges=edges,
         vertices=vertices
     )
-    expected_angle = stk.angle_theta([0, 1, 0], [0, 2, 0])
-    assert (
-        abs(stk.angle_theta(plane, [0, 0, 1]) - expected_angle) < 1e-12
-    )
+    expected_angle = stk.vector_angle([0, 1, 0], [0, 2, 0])
+    result_angle = stk.vector_angle(plane, [0, 0, 1])
+    assert abs(result_angle - expected_angle) < 1e-12
 
 
 def test_get_molecule_centroid(tmp_vertex, tmp_amine3):
