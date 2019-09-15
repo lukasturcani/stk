@@ -117,6 +117,15 @@ class VertexData:
 
         raise NotImplementedError()
 
+    def __str__(self):
+        x, y, z = self.position
+        cell_id = self.cell.tolist()
+        cell = '' if cell_id == [0, 0, 0] else f', cell={cell_id}'
+        return f'VertexData({x}, {y}, {z}{cell})'
+
+    def __repr__(self):
+        return str(self)
+
 
 class Vertex:
     """
@@ -488,8 +497,10 @@ class Vertex:
         )
 
     def __str__(self):
-        x, y, z = self._position
-        return f'Vertex(id={self.id}, position={[x, y, z]})'
+        position = self._position.tolist()
+        cell_id = self._cell.tolist()
+        cell = '' if cell_id == [0, 0, 0] else f', cell={cell_id}'
+        return f'Vertex(id={self.id}, position={position}{cell})'
 
     def __repr__(self):
         return str(self)
@@ -600,6 +611,25 @@ class EdgeData:
         """
 
         return Edge(self)
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        vertices = ', '.join(
+            str(vertex.id) for vertex in self.vertices
+        )
+        if self._custom_position:
+            position = f', position={self._position!r}'
+        else:
+            position = ''
+
+        if any(i != 0 for i in self._periodicity):
+            periodicity = f', periodicity={tuple(self._periodicity)!r}'
+        else:
+            periodicity = ''
+
+        return f'Edge({vertices}{position}{periodicity})'
 
 
 class Edge:

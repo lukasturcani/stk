@@ -28,33 +28,23 @@ For usage examples see :class:`.Cage`.
 
 import numpy as np
 
-from ..topology_graph import TopologyGraph, Vertex
+from ..topology_graph import TopologyGraph, VertexData, Vertex
 from ....utilities import vector_angle
 
 
-class _CageVertex(Vertex):
-    """
-    Represents a vertex of a :class:`.Cage`.
+class _CageVertexData(VertexData):
 
-    Attributes
-    ----------
-    id : :class:`int`
-        The id of the vertex. This should be its index in
-        :attr:`TopologyGraph.vertices`.
-
-    aligner_edge : :class:`int`
-        The edge which is used to align the
-        :class:`.BuildingBlock` placed on the vertex. The first
-        :class:`.FunctionalGroup` in :attr:`.BuildingBlock.func_groups`
-        is rotated such that it lies exactly on this :class:`.Edge`.
-        Must be between ``0`` and the number of edges the vertex is
-        connected to.
-
-    """
-
-    def __init__(self, x, y, z, use_bonder_placement=True):
+    def __init__(
+        self,
+        x,
+        y,
+        z,
+        cell=None,
+        aligner_edge=None,
+        use_bonder_placement=True
+    ):
         """
-        Initialize a :class:`_CageVertex`.
+        Initialize a :class:`_CageVertexData` instance.
 
         Parameters
         ----------
@@ -67,6 +57,13 @@ class _CageVertex(Vertex):
         z : :class:`float`
             The z coordinate.
 
+        aligner_edge : :class:`int`, optional
+            The edge which is used to align the :class:`.BuildingBlock`
+            placed on the vertex. The first :class:`.FunctionalGroup`
+            in :attr:`.BuildingBlock.func_groups` is rotated such that
+            it lies exactly on this :class:`.Edge`. Must be between
+            ``0`` and the number of edges the vertex is connected to.
+
         use_bonder_placement : :class:`bool`, optional
             If ``True``the position of the vertex will be updated such
             that it is in the middle of the neighboring bonder
@@ -75,33 +72,42 @@ class _CageVertex(Vertex):
 
         """
 
+        self.aligner_edge = aligner_edge
+        self.use_bonder_placement = use_bonder_placement
+        super().__init__(x, y, z, cell)
+
+    @classmethod
+    def init_at_center(cls, *vertex_data):
+        obj = super().init_at_center(*vertex_data)
+        obj.aligner_edge = None
+        obj.use_bonder_placement = True
+        return obj
+
+
+class _CageVertex(Vertex):
+    """
+    Represents a vertex of a :class:`.Cage`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    """
+
+    def __init__(self, data):
         # _neighbor_positions holds the bonder centroids of functional
         # groups on neighbor vertices connected to this vertex.
         self._neighbor_positions = []
-        self.aligner_edge = None
-        self._use_bonder_placement = use_bonder_placement
-        super().__init__(x, y, z)
-
-    @classmethod
-    def init_at_center(cls, *vertices):
-        """
-        Initialize at the center of `vertices`.
-
-        Parameters
-        ----------
-        vertices : :class:`.Vertex`
-            Vertices at whose center this vertex should be initialized.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        center = sum(vertex.get_position() for vertex in vertices)
-        center /= len(vertices)
-        return cls(*center)
+        self._use_bonder_placement = data.use_bonder_placement
+        # The edge which is used to align the :class:`.BuildingBlock`
+        # placed on the vertex. The first :class:`.FunctionalGroup`
+        # in :attr:`.BuildingBlock.func_groups` is rotated such that
+        # it lies exactly on this :class:`.Edge`. Must be between
+        # ``0`` and the number of edges the vertex is connected to.
+        self._aligner_edge = data.aligner_edge
+        super.__init__(data)
 
     def clone(self, clear_edges=False):
         """
@@ -120,10 +126,13 @@ class _CageVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone.aligner_edge = self.aligner_edge
+        clone._aligner_edge = self._aligner_edge
         clone._use_bonder_placement = self._use_bonder_placement
         clone._neighbor_positions = list(self._neighbor_positions)
         return clone
+
+    def get_aligner_edge(self):
+        return self._aligner_edge
 
     def place_building_block(self, building_block, vertices, edges):
         """
@@ -214,7 +223,7 @@ class _CageVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._position
-        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        aligner_edge = edges[self._edge_ids[self._aligner_edge]]
         edge_coord = aligner_edge.get_position()
         connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
         target = edge_coord - self._get_edge_centroid(connected_edges)
@@ -283,7 +292,7 @@ class _CageVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_bonder_centroid - self._position
-        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        aligner_edge = edges[self._edge_ids[self._aligner_edge]]
         edge_coord = aligner_edge.get_position()
         target = edge_coord - self._get_edge_centroid(connected_edges)
         building_block.apply_rotation_to_minimize_angle(
@@ -496,7 +505,7 @@ class _CageVertex(Vertex):
         return angle
 
     def _get_edge_angle(self, axis, edges):
-        aligner_edge = edges[self._edge_ids[self.aligner_edge]]
+        aligner_edge = edges[self._edge_ids[self._aligner_edge]]
         aligner_edge_coord = aligner_edge.get_position()
         connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
         edge_centroid = self._get_edge_centroid(connected_edges)
@@ -519,11 +528,10 @@ class _CageVertex(Vertex):
         return angle
 
     def __str__(self):
-        x, y, z = self._position
         return (
             f'Vertex(id={self.id}, '
-            f'position={[x, y, z]}, '
-            f'aligner_edge={self.aligner_edge})'
+            f'position={self._position.tolist()}, '
+            f'aligner_edge={self._aligner_edge})'
         )
 
 
@@ -787,7 +795,7 @@ class Cage(TopologyGraph):
 
     def __repr__(self):
         vertex_alignments = ', '.join(
-            f'{v.id}: {v.aligner_edge}'
+            f'{v.id}: {v.get_aligner_edge()}'
             for v in self.vertices
         )
         return (

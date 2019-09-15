@@ -121,13 +121,7 @@ class _COFVertex(Vertex):
     ----------
     id : :class:`int`
         The id of the vertex. This should be its index in
-        :attr:`TopologyGraph.vertices`.
-
-    aligner_edge : :class:`.Edge`
-        The :class:`.Edge` in :attr:`edges`, which is used to align the
-        :class:`.BuildingBlock` placed on the vertex. The first
-        :class:`.FunctionalGroup` in :attr:`.BuildingBlock.func_groups`
-        is rotated such that it lies exactly on this :class:`.Edge`.
+        :attr:`.TopologyGraph.vertices`.
 
     """
 
@@ -142,7 +136,12 @@ class _COFVertex(Vertex):
 
         """
 
-        self.aligner_edge = data.aligner_edge
+        # The edge which is used to align the :class:`.BuildingBlock`
+        # placed on the vertex. The first :class:`.FunctionalGroup`
+        # in :attr:`.BuildingBlock.func_groups` is rotated such that
+        # it lies exactly on this :class:`.Edge`. Must be between
+        # ``0`` and the number of edges the vertex is connected to.
+        self._aligner_edge = data.aligner_edge
         super().__init__(data)
 
     def clone(self, clear_edges=False):
@@ -161,7 +160,7 @@ class _COFVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone.aligner_edge = self.aligner_edge
+        clone._aligner_edge = self._aligner_edge
         return clone
 
     def place_building_block(
