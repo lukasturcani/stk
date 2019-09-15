@@ -670,13 +670,13 @@ class EdgeData:
         vertices = ', '.join(
             str(vertex.id) for vertex in self.vertices
         )
-        if self._custom_position:
-            position = f', position={self._position!r}'
+        if self.custom_position:
+            position = f', position={self.position!r}'
         else:
             position = ''
 
-        if any(i != 0 for i in self._periodicity):
-            periodicity = f', periodicity={tuple(self._periodicity)!r}'
+        if any(i != 0 for i in self.periodicity):
+            periodicity = f', periodicity={tuple(self.periodicity)!r}'
         else:
             periodicity = ''
 

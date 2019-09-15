@@ -183,6 +183,9 @@ class _COFVertex(Vertex):
         clone._aligner_edge = self._aligner_edge
         return clone
 
+    def get_aligner_edge(self):
+        return self._aligner_edge
+
     def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
@@ -659,7 +662,7 @@ class COF(TopologyGraph):
         self._periodic = periodic
 
         vertex_data = self._get_vertex_data(vertex_alignments)
-        edge_data = self.get_edge_data(vertex_data)
+        edge_data = self._get_edge_data(vertex_data)
 
         vertex_data = tuple(
             vertex
@@ -877,9 +880,9 @@ class COF(TopologyGraph):
 
     def __repr__(self):
         vertex_alignments = ', '.join(
-            f'{v.id}: {v.aligner_edge}'
+            f'{v.id}: {v.get_aligner_edge()}'
             # Only get the vertices in the first unit cell.
-            for v in self.vertices[:len(self.__class__.vertices)]
+            for v in self.vertices[:len(self.vertex_data)]
         )
 
         x, y, z = self._lattice_size

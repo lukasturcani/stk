@@ -91,7 +91,7 @@ def test_vertex(
     }
     for topology_graph in topology_graphs:
         for vertex in topology_graph.vertices:
-            bb = building_blocks[len(vertex.edges)]
+            bb = building_blocks[vertex.get_num_edges()]
             _test_placement(vertex, bb)
             _test_assignment(vertex, bb)
 
@@ -173,8 +173,6 @@ def test_alignments(amine2_alt3, aldehyde4_alt1):
         amine2_alt3: 11,
         aldehyde4_alt1: 11
     }
-    v0 = stk.cof.Kagome.vertices[0]
-    vlast = stk.cof.Kagome.vertices[-1]
     for i in range(4):
         for periodic in (True, False):
             cof = stk.ConstructedMolecule(
@@ -182,8 +180,8 @@ def test_alignments(amine2_alt3, aldehyde4_alt1):
                 topology_graph=stk.cof.Kagome(
                     lattice_size=(3, 3, 1),
                     vertex_alignments={
-                        v0: v0.edges[i],
-                        vlast: vlast.edges[i % 2]
+                        0: i,
+                        len(stk.cof.Kagome.vertex_data)-1: i % 2
                     },
                     periodic=periodic
                 )
@@ -231,8 +229,12 @@ def test_multi_bb(
     }
     for periodic in (True, False):
         kagome = stk.cof.Kagome((3, 3, 1), periodic)
-        di_verts = [v for v in kagome.vertices if len(v.edges) == 2]
-        tetra_verts = [v for v in kagome.vertices if len(v.edges) == 4]
+        di_verts = [
+            v for v in kagome.vertices if v.get_num_edges() == 2
+        ]
+        tetra_verts = [
+            v for v in kagome.vertices if v.get_num_edges() == 4
+        ]
         cof = stk.ConstructedMolecule(
             building_blocks=building_blocks,
             topology_graph=kagome,
