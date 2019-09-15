@@ -536,7 +536,7 @@ class EdgeData:
     vertices : :class:`list` of :class:`.VertexData`
         The vertices connected to the edge.
 
-    periodicity : :class:`tuple` of :class:`int`
+    periodicity : :class:`numpy.ndarray`
         The periodicity of the edge. For example, if ``(0, 0, 0)``
         then the edge is not periodic. If, ``(1, 0, -1)`` then the
         edge is periodic across the x axis in the positive
