@@ -616,7 +616,12 @@ class EdgeData:
         if not self.custom_position:
             self.position = _position / i
 
-    def clone(self, vertex_map=None):
+    def clone(
+        self,
+        vertex_map=None,
+        recalculate_position=False,
+        add_to_vertices=True
+    ):
         """
         Return a clone.
 
@@ -629,6 +634,15 @@ class EdgeData:
             vertex data instances which should be used in the clone.
             Only vertex data instances which need to be changed need
             to be present in the `vertex_map`.
+
+        recalculate_position : :class:`bool`, optional
+            Toggle if the position of the clone should be recalculated
+            from the vertices it connects or if it should inherit
+            the position of the original edge.
+
+        add_to_vertices : :class:`bool`, optional
+            Toggles if the clone should be added to
+            :attr:`.VertexData.edges`.
 
         Returns
         -------
@@ -644,10 +658,25 @@ class EdgeData:
         )
         clone.periodicity = np.array(self.periodicity)
         clone.custom_position = self.custom_position
-        clone.position = np.array(self.position)
         clone.lattice_constants = tuple(
             np.array(constant) for constant in self.lattice_constants
         )
+        if recalculate_position:
+            vertex_positions = (
+                vertex.position for vertex in clone.vertices
+            )
+            clone._position = np.divide(
+                sum(vertex_positions),
+                len(clone.vertices)
+            )
+            self.custom_position = False
+        else:
+            clone.position = np.array(self.position)
+
+        if add_to_vertices:
+            for vertex in clone.vertices:
+                vertex.edges.append(clone)
+
         return clone
 
     def get_edge(self):
