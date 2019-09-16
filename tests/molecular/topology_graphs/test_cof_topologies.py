@@ -19,10 +19,8 @@ def _alignment(vertex, building_block, vertices, edges):
     v1 = stk.normalize_vector(fg_position - vertex.get_position())
 
     def inner(edge_id):
-        v2 = (
-            edges[edge_id].get_position(vertex, vertices) -
-            vertex.get_position()
-        )
+        edge_position = edges[edge_id].get_position(vertex, vertices)
+        v2 = edge_position - vertex.get_position()
         return v1 @ stk.normalize_vector(v2)
 
     return inner
@@ -39,12 +37,13 @@ def _test_placement(vertex, bb, vertices, edges):
         vertex.get_edge_ids(),
         key=_alignment(vertex, bb, vertices, edges)
     )
-    assert aligned == vertex.get_aligner_edge()
+    vertex_edges = list(vertex.get_edge_ids())
+    assert aligned == vertex_edges[vertex.get_aligner_edge()]
 
 
-def _angle(bb, edge, vertex):
+def _angle(bb, edge, vertex, vertices):
     edge_vector = (
-        edge.get_position(vertex) -
+        edge.get_position(vertex, vertices) -
         bb.get_centroid(bb.get_bonder_ids())
     )
 
@@ -63,18 +62,19 @@ def _test_assignment(vertex, bb, vertices, edges):
     assignments = (
         vertex.assign_func_groups_to_edges(bb, vertices, edges)
     )
-    assert assignments[0] == vertex.get_aligner_edge()
+    vertex_edges = list(vertex.get_edge_ids())
+    assert assignments[0] == vertex_edges[vertex.get_aligner_edge()]
     for edge_id in vertex.get_edge_ids():
         closest = min(
             range(len(bb.func_groups)),
-            key=_angle(bb, edges[edge_id], vertex)
+            key=_angle(bb, edges[edge_id], vertex, vertices)
         )
         assert assignments[closest] == edge_id
 
     if len(bb.func_groups) == 2:
         not_aligner = next(
             e for e in vertex.get_edge_ids()
-            if e is not vertex.get_aligner_edge()
+            if e != vertex_edges[vertex.get_aligner_edge()]
         )
         assert assignments[1] == not_aligner
 
