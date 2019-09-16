@@ -714,11 +714,14 @@ class Cage(TopologyGraph):
         if vertex_alignments is None:
             vertex_alignments = {}
 
-        vertex_data = {data: data.clone() for data in self.vertex_data}
+        vertex_data = {
+            data: data.clone(True) for data in self.vertex_data
+        }
         for vertex in vertex_data.values():
             vertex.aligner_edge = vertex_alignments.get(vertex.id, 0)
-        edge_data = (
-            edge.clone(vertex_data) for edge in self.edge_data
+        edge_data = tuple(
+            edge.clone(vertex_data)
+            for edge in self.edge_data
         )
         vertex_types = sorted(
             {len(v.edges) for v in vertex_data},
