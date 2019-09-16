@@ -60,7 +60,7 @@ def test_fitness_plateau():
     pop = stk.Population(
         *(stk.Population(*bbs[i:i+5]) for i in range(0, len(bbs), 5))
     )
-    
+
     for i, mol in enumerate(pop):
         mol.fitness = i
         mol._identity_key = i
