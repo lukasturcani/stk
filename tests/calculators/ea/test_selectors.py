@@ -90,3 +90,20 @@ def test_stochastic_universal(generation):
         use_rank=True
     )
     assert len(list(stochastic_ranked.select(generation))) == 5
+
+
+def test_tournament(generation):
+    tournament = stk.TournamentSelection(num_batches=2, batch_size=2)
+    for batch in tournament.select(generation):
+        assert len(batch) == 2
+    assert len(list(tournament.select(generation))) == 2
+    tournament_no_dupes = stk.TournamentSelection(
+        num_batches=5,
+        batch_size=1,
+        yield_duplicates=False
+    )
+    tournament_no_dupes_selected = set(
+        mol for mol in tournament_no_dupes.select(generation)
+    )
+    # Assert that no duplicate molecules are in selected.
+    assert len(tournament_no_dupes_selected) == 5
