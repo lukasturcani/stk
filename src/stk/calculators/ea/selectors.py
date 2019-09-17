@@ -773,7 +773,7 @@ class TournamentSelection(Selector):
     molecules with the highest fitness are chosen. Competitions are repeated
     untill the total number of molecules yielded is equal to the number
     of batches. If batch size is greater than 1, batches of molecules will
-    compete in each tournmant, yielding the highest fitness batch.
+    compete in each tournmant, yielding the highest fitness
 
     Examples
     --------
@@ -876,7 +876,7 @@ class TournamentSelection(Selector):
                 len(batches),
                 num_selections,
                 replace=False
-                )
+            )
             # Compare all batches, yielding the index of the batch
             # with the highest fitness.
             selected_index = batches.index(
@@ -887,7 +887,7 @@ class TournamentSelection(Selector):
             )
             # Add selected to yielded.
             self._yielded.update(batches[selected_index])
-            yield batches[selected_index]
+            yield batches[selected_index][0]
             # If duplicates are not allowed, remove the yielded
             #  batch from batches.
             if not self._yield_duplicates:
