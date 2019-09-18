@@ -764,16 +764,17 @@ class AboveAverage(Selector):
                         return
 
 
-class TournamentSelection(Selector):
+class Tournament(Selector):
     """
     Yields molecules by tournament selection.
 
-    In tournament selection, a random number of members are chosen from the
-    population which undergo competitions. In the competitions,
+    In tournament selection, a random number of members is chosen from the
+    population to undergo competitions. In the competitions,
     molecules with the highest fitness are chosen. Competitions are repeated
-    untill the total number of molecules yielded is equal to the number
+    until the total number of molecules yielded is equal to the number
     of batches. If batch size is greater than 1, batches of molecules will
-    compete in each tournmant, yielding the highest fitness
+    compete in each tournament, yielding the batch with the highest fitness.
+    This process is repeated until the number of molecules.
 
     Examples
     --------
@@ -788,10 +789,10 @@ class TournamentSelection(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        stochastic_sampling = stk.StochasticUniversalSampling()
+        tournament_selection = stk.tournament()
 
         # Select the molecules.
-        for selected, in stochastic_samplng.select(pop):
+        for selected, in tournament_selection.select(pop):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
             mutant = mutator.mutate(selected)
@@ -828,8 +829,11 @@ class TournamentSelection(Selector):
             The number of molecules yielded at once.
 
         yield_duplicates: :class:`bool` optional
-            If ``True``, the same molecule can be yielded from the selection
-            process multiple times.
+            If ``True``, the same batch can be yielded from the selection
+            process multiple times, as the batch can be selected to compete
+            in a tournament multiple times. If ``False``, the batch
+            will be removed from the batch population once it has been
+            selected.
         """
         self._yield_duplicates = yield_duplicates
         super().__init__(
@@ -879,11 +883,9 @@ class TournamentSelection(Selector):
             )
             # Compare all batches, yielding the index of the batch
             # with the highest fitness.
-            selected_index = batches.index(
-                max(
-                    (batches[index] for index in comparison_indexes),
-                    key=lambda batch: batch[-1]
-                )
+            selected_index = max(
+                    comparison_indexes,
+                    key=lambda index: batches[index][-1]
             )
             # Add selected to yielded.
             self._yielded.update(batches[selected_index])

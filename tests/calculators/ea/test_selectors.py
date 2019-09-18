@@ -93,11 +93,21 @@ def test_stochastic_universal(generation):
 
 
 def test_tournament(generation):
-    tournament = stk.TournamentSelection(num_batches=2, batch_size=2)
-    for batch in tournament.select(generation):
+    tournament = stk.Tournament(num_batches=2, batch_size=2)
+    pop_batches = tournament._batch(generation)
+    worst_batch = min(
+        pop_batches,
+        key=lambda batch: batch[-1]
+    )
+    batches = enumerate(tournament.select(generation), 1)
+    for i, batch in batches:
         assert len(batch) == 2
-    assert len(list(tournament.select(generation))) == 2
-    tournament_no_dupes = stk.TournamentSelection(
+        # Ensures the worst performing batch is never selected.
+        # This is impossible in tournament sampling.
+        assert worst_batch is not batch
+    assert i == 2
+
+    tournament_no_dupes = stk.Tournament(
         num_batches=5,
         batch_size=1,
         yield_duplicates=False
@@ -107,3 +117,20 @@ def test_tournament(generation):
     )
     # Assert that no duplicate molecules are in selected.
     assert len(tournament_no_dupes_selected) == 5
+
+    small_pop = generation[:2]
+    small_tournament = stk.Tournament(
+        num_batches=10,
+        batch_size=1,
+        yield_duplicates=True
+    )
+    small_pop_batches = tournament._batch(small_pop)
+    # Ensure that out of a choice of two, the lowest fitness
+    # is never chosen.
+    worst_mol = min(
+        small_pop_batches,
+        key=lambda mol: mol[-1]
+    )
+    for batch in small_tournament.select(small_pop):
+        assert len(batch) == 1
+        assert worst_mol not in batch
