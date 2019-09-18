@@ -502,7 +502,8 @@ class SimilarBuildingBlock(Mutator):
         if chosen_bb not in self._similar_bbs[mol]:
             self._similar_bbs[mol][chosen_bb] = iter(sorted(
                 self._building_blocks,
-                key=lambda m: dice_similarity(m, chosen_bb)
+                key=lambda m: dice_similarity(m, chosen_bb),
+                reverse=True
             ))
 
         try:
@@ -510,7 +511,8 @@ class SimilarBuildingBlock(Mutator):
         except StopIteration:
             self._similar_bbs[mol][chosen_bb] = iter(sorted(
                 self._building_blocks,
-                key=lambda m: dice_similarity(m, chosen_bb)
+                key=lambda m: dice_similarity(m, chosen_bb),
+                reverse=True
             ))
             new_bb = next(self._similar_bbs[mol][chosen_bb])
 
@@ -522,7 +524,8 @@ class SimilarBuildingBlock(Mutator):
             except StopIteration:
                 self._similar_bbs[mol][chosen_bb] = iter(sorted(
                     self._building_blocks,
-                    key=lambda m: dice_similarity(m, chosen_bb)
+                    key=lambda m: dice_similarity(m, chosen_bb),
+                    reverse=True
                 ))
                 new_bb = next(self._similar_bbs[mol][chosen_bb])
 
