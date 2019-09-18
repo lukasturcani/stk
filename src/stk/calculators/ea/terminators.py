@@ -290,7 +290,7 @@ class FitnessPlateau(Terminator):
                 )
                 # Get the top members of the generation.
                 keys = frozenset(
-                    mol._key for mol in gen[:self._top_members]
+                    mol.get_identity_key() for mol in gen[:self._top_members]
                 )
                 gens.add(keys)
             unique_gens = len(gens)
