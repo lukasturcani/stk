@@ -728,9 +728,8 @@ class XTBEnergy(EnergyCalculator):
                 stdin=sp.PIPE,
                 stdout=f,
                 stderr=sp.PIPE,
-                # Uses the shell if unlimited_memory is True to run
-                # multiple commands in one subprocess.
-                shell=self._unlimited_memory
+                # Shell is required to run complex arguments.
+                shell=True
             )
 
     def get_energy(self, mol):
