@@ -20,28 +20,39 @@ def test_random_building_block(
 
 
 def test_similar_building_block(
-    polymer,
     amine2,
     aldehyde2,
     aldehyde2_alt1,
     aldehyde2_alt2
 ):
 
+    polymer = stk.ConstructedMolecule(
+        building_blocks=[amine2, aldehyde2],
+        topology_graph=stk.polymer.Linear('AB', 3)
+    )
+
+    alts = [aldehyde2_alt1, aldehyde2_alt2]
     mutator = stk.SimilarBuildingBlock(
-        building_blocks=[aldehyde2_alt1, aldehyde2_alt2],
+        building_blocks=alts,
         duplicate_building_blocks=False,
         key=lambda mol: mol.func_groups[0].fg_type.name == 'aldehyde'
     )
     mutant = mutator.mutate(polymer)
     expected = stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde2_alt1],
+        building_blocks=[
+            amine2,
+            max(alts, key=lambda m: stk.dice_similarity(m, aldehyde2))
+        ],
         topology_graph=stk.polymer.Linear('AB', 3)
     )
     assert mutant.get_identity_key() == expected.get_identity_key()
 
     mutant = mutator.mutate(polymer)
     expected = stk.ConstructedMolecule(
-        building_blocks=[amine2, aldehyde2_alt2],
+        building_blocks=[
+            amine2,
+            min(alts, key=lambda m: stk.dice_similarity(m, aldehyde2))
+        ],
         topology_graph=stk.polymer.Linear('AB', 3)
     )
     assert mutant.get_identity_key() == expected.get_identity_key()
