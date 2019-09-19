@@ -97,7 +97,7 @@ def test_tournament(generation):
     tournament_no_dupes = stk.Tournament(
         num_batches=5,
         batch_size=1,
-        yield_duplicates=False
+        duplicate_batches=False
     )
     tournament_no_dupes_selected = set(
         mol for mol in tournament_no_dupes.select(generation)
@@ -109,14 +109,13 @@ def test_tournament(generation):
     small_tournament = stk.Tournament(
         num_batches=10,
         batch_size=1,
-        yield_duplicates=True
+        duplicate_batches=True
     )
-    small_pop_batches = tournament._batch(small_pop)
     # Ensure that out of a choice of two, the lowest fitness
     # is never chosen.
     worst_mol = min(
-        small_pop_batches,
-        key=lambda mol: mol[-1]
+        small_pop,
+        key=lambda mol: mol.fitness
     )
     for batch in small_tournament.select(small_pop):
         assert len(batch) == 1
