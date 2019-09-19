@@ -768,13 +768,14 @@ class Tournament(Selector):
     """
     Yields molecules by tournament selection.
 
-    In tournament selection, a random number of members is chosen from the
-    population to undergo competitions. In the competitions,
-    molecules with the highest fitness are chosen. Competitions are repeated
-    until the total number of molecules yielded is equal to the number
-    of batches. If batch size is greater than 1, batches of molecules will
-    compete in each tournament, yielding the batch with the highest fitness.
-    This process is repeated until the number of molecules.
+    In tournament selection, a random number of members is chosen from
+    the population undergo a competition. In each competition, a random
+    number of batches is chosen to compete and batches with the highest
+    fitness are yielded. Competitions are repeated until the total
+    number of batches yielded is equal to the number of batches.
+    If batch size is greater than 1, the compared fitness is the
+    average fitness of the batch. This process is repeated until the
+    number of yielded batches is equal to `num_batches`.
 
     Examples
     --------
@@ -789,13 +790,17 @@ class Tournament(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        tournament_selection = stk.tournament()
+        tournament_selection = stk.Tournament(
+            num_batches=5,
+            batch_size=1
+        )
 
         # Select the molecules.
         for selected, in tournament_selection.select(pop):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
             mutant = mutator.mutate(selected)
+
     """
 
     def __init__(
@@ -804,7 +809,8 @@ class Tournament(Selector):
         duplicates=True,
         use_rank=False,
         batch_size=1,
-        yield_duplicates=False
+        duplicate_batches=False,
+        random_seed=None
     ):
         """
         Initialize a :class:`TournamentSelection` instance.
@@ -828,14 +834,19 @@ class Tournament(Selector):
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
-        yield_duplicates: :class:`bool` optional
-            If ``True``, the same batch can be yielded from the selection
-            process multiple times, as the batch can be selected to compete
-            in a tournament multiple times. If ``False``, the batch
-            will be removed from the batch population once it has been
-            selected.
+        duplicate_batches: :class:`bool` optional
+            If ``True``, the same batch can be yielded from the
+            selection process multiple times, as the batch can be
+            selected to compete in a tournament multiple times.
+            If ``False``, the batch will be removed from the batch
+            population once it has been selected.
+
+        random_seed : :class:`int`, optional
+            The random seed to use.
+
         """
-        self._yield_duplicates = yield_duplicates
+        self._duplicate_batches = duplicate_batches
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(
             num_batches=num_batches,
             duplicates=duplicates,
@@ -866,16 +877,18 @@ class Tournament(Selector):
             key=lambda x: x[-1]
         )
         # Ensure duplicate molecules are not in each batch.
-        if self._duplicates:
+        if not self._duplicates:
             # Ensure batches do not contain duplicates.
             batches = list(self._no_duplicates(batches))
 
         yielded = 0
 
         while yielded < self._num_batches:
-            # Randomly select number of members to choose from population.
-            num_selections = np.random.randint(2, len(batches)+1)
-            # Get the indexes of all the batches to enter the tournament.
+            # Randomly select number of members to choose from
+            # population.
+            num_selections = self._generator.randint(2, len(batches)+1)
+            # Get the indexes of all the batches to enter the
+            # tournament.
             comparison_indexes = np.random.choice(
                 len(batches),
                 num_selections,
@@ -884,15 +897,15 @@ class Tournament(Selector):
             # Compare all batches, yielding the index of the batch
             # with the highest fitness.
             selected_index = max(
-                    comparison_indexes,
-                    key=lambda index: batches[index][-1]
+                comparison_indexes,
+                key=lambda index: batches[index][-1]
             )
             # Add selected to yielded.
             self._yielded.update(batches[selected_index])
             yield batches[selected_index][0]
-            # If duplicates are not allowed, remove the yielded
+            # If duplicate batches are not allowed, remove the yielded
             #  batch from batches.
-            if not self._yield_duplicates:
+            if not self._duplicate_batches:
                 batches.pop(selected_index)
             yielded += 1
         return
