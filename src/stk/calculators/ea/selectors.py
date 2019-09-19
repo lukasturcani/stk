@@ -95,7 +95,7 @@ class Selector:
             batch.
 
         use_rank : :class:`bool`
-            When ``True`` the fitness value of a moleucle is calculated
+            When ``True`` the fitness value of a molecule is calculated
             as ``f = 1/rank``.
 
         batch_size : :class:`int`
@@ -349,7 +349,7 @@ class SelectorSequence(Selector):
 
 class Fittest(Selector):
     """
-    Selects batches of molcules, fittest first.
+    Selects batches of molecules, fittest first.
 
     The fitness of a batch is the sum of the fitness values of the
     molecules in the batch.
@@ -567,7 +567,7 @@ class Roulette(Selector):
 
         Parameters
         ----------
-        population : :class:`.Populaion`
+        population : :class:`.Population`
             A :class:`.Population` from which batches of molecules are
             selected.
 
@@ -668,7 +668,7 @@ class AboveAverage(Selector):
             # selected is a tuple of length 2, holding the selected
             # molecules. You can do stuff with the selected molecules
             # Like apply crossover operations on them.
-            offspring = list(crosser.cross(*selectd))
+            offspring = list(crosser.cross(*selected))
 
     """
 
@@ -739,7 +739,7 @@ class AboveAverage(Selector):
         ])
 
         # Sort the batches so that highest fitness batches are
-        # yielded first. This is neccessary because if not all batches
+        # yielded first. This is necessary because if not all batches
         # will be yielded, we want the molecules to appear in the
         # batches of the highest fitness. The same is true for when
         # self.duplicates is False. If duplicates is False then we want
