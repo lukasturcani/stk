@@ -10,51 +10,60 @@ Rotaxane
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
-from .topology_graph import TopologyGraph, Vertex
+from .topology_graph import TopologyGraph, VertexData, Vertex
+
+
+class _AxleVertexData(VertexData):
+    def get_vertex(self):
+        return _AxleVertex(self)
 
 
 class _AxleVertex(Vertex):
+    def place_building_block(self, building_block, vertices, edges):
+        building_block.set_centroid(self._position)
+        return building_block.get_position_matrix()
+
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
+        return {}
+
+
+class _CycleVertexData(VertexData):
     """
-    Places the axle in a :class:`NRotaxane`.
+    Holds data for a :class:`._CycleVertex`.
 
     Attributes
     ----------
     id : :class:`int`
-        The id of the vertex. This should be its index in
+        The id of the vertex. Must match the index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
+
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
 
     """
 
-    def place_building_block(self, building_block):
-        """
-        Place `building_block` on the :class:`.Vertex`.
+    def __init__(self, x, y, z, orientation):
+        self.orientation = orientation
+        super().__init__(x, y, z)
 
-        `building_block` is placed such that its bonder-bonder
-        direction vector is either parallel or anti-parallel to the
-        polymer chain.
+    def clone(self, clear_edges=False):
+        clone = super().clone(clear_edges)
+        clone.orientation = self.orientation
+        return clone
 
-        Parameters
-        ----------
-        building_block : :class:`.Molecule`
-            The building block molecule which is to be placed on the
-            vertex.
-
-        Returns
-        -------
-        :class:`numpy.nadarray`
-            The position matrix of `building_block` after being
-            placed.
-
-        """
-
-        building_block.set_centroid(self._position)
-        return building_block.get_position_matrix()
-
-    def assign_func_groups_to_edges(self, building_block):
-        return {}
+    def get_vertex(self):
+        return _CycleVertex(self)
 
 
 class _CycleVertex(Vertex):
@@ -67,54 +76,18 @@ class _CycleVertex(Vertex):
         The id of the vertex. This should be its index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
-
     """
 
-    def __init__(self, x, y, z, orientation):
-        self._orientation = orientation
-        super().__init__(x, y, z)
+    def __init__(self, data):
+        self._orientation = data.orientation
+        super().__init__(data)
 
     def clone(self, clear_edges=False):
-        """
-        Return a clone.
-
-        Parameters
-        ----------
-        clear_edges : :class:`bool`, optional
-            If ``True`` the :attr:`edges` attribute of the clone will
-            be empty.
-
-        Returns
-        -------
-        :class:`Vertex`
-            The clone.
-
-        """
-
         clone = super().clone(clear_edges)
         clone._orientation = self._orientation
         return clone
 
-    def place_building_block(self, building_block):
-        """
-        Place `building_block` on the :class:`.Vertex`.
-
-        Parameters
-        ----------
-        building_block : :class:`.Molecule`
-            The building block molecule which is to be placed on the
-            vertex.
-
-        Returns
-        -------
-        :class:`numpy.nadarray`
-            The position matrix of `building_block` after being
-            placed.
-
-        """
-
+    def place_building_block(self, building_block, vertices, edges):
         rdkit_mol = building_block.to_rdkit_mol()
         macrocycle = max(rdkit.GetSymmSSSR(rdkit_mol), key=len)
         cycle_normal = building_block.get_plane_normal(macrocycle)
@@ -131,14 +104,18 @@ class _CycleVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         return {}
 
     def __str__(self):
-        x, y, z = self._position
         return (
             f'Vertex(id={self.id}, '
-            f'position={[x, y, z]}, '
+            f'position={self._position.tolist()}, '
             f'orientation={self._orientation})'
         )
 
@@ -258,19 +235,19 @@ class NRotaxane(TopologyGraph):
         self._orientations = orientations
         self._num_repeating_units = num_repeating_units
 
-        vertices = [_AxleVertex(0, 0, 0)]
+        vertex_data = [_AxleVertexData(0, 0, 0)]
         threads = orientations * num_repeating_units
         distance = 1 / (len(threads)+1)
         for i, orientation in enumerate(threads, 1):
-            vertices.append(
-                _CycleVertex(
+            vertex_data.append(
+                _CycleVertexData(
                     x=i*distance-0.5,
                     y=0,
                     z=0,
                     orientation=orientation
                 )
             )
-        super().__init__(tuple(vertices), (), (), num_processes)
+        super().__init__(tuple(vertex_data), (), (), num_processes)
 
     @staticmethod
     def _normalize_repeating_unit(repeating_unit):
