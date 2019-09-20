@@ -170,7 +170,7 @@ structural isomers of a single cage in one swoop
     import itertools as it
 
     edges = (
-        range(v.get_num_edges()) for v in stk.cage.FourPlusSix.vertices
+        range(len(v.edges)) for v in stk.cage.FourPlusSix.vertex_data
     )
     # Create 5184 structural isomers.
     isomers = []
@@ -179,7 +179,7 @@ structural isomers of a single cage in one swoop
             vertex_alignments={
                 vertex.id: edge
                 for vertex, edge
-                in zip(stk.cage.FourPlusSix.vertices, aligners)
+                in zip(stk.cage.FourPlusSix.vertex_data, aligners)
             }
         )
         isomer = stk.ConstructedMolecule(
