@@ -4,7 +4,7 @@ from os.path import join
 import numpy as np
 
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'host_guest_topology_tests_output'
@@ -88,7 +88,8 @@ def test_complex(
     amine2,
     amine2_alt3,
     aldehyde3,
-    chained_c60
+    chained_c60,
+    valid_host_guest_dir
 ):
 
     host = _create_host(amine2, amine2_alt3, aldehyde3)
@@ -106,3 +107,4 @@ def test_complex(
         )
         _test_construction(complex_, i, num_expected_bbs)
         _test_dump_and_load(test_dir, complex_)
+        _compare_with_valid(valid_host_guest_dir, complex_)

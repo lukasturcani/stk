@@ -4,7 +4,7 @@ from collections import namedtuple
 from os.path import join
 import numpy as np
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'cof_topology_tests_output'
@@ -172,7 +172,7 @@ def _test_construction(
     )
 
 
-def test_alignments(amine2_alt3, aldehyde4_alt1):
+def test_alignments(amine2_alt3, aldehyde4_alt1, valid_cof_dir):
     num_expected_bbs = {
         amine2_alt3: 6*9,
         aldehyde4_alt1: 3*9
@@ -211,7 +211,16 @@ def test_alignments(amine2_alt3, aldehyde4_alt1):
                 num_unreacted_fgs=num_unreacted_fgs,
                 periodic=periodic
             )
-            _test_dump_and_load(test_dir, cof)
+            _test_dump_and_load(
+                test_dir=test_dir,
+                mol=cof,
+                name=f'aligning_{i}_{i%2}{kind}'
+            )
+            _compare_with_valid(
+                test_dir=valid_cof_dir,
+                mol=cof,
+                name=f'aligning_{i}_{i%2}{kind}'
+            )
 
 
 def test_multi_bb(
@@ -220,7 +229,8 @@ def test_multi_bb(
     amine2_alt2,
     amine2_alt3,
     aldehyde4,
-    aldehyde4_alt1
+    aldehyde4_alt1,
+    valid_cof_dir
 ):
     building_blocks = [
         amine2,
@@ -278,7 +288,8 @@ def test_multi_bb(
             num_unreacted_fgs=num_unreacted_fgs,
             periodic=periodic
         )
-        _test_dump_and_load(test_dir, cof)
+        _test_dump_and_load(test_dir, cof, 'multi')
+        _compare_with_valid(valid_cof_dir, cof, 'multi')
 
 
 def test_topologies(
@@ -291,7 +302,8 @@ def test_topologies(
     tmp_square,
     tmp_periodic_square,
     tmp_linkerless_honeycomb,
-    tmp_periodic_linkerless_honeycomb
+    tmp_periodic_linkerless_honeycomb,
+    valid_cof_dir
 ):
 
     COFData = namedtuple(
@@ -338,3 +350,4 @@ def test_topologies(
             periodic=cof.periodic
         )
         _test_dump_and_load(test_dir, cof.cof)
+        _compare_with_valid(valid_cof_dir, cof.cof)

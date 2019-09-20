@@ -4,7 +4,7 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 from os.path import join
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'rotaxane_topology_tests_output'
@@ -90,7 +90,9 @@ class _RotaxaneData:
 def test_construction(
     tmp_polymer,
     tmp_macrocycle,
-    tmp_macrocycle_alt1
+    tmp_macrocycle_alt1,
+    valid_rotaxane_dir
+
 ):
     rotaxanes = (
         _RotaxaneData(
@@ -133,5 +135,7 @@ def test_construction(
     )
 
     for i, rotaxane in enumerate(rotaxanes):
+        i = str(i)
         _test_construction(test_dir, f'{i}.mol', rotaxane)
-        _test_dump_and_load(test_dir, rotaxane.rotaxane)
+        _test_dump_and_load(test_dir, rotaxane.rotaxane, i)
+        _compare_with_valid(valid_rotaxane_dir, rotaxane.rotaxane, i)

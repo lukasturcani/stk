@@ -5,7 +5,7 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'cyclic_topology_tests_output'
@@ -115,7 +115,7 @@ class _MacrocycleData:
         self.num_bonds_lost_per_join = num_bonds_lost_per_join
 
 
-def test_construction():
+def test_construction(valid_cyclic_dir):
     bb1 = stk.BuildingBlock('BrCCBr', ['bromine'])
     bb2 = stk.BuildingBlock('BrCNCBr', ['bromine'])
     macrocycles = (
@@ -143,6 +143,8 @@ def test_construction():
         )
     )
 
-    for macrocycle in macrocycles:
+    for i, macrocycle in enumerate(macrocycles):
+        i = str(i)
         _test_construction(macrocycle)
-        _test_dump_and_load(test_dir, macrocycle.macrocycle)
+        _test_dump_and_load(test_dir, macrocycle.macrocycle, i)
+        _compare_with_valid(valid_cyclic_dir, macrocycle.macrocycle, i)

@@ -4,7 +4,7 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 from os.path import join
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'linear_topology_tests_output'
@@ -129,7 +129,8 @@ def test_construction(
     boronic_acid2,
     diol2,
     tmp_bromine2,
-    tmp_bromine2_alt1
+    tmp_bromine2_alt1,
+    valid_linear_dir
 ):
     num_repeating_units = 3
 
@@ -207,5 +208,7 @@ def test_construction(
     )
 
     for i, polymer_data in enumerate(polymers):
+        i = str(i)
         _test_construction(f'{i}.mol', polymer_data)
-        _test_dump_and_load(test_dir, polymer_data.polymer)
+        _test_dump_and_load(test_dir, polymer_data.polymer, i)
+        _compare_with_valid(valid_linear_dir, polymer_data.polymer, i)
