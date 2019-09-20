@@ -102,6 +102,12 @@ class _GuestVertexData(VertexData):
         self.target = target
         super().__init__(x, y, z)
 
+    def clone(self, clear_edges=False):
+        clone = super().clone(clear_edges)
+        clone.start = np.array(self.start)
+        clone.target = np.array(self.target)
+        return clone
+
     def get_vertex(self):
         return _GuestVertex(self)
 

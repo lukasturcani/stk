@@ -10,30 +10,45 @@ import numpy as np
 import logging
 from scipy.spatial.distance import euclidean
 
-from .topology_graph import TopologyGraph, Vertex, Edge
+from .topology_graph import TopologyGraph, VertexData, Vertex, EdgeData
 
 
 logger = logging.getLogger(__name__)
 
 
-class _CycleVertex(Vertex):
+class _CycleVertexData(VertexData):
     """
-    Represents a vertex in the middle of a linear polymer chain.
+    Holds data for a :class:`.CycleVertex`.
 
     Attributes
     ----------
     id : :class:`int`
-        The id of the vertex. This should be its index in
+        The id of the vertex. Must match the index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
+
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
+
+    orientation : :class:`float`
+        Can be any number from ``0`` to ``1``, both inclusive. It
+        specifies the probability the building block placed on the
+        vertex will have its orientation along the chain flipped.
+
+    angle : :class:`float`
+        The angle along the macrocycle at which the vertex is
+        found.
 
     """
 
     def __init__(self, x, y, z, orientation, angle):
         """
-        Initialize a :class:`.LinearVertex`.
+        Initialize a :class:`._CycleVertexData`.
 
         Parameters
         ----------
@@ -57,9 +72,36 @@ class _CycleVertex(Vertex):
 
         """
 
-        self._orientation = orientation
-        self._angle = angle
+        self.orientation = orientation
+        self.angle = angle
         super().__init__(x, y, z)
+
+    def clone(self, clear_edges=False):
+        clone = super().clone(clear_edges)
+        clone.orientation = self.orientation
+        clone.angle = self.angle
+        return clone
+
+    def get_vertex(self):
+        return _CycleVertex(self)
+
+
+class _CycleVertex(Vertex):
+    """
+    Represents a vertex in the middle of a linear polymer chain.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    """
+
+    def __init__(self, data):
+        self._orientation = data.orientation
+        self._angle = data.angle
+        super().__init__(data)
 
     def clone(self, clear_edges=False):
         """
@@ -83,24 +125,7 @@ class _CycleVertex(Vertex):
         clone._angle = self._angle
         return clone
 
-    def place_building_block(self, building_block):
-        """
-        Place `building_block` on the :class:`.Vertex`.
-
-        Parameters
-        ----------
-        building_block : :class:`.Molecule`
-            The building block molecule which is to be placed on the
-            vertex.
-
-        Returns
-        -------
-        :class:`numpy.nadarray`
-            The position matrix of `building_block` after being
-            placed.
-
-        """
-
+    def place_building_block(self, building_block, vertices, edges):
         if len(building_block.func_groups) > 2:
             logger.warning(
                 'You are placing a building block which has more than '
@@ -134,41 +159,28 @@ class _CycleVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
-        """
-        Assign functional groups to edges.
-
-        Each :class:`.FunctionalGroup` of the `building_block` needs
-        to be associated with one of the :class:`.Edge` instances in
-        :attr:`edges`.
-
-        Parameters
-        ----------
-        building_block : :class:`.Molecule`
-            The building block molecule which is needs to have
-            functional groups assigned to edges.
-
-        Returns
-        -------
-        :class:`dict`
-            A mapping from the id of a functional group in
-            `building_block` to the id of the edge in :attr:`edges` it
-            is assigned to.
-
-        """
-
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         return {
-            fg_id: e.id for fg_id, e in enumerate(sorted(
-                self.edges,
-                key=lambda e: self._fg0_distance(building_block, e)
+            fg_id: edge_id for fg_id, edge_id in enumerate(sorted(
+                self._edge_ids,
+                key=lambda edge_id: self._fg0_distance(
+                    building_block=building_block,
+                    edge_id=edge_id,
+                    edges=edges
+                )
             ))
         }
 
-    def _fg0_distance(self, building_block, e):
+    def _fg0_distance(self, building_block, edge_id, edges):
         fg_position = building_block.get_centroid(
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
-        return euclidean(e.get_position(), fg_position)
+        return euclidean(edges[edge_id].get_position(), fg_position)
 
     def __str__(self):
         x, y, z = self._position
@@ -182,7 +194,7 @@ class _CycleVertex(Vertex):
 
 class Macrocycle(TopologyGraph):
     """
-    Represents macrocycle topology graphs.
+    Represents a macrocycle topology graph.
 
     The macrocycle can be represented as a linear polymer with the two
     end groups bonded to close the loop.
@@ -288,26 +300,28 @@ class Macrocycle(TopologyGraph):
         chain = orientations*num_repeating_units
         # Each monomer in the macrocycle is separated by angle_diff.
         angle_diff = (2*np.pi)/len(chain)
-        vertices = []
-        edges = []
+        vertex_data = []
+        edge_data = []
         for i, orientation in enumerate(chain):
             theta = i*angle_diff
-            v = _CycleVertex(
+            v = _CycleVertexData(
                 x=np.cos(theta),
                 y=np.sin(theta),
                 z=0,
                 orientation=orientation,
                 angle=theta
             )
-            vertices.append(v)
+            vertex_data.append(v)
 
             if i > 0:
-                edges.append(Edge(vertices[i-1], vertices[i]))
+                edge_data.append(
+                    EdgeData(vertex_data[i-1], vertex_data[i])
+                )
 
-        edges.append(Edge(vertices[0], vertices[-1]))
+        edge_data.append(EdgeData(vertex_data[0], vertex_data[-1]))
         super().__init__(
-            vertices=tuple(vertices),
-            edges=tuple(edges),
+            vertex_data=tuple(vertex_data),
+            edge_data=tuple(edge_data),
             construction_stages=(),
             num_processes=num_processes
         )
