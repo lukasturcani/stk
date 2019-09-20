@@ -12,8 +12,8 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def _test_axle_placement(vertex,  bb):
-    vertex.place_building_block(bb)
+def _test_axle_placement(vertex,  bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     assert np.allclose(
         a=vertex.get_position(),
         b=bb.get_centroid(),
@@ -26,8 +26,8 @@ def _cycle_atoms(bb):
     return max(rdkit.GetSymmSSSR(rdkit_mol), key=len)
 
 
-def _test_cycle_placement(vertex, bb):
-    vertex.place_building_block(bb)
+def _test_cycle_placement(vertex, bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     cycle_atoms = _cycle_atoms(bb)
     assert np.allclose(
         a=vertex.get_position(),
@@ -43,10 +43,12 @@ def _test_cycle_placement(vertex, bb):
 
 def test_vertex(tmp_polymer, tmp_macrocycle):
     rotaxane = stk.rotaxane.NRotaxane('A', 4)
+    vertices = rotaxane.vertices
+    edges = rotaxane.edges
     axle, *cycles = rotaxane.vertices
-    _test_axle_placement(axle, tmp_polymer)
+    _test_axle_placement(axle, tmp_polymer, vertices, edges)
     for vertex in cycles:
-        _test_cycle_placement(vertex, tmp_macrocycle)
+        _test_cycle_placement(vertex, tmp_macrocycle, vertices, edges)
 
 
 def _test_construction(test_dir, filename, rotaxane_data):
