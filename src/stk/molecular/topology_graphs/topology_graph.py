@@ -943,10 +943,18 @@ PlacementResult = namedtuple(
 )
 
 
-def _place_building_blocks(vertex, building_block):
-    vertex.place_building_block(building_block)
-    assignments = vertex.assign_func_groups_to_edges(building_block)
-    return PlacementResult(building_block, vertex, assignments)
+def _place_building_blocks(vertices, edges):
+
+    def inner(vertex, building_block):
+        vertex.place_building_block(building_block, vertices, edges)
+        assignments = vertex.assign_func_groups_to_edges(
+            building_block=building_block,
+            vertices=vertices,
+            edges=edges
+        )
+        return PlacementResult(building_block, vertex, assignments)
+
+    return inner
 
 
 class TopologyGraph:
@@ -1374,6 +1382,7 @@ class TopologyGraph:
         }
         # Use a shorter alias.
         counter = mol.building_block_counter
+        place = _place_building_blocks(vertices, edges)
         with pathos.pools.ProcessPool(self._num_processes) as pool:
             for stage in self._stages:
                 verts = []
@@ -1381,7 +1390,7 @@ class TopologyGraph:
                 for instance_vertex in stage:
                     verts.append(vertices[instance_vertex.id])
                     bbs.append(vertex_building_blocks[instance_vertex])
-                results = pool.map(_place_building_blocks, verts, bbs)
+                results = pool.map(place, verts, bbs)
 
                 for result in results:
                     result_bb = result.building_block
