@@ -33,7 +33,12 @@ class _HostVertex(Vertex):
         building_block.set_centroid(self._position)
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         return dict()
 
 

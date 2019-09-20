@@ -12,8 +12,8 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def _test_placement(vertex, bb):
-    vertex.place_building_block(bb)
+def _test_placement(vertex, bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     assert np.allclose(
         a=bb.get_centroid(),
         b=vertex.get_position(),
@@ -46,8 +46,10 @@ def test_vertex(tmp_four_plus_six, tmp_bromine2):
     )
     for complex_, target in complexes:
         v1, v2 = complex_.vertices
-        _test_placement(v1, host)
-        _test_placement(v2, guest)
+        vertices = complex_.vertices
+        edges = complex_.edges
+        _test_placement(v1, host, vertices, edges)
+        _test_placement(v2, guest, vertices, edges)
         _test_alignment(v2, guest, target)
 
 
