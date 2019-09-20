@@ -5,7 +5,7 @@ def test_reference_creation():
     v1, v2, v3 = vertices = (
         stk.VertexData(1, 2, 3),
         stk.VertexData(10, 20, 30),
-        stk.VertexDat(100, 200, 300)
+        stk.VertexData(100, 200, 300)
     )
 
     e1 = stk.EdgeData(v1, v2)
