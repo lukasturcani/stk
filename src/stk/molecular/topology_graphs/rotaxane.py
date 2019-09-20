@@ -51,9 +51,35 @@ class _CycleVertexData(VertexData):
     cell : :class:`numpy.ndarray`
         The unit cell in which the vertex is found.
 
+    orientation : :class:`float`
+        Can be any number from ``0`` to ``1``, both inclusive. It
+        specifies the probability the building block placed on the
+        vertex will have its orientation along the chain flipped.
+
     """
 
     def __init__(self, x, y, z, orientation):
+        """
+        Initialize a :Class:`._CycleVertexData` instance.
+
+        Parameters
+        ----------
+        x : :class:`float`
+            The x coordinate.
+
+        y : :class:`float`
+            The y coordinate.
+
+        z : :class:`float`
+            The z coordinate.
+
+        orientation : :class:`float`
+            Can be any number from ``0`` to ``1``, both inclusive. It
+            specifies the probability the building block placed on the
+            vertex will have its orientation along the chain flipped.
+
+        """
+
         self.orientation = orientation
         super().__init__(x, y, z)
 
