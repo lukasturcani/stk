@@ -217,7 +217,7 @@ def test_alignments(amine2_alt3, aldehyde4_alt1, valid_cof_dir):
                 name=f'aligning_{i}_{i%2}{kind}'
             )
             _compare_with_valid(
-                test_dir=valid_cof_dir,
+                valid_dir=valid_cof_dir,
                 mol=cof,
                 name=f'aligning_{i}_{i%2}{kind}'
             )
