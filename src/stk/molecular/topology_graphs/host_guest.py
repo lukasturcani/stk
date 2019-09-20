@@ -9,7 +9,12 @@ Host Guest Complex
 
 import numpy as np
 
-from .topology_graph import TopologyGraph, Vertex
+from .topology_graph import TopologyGraph, VertexData, Vertex
+
+
+class _HostVertexData(VertexData):
+    def get_vertex(self):
+        return _HostVertex(self)
 
 
 class _HostVertex(Vertex):
@@ -22,57 +27,55 @@ class _HostVertex(Vertex):
         The id of the vertex. This should be its index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
-
     """
 
-    def place_building_block(self, building_block):
-        """
-        Place `building_block` on the :class:`.Vertex`.
-
-        Parameters
-        ----------
-        building_block : :class:`.Molecule`
-            The building block molecule which is to be placed on the
-            vertex.
-
-        Returns
-        -------
-        :class:`numpy.nadarray`
-            The position matrix of `building_block` after being
-            placed.
-
-        """
-
+    def place_building_block(self, building_block, vertices, edges):
         building_block.set_centroid(self._position)
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         return dict()
 
 
-class _GuestVertex(Vertex):
+class _GuestVertexData(VertexData):
     """
-    Places the guest in a :class:`.Complex`.
+    Holds data for a :class:`_GuestVertex`.
 
     Attributes
     ----------
     id : :class:`int`
-        The id of the vertex. This should be its index in
+        The id of the vertex. Must match the index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
+
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
+
+    start : :class:`numpy.ndarray`
+        A direction vector which gets aligned with `target`.
+
+    target : :class:`numpy.ndarray`
+        A direction vector which determines the rotation applied to
+        the placed building block. A rotation such that
+        `start` is transformed into `target` is applied
+        to the placed building block.
 
     """
 
     def __init__(self, x, y, z, start, target):
         """
-        Intialize a :class:`._GuestVertex`.
+        Initialize a :class:`_GuestVertexData` instance.
 
-        Parameters
-        ----------
         Parameters
         ----------
         x : :class:`float`
@@ -95,9 +98,36 @@ class _GuestVertex(Vertex):
 
         """
 
-        self._start = np.array(start)
-        self._target = np.array(target)
+        self.start = start
+        self.target = target
         super().__init__(x, y, z)
+
+    def clone(self, clear_edges=False):
+        clone = super().clone(clear_edges)
+        clone.start = np.array(self.start)
+        clone.target = np.array(self.target)
+        return clone
+
+    def get_vertex(self):
+        return _GuestVertex(self)
+
+
+class _GuestVertex(Vertex):
+    """
+    Places the guest in a :class:`.Complex`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    """
+
+    def __init__(self, data):
+        self._start = np.array(data.start)
+        self._target = np.array(data.target)
+        super().__init__(data)
 
     def clone(self, clear_edges=False):
         """
@@ -121,24 +151,7 @@ class _GuestVertex(Vertex):
         clone._target = np.array(self._target)
         return clone
 
-    def place_building_block(self, building_block):
-        """
-        Place `building_block` on the :class:`.Vertex`.
-
-        Parameters
-        ----------
-        building_block : :class:`.Molecule`
-            The building block molecule which is to be placed on the
-            vertex.
-
-        Returns
-        -------
-        :class:`numpy.nadarray`
-            The position matrix of `building_block` after being
-            placed.
-
-        """
-
+    def place_building_block(self, building_block, vertices, edges):
         building_block.set_centroid(self._position)
         building_block.apply_rotation_between_vectors(
             start=self._start,
@@ -147,7 +160,12 @@ class _GuestVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         return dict()
 
 
@@ -267,8 +285,8 @@ class Complex(TopologyGraph):
 
         x, y, z = displacement
         vertices = (
-            _HostVertex(0, 0, 0),
-            _GuestVertex(x, y, z, start, target)
+            _HostVertexData(0, 0, 0),
+            _GuestVertexData(x, y, z, start, target)
         )
         super().__init__(vertices, (), (), num_processes)
 

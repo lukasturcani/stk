@@ -12,7 +12,7 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def _alignment(vertex, building_block):
+def _alignment(vertex, building_block, edges):
     fg_position = building_block.get_centroid(
         atom_ids=building_block.func_groups[0].get_bonder_ids()
     )
@@ -20,27 +20,38 @@ def _alignment(vertex, building_block):
         fg_position - vertex.get_position()
     )
 
-    def inner(edge):
-        edge_vector = edge.get_position() - vertex.get_position()
+    def inner(edge_id):
+        edge_vector = (
+            edges[edge_id].get_position() - vertex.get_position()
+        )
         return fg_vector @ stk.normalize_vector(edge_vector)
 
     return inner
 
 
-def _test_placement(vertex, bb):
-    vertex.place_building_block(bb)
+def _test_placement(vertex, bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     assert np.allclose(
         a=bb.get_centroid(bb.get_bonder_ids()),
         b=vertex.get_position(),
         atol=1e-8,
     )
-    aligned = max(vertex.edges, key=_alignment(vertex, bb))
-    assert aligned is vertex.aligner_edge
+    aligned = max(
+        vertex.get_edge_ids(),
+        key=_alignment(vertex, bb, edges)
+    )
+    assert aligned is vertex._edge_ids[vertex.get_aligner_edge()]
 
 
-def _test_assignment(vertex, bb):
-    assignments = vertex.assign_func_groups_to_edges(bb)
-    assert assignments[0] == vertex.aligner_edge.id
+def _test_assignment(vertex, bb, vertices, edges):
+    assignments = vertex.assign_func_groups_to_edges(
+        building_block=bb,
+        vertices=vertices,
+        edges=edges
+    )
+    assert (
+        assignments[0] == vertex._edge_ids[vertex.get_aligner_edge()]
+    )
 
 
 def test_vertex(
@@ -76,10 +87,12 @@ def test_vertex(
         5: tmp_aldehyde5
     }
     for topology_graph in topology_graphs:
+        vertices = topology_graph.vertices
+        edges = topology_graph.edges
         for vertex in topology_graph.vertices:
-            bb = building_blocks[len(vertex.edges)]
-            _test_placement(vertex, bb)
-            _test_assignment(vertex, bb)
+            bb = building_blocks[vertex.get_num_edges()]
+            _test_placement(vertex, bb, vertices, edges)
+            _test_assignment(vertex, bb, vertices, edges)
 
 
 def test_topologies(
@@ -139,11 +152,8 @@ def test_topologies(
 def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
     building_blocks = [amine2, amine2_alt3, aldehyde3, aldehyde3_alt3]
     for fg in range(3):
-        v4 = stk.cage.FourPlusSix.vertices[3]
         four_plus_six = stk.cage.FourPlusSix(
-            vertex_alignments={
-                v4: v4.edges[fg]
-            },
+            vertex_alignments={3: fg},
         )
         c = stk.ConstructedMolecule(
             building_blocks=building_blocks,
@@ -157,11 +167,8 @@ def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
         )
         c.write(join(test_dir, f'4p6_valignment_{fg}.mol'))
 
-    v10 = stk.cage.FourPlusSix.vertices[9]
     four_plus_six = stk.cage.FourPlusSix(
-        vertex_alignments={
-            v10: v10.edges[1]
-        }
+        vertex_alignments={9: 1}
     )
     c = stk.ConstructedMolecule(
         building_blocks=building_blocks,

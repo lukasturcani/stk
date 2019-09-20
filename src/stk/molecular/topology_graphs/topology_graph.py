@@ -27,24 +27,30 @@ from ..reactor import Reactor
 from ...utilities import vector_angle
 
 
-class Vertex:
+class VertexData:
     """
-    Represents a vertex in a :class:`.TopologyGraph`.
+    Holds the data used to initialize a :class:`.Vertex`.
 
     Attributes
     ----------
     id : :class:`int`
-        The id of the vertex. This should be its index in
+        The id of the vertex. Must match the index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
+
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
 
     """
 
     def __init__(self, x, y, z):
         """
-        Initialize a :class:`.Vertex`.
+        Initialize a :class:`.VertexData` instance.
 
         Parameters
         ----------
@@ -59,35 +65,116 @@ class Vertex:
 
         """
 
-        # This is set by TopologyGraph.__init__().
+        # Set by TopologyGraph.__init__.
         self.id = None
-        self._position = np.array([x, y, z], dtype=np.dtype('float64'))
+        self.position = np.array([x, y, z], dtype=np.dtype('float64'))
         self.edges = []
-        self._cell = np.array([0, 0, 0])
-        # This holds the ConstructedMolecule that the vertex is used
-        # to construct.
-        self._mol = None
+        self.cell = np.array([0, 0, 0])
 
     @classmethod
-    def init_at_center(cls, *vertices):
+    def init_at_center(cls, *vertex_data):
         """
-        Initialize at the center of `vertices`.
+        Initialize at the center of other vertices.
 
         Parameters
         ----------
-        vertices : :class:`.Vertex`
+        *vertex_data : :class:`.VertexData`
             Vertices at whose center this vertex should be initialized.
 
         Returns
         -------
-        :class:`.Vertex`
+        :class:`.VertexData`
             The vertex.
 
         """
 
-        center = sum(vertex.get_position() for vertex in vertices)
-        center /= len(vertices)
+        center = sum(vertex.position for vertex in vertex_data)
+        center /= len(vertex_data)
         return cls(*center)
+
+    def get_vertex(self):
+        """
+        Get a vertex from the data.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            A vertex initialized from the data.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method which needs to be implemented in
+            a subclass.
+
+        """
+
+        raise NotImplementedError()
+
+    def clone(self, clear_edges=False):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        clear_edges : :class:`bool`, optional
+            ``True`` if the clone should not be connected to any edges.
+
+        Returns
+        -------
+        :class:`VertexData`
+            The clone.
+
+        """
+
+        clone = self.__class__.__new__(self.__class__)
+        clone.id = self.id
+        clone.position = list(self.position)
+        clone.edges = [] if clear_edges else list(self.edges)
+        clone.cell = np.array(self.cell)
+        return clone
+
+    def __str__(self):
+        position = self.position.tolist()
+        cell_id = self.cell.tolist()
+        cell = '' if cell_id == [0, 0, 0] else f', cell={cell_id}'
+        return f'VertexData(id={self.id}, position={position}{cell})'
+
+    def __repr__(self):
+        return str(self)
+
+
+class Vertex:
+    """
+    Represents a vertex in a :class:`.TopologyGraph`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    """
+
+    def __init__(self, data):
+        """
+        Initialize a :class:`.Vertex`.
+
+        Parameters
+        ----------
+        data : :class:`.VertexData`
+            The vertex data.
+
+        """
+
+        self.id = data.id
+        self._position = np.array(data.position)
+        # Holds the ids of edges the Vertex is connected to.
+        self._edge_ids = [edge_data.id for edge_data in data.edges]
+        self._cell = np.array(data.cell)
+        # This holds the ConstructedMolecule that the vertex is used
+        # to construct.
+        self._mol = None
 
     def apply_scale(self, scale):
         """
@@ -118,8 +205,7 @@ class Vertex:
         Parameters
         ----------
         clear_edges : :class:`bool`, optional
-            If ``True`` the :attr:`edges` attribute of the clone will
-            be empty.
+            ``True`` if the clone should not be connected to any edges.
 
         Returns
         -------
@@ -132,7 +218,7 @@ class Vertex:
         clone.id = self.id
         clone._position = np.array(self._position)
         clone._cell = np.array(self._cell)
-        clone.edges = [] if clear_edges else list(self.edges)
+        clone._edge_ids = [] if clear_edges else list(self._edge_ids)
         clone._mol = self._mol
         return clone
 
@@ -149,24 +235,31 @@ class Vertex:
 
         return np.array(self._position)
 
-    def set_position(self, position):
+    def get_num_edges(self):
         """
-        Set the position of the vertex.
-
-        Parameters
-        ----------
-        :class:`numpy.ndarray`
-            The new position of the vertex.
+        Return the number of connceted edge.
 
         Returns
         -------
-        :class:`.Vertex`
-            The vertex.
+        :class:`int`
+            The number of connected edges.
 
         """
 
-        self._position = np.array(position)
-        return self
+        return len(self._edge_ids)
+
+    def get_edge_ids(self):
+        """
+        Yield the ids of connected edges.
+
+        Yields
+        ------
+        :class:`int`
+            The :class:`~.Edge.id` of a connected edge.
+
+        """
+
+        yield from self._edge_ids
 
     def get_cell(self):
         """
@@ -180,31 +273,6 @@ class Vertex:
         """
 
         return np.array(self._cell)
-
-    def set_cell(self, x, y, z):
-        """
-        Set the cell of the lattice in which the vertex is found.
-
-        Parameters
-        ----------
-        x : :class:`int`
-            The x position of the cell in the lattice.
-
-        y : :class:`int`
-            The y position of the cell in the lattice.
-
-        z : :class:`int`
-            The z position of the cell in the lattice.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        self._cell = np.array([x, y, z])
-        return self
 
     def set_contructed_molecule(self, mol):
         """
@@ -223,8 +291,9 @@ class Vertex:
         """
 
         self._mol = mol
+        return self
 
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -233,6 +302,14 @@ class Vertex:
         building_block : :class:`.Molecule`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -250,7 +327,12 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Assign functional groups to edges.
 
@@ -263,6 +345,14 @@ class Vertex:
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to edges.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -284,7 +374,9 @@ class Vertex:
     def after_assign_func_groups_to_edges(
         self,
         building_block,
-        func_groups
+        func_groups,
+        vertices,
+        edges
     ):
         """
         Perform operations after functional groups have been assigned.
@@ -306,6 +398,14 @@ class Vertex:
             The functional group clones added to the constructed
             molecule.
 
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
+
         Returns
         -------
         None : :class:`NoneType`
@@ -314,15 +414,18 @@ class Vertex:
 
         return
 
-    def _get_edge_centroid(self, edge_ids=None):
+    def _get_edge_centroid(self, centroid_edges, vertices):
         """
-        Return the centroid of the connected edges.
+        Return the centroid of `centroid_edges`.
 
         Parameters
         ----------
-        edge_ids : :class:`iterable` of :class:`int`
-            The ids of edges which are used to calculate the centroid.
-            If ``None``, then all  the edges in :attr:`edges` are used.
+        centroid_edges : :class:`iterable` of :class:`.Edge`
+            The edges which are used to calculate the centroid.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All the vertices in the topology graph. Index of each
+            vertex must be equal to its :class:`~.Vertex.id`.
 
         Returns
         -------
@@ -331,19 +434,14 @@ class Vertex:
 
         """
 
-        if edge_ids is None:
-            edge_ids = range(len(self.edges))
-
         edge_positions = []
-        for i, edge_id in enumerate(edge_ids, 1):
-            edge_positions.append(
-                self.edges[edge_id].get_position(self)
-            )
+        for i, edge in enumerate(centroid_edges, 1):
+            edge_positions.append(edge.get_position(self, vertices))
         return np.sum(edge_positions, axis=0) / i
 
-    def _get_edge_plane_normal(self, reference, edge_ids=None):
+    def _get_edge_plane_normal(self, reference, plane_edges, vertices):
         """
-        Get the normal to the plane on which the :attr:`edges` lie.
+        Get the normal to the plane on which `edges` lie.
 
         Parameters
         ----------
@@ -352,11 +450,14 @@ class Vertex:
             normal is set such that its angle with with `reference`
             is always acute.
 
-        edge_ids : :class:`iterable` of :class:`int`
-            The ids of edges which are used to calculate the plane.
+        plane_edges : :class:`iterable` of :class:`.Edge`
+            The edges which are used to calculate the plane.
             If there are more than three, a plane of best fit across
-            edges is returned. If ``None``, then all  the edges in
-            :attr:`edges` are used.
+            `edges` is returned.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All the vertices in the topology graph. Index of each
+            vertex must be equal to its :class:`~.Vertex.id`.
 
         Returns
         -------
@@ -364,30 +465,11 @@ class Vertex:
             A unit vector which describes the normal to the plane of
             the edges.
 
-        Raises
-        ------
-        :class:`ValueError`
-            If there are not at least 3 edges, which is necessary to
-            define a plane.
-
         """
 
-        if edge_ids is None:
-            edge_ids = range(len(self.edges))
-        else:
-            # The iterable is used mutliple times.
-            edge_ids = list(edge_ids)
-
-        if len(edge_ids) < 3:
-            raise ValueError(
-                'At least 3 edges are necessary to create a plane.'
-            )
-
         edge_positions = []
-        for i, edge_id in enumerate(edge_ids, 1):
-            edge_positions.append(
-                self.edges[edge_id].get_position(self)
-            )
+        for i, edge in enumerate(plane_edges, 1):
+            edge_positions.append(edge.get_position(self, vertices))
         edge_positions = np.array(edge_positions)
 
         centroid = np.sum(edge_positions, axis=0) / i
@@ -419,7 +501,7 @@ class Vertex:
         """
 
         if atom_ids is None:
-            atom_ids = range(len(self.atoms))
+            atom_ids = range(len(self._mol.atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
@@ -432,53 +514,67 @@ class Vertex:
         )
 
     def __str__(self):
-        x, y, z = self._position
-        return f'Vertex(id={self.id}, position={[x, y, z]})'
+        position = self._position.tolist()
+        cell_id = self._cell.tolist()
+        cell = '' if cell_id == [0, 0, 0] else f', cell={cell_id}'
+        return f'Vertex(id={self.id}, position={position}{cell})'
 
     def __repr__(self):
         return str(self)
 
 
-class Edge:
+class EdgeData:
     """
-    Represents an edge in a topology graph.
+    Holds data used to initialize a :class:`.Edge`.
 
     Attributes
     ----------
     id : :class:`int`
-        The id of the edge. Matches the index of the edge in
+        The id of the edge. This is equal the index of the edge in
         :attr:`.TopologyGraph.edges`.
 
-    vertices : :class:`tuple` of :class:`.Vertex`
-        The vertices which the :class:`Edge` connects.
+    vertices : :class:`list` of :class:`.VertexData`
+        The vertices connected to the edge.
 
-    periodicity : :class:`tuple` of :class:`int`
+    periodicity : :class:`numpy.ndarray`
         The periodicity of the edge. For example, if ``(0, 0, 0)``
         then the edge is not periodic. If, ``(1, 0, -1)`` then the
-        edge is periodic across the x axis in the positive direction,
-        is not periodic across the y axis and is periodic across the
-        z axis in the negative direction.
+        edge is periodic across the x axis in the positive
+        direction, is not periodic across the y axis and is
+        periodic across the z axis in the negative direction.
+
+    lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+        The a, b and c lattice constants as vectors in Cartesian
+        coordinates.
+
+    position : :class:`numpy.ndarray`
+        The position of the edge.
+
+    custom_position : :class:`bool`
+        ``True`` if the :attr:`position` of the edge was set manually.
+        ``False``if the position of the edge is the centroid of the
+        connected :attr:`vertices`.
 
     """
 
     def __init__(
         self,
-        *vertices,
+        *vertex_data,
         position=None,
         periodicity=None,
         lattice_constants=None
     ):
         """
-        Initialize an :class:`Edge`.
+        Initialize an :class:`EdgeData` instance.
 
         Parameters
         ----------
-        *vertices : :class:`.Vertex`
+        *vertex_data : :class:`.VertexData`
             The vertices which the :class:`Edge` connects.
 
         position : :class:`numpy.ndarray`, optional
             The position of the edge. If ``None``, the centroid
-            of `vertices` is used.
+            of `vertex_data` is used.
 
         periodicity : :class:`tuple` of :class:`int`, optional
             The periodicity of the edge. For example, if ``(0, 0, 0)``
@@ -491,7 +587,7 @@ class Edge:
         lattice_constants : :class:`iterable`, optional
             If the edge is periodic, the a, b and c lattice
             constants should be provided as vectors in Cartesian
-            coordiantes.
+            coordinates.
 
         """
 
@@ -500,30 +596,164 @@ class Edge:
         if lattice_constants is None:
             lattice_constants = ([0, 0, 0] for i in range(3))
 
-        self.vertices = vertices
-        # This will be set by TopologyGraph.__init__.
+        # This is set by TopologyGraph.__init__.
         self.id = None
-        self._periodicity = np.array(periodicity)
+        self.vertices = vertex_data
+        self.periodicity = np.array(periodicity)
+        self.custom_position = position is not None
+        self.position = position
+        self.lattice_constants = tuple(
+            np.array(constant) for constant in lattice_constants
+        )
+
+        _position = 0
+        for i, vertex in enumerate(vertex_data, 1):
+            vertex.edges.append(self)
+
+            if not self.custom_position:
+                _position += vertex.position
+
+        if not self.custom_position:
+            self.position = _position / i
+
+    def clone(
+        self,
+        vertex_map=None,
+        recalculate_position=False,
+        add_to_vertices=True
+    ):
+        """
+        Return a clone.
+
+        Parameters
+        ----------
+        vertex_map : :class:`dict`
+            If the clone should hold different :class:`.VertexData`
+            instances, then a :class:`dict` should be provided, which
+            maps vertex data in the current :class:`.EdgeData` to the
+            vertex data instances which should be used in the clone.
+            Only vertex data instances which need to be changed need
+            to be present in the `vertex_map`.
+
+        recalculate_position : :class:`bool`, optional
+            Toggle if the position of the clone should be recalculated
+            from the vertices it connects or if it should inherit
+            the position of the original edge.
+
+        add_to_vertices : :class:`bool`, optional
+            Toggles if the clone should be added to
+            :attr:`.VertexData.edges`.
+
+        Returns
+        -------
+        :class:`EdgeData`
+            The clone.
+
+        """
+
+        clone = self.__class__.__new__(self.__class__)
+        clone.id = self.id
+        clone.vertices = tuple(
+            vertex_map.get(v, v) for v in self.vertices
+        )
+        clone.periodicity = np.array(self.periodicity)
+        clone.custom_position = self.custom_position
+        clone.lattice_constants = tuple(
+            np.array(constant) for constant in self.lattice_constants
+        )
+        if recalculate_position:
+            vertex_positions = (
+                vertex.position for vertex in clone.vertices
+            )
+            clone.position = np.divide(
+                sum(vertex_positions),
+                len(clone.vertices)
+            )
+            self.custom_position = False
+        else:
+            clone.position = np.array(self.position)
+
+        if add_to_vertices:
+            for vertex in clone.vertices:
+                vertex.edges.append(clone)
+
+        return clone
+
+    def get_edge(self):
+        """
+        Get an :class:`.Edge` from the data.
+
+        Returns
+        -------
+        :class:`Edge`
+            The edge.
+
+        """
+
+        return Edge(self)
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        vertices = ', '.join(
+            str(vertex.id) for vertex in self.vertices
+        )
+        id_ = '' if self.id is None else f', id={self.id}'
+        if self.custom_position:
+            position = f', position={self.position!r}'
+        else:
+            position = ''
+
+        if any(i != 0 for i in self.periodicity):
+            periodicity = f', periodicity={tuple(self.periodicity)!r}'
+        else:
+            periodicity = ''
+
+        return f'EdgeData({vertices}{id_}{position}{periodicity})'
+
+
+class Edge:
+    """
+    Represents an edge in a topology graph.
+
+    Note that some methods of this class will behave differently
+    before and after :meth:`finalize` is called. Methods will switch
+    from returning :class:`.Vertex` objects to returning :class:`int`
+    objects.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the edge. Matches the index of the edge in
+        :attr:`.TopologyGraph.edges`.
+
+    """
+
+    def __init__(self, data):
+        """
+        Initialize an :class:`Edge`.
+
+        Parameters
+        ----------
+        data : :class:`.EdgeData`
+            The edge data.
+
+        """
+
+        self._vertex_ids = [vertex.id for vertex in data.vertices]
+        self.id = data.id
+        self._periodicity = np.array(data.periodicity)
         # The FunctionalGroup instances which the edge connects.
         # These will belong to the molecules placed on the vertices
         # connected by the edge.
         self._func_groups = []
 
-        self._custom_position = position is not None
-        self._position = position
+        self._custom_position = data.custom_position
+        self._position = np.array(data.position)
         self._lattice_constants = tuple(
-            np.array(constant) for constant in lattice_constants
+            np.array(constant) for constant in data.lattice_constants
         )
-
-        _position = 0
-        for i, vertex in enumerate(vertices, 1):
-            vertex.edges.append(self)
-
-            if not self._custom_position:
-                _position += vertex.get_position()
-
-        if not self._custom_position:
-            self._position = _position / i
 
     def get_periodicity(self):
         """
@@ -542,30 +772,18 @@ class Edge:
 
         return np.array(self._periodicity)
 
-    def set_periodicity(self, x, y, z):
+    def is_periodic(self):
         """
-        Set the periodicity  of the edge.
-
-        Parameters
-        ----------
-        x : :class:`int`
-            The periodicity of the edge along the x axis.
-
-        y : :class:`int`
-            The periodicity of the edge along the y axis.
-
-        z : :class:`int`
-            The periodicity of the edge along the z axis.
+        Return ``True`` if periodic.
 
         Returns
         -------
-        :class:`.Edge`
-            The edge.
+        :class:`bool`
+            ``True`` if periodic.
 
         """
 
-        self._periodicity = np.array([x, y, z])
-        return self
+        return any(i != 0 for i in self._periodicity)
 
     def apply_scale(self, scale):
         """
@@ -593,33 +811,9 @@ class Edge:
         )
         return self
 
-    def clone(
-        self,
-        vertex_map=None,
-        recalculate_position=False,
-        add_to_vertices=True
-    ):
+    def clone(self):
         """
         Return a clone.
-
-        Parameters
-        ----------
-        vertex_map : :class:`dict`, optional
-            If the clone should hold different :class:`.Vertex`
-            instances, then a :class:`dict` should be provided, which
-            maps vertices in the current :class:`.Edge` to the
-            vertices which should be used in the clone. Only
-            vertices which need to be remapped need to be present in
-            the `vertex_map`.
-
-        recalculate_position : :class:`bool`, optional
-            Toggle if the position of the clone should be reculated
-            from the vertices it connects or if it should inherit
-            the position of the original edge.
-
-        add_to_vertices : :class:`bool`, optional
-            Toggles if the clone should be added to
-            :attr:`.Vertex.edges`.
 
         Returns
         -------
@@ -627,9 +821,6 @@ class Edge:
             The clone.
 
         """
-
-        if vertex_map is None:
-            vertex_map = {}
 
         clone = self.__class__.__new__(self.__class__)
         clone.id = self.id
@@ -639,24 +830,8 @@ class Edge:
         clone._lattice_constants = tuple(
             np.array(constant) for constant in self._lattice_constants
         )
-        clone.vertices = tuple(
-            vertex_map.get(vertex, vertex) for vertex in self.vertices
-        )
-
-        if recalculate_position:
-            vertex_positions = (
-                vertex.get_position() for vertex in clone.vertices
-            )
-            clone._position = np.divide(
-                sum(vertex_positions),
-                len(clone.vertices)
-            )
-        else:
-            clone._position = np.array(self._position)
-
-        if add_to_vertices:
-            for vertex in clone.vertices:
-                vertex.edges.append(clone)
+        clone._vertex_ids = tuple(self._vertex_ids)
+        clone._position = np.array(self._position)
         return clone
 
     def get_func_groups(self):
@@ -671,6 +846,19 @@ class Edge:
         """
 
         return tuple(self._func_groups)
+
+    def get_vertex_ids(self):
+        """
+        Get the connected vertices.
+
+        Yields
+        ------
+        :class:`int`
+            The id of a connected vertex.
+
+        """
+
+        yield from self._vertex_ids
 
     def assign_func_group(self, func_group):
         """
@@ -690,16 +878,21 @@ class Edge:
 
         self._func_groups.append(func_group)
 
-    def get_position(self, vertex=None):
+    def get_position(self, reference=None, vertices=None):
         """
         Return the position.
 
         Parameters
         ----------
-        vertex : :class:`.Vertex`, optional
+        reference : :class:`.Vertex`, optional
             If the edge is periodic, the position returned will
             depend on which vertex the edge position is calculated
             relative to.
+
+        vertices : :class:`tuple` of :class:`.Vertex`, optional
+            All the vertices in the topology graph. Index of each
+            vertex must be equal to its :class:`~.Vertex.id`. Only
+            needs to be supplied if `reference` is supplied.
 
         Returns
         -------
@@ -708,42 +901,29 @@ class Edge:
 
         """
 
-        not_periodic = all(dim == 0 for dim in self._periodicity)
-        if vertex is None or not_periodic:
+        if reference is None or not self.is_periodic():
             return np.array(self._position)
 
-        other = next(v for v in self.vertices if v is not vertex)
-        direction = 1 if vertex is self.vertices[0] else -1
-        end_cell = vertex.get_cell() + direction*self._periodicity
+        other = vertices[
+            next(v for v in self._vertex_ids if v != reference.id)
+        ]
+        direction = (
+            1 if reference is vertices[self._vertex_ids[0]] else -1
+        )
+        end_cell = reference.get_cell() + direction*self._periodicity
         cell_shift = end_cell - other.get_cell()
         shift = 0
         for dim, constant in zip(cell_shift, self._lattice_constants):
             shift += dim*constant
-        return (other.get_position()+shift+vertex.get_position()) / 2
-
-    def set_position(self, position):
-        """
-        Set the position.
-
-        Parameters
-        ----------
-        position : :class:`numpy.ndarray`
-            The new position of the edge.
-
-        Returns
-        -------
-        :class:`Edge`
-            The edge.
-
-        """
-
-        self._position = np.array(position)
+        return (
+            (other.get_position()+shift+reference.get_position()) / 2
+        )
 
     def __str__(self):
         return repr(self)
 
     def __repr__(self):
-        vertices = ', '.join(str(v.id) for v in self.vertices)
+        vertices = ', '.join(str(id_) for id_ in self._vertex_ids)
         if self._custom_position:
             position = f', position={self._position!r}'
         else:
@@ -810,8 +990,8 @@ class TopologyGraph:
 
     def __init__(
         self,
-        vertices,
-        edges,
+        vertex_data,
+        edge_data,
         construction_stages,
         num_processes
     ):
@@ -820,10 +1000,10 @@ class TopologyGraph:
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`.Vertex`
+        vertices : :class:`tuple` of :class:`.VertexData`
             The vertices which make up the graph.
 
-        edges : :class:`tuple` of :class:`.Edge`
+        edges : :class:`tuple` of :class:`.EdgeData`
             The edges which make up the graph.
 
         construction_stages : :class:`tuple` of :class:`callable`
@@ -852,15 +1032,21 @@ class TopologyGraph:
 
         """
 
-        self.vertices = vertices
-        self.edges = edges
+        self._set_data_ids(vertex_data)
+        self._set_data_ids(edge_data)
+        self.vertices = tuple(
+            data.get_vertex() for data in vertex_data
+        )
+        self.edges = tuple(
+            data.get_edge() for data in edge_data
+        )
         self._construction_stages = construction_stages
         self._set_stages()
         self._num_processes = num_processes
-        for i, vertex in enumerate(self.vertices):
-            vertex.id = i
-        for i, edge in enumerate(self.edges):
-            edge.id = i
+
+    def _set_data_ids(self, data):
+        for i, data in enumerate(data):
+            data.id = i
 
     def _set_stages(self):
         self._stages = tuple(
@@ -894,7 +1080,7 @@ class TopologyGraph:
 
         scale = self._get_scale(mol)
         vertices = tuple(self._get_vertex_clones(mol, scale))
-        edges = tuple(self._get_edge_clones(vertices, scale))
+        edges = tuple(self._get_edge_clones(scale))
 
         self._prepare(mol)
         self._place_building_blocks(mol, vertices, edges)
@@ -1014,12 +1200,14 @@ class TopologyGraph:
         """
 
         for vertex in self.vertices:
-            clone = vertex.clone(clear_edges=True)
-            clone.set_contructed_molecule(mol)
-            clone.apply_scale(scale)
-            yield clone
+            yield (
+                vertex
+                .clone()
+                .set_contructed_molecule(mol)
+                .apply_scale(scale)
+            )
 
-    def _get_edge_clones(self, vertices, scale):
+    def _get_edge_clones(self, scale):
         """
         Yield clones of :attr:`edges`.
 
@@ -1028,9 +1216,6 @@ class TopologyGraph:
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`.Vertex`
-            Clones of :attr:`vertices`.
-
         scale : :class:`float` or :class:`list` of :class:`float`
             The value by which the position of each :class:`Edge` is
             scaled. Can be a single number if all axes are scaled by
@@ -1044,14 +1229,8 @@ class TopologyGraph:
 
         """
 
-        vertex_clones = {
-            original: clone
-            for original, clone in zip(self.vertices, vertices)
-        }
         for edge in self.edges:
-            clone = edge.clone(vertex_clones)
-            clone.apply_scale(scale)
-            yield clone
+            yield edge.clone().apply_scale(scale)
 
     def _before_react(self, mol, vertices, edges):
         return vertices, edges
@@ -1154,19 +1333,26 @@ class TopologyGraph:
                 original_coords = bb.get_position_matrix()
 
                 mol._position_matrix.extend(
-                    vertex.place_building_block(bb)
+                    vertex.place_building_block(bb, vertices, edges)
+                )
+                assignments = vertex.assign_func_groups_to_edges(
+                    building_block=bb,
+                    vertices=vertices,
+                    edges=edges
                 )
                 atom_map = self._assign_func_groups_to_edges(
                     mol=mol,
                     bb=bb,
                     bb_id=bb_id,
                     edges=edges,
-                    assignments=vertex.assign_func_groups_to_edges(bb)
+                    assignments=assignments
                 )
                 # Perform additional, miscellaneous operations.
                 vertex.after_assign_func_groups_to_edges(
                     building_block=bb,
-                    func_groups=mol.func_groups[-len(bb.func_groups):]
+                    func_groups=mol.func_groups[-len(bb.func_groups):],
+                    vertices=vertices,
+                    edges=edges
                 )
 
                 bb.set_position_matrix(original_coords)
@@ -1217,7 +1403,9 @@ class TopologyGraph:
                     num_fgs = len(bb.func_groups)
                     vertex.after_assign_func_groups_to_edges(
                         building_block=result_bb,
-                        func_groups=mol.func_groups[-num_fgs:]
+                        func_groups=mol.func_groups[-num_fgs:],
+                        vertices=vertices,
+                        edges=edges
                     )
                     mol.bonds.extend(
                         b.clone(atom_map) for b in bb.bonds

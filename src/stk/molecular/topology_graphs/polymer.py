@@ -9,30 +9,41 @@ Polymer
 import logging
 import numpy as np
 
-from .topology_graph import TopologyGraph, Vertex, Edge
+from .topology_graph import TopologyGraph, VertexData, Vertex, EdgeData
 
 
 logger = logging.getLogger(__name__)
 
 
-class _LinearVertex(Vertex):
+class _LinearVertexData(VertexData):
     """
-    Represents a vertex in the middle of a linear polymer chain.
+    Holds the data of a linear polymer vertex.
 
     Attributes
     ----------
     id : :class:`int`
-        The id of the vertex. This should be its index in
+        The id of the vertex. Must match the index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
+
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
+
+    orientation : :class:`float`
+        Can be any number from ``0`` to ``1``, both inclusive. It
+        specifies the probability the building block placed on the
+        vertex will have its orientation along the chain flipped.
 
     """
 
     def __init__(self, x, y, z, orientation):
         """
-        Initialize a :class:`.LinearVertex`.
+        Initialize a :class:`_LinearVertexData` instance.
 
         Parameters
         ----------
@@ -52,8 +63,43 @@ class _LinearVertex(Vertex):
 
         """
 
-        self._orientation = orientation
+        self.orientation = orientation
         super().__init__(x, y, z)
+
+    def clone(self, clear_edges=False):
+        clone = super().clone(clear_edges)
+        clone.orientation = self.orientation
+        return clone
+
+    def get_vertex(self):
+        return _LinearVertex(self)
+
+
+class _HeadVertexData(_LinearVertexData):
+    def get_vertex(self):
+        return _HeadVertex(self)
+
+
+class _TailVertexData(_LinearVertexData):
+    def get_vertex(self):
+        return _TailVertex(self)
+
+
+class _LinearVertex(Vertex):
+    """
+    Represents a vertex in the middle of a linear polymer chain.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    """
+
+    def __init__(self, data):
+        self._orientation = data.orientation
+        super().__init__(data)
 
     def clone(self, clear_edges=False):
         """
@@ -76,19 +122,23 @@ class _LinearVertex(Vertex):
         clone._orientation = self._orientation
         return clone
 
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
-        `building_block` is placed such that its bonder-bonder
-        direction vector is either parallel or anti-parallel to the
-        polymer chain.
-
         Parameters
         ----------
-        building_block : :class:`.Molecule`
+        building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -126,7 +176,12 @@ class _LinearVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Assign functional groups to edges.
 
@@ -139,6 +194,14 @@ class _LinearVertex(Vertex):
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to edges.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -157,15 +220,14 @@ class _LinearVertex(Vertex):
             )[0]
         )
         return {
-            fg1: self.edges[0].id,
-            fg2: self.edges[1].id
+            fg1: self._edge_ids[0],
+            fg2: self._edge_ids[1]
         }
 
     def __str__(self):
-        x, y, z = self._position
         return (
             f'Vertex(id={self.id}, '
-            f'position={[x, y, z]}, '
+            f'position={self._position.tolist()}, '
             f'orientation={self._orientation})'
         )
 
@@ -183,12 +245,9 @@ class _TerminalVertex(_LinearVertex):
         The id of the vertex. This should be its index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
-
     """
 
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -203,19 +262,32 @@ class _TerminalVertex(_LinearVertex):
 
         Parameters
         ----------
-        building_block : :class:`.Molecule`
+        building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
         :class:`numpy.nadarray`
             The position matrix of `building_block` after being
             placed on the :class:`.Vertex`.
+
         """
 
         if len(building_block.func_groups) != 1:
-            return super().place_building_block(building_block)
+            return super().place_building_block(
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
+            )
 
         building_block.set_centroid(
             position=self._position,
@@ -232,7 +304,12 @@ class _TerminalVertex(_LinearVertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Assign functional groups to edges.
 
@@ -245,6 +322,14 @@ class _TerminalVertex(_LinearVertex):
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to edges.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -270,10 +355,10 @@ class _TerminalVertex(_LinearVertex):
                 )[0]
             )
             fg_index = 0 if self._cap_direction == 1 else -1
-            return {fgs[fg_index]: self.edges[0].id}
+            return {fgs[fg_index]: self._edge_ids[0]}
 
         elif len(building_block.func_groups) == 1:
-            return {0: self.edges[0].id}
+            return {0: self._edge_ids[0]}
 
         else:
             raise ValueError(
@@ -288,8 +373,9 @@ class _HeadVertex(_TerminalVertex):
 
     Attributes
     ----------
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
 
     """
 
@@ -304,8 +390,9 @@ class _TailVertex(_TerminalVertex):
 
     Attributes
     ----------
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
 
     """
 
@@ -316,7 +403,7 @@ class _TailVertex(_TerminalVertex):
 
 class Linear(TopologyGraph):
     """
-    Represents linear polymer topology graphs.
+    Represents a linear polymer topology graph.
 
     Attributes
     ----------
@@ -425,23 +512,25 @@ class Linear(TopologyGraph):
         self._num_repeating_units = num_repeating_units
 
         head, *body, tail = orientations*num_repeating_units
-        vertices = [_HeadVertex(0, 0, 0, head)]
-        edges = []
+        vertex_data = [_HeadVertexData(0, 0, 0, head)]
+        edge_data = []
         for i, orientation in enumerate(body, 1):
-            v = _LinearVertex(
+            v = _LinearVertexData(
                 x=i, y=0, z=0, orientation=orientation
             )
-            vertices.append(v)
-            edges.append(Edge(vertices[i-1], vertices[i]))
+            vertex_data.append(v)
+            edge_data.append(
+                EdgeData(vertex_data[i-1], vertex_data[i])
+            )
 
-        vertices.append(
-            _TailVertex(len(vertices), 0, 0, tail)
+        vertex_data.append(
+            _TailVertexData(len(vertex_data), 0, 0, tail)
         )
-        edges.append(Edge(vertices[-2], vertices[-1]))
+        edge_data.append(EdgeData(vertex_data[-2], vertex_data[-1]))
 
         super().__init__(
-            vertices=tuple(vertices),
-            edges=tuple(edges),
+            vertex_data=tuple(vertex_data),
+            edge_data=tuple(edge_data),
             construction_stages=(),
             num_processes=num_processes
         )

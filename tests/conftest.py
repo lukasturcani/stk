@@ -66,7 +66,7 @@ def make_reactor():
             mol.topology_graph._get_vertex_clones(mol, 1)
         )
         edge_clones = tuple(
-            mol.topology_graph._get_edge_clones(vertex_clones, 1)
+            mol.topology_graph._get_edge_clones(1)
         )
         mol._edge_clones = edge_clones
 
