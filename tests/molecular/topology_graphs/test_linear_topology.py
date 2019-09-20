@@ -12,8 +12,8 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def _test_placement(vertex, bb):
-    vertex.place_building_block(bb)
+def _test_placement(vertex, bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     assert np.allclose(
         a=vertex.get_position(),
         b=bb.get_centroid(bb.get_bonder_ids()),
@@ -32,9 +32,14 @@ def _fg_distance(edge, bb):
     return inner
 
 
-def _test_assignment(vertex, bb):
-    assignments = vertex.assign_func_groups_to_edges(bb)
-    for edge in vertex.edges:
+def _test_assignment(vertex, bb, vertices, edges):
+    assignments = vertex.assign_func_groups_to_edges(
+        building_block=bb,
+        vertices=vertices,
+        edges=edges
+    )
+    for edge_id in vertex.get_edge_ids():
+        edge = edges[edge_id]
         closest = min(
             range(len(bb.func_groups)), key=_fg_distance(edge, bb)
         )
@@ -48,8 +53,18 @@ def test_vertex(tmp_amine2):
     )
 
     for vertex in chain.vertices:
-        _test_placement(vertex, tmp_amine2)
-        _test_assignment(vertex, tmp_amine2)
+        _test_placement(
+            vertex=vertex,
+            bb=tmp_amine2,
+            vertices=chain.vertices,
+            edges=chain.edges
+        )
+        _test_assignment(
+            vertex=vertex,
+            bb=tmp_amine2,
+            vertices=chain.vertices,
+            edges=chain.edges
+        )
 
 
 def _test_construction(filename, polymer_data):

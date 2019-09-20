@@ -283,7 +283,11 @@ class _TerminalVertex(_LinearVertex):
         """
 
         if len(building_block.func_groups) != 1:
-            return super().place_building_block(building_block)
+            return super().place_building_block(
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
+            )
 
         building_block.set_centroid(
             position=self._position,
