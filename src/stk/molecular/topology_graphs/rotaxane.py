@@ -296,7 +296,9 @@ class NRotaxane(TopologyGraph):
             )
 
         # Save the chosen orientations for __repr__.
-        self._orientations = tuple(int(v.flip) for v in vertex_data)
+        self._orientations = tuple(
+            int(v.flip) for v in vertex_data[1:]
+        )
 
         super().__init__(tuple(vertex_data), (), (), num_processes)
 
