@@ -84,7 +84,7 @@ def _compare_with_valid(valid_dir, mol, name=None):
         assert b1.atom1.id == b2.atom1.id
         assert b1.atom2.id == b2.atom2.id
         assert b1.order == b2.order
-        assert b1.periodicty == b2.periodicty
+        assert b1.periodicity == b2.periodicity
 
     assert np.alltrue(np.equal(
         mol.get_position_matrix(),

@@ -106,5 +106,5 @@ def test_complex(
             )
         )
         _test_construction(complex_, i, num_expected_bbs)
-        _test_dump_and_load(test_dir, complex_)
-        _compare_with_valid(valid_host_guest_dir, complex_)
+        _test_dump_and_load(test_dir, complex_, str(i))
+        _compare_with_valid(valid_host_guest_dir, complex_, str(i))

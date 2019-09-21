@@ -288,8 +288,8 @@ def test_multi_bb(
             num_unreacted_fgs=num_unreacted_fgs,
             periodic=periodic
         )
-        _test_dump_and_load(test_dir, cof, 'multi')
-        _compare_with_valid(valid_cof_dir, cof, 'multi')
+        _test_dump_and_load(test_dir, cof, f'multi{kind}')
+        _compare_with_valid(valid_cof_dir, cof, f'multi{kind}')
 
 
 def test_topologies(
@@ -349,5 +349,7 @@ def test_topologies(
             num_unreacted_fgs=num_unreacted_fgs,
             periodic=cof.periodic
         )
-        _test_dump_and_load(test_dir, cof.cof)
-        _compare_with_valid(valid_cof_dir, cof.cof)
+        periodic = '_periodic' if cof.periodic else ''
+        name = f'{cof.cof.topology_graph.__class__.__name__}{periodic}'
+        _test_dump_and_load(test_dir, cof.cof, name)
+        _compare_with_valid(valid_cof_dir, cof.cof, name)
