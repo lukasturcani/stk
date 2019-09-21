@@ -504,7 +504,7 @@ class Linear(TopologyGraph):
     .. code-block:: python
 
         # p8 and p9 are guaranteed to be the same, because chain3 and
-        # chain4 used the same random seeed.
+        # chain4 used the same random seed.
 
         chain3 = stk.polymer.Linear(
             repeating_unit='AB',
