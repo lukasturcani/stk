@@ -447,12 +447,86 @@ class Linear(TopologyGraph):
         # p1 and p2 are different ways to write the same thing.
         p1 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear('ACB', 3)
+            topology_graph=stk.polymer.Linear('ACB', 1)
         )
         p2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear((0, 2, 1), 3)
+            topology_graph=stk.polymer.Linear((0, 2, 1), 1)
         )
+
+    The `orientations` parameter allows the direction of each building
+    block along to the chain to be flipped
+
+    .. code-block:: python
+
+        bb4 = stk.BuildingBlock('NCNCCN', ['amine'])
+
+        p3 = stk.ConstructedMolecule(
+            building_blocks=[bb2, bb4],
+            topology_graph=stk.polymer.Linear(
+                repeating_unit='AB',
+                num_repeating_units=5,
+                orientations=(1, 0.5)
+            )
+        )
+
+    In the above example, ``bb1`` is guaranteed to be flipped,
+    ``bb2`` has a 50 % chance of being flipped, each time it is placed
+    on a node.
+
+    Note that whether a building block will be flipped or not
+    is decided during the initialization of :class:`.Linear`
+
+    . code-block:: python
+
+        # chain will always construct the same polymer.
+        chain = stk.polymer.Linear(
+            repeating_unit='AB',
+            num_repeating_untis=5,
+            orientations=(0.65, 0.45)
+        )
+        # p4 and p5 are guaranteed to be the same as they used the same
+        # topology graph.
+        p4 = stk.ConstructedMolecule([bb2, bb4], chain)
+        p5 = stk.ConstructedMolecule([bb2, bb4], chain)
+
+        # chain2 may lead to a different polymer than chain, despite
+        # being initialized with the same parameters.
+        chain2 = stk.polymer.Linear(
+            repeating_unit='AB',
+            num_repeating_untis=5,
+            orientations=(0.65, 0.45)
+        )
+
+        # p6 and p7 are guaranteed to be the same because they used the
+        # the same topology graph. However, they may be different to
+        # p4 and p5.
+        p6 = stk.ConstructedMolecule([bb2, bb4], chain2)
+        p7 = stk.ConstructedMolecule([bb2, bb4], chain2)
+
+    The `random_seed` parameter can be used to get reproducible results
+
+    .. code-block:: python
+
+        # p8 and p9 are guaranteed to be the same, because chain3 and
+        # chain4 used the same random seeed.
+
+        chain3 = stk.polymer.Linear(
+            repeating_unit='AB',
+            num_repeating_untis=5,
+            orientations=(0.65, 0.45),
+            random_seed=4
+        )
+        p8 = stk.ConstructedMolecule([bb2, bb4], chain3)
+
+        chain4 = stk.polymer.Linear(
+            repeating_unit='AB',
+            num_repeating_untis=5,
+            orientations=(0.65, 0.45),
+            random_seed=4
+        )
+        p9 = stk.ConstructedMolecule([bb2, bb4], chain4)
+
 
     """
 
@@ -461,6 +535,7 @@ class Linear(TopologyGraph):
         repeating_unit,
         num_repeating_units,
         orientations=None,
+        random_seed=None,
         num_processes=1
     ):
         """
@@ -481,7 +556,7 @@ class Linear(TopologyGraph):
             The number of repeating units which are used to make the
             polymer.
 
-        orientations : :class:`tuple` of :class:`float`
+        orientations : :class:`tuple` of :class:`float`, optional
             For each character in the repeating unit, a value
             between ``0`` and ``1`` (both inclusive) must be given in
             a :class:`tuple`. It indicates the probability that each
@@ -493,6 +568,9 @@ class Linear(TopologyGraph):
             a number between ``0`` and ``1`` is chosen. If ``None``
             then ``0`` is picked in all cases.
 
+        random_seed : :class:`int`, optional
+            The random seed to use when choosing random orientations.
+
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
@@ -503,6 +581,8 @@ class Linear(TopologyGraph):
             orientations = tuple(
                 0. for i in range(len(repeating_unit))
             )
+
+        self._generator = np.random.RandomState(random_seed)
 
         # Keep these for __repr__
         self._repeating_unit = self._normalize_repeating_unit(
