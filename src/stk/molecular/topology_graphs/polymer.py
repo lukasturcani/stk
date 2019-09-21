@@ -563,6 +563,11 @@ class Linear(TopologyGraph):
             a number between ``0`` and ``1`` is chosen. If ``None``
             then ``0`` is picked in all cases.
 
+            It is also possible to supply an orientation for every
+            vertex in the final topology graph. In this case, the
+            length of `orientations` must be equal to
+            ``len(repeating_unit)*num_repeating_units``.
+
         random_seed : :class:`int`, optional
             The random seed to use when choosing random orientations.
 
@@ -570,11 +575,28 @@ class Linear(TopologyGraph):
             The number of parallel processes to create during
             :meth:`construct`.
 
+        Raises
+        ------
+        :class:`ValueError`
+            If the length of `orientation` is not equal in length to
+            `repeating_unit` or to the total number of vertices.
+
         """
 
         if orientations is None:
             orientations = tuple(
                 0. for i in range(len(repeating_unit))
+            )
+
+        if len(orientations) == len(repeating_unit):
+            orientations = orientations*num_repeating_units
+
+        polymer_length = len(repeating_unit)*num_repeating_units
+        if len(orientations) != polymer_length:
+            raise ValueError(
+                'The length of orientations must match either '
+                'the length of repeating_unit or the '
+                'total number of vertices.'
             )
 
         generator = np.random.RandomState(random_seed)
@@ -585,7 +607,7 @@ class Linear(TopologyGraph):
         )
         self._num_repeating_units = num_repeating_units
 
-        head, *body, tail = orientations*num_repeating_units
+        head, *body, tail = orientations
         choices = [True, False]
         vertex_data = [
             _HeadVertexData(
