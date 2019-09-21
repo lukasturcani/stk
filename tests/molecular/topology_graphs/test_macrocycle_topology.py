@@ -5,7 +5,7 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'cyclic_topology_tests_output'
@@ -115,7 +115,7 @@ class _MacrocycleData:
         self.num_bonds_lost_per_join = num_bonds_lost_per_join
 
 
-def test_construction():
+def test_construction(valid_cyclic_dir):
     bb1 = stk.BuildingBlock('BrCCBr', ['bromine'])
     bb2 = stk.BuildingBlock('BrCNCBr', ['bromine'])
     macrocycles = (
@@ -143,6 +143,27 @@ def test_construction():
         )
     )
 
-    for macrocycle in macrocycles:
+    for i, macrocycle in enumerate(macrocycles):
+        i = str(i)
         _test_construction(macrocycle)
-        _test_dump_and_load(test_dir, macrocycle.macrocycle)
+        _test_dump_and_load(test_dir, macrocycle.macrocycle, i)
+        _compare_with_valid(valid_cyclic_dir, macrocycle.macrocycle, i)
+
+
+def test_orientations(amine2_alt3, aldehyde2):
+    cycle1 = stk.macrocycle.Macrocycle('AB', 10, (0.5, 0.5))
+    m1 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], cycle1)
+    m2 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], cycle1)
+    assert np.alltrue(np.equal(
+        m1.get_position_matrix(),
+        m2.get_position_matrix()
+    ))
+
+    cycle2 = stk.macrocycle.Macrocycle('AB', 10, (0.5, 0.5), 5)
+    cycle3 = stk.macrocycle.Macrocycle('AB', 10, (0.5, 0.5), 5)
+    m3 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], cycle2)
+    m4 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], cycle3)
+    assert np.alltrue(np.equal(
+        m3.get_position_matrix(),
+        m4.get_position_matrix()
+    ))

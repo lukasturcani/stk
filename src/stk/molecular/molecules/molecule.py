@@ -395,15 +395,15 @@ class Molecule(metaclass=_Cached):
         self.apply_displacement(origin)
         return self
 
-    def get_atom_coords(self, atom_ids=None):
+    def get_atom_positions(self, atom_ids=None):
         """
-        Yield the coordinates of atoms.
+        Yield the positions of atoms.
 
         Parameters
         ----------
         atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of the atoms whose coordinates are desired.
-            If ``None``, then the coordinates of all atoms will be
+            The ids of the atoms whose positions are desired.
+            If ``None``, then the positions of all atoms will be
             yielded.
 
         Yields
@@ -500,13 +500,13 @@ class Molecule(metaclass=_Cached):
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
         elif not isinstance(atom_ids, (list, tuple)):
-            # Iterable gets used twice, once in get_atom_coords
+            # Iterable gets used twice, once in get_atom_positions
             # and once in zip.
             atom_ids = list(atom_ids)
 
         center = 0
         total_mass = 0.
-        coords = self.get_atom_coords(atom_ids)
+        coords = self.get_atom_positions(atom_ids)
         for atom_id, coord in zip(atom_ids, coords):
             mass = self.atoms[atom_id].mass
             total_mass += mass
@@ -642,7 +642,7 @@ class Molecule(metaclass=_Cached):
         # Normal must always be acute with reference vector. This
         # ensures the normal is always the same, even if the molecule
         # is rotated.
-        atom1, atom2 = self.get_atom_coords(atom_ids[:2])
+        atom1, atom2 = self.get_atom_positions(atom_ids[:2])
         reference = atom1 - atom2
         normal = np.linalg.svd(pos - centroid)[-1][2, :]
         if (

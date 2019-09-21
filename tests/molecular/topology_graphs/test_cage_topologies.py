@@ -4,7 +4,7 @@ from os.path import join
 import numpy as np
 
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'cage_topology_tests_output'
@@ -113,7 +113,8 @@ def test_topologies(
     tmp_four_plus_six2,
     tmp_six_plus_nine,
     tmp_eight_plus_twelve,
-    tmp_twenty_plus_thirty
+    tmp_twenty_plus_thirty,
+    valid_cage_dir
 ):
     cages = (
         (tmp_six_plus_eight, 6, 8),
@@ -147,6 +148,7 @@ def test_topologies(
         }
         _test_construction(cage, num_expected_bbs)
         _test_dump_and_load(test_dir, cage)
+        _compare_with_valid(valid_cage_dir, cage)
 
 
 def test_alignments(amine2, amine2_alt3, aldehyde3, aldehyde3_alt3):
@@ -232,7 +234,8 @@ def test_multi_bb(
     amine2_alt2,
     aldehyde3,
     aldehyde3_alt1,
-    aldehyde3_alt2
+    aldehyde3_alt2,
+    valid_cage_dir
 ):
     building_blocks = [
         amine2,
@@ -266,4 +269,5 @@ def test_multi_bb(
         aldehyde3_alt2: 2
     }
     _test_construction(c, num_expected_bbs)
-    _test_dump_and_load(test_dir, c)
+    _test_dump_and_load(test_dir, c, 'multi')
+    _compare_with_valid(valid_cage_dir, c, 'multi')
