@@ -578,7 +578,7 @@ class Linear(TopologyGraph):
         Raises
         ------
         :class:`ValueError`
-            If the length of `orientation` is not equal in length to
+            If the length of `orientations` is not equal in length to
             `repeating_unit` or to the total number of vertices.
 
         """
@@ -631,7 +631,7 @@ class Linear(TopologyGraph):
                 x=len(vertex_data),
                 y=0,
                 z=0,
-                flip=generator.choice(choices, p=[head, 1-head]))
+                flip=generator.choice(choices, p=[tail, 1-tail]))
         )
 
         # Save the chosen orientations for __repr__.
