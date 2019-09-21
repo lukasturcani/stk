@@ -212,3 +212,22 @@ def test_construction(
         _test_construction(f'{i}.mol', polymer_data)
         _test_dump_and_load(test_dir, polymer_data.polymer, i)
         _compare_with_valid(valid_linear_dir, polymer_data.polymer, i)
+
+
+def test_orientations(amine2_alt3, aldehyde2):
+    chain1 = stk.polymer.Linear('AB', 10, (0.5, 0.5))
+    p1 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], chain1)
+    p2 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], chain1)
+    assert np.alltrue(np.equal(
+        p1.get_position_matrix(),
+        p2.get_position_matrix()
+    ))
+
+    chain2 = stk.polymer.Linear('AB', 10, (0.5, 0.5), 5)
+    chain3 = stk.polymer.Linear('AB', 10, (0.5, 0.5), 5)
+    p3 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], chain2)
+    p4 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], chain3)
+    assert np.alltrue(np.equal(
+        p3.get_position_matrix(),
+        p4.get_position_matrix()
+    ))
