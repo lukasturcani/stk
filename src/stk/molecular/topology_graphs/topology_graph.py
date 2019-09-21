@@ -3,19 +3,55 @@ Adding Topology Graphs
 ======================
 
 To add a new topology graph a new subclass of :class:`.TopologyGraph`
-must be added, which implements its virtual methods. Similarly,
-a new subclass of :class:`.Vertex` must also be made and its virtual
-methods implemented. When the new subclass of :class:`.TopologyGraph`
-is initialized, it must create instances of the :class:`.Vertex`
-subclass, together with :class:`.Edge` instances. Once your
-topology graph has the vertices and edges it wants, simply run
+must be added, which implements its virtual methods. Similarly, new
+subclasses of :class:`.VertexData`` and :class:`.Vertex` must also be
+made and their virtual methods implemented. When the new subclass of
+:class:`.TopologyGraph` is initialized, it must create instances of the
+:class:`.VertexData`
+subclass, together with :class:`.EdgeData` instances. Once your
+topology graph has the vertex and edge data it wants, simply run
 :meth:`.TopologyGraph.__init__` and you're done.
+
+When creating a :class:`.VertexData` subclass,
+:meth:`~.VertexData.get_vertex` needs to be implemented such that it
+return an instance of the :class:`.Vertex` subclass. If you need to
+define a new :meth:`__init__` method for either subclass, you will
+also need to implement :meth:`clone`.
 
 The subclass can also create `construction_stages` if parallel
 construction needs to be broken down into separate stages. However,
 if this is not the case, then an empty :class:`tuple` can simply be
 passed.
 
+Why is both :class:`.VertexData` and :class:`.Vertex` needed?
+-------------------------------------------------------------
+
+At first, it may appear that having both :class:`.VertexData` and
+:class:`.Vertex` is an unnecssary inconvenience, as when you create
+a new :class:`.TopologyGraph` subclass you have to subclass both of
+these classes rather than just :class:`.Vertex`. The answer is
+related to how these two classes reference other objects in the
+:class:`.TopologyGraph`.
+
+:class:`.VertexData` and :class:`.EdgeData` objects keep pointers
+to each other in the :attr:`~.VertexData.edges` and
+:attr:`~.EdgeData.vertices`. This is extremely convenient for
+defining a :class:`.TopologyGraph` because its components can directly
+reference one another. However, it poses a significant issue for
+serialization. Topology graphs are usually highly-cyclic structures
+and are therefore often not possible to serialize with off-the-shelf
+serialization tools like :mod:`pickle` or :mod:`dill`. However,
+serialization is necessary and fundamental for allowing
+parallelization of :class:`.TopologyGraph` construction. The
+vertices and edges of the graph have to be serialized and sent to
+other cores so that they can place and connect building blocks in
+parallel. As a  result, :class:`.VertexData` exists to allow a
+convenient definition of a :class:`TopologyGraph`, while
+:class:`.Vertex` exists to provide a serializable representation of it.
+:class:`.Verex` and :class:`Edge` do not reference other objects
+directly, instead they refer to them by their :attr:`.Vertex.id`,
+which is used to get an index into :attr:`.TopologyGraph.vertices`
+and :attr:`.TopologyGraph.edges`.
 
 """
 
@@ -105,7 +141,8 @@ class VertexData:
         ------
         :class:`NotImplementedError`
             This is a virtual method which needs to be implemented in
-            a subclass.
+            a subclass. The implementation should return an instance of
+            the matching :class:`.Vertex` subclass.
 
         """
 
