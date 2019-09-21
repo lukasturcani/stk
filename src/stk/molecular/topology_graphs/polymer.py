@@ -34,14 +34,13 @@ class _LinearVertexData(VertexData):
     cell : :class:`numpy.ndarray`
         The unit cell in which the vertex is found.
 
-    orientation : :class:`float`
-        Can be any number from ``0`` to ``1``, both inclusive. It
-        specifies the probability the building block placed on the
-        vertex will have its orientation along the chain flipped.
+    flip : :class:`bool`
+        If ``True`` any building block placed by the vertex will
+        have its orientation along the chain flipped.
 
     """
 
-    def __init__(self, x, y, z, orientation):
+    def __init__(self, x, y, z, flip):
         """
         Initialize a :class:`_LinearVertexData` instance.
 
@@ -56,19 +55,18 @@ class _LinearVertexData(VertexData):
         z : :class:`float`
             The z coordinate.
 
-        orientation : :class:`float`
-            Can be any number from ``0`` to ``1``, both inclusive. It
-            specifies the probability the building block placed on the
-            vertex will have its orientation along the chain flipped.
+        flip : :class:`bool`
+            If ``True`` any building block placed by the vertex will
+            have its orientation along the chain flipped.
 
         """
 
-        self.orientation = orientation
+        self.flip = flip
         super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         clone = super().clone(clear_edges)
-        clone.orientation = self.orientation
+        clone.flip = self.flip
         return clone
 
     def get_vertex(self):
@@ -98,7 +96,7 @@ class _LinearVertex(Vertex):
     """
 
     def __init__(self, data):
-        self._orientation = data.orientation
+        self._flip = data.flip
         super().__init__(data)
 
     def clone(self, clear_edges=False):
@@ -119,7 +117,7 @@ class _LinearVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone._orientation = self._orientation
+        clone._flip = self._flip
         return clone
 
     def place_building_block(self, building_block, vertices, edges):
@@ -166,12 +164,9 @@ class _LinearVertex(Vertex):
                 fg_ids=(0, 1)
             )
         )[-1]
-
-        p = [1-self._orientation, self._orientation]
-        direction = np.random.choice([1, -1], p=p)
         building_block.apply_rotation_between_vectors(
             start=bonder_vector,
-            target=[direction, 0, 0],
+            target=[-1 if self._flip else 1, 0, 0],
             origin=self._position
         )
         return building_block.get_position_matrix()
@@ -228,7 +223,7 @@ class _LinearVertex(Vertex):
         return (
             f'Vertex(id={self.id}, '
             f'position={self._position.tolist()}, '
-            f'orientation={self._orientation})'
+            f'flip={self._flip})'
         )
 
 
@@ -582,30 +577,44 @@ class Linear(TopologyGraph):
                 0. for i in range(len(repeating_unit))
             )
 
-        self._generator = np.random.RandomState(random_seed)
+        generator = np.random.RandomState(random_seed)
 
-        # Keep these for __repr__
+        # Keep these for __repr__.
         self._repeating_unit = self._normalize_repeating_unit(
             repeating_unit=repeating_unit
         )
-        self._orientations = orientations
         self._num_repeating_units = num_repeating_units
 
         head, *body, tail = orientations*num_repeating_units
-        vertex_data = [_HeadVertexData(0, 0, 0, head)]
-        edge_data = []
-        for i, orientation in enumerate(body, 1):
-            v = _LinearVertexData(
-                x=i, y=0, z=0, orientation=orientation
+        choices = [True, False]
+        vertex_data = [
+            _HeadVertexData(
+                x=0,
+                y=0,
+                z=0,
+                flip=generator.choice(choices, p=[head, 1-head])
             )
+        ]
+        edge_data = []
+        for i, p in enumerate(body, 1):
+            flip = generator.choice(choices, p=[p, 1-p])
+            v = _LinearVertexData(i, 0, 0, flip)
             vertex_data.append(v)
             edge_data.append(
                 EdgeData(vertex_data[i-1], vertex_data[i])
             )
 
         vertex_data.append(
-            _TailVertexData(len(vertex_data), 0, 0, tail)
+            _TailVertexData(
+                x=len(vertex_data),
+                y=0,
+                z=0,
+                flip=generator.choice(choices, p=[head, 1-head]))
         )
+
+        # Save the chosen orientations for __repr__.
+        self._orientations = tuple(int(v.flip) for v in vertex_data)
+
         edge_data.append(EdgeData(vertex_data[-2], vertex_data[-1]))
 
         super().__init__(
