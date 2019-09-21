@@ -51,14 +51,13 @@ class _CycleVertexData(VertexData):
     cell : :class:`numpy.ndarray`
         The unit cell in which the vertex is found.
 
-    orientation : :class:`float`
-        Can be any number from ``0`` to ``1``, both inclusive. It
-        specifies the probability the building block placed on the
-        vertex will have its orientation along the chain flipped.
+    flip : :class:`bool`
+        If ``True`` any building block placed by the vertex will
+        have its orientation along the chain flipped.
 
     """
 
-    def __init__(self, x, y, z, orientation):
+    def __init__(self, x, y, z, flip):
         """
         Initialize a :Class:`._CycleVertexData` instance.
 
@@ -73,19 +72,18 @@ class _CycleVertexData(VertexData):
         z : :class:`float`
             The z coordinate.
 
-        orientation : :class:`float`
-            Can be any number from ``0`` to ``1``, both inclusive. It
-            specifies the probability the building block placed on the
-            vertex will have its orientation along the chain flipped.
+        flip : :class:`bool`
+            If ``True`` any building block placed by the vertex will
+            have its orientation along the chain flipped.
 
         """
 
-        self.orientation = orientation
+        self.flip = flip
         super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         clone = super().clone(clear_edges)
-        clone.orientation = self.orientation
+        clone.flip = self.flip
         return clone
 
     def get_vertex(self):
@@ -105,12 +103,12 @@ class _CycleVertex(Vertex):
     """
 
     def __init__(self, data):
-        self._orientation = data.orientation
+        self._flip = data.flip
         super().__init__(data)
 
     def clone(self, clear_edges=False):
         clone = super().clone(clear_edges)
-        clone._orientation = self._orientation
+        clone._flip = self._flip
         return clone
 
     def place_building_block(self, building_block, vertices, edges):
@@ -121,11 +119,9 @@ class _CycleVertex(Vertex):
             position=self._position,
             atom_ids=macrocycle
         )
-        p = [1-self._orientation, self._orientation]
-        direction = np.random.choice([1, -1], p=p)
         building_block.apply_rotation_between_vectors(
             start=cycle_normal,
-            target=[direction, 0, 0],
+            target=[-1 if self._flip else 1, 0, 0],
             origin=self._position
         )
         return building_block.get_position_matrix()
@@ -142,7 +138,7 @@ class _CycleVertex(Vertex):
         return (
             f'Vertex(id={self.id}, '
             f'position={self._position.tolist()}, '
-            f'orientation={self._orientation})'
+            f'flip={self._flip})'
         )
 
 
@@ -206,6 +202,10 @@ class NRotaxane(TopologyGraph):
             topology_graph=stk.rotaxane.NRotaxane((1, 3, 2), 3)
         )
 
+    :class:`.NRotaxane` shares many parameters with :class:`.Linear`,
+    and the examples described there are also valid for this class.
+    Be sure to read them.
+
     """
 
     def __init__(
@@ -213,6 +213,7 @@ class NRotaxane(TopologyGraph):
         repeating_unit,
         num_repeating_units,
         orientations=None,
+        random_seed=None,
         num_processes=1
     ):
         """
@@ -244,6 +245,14 @@ class NRotaxane(TopologyGraph):
             if a number between ``0`` and ``1`` is chosen. If
             ``None`` then defaults to ``0`` in every case.
 
+            It is also possible to supply an orientation for every
+            cycle vertex in the final topology graph. In this case, the
+            length of `orientations` must be equal to
+            ``len(repeating_unit)*num_repeating_units``.
+
+        random_seed : :class:`int`, optional
+            The random seed to use when choosing random orientations.
+
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
@@ -255,24 +264,40 @@ class NRotaxane(TopologyGraph):
                 0. for i in range(len(repeating_unit))
             )
 
+        if len(orientations) == len(repeating_unit):
+            orientations = orientations*num_repeating_units
+
+        chain_length = len(repeating_unit)*num_repeating_units
+        if len(orientations) != chain_length:
+            raise ValueError(
+                'The length of orientations must match either '
+                'the length of repeating_unit or the '
+                'total number of vertices.'
+            )
+
+        generator = np.random.RandomState(random_seed)
+
         self._repeating_unit = self._normalize_repeating_unit(
             repeating_unit=repeating_unit
         )
-        self._orientations = orientations
         self._num_repeating_units = num_repeating_units
 
         vertex_data = [_AxleVertexData(0, 0, 0)]
-        threads = orientations * num_repeating_units
-        distance = 1 / (len(threads)+1)
-        for i, orientation in enumerate(threads, 1):
+        distance = 1 / (chain_length+1)
+        choices = [True, False]
+        for i, p in enumerate(orientations, 1):
             vertex_data.append(
                 _CycleVertexData(
                     x=i*distance-0.5,
                     y=0,
                     z=0,
-                    orientation=orientation
+                    flip=generator.choice(choices, p=[p, 1-p])
                 )
             )
+
+        # Save the chosen orientations for __repr__.
+        self._orientations = tuple(int(v.flip) for v in vertex_data)
+
         super().__init__(tuple(vertex_data), (), (), num_processes)
 
     @staticmethod
