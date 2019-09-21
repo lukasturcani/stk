@@ -14,12 +14,13 @@ topology graph has the vertex and edge data it wants, simply run
 
 When creating a :class:`.VertexData` subclass,
 :meth:`~.VertexData.get_vertex` needs to be implemented such that it
-return an instance of the :class:`.Vertex` subclass. If you need to
+returns an instance of your :class:`.Vertex` subclass. If you need to
 define a new :meth:`__init__` method for either subclass, you will
-also need to implement :meth:`clone`.
+also need to implement :meth:`clone` for it.
 
-The subclass can also create `construction_stages` if parallel
-construction needs to be broken down into separate stages. However,
+The :class:`.TopologyGraph` subclass can also create
+`construction_stages` if parallel construction needs to be broken down
+into separate stages. However,
 if this is not the case, then an empty :class:`tuple` can simply be
 passed.
 
@@ -37,7 +38,7 @@ related to how these two classes reference other objects in the
 to each other in the :attr:`~.VertexData.edges` and
 :attr:`~.EdgeData.vertices`. This is extremely convenient for
 defining a :class:`.TopologyGraph` because its components can directly
-reference one another. However, it poses a significant issue for
+reference each other. However, it poses a significant issue for
 serialization. Topology graphs are usually highly-cyclic structures
 and are therefore often not possible to serialize with off-the-shelf
 serialization tools like :mod:`pickle` or :mod:`dill`. However,
@@ -52,6 +53,9 @@ convenient definition of a :class:`TopologyGraph`, while
 directly, instead they refer to them by their :attr:`.Vertex.id`,
 which is used to get an index into :attr:`.TopologyGraph.vertices`
 and :attr:`.TopologyGraph.edges`.
+
+:meth:`.VertexData.get_vertex` is used to convert :class:`.VertexData`
+into its :class:`.Vertex` counterpart.
 
 """
 
