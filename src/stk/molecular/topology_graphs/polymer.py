@@ -472,7 +472,7 @@ class Linear(TopologyGraph):
     Note that whether a building block will be flipped or not
     is decided during the initialization of :class:`.Linear`
 
-    . code-block:: python
+    .. code-block:: python
 
         # chain will always construct the same polymer.
         chain = stk.polymer.Linear(
