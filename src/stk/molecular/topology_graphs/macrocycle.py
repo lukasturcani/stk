@@ -35,10 +35,9 @@ class _CycleVertexData(VertexData):
     cell : :class:`numpy.ndarray`
         The unit cell in which the vertex is found.
 
-    orientation : :class:`float`
-        Can be any number from ``0`` to ``1``, both inclusive. It
-        specifies the probability the building block placed on the
-        vertex will have its orientation along the chain flipped.
+    flip : :class:`bool`
+        If ``True`` any building block placed by the vertex will
+        have its orientation along the chain flipped.
 
     angle : :class:`float`
         The angle along the macrocycle at which the vertex is
@@ -46,7 +45,7 @@ class _CycleVertexData(VertexData):
 
     """
 
-    def __init__(self, x, y, z, orientation, angle):
+    def __init__(self, x, y, z, flip, angle):
         """
         Initialize a :class:`._CycleVertexData`.
 
@@ -61,10 +60,9 @@ class _CycleVertexData(VertexData):
         z : :class:`float`
             The z coordinate.
 
-        orientation : :class:`float`
-            Can be any number from ``0`` to ``1``, both inclusive. It
-            specifies the probability the building block placed on the
-            vertex will have its orientation along the chain flipped.
+    flip : :class:`bool`
+        If ``True`` any building block placed by the vertex will
+        have its orientation along the chain flipped.
 
         angle : :class:`float`
             The angle along the macrocycle at which the vertex is
@@ -72,13 +70,13 @@ class _CycleVertexData(VertexData):
 
         """
 
-        self.orientation = orientation
+        self.flip = flip
         self.angle = angle
         super().__init__(x, y, z)
 
     def clone(self, clear_edges=False):
         clone = super().clone(clear_edges)
-        clone.orientation = self.orientation
+        clone.flip = self.flip
         clone.angle = self.angle
         return clone
 
@@ -99,7 +97,7 @@ class _CycleVertex(Vertex):
     """
 
     def __init__(self, data):
-        self._orientation = data.orientation
+        self._flip = data.flip
         self._angle = data.angle
         super().__init__(data)
 
@@ -121,7 +119,7 @@ class _CycleVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone._orientation = self._orientation
+        clone._flip = self._flip
         clone._angle = self._angle
         return clone
 
@@ -144,12 +142,9 @@ class _CycleVertex(Vertex):
                 fg_ids=(0, 1)
             )
         )[-1]
-
-        p = [1-self._orientation, self._orientation]
-        direction = np.random.choice([1, -1], p=p)
         building_block.apply_rotation_between_vectors(
             start=bonder_vector,
-            target=[direction, 0, 0],
+            target=[-1 if self._flip else 1, 0, 0],
             origin=self._position
         )
         building_block.apply_rotation_about_axis(
@@ -183,11 +178,10 @@ class _CycleVertex(Vertex):
         return euclidean(edges[edge_id].get_position(), fg_position)
 
     def __str__(self):
-        x, y, z = self._position
         return (
             f'Vertex(id={self.id}, '
-            f'position={[x, y, z]}, '
-            f'orientation={self._orientation}, '
+            f'position={self._position.tolist()}, '
+            f'flip={self._flip}, '
             f'angle={self._angle})'
         )
 
@@ -240,6 +234,10 @@ class Macrocycle(TopologyGraph):
             topology_graph=stk.macrocycle.Macrocycle((0, 2, 1), 3)
         )
 
+    :class:`.Macrocycle` shares many parameters with :class:`.Linear`,
+    and the examples described there are also valid for this class.
+    Be sure to read them.
+
     """
 
     def __init__(
@@ -247,6 +245,7 @@ class Macrocycle(TopologyGraph):
         repeating_unit,
         num_repeating_units,
         orientations=None,
+        random_seed=None,
         num_processes=1
     ):
         """
@@ -279,6 +278,14 @@ class Macrocycle(TopologyGraph):
             a number between ``0`` and ``1`` is chosen. If ``None``
             then ``0`` is picked in every case.
 
+            It is also possible to supply an orientation for every
+            vertex in the final topology graph. In this case, the
+            length of `orientations` must be equal to
+            ``len(repeating_unit)*num_repeating_units``.
+
+        random_seed : :class:`int`, optional
+            The random seed to use when choosing random orientations.
+
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
@@ -290,25 +297,37 @@ class Macrocycle(TopologyGraph):
                 0. for i in range(len(repeating_unit))
             )
 
-        # Keep these for __repr__
+        if len(orientations) == len(repeating_unit):
+            orientations = orientations*num_repeating_units
+
+        chain_length = len(repeating_unit)*num_repeating_units
+        if len(orientations) != chain_length:
+            raise ValueError(
+                'The length of orientations must match either '
+                'the length of repeating_unit or the '
+                'total number of vertices.'
+            )
+
+        generator = np.random.RandomState(random_seed)
+
+        # Keep these for __repr__.
         self._repeating_unit = self._normalize_repeating_unit(
             repeating_unit=repeating_unit
         )
-        self._orientations = orientations
         self._num_repeating_units = num_repeating_units
 
-        chain = orientations*num_repeating_units
         # Each monomer in the macrocycle is separated by angle_diff.
-        angle_diff = (2*np.pi)/len(chain)
+        angle_diff = (2*np.pi)/chain_length
         vertex_data = []
         edge_data = []
-        for i, orientation in enumerate(chain):
+        choices = [True, False]
+        for i, p in enumerate(orientations):
             theta = i*angle_diff
             v = _CycleVertexData(
                 x=np.cos(theta),
                 y=np.sin(theta),
                 z=0,
-                orientation=orientation,
+                flip=generator.choice(choices, p=[p, 1-p]),
                 angle=theta
             )
             vertex_data.append(v)
@@ -317,6 +336,9 @@ class Macrocycle(TopologyGraph):
                 edge_data.append(
                     EdgeData(vertex_data[i-1], vertex_data[i])
                 )
+
+        # Save the chosen orientations for __repr__.
+        self._orientations = tuple(int(v.flip) for v in vertex_data)
 
         edge_data.append(EdgeData(vertex_data[0], vertex_data[-1]))
         super().__init__(
