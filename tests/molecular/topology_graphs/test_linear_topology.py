@@ -4,7 +4,7 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 from os.path import join
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'linear_topology_tests_output'
@@ -12,8 +12,8 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def _test_placement(vertex, bb):
-    vertex.place_building_block(bb)
+def _test_placement(vertex, bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     assert np.allclose(
         a=vertex.get_position(),
         b=bb.get_centroid(bb.get_bonder_ids()),
@@ -32,9 +32,14 @@ def _fg_distance(edge, bb):
     return inner
 
 
-def _test_assignment(vertex, bb):
-    assignments = vertex.assign_func_groups_to_edges(bb)
-    for edge in vertex.edges:
+def _test_assignment(vertex, bb, vertices, edges):
+    assignments = vertex.assign_func_groups_to_edges(
+        building_block=bb,
+        vertices=vertices,
+        edges=edges
+    )
+    for edge_id in vertex.get_edge_ids():
+        edge = edges[edge_id]
         closest = min(
             range(len(bb.func_groups)), key=_fg_distance(edge, bb)
         )
@@ -48,8 +53,18 @@ def test_vertex(tmp_amine2):
     )
 
     for vertex in chain.vertices:
-        _test_placement(vertex, tmp_amine2)
-        _test_assignment(vertex, tmp_amine2)
+        _test_placement(
+            vertex=vertex,
+            bb=tmp_amine2,
+            vertices=chain.vertices,
+            edges=chain.edges
+        )
+        _test_assignment(
+            vertex=vertex,
+            bb=tmp_amine2,
+            vertices=chain.vertices,
+            edges=chain.edges
+        )
 
 
 def _test_construction(filename, polymer_data):
@@ -114,7 +129,8 @@ def test_construction(
     boronic_acid2,
     diol2,
     tmp_bromine2,
-    tmp_bromine2_alt1
+    tmp_bromine2_alt1,
+    valid_linear_dir
 ):
     num_repeating_units = 3
 
@@ -192,5 +208,26 @@ def test_construction(
     )
 
     for i, polymer_data in enumerate(polymers):
+        i = str(i)
         _test_construction(f'{i}.mol', polymer_data)
-        _test_dump_and_load(test_dir, polymer_data.polymer)
+        _test_dump_and_load(test_dir, polymer_data.polymer, i)
+        _compare_with_valid(valid_linear_dir, polymer_data.polymer, i)
+
+
+def test_orientations(amine2_alt3, aldehyde2):
+    chain1 = stk.polymer.Linear('AB', 10, (0.5, 0.5))
+    p1 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], chain1)
+    p2 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], chain1)
+    assert np.alltrue(np.equal(
+        p1.get_position_matrix(),
+        p2.get_position_matrix()
+    ))
+
+    chain2 = stk.polymer.Linear('AB', 10, (0.5, 0.5), 5)
+    chain3 = stk.polymer.Linear('AB', 10, (0.5, 0.5), 5)
+    p3 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], chain2)
+    p4 = stk.ConstructedMolecule([amine2_alt3, aldehyde2], chain3)
+    assert np.alltrue(np.equal(
+        p3.get_position_matrix(),
+        p4.get_position_matrix()
+    ))

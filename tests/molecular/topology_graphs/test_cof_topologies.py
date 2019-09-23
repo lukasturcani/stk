@@ -4,7 +4,7 @@ from collections import namedtuple
 from os.path import join
 import numpy as np
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'cof_topology_tests_output'
@@ -12,33 +12,38 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def _alignment(vertex, building_block):
+def _alignment(vertex, building_block, vertices, edges):
     fg_position = building_block.get_centroid(
         atom_ids=building_block.func_groups[0].get_bonder_ids()
     )
     v1 = stk.normalize_vector(fg_position - vertex.get_position())
 
-    def inner(edge):
-        v2 = edge.get_position(vertex) - vertex.get_position()
+    def inner(edge_id):
+        edge_position = edges[edge_id].get_position(vertex, vertices)
+        v2 = edge_position - vertex.get_position()
         return v1 @ stk.normalize_vector(v2)
 
     return inner
 
 
-def _test_placement(vertex, bb):
-    vertex.place_building_block(bb)
+def _test_placement(vertex, bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     assert np.allclose(
         a=bb.get_centroid(bb.get_bonder_ids()),
         b=vertex.get_position(),
         atol=1e-8
     )
-    aligned = max(vertex.edges, key=_alignment(vertex, bb))
-    assert aligned is vertex.aligner_edge
+    aligned = max(
+        vertex.get_edge_ids(),
+        key=_alignment(vertex, bb, vertices, edges)
+    )
+    vertex_edges = list(vertex.get_edge_ids())
+    assert aligned == vertex_edges[vertex.get_aligner_edge()]
 
 
-def _angle(bb, edge, vertex):
+def _angle(bb, edge, vertex, vertices):
     edge_vector = (
-        edge.get_position(vertex) -
+        edge.get_position(vertex, vertices) -
         bb.get_centroid(bb.get_bonder_ids())
     )
 
@@ -53,21 +58,25 @@ def _angle(bb, edge, vertex):
     return inner
 
 
-def _test_assignment(vertex, bb):
-    assignments = vertex.assign_func_groups_to_edges(bb)
-    assert assignments[0] == vertex.aligner_edge.id
-    for edge in vertex.edges:
+def _test_assignment(vertex, bb, vertices, edges):
+    assignments = (
+        vertex.assign_func_groups_to_edges(bb, vertices, edges)
+    )
+    vertex_edges = list(vertex.get_edge_ids())
+    assert assignments[0] == vertex_edges[vertex.get_aligner_edge()]
+    for edge_id in vertex.get_edge_ids():
         closest = min(
             range(len(bb.func_groups)),
-            key=_angle(bb, edge, vertex)
+            key=_angle(bb, edges[edge_id], vertex, vertices)
         )
-        assert assignments[closest] == edge.id
+        assert assignments[closest] == edge_id
 
     if len(bb.func_groups) == 2:
         not_aligner = next(
-            e for e in vertex.edges if e is not vertex.aligner_edge
+            e for e in vertex.get_edge_ids()
+            if e != vertex_edges[vertex.get_aligner_edge()]
         )
-        assert assignments[1] == not_aligner.id
+        assert assignments[1] == not_aligner
 
 
 def test_vertex(
@@ -90,10 +99,13 @@ def test_vertex(
         6: tmp_aldehyde6
     }
     for topology_graph in topology_graphs:
+        vertices = topology_graph.vertices
+        edges = topology_graph.edges
+
         for vertex in topology_graph.vertices:
-            bb = building_blocks[len(vertex.edges)]
-            _test_placement(vertex, bb)
-            _test_assignment(vertex, bb)
+            bb = building_blocks[vertex.get_num_edges()]
+            _test_placement(vertex, bb, vertices, edges)
+            _test_assignment(vertex, bb, vertices, edges)
 
 
 def _test_construction(
@@ -160,7 +172,7 @@ def _test_construction(
     )
 
 
-def test_alignments(amine2_alt3, aldehyde4_alt1):
+def test_alignments(amine2_alt3, aldehyde4_alt1, valid_cof_dir):
     num_expected_bbs = {
         amine2_alt3: 6*9,
         aldehyde4_alt1: 3*9
@@ -173,8 +185,6 @@ def test_alignments(amine2_alt3, aldehyde4_alt1):
         amine2_alt3: 11,
         aldehyde4_alt1: 11
     }
-    v0 = stk.cof.Kagome.vertices[0]
-    vlast = stk.cof.Kagome.vertices[-1]
     for i in range(4):
         for periodic in (True, False):
             cof = stk.ConstructedMolecule(
@@ -182,8 +192,8 @@ def test_alignments(amine2_alt3, aldehyde4_alt1):
                 topology_graph=stk.cof.Kagome(
                     lattice_size=(3, 3, 1),
                     vertex_alignments={
-                        v0: v0.edges[i],
-                        vlast: vlast.edges[i % 2]
+                        0: i,
+                        len(stk.cof.Kagome.vertex_data)-1: i % 2
                     },
                     periodic=periodic
                 )
@@ -201,7 +211,16 @@ def test_alignments(amine2_alt3, aldehyde4_alt1):
                 num_unreacted_fgs=num_unreacted_fgs,
                 periodic=periodic
             )
-            _test_dump_and_load(test_dir, cof)
+            _test_dump_and_load(
+                test_dir=test_dir,
+                mol=cof,
+                name=f'aligning_{i}_{i%2}{kind}'
+            )
+            _compare_with_valid(
+                valid_dir=valid_cof_dir,
+                mol=cof,
+                name=f'aligning_{i}_{i%2}{kind}'
+            )
 
 
 def test_multi_bb(
@@ -210,7 +229,8 @@ def test_multi_bb(
     amine2_alt2,
     amine2_alt3,
     aldehyde4,
-    aldehyde4_alt1
+    aldehyde4_alt1,
+    valid_cof_dir
 ):
     building_blocks = [
         amine2,
@@ -231,8 +251,12 @@ def test_multi_bb(
     }
     for periodic in (True, False):
         kagome = stk.cof.Kagome((3, 3, 1), periodic)
-        di_verts = [v for v in kagome.vertices if len(v.edges) == 2]
-        tetra_verts = [v for v in kagome.vertices if len(v.edges) == 4]
+        di_verts = [
+            v for v in kagome.vertices if v.get_num_edges() == 2
+        ]
+        tetra_verts = [
+            v for v in kagome.vertices if v.get_num_edges() == 4
+        ]
         cof = stk.ConstructedMolecule(
             building_blocks=building_blocks,
             topology_graph=kagome,
@@ -264,7 +288,8 @@ def test_multi_bb(
             num_unreacted_fgs=num_unreacted_fgs,
             periodic=periodic
         )
-        _test_dump_and_load(test_dir, cof)
+        _test_dump_and_load(test_dir, cof, f'multi{kind}')
+        _compare_with_valid(valid_cof_dir, cof, f'multi{kind}')
 
 
 def test_topologies(
@@ -277,7 +302,8 @@ def test_topologies(
     tmp_square,
     tmp_periodic_square,
     tmp_linkerless_honeycomb,
-    tmp_periodic_linkerless_honeycomb
+    tmp_periodic_linkerless_honeycomb,
+    valid_cof_dir
 ):
 
     COFData = namedtuple(
@@ -323,4 +349,7 @@ def test_topologies(
             num_unreacted_fgs=num_unreacted_fgs,
             periodic=cof.periodic
         )
-        _test_dump_and_load(test_dir, cof.cof)
+        periodic = '_periodic' if cof.periodic else ''
+        name = f'{cof.cof.topology_graph.__class__.__name__}{periodic}'
+        _test_dump_and_load(test_dir, cof.cof, name)
+        _compare_with_valid(valid_cof_dir, cof.cof, name)

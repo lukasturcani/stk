@@ -93,12 +93,12 @@ def test_apply_rotation_to_minimize_angle(tmp_amine2):
     )
 
 
-def test_get_atom_coords(tmp_amine2):
+def test_get_atom_positions(tmp_amine2):
     num_atoms = len(tmp_amine2.atoms)
     new_coords = np.array([[i]*3 for i in range(num_atoms)])
     tmp_amine2.set_position_matrix(new_coords)
 
-    for i, atom_coords in enumerate(tmp_amine2.get_atom_coords()):
+    for i, atom_coords in enumerate(tmp_amine2.get_atom_positions()):
         assert all(atom_coords == [i, i, i])
 
     tmp_amine2.set_position_matrix(new_coords*10)
@@ -108,7 +108,7 @@ def test_get_atom_coords(tmp_amine2):
     for atom_ids in all_atom_ids:
         coords = zip(
             (0, 2, 4),
-            tmp_amine2.get_atom_coords(atom_ids=atom_ids)
+            tmp_amine2.get_atom_positions(atom_ids=atom_ids)
         )
         for i, (atom_id, atom_coords) in enumerate(coords, 1):
             assert all(atom_coords == [atom_id*10]*3)

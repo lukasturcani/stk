@@ -4,7 +4,7 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 from os.path import join
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'rotaxane_topology_tests_output'
@@ -12,8 +12,8 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def _test_axle_placement(vertex,  bb):
-    vertex.place_building_block(bb)
+def _test_axle_placement(vertex,  bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     assert np.allclose(
         a=vertex.get_position(),
         b=bb.get_centroid(),
@@ -26,8 +26,8 @@ def _cycle_atoms(bb):
     return max(rdkit.GetSymmSSSR(rdkit_mol), key=len)
 
 
-def _test_cycle_placement(vertex, bb):
-    vertex.place_building_block(bb)
+def _test_cycle_placement(vertex, bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     cycle_atoms = _cycle_atoms(bb)
     assert np.allclose(
         a=vertex.get_position(),
@@ -43,10 +43,12 @@ def _test_cycle_placement(vertex, bb):
 
 def test_vertex(tmp_polymer, tmp_macrocycle):
     rotaxane = stk.rotaxane.NRotaxane('A', 4)
+    vertices = rotaxane.vertices
+    edges = rotaxane.edges
     axle, *cycles = rotaxane.vertices
-    _test_axle_placement(axle, tmp_polymer)
+    _test_axle_placement(axle, tmp_polymer, vertices, edges)
     for vertex in cycles:
-        _test_cycle_placement(vertex, tmp_macrocycle)
+        _test_cycle_placement(vertex, tmp_macrocycle, vertices, edges)
 
 
 def _test_construction(test_dir, filename, rotaxane_data):
@@ -88,7 +90,9 @@ class _RotaxaneData:
 def test_construction(
     tmp_polymer,
     tmp_macrocycle,
-    tmp_macrocycle_alt1
+    tmp_macrocycle_alt1,
+    valid_rotaxane_dir
+
 ):
     rotaxanes = (
         _RotaxaneData(
@@ -131,5 +135,30 @@ def test_construction(
     )
 
     for i, rotaxane in enumerate(rotaxanes):
+        i = str(i)
         _test_construction(test_dir, f'{i}.mol', rotaxane)
-        _test_dump_and_load(test_dir, rotaxane.rotaxane)
+        _test_dump_and_load(test_dir, rotaxane.rotaxane, i)
+        _compare_with_valid(valid_rotaxane_dir, rotaxane.rotaxane, i)
+
+
+def test_orientations(polymer, tmp_macrocycle, tmp_macrocycle_alt1):
+    axle = polymer
+    cycle1 = tmp_macrocycle
+    cycle2 = tmp_macrocycle_alt1
+
+    rotaxane1 = stk.rotaxane.NRotaxane('AB', 10, (0.5, 0.5))
+    r1 = stk.ConstructedMolecule([axle, cycle1, cycle2], rotaxane1)
+    r2 = stk.ConstructedMolecule([axle, cycle1, cycle2], rotaxane1)
+    assert np.alltrue(np.equal(
+        r1.get_position_matrix(),
+        r2.get_position_matrix()
+    ))
+
+    rotaxane2 = stk.rotaxane.NRotaxane('AB', 10, (0.5, 0.5), 5)
+    rotaxane3 = stk.rotaxane.NRotaxane('AB', 10, (0.5, 0.5), 5)
+    r3 = stk.ConstructedMolecule([axle, cycle1, cycle2], rotaxane2)
+    r4 = stk.ConstructedMolecule([axle, cycle1, cycle2], rotaxane3)
+    assert np.alltrue(np.equal(
+        r3.get_position_matrix(),
+        r4.get_position_matrix()
+    ))

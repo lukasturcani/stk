@@ -6,8 +6,8 @@ Defines cages made from building blocks with 2 and 4 functional groups.
 
 import numpy as np
 
-from .base import Cage,  _CageVertex
-from ..topology_graph import Edge
+from .base import Cage,  _CageVertexData
+from ..topology_graph import EdgeData
 
 
 class TwoPlusFour(Cage):
@@ -18,6 +18,14 @@ class TwoPlusFour(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -26,25 +34,25 @@ class TwoPlusFour(Cage):
 
     """
 
-    vertices = (
-        _CageVertex(0, 0, -1),
-        _CageVertex(0, 0, 1),
+    vertex_data = (
+        _CageVertexData(0, 0, -1),
+        _CageVertexData(0, 0, 1),
 
-        _CageVertex(2, 0, 0, False),
-        _CageVertex(-2, 0, 0, False),
-        _CageVertex(0, 2, 0, False),
-        _CageVertex(0, -2, 0, False)
+        _CageVertexData(2, 0, 0, False),
+        _CageVertexData(-2, 0, 0, False),
+        _CageVertexData(0, 2, 0, False),
+        _CageVertexData(0, -2, 0, False)
     )
 
-    edges = (
-        Edge(vertices[2], vertices[0]),
-        Edge(vertices[2], vertices[1]),
-        Edge(vertices[3], vertices[0]),
-        Edge(vertices[3], vertices[1]),
-        Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[1]),
-        Edge(vertices[5], vertices[0]),
-        Edge(vertices[5], vertices[1])
+    edge_data = (
+        EdgeData(vertex_data[2], vertex_data[0]),
+        EdgeData(vertex_data[2], vertex_data[1]),
+        EdgeData(vertex_data[3], vertex_data[0]),
+        EdgeData(vertex_data[3], vertex_data[1]),
+        EdgeData(vertex_data[4], vertex_data[0]),
+        EdgeData(vertex_data[4], vertex_data[1]),
+        EdgeData(vertex_data[5], vertex_data[0]),
+        EdgeData(vertex_data[5], vertex_data[1])
     )
 
     num_windows = 4
@@ -59,6 +67,14 @@ class ThreePlusSix(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -68,39 +84,39 @@ class ThreePlusSix(Cage):
     """
 
     _x = 1
-    vertices = (
-        _CageVertex(-2*_x, -_x*np.sqrt(3), 0, False),
-        _CageVertex(2*_x, -_x*np.sqrt(3), 0, False),
-        _CageVertex(0, _x*np.sqrt(3), 0, False),
+    vertex_data = (
+        _CageVertexData(-2*_x, -_x*np.sqrt(3), 0, False),
+        _CageVertexData(2*_x, -_x*np.sqrt(3), 0, False),
+        _CageVertexData(0, _x*np.sqrt(3), 0, False),
 
-        _CageVertex(0, -2*_x*np.sqrt(3), _x, False),
-        _CageVertex(0, -2*_x*np.sqrt(3), -_x, False),
+        _CageVertexData(0, -2*_x*np.sqrt(3), _x, False),
+        _CageVertexData(0, -2*_x*np.sqrt(3), -_x, False),
 
-        _CageVertex(2*_x, 0, _x, False),
-        _CageVertex(2*_x, 0, -_x, False),
+        _CageVertexData(2*_x, 0, _x, False),
+        _CageVertexData(2*_x, 0, -_x, False),
 
-        _CageVertex(-2*_x, 0, _x, False),
-        _CageVertex(-2*_x, 0, -_x, False),
+        _CageVertexData(-2*_x, 0, _x, False),
+        _CageVertexData(-2*_x, 0, -_x, False),
     )
 
-    edges = (
-        Edge(vertices[3], vertices[0]),
-        Edge(vertices[3], vertices[1]),
+    edge_data = (
+        EdgeData(vertex_data[3], vertex_data[0]),
+        EdgeData(vertex_data[3], vertex_data[1]),
 
-        Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[1]),
+        EdgeData(vertex_data[4], vertex_data[0]),
+        EdgeData(vertex_data[4], vertex_data[1]),
 
-        Edge(vertices[5], vertices[1]),
-        Edge(vertices[5], vertices[2]),
+        EdgeData(vertex_data[5], vertex_data[1]),
+        EdgeData(vertex_data[5], vertex_data[2]),
 
-        Edge(vertices[6], vertices[1]),
-        Edge(vertices[6], vertices[2]),
+        EdgeData(vertex_data[6], vertex_data[1]),
+        EdgeData(vertex_data[6], vertex_data[2]),
 
-        Edge(vertices[7], vertices[0]),
-        Edge(vertices[7], vertices[2]),
+        EdgeData(vertex_data[7], vertex_data[0]),
+        EdgeData(vertex_data[7], vertex_data[2]),
 
-        Edge(vertices[8], vertices[0]),
-        Edge(vertices[8], vertices[2]),
+        EdgeData(vertex_data[8], vertex_data[0]),
+        EdgeData(vertex_data[8], vertex_data[2]),
 
     )
 
@@ -116,6 +132,14 @@ class FourPlusEight(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -124,51 +148,51 @@ class FourPlusEight(Cage):
 
     """
 
-    vertices = (
-        _CageVertex(-1, -1, 0, False),
-        _CageVertex(-1, 1, 0, False),
+    vertex_data = (
+        _CageVertexData(-1, -1, 0, False),
+        _CageVertexData(-1, 1, 0, False),
 
-        _CageVertex(1, -1, 0, False),
-        _CageVertex(1, 1, 0, False),
+        _CageVertexData(1, -1, 0, False),
+        _CageVertexData(1, 1, 0, False),
 
-        _CageVertex(-2, 0, 1, False),
-        _CageVertex(-2, 0, -1, False),
+        _CageVertexData(-2, 0, 1, False),
+        _CageVertexData(-2, 0, -1, False),
 
-        _CageVertex(0, 2, 1, False),
-        _CageVertex(0, 2, -1, False),
+        _CageVertexData(0, 2, 1, False),
+        _CageVertexData(0, 2, -1, False),
 
-        _CageVertex(0, -2, 1, False),
-        _CageVertex(0, -2, -1, False),
+        _CageVertexData(0, -2, 1, False),
+        _CageVertexData(0, -2, -1, False),
 
-        _CageVertex(2, 0, 1, False),
-        _CageVertex(2, 0, -1, False)
+        _CageVertexData(2, 0, 1, False),
+        _CageVertexData(2, 0, -1, False)
 
     )
 
-    edges = (
-        Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[1]),
+    edge_data = (
+        EdgeData(vertex_data[4], vertex_data[0]),
+        EdgeData(vertex_data[4], vertex_data[1]),
 
-        Edge(vertices[5], vertices[0]),
-        Edge(vertices[5], vertices[1]),
+        EdgeData(vertex_data[5], vertex_data[0]),
+        EdgeData(vertex_data[5], vertex_data[1]),
 
-        Edge(vertices[6], vertices[1]),
-        Edge(vertices[6], vertices[3]),
+        EdgeData(vertex_data[6], vertex_data[1]),
+        EdgeData(vertex_data[6], vertex_data[3]),
 
-        Edge(vertices[7], vertices[1]),
-        Edge(vertices[7], vertices[3]),
+        EdgeData(vertex_data[7], vertex_data[1]),
+        EdgeData(vertex_data[7], vertex_data[3]),
 
-        Edge(vertices[8], vertices[0]),
-        Edge(vertices[8], vertices[2]),
+        EdgeData(vertex_data[8], vertex_data[0]),
+        EdgeData(vertex_data[8], vertex_data[2]),
 
-        Edge(vertices[9], vertices[0]),
-        Edge(vertices[9], vertices[2]),
+        EdgeData(vertex_data[9], vertex_data[0]),
+        EdgeData(vertex_data[9], vertex_data[2]),
 
-        Edge(vertices[10], vertices[2]),
-        Edge(vertices[10], vertices[3]),
+        EdgeData(vertex_data[10], vertex_data[2]),
+        EdgeData(vertex_data[10], vertex_data[3]),
 
-        Edge(vertices[11], vertices[2]),
-        Edge(vertices[11], vertices[3]),
+        EdgeData(vertex_data[11], vertex_data[2]),
+        EdgeData(vertex_data[11], vertex_data[3]),
 
     )
 
@@ -184,6 +208,14 @@ class FivePlusTen(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -196,56 +228,56 @@ class FivePlusTen(Cage):
     _s1 = np.sin(2*np.pi/5)
     _s2 = np.sin(4*np.pi/5)
 
-    vertices = (
-        _CageVertex(0, 1, 0, False),
-        _CageVertex(_s1, _c1, 0, False),
-        _CageVertex(_s2, -_c2, 0, False),
+    vertex_data = (
+        _CageVertexData(0, 1, 0, False),
+        _CageVertexData(_s1, _c1, 0, False),
+        _CageVertexData(_s2, -_c2, 0, False),
 
-        _CageVertex(-_s2, -_c2, 0, False),
-        _CageVertex(-_s1, _c1, 0, False),
+        _CageVertexData(-_s2, -_c2, 0, False),
+        _CageVertexData(-_s1, _c1, 0, False),
 
-        _CageVertex(_s1, 1+_c1, 0.5, False),
-        _CageVertex(_s1, 1+_c1, -0.5, False),
+        _CageVertexData(_s1, 1+_c1, 0.5, False),
+        _CageVertexData(_s1, 1+_c1, -0.5, False),
 
-        _CageVertex(_s1+_s2, _c1-_c2, 0.5, False),
-        _CageVertex(_s1+_s2, _c1-_c2, -0.5, False),
+        _CageVertexData(_s1+_s2, _c1-_c2, 0.5, False),
+        _CageVertexData(_s1+_s2, _c1-_c2, -0.5, False),
 
-        _CageVertex(0, -2*_c2, 0.5, False),
-        _CageVertex(0, -2*_c2, -0.5, False),
+        _CageVertexData(0, -2*_c2, 0.5, False),
+        _CageVertexData(0, -2*_c2, -0.5, False),
 
-        _CageVertex(-_s2-_s1, -_c2+_c1, 0.5, False),
-        _CageVertex(-_s2-_s1, -_c2+_c1, -0.5, False),
+        _CageVertexData(-_s2-_s1, -_c2+_c1, 0.5, False),
+        _CageVertexData(-_s2-_s1, -_c2+_c1, -0.5, False),
 
-        _CageVertex(-_s1, 1+_c1, 0.5, False),
-        _CageVertex(-_s1, 1+_c1, -0.5, False),
+        _CageVertexData(-_s1, 1+_c1, 0.5, False),
+        _CageVertexData(-_s1, 1+_c1, -0.5, False),
 
     )
 
-    edges = (
-        Edge(vertices[5], vertices[0]),
-        Edge(vertices[5], vertices[1]),
-        Edge(vertices[6], vertices[0]),
-        Edge(vertices[6], vertices[1]),
+    edge_data = (
+        EdgeData(vertex_data[5], vertex_data[0]),
+        EdgeData(vertex_data[5], vertex_data[1]),
+        EdgeData(vertex_data[6], vertex_data[0]),
+        EdgeData(vertex_data[6], vertex_data[1]),
 
-        Edge(vertices[7], vertices[1]),
-        Edge(vertices[7], vertices[2]),
-        Edge(vertices[8], vertices[1]),
-        Edge(vertices[8], vertices[2]),
+        EdgeData(vertex_data[7], vertex_data[1]),
+        EdgeData(vertex_data[7], vertex_data[2]),
+        EdgeData(vertex_data[8], vertex_data[1]),
+        EdgeData(vertex_data[8], vertex_data[2]),
 
-        Edge(vertices[9], vertices[2]),
-        Edge(vertices[9], vertices[3]),
-        Edge(vertices[10], vertices[2]),
-        Edge(vertices[10], vertices[3]),
+        EdgeData(vertex_data[9], vertex_data[2]),
+        EdgeData(vertex_data[9], vertex_data[3]),
+        EdgeData(vertex_data[10], vertex_data[2]),
+        EdgeData(vertex_data[10], vertex_data[3]),
 
-        Edge(vertices[11], vertices[3]),
-        Edge(vertices[11], vertices[4]),
-        Edge(vertices[12], vertices[3]),
-        Edge(vertices[12], vertices[4]),
+        EdgeData(vertex_data[11], vertex_data[3]),
+        EdgeData(vertex_data[11], vertex_data[4]),
+        EdgeData(vertex_data[12], vertex_data[3]),
+        EdgeData(vertex_data[12], vertex_data[4]),
 
-        Edge(vertices[13], vertices[4]),
-        Edge(vertices[13], vertices[0]),
-        Edge(vertices[14], vertices[4]),
-        Edge(vertices[14], vertices[0])
+        EdgeData(vertex_data[13], vertex_data[4]),
+        EdgeData(vertex_data[13], vertex_data[0]),
+        EdgeData(vertex_data[14], vertex_data[4]),
+        EdgeData(vertex_data[14], vertex_data[0])
 
     )
 
@@ -261,6 +293,14 @@ class SixPlusTwelve(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -269,62 +309,86 @@ class SixPlusTwelve(Cage):
 
     """
 
-    _vertices = (
-        _CageVertex(-1, -1, 0),
-        _CageVertex(-1, 1, 0),
-        _CageVertex(1, -1, 0),
-        _CageVertex(1, 1, 0),
-        _CageVertex(0, 0, 1),
-        _CageVertex(0, 0, -1)
+    _vertex_data = (
+        _CageVertexData(-1, -1, 0),
+        _CageVertexData(-1, 1, 0),
+        _CageVertexData(1, -1, 0),
+        _CageVertexData(1, 1, 0),
+        _CageVertexData(0, 0, 1),
+        _CageVertexData(0, 0, -1)
     )
 
-    vertices = (
-        *_vertices,
-        _CageVertex.init_at_center(_vertices[0], _vertices[1]),
-        _CageVertex.init_at_center(_vertices[1], _vertices[3]),
-        _CageVertex.init_at_center(_vertices[3], _vertices[2]),
+    vertex_data = (
+        *_vertex_data,
+        _CageVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[1]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[1], _vertex_data[3]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[3], _vertex_data[2]
+        ),
 
-        _CageVertex.init_at_center(_vertices[0], _vertices[2]),
-        _CageVertex.init_at_center(_vertices[4], _vertices[0]),
-        _CageVertex.init_at_center(_vertices[4], _vertices[1]),
+        _CageVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[2]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[4], _vertex_data[0]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[4], _vertex_data[1]
+        ),
 
-        _CageVertex.init_at_center(_vertices[4], _vertices[2]),
-        _CageVertex.init_at_center(_vertices[4], _vertices[3]),
-        _CageVertex.init_at_center(_vertices[5], _vertices[0]),
+        _CageVertexData.init_at_center(
+            _vertex_data[4], _vertex_data[2]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[4], _vertex_data[3]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[5], _vertex_data[0]
+        ),
 
-        _CageVertex.init_at_center(_vertices[5], _vertices[1]),
-        _CageVertex.init_at_center(_vertices[5], _vertices[2]),
-        _CageVertex.init_at_center(_vertices[5], _vertices[3])
+        _CageVertexData.init_at_center(
+            _vertex_data[5], _vertex_data[1]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[5], _vertex_data[2]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[5], _vertex_data[3]
+        )
     )
 
-    edges = (
-        Edge(vertices[6], vertices[0]),
-        Edge(vertices[6], vertices[1]),
-        Edge(vertices[7], vertices[1]),
-        Edge(vertices[7], vertices[3]),
-        Edge(vertices[8], vertices[3]),
-        Edge(vertices[8], vertices[2]),
+    edge_data = (
+        EdgeData(vertex_data[6], vertex_data[0]),
+        EdgeData(vertex_data[6], vertex_data[1]),
+        EdgeData(vertex_data[7], vertex_data[1]),
+        EdgeData(vertex_data[7], vertex_data[3]),
+        EdgeData(vertex_data[8], vertex_data[3]),
+        EdgeData(vertex_data[8], vertex_data[2]),
 
-        Edge(vertices[9], vertices[0]),
-        Edge(vertices[9], vertices[2]),
-        Edge(vertices[10], vertices[4]),
-        Edge(vertices[10], vertices[0]),
-        Edge(vertices[11], vertices[4]),
-        Edge(vertices[11], vertices[1]),
+        EdgeData(vertex_data[9], vertex_data[0]),
+        EdgeData(vertex_data[9], vertex_data[2]),
+        EdgeData(vertex_data[10], vertex_data[4]),
+        EdgeData(vertex_data[10], vertex_data[0]),
+        EdgeData(vertex_data[11], vertex_data[4]),
+        EdgeData(vertex_data[11], vertex_data[1]),
 
-        Edge(vertices[12], vertices[4]),
-        Edge(vertices[12], vertices[2]),
-        Edge(vertices[13], vertices[4]),
-        Edge(vertices[13], vertices[3]),
-        Edge(vertices[14], vertices[5]),
-        Edge(vertices[14], vertices[0]),
+        EdgeData(vertex_data[12], vertex_data[4]),
+        EdgeData(vertex_data[12], vertex_data[2]),
+        EdgeData(vertex_data[13], vertex_data[4]),
+        EdgeData(vertex_data[13], vertex_data[3]),
+        EdgeData(vertex_data[14], vertex_data[5]),
+        EdgeData(vertex_data[14], vertex_data[0]),
 
-        Edge(vertices[15], vertices[5]),
-        Edge(vertices[15], vertices[1]),
-        Edge(vertices[16], vertices[5]),
-        Edge(vertices[16], vertices[2]),
-        Edge(vertices[17], vertices[5]),
-        Edge(vertices[17], vertices[3])
+        EdgeData(vertex_data[15], vertex_data[5]),
+        EdgeData(vertex_data[15], vertex_data[1]),
+        EdgeData(vertex_data[16], vertex_data[5]),
+        EdgeData(vertex_data[16], vertex_data[2]),
+        EdgeData(vertex_data[17], vertex_data[5]),
+        EdgeData(vertex_data[17], vertex_data[3])
     )
 
     num_windows = 8
@@ -339,6 +403,14 @@ class EightPlusSixteen(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -348,91 +420,123 @@ class EightPlusSixteen(Cage):
     """
 
     _x = 2
-    _vertices = (
-        _CageVertex(-0.5*_x, 0.5*_x, -0.35*_x),
-        _CageVertex(-0.5*_x, -0.5*_x, -0.35*_x),
-        _CageVertex(0.5*_x, -0.5*_x, -0.35*_x),
-        _CageVertex(0.5*_x, 0.5*_x, -0.35*_x),
+    _vertex_data = (
+        _CageVertexData(-0.5*_x, 0.5*_x, -0.35*_x),
+        _CageVertexData(-0.5*_x, -0.5*_x, -0.35*_x),
+        _CageVertexData(0.5*_x, -0.5*_x, -0.35*_x),
+        _CageVertexData(0.5*_x, 0.5*_x, -0.35*_x),
 
-        _CageVertex(-_x*np.sqrt(2)/2, 0, _x*0.35),
-        _CageVertex(0, -_x*np.sqrt(2)/2, _x*0.35),
-        _CageVertex(_x*np.sqrt(2)/2, 0, _x*0.35),
-        _CageVertex(0, _x*np.sqrt(2)/2, _x*0.35)
+        _CageVertexData(-_x*np.sqrt(2)/2, 0, _x*0.35),
+        _CageVertexData(0, -_x*np.sqrt(2)/2, _x*0.35),
+        _CageVertexData(_x*np.sqrt(2)/2, 0, _x*0.35),
+        _CageVertexData(0, _x*np.sqrt(2)/2, _x*0.35)
     )
 
-    vertices = (
-        *_vertices,
+    vertex_data = (
+        *_vertex_data,
 
-        _CageVertex.init_at_center(_vertices[1], _vertices[5]),
-        _CageVertex.init_at_center(_vertices[2], _vertices[5]),
-        _CageVertex.init_at_center(_vertices[0], _vertices[4]),
-        _CageVertex.init_at_center(_vertices[1], _vertices[4]),
+        _CageVertexData.init_at_center(
+            _vertex_data[1], _vertex_data[5]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[2], _vertex_data[5]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[4]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[1], _vertex_data[4]
+        ),
 
-        _CageVertex.init_at_center(_vertices[2], _vertices[6]),
-        _CageVertex.init_at_center(_vertices[3], _vertices[6]),
-        _CageVertex.init_at_center(_vertices[0], _vertices[7]),
-        _CageVertex.init_at_center(_vertices[3], _vertices[7]),
+        _CageVertexData.init_at_center(
+            _vertex_data[2], _vertex_data[6]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[3], _vertex_data[6]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[7]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[3], _vertex_data[7]
+        ),
 
-        _CageVertex.init_at_center(_vertices[0], _vertices[1]),
-        _CageVertex.init_at_center(_vertices[1], _vertices[2]),
-        _CageVertex.init_at_center(_vertices[2], _vertices[3]),
-        _CageVertex.init_at_center(_vertices[3], _vertices[0]),
+        _CageVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[1]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[1], _vertex_data[2]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[2], _vertex_data[3]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[3], _vertex_data[0]
+        ),
 
-        _CageVertex.init_at_center(_vertices[4], _vertices[5]),
-        _CageVertex.init_at_center(_vertices[5], _vertices[6]),
-        _CageVertex.init_at_center(_vertices[6], _vertices[7]),
-        _CageVertex.init_at_center(_vertices[7], _vertices[4]),
+        _CageVertexData.init_at_center(
+            _vertex_data[4], _vertex_data[5]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[5], _vertex_data[6]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[6], _vertex_data[7]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[7], _vertex_data[4]
+        ),
 
     )
 
-    edges = (
-        Edge(vertices[8], vertices[1]),
-        Edge(vertices[8], vertices[5]),
+    edge_data = (
+        EdgeData(vertex_data[8], vertex_data[1]),
+        EdgeData(vertex_data[8], vertex_data[5]),
 
-        Edge(vertices[9], vertices[2]),
-        Edge(vertices[9], vertices[5]),
+        EdgeData(vertex_data[9], vertex_data[2]),
+        EdgeData(vertex_data[9], vertex_data[5]),
 
-        Edge(vertices[10], vertices[0]),
-        Edge(vertices[10], vertices[4]),
+        EdgeData(vertex_data[10], vertex_data[0]),
+        EdgeData(vertex_data[10], vertex_data[4]),
 
-        Edge(vertices[11], vertices[1]),
-        Edge(vertices[11], vertices[4]),
+        EdgeData(vertex_data[11], vertex_data[1]),
+        EdgeData(vertex_data[11], vertex_data[4]),
 
-        Edge(vertices[12], vertices[2]),
-        Edge(vertices[12], vertices[6]),
+        EdgeData(vertex_data[12], vertex_data[2]),
+        EdgeData(vertex_data[12], vertex_data[6]),
 
-        Edge(vertices[13], vertices[3]),
-        Edge(vertices[13], vertices[6]),
+        EdgeData(vertex_data[13], vertex_data[3]),
+        EdgeData(vertex_data[13], vertex_data[6]),
 
-        Edge(vertices[14], vertices[0]),
-        Edge(vertices[14], vertices[7]),
+        EdgeData(vertex_data[14], vertex_data[0]),
+        EdgeData(vertex_data[14], vertex_data[7]),
 
-        Edge(vertices[15], vertices[3]),
-        Edge(vertices[15], vertices[7]),
+        EdgeData(vertex_data[15], vertex_data[3]),
+        EdgeData(vertex_data[15], vertex_data[7]),
 
-        Edge(vertices[16], vertices[0]),
-        Edge(vertices[16], vertices[1]),
+        EdgeData(vertex_data[16], vertex_data[0]),
+        EdgeData(vertex_data[16], vertex_data[1]),
 
-        Edge(vertices[17], vertices[1]),
-        Edge(vertices[17], vertices[2]),
+        EdgeData(vertex_data[17], vertex_data[1]),
+        EdgeData(vertex_data[17], vertex_data[2]),
 
-        Edge(vertices[18], vertices[2]),
-        Edge(vertices[18], vertices[3]),
+        EdgeData(vertex_data[18], vertex_data[2]),
+        EdgeData(vertex_data[18], vertex_data[3]),
 
-        Edge(vertices[19], vertices[3]),
-        Edge(vertices[19], vertices[0]),
+        EdgeData(vertex_data[19], vertex_data[3]),
+        EdgeData(vertex_data[19], vertex_data[0]),
 
-        Edge(vertices[20], vertices[4]),
-        Edge(vertices[20], vertices[5]),
+        EdgeData(vertex_data[20], vertex_data[4]),
+        EdgeData(vertex_data[20], vertex_data[5]),
 
-        Edge(vertices[21], vertices[5]),
-        Edge(vertices[21], vertices[6]),
+        EdgeData(vertex_data[21], vertex_data[5]),
+        EdgeData(vertex_data[21], vertex_data[6]),
 
-        Edge(vertices[22], vertices[6]),
-        Edge(vertices[22], vertices[7]),
+        EdgeData(vertex_data[22], vertex_data[6]),
+        EdgeData(vertex_data[22], vertex_data[7]),
 
-        Edge(vertices[23], vertices[7]),
-        Edge(vertices[23], vertices[4])
+        EdgeData(vertex_data[23], vertex_data[7]),
+        EdgeData(vertex_data[23], vertex_data[4])
     )
 
     num_windows = 10
@@ -447,6 +551,14 @@ class TenPlusTwenty(Cage):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -456,100 +568,140 @@ class TenPlusTwenty(Cage):
     """
 
     _x = 2
-    _vertices = (
-        _CageVertex(-_x, _x, -_x),
-        _CageVertex(-_x, -_x, -_x),
-        _CageVertex(_x, _x, -_x),
-        _CageVertex(_x, -_x, -_x),
+    _vertex_data = (
+        _CageVertexData(-_x, _x, -_x),
+        _CageVertexData(-_x, -_x, -_x),
+        _CageVertexData(_x, _x, -_x),
+        _CageVertexData(_x, -_x, -_x),
 
-        _CageVertex(-_x, _x, _x),
-        _CageVertex(-_x, -_x, _x),
-        _CageVertex(_x, _x, _x),
-        _CageVertex(_x, -_x, _x),
+        _CageVertexData(-_x, _x, _x),
+        _CageVertexData(-_x, -_x, _x),
+        _CageVertexData(_x, _x, _x),
+        _CageVertexData(_x, -_x, _x),
 
-        _CageVertex(0, 0, _x*1.5),
-        _CageVertex(0, 0, -_x*1.5)
+        _CageVertexData(0, 0, _x*1.5),
+        _CageVertexData(0, 0, -_x*1.5)
     )
 
-    vertices = (
-        *_vertices,
+    vertex_data = (
+        *_vertex_data,
 
-        _CageVertex.init_at_center(_vertices[0], _vertices[2]),
-        _CageVertex.init_at_center(_vertices[0], _vertices[1]),
-        _CageVertex.init_at_center(_vertices[1], _vertices[3]),
-        _CageVertex.init_at_center(_vertices[2], _vertices[3]),
+        _CageVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[2]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[1]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[1], _vertex_data[3]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[2], _vertex_data[3]
+        ),
 
-        _CageVertex.init_at_center(_vertices[4], _vertices[6]),
-        _CageVertex.init_at_center(_vertices[4], _vertices[5]),
-        _CageVertex.init_at_center(_vertices[5], _vertices[7]),
-        _CageVertex.init_at_center(_vertices[6], _vertices[7]),
+        _CageVertexData.init_at_center(
+            _vertex_data[4], _vertex_data[6]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[4], _vertex_data[5]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[5], _vertex_data[7]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[6], _vertex_data[7]
+        ),
 
-        _CageVertex.init_at_center(_vertices[0], _vertices[4]),
-        _CageVertex.init_at_center(_vertices[1], _vertices[5]),
-        _CageVertex.init_at_center(_vertices[2], _vertices[6]),
-        _CageVertex.init_at_center(_vertices[3], _vertices[7]),
+        _CageVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[4]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[1], _vertex_data[5]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[2], _vertex_data[6]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[3], _vertex_data[7]
+        ),
 
-        _CageVertex.init_at_center(_vertices[8], _vertices[4]),
-        _CageVertex.init_at_center(_vertices[8], _vertices[5]),
-        _CageVertex.init_at_center(_vertices[8], _vertices[6]),
-        _CageVertex.init_at_center(_vertices[8], _vertices[7]),
+        _CageVertexData.init_at_center(
+            _vertex_data[8], _vertex_data[4]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[8], _vertex_data[5]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[8], _vertex_data[6]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[8], _vertex_data[7]
+        ),
 
-        _CageVertex.init_at_center(_vertices[9], _vertices[0]),
-        _CageVertex.init_at_center(_vertices[9], _vertices[1]),
-        _CageVertex.init_at_center(_vertices[9], _vertices[2]),
-        _CageVertex.init_at_center(_vertices[9], _vertices[3])
+        _CageVertexData.init_at_center(
+            _vertex_data[9], _vertex_data[0]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[9], _vertex_data[1]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[9], _vertex_data[2]
+        ),
+        _CageVertexData.init_at_center(
+            _vertex_data[9], _vertex_data[3]
+        )
     )
 
-    edges = (
-        Edge(vertices[10], vertices[0]),
-        Edge(vertices[10], vertices[2]),
-        Edge(vertices[11], vertices[0]),
-        Edge(vertices[11], vertices[1]),
+    edge_data = (
+        EdgeData(vertex_data[10], vertex_data[0]),
+        EdgeData(vertex_data[10], vertex_data[2]),
+        EdgeData(vertex_data[11], vertex_data[0]),
+        EdgeData(vertex_data[11], vertex_data[1]),
 
-        Edge(vertices[12], vertices[1]),
-        Edge(vertices[12], vertices[3]),
-        Edge(vertices[13], vertices[2]),
-        Edge(vertices[13], vertices[3]),
+        EdgeData(vertex_data[12], vertex_data[1]),
+        EdgeData(vertex_data[12], vertex_data[3]),
+        EdgeData(vertex_data[13], vertex_data[2]),
+        EdgeData(vertex_data[13], vertex_data[3]),
 
-        Edge(vertices[14], vertices[4]),
-        Edge(vertices[14], vertices[6]),
-        Edge(vertices[15], vertices[4]),
-        Edge(vertices[15], vertices[5]),
+        EdgeData(vertex_data[14], vertex_data[4]),
+        EdgeData(vertex_data[14], vertex_data[6]),
+        EdgeData(vertex_data[15], vertex_data[4]),
+        EdgeData(vertex_data[15], vertex_data[5]),
 
-        Edge(vertices[16], vertices[5]),
-        Edge(vertices[16], vertices[7]),
-        Edge(vertices[17], vertices[6]),
-        Edge(vertices[17], vertices[7]),
+        EdgeData(vertex_data[16], vertex_data[5]),
+        EdgeData(vertex_data[16], vertex_data[7]),
+        EdgeData(vertex_data[17], vertex_data[6]),
+        EdgeData(vertex_data[17], vertex_data[7]),
 
-        Edge(vertices[18], vertices[0]),
-        Edge(vertices[18], vertices[4]),
-        Edge(vertices[19], vertices[1]),
-        Edge(vertices[19], vertices[5]),
+        EdgeData(vertex_data[18], vertex_data[0]),
+        EdgeData(vertex_data[18], vertex_data[4]),
+        EdgeData(vertex_data[19], vertex_data[1]),
+        EdgeData(vertex_data[19], vertex_data[5]),
 
-        Edge(vertices[20], vertices[2]),
-        Edge(vertices[20], vertices[6]),
-        Edge(vertices[21], vertices[3]),
-        Edge(vertices[21], vertices[7]),
+        EdgeData(vertex_data[20], vertex_data[2]),
+        EdgeData(vertex_data[20], vertex_data[6]),
+        EdgeData(vertex_data[21], vertex_data[3]),
+        EdgeData(vertex_data[21], vertex_data[7]),
 
-        Edge(vertices[22], vertices[8]),
-        Edge(vertices[22], vertices[4]),
-        Edge(vertices[23], vertices[8]),
-        Edge(vertices[23], vertices[5]),
+        EdgeData(vertex_data[22], vertex_data[8]),
+        EdgeData(vertex_data[22], vertex_data[4]),
+        EdgeData(vertex_data[23], vertex_data[8]),
+        EdgeData(vertex_data[23], vertex_data[5]),
 
-        Edge(vertices[24], vertices[8]),
-        Edge(vertices[24], vertices[6]),
-        Edge(vertices[25], vertices[8]),
-        Edge(vertices[25], vertices[7]),
+        EdgeData(vertex_data[24], vertex_data[8]),
+        EdgeData(vertex_data[24], vertex_data[6]),
+        EdgeData(vertex_data[25], vertex_data[8]),
+        EdgeData(vertex_data[25], vertex_data[7]),
 
-        Edge(vertices[26], vertices[9]),
-        Edge(vertices[26], vertices[0]),
-        Edge(vertices[27], vertices[9]),
-        Edge(vertices[27], vertices[1]),
+        EdgeData(vertex_data[26], vertex_data[9]),
+        EdgeData(vertex_data[26], vertex_data[0]),
+        EdgeData(vertex_data[27], vertex_data[9]),
+        EdgeData(vertex_data[27], vertex_data[1]),
 
-        Edge(vertices[28], vertices[9]),
-        Edge(vertices[28], vertices[2]),
-        Edge(vertices[29], vertices[9]),
-        Edge(vertices[29], vertices[3])
+        EdgeData(vertex_data[28], vertex_data[9]),
+        EdgeData(vertex_data[28], vertex_data[2]),
+        EdgeData(vertex_data[29], vertex_data[9]),
+        EdgeData(vertex_data[29], vertex_data[3])
     )
 
     num_windows = 12

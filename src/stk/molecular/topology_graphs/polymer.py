@@ -9,30 +9,40 @@ Polymer
 import logging
 import numpy as np
 
-from .topology_graph import TopologyGraph, Vertex, Edge
+from .topology_graph import TopologyGraph, VertexData, Vertex, EdgeData
 
 
 logger = logging.getLogger(__name__)
 
 
-class _LinearVertex(Vertex):
+class _LinearVertexData(VertexData):
     """
-    Represents a vertex in the middle of a linear polymer chain.
+    Holds the data of a linear polymer vertex.
 
     Attributes
     ----------
     id : :class:`int`
-        The id of the vertex. This should be its index in
+        The id of the vertex. Must match the index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
+
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
+
+    flip : :class:`bool`
+        If ``True`` any building block placed by the vertex will
+        have its orientation along the chain flipped.
 
     """
 
-    def __init__(self, x, y, z, orientation):
+    def __init__(self, x, y, z, flip):
         """
-        Initialize a :class:`.LinearVertex`.
+        Initialize a :class:`_LinearVertexData` instance.
 
         Parameters
         ----------
@@ -45,15 +55,49 @@ class _LinearVertex(Vertex):
         z : :class:`float`
             The z coordinate.
 
-        orientation : :class:`float`
-            Can be any number from ``0`` to ``1``, both inclusive. It
-            specifies the probability the building block placed on the
-            vertex will have its orientation along the chain flipped.
+        flip : :class:`bool`
+            If ``True`` any building block placed by the vertex will
+            have its orientation along the chain flipped.
 
         """
 
-        self._orientation = orientation
+        self.flip = flip
         super().__init__(x, y, z)
+
+    def clone(self, clear_edges=False):
+        clone = super().clone(clear_edges)
+        clone.flip = self.flip
+        return clone
+
+    def get_vertex(self):
+        return _LinearVertex(self)
+
+
+class _HeadVertexData(_LinearVertexData):
+    def get_vertex(self):
+        return _HeadVertex(self)
+
+
+class _TailVertexData(_LinearVertexData):
+    def get_vertex(self):
+        return _TailVertex(self)
+
+
+class _LinearVertex(Vertex):
+    """
+    Represents a vertex in the middle of a linear polymer chain.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
+
+    """
+
+    def __init__(self, data):
+        self._flip = data.flip
+        super().__init__(data)
 
     def clone(self, clear_edges=False):
         """
@@ -73,22 +117,26 @@ class _LinearVertex(Vertex):
         """
 
         clone = super().clone(clear_edges)
-        clone._orientation = self._orientation
+        clone._flip = self._flip
         return clone
 
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
-        `building_block` is placed such that its bonder-bonder
-        direction vector is either parallel or anti-parallel to the
-        polymer chain.
-
         Parameters
         ----------
-        building_block : :class:`.Molecule`
+        building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -116,17 +164,19 @@ class _LinearVertex(Vertex):
                 fg_ids=(0, 1)
             )
         )[-1]
-
-        p = [1-self._orientation, self._orientation]
-        direction = np.random.choice([1, -1], p=p)
         building_block.apply_rotation_between_vectors(
             start=bonder_vector,
-            target=[direction, 0, 0],
+            target=[-1 if self._flip else 1, 0, 0],
             origin=self._position
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Assign functional groups to edges.
 
@@ -139,6 +189,14 @@ class _LinearVertex(Vertex):
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to edges.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -157,16 +215,15 @@ class _LinearVertex(Vertex):
             )[0]
         )
         return {
-            fg1: self.edges[0].id,
-            fg2: self.edges[1].id
+            fg1: self._edge_ids[0],
+            fg2: self._edge_ids[1]
         }
 
     def __str__(self):
-        x, y, z = self._position
         return (
             f'Vertex(id={self.id}, '
-            f'position={[x, y, z]}, '
-            f'orientation={self._orientation})'
+            f'position={self._position.tolist()}, '
+            f'flip={self._flip})'
         )
 
 
@@ -183,12 +240,9 @@ class _TerminalVertex(_LinearVertex):
         The id of the vertex. This should be its index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
-
     """
 
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -203,19 +257,32 @@ class _TerminalVertex(_LinearVertex):
 
         Parameters
         ----------
-        building_block : :class:`.Molecule`
+        building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
         :class:`numpy.nadarray`
             The position matrix of `building_block` after being
             placed on the :class:`.Vertex`.
+
         """
 
         if len(building_block.func_groups) != 1:
-            return super().place_building_block(building_block)
+            return super().place_building_block(
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
+            )
 
         building_block.set_centroid(
             position=self._position,
@@ -232,7 +299,12 @@ class _TerminalVertex(_LinearVertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Assign functional groups to edges.
 
@@ -245,6 +317,14 @@ class _TerminalVertex(_LinearVertex):
         building_block : :class:`.Molecule`
             The building block molecule which is needs to have
             functional groups assigned to edges.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -270,10 +350,10 @@ class _TerminalVertex(_LinearVertex):
                 )[0]
             )
             fg_index = 0 if self._cap_direction == 1 else -1
-            return {fgs[fg_index]: self.edges[0].id}
+            return {fgs[fg_index]: self._edge_ids[0]}
 
         elif len(building_block.func_groups) == 1:
-            return {0: self.edges[0].id}
+            return {0: self._edge_ids[0]}
 
         else:
             raise ValueError(
@@ -288,8 +368,9 @@ class _HeadVertex(_TerminalVertex):
 
     Attributes
     ----------
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
 
     """
 
@@ -304,8 +385,9 @@ class _TailVertex(_TerminalVertex):
 
     Attributes
     ----------
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`TopologyGraph.vertices`.
 
     """
 
@@ -316,7 +398,7 @@ class _TailVertex(_TerminalVertex):
 
 class Linear(TopologyGraph):
     """
-    Represents linear polymer topology graphs.
+    Represents a linear polymer topology graph.
 
     Attributes
     ----------
@@ -360,12 +442,86 @@ class Linear(TopologyGraph):
         # p1 and p2 are different ways to write the same thing.
         p1 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear('ACB', 3)
+            topology_graph=stk.polymer.Linear('ACB', 1)
         )
         p2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear((0, 2, 1), 3)
+            topology_graph=stk.polymer.Linear((0, 2, 1), 1)
         )
+
+    The `orientations` parameter allows the direction of each building
+    block along to the chain to be flipped
+
+    .. code-block:: python
+
+        bb4 = stk.BuildingBlock('NCNCCN', ['amine'])
+
+        p3 = stk.ConstructedMolecule(
+            building_blocks=[bb2, bb4],
+            topology_graph=stk.polymer.Linear(
+                repeating_unit='AB',
+                num_repeating_units=5,
+                orientations=(1, 0.5)
+            )
+        )
+
+    In the above example, ``bb1`` is guaranteed to be flipped,
+    ``bb2`` has a 50 % chance of being flipped, each time it is placed
+    on a node.
+
+    Note that whether a building block will be flipped or not
+    is decided during the initialization of :class:`.Linear`
+
+    .. code-block:: python
+
+        # chain will always construct the same polymer.
+        chain = stk.polymer.Linear(
+            repeating_unit='AB',
+            num_repeating_untis=5,
+            orientations=(0.65, 0.45)
+        )
+        # p4 and p5 are guaranteed to be the same as they used the same
+        # topology graph.
+        p4 = stk.ConstructedMolecule([bb2, bb4], chain)
+        p5 = stk.ConstructedMolecule([bb2, bb4], chain)
+
+        # chain2 may lead to a different polymer than chain, despite
+        # being initialized with the same parameters.
+        chain2 = stk.polymer.Linear(
+            repeating_unit='AB',
+            num_repeating_untis=5,
+            orientations=(0.65, 0.45)
+        )
+
+        # p6 and p7 are guaranteed to be the same because they used the
+        # the same topology graph. However, they may be different to
+        # p4 and p5.
+        p6 = stk.ConstructedMolecule([bb2, bb4], chain2)
+        p7 = stk.ConstructedMolecule([bb2, bb4], chain2)
+
+    The `random_seed` parameter can be used to get reproducible results
+
+    .. code-block:: python
+
+        # p8 and p9 are guaranteed to be the same, because chain3 and
+        # chain4 used the same random seed.
+
+        chain3 = stk.polymer.Linear(
+            repeating_unit='AB',
+            num_repeating_untis=5,
+            orientations=(0.65, 0.45),
+            random_seed=4
+        )
+        p8 = stk.ConstructedMolecule([bb2, bb4], chain3)
+
+        chain4 = stk.polymer.Linear(
+            repeating_unit='AB',
+            num_repeating_untis=5,
+            orientations=(0.65, 0.45),
+            random_seed=4
+        )
+        p9 = stk.ConstructedMolecule([bb2, bb4], chain4)
+
 
     """
 
@@ -374,6 +530,7 @@ class Linear(TopologyGraph):
         repeating_unit,
         num_repeating_units,
         orientations=None,
+        random_seed=None,
         num_processes=1
     ):
         """
@@ -394,7 +551,7 @@ class Linear(TopologyGraph):
             The number of repeating units which are used to make the
             polymer.
 
-        orientations : :class:`tuple` of :class:`float`
+        orientations : :class:`tuple` of :class:`float`, optional
             For each character in the repeating unit, a value
             between ``0`` and ``1`` (both inclusive) must be given in
             a :class:`tuple`. It indicates the probability that each
@@ -406,9 +563,23 @@ class Linear(TopologyGraph):
             a number between ``0`` and ``1`` is chosen. If ``None``
             then ``0`` is picked in all cases.
 
+            It is also possible to supply an orientation for every
+            vertex in the final topology graph. In this case, the
+            length of `orientations` must be equal to
+            ``len(repeating_unit)*num_repeating_units``.
+
+        random_seed : :class:`int`, optional
+            The random seed to use when choosing random orientations.
+
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If the length of `orientations` is not equal in length to
+            `repeating_unit` or to the total number of vertices.
 
         """
 
@@ -417,31 +588,60 @@ class Linear(TopologyGraph):
                 0. for i in range(len(repeating_unit))
             )
 
-        # Keep these for __repr__
+        if len(orientations) == len(repeating_unit):
+            orientations = orientations*num_repeating_units
+
+        polymer_length = len(repeating_unit)*num_repeating_units
+        if len(orientations) != polymer_length:
+            raise ValueError(
+                'The length of orientations must match either '
+                'the length of repeating_unit or the '
+                'total number of vertices.'
+            )
+
+        generator = np.random.RandomState(random_seed)
+
+        # Keep these for __repr__.
         self._repeating_unit = self._normalize_repeating_unit(
             repeating_unit=repeating_unit
         )
-        self._orientations = orientations
         self._num_repeating_units = num_repeating_units
 
-        head, *body, tail = orientations*num_repeating_units
-        vertices = [_HeadVertex(0, 0, 0, head)]
-        edges = []
-        for i, orientation in enumerate(body, 1):
-            v = _LinearVertex(
-                x=i, y=0, z=0, orientation=orientation
+        head, *body, tail = orientations
+        choices = [True, False]
+        vertex_data = [
+            _HeadVertexData(
+                x=0,
+                y=0,
+                z=0,
+                flip=generator.choice(choices, p=[head, 1-head])
             )
-            vertices.append(v)
-            edges.append(Edge(vertices[i-1], vertices[i]))
+        ]
+        edge_data = []
+        for i, p in enumerate(body, 1):
+            flip = generator.choice(choices, p=[p, 1-p])
+            v = _LinearVertexData(i, 0, 0, flip)
+            vertex_data.append(v)
+            edge_data.append(
+                EdgeData(vertex_data[i-1], vertex_data[i])
+            )
 
-        vertices.append(
-            _TailVertex(len(vertices), 0, 0, tail)
+        vertex_data.append(
+            _TailVertexData(
+                x=len(vertex_data),
+                y=0,
+                z=0,
+                flip=generator.choice(choices, p=[tail, 1-tail]))
         )
-        edges.append(Edge(vertices[-2], vertices[-1]))
+
+        # Save the chosen orientations for __repr__.
+        self._orientations = tuple(int(v.flip) for v in vertex_data)
+
+        edge_data.append(EdgeData(vertex_data[-2], vertex_data[-1]))
 
         super().__init__(
-            vertices=tuple(vertices),
-            edges=tuple(edges),
+            vertex_data=tuple(vertex_data),
+            edge_data=tuple(edge_data),
             construction_stages=(),
             num_processes=num_processes
         )

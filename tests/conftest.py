@@ -66,7 +66,7 @@ def make_reactor():
             mol.topology_graph._get_vertex_clones(mol, 1)
         )
         edge_clones = tuple(
-            mol.topology_graph._get_edge_clones(vertex_clones, 1)
+            mol.topology_graph._get_edge_clones(1)
         )
         mol._edge_clones = edge_clones
 
@@ -89,3 +89,40 @@ def mae_path():
 @pytest.fixture(scope='session')
 def bb_dir():
     return join('..', 'data', 'building_block_init')
+
+
+@pytest.fixture(scope='session')
+def valid_topologies_dir():
+    return join('..', 'data', 'valid_topologies')
+
+
+@pytest.fixture(scope='session')
+def valid_cage_dir(valid_topologies_dir):
+    return join(valid_topologies_dir, 'cage_topology_tests_output')
+
+
+@pytest.fixture(scope='session')
+def valid_cof_dir(valid_topologies_dir):
+    return join(valid_topologies_dir, 'cof_topology_tests_output')
+
+
+@pytest.fixture(scope='session')
+def valid_cyclic_dir(valid_topologies_dir):
+    return join(valid_topologies_dir, 'cyclic_topology_tests_output')
+
+
+@pytest.fixture(scope='session')
+def valid_host_guest_dir(valid_topologies_dir):
+    return join(
+        valid_topologies_dir, 'host_guest_topology_tests_output'
+    )
+
+
+@pytest.fixture(scope='session')
+def valid_linear_dir(valid_topologies_dir):
+    return join(valid_topologies_dir, 'linear_topology_tests_output')
+
+
+@pytest.fixture(scope='session')
+def valid_rotaxane_dir(valid_topologies_dir):
+    return join(valid_topologies_dir, 'rotaxane_topology_tests_output')

@@ -4,7 +4,7 @@ from os.path import join
 import numpy as np
 
 
-from ..._test_utilities import _test_dump_and_load
+from ..._test_utilities import _test_dump_and_load, _compare_with_valid
 
 
 test_dir = 'host_guest_topology_tests_output'
@@ -12,8 +12,8 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 
 
-def _test_placement(vertex, bb):
-    vertex.place_building_block(bb)
+def _test_placement(vertex, bb, vertices, edges):
+    vertex.place_building_block(bb, vertices, edges)
     assert np.allclose(
         a=bb.get_centroid(),
         b=vertex.get_position(),
@@ -22,7 +22,7 @@ def _test_placement(vertex, bb):
 
 
 def _test_alignment(vertex, bb, target):
-    atom1, atom2 = bb.get_atom_coords([0, 1])
+    atom1, atom2 = bb.get_atom_positions([0, 1])
     assert np.allclose(
         a=stk.normalize_vector(atom1 - atom2),
         b=target,
@@ -33,7 +33,7 @@ def _test_alignment(vertex, bb, target):
 def test_vertex(tmp_four_plus_six, tmp_bromine2):
     host = tmp_four_plus_six
     guest = tmp_bromine2
-    atom1, atom2 = guest.get_atom_coords([0, 1])
+    atom1, atom2 = guest.get_atom_positions([0, 1])
     guest_start = stk.normalize_vector(atom1 - atom2)
     complex2 = stk.host_guest.Complex(
         guest_start=guest_start,
@@ -46,8 +46,10 @@ def test_vertex(tmp_four_plus_six, tmp_bromine2):
     )
     for complex_, target in complexes:
         v1, v2 = complex_.vertices
-        _test_placement(v1, host)
-        _test_placement(v2, guest)
+        vertices = complex_.vertices
+        edges = complex_.edges
+        _test_placement(v1, host, vertices, edges)
+        _test_placement(v2, guest, vertices, edges)
         _test_alignment(v2, guest, target)
 
 
@@ -86,7 +88,8 @@ def test_complex(
     amine2,
     amine2_alt3,
     aldehyde3,
-    chained_c60
+    chained_c60,
+    valid_host_guest_dir
 ):
 
     host = _create_host(amine2, amine2_alt3, aldehyde3)
@@ -103,4 +106,5 @@ def test_complex(
             )
         )
         _test_construction(complex_, i, num_expected_bbs)
-        _test_dump_and_load(test_dir, complex_)
+        _test_dump_and_load(test_dir, complex_, str(i))
+        _compare_with_valid(valid_host_guest_dir, complex_, str(i))

@@ -1,6 +1,7 @@
 import itertools as it
 import stk
 from os.path import join
+import numpy as np
 
 
 def _add_test_attrs(mol):
@@ -69,10 +70,32 @@ def _test_bbs(mol, loaded):
     assert bbs2[1].test_attr5 == 'alpha'
 
 
-def _test_dump_and_load(test_dir, mol):
-    path = join(
-        test_dir, f'{mol.topology_graph.__class__.__name__}.dump'
-    )
+def _compare_with_valid(valid_dir, mol, name=None):
+    if name is None:
+        name = mol.topology_graph.__class__.__name__
+    path = join(valid_dir, f'{name}.dump')
+
+    valid = stk.Molecule.load(path)
+    for a1, a2 in zip(mol.atoms, valid.atoms):
+        assert a1.__class__ is a2.__class__
+        assert a1.charge == a2.charge
+
+    for b1, b2 in zip(mol.bonds, valid.bonds):
+        assert b1.atom1.id == b2.atom1.id
+        assert b1.atom2.id == b2.atom2.id
+        assert b1.order == b2.order
+        assert b1.periodicity == b2.periodicity
+
+    assert np.alltrue(np.equal(
+        mol.get_position_matrix(),
+        valid.get_position_matrix()
+    ))
+
+
+def _test_dump_and_load(test_dir, mol, name=None):
+    if name is None:
+        name = mol.topology_graph.__class__.__name__
+    path = join(test_dir, f'{name}.dump')
     _add_test_attrs(mol)
     mol.dump(
         path=path,

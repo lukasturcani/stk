@@ -15,34 +15,41 @@ For usage examples see :class:`.COF`.
 import numpy as np
 import itertools as it
 
-from .topology_graph import TopologyGraph, Vertex, Edge
+from .topology_graph import TopologyGraph, VertexData, Vertex, EdgeData
 from ...utilities import vector_angle, flatten
 
 
-class _COFVertex(Vertex):
+class _COFVertexData(VertexData):
     """
-    Represents a vertex of a :class:`.COF`.
+    Holds data for a COF vertex.
 
     Attributes
     ----------
     id : :class:`int`
-        The id of the vertex. This should be its index in
+        The id of the vertex. Must match the index in
         :attr:`TopologyGraph.vertices`.
 
-    edges : :class:`list` of :class:`.Edge`
-        The edges the :class:`Vertex` is connected to.
+    position : :class:`numpy.ndarray`
+        The position of the vertex.
 
-    aligner_edge : :class:`.Edge`
-        The :class:`.Edge` in :attr:`edges`, which is used to align the
-        :class:`.BuildingBlock` placed on the vertex. The first
-        :class:`.FunctionalGroup` in :attr:`.BuildingBlock.func_groups`
-        is rotated such that it lies exactly on this :class:`.Edge`.
+    edges : :class:`list` of :class:`.EdgeData`
+        The edges connected to the vertex.
+
+    cell : :class:`numpy.ndarray`
+        The unit cell in which the vertex is found.
+
+    aligner_edge : :class:`int`
+        The edge which is used to align the :class:`.BuildingBlock`
+        placed on the vertex. The first :class:`.FunctionalGroup`
+        in :attr:`.BuildingBlock.func_groups` is rotated such that
+        it lies exactly on this :class:`.Edge`. Must be between
+        ``0`` and the number of edges the vertex is connected to.
 
     """
 
     def __init__(self, x, y, z):
         """
-        Initialize a :class:`_COFVertex`.
+        Initialize a :class:`.VertexData` instance.
 
         Parameters
         ----------
@@ -61,40 +68,26 @@ class _COFVertex(Vertex):
         super().__init__(x, y, z)
 
     @classmethod
-    def init_at_center(cls, *vertices):
-        """
-        Initialize at the center of `vertices`.
-
-        Parameters
-        ----------
-        vertices : :class:`.Vertex`
-            Vertices at whose center this vertex should be initialized.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        center = sum(vertex.get_position() for vertex in vertices)
-        center /= len(vertices)
-        return cls(*center)
+    def init_at_center(cls, *vertex_data):
+        obj = super().init_at_center(*vertex_data)
+        obj.aligner_edge = None
+        return obj
 
     @classmethod
     def init_at_shifted_center(
         cls,
-        vertices,
+        vertex_data,
         shifts,
-        lattice_constants
+        lattice_constants,
+        aligner_edge=None
     ):
         """
-        Initialize at the center of shifted `vertices`.
+        Initialize at the center of shifted `vertex_data`.
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`_COFVertex`
-            The vertics at whose center this vertex should be
+        vertex_data : :class:`tuple` of :class:`.VertexData`
+            The vertices at whose center this vertex should be
             intialized.
 
         shifts : :class:`tuple`
@@ -119,12 +112,11 @@ class _COFVertex(Vertex):
         """
 
         positions = []
-        for vertex, shift in zip(vertices, shifts):
+        for vertex, shift in zip(vertex_data, shifts):
             total_shift = 0
             for dim_shift, constant in zip(shift, lattice_constants):
                 total_shift += dim_shift * constant
-            position = vertex.get_position() + total_shift
-            positions.append(position)
+            positions.append(vertex.position + total_shift)
 
         position = np.divide(
             np.sum(positions, axis=0),
@@ -133,56 +125,68 @@ class _COFVertex(Vertex):
         return cls(*position)
 
     def clone(self, clear_edges=False):
+        clone = super().clone(clear_edges)
+        clone.aligner_edge = self.aligner_edge
+        return clone
+
+    def get_vertex(self):
+        return _COFVertex(self)
+
+
+class _COFVertex(Vertex):
+    """
+    Represents a vertex of a :class:`.COF`.
+
+    Attributes
+    ----------
+    id : :class:`int`
+        The id of the vertex. This should be its index in
+        :attr:`.TopologyGraph.vertices`.
+
+    """
+
+    def __init__(self, data):
         """
-        Create a clone of the instance.
+        Initialize a :class:`_COFVertex`.
+
+        Parameters
+        ----------
+        data : :class:`_COFVertexData`
+            The vertex data.
+
+        """
+
+        # The edge which is used to align the :class:`.BuildingBlock`
+        # placed on the vertex. The first :class:`.FunctionalGroup`
+        # in :attr:`.BuildingBlock.func_groups` is rotated such that
+        # it lies exactly on this :class:`.Edge`. Must be between
+        # ``0`` and the number of edges the vertex is connected to.
+        self._aligner_edge = data.aligner_edge
+        super().__init__(data)
+
+    def clone(self, clear_edges=False):
+        """
+        Return a clone.
 
         Parameters
         ----------
         clear_edges : :class:`bool`, optional
-            If ``True`` the :attr:`edges` attribute of the clone will
-            be empty.
+            ``True`` if the clone should not be connected to any edges.
 
         Returns
         -------
         :class:`Vertex`
-            A clone with the same position but not connected to any
-            :class:`.Edge` objects.
-
+            The clone.
         """
 
         clone = super().clone(clear_edges)
-        if self.aligner_edge is not None:
-            clone.aligner_edge = self.aligner_edge.clone(
-                add_to_vertices=False
-            )
-        else:
-            clone.aligner_edge = None
+        clone._aligner_edge = self._aligner_edge
         return clone
 
-    def apply_scale(self, scale):
-        """
-        Scale the position by `scale`.
+    def get_aligner_edge(self):
+        return self._aligner_edge
 
-        Parameters
-        ----------
-        scale : :class:`float` or :class:`list`of :class:`float`
-            The value by which the position of the :class:`Vertex` is
-            scaled. Can be a single number if all axes are scaled by
-            the same amount or a :class:`list` of three numbers if
-            each axis is scaled by a different value.
-
-        Returns
-        -------
-        :class:`Vertex`
-            The vertex is returned.
-
-        """
-
-        self._position *= scale
-        self.aligner_edge.apply_scale(scale)
-        return self
-
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, vertices, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -191,6 +195,14 @@ class _COFVertex(Vertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -201,10 +213,23 @@ class _COFVertex(Vertex):
         """
 
         if len(building_block.func_groups) == 2:
-            return self._place_linear_building_block(building_block)
-        return self._place_nonlinear_building_block(building_block)
+            return self._place_linear_building_block(
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
+            )
+        return self._place_nonlinear_building_block(
+            building_block=building_block,
+            vertices=vertices,
+            edges=edges
+        )
 
-    def _place_linear_building_block(self, building_block):
+    def _place_linear_building_block(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -213,6 +238,14 @@ class _COFVertex(Vertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -230,11 +263,15 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_centroid - self._position
-        e0_coord = self.edges[0].get_position(self)
-        e1_coord = self.edges[1].get_position(self)
+        e0_coord = (
+            edges[self._edge_ids[0]].get_position(self, vertices)
+        )
+        e1_coord = (
+            edges[self._edge_ids[1]].get_position(self, vertices)
+        )
         target = e0_coord - e1_coord
 
-        if self.aligner_edge.id != self.edges[0].id:
+        if self._edge_ids[self._aligner_edge] != self._edge_ids[0]:
             target *= -1
 
         building_block.apply_rotation_between_vectors(
@@ -251,7 +288,12 @@ class _COFVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def _place_nonlinear_building_block(self, building_block):
+    def _place_nonlinear_building_block(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -260,6 +302,14 @@ class _COFVertex(Vertex):
         building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
 
         Returns
         -------
@@ -282,7 +332,9 @@ class _COFVertex(Vertex):
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
         start = fg_bonder_centroid - self._position
-        edge_coord = self.aligner_edge.get_position(self)
+
+        aligner_edge = edges[self._edge_ids[self._aligner_edge]]
+        edge_coord = aligner_edge.get_position(self, vertices)
         target = edge_coord - self._position
         building_block.apply_rotation_to_minimize_angle(
             start=start,
@@ -292,7 +344,12 @@ class _COFVertex(Vertex):
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(self, building_block):
+    def assign_func_groups_to_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         """
         Assign functional groups to edges.
 
@@ -306,6 +363,14 @@ class _COFVertex(Vertex):
             The building block molecule which is needs to have
             functional groups assigned to edges.
 
+        vertices : :class:`tuple` of :class:`.Vertex`
+            All vertices in the topology graph. The index of each
+            vertex must match its :class:`~.Vertex.id`.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            All edges in the topology graph. The index of each
+            edge must match its :class:`~.Edge.id`.
+
         Returns
         -------
         :class:`dict`
@@ -317,32 +382,53 @@ class _COFVertex(Vertex):
 
         if len(building_block.func_groups) == 2:
             return self._assign_func_groups_to_linear_edges(
-                building_block=building_block
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
             )
         return self._assign_func_groups_to_nonlinear_edges(
-                building_block=building_block
+                building_block=building_block,
+                vertices=vertices,
+                edges=edges
             )
 
-    def _assign_func_groups_to_linear_edges(self, building_block):
+    def _assign_func_groups_to_linear_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         return {
-            fg_id: e.id for fg_id, e in enumerate(sorted(
-                self.edges,
-                key=self._get_fg0_distance(building_block)
+            fg_id: edge_id for fg_id, edge_id in enumerate(sorted(
+                self._edge_ids,
+                key=self._get_fg0_distance(
+                    building_block=building_block,
+                    vertices=vertices,
+                    edges=edges
+                )
             ))
         }
 
-    def _get_fg0_distance(self, building_block):
+    def _get_fg0_distance(self, building_block, vertices, edges):
         fg_coord = building_block.get_centroid(
             atom_ids=building_block.func_groups[0].get_bonder_ids()
         )
 
-        def distance(edge):
-            displacement = edge.get_position(self) - fg_coord
+        def distance(edge_id):
+            displacement = edges[edge_id].get_position(
+                reference=self,
+                vertices=vertices
+            ) - fg_coord
             return np.linalg.norm(displacement)
 
         return distance
 
-    def _assign_func_groups_to_nonlinear_edges(self, building_block):
+    def _assign_func_groups_to_nonlinear_edges(
+        self,
+        building_block,
+        vertices,
+        edges
+    ):
         # The idea is to order the functional groups in building_block
         # by their angle from func_groups[0] and the bonder centroid,
         #  going in the clockwise direction.
@@ -372,10 +458,13 @@ class _COFVertex(Vertex):
                 axis=axis
             )
         )
-        edges = sorted(self.edges, key=self._get_edge_angle(axis))
+        edge_ids = sorted(
+            self._edge_ids,
+            key=self._get_edge_angle(axis, vertices, edges)
+        )
         assignments = {}
-        for edge, fg_id in zip(edges, func_groups):
-            assignments[fg_id] = edge.id
+        for edge_id, fg_id in zip(edge_ids, func_groups):
+            assignments[fg_id] = edge_id
         return assignments
 
     @staticmethod
@@ -401,15 +490,20 @@ class _COFVertex(Vertex):
 
         return angle
 
-    def _get_edge_angle(self, axis):
+    def _get_edge_angle(self, axis, vertices, edges):
 
-        aligner_edge_coord = self.aligner_edge.get_position(self)
-        edge_centroid = self._get_edge_centroid()
+        aligner_edge = edges[self._edge_ids[self._aligner_edge]]
+        aligner_edge_coord = aligner_edge.get_position(self, vertices)
+        connected_edges = tuple(edges[id_] for id_ in self._edge_ids)
+        edge_centroid = self._get_edge_centroid(
+            centroid_edges=connected_edges,
+            vertices=vertices
+        )
         # This axis is used to figure out the clockwise direction.
         aligner_edge_direction = aligner_edge_coord - edge_centroid
 
-        def angle(edge):
-            coord = edge.get_position(self)
+        def angle(edge_id):
+            coord = edges[edge_id].get_position(self, vertices)
             edge_direction = coord - edge_centroid
             theta = vector_angle(
                 vector1=edge_direction,
@@ -424,15 +518,10 @@ class _COFVertex(Vertex):
         return angle
 
     def __str__(self):
-        x, y, z = self._position
-        if self.aligner_edge is not None:
-            aligner_edge = self.edges.index(self.aligner_edge)
-        else:
-            aligner_edge = None
         return (
             f'Vertex(id={self.id}, '
-            f'position={[x, y, z]}, '
-            f'aligner_edge={aligner_edge})'
+            f'position={self._position.tolist()}, '
+            f'aligner_edge={self._aligner_edge})'
         )
 
 
@@ -446,6 +535,14 @@ class COF(TopologyGraph):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -454,8 +551,8 @@ class COF(TopologyGraph):
 
     Examples
     --------
-    :class:`COF` instances can be made without supplying
-    additional arguments (using :class:`.Honeycomb` as an example)
+    :class:`COF` instances can be made by supplying only
+    the lattice size (using :class:`.Honeycomb` as an example)
 
     .. code-block:: python
 
@@ -473,72 +570,49 @@ class COF(TopologyGraph):
 
     .. code-block:: python
 
-        v0 = stk.cof.Honeycomb.vertices[0]
-        v2 = stk.cof.Honeycomb.vertices[2]
         lattice = stk.cof.Honeycomb(
             lattice_size=(2, 2, 1),
-            vertex_alignments={
-                v0: v0.edges[1],
-                v2: v2.edges[2]
-            }
+            vertex_alignments={0: 1, 2: 2}
         )
         cof2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2],
             topology_graph=lattice
         )
 
-    By changing which edge each vertex is aligned with, a different
-    structural isomer of the COF can be formed.
+    The parameter maps the :attr:`~.Vertex.id` of a vertex to a number
+    between 0 (inclusive) and the number of edges the vertex is
+    connected to (exclusive). So a vertex connected to three edges
+    can be mapped to ``0``, ``1`` or ``2``.
 
-    Note the in the `vertex_alignments` parameter the class vertices
-    and edges are used, however when the `building_block_vertices`
-    parameter is used, the instance vertices are used. **These are not
-    interchangeable!**
+    You can also build COFs with multiple building blocks, but you
+    have to assign each building block to a vertex with
+    `building_block_vertices`.
 
     .. code-block:: python
 
-        # Use the class vertices and edges to set vertex_alignments
-        # and create a topology graph.
-        v0 = stk.cof.Honeycomb.vertices[0]
-        v2 = stk.cof.Honeycomb.vertices[2]
         lattice = stk.cof.Honeycomb(
             lattice_size=(2, 2, 1),
-            vertex_alignments={
-                v0: v0.edges[1],
-                v2: v2.edges[2]
-            }
+            vertex_alignments={0: 1, 2: 2}
         )
         bb3 = stk.BuildingBlock('NCOCN', ['amine'])
         cof2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
             topology_graph=lattice
-            # Use the instance vertices in the building_block_vertices
-            # parameter.
             building_block_vertices={
-                bb1: lattice.vertices[:2],
-                bb2: lattice.vertices[4:],
-                bb3: lattice.vertices[2:4]
+                bb1: lattice.verices[:2],
+                bb2: lattice.verices[4:],
+                bb3: lattice.verices[2:4]
             }
         )
-
-    The example above also demonstrates how COFs with many building
-    blocks can be built. You can add as many :class:`.BuildingBlock`
-    instances into `building_blocks` as you like. If you do not
-    assign where each building block is placed with
-    `building_block_vertices`, they will be placed on the
-    :attr:`vertices` of the :class:`.COF` at random. Random
-    placement will account for the fact that the length of
-    :attr:`.BuildingBlock.func_groups` needs to match the number of
-    edges connected to a vertex.
 
     """
 
     def __init_subclass__(cls, **kwargs):
-        for i, vertex in enumerate(cls.vertices):
+        for i, vertex in enumerate(cls.vertex_data):
             vertex.id = i
-        for i, edge in enumerate(cls.edges):
+        for i, edge in enumerate(cls.edge_data):
             edge.id = i
-            edge._lattice_constants = tuple(
+            edge.lattice_constants = tuple(
                 np.array(constant)
                 for constant in cls._lattice_constants
             )
@@ -566,22 +640,18 @@ class COF(TopologyGraph):
             groups on the ends of the lattice will be unreacted.
 
         vertex_alignments : :class:`dict`, optional
-            A mapping from a :class:`.Vertex`, in the class
-            attribute :attr:`vertices`, to an :class:`.Edge`, in the
-            class attribute :attr:`edges`, connected to it.
+            A mapping from the :attr:`.Vertex.id` of a :class:`.Vertex`
+            :attr:`vertices` to an :class:`.Edge` connected to it.
             The :class:`.Edge` is used to align the first
             :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
             placed on that vertex. Only vertices which need to have
-            their default alignment changed need to be present in the
-            :class:`dict`. If ``None`` then the first :class:`.Edge`
-            in :attr:`.Vertex.edges` is used for each vertex. Changing
-            which :class:`.Edge` is used will mean that the topology
-            graph will represent a different structural isomer.
-
-            The vertices and edges can also be referred to by their
-            indices. The vertices are referred to by their index in
-            the class attribute :attr:`vertices` while the edges are
-            referred to by their index in :attr:`.Vertex.edges`.
+            their default edge changed need to be present in the
+            :class:`dict`. If ``None`` then the default edge is used
+            for each vertex. Changing which :class:`.Edge` is used will
+            mean that the topology graph represents different
+            structural isomers. The edge is refered to by a number
+            between ``0`` (inclusive) and the number of edges the
+            vertex is connected to (exclusive).
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
@@ -591,80 +661,39 @@ class COF(TopologyGraph):
 
         if vertex_alignments is None:
             vertex_alignments = {}
-        vertex_alignments = self._normalize_vertex_alignments(
-            vertex_alignments=vertex_alignments
-        )
 
         self._lattice_size = lattice_size
         self._periodic = periodic
 
-        vertices = self._get_instance_vertices(vertex_alignments)
-        edges = self._get_instance_edges(vertices)
+        vertex_data = self._get_vertex_data(vertex_alignments)
+        edge_data = self._get_edge_data(vertex_data)
 
-        vertices = tuple(
+        vertex_data = tuple(
             vertex
-            for clones in flatten(vertices, {dict})
+            for clones in flatten(vertex_data, {dict})
             for vertex in clones.values()
         )
-        super().__init__(vertices, edges, (), num_processes)
+        super().__init__(vertex_data, edge_data, (), num_processes)
 
-    def _normalize_vertex_alignments(self, vertex_alignments):
+    def _get_vertex_data(self, vertex_alignments):
         """
-        Normalize different `vertex_alignments` input forms.
-
-        Parameters
-        ----------
-        vertex_alignments : :class:`dict`
-            A mapping from a :class:`.Vertex`, in the class
-            attribute :attr:`vertices`, to an :class:`.Edge`, in the
-            class attribute :attr:`edges`, connected to it.
-            The :class:`.Edge` is used to align the first
-            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
-            placed on that vertex. Only vertices which need to have
-            their default alignment changed need to be present in the
-            :class:`dict`. If ``None`` then the first :class:`.Edge`
-            in :attr:`.Vertex.edges` is used for each vertex. Changing
-            which :class:`.Edge` is used will mean that the topology
-            graph will represent a different structural isomer.
-
-            The vertices and edges can also be referred to by their
-            indices. The vertices are referred to by their index in
-            the class attribute :attr:`vertices` while the edges are
-            referred to by their index in :attr:`.Vertex.edges`.
-
-        Returns
-        -------
-        :class:`dict`
-            `vertex_alignments` but with indices replaced with the
-            vertices and edges they refer to.
-
-        """
-
-        _vertex_alignments = {}
-        for v, e in vertex_alignments.items():
-            v = self.vertices[v] if isinstance(v, int) else v
-            e = v.edges[e] if isinstance(e, int) else e
-            _vertex_alignments[v] = e
-        return _vertex_alignments
-
-    def _get_instance_vertices(self, vertex_alignments):
-        """
-        Create the vertices of the topology graph instance.
+        Create the vertex data of the topology graph instance.
 
         Parameters
         ---------
         vertex_alignments : :class:`dict`
-            A mapping from a :class:`.Vertex`, in the class
-            attribute :attr:`vertices`, to an :class:`.Edge`, in the
-            class attribute :attr:`edges`, connected to it.
+            A mapping from the :attr:`.Vertex.id` of a :class:`.Vertex`
+            :attr:`vertices` to an :class:`.Edge` connected to it.
             The :class:`.Edge` is used to align the first
             :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
             placed on that vertex. Only vertices which need to have
-            their default alignment changed need to be present in the
-            :class:`dict`. If ``None`` then the first :class:`.Edge`
-            in :attr:`.Vertex.edges` is used for each vertex. Changing
-            which :class:`.Edge` is used will mean that the topology
-            graph will represent a different structural isomer.
+            their default edge changed need to be present in the
+            :class:`dict`. If ``None`` then the default edge is used
+            for each vertex. Changing which :class:`.Edge` is used will
+            mean that the topology graph represents different
+            structural isomers. The edge is refered to by a number
+            between ``0`` (inclusive) and the number of edges the
+            vertex is connected to (exclusive).
 
         Returns
         -------
@@ -672,9 +701,8 @@ class COF(TopologyGraph):
             A nested :class:`list` which can be indexed as
             ``vertices[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
-            the vertices in the class attribute :attr:`vertices` to
-            the instance clones, for that unit cell.
-
+            the vertices in :attr:`vertex_data` to its clone for that
+            unit cell.
 
         """
 
@@ -691,41 +719,36 @@ class COF(TopologyGraph):
         ]
         # Make a clone of each vertex for each unit cell.
         cells = it.product(xdim, ydim, zdim)
-        vertices = it.product(cells, self.vertices)
+        vertices = it.product(cells, self.vertex_data)
         for cell, vertex in vertices:
             x, y, z = cell
-            clone = vertex.clone(clear_edges=True)
-            clone.set_cell(x, y, z)
-            clone.aligner_edge = vertex_alignments.get(
-                vertex,
-                vertex.edges[0]
-            )
+            clone = vertex.clone(True)
+            clone.cell = np.array(cell)
+            clone.aligner_edge = vertex_alignments.get(vertex.id, 0)
             # Shift the clone so that it's within the cell.
-            shift = 0
             for axis, dim in zip(cell, self._lattice_constants):
-                shift += axis * dim
-            clone.set_position(clone.get_position()+shift)
+                clone.position += axis * dim
 
             vertex_clones[x][y][z][vertex] = clone
         return vertex_clones
 
-    def _get_instance_edges(self, vertices):
+    def _get_edge_data(self, vertex_data):
         """
-        Create the edges in the topology graph instance.
+        Create the edge data of the topology graph instance.
 
         Parameters
         ----------
-        vertices : :class:`list`
+        vertex_data : :class:`list`
             A nested :class:`list` which can be indexed as
-            ``vertices[x][y][z]``, which will return a :class:`dict`
+            ``vertex_data[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
-            the vertices in the class attribute :attr:`vertices` to
-            the instance clones, for that unit cell.
+            the vertices in :attr:`vertex_data` to the clones for that
+            unit cell.
 
         Returns
         -------
-        :class:`tuple` of :class:`.Edge`
-            The edges of the topology graph instance.
+        :class:`tuple` of :class:`.EdgeData`
+            The edge data of the topology graph instance.
 
         """
 
@@ -733,12 +756,11 @@ class COF(TopologyGraph):
         # Make a clone for each edge for each unit cell.
         xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
         cells = it.product(xdim, ydim, zdim)
-        edges = it.product(cells, self.edges)
+        edges = it.product(cells, self.edge_data)
         for cell, edge in edges:
             x, y, z = cell
-            # The cell in which edge.vertices[1] is found.
-            periodicity = edge.get_periodicity()
-            periodic_cell = np.array(cell) + periodicity
+            # The cell in which the second vertex of the edge is found.
+            periodic_cell = np.array(cell) + edge.periodicity
             # Wrap around periodic cells, ie those that are less than 0
             # or greater than the lattice size along any dimension.
             dims = zip(periodic_cell, self._lattice_size)
@@ -747,12 +769,11 @@ class COF(TopologyGraph):
                 for dim, max_dim in dims
             ])
             # Make a vertex map which accounts for the fact that
-            # edge.vertices[1] is in cell2.
-            v0 = edge.vertices[0]
-            v1 = edge.vertices[1]
+            # v1 is in cell2.
+            v0, v1 = edge.vertices
             vertex_map = {
-                v0: vertices[x][y][z][v0],
-                v1: vertices[cell2_x][cell2_y][cell2_z][v1]
+                v0: vertex_data[x][y][z][v0],
+                v1: vertex_data[cell2_x][cell2_y][cell2_z][v1]
             }
             # If the edge is not periodic if periodic_cell is did not
             # have to wrap around.
@@ -761,26 +782,19 @@ class COF(TopologyGraph):
                 dim >= 0 and dim < max_dim
                 for dim, max_dim in dims
             )
-            clone = edge.clone(
-                vertex_map=vertex_map,
-                recalculate_position=edge_is_not_periodic
-            )
+            clone = edge.clone(vertex_map, True, True)
             edge_clones.append(clone)
             if edge_is_not_periodic:
-                clone.set_periodicity(0, 0, 0)
-            # Set the aligner edge to the clone.
-            for vertex in vertex_map.values():
-                if vertex.aligner_edge is edge:
-                    vertex.aligner_edge = clone
+                clone.periodicity = np.array([0, 0, 0])
+
         return tuple(edge_clones)
 
-    def _before_react(self, mol, vertex_clones, edge_clones):
+    def _before_react(self, mol, vertices, edges):
         if self._periodic:
-            return vertex_clones, edge_clones
-        return vertex_clones, [
-            edge for edge in edge_clones
-            if all(dim == 0 for dim in edge.get_periodicity())
-        ]
+            return vertices, edges
+        return vertices, tuple(
+            edge for edge in edges if not edge.is_periodic()
+        )
 
     def assign_building_blocks_to_vertices(self, building_blocks):
         """
@@ -837,7 +851,7 @@ class COF(TopologyGraph):
 
         building_block_vertices = {}
         for vertex in self.vertices:
-            bb = bb_by_degree[len(vertex.edges)]
+            bb = bb_by_degree[vertex.get_num_edges()]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
             )
@@ -870,9 +884,9 @@ class COF(TopologyGraph):
 
     def __repr__(self):
         vertex_alignments = ', '.join(
-            f'{v.id}: {v.edges.index(v.aligner_edge)}'
+            f'{v.id}: {v.get_aligner_edge()}'
             # Only get the vertices in the first unit cell.
-            for v in self.vertices[:len(self.__class__.vertices)]
+            for v in self.vertices[:len(self.vertex_data)]
         )
 
         x, y, z = self._lattice_size
@@ -896,6 +910,14 @@ class Honeycomb(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -910,35 +932,45 @@ class Honeycomb(COF):
         np.array([0, 0, 5/1.7321])
     )
 
-    _vertices = (
-        _COFVertex(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
-        _COFVertex(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
+    _vertex_data = (
+        _COFVertexData(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
+        _COFVertexData(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
     )
 
-    vertices = (
-        *_vertices,
-        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[1]),
+    vertex_data = (
+        *_vertex_data,
+        _COFVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[1]
+        ),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[0], _vertex_data[1]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[1]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[0], _vertex_data[1]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         )
     )
 
-    edges = (
-        Edge(vertices[2], vertices[0]),
-        Edge(vertices[2], vertices[1]),
+    edge_data = (
+        EdgeData(vertex_data[2], vertex_data[0]),
+        EdgeData(vertex_data[2], vertex_data[1]),
 
-        Edge(vertices[3], vertices[0]),
-        Edge(vertices[3], vertices[1], periodicity=(0, -1, 0)),
+        EdgeData(vertex_data[3], vertex_data[0]),
+        EdgeData(
+            vertex_data[3],
+            vertex_data[1],
+            periodicity=(0, -1, 0)
+        ),
 
-        Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[1], periodicity=(-1, 0, 0))
+        EdgeData(vertex_data[4], vertex_data[0]),
+        EdgeData(
+            vertex_data[4],
+            vertex_data[1],
+            periodicity=(-1, 0, 0)
+        )
     )
 
 
@@ -953,6 +985,14 @@ class Hexagonal(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -960,99 +1000,138 @@ class Hexagonal(COF):
         The edges which make up the topology graph.
 
     """
+
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
         np.array([0.5, 0.866, 0]),
         np.array([0, 0, 5/1.7321])
     )
 
-    _vertices = (
-        _COFVertex(*((1/4)*_a + (1/4)*_b + (1/2)*_c)),
-        _COFVertex(*((1/4)*_a + (3/4)*_b + (1/2)*_c)),
-        _COFVertex(*((3/4)*_a + (1/4)*_b + (1/2)*_c)),
-        _COFVertex(*((3/4)*_a + (3/4)*_b + (1/2)*_c))
+    _vertex_data = (
+        _COFVertexData(*((1/4)*_a + (1/4)*_b + (1/2)*_c)),
+        _COFVertexData(*((1/4)*_a + (3/4)*_b + (1/2)*_c)),
+        _COFVertexData(*((3/4)*_a + (1/4)*_b + (1/2)*_c)),
+        _COFVertexData(*((3/4)*_a + (3/4)*_b + (1/2)*_c))
     )
 
-    vertices = (
-        *_vertices,
-        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
-        _COFVertex.init_at_center(_vertices[0], _vertices[2]),
-        _COFVertex.init_at_center(_vertices[1], _vertices[2]),
-        _COFVertex.init_at_center(_vertices[1], _vertices[3]),
-        _COFVertex.init_at_center(_vertices[2], _vertices[3]),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[2]),
+    vertex_data = (
+        *_vertex_data,
+        _COFVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[1]
+        ),
+        _COFVertexData.init_at_center(
+            _vertex_data[0], _vertex_data[2]
+        ),
+        _COFVertexData.init_at_center(
+            _vertex_data[1], _vertex_data[2]
+        ),
+        _COFVertexData.init_at_center(
+            _vertex_data[1], _vertex_data[3]
+        ),
+        _COFVertexData.init_at_center(
+            _vertex_data[2], _vertex_data[3]
+        ),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[0], _vertex_data[2]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[1]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[0], _vertex_data[1]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[3]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[0], _vertex_data[3]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[2], _vertices[1]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[2], _vertex_data[1]),
             shifts=((0, 0, 0), (1, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[2], _vertices[3]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[2], _vertex_data[3]),
             shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[1], _vertices[3]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[1], _vertex_data[3]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[3], _vertices[0]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[3], _vertex_data[0]),
             shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants
         )
     )
 
-    edges = (
-        Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[1]),
+    edge_data = (
+        EdgeData(vertex_data[4], vertex_data[0]),
+        EdgeData(vertex_data[4], vertex_data[1]),
 
-        Edge(vertices[5], vertices[0]),
-        Edge(vertices[5], vertices[2]),
+        EdgeData(vertex_data[5], vertex_data[0]),
+        EdgeData(vertex_data[5], vertex_data[2]),
 
-        Edge(vertices[6], vertices[1]),
-        Edge(vertices[6], vertices[2]),
+        EdgeData(vertex_data[6], vertex_data[1]),
+        EdgeData(vertex_data[6], vertex_data[2]),
 
-        Edge(vertices[7], vertices[1]),
-        Edge(vertices[7], vertices[3]),
+        EdgeData(vertex_data[7], vertex_data[1]),
+        EdgeData(vertex_data[7], vertex_data[3]),
 
-        Edge(vertices[8], vertices[2]),
-        Edge(vertices[8], vertices[3]),
+        EdgeData(vertex_data[8], vertex_data[2]),
+        EdgeData(vertex_data[8], vertex_data[3]),
 
-        Edge(vertices[9], vertices[0]),
-        Edge(vertices[9], vertices[2], periodicity=(-1, 0, 0)),
+        EdgeData(vertex_data[9], vertex_data[0]),
+        EdgeData(
+            vertex_data[9],
+            vertex_data[2],
+            periodicity=(-1, 0, 0)
+        ),
 
-        Edge(vertices[10], vertices[0]),
-        Edge(vertices[10], vertices[1], periodicity=(0, -1, 0)),
+        EdgeData(vertex_data[10], vertex_data[0]),
+        EdgeData(
+            vertex_data[10],
+            vertex_data[1],
+            periodicity=(0, -1, 0)
+        ),
 
-        Edge(vertices[11], vertices[0]),
-        Edge(vertices[11], vertices[3], periodicity=(0, -1, 0)),
+        EdgeData(vertex_data[11], vertex_data[0]),
+        EdgeData(
+            vertex_data[11],
+            vertex_data[3],
+            periodicity=(0, -1, 0)
+        ),
 
-        Edge(vertices[12], vertices[2]),
-        Edge(vertices[12], vertices[1], periodicity=(1, -1, 0)),
+        EdgeData(vertex_data[12], vertex_data[2]),
+        EdgeData(
+            vertex_data[12],
+            vertex_data[1],
+            periodicity=(1, -1, 0)
+        ),
 
-        Edge(vertices[13], vertices[2]),
-        Edge(vertices[13], vertices[3], periodicity=(0, -1, 0)),
+        EdgeData(vertex_data[13], vertex_data[2]),
+        EdgeData(
+            vertex_data[13],
+            vertex_data[3],
+            periodicity=(0, -1, 0)
+        ),
 
-        Edge(vertices[14], vertices[1]),
-        Edge(vertices[14], vertices[3], periodicity=(-1, 0, 0)),
+        EdgeData(vertex_data[14], vertex_data[1]),
+        EdgeData(
+            vertex_data[14],
+            vertex_data[3],
+            periodicity=(-1, 0, 0)
+        ),
 
-        Edge(vertices[15], vertices[3]),
-        Edge(vertices[15], vertices[0], periodicity=(1, 0, 0))
+        EdgeData(vertex_data[15], vertex_data[3]),
+        EdgeData(
+            vertex_data[15],
+            vertex_data[0],
+            periodicity=(1, 0, 0)
+        )
     )
 
 
@@ -1067,6 +1146,14 @@ class Square(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -1081,29 +1168,37 @@ class Square(COF):
         np.array([0., 0., 1.])
     )
 
-    _vertices = (
-        _COFVertex(*((0.5)*_a + (0.5)*_b + (0.5)*_c)),
+    _vertex_data = (
+        _COFVertexData(*((0.5)*_a + (0.5)*_b + (0.5)*_c)),
     )
-    vertices = (
-        *_vertices,
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[0]),
+    vertex_data = (
+        *_vertex_data,
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[0], _vertex_data[0]),
             shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[0]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[0], _vertex_data[0]),
             shifts=((0, 0, 0), (0, 1, 0)),
             lattice_constants=_lattice_constants
         )
 
     )
 
-    edges = (
-        Edge(vertices[1], vertices[0]),
-        Edge(vertices[1], vertices[0], periodicity=(1, 0, 0)),
-        Edge(vertices[2], vertices[0]),
-        Edge(vertices[2], vertices[0], periodicity=(0, 1, 0))
+    edge_data = (
+        EdgeData(vertex_data[1], vertex_data[0]),
+        EdgeData(
+            vertex_data[1],
+            vertex_data[0],
+            periodicity=(1, 0, 0)
+        ),
+        EdgeData(vertex_data[2], vertex_data[0]),
+        EdgeData(
+            vertex_data[2],
+            vertex_data[0],
+            periodicity=(0, 1, 0)
+        )
     )
 
 
@@ -1118,6 +1213,14 @@ class Kagome(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -1132,53 +1235,74 @@ class Kagome(COF):
         np.array([0., 0., 5/1.7321])
     )
 
-    _vertices = (
-        _COFVertex(*((1/4)*_a + (3/4)*_b + (0.5)*_c)),
-        _COFVertex(*((3/4)*_a + (3/4)*_b + (1/2)*_c)),
-        _COFVertex(*((3/4)*_a + (1/4)*_b + (1/2)*_c))
+    _vertex_data = (
+        _COFVertexData(*((1/4)*_a + (3/4)*_b + (0.5)*_c)),
+        _COFVertexData(*((3/4)*_a + (3/4)*_b + (1/2)*_c)),
+        _COFVertexData(*((3/4)*_a + (1/4)*_b + (1/2)*_c))
     )
 
-    vertices = (
-        *_vertices,
-        _COFVertex.init_at_center(_vertices[0], _vertices[1]),
-        _COFVertex.init_at_center(_vertices[0], _vertices[2]),
-        _COFVertex.init_at_center(_vertices[1], _vertices[2]),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[1]),
+    vertex_data = (
+        *_vertex_data,
+        _COFVertexData.init_at_center(
+            _vertex_data[0],
+            _vertex_data[1]
+        ),
+        _COFVertexData.init_at_center(
+            _vertex_data[0],
+            _vertex_data[2]
+        ),
+        _COFVertexData.init_at_center(
+            _vertex_data[1],
+            _vertex_data[2]
+        ),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[0], _vertex_data[1]),
             shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[0], _vertices[2]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[0], _vertex_data[2]),
             shifts=((0, 0, 0), (-1, 1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _COFVertex.init_at_shifted_center(
-            vertices=(_vertices[1], _vertices[2]),
+        _COFVertexData.init_at_shifted_center(
+            vertex_data=(_vertex_data[1], _vertex_data[2]),
             shifts=((0, 0, 0), (0, 1, 0)),
             lattice_constants=_lattice_constants
         )
 
     )
 
-    edges = (
-        Edge(vertices[3], vertices[0]),
-        Edge(vertices[3], vertices[1]),
+    edge_data = (
+        EdgeData(vertex_data[3], vertex_data[0]),
+        EdgeData(vertex_data[3], vertex_data[1]),
 
-        Edge(vertices[4], vertices[0]),
-        Edge(vertices[4], vertices[2]),
+        EdgeData(vertex_data[4], vertex_data[0]),
+        EdgeData(vertex_data[4], vertex_data[2]),
 
-        Edge(vertices[5], vertices[1]),
-        Edge(vertices[5], vertices[2]),
+        EdgeData(vertex_data[5], vertex_data[1]),
+        EdgeData(vertex_data[5], vertex_data[2]),
 
-        Edge(vertices[6], vertices[0]),
-        Edge(vertices[6], vertices[1], periodicity=(-1, 0, 0)),
+        EdgeData(vertex_data[6], vertex_data[0]),
+        EdgeData(
+            vertex_data[6],
+            vertex_data[1],
+            periodicity=(-1, 0, 0)
+        ),
 
-        Edge(vertices[7], vertices[0]),
-        Edge(vertices[7], vertices[2], periodicity=(-1, 1, 0)),
+        EdgeData(vertex_data[7], vertex_data[0]),
+        EdgeData(
+            vertex_data[7],
+            vertex_data[2],
+            periodicity=(-1, 1, 0)
+        ),
 
-        Edge(vertices[8], vertices[1]),
-        Edge(vertices[8], vertices[2], periodicity=(0, 1, 0))
+        EdgeData(vertex_data[8], vertex_data[1]),
+        EdgeData(
+            vertex_data[8],
+            vertex_data[2],
+            periodicity=(0, 1, 0)
+        )
     )
 
 
@@ -1193,6 +1317,14 @@ class LinkerlessHoneycomb(COF):
 
     Attributes
     ----------
+    vertex_data : :class:`tuple` of :class:`.VertexData`
+        A class attribute. Holds the data of the vertices which make up
+        the topology graph.
+
+    edge_data : :class:`tuple` of :class:`.EdgeData`
+        A class attribute. Holds the data of the edges which make up
+        the topology graph.
+
     vertices : :class:`tuple` of :class:`.Vertex`
         The vertices which make up the topology graph.
 
@@ -1207,13 +1339,21 @@ class LinkerlessHoneycomb(COF):
         np.array([0., 0., 5/1.7321])
     )
 
-    vertices = (
-        _COFVertex(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
-        _COFVertex(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
+    vertex_data = (
+        _COFVertexData(*((1/3)*_a + (1/3)*_b + (1/2)*_c)),
+        _COFVertexData(*((2/3)*_a + (2/3)*_b + (1/2)*_c))
     )
 
-    edges = (
-        Edge(vertices[0], vertices[1]),
-        Edge(vertices[0], vertices[1], periodicity=(-1, 0, 0)),
-        Edge(vertices[0], vertices[1], periodicity=(0, -1, 0))
+    edge_data = (
+        EdgeData(vertex_data[0], vertex_data[1]),
+        EdgeData(
+            vertex_data[0],
+            vertex_data[1],
+            periodicity=(-1, 0, 0)
+        ),
+        EdgeData(
+            vertex_data[0],
+            vertex_data[1],
+            periodicity=(0, -1, 0)
+        )
     )
