@@ -883,7 +883,9 @@ class Tournament(Selector):
 
         yielded = 0
 
-        while yielded < self._num_batches:
+        # If less than two members of the batch exist,
+        # the tournament cannot take place.
+        while yielded < self._num_batches and len(batches) >= 2:
             # Randomly select number of members to choose from
             # population.
             num_selections = self._generator.randint(2, len(batches)+1)
