@@ -234,6 +234,7 @@ class BuildingBlock(Molecule):
         cls,
         file_glob,
         functional_groups=None,
+        random_seed=None,
         use_cache=False
     ):
         """
@@ -249,6 +250,9 @@ class BuildingBlock(Molecule):
             The names of the functional group types which are to be
             added to :attr:`func_groups`. If ``None``, then no
             functional groups are added.
+
+        random_seed : :class:`int`, optional
+            The random seed to use.
 
         use_cache : :class:`bool`, optional
             If ``True``, a new :class:`.BuildingBlock` will
@@ -270,7 +274,8 @@ class BuildingBlock(Molecule):
         """
 
         files = glob(file_glob)
-        np.random.shuffle(files)
+        generator = np.random.RandomState(random_seed)
+        generator.shuffle(files)
 
         for path in files:
             try:
