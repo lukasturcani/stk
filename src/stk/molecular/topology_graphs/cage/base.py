@@ -397,10 +397,10 @@ class _CageVertex(Vertex):
                 edges=edges
             )
         return self._assign_func_groups_to_nonlinear_edges(
-                building_block=building_block,
-                vertices=vertices,
-                edges=edges
-            )
+            building_block=building_block,
+            vertices=vertices,
+            edges=edges
+        )
 
     def after_assign_func_groups_to_edges(
         self,
