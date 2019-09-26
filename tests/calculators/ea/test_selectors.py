@@ -77,3 +77,46 @@ def test_selector_funnel(generation):
 
     for mol in funnel_selected:
         assert mol in above_avg_elites
+
+
+def test_tournament(generation):
+    tournament = stk.Tournament(num_batches=2, batch_size=2)
+    pop_batches = tournament._batch(generation)
+    worst_batch = min(
+        pop_batches,
+        key=lambda batch: batch[-1]
+    )
+    batches = enumerate(tournament.select(generation), 1)
+    for i, batch in batches:
+        assert len(batch) == 2
+        # Ensures the worst performing batch is never selected.
+        # This is impossible in tournament sampling.
+        assert worst_batch is not batch
+    assert i == 2
+
+    tournament_no_dupes = stk.Tournament(
+        num_batches=5,
+        batch_size=1,
+        duplicate_batches=False
+    )
+    tournament_no_dupes_selected = set(
+        mol for mol in tournament_no_dupes.select(generation)
+    )
+    # Assert that no duplicate molecules are in selected.
+    assert len(tournament_no_dupes_selected) == 5
+
+    small_pop = generation[:2]
+    small_tournament = stk.Tournament(
+        num_batches=10,
+        batch_size=1,
+        duplicate_batches=True
+    )
+    # Ensure that out of a choice of two, the lowest fitness
+    # is never chosen.
+    worst_mol = min(
+        small_pop,
+        key=lambda mol: mol.fitness
+    )
+    for batch in small_tournament.select(small_pop):
+        assert len(batch) == 1
+        assert worst_mol not in batch
