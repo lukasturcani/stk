@@ -807,7 +807,7 @@ class MetalComplex(TopologyGraph):
             for v in self.vertices
         )
         return (
-            f'cage.{self.__class__.__name__}('
+            f'metal_complex.{self.__class__.__name__}('
             f'vertex_alignments={{{vertex_alignments}}})'
         )
 
