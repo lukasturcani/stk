@@ -99,7 +99,8 @@ def _add_yielded_reset(select):
     @wraps(select)
     def inner(self, population):
         if self._reset_yielded:
-            self._yielded &= set()
+            self._yielded_mols &= set()
+            self._yielded_batches &= set()
         return select(self, population)
 
     return inner
@@ -485,64 +486,56 @@ class Fittest(Selector):
 
     def __init__(
         self,
+        batch_size=1,
         num_batches=None,
-        duplicates=True,
-        batch_size=1
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
     ):
         """
-        Initialize a :class:`Fittest` instance.
+        Initialize a :class:`Selector` instance.
 
         Parameters
         ----------
-        num_batches : :class:`int`, optional
-            The number of batches to yield. If ``None`` then yielding
-            will continue until the generator is exhausted.
-
-        duplicates : :class:`bool`, optional
-            If ``True``, the same molecule can be yielded in more than
-            one batch.
-
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
+
+        num_batches : :class:`int`, optional
+            The number of batches to yield. If ``None`` then yielding
+            will continue forever or until the generator is exhausted,
+            whichever comes first.
+
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
 
         """
 
         super().__init__(
+            batch_size=batch_size,
             num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=False,
-            batch_size=batch_size
+            dupclicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier
         )
 
-    def select(self, population):
-        """
-        Yield batches of molecules, fittest first.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            A batch of selected molecules.
-
-        """
-
-        batches = self._batch(population)
-
-        # Sort by total fitness value of each batch.
-        batches = sorted(batches, reverse=True, key=lambda x: x[1])
-
-        if not self._duplicates:
-            batches = self._no_duplicates(batches)
-
-        for i, (batch, fitness) in enumerate(batches):
-            if i >= self._num_batches:
-                break
-            yield batch
+    def _select(self, batches):
+        batches = sorted(batches, reverse=True)
+        if not self._duplicate_batches:
+            batches = filter(self._is_unyielded_batch, batches)
+        if not self._duplicate_mols:
+            batches = filter(self._has_unyielded_mols, batches)
+        yield from it.islice(batches, self._num_batches)
 
 
 class Roulette(Selector):
