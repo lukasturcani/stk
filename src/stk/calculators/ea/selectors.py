@@ -977,36 +977,32 @@ class Tournament(Selector):
         )
 
     def _select(self, batches, yielded_mols, yielded_batches):
-        yielded = 0
+        has_unyielded_mols = _has_unyielded_mols(yielded_mols)
+        is_unyielded_batch = _is_unyielded_batch(yielded_batches)
 
-        # If less than two members of the batch exist,
-        # the tournament cannot take place.
-        while yielded < self._num_batches and len(batches) >= 2:
-            # Randomly select number of members to choose from
-            # population.
-            num_selections = self._generator.randint(2, len(batches)+1)
-            # Get the indexes of all the batches to enter the
-            # tournament.
-            comparison_indexes = np.random.choice(
-                len(batches),
-                num_selections,
+        num_yields = 0
+        # The tournament can only take place if there is more than 1
+        # batch.
+        while num_yields < self._num_batches and len(batches) > 1:
+            tournament_size = self._generator.randint(
+                low=2,
+                high=len(batches)+1
+            )
+            competitors = self._generator.choice(
+                a=batches,
+                size=tournament_size,
                 replace=False
             )
-            # Compare all batches, yielding the index of the batch
-            # with the highest fitness.
-            selected_index = max(
-                comparison_indexes,
-                key=lambda index: batches[index][-1]
-            )
-            # Add selected to yielded.
-            self._yielded.update(batches[selected_index])
-            yield batches[selected_index][0]
-            # If duplicate batches are not allowed, remove the yielded
-            #  batch from batches.
+            winner = max(competitors)
+            num_yields += 1
+            yield winner
+
+            if not self._duplicate_mols:
+                batches = filter(has_unyielded_mols, batches)
             if not self._duplicate_batches:
-                batches.pop(selected_index)
-            yielded += 1
-        return
+                batches = filter(is_unyielded_batch, batches)
+            if not self._duplicate_mols or not self._duplicate_batches:
+                batches = tuple(batches)
 
 
 class StochasticUniversalSampling(Selector):
