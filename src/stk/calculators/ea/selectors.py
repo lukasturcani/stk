@@ -52,7 +52,6 @@ class _Batch:
 
     def __init__(self, mols, fitness_values):
         self._mols = mols
-        self._fitness_values = dict(fitness_values)
         self._fitness = sum(fitness_values[mol] for mol in mols)
         self._identity_key = frozenset(Counter(mols).items())
 
