@@ -589,6 +589,15 @@ _fg_types = (
         )
     ),
 
+    # Dummy metal functional group.
+
+    FGType(
+        name="metal",
+        func_group_smarts="",
+        bonder_smarts=[""],
+        deleter_smarts=[]
+    ),
+
     # Metal interacting functional groups.
 
     FGType(
