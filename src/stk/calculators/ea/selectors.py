@@ -928,82 +928,55 @@ class Tournament(Selector):
 
     def __init__(
         self,
-        num_batches=None,
-        duplicates=True,
-        use_rank=False,
         batch_size=1,
-        duplicate_batches=False,
-        random_seed=None
+        num_batches=None,
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
+        random_seed=None,
     ):
         """
         Initialize a :class:`TournamentSelection` instance.
 
         Parameters
         ----------
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
+
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
 
-        duplicates : :class:`bool`, optional
-            If ``True``, the same molecule can be yielded in more than
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
             one batch.
 
-        use_rank : :class:`bool`, optional
-            When ``True`` the fitness value of an individual is
-            calculated as ``f = 1/rank``. In tournament sampling, this
-            does not affect the selection process.
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
 
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
-
-        duplicate_batches: :class:`bool` optional
-            If ``True``, the same batch can be yielded from the
-            selection process multiple times, as the batch can be
-            selected to compete in a tournament multiple times.
-            If ``False``, the batch will be removed from the batch
-            population once it has been selected.
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
 
         random_seed : :class:`int`, optional
             The random seed to use.
 
         """
-        self._duplicate_batches = duplicate_batches
+
         self._generator = np.random.RandomState(random_seed)
         super().__init__(
-            num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=use_rank,
             batch_size=batch_size,
+            num_batches=num_batches,
+            dupclicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
         )
 
-    def select(self, population):
-        """
-        Yield molecules by tournament selection.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            The population from which individuals are to be selected.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            The next selected batch of molecules.
-
-        """
-
-        # Sort batches by fitness.
-        batches = sorted(
-            self._batch(population),
-            reverse=True,
-            key=lambda x: x[-1]
-        )
-        # Ensure duplicate molecules are not in each batch.
-        if not self._duplicates:
-            # Ensure batches do not contain duplicates.
-            batches = list(self._no_duplicates(batches))
-
+    def _select(self, batches, yielded_mols, yielded_batches):
         yielded = 0
 
         # If less than two members of the batch exist,
