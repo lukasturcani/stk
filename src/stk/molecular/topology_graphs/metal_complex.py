@@ -732,17 +732,17 @@ class MetalComplex(TopologyGraph):
         # Need to remove information about the sites that will not
         # react from stage, self.vertices and self.edges.
         if unsatured_vertices is not None:
-            self.old_vertices = self.vertices
-            self.old_edges = self.edges
-            self.vertices = tuple(
-                i for i in self.old_vertices
+            self.old_vertex_data = self.vertex_data
+            self.old_edge_data = self.edge_data
+            self.vertex_data = tuple(
+                i for i in self.old_vertex_data
                 if i.id not in unsatured_vertices
             )
             used_edges = [
-                i for i in self.edges
-                if set(i.vertices).issubset(set(self.vertices))
+                i for i in self.old_edge_data
+                if set(i.vertices).issubset(set(self.vertex_data))
             ]
-            self.edges = tuple(i for i in used_edges)
+            self.edge_data = tuple(i for i in used_edges)
 
         if vertex_alignments is None:
             vertex_alignments = {}
