@@ -541,6 +541,8 @@ class Best(Selector):
             batch_size=batch_size,
             num_batches=num_batches,
             dupclicate_mols=duplicate_mols,
+            # Note that duplicate batches can still occur in Best,
+            # if there a duplicates of an object in the population.
             duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
@@ -602,8 +604,10 @@ class Worst(Selector):
             batch_size=batch_size,
             num_batches=num_batches,
             dupclicate_mols=duplicate_mols,
+            # Note that duplicate batches can still occur in Worst,
+            # if there a duplicates of an object in the population.
             duplicate_batches=duplicate_batches,
-            fitness_modifier=fitness_modifier
+            fitness_modifier=fitness_modifier,
         )
 
     def _select(self, batches, yielded_mols, yielded_batches):
@@ -737,7 +741,7 @@ class Roulette(Selector):
         has_unyielded_mols = _has_unyielded_mols(yielded_mols)
         is_unyielded_batch = _is_unyielded_batch(yielded_batches)
 
-        while batches and len(yielded_batches) < self._num_batches:
+        while batches and len() < self._num_batches:
             total = sum(batch.get_fitness() for batch in batches)
             weights = [
                 batch.get_fitness() / total for batch in batches
@@ -849,25 +853,36 @@ class AboveAverage(Selector):
 
     def _select(self, batches, yielded_mols, yielded_batches):
         mean = np.mean([batch.get_fitness() for batch in batches])
+        # Yield highest fitness batches first.
         batches = sorted(batches, reverse=True)
-
-        if not self._duplicate_mols:
-            has_unyielded_mols = _has_unyielded_mols(yielded_mols)
-            batches = filter(has_unyielded_mols, batches)
-        if not self._duplicate_batches:
-            is_unyielded_batch = _is_unyielded_batch(yielded_batches)
-            batches = filter(is_unyielded_batch, batches)
-
-        batches = it.islice(batches, self._num_batches)
+        # Yield only batches with a fitness larger than the mean.
         batches = it.takewhile(
             lambda batch: batch.get_fitness() > mean,
             batches
         )
-        for batch in batches:
-            fitness = batch.get_fitness()
-            n = int(fitness // mean) if self._duplicate_batches else 1
-            for i in range(n):
-                yield batch
+        # Yield batches which are multiple times better than the mean
+        # multiple times.
+        batches = (
+            batch
+            for batch in batches
+            for i in range(self._get_num_duplicates(batch, mean))
+        )
+        # If duplicate molecules are not allowed, filter out batches
+        # with them.
+        if not self._duplicate_mols:
+            has_unyielded_mols = _has_unyielded_mols(yielded_mols)
+            batches = filter(has_unyielded_mols, batches)
+        # If duplicate batches are not allowed, filter them out.
+        if not self._duplicate_batches:
+            is_unyielded_batch = _is_unyielded_batch(yielded_batches)
+            batches = filter(is_unyielded_batch, batches)
+        # Limit the number of yielded batches to _num_batches.
+        yield from it.islice(batches, self._num_batches)
+
+    def _get_num_duplicates(self, batch, mean):
+        if self._duplicate_batches and self._duplicate_mols:
+            return int(batch.get_fitness() // mean)
+        return 1
 
 
 class Tournament(Selector):
