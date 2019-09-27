@@ -687,6 +687,141 @@ class MetalComplex(TopologyGraph):
     Examples
     --------
 
+    Construction of topologies that contain metals requires some extra
+    manipulation compared ot purely organic systems because SMILES and
+    RDKit are not properly defined to handle metal chemistry. To define
+    a :class:`.BuildingBlock` containing metal atoms and functional
+    groups in stk requires something like below to avoid RDKit
+    problems upon initialization. Note that here the functional groups
+    do not define the metal centre coordination geometry, but does
+    define the number of coordination sites per metal.
+
+    .. code-block:: python
+
+        import stk
+        from rdkit.Chem import AllChem as rdkit
+        import numpy as np
+
+        # Define an stk BuildingBlock with no functional groups and a
+        # single metal (Pd with 2+ charge) atom.
+        m = rdkit.MolFromSmiles('[Pd+2]')
+        m.AddConformer(rdkit.Conformer(m.GetNumAtoms()))
+        metal = stk.BuildingBlock.init_from_rdkit_mol(
+            m,
+            functional_groups=None,
+        )
+
+        # Manually set atom position if required. RDKit will default
+        # to [0, 0, 0].
+        metal.set_position_matrix(np.array([[0.0, 0.0, 0.0]]))
+
+        # Manually set functional group information for the metal
+        # centre. The key of this dictionary is the fg.id.
+        # Pd2+ is 4 coordinate, so we write 4 metal functiongal groups.
+        metal_coord_info = {
+            0: {
+                'atom_ids': [0],
+                'bonder_ids': [0],
+                'deleter_ids': [None]
+            },
+            1: {
+                'atom_ids': [0],
+                'bonder_ids': [0],
+                'deleter_ids': [None]
+            },
+            2: {
+                'atom_ids': [0],
+                'bonder_ids': [0],
+                'deleter_ids': [None]
+            },
+            3: {
+                'atom_ids': [0],
+                'bonder_ids': [0],
+                'deleter_ids': [None]
+            },
+        }
+        metal = stk.assign_metal_fgs(
+            building_block=metal,
+            coordination_info=metal_coord_info
+        )
+
+    The metal centre coordination geometry is defined by the topology
+    graph used for construction. Pd 2+ is square planar, but we can
+    also have mono or bidentate coordination to the Pd. Therefore,
+    there are multiple topology graphs available. Ligands that bind to
+    metal centres are given functional groups that are designated for
+    metal interaction with 'metal' in their name. In the below example,
+    we explicitly assign one of the multiple metal bonding functional
+    groups for interaction with the metal complex. As these metal
+    complexes are expected to be building blocks of future molecules,
+    we also allow for the construction of undercoordinated metal
+    centres. This is handled, by removing the unsaturated vertices
+    from the topology graph prior to construction. These need to be
+    manually defined:
+
+    .. code-block:: python
+
+        ligand = stk.BuildingBlock(
+            'c1cc(-c2ccc(-c3ccncc3)cc2)ccn1',
+            functional_groups=['pyridine_N_metal']
+        )
+        # Handle multiple functional groups on the ligand to ensure
+        # only one functional group is bound to the metal.
+        ligand.func_groups = tuple(i for i in [ligand.func_groups[0]])
+
+        # Construct four-coordinated Pd 2+ square planar complex.
+        sqpl = stk.metal_complex.SquarePlanarMonodentate()
+        pdl2_sqpl_complex = stk.ConstructedMolecule(
+            building_blocks=[metal, ligand],
+            topology_graph=sqpl,
+            # Assign the metal to vertex 0, although this is not a
+            # requirement.
+            building_block_vertices={
+                metal: tuple([sqpl.vertices[0]]),
+                ligand: sqpl.vertices[1:]
+            }
+        )
+
+        # Construct two-coordinated Pd2+ square planar complex with
+        # two unsaturated sites.
+        sqpl = stk.metal_complex.SquarePlanarMonodentate(
+            unsatured_vertices=[3, 4]
+        )
+        pdl2_sqpl_complex = stk.ConstructedMolecule(
+            building_blocks=[metal, ligand],
+            topology_graph=sqpl,
+            building_block_vertices={
+                metal: tuple([sqpl.vertices[0]]),
+                # We do not need to specify anything extra here,
+                # because vertices 3 and 4 will be removed from the
+                # topology graph upon construction.
+                ligand: sqpl.vertices[1:]
+            }
+        )
+
+        # Construct an unsaturated Pd2+ atom.
+        sqpl = stk.metal_complex.SquarePlanarMonodentate(
+            unsatured_vertices=[1, 2, 3, 4]
+        )
+        pdl2_sqpl_complex = stk.ConstructedMolecule(
+            building_blocks=[metal],
+            topology_graph=sqpl,
+            building_block_vertices={
+                metal: tuple([sqpl.vertices[0]])
+            }
+        )
+
+    Finally, it is crucial to save metal-containing molecules using the
+    :meth:`.dump` option to a :class:`dict` because RDKit may fail to
+    load the molecule back from a .mol file. Note that the metal
+    functional groups assigned to the building blocks will be lost.
+
+    .. code-block:: python
+
+        # Dump ConstructedMolecule.
+        pdl2_sqpl_complex.dump('metal_complex.json')
+        # Load in ConstructedMolecule.
+        loaded = stk.ConstructedMolecule.load('metal_complex.json')
 
     """
 
