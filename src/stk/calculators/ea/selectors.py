@@ -2,7 +2,7 @@
 Selection
 =========
 
-#. :class:`.Fittest`
+#. :class:`.Best`
 #. :class:`.Roulette`
 #. :class:`.AboveAverage`
 #. :class:`SelectorSequence`
@@ -13,7 +13,7 @@ Selection is carried out by :class:`Selector` objects.
 Selectors are objects with a :meth:`~Selector.select`
 method, which is used to select molecules from a :class:`.Population`.
 Examples of how :class:`Selector` classes can be used is given their
-documentation, for example :class:`Fittest`, :class:`Roulette` or
+documentation, for example :class:`Best`, :class:`Roulette` or
 :class:`AboveAverage`.
 
 :class:`Selector` can be combined to generate more complex selection
@@ -304,9 +304,9 @@ class SelectorFunnel(Selector):
 
         # Create a Selector which yields the top 10 molecules according
         # to roulette selection.
-        fittest = stk.Fittest(num_batches=10)
+        best = stk.Best(num_batches=10)
         roulette = stk.Roulette()
-        elitist_roulette = stk.SelectorFunnel(fittest, roulette)
+        elitist_roulette = stk.SelectorFunnel(best, roulette)
 
         # Use the selector to yield molecules.
         for selected_mol in elitist_roulette.select(pop):
@@ -329,13 +329,15 @@ class SelectorFunnel(Selector):
 
         self._selectors = selectors
         self._num_batches = selectors[-1]._num_batches
-        self._yielded = set()
+        self._yielded_mols = set()
+        self._yielded_batches = set()
         self._reset_yielded = True
         # Make all the selectors share the same yielded set.
         for selector in self._selectors:
             # Only the funnel will reset yielded.
             selector._reset_yielded = False
-            selector._yielded = self._yielded
+            selector._yielded_mols = self._yielded_mols
+            selector._yielded_batches = self._yielded_batches
 
     def select(self, population):
         """
@@ -366,7 +368,7 @@ class SelectorSequence(Selector):
 
     Examples
     --------
-    First use :class:`Fittest` to select the 10 fittest batches and
+    First use :class:`Best` to select the 10 best batches and
     then use :class:`Roulette` to select batches in proportion to their
     fitness.
 
@@ -379,9 +381,9 @@ class SelectorSequence(Selector):
 
         # Create a Selector which yields 10 batches of molecules and
         # then uses roulette selection indefinitely.
-        fittest = stk.Fittest(batch_size=3)
+        best = stk.Best(batch_size=3)
         roulette = stk.Roulette(batch_size=3)
-        elitist_roulette = stk.SelectorSequence(fittest, roulette)
+        elitist_roulette = stk.SelectorSequence(best, roulette)
 
         # Use the selector to yield molecules.
         for selected_mol in elitist_roulette.select(pop):
@@ -405,13 +407,15 @@ class SelectorSequence(Selector):
         self._num_batches = sum(
             selector._num_batches for selector in self._selectors
         )
-        self._yielded = set()
+        self._yielded_mols = set()
+        self._yielded_batches = set()
         self._reset_yielded = True
         # Make all the selectors share the yielded set.
         for selector in self._selectors:
             # Only the sequence will reset yielded.
             selector._reset_yielded = False
-            selector._yielded = self._yielded
+            selector._yielded_mols = self._yielded_mols
+            selector._yielded_batches = self._yielded_batches
 
     def select(self, population):
         """
@@ -434,7 +438,7 @@ class SelectorSequence(Selector):
             yield from selector.select(population)
 
 
-class Fittest(Selector):
+class Best(Selector):
     """
     Selects batches of molecules, fittest first.
 
@@ -454,10 +458,10 @@ class Fittest(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        fittest = stk.Fittest()
+        best = stk.Best()
 
         # Select the molecules.
-        for selected, in fittest.select(pop):
+        for selected, in best.select(pop):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
             mutant = mutator.mutate(selected)
@@ -473,10 +477,10 @@ class Fittest(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        fittest = stk.Fittest(batch_size=2)
+        best = stk.Best(batch_size=2)
 
         # Select the molecules.
-        for selected in fittest.select(pop):
+        for selected in best.select(pop):
             # selected is a tuple of length 2, holding the selected
             # molecules. You can do stuff with the selected molecules
             # Like apply crossover operations on them.
@@ -493,7 +497,7 @@ class Fittest(Selector):
         fitness_modifier=None,
     ):
         """
-        Initialize a :class:`Selector` instance.
+        Initialize a :class:`Best` instance.
 
         Parameters
         ----------
