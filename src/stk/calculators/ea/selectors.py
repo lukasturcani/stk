@@ -134,7 +134,7 @@ def _is_unyielded_batch(yielded_batches):
 
 def _has_yielded_mols(yielded_mols):
     def inner(batch):
-        return all(mol in yielded_mols for mol in batch)
+        return any(mol in yielded_mols for mol in batch)
     return inner
 
 
