@@ -138,7 +138,7 @@ def _has_yielded_mols(yielded_mols):
     return inner
 
 
-def _has_unyielded_mols(yielded_mols):
+def _has_no_yielded_mols(yielded_mols):
     def inner(batch):
         return all(mol not in yielded_mols for mol in batch)
     return inner
@@ -563,8 +563,8 @@ class Best(Selector):
         batches = sorted(batches, reverse=True)
 
         if not self._duplicate_mols:
-            has_unyielded_mols = _has_unyielded_mols(yielded_mols)
-            batches = filter(has_unyielded_mols, batches)
+            has_no_yielded_mols = _has_no_yielded_mols(yielded_mols)
+            batches = filter(has_no_yielded_mols, batches)
 
         if not self._duplicate_batches:
             is_unyielded_batch = _is_unyielded_batch(yielded_batches)
@@ -626,8 +626,8 @@ class Worst(Selector):
         batches = sorted(batches)
 
         if not self._duplicate_mols:
-            has_unyielded_mols = _has_unyielded_mols(yielded_mols)
-            batches = filter(has_unyielded_mols, batches)
+            has_no_yielded_mols = _has_no_yielded_mols(yielded_mols)
+            batches = filter(has_no_yielded_mols, batches)
 
         if not self._duplicate_batches:
             is_unyielded_batch = _is_unyielded_batch(yielded_batches)
@@ -750,7 +750,7 @@ class Roulette(Selector):
         )
 
     def _select(self, batches, yielded_mols, yielded_batches):
-        has_unyielded_mols = _has_unyielded_mols(yielded_mols)
+        has_no_yielded_mols = _has_no_yielded_mols(yielded_mols)
         is_unyielded_batch = _is_unyielded_batch(yielded_batches)
 
         num_yields = 0
@@ -763,7 +763,7 @@ class Roulette(Selector):
             yield self._generator.choice(batches, p=weights)
 
             if not self._duplicate_mols:
-                batches = filter(has_unyielded_mols, batches)
+                batches = filter(has_no_yielded_mols, batches)
             if not self._duplicate_batches:
                 batches = filter(is_unyielded_batch, batches)
             if not self._duplicate_mols or not self._duplicate_batches:
@@ -884,8 +884,8 @@ class AboveAverage(Selector):
         # If duplicate molecules are not allowed, filter out batches
         # with them.
         if not self._duplicate_mols:
-            has_unyielded_mols = _has_unyielded_mols(yielded_mols)
-            batches = filter(has_unyielded_mols, batches)
+            has_no_yielded_mols = _has_no_yielded_mols(yielded_mols)
+            batches = filter(has_no_yielded_mols, batches)
         # If duplicate batches are not allowed, filter them out.
         if not self._duplicate_batches:
             is_unyielded_batch = _is_unyielded_batch(yielded_batches)
@@ -989,7 +989,7 @@ class Tournament(Selector):
         )
 
     def _select(self, batches, yielded_mols, yielded_batches):
-        has_unyielded_mols = _has_unyielded_mols(yielded_mols)
+        has_no_yielded_mols = _has_no_yielded_mols(yielded_mols)
         is_unyielded_batch = _is_unyielded_batch(yielded_batches)
 
         num_yields = 0
@@ -1009,7 +1009,7 @@ class Tournament(Selector):
             yield max(competitors)
 
             if not self._duplicate_mols:
-                batches = filter(has_unyielded_mols, batches)
+                batches = filter(has_no_yielded_mols, batches)
             if not self._duplicate_batches:
                 batches = filter(is_unyielded_batch, batches)
             if not self._duplicate_mols or not self._duplicate_batches:
