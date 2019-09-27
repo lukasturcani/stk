@@ -542,11 +542,72 @@ class Best(Selector):
             num_batches=num_batches,
             dupclicate_mols=duplicate_mols,
             duplicate_batches=duplicate_batches,
-            fitness_modifier=fitness_modifier
+            fitness_modifier=fitness_modifier,
         )
 
     def _select(self, batches, yielded_mols, yielded_batches):
         batches = sorted(batches, reverse=True)
+
+        if not self._duplicate_mols:
+            has_unyielded_mols = _has_unyielded_mols(yielded_mols)
+            batches = filter(has_unyielded_mols, batches)
+
+        if not self._duplicate_batches:
+            is_unyielded_batch = _is_unyielded_batch(yielded_batches)
+            batches = filter(is_unyielded_batch, batches)
+
+        yield from it.islice(batches, self._num_batches)
+
+
+class Worst(Selector):
+
+    def __init__(
+        self,
+        batch_size=1,
+        num_batches=None,
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
+    ):
+        """
+        Initialize a :class:`Best` instance.
+
+        Parameters
+        ----------
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
+
+        num_batches : :class:`int`, optional
+            The number of batches to yield. If ``None`` then yielding
+            will continue forever or until the generator is exhausted,
+            whichever comes first.
+
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
+
+        """
+
+        super().__init__(
+            batch_size=batch_size,
+            num_batches=num_batches,
+            dupclicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier
+        )
+
+    def _select(self, batches, yielded_mols, yielded_batches):
+        batches = sorted(batches)
 
         if not self._duplicate_mols:
             has_unyielded_mols = _has_unyielded_mols(yielded_mols)
@@ -621,10 +682,11 @@ class Roulette(Selector):
 
     def __init__(
         self,
-        num_batches=None,
-        duplicates=True,
-        use_rank=False,
         batch_size=1,
+        num_batches=None,
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
         random_seed=None
     ):
         """
@@ -632,21 +694,27 @@ class Roulette(Selector):
 
         Parameters
         ----------
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
+
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
 
-        duplicates : :class:`bool`, optional
-            If ``True`` the same member can be yielded in more than
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
             one batch.
 
-        use_rank : :class:`bool`, optional
-            When ``True`` the fitness value of an individual is
-            calculated as ``f = 1/rank``.
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
 
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
 
         random_seed : :class:`int`, optional
             The random seed to use.
@@ -655,70 +723,35 @@ class Roulette(Selector):
 
         self._generator = np.random.RandomState(random_seed)
         super().__init__(
+            batch_size=batch_size,
             num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=use_rank,
-            batch_size=batch_size
+            dupclicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
         )
 
-    def select(self, population):
-        """
-        Yield batches of molecules using roulette selection.
+    def _select(self, batches, yielded_mols, yielded_batches):
 
-        Parameters
-        ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
+        has_unyielded_mols = _has_unyielded_mols(yielded_mols)
+        is_unyielded_batch = _is_unyielded_batch(yielded_batches)
 
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            A batch of selected molecules.
-
-        """
-
-        if not self._duplicates:
-            valid_pop = [
-                mol for mol in population if mol not in self._yielded
-            ]
-        else:
-            valid_pop = list(population)
-        yields = 0
         while (
-            len(valid_pop) >= self._batch_size
-            and yields < self._num_batches
+            len(batches) >= self._batch_size
+            and len(yielded_batches) < self._num_batches
         ):
 
-            if self._use_rank:
-                ranks = range(1, len(valid_pop)+1)
-                total = sum(1/rank for rank in ranks)
+            if not self._duplicate_mols:
+                batches = filter(has_unyielded_mols, batches)
+            if not self._duplicate_batches:
+                batches = filter(is_unyielded_batch, batches)
+            if not self._duplicate_mols or not self._duplicate_batches:
+                batches = tuple(batches)
 
-                ranks = range(1, len(valid_pop)+1)
-                weights = [1/(rank*total) for rank in ranks]
-
-                valid_pop = sorted(
-                    valid_pop, key=lambda m: m.fitness, reverse=True
-                )
-
-            else:
-                total = sum(mol.fitness for mol in valid_pop)
-                weights = [mol.fitness / total for mol in valid_pop]
-
-            selected = tuple(self._generator.choice(
-                a=valid_pop,
-                size=self._batch_size,
-                replace=False,
-                p=weights
-            ))
-            yield selected
-            yields += 1
-            if not self._duplicates:
-                self._yielded.update(selected)
-                valid_pop = [
-                    mol for mol in population
-                    if mol not in self._yielded
-                ]
+            total = sum(batch.get_fitness() for batch in batches)
+            weights = [
+                batch.get_fitness() / total for batch in batches
+            ]
+            yield self._generator.choice(batches, p=weights)
 
 
 class AboveAverage(Selector):
@@ -774,94 +807,69 @@ class AboveAverage(Selector):
 
     def __init__(
         self,
-        duplicate_batches=False,
+        batch_size=1,
         num_batches=None,
-        duplicates=True,
-        use_rank=False,
-        batch_size=1
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
     ):
         """
         Initialize a :class:`AboveAverage` instance.
 
         Parameters
         ----------
-        duplicate_batches : :class:`bool`, optional
-            If ``True``, the same batch may be yielded more than
-            once. For example, if the batch has a fitness twice above
-            average it will be yielded twice, if it has a fitness
-            three times above average, it will be yielded three times
-            and so on.
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
 
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
 
-        duplicates : :class:`bool`, optional
-            If ``True``, the same molecule can be yielded in more than
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
             one batch.
 
-        use_rank : :class:`bool`, optional
-            When ``True`` the fitness value of an individual is
-            calculated as ``f = 1/rank``.
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
 
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
 
         """
 
-        self._duplicate_batches = duplicate_batches
         super().__init__(
+            batch_size=batch_size,
             num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=use_rank,
-            batch_size=batch_size
+            dupclicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
         )
 
-    def select(self, population):
-        """
-        Yield above average fitness batches of molecules.
+    def _select(self, batches, yielded_mols, yielded_batches):
+        has_unyielded_mols = _has_unyielded_mols(yielded_mols)
+        is_unyielded_batch = _is_unyielded_batch(yielded_batches)
 
-        Parameters
-        ----------
-        population : :class:`.Population`
-            The population from which individuals are to be selected.
+        mean = np.mean([batch.get_fitness() for batch in batches])
+        batches = sorted(batches)
+        while (
+            batches
+            and batches[-1].get_fitness() >= mean
+            and len(yielded_batches) < self._num_batches
+        ):
+            if not self._duplicate_mols:
+                batches = filter(has_unyielded_mols, batches)
+            if not self._duplicate_batches:
+                batches = filter(is_unyielded_batch, batches)
+            if not self._duplicate_mols or not self._duplicate_batches:
+                batches = tuple(batches)
 
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            The next selected batch of molecules.
-
-        """
-
-        mean = np.mean([
-            fitness for batch, fitness in self._batch(population)
-        ])
-
-        # Sort the batches so that highest fitness batches are
-        # yielded first. This is necessary because if not all batches
-        # will be yielded, we want the molecules to appear in the
-        # batches of the highest fitness. The same is true for when
-        # self.duplicates is False. If duplicates is False then we want
-        # molecules to appear in their optimal batch only.
-        batches = sorted(
-            self._batch(population),
-            reverse=True,
-            key=lambda x: x[-1]
-        )
-
-        if self._duplicates:
-            batches = self._no_duplicates(batches)
-
-        yielded = 0
-        for batch, fitness in batches:
-            if fitness >= mean:
-                n = fitness // mean if self._duplicate_batches else 1
-                for i in range(int(n)):
-                    yield batch
-                    yielded += 1
-                    if yielded >= self._num_batches:
-                        return
+            batch = batches.pop()
+            yield batch
 
 
 class Tournament(Selector):
