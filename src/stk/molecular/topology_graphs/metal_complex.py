@@ -789,14 +789,17 @@ class MetalComplex(TopologyGraph):
             each axis is scaled by a different value.
 
         """
-
-        return max(
-            bb.get_maximum_diameter()
-            for bb in mol.building_block_vertices
+        organic_bbs = [
+            i for i in mol.building_block_vertices
             if 'metal' not in list(set((
-                i.fg_type.name for i in bb.func_groups
+                j.fg_type.name for j in i.func_groups
             )))
-        )
+        ]
+        if organic_bbs:
+            return max(bb.get_maximum_diameter() for bb in organic_bbs)
+        else:
+            # No organic building blocks.
+            return 1
 
     def __repr__(self):
         vertex_alignments = ', '.join(
