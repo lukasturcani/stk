@@ -120,9 +120,21 @@ class Batch:
         return self._fitness <= other._fitness
 
 
+def _is_yielded_batch(yielded_batches):
+    def inner(batch):
+        return batch.get_identity_key() in yielded_batches
+    return inner
+
+
 def _is_unyielded_batch(yielded_batches):
     def inner(batch):
         return batch.get_identity_key() not in yielded_batches
+    return inner
+
+
+def _has_yielded_mols(yielded_mols):
+    def inner(batch):
+        return all(mol in yielded_mols for mol in batch)
     return inner
 
 
@@ -540,7 +552,7 @@ class Best(Selector):
         super().__init__(
             batch_size=batch_size,
             num_batches=num_batches,
-            dupclicate_mols=duplicate_mols,
+            duplicate_mols=duplicate_mols,
             # Note that duplicate batches can still occur in Best,
             # if there a duplicates of an object in the population.
             duplicate_batches=duplicate_batches,
@@ -603,7 +615,7 @@ class Worst(Selector):
         super().__init__(
             batch_size=batch_size,
             num_batches=num_batches,
-            dupclicate_mols=duplicate_mols,
+            duplicate_mols=duplicate_mols,
             # Note that duplicate batches can still occur in Worst,
             # if there a duplicates of an object in the population.
             duplicate_batches=duplicate_batches,
@@ -732,7 +744,7 @@ class Roulette(Selector):
         super().__init__(
             batch_size=batch_size,
             num_batches=num_batches,
-            dupclicate_mols=duplicate_mols,
+            duplicate_mols=duplicate_mols,
             duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
@@ -848,7 +860,7 @@ class AboveAverage(Selector):
         super().__init__(
             batch_size=batch_size,
             num_batches=num_batches,
-            dupclicate_mols=duplicate_mols,
+            duplicate_mols=duplicate_mols,
             duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
@@ -971,7 +983,7 @@ class Tournament(Selector):
         super().__init__(
             batch_size=batch_size,
             num_batches=num_batches,
-            dupclicate_mols=duplicate_mols,
+            duplicate_mols=duplicate_mols,
             duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
@@ -993,9 +1005,8 @@ class Tournament(Selector):
                 size=tournament_size,
                 replace=False
             )
-            winner = max(competitors)
             num_yields += 1
-            yield winner
+            yield max(competitors)
 
             if not self._duplicate_mols:
                 batches = filter(has_unyielded_mols, batches)
@@ -1043,95 +1054,84 @@ class StochasticUniversalSampling(Selector):
 
     def __init__(
         self,
+        batch_size=1,
         num_batches=None,
-        duplicates=False,
-        use_rank=False,
-        batch_size=1
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
+        random_seed=None,
     ):
         """
-        Initialize a :class:`StochasticUniversalSampling` instance.
+        Initialize a :class:`TournamentSelection` instance.
 
         Parameters
         ----------
-        num_batches : :class:`int`, optional
-            The number of batches to yield. Cannot be ``None``.
-            The number of positions that will be sampled evenly from the
-            population.
-
-        duplicates : :class:`bool`, optional
-            If ``True``, the same molecule can be yielded in more than
-            one batch.
-
-        use_rank : :class:`bool`, optional
-            When ``True`` the fitness value of an individual is
-            calculated as ``f = 1/rank``. The distance of each molecule along
-            is then given by ``f = 1/rank``.
-
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
+        num_batches : :class:`int`, optional
+            The number of batches to yield. If ``None`` then yielding
+            will continue forever or until the generator is exhausted,
+            whichever comes first.
+
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
+
+        random_seed : :class:`int`, optional
+            The random seed to use.
+
         """
+
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(
-            num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=use_rank,
             batch_size=batch_size,
+            num_batches=num_batches,
+            duplicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
         )
 
-    def select(self, population):
-        """
-        Yield molecules using stochastic universal sampling.
+    def _select(self, batches, yielded_mols, yielded_batches):
+        has_yielded_mols = _has_yielded_mols(yielded_mols)
+        is_yielded_batch = _is_yielded_batch(yielded_batches)
 
-        Parameters
-        ----------
-        population : :class:`.Population`
-            The population from which individuals are to be selected.
+        batches = sorted(batches, reverse=True)
+        total = sum(batch.get_fitness() for batch in batches)
+        batch_positions = []
+        batch_position = 0
+        for batch in batches:
+            batch_position += batch.get_fitness()/total
+            batch_positions.append(batch_position)
 
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            The next selected batch of molecules.
+        pointer_distance = 1/self._num_batches
+        pointers = []
+        pointer = self._generator.uniform(0, pointer_distance)
+        for i in range(self._num_batches):
+            pointer += pointer_distance
+            pointers.append(pointer)
 
-        """
-        # Get sorted batches of the population.
-        batches = sorted(
-            self._batch(population),
-            reverse=True,
-            key=lambda x: x[-1]
-        )
-        if self._duplicates:
-            # Ensure batches do not contain duplicates.
-            batches = list(self._no_duplicates(batches))
+        batch_index = 0
+        for pointer in pointers:
+            while pointer > batch_positions[batch_index]:
+                batch_index += 1
 
-        yielded = 0
-        if self._use_rank:
-            # Set distances according to the rank.
-            ranks = range(1, len(batches)+1)
-            total = sum(1/rank for rank in ranks)
-            distances = [1/(rank*total) for rank in ranks]
-        else:
-            # Set distances according to the fitness.
-            total = sum(fitness for _, fitness in batches)
-            distances = [fitness/total for _, fitness in batches]
-        # Distance to add each time to the pointer.
-        distance = 1/self._num_batches
+            batch = batches[batch_index]
 
-        # First pointer position is random between 0
-        # and first pointer.
-        first_pointer = np.random.uniform(0, distance)
-        pointer = first_pointer
-        cmltv_distance = 0
-        while yielded < self._num_batches:
-            # Track distance progress.
-            for i, dist in enumerate(distances):
-                cmltv_distance += dist
-                # If pointer value is less than the cumulative distance,
-                # yield the molecule.
-                if pointer < cmltv_distance:
-                    selected = batches[i][0]
-                    self._yielded.update(selected)
-                    yield selected
-                    yielded += 1
-                    break
-            pointer += distance
-        return
+            if not self._duplicate_mols and has_yielded_mols(batch):
+                continue
+
+            if not self._duplicate_batches and is_yielded_batch(batch):
+                continue
+
+            yield batch
