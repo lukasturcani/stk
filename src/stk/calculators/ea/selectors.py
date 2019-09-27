@@ -759,8 +759,7 @@ class AboveAverage(Selector):
     Yields above average batches of molecules.
 
     The fitness of a batch is the sum of all fitness values of the
-    molecules in the batch. Contrary to the name, this selector will
-    also yield a batch which has exactly average fitness.
+    molecules in the batch.
 
     Examples
     --------
@@ -851,25 +850,33 @@ class AboveAverage(Selector):
         )
 
     def _select(self, batches, yielded_mols, yielded_batches):
-        has_unyielded_mols = _has_unyielded_mols(yielded_mols)
+
+        if not self._duplicate_mols:
+            has_unyielded_mols = _has_unyielded_mols(yielded_mols)
+            batches = filter(has_unyielded_mols, batches)
+        if not self._duplicate_batches:
+            batches = filter(is_unyielded_batch, batches)
+
         is_unyielded_batch = _is_unyielded_batch(yielded_batches)
 
         mean = np.mean([batch.get_fitness() for batch in batches])
         batches = sorted(batches)
         while (
             batches
-            and batches[-1].get_fitness() >= mean
+            and batches[-1].get_fitness() > mean
             and len(yielded_batches) < self._num_batches
         ):
-            if not self._duplicate_mols:
-                batches = filter(has_unyielded_mols, batches)
-            if not self._duplicate_batches:
-                batches = filter(is_unyielded_batch, batches)
-            if not self._duplicate_mols or not self._duplicate_batches:
-                batches = tuple(batches)
 
             batch = batches.pop()
-            yield batch
+            fitness = batch.get_fitness()
+            n = int(fitness // mean) if self._duplicate_batches else 1
+            for i in range(n):
+                yield batch
+
+
+
+            if not self._duplicate_mols or not self._duplicate_batches:
+                batches = tuple(batches)
 
 
 class Tournament(Selector):
