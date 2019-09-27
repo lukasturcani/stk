@@ -785,7 +785,7 @@ class MetalComplex(TopologyGraph):
         # Construct two-coordinated Pd2+ square planar complex with
         # two unsaturated sites.
         sqpl = stk.metal_complex.SquarePlanarMonodentate(
-            unsatured_vertices=[3, 4]
+            unsaturated_vertices=[3, 4]
         )
         pdl2_sqpl_complex = stk.ConstructedMolecule(
             building_blocks=[metal, ligand],
@@ -801,7 +801,7 @@ class MetalComplex(TopologyGraph):
 
         # Construct an unsaturated Pd2+ atom.
         sqpl = stk.metal_complex.SquarePlanarMonodentate(
-            unsatured_vertices=[1, 2, 3, 4]
+            unsaturated_vertices=[1, 2, 3, 4]
         )
         pdl2_sqpl_complex = stk.ConstructedMolecule(
             building_blocks=[metal],
@@ -833,7 +833,7 @@ class MetalComplex(TopologyGraph):
         return super().__init_subclass__(**kwargs)
 
     def __init__(self, vertex_alignments=None,
-                 unsatured_vertices=None, num_processes=1):
+                 unsaturated_vertices=None, num_processes=1):
         """
         Initialize a :class:`.MetalComplex`.
 
@@ -866,12 +866,12 @@ class MetalComplex(TopologyGraph):
         # Metal complexes can have unsaturated sites.
         # Need to remove information about the sites that will not
         # react from stage, self.vertices and self.edges.
-        if unsatured_vertices is not None:
+        if unsaturated_vertices is not None:
             self.old_vertex_data = self.vertex_data
             self.old_edge_data = self.edge_data
             self.vertex_data = tuple(
                 i for i in self.old_vertex_data
-                if i.id not in unsatured_vertices
+                if i.id not in unsaturated_vertices
             )
             used_edges = [
                 i for i in self.old_edge_data
