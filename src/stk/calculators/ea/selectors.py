@@ -48,17 +48,58 @@ class _Batch:
     """
     Represents a batch of molecules.
 
+    Batches can be compared, the comparison is based on their
+    fitness values. Batches can also be iterated through, this
+    iterates through all the molecules in the batch.
+
     """
 
     def __init__(self, mols, fitness_values):
+        """
+        Initialize a :class:`._Batch`.
+
+        Parameters
+        ----------
+        mols : :class:`tuple` of :class:`.Molecule`
+            The molecules which are part of the batch.
+
+        fitness_values : :class:`dict`
+            Maps each molecule in `mols` to its fitness value.
+
+        """
+
         self._mols = mols
         self._fitness = sum(fitness_values[mol] for mol in mols)
         self._identity_key = frozenset(Counter(mols).items())
 
     def get_fitness(self):
+        """
+        Get the fitness value of the batch.
+
+        Returns
+        -------
+        :class:`float`
+            The fitness value.
+
+        """
+
         return self._fitness
 
     def get_identity_key(self):
+        """
+        Get the identity key of the batch.
+
+        If two batches hold the same molecules, the same number of
+        times, they will have the same identity key.
+
+        Returns
+        -------
+        :class:`object`
+            A hashable object which can be used to compare if two
+            batches are the same.
+
+        """
+
         return self._identity_key
 
     def __iter__(self):
@@ -392,7 +433,12 @@ class SelectorSequence(Selector):
 
     """
 
-    def __init__(self, *selectors):
+    def __init__(
+        self,
+        *selectors,
+        duplicate_mols=True,
+        duplicate_batches=True
+    ):
         """
         Initialize a :class:`SelectorSequence` instance.
 
@@ -400,6 +446,8 @@ class SelectorSequence(Selector):
         ----------
         *selectors : :class:`Selector`
             The :class:`Selector` objects used to select molecules.
+
+        duplicate_mols : :class:`boo.`
 
         """
 
