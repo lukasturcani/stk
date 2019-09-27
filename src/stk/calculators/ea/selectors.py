@@ -911,3 +911,135 @@ class Tournament(Selector):
                 batches.pop(selected_index)
             yielded += 1
         return
+
+
+class StochasticUniversalSampling(Selector):
+    """
+    Yields molecules by stochastic universal sampling.
+
+    Stochastic universal sampling yields molecules by sampling the population
+    across evenly spaced intervals. Members with greater fitness values occupy
+    a larger area and are therefore more likely to be sampled.
+    This approach means weaker members of the population
+    are given a greater chance to be chosen.
+
+    References
+    ----------
+    https://en.wikipedia.org/wiki/Stochastic_universal_sampling
+
+    Examples
+    --------
+    Yielding molecules one at a time. For example, if molecules need
+    to be selected for mutation or the next generation.
+
+    .. code-block:: python
+
+        import stk
+
+        # Make a population holding some molecules.
+        pop = stk.Population(...)
+
+        # Make the selector.
+        stochastic_sampling = stk.StochasticUniversalSampling(num_batches=5)
+
+        # Select the molecules.
+        for selected, in stochastic_samplng.select(pop):
+            # Do stuff with each selected molecule, like apply a
+            # mutation to it to generate a mutant.
+            mutant = mutator.mutate(selected)
+    """
+
+    def __init__(
+        self,
+        num_batches=None,
+        duplicates=False,
+        use_rank=False,
+        batch_size=1
+    ):
+        """
+        Initialize a :class:`StochasticUniversalSampling` instance.
+
+        Parameters
+        ----------
+        num_batches : :class:`int`, optional
+            The number of batches to yield. Cannot be ``None``.
+            The number of positions that will be sampled evenly from the
+            population.
+
+        duplicates : :class:`bool`, optional
+            If ``True``, the same molecule can be yielded in more than
+            one batch.
+
+        use_rank : :class:`bool`, optional
+            When ``True`` the fitness value of an individual is
+            calculated as ``f = 1/rank``. The distance of each molecule along
+            is then given by ``f = 1/rank``.
+
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
+
+        """
+        super().__init__(
+            num_batches=num_batches,
+            duplicates=duplicates,
+            use_rank=use_rank,
+            batch_size=batch_size,
+        )
+
+    def select(self, population):
+        """
+        Yield molecules using stochastic universal sampling.
+
+        Parameters
+        ----------
+        population : :class:`.Population`
+            The population from which individuals are to be selected.
+
+        Yields
+        ------
+        :class:`tuple` of :class:`.Molecule`
+            The next selected batch of molecules.
+
+        """
+        # Get sorted batches of the population.
+        batches = sorted(
+            self._batch(population),
+            reverse=True,
+            key=lambda x: x[-1]
+        )
+        if self._duplicates:
+            # Ensure batches do not contain duplicates.
+            batches = list(self._no_duplicates(batches))
+
+        yielded = 0
+        if self._use_rank:
+            # Set distances according to the rank.
+            ranks = range(1, len(batches)+1)
+            total = sum(1/rank for rank in ranks)
+            distances = [1/(rank*total) for rank in ranks]
+        else:
+            # Set distances according to the fitness.
+            total = sum(fitness for _, fitness in batches)
+            distances = [fitness/total for _, fitness in batches]
+        # Distance to add each time to the pointer.
+        distance = 1/self._num_batches
+
+        # First pointer position is random between 0
+        # and first pointer.
+        first_pointer = np.random.uniform(0, distance)
+        pointer = first_pointer
+        cmltv_distance = 0
+        while yielded < self._num_batches:
+            # Track distance progress.
+            for i, dist in enumerate(distances):
+                cmltv_distance += dist
+                # If pointer value is less than the cumulative distance,
+                # yield the molecule.
+                if pointer < cmltv_distance:
+                    selected = batches[i][0]
+                    self._yielded.update(selected)
+                    yield selected
+                    yielded += 1
+                    break
+            pointer += distance
+        return

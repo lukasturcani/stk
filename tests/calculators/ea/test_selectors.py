@@ -79,6 +79,19 @@ def test_selector_funnel(generation):
         assert mol in above_avg_elites
 
 
+def test_stochastic_universal(generation):
+    stochastic = stk.StochasticUniversalSampling(num_batches=5, batch_size=5)
+    for batch in stochastic.select(generation):
+        assert len(batch) == 5
+    assert len(list(stochastic.select(generation))) == 5
+    stochastic_ranked = stk.StochasticUniversalSampling(
+        num_batches=5,
+        batch_size=1,
+        use_rank=True
+    )
+    assert len(list(stochastic_ranked.select(generation))) == 5
+
+
 def test_tournament(generation):
     tournament = stk.Tournament(num_batches=2, batch_size=2)
     pop_batches = tournament._batch(generation)
