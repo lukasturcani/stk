@@ -721,6 +721,9 @@ class Roulette(Selector):
 
         """
 
+        if num_batches is None:
+            num_batches = float('inf')
+
         self._generator = np.random.RandomState(random_seed)
         super().__init__(
             batch_size=batch_size,
@@ -731,14 +734,15 @@ class Roulette(Selector):
         )
 
     def _select(self, batches, yielded_mols, yielded_batches):
-
         has_unyielded_mols = _has_unyielded_mols(yielded_mols)
         is_unyielded_batch = _is_unyielded_batch(yielded_batches)
 
-        while (
-            len(batches) >= self._batch_size
-            and len(yielded_batches) < self._num_batches
-        ):
+        while batches and len(yielded_batches) < self._num_batches:
+            total = sum(batch.get_fitness() for batch in batches)
+            weights = [
+                batch.get_fitness() / total for batch in batches
+            ]
+            yield self._generator.choice(batches, p=weights)
 
             if not self._duplicate_mols:
                 batches = filter(has_unyielded_mols, batches)
@@ -746,12 +750,6 @@ class Roulette(Selector):
                 batches = filter(is_unyielded_batch, batches)
             if not self._duplicate_mols or not self._duplicate_batches:
                 batches = tuple(batches)
-
-            total = sum(batch.get_fitness() for batch in batches)
-            weights = [
-                batch.get_fitness() / total for batch in batches
-            ]
-            yield self._generator.choice(batches, p=weights)
 
 
 class AboveAverage(Selector):
@@ -850,33 +848,26 @@ class AboveAverage(Selector):
         )
 
     def _select(self, batches, yielded_mols, yielded_batches):
+        mean = np.mean([batch.get_fitness() for batch in batches])
+        batches = sorted(batches, reverse=True)
 
         if not self._duplicate_mols:
             has_unyielded_mols = _has_unyielded_mols(yielded_mols)
             batches = filter(has_unyielded_mols, batches)
         if not self._duplicate_batches:
+            is_unyielded_batch = _is_unyielded_batch(yielded_batches)
             batches = filter(is_unyielded_batch, batches)
 
-        is_unyielded_batch = _is_unyielded_batch(yielded_batches)
-
-        mean = np.mean([batch.get_fitness() for batch in batches])
-        batches = sorted(batches)
-        while (
+        batches = it.islice(batches, self._num_batches)
+        batches = it.takewhile(
+            lambda batch: batch.get_fitness() > mean,
             batches
-            and batches[-1].get_fitness() > mean
-            and len(yielded_batches) < self._num_batches
-        ):
-
-            batch = batches.pop()
+        )
+        for batch in batches:
             fitness = batch.get_fitness()
             n = int(fitness // mean) if self._duplicate_batches else 1
             for i in range(n):
                 yield batch
-
-
-
-            if not self._duplicate_mols or not self._duplicate_batches:
-                batches = tuple(batches)
 
 
 class Tournament(Selector):
