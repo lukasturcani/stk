@@ -741,11 +741,13 @@ class Roulette(Selector):
         has_unyielded_mols = _has_unyielded_mols(yielded_mols)
         is_unyielded_batch = _is_unyielded_batch(yielded_batches)
 
-        while batches and len() < self._num_batches:
+        num_yields = 0
+        while batches and num_yields < self._num_batches:
             total = sum(batch.get_fitness() for batch in batches)
             weights = [
                 batch.get_fitness() / total for batch in batches
             ]
+            num_yields += 1
             yield self._generator.choice(batches, p=weights)
 
             if not self._duplicate_mols:
