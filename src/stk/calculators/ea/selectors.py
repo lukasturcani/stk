@@ -116,40 +116,57 @@ class Selector:
 
     """
 
-    def __init__(self, num_batches, duplicates, use_rank, batch_size):
+    def __init__(
+        self,
+        batch_size,
+        num_batches,
+        duplicate_mols,
+        duplicate_batches,
+        fitness_modifier,
+    ):
         """
         Initialize a :class:`Selector` instance.
 
         Parameters
         ----------
+        batch_size : :class:`int`
+            The number of molecules yielded at once.
+
         num_batches : :class:`int`
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
 
-        duplicates : :class:`bool`
-            If ``True`` the same member can be yielded in more than one
-            batch.
+        duplicate_mols : :class:`bool`
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
 
-        use_rank : :class:`bool`
-            When ``True`` the fitness value of a molecule is calculated
-            as ``f = 1/rank``.
+        duplicate_batches : :class:`bool`
+            If ``True`` the same batch can be yielded more than once.
 
-        batch_size : :class:`int`
-            The number of molecules yielded at once.
+        fitness_modifier : :class:`callable`
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
 
         """
 
         if num_batches is None:
             num_batches = float('inf')
 
-        self._num_batches = num_batches
-        self._duplicates = duplicates
-        self._use_rank = use_rank
+        if fitness_modifier is None:
+            fitness_modifier = self._get_fitness_values
+
         self._batch_size = batch_size
+        self._num_batches = num_batches
+        self._duplicate_mols = duplicate_mols
+        self._duplicate_batches = duplicate_batches
 
         # The previously yielded molecules.
-        self._yielded = set()
+        self._yielded_mols = set()
+        self._yielded_batches = set()
         # If True, _yielded is emptied before each select() call.
         self._reset_yielded = True
 
@@ -157,53 +174,47 @@ class Selector:
         cls.select = _add_yielded_reset(cls.select)
         return super().__init_subclass__(**kwargs)
 
-    def _batch(self, population):
+    @staticmethod
+    def _get_fitness_values(population):
+        return {mol: mol.fitness for mol in population}
+
+    def _get_batches(self, population, fitness_values):
         """
-        Batch molecules of `population` together.
+        Get batches molecules from `population`.
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
+
 
         Yields
         ------
-        :class:`tuple`
-            A :class:`tuple` of form ``(batch, fitness)`` where
-            ``batch`` is a :class:`tuple` of :class:`.Molecule` and
-            ``fitness`` is a :class:`float` which is the sum of all
-            fitness values of the molecules in the batch.
+        :class:`._Batch`
+            A batch of molecules from `population`.
+
 
         """
 
-        for batch in it.combinations(population, self._batch_size):
-            yield batch, sum(m.fitness for m in batch)
+        batches = (
+            _Batch(
+                mols=mols,
+                fitness_values={
+                    mol: fitness_values[mol] for mol in mols
+                }
+            )
+            for mols in it.combinations(population, self._batch_size)
+        )
 
-    def _no_duplicates(self, batches):
-        """
-        Make sure that no molecule is yielded in more than one batch.
+        if not self._duplicate_batches:
+            batches = filter(self._is_unyielded_batch, batches)
+        if not self._duplicate_mols:
+            batches = filter(self._has_unyielded_mols, batches)
+        yield from batches
 
-        Parameters
-        ----------
-        batches : :class:`iterable`
-            An :class:`iterable` yielding :class:`tuple` of form
-            ``(batch, fitness)`` where ``batch`` is a :class:`tuple`
-            of :class:`.Molecule`.
+    def _is_unyielded_batch(self, batch):
+        return batch.get_identity_key() not in self._yielded_batches
 
-        Yields
-        ------
-        :class:`tuple`
-            A :class:`tuple` of form ``(batch, fitness)`` where
-            ``batch`` is a :class:`tuple` of :class:`.Molecule` and
-            ``fitness`` is a :class:`float`.
-
-        """
-
-        for batch, fitness in batches:
-            if all(mol not in self._yielded for mol in batch):
-                self._yielded.update(batch)
-                yield batch, fitness
+    def _has_unyielded_mols(self, batch):
+        return all(mol not in self._yielded_mols for mol in batch)
 
     def select(self, population):
         """
@@ -220,15 +231,53 @@ class Selector:
         :class:`tuple` of :class:`.Molecule`
             A batch of selected molecules.
 
+        """
+
+        batches = tuple(self._get_batches(
+            population=population,
+            fitness_values=self._fitness_modifier(population)
+        ))
+        for batch in self._select(batches):
+            self._yielded_batches.add(batch.get_identity_key())
+            self._yielded_mols.update(batch)
+            yield tuple(batch)
+
+    def _select(self, batches):
+        """
+        Apply a selection algorithm to `batches`.
+
+        Notes
+        -----
+        Any batch that is yielded is automatically added to
+        :attr:`_yielded_mols` and :attr:`_yielded_batches`. See the
+        code of :meth:`select`, which performs this operation.
+
+        When used in a :class:`.SelectorFunnel` or
+        :class:`SelectorSequence`, `batches` will not include batches
+        which have been made ineligible by being yielded through a
+        previous :class:`.Selector`, if :attr:`_duplicate_mols` or
+        :attr:`_duplicate_batches` is set to ``False`` on the
+        current :class:`.Selector`.
+
+        Parameters
+        ----------
+        batches : :class:`tuple` of :class:`._Batch`
+            The batches, from which some should be selected.
+
+        Yields
+        ------
+        :class:`._Batch`
+            A selected batch from `batches`.
+
         Raises
         ------
         :class:`NotImplementedError`
-            This is a virtual method which needs to be implemented in a
+            This is a virtual method and need to be implemented in a
             subclass.
 
         """
 
-        return NotImplementedError()
+        raise NotImplementedError()
 
 
 class SelectorFunnel(Selector):
