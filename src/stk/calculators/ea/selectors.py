@@ -38,9 +38,47 @@ import itertools as it
 import numpy as np
 import logging
 from functools import wraps
+from collections import Counter
 
 
 logger = logging.getLogger(__name__)
+
+
+class _Batch:
+    """
+    Represents a batch of molecules.
+
+    """
+
+    def __init__(self, mols, fitness_values):
+        self._mols = mols
+        self._fitness_values = dict(fitness_values)
+        self._fitness = sum(fitness_values[mol] for mol in mols)
+        self._identity_key = frozenset(Counter(mols).items())
+
+    def get_fitness(self):
+        return self._fitness
+
+    def get_identity_key(self):
+        return self._identity_key
+
+    def __iter__(self):
+        return iter(self._mols)
+
+    def __eq__(self, other):
+        return self._fitness == other._fitness
+
+    def __gt__(self, other):
+        return self._fitness > other._fitness
+
+    def __ge__(self, other):
+        return self._fitness >= other._fitness
+
+    def __lt__(self, other):
+        return self._fitness < other._fitness
+
+    def __le__(self, other):
+        return self._fitness <= other._fitness
 
 
 def _add_yielded_reset(select):
