@@ -1458,6 +1458,16 @@ class StochasticUniversalSampling(Selector):
     def _select(self, batches, yielded):
         batches = sorted(batches, reverse=True)
 
+        # SUS may need to run multiple rounds if duplicate_mols or
+        # duplicate_batches is True. This is because in each round
+        # you can generate multiple pointers to the same batch or to
+        # batches sharings molecules. If this happens the lower fitness
+        # batch will not be yielded. Instead a second round of SUS will
+        # occur with any ineligible batches removed and a reduced
+        # number of pointers, to account for batches yielded in the
+        # previous roounds. This will repeat until the desired number
+        # of batches has been yielded, or there are no more valid
+        # batches.
         while batches and yielded.get_num() < self._num_batches:
             yield from self._select_with_stochastic_universal_sampling(
                 batches=batches,
