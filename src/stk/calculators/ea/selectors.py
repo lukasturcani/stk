@@ -203,6 +203,20 @@ class Selector:
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
 
+    def __init_subclass__(cls, **kwargs):
+        cls._selected = cls._update_yielded(cls._selected)
+        return super().__init_subclass__(**kwargs)
+
+    @staticmethod
+    def _update_yielded(_selected):
+
+        def inner(self, batches, yielded):
+            for batch in _selected(self, batches, yielded):
+                yielded.update(batch)
+                yield batch
+
+        return inner
+
     @staticmethod
     def _get_fitness_values(population):
         return {mol: mol.fitness for mol in population}
@@ -255,16 +269,9 @@ class Selector:
             fitness_values=self._fitness_modifier(population)
         ))
 
-        yielded = _YieldedData()
-        selected_batches = self._select(
-            batches=batches,
-            yielded=yielded,
-        )
-        for batch in selected_batches:
-            yielded.update(batch)
-            yield batch
+        yield from self._select(batches, _YieldedData())
 
-    def _select(self, batches, yielded_mols, yielded_batches):
+    def _select(self, batches, yielded):
         """
         Apply a selection algorithm to `batches`.
 
@@ -313,15 +320,10 @@ class RemoveBatches(Selector):
             batch for batch in batches
             if batch.get_identity_key() not in removed
         )
-
-        yielded = _YieldedData()
-        selected_batches = self._selector._select(
+        yield from self._selector._select(
             batches=filtered_batches,
-            yielded=yielded,
+            yielded=_YieldedData(),
         )
-        for batch in selected_batches:
-            yielded.update(batch)
-            yield batch
 
 
 class RemoveMolecules(Selector):
@@ -357,15 +359,10 @@ class FilterBatches(Selector):
             batch for batch in batches
             if batch.get_identity_key() in valid
         )
-
-        yielded = _YieldedData()
-        selected_batches = self._selector._select(
+        yield from self._selector._select(
             batches=filtered_batches,
-            yielded=yielded,
+            yielded=_YieldedData(),
         )
-        for batch in selected_batches:
-            yielded.update(batch)
-            yield batch
 
 
 class FilterMolecules(Selector):
