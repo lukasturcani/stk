@@ -221,10 +221,8 @@ class _YieldedData:
     Keeps track of batches yielded by :meth:`.Selector._select`.
 
     Each :meth:`.Selector._select` call should be paired with a
-    new :class:`._YieldedData` instance, which will be automatically
-    updated each time a new batch is yielded. See
-    :meth:`.Selector.__init_subclass__`, to see how the automated
-    update is set up.
+    new :class:`._YieldedData` instance, which should be updated
+    each time a new batch is yielded.
 
     """
 
@@ -277,10 +275,13 @@ class _YieldedData:
 
         Parameters
         ----------
-        batch : :class:
+        batch : :class:`.Batch`
+            The batch to check.
 
         Returns
         -------
+        :class:`bool`
+            ``True`` if `batch` has already been yielded.
 
         """
 
@@ -288,6 +289,17 @@ class _YieldedData:
 
     def is_unyielded_batch(self, batch):
         """
+        Check if `batch` has not been yielded.
+
+        Parameters
+        ----------
+        batch : :class:`.Batch`
+            The batch to check.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `batch` has not been yielded.
 
         """
 
@@ -295,6 +307,18 @@ class _YieldedData:
 
     def has_yielded_mols(self, batch):
         """
+        Check if `batch` contains any previously yielded molecules.
+
+        Parameters
+        ----------
+        batch : :class:`.Batch`
+            The batch to check.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `batch` contains any molecules which have
+            previously been yielded.
 
         """
 
@@ -302,6 +326,18 @@ class _YieldedData:
 
     def has_no_yielded_mols(self, batch):
         """
+        Check if `batch` consists only of unyielded molecules.
+
+        Parameters
+        ----------
+        batch : :class:`.Batch`
+            The batch to check.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `batch` does not have any previously yielded
+            molecules.
 
         """
 
@@ -321,24 +357,24 @@ class Selector:
 
     def __init__(
         self,
-        batch_size,
         num_batches,
+        batch_size,
         duplicate_mols,
         duplicate_batches,
         fitness_modifier,
     ):
         """
-        Initialize a :class:`Selector` instance.
+        Initialize a :class:`.Selector` instance.
 
         Parameters
         ----------
-        batch_size : :class:`int`
-            The number of molecules yielded at once.
-
         num_batches : :class:`int`
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
+
+        batch_size : :class:`int`
+            The number of molecules yielded at once.
 
         duplicate_mols : :class:`bool`
             If ``True`` the same molecule can be yielded in more than
@@ -359,8 +395,8 @@ class Selector:
         if fitness_modifier is None:
             fitness_modifier = self._get_fitness_values
 
-        self._batch_size = batch_size
         self._num_batches = num_batches
+        self._batch_size = batch_size
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
 
@@ -370,6 +406,10 @@ class Selector:
 
     @staticmethod
     def _update_yielded(_selected):
+        """
+        Decorate `_selected` to automatically update `yielded`.
+
+        """
 
         def inner(self, batches, yielded):
             for batch in _selected(self, batches, yielded):
@@ -380,6 +420,22 @@ class Selector:
 
     @staticmethod
     def _get_fitness_values(population):
+        """
+        Map each molecule to its fitness value.
+
+        Parameters
+        ----------
+        population : :class:`iterable`
+            The population from which batches are selected.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps each molecule in `population` to the fitness value
+            in its :attr:`~.Molecule.fitness` attribute.
+
+        """
+
         return {mol: mol.fitness for mol in population}
 
     def _get_batches(self, population, fitness_values):
@@ -388,13 +444,17 @@ class Selector:
 
         Parameters
         ----------
+        population : :class:`iterable`
+            The molecules which are to be batched.
 
+        fitness_values : :class:`dict`
+            Maps each molecule in `population` to the fitness value
+            the selection algorithm should use.
 
         Yields
         ------
         :class:`.Batch`
             A batch of molecules from `population`.
-
 
         """
 
@@ -414,9 +474,8 @@ class Selector:
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
+        population : :class:`iterable`
+            A collection of molecules from which batches are selected.
 
         Yields
         ------
@@ -436,16 +495,16 @@ class Selector:
         """
         Apply a selection algorithm to `batches`.
 
-        Notes
-        -----
-        Any batch that is yielded is automatically added to
-        `_yielded_mols` and `_yielded_batches`. See the
-        code of :meth:`select`, which performs this operation.
-
         Parameters
         ----------
         batches : :class:`tuple` of :class:`.Batch`
             The batches, from which some should be selected.
+
+        yielded : :class:`._YieldedData`
+            A container holding information about previously
+            yielded batches. It is automatically updated each time
+            ``yield`` is used, due to the decorator
+            applied in :meth:`__init_subclass__`.
 
         Yields
         ------
@@ -464,7 +523,44 @@ class Selector:
 
 
 class RemoveBatches(Selector):
+    """
+    Prevents a :class:`.Selector` from selecting some batches.
+
+    Examples
+    --------
+    You want to use :class:`.Roulette` selection on all but the
+    5 :class:`.Worst` batches
+
+    .. code-block:: python
+
+        import stk
+
+        population = stk.Population(...)
+        selector = stk.RemoveBatches(
+            remover=stk.Worst(5),
+            selector=stk.Roulette(20),
+        )
+        for mol, in selector.select(population):
+            # Do stuff with mol.
+
+    """
+
     def __init__(self, remover, selector):
+        """
+        Initialize a :class:`.RemoveBatches` instance.
+
+        Parameters
+        ----------
+        remover : :class:`.Selector`
+            Selects batches of molecules, which cannot be yielded by
+            `selector`.
+
+        selector : :class:`.Selector`
+            Selects batches of molecules, except those selected by
+            `remover`.
+
+        """
+
         self._remover = remover
         self._selector = selector
 
@@ -488,7 +584,30 @@ class RemoveBatches(Selector):
 
 
 class RemoveMolecules(Selector):
+    """
+    Prevents a :class:`.Selector` from selecting some molecules.
+
+    Examples
+    --------
+
+    """
+
     def __init__(self, remover, selector):
+        """
+        Initialize a :class:`.RemoveMolecules` instance.
+
+        Parameters
+        ----------
+        remover : :class:`.Selector`
+            Selects batches molecules, any molecule selected cannot
+            be selected by `selector`.
+
+        selector : :class:`.Selector`
+            Selects batches of molecules, not containing any molecules
+            selected by `remover`.
+
+        """
+
         self._remover = remover
         self._selector = selector
 
@@ -503,7 +622,26 @@ class RemoveMolecules(Selector):
 
 
 class FilterBatches(Selector):
+    """
+    Allows a :class:`.Selector` to select only some batches.
+
+    Examples
+    --------
+
+    """
+
     def __init__(self, filter, selector):
+        """
+        Initialize a :class:`.FilterBatches` instance.
+
+        Parameters
+        ----------
+        filter : :class:`.Selector`
+
+        selector : :class:`.Selector`
+
+        """
+
         self._filter = filter
         self._selector = selector
 
@@ -527,7 +665,26 @@ class FilterBatches(Selector):
 
 
 class FilterMolecules(Selector):
+    """
+    Allows a :class:`.Selector` to select only some molecules.
+
+    Examples
+    --------
+
+    """
+
     def __init__(self, filter, selector):
+        """
+        Initialize a :class:`.FilterMolecules` instance.
+
+        Parameters
+        ----------
+        filter : :class:`.Selector`
+
+        selector : :class:`.Selector`
+
+        """
+
         self._filter = filter
         self._selector = selector
 
