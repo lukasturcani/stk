@@ -230,6 +230,12 @@ class Batch:
     def __le__(self, other):
         return self._fitness <= other._fitness
 
+    def __repr__(self):
+        return f'Batch({self._mols})'
+
+    def __str__(self):
+        return repr(self)
+
 
 class _YieldedData:
     """
