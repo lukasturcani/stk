@@ -566,8 +566,8 @@ class Best(Selector):
         """
 
         super().__init__(
-            batch_size=batch_size,
             num_batches=num_batches,
+            batch_size=batch_size,
             duplicate_mols=duplicate_mols,
             # Note that duplicate batches can still occur in Best,
             # if there a duplicates of an object in the population.
@@ -627,8 +627,8 @@ class Worst(Selector):
         """
 
         super().__init__(
-            batch_size=batch_size,
             num_batches=num_batches,
+            batch_size=batch_size,
             duplicate_mols=duplicate_mols,
             # Note that duplicate batches can still occur in Worst,
             # if there a duplicates of an object in the population.
@@ -754,8 +754,8 @@ class Roulette(Selector):
 
         self._generator = np.random.RandomState(random_seed)
         super().__init__(
-            batch_size=batch_size,
             num_batches=num_batches,
+            batch_size=batch_size,
             duplicate_mols=duplicate_mols,
             duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
@@ -865,8 +865,8 @@ class AboveAverage(Selector):
         """
 
         super().__init__(
-            batch_size=batch_size,
             num_batches=num_batches,
+            batch_size=batch_size,
             duplicate_mols=duplicate_mols,
             duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
@@ -987,8 +987,8 @@ class Tournament(Selector):
 
         self._generator = np.random.RandomState(random_seed)
         super().__init__(
-            batch_size=batch_size,
             num_batches=num_batches,
+            batch_size=batch_size,
             duplicate_mols=duplicate_mols,
             duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
@@ -1098,8 +1098,8 @@ class StochasticUniversalSampling(Selector):
 
         self._generator = np.random.RandomState(random_seed)
         super().__init__(
-            batch_size=batch_size,
             num_batches=num_batches,
+            batch_size=batch_size,
             duplicate_mols=duplicate_mols,
             duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
