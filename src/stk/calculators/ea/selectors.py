@@ -62,8 +62,8 @@ selected by the `remover`
         # Do stuff with mol.
 
 You can combine :class:`.RemoveBatches` and :class:`.SelectorSequence`
-to get a selector which yields the top 5 batches first and then
-selects using roulette any of the other batches
+to get a selector which yields the top 5 batches first and then,
+using roulette, selects any of the other batches
 
 .. code-block:: python
 
