@@ -17,17 +17,17 @@ Selection
 
 Selection is carried out by :class:`.Selector` objects.
 Selectors are objects with a :meth:`~.Selector.select`
-method, which is used to select molecules from a :class:`.Population`.
-Examples of how :class:`.Selector` classes can be used is given their
-documentation, for example :class:`.Best`, :class:.`Roulette` or
-:class:`.AboveAverage`.
+method, which is used to select batches of molecules from a
+:class:`.Population`. Examples of how :class:`.Selector` classes can be
+used is given their documentation, for example :class:`.Best`,
+:class:.`Roulette` or :class:`.AboveAverage`.
 
 Selectors can be combined to generate more complex selection
 processes. For example, let's say we want to implement elitism.
-Elitism is when the best molecules are guaranteed to be selected first
+Elitism is when the best batches are guaranteed to be selected first,
 before the selection algorithm is carried out. The
 :class:`.SelectorSequence` exists precisely for this reason. It takes
-two selectors and yields from them one after the other
+two selectors and yields batches from them one after the other
 
 .. code-block:: python
 
@@ -39,13 +39,13 @@ two selectors and yields from them one after the other
         selector2=stk.Roulette(20),
     )
     # Select with Best first and then with Roulette.
-    for mol, in elite_roulette.select(population):
-        # Do stuff with mol.
+    for batch in elite_roulette.select(population):
+        # Do stuff with batch.
 
 
-What if you did not want Roulette to include any batches
-selected by Best? The :class:`.RemoveBatches` selector can be used
-for this. It takes two selectors, one called a `remover` and one
+What if you did not want Roulette to yield any batches
+selected by :class:`.Best`? The :class:`.RemoveBatches` selector can be
+used for this. It takes two selectors, one called a `remover` and one
 called a `selector`. It first yields batches of molecules from a
 population with the `remover`. It then passes the same population
 to the `selector` but prevents it from yielding any batches
@@ -58,8 +58,8 @@ selected by the `remover`
         selector=stk.Roulettte(20),
     )
     # Select batches, excluding the top 5.
-    for mol, in roulette_without_elites.select(population):
-        # Do stuff with mol.
+    for batch in roulette_without_elites.select(population):
+        # Do stuff with batch.
 
 You can combine :class:`.RemoveBatches` and :class:`.SelectorSequence`
 to get a selector which yields the top 5 batches first and then,
@@ -540,8 +540,9 @@ class RemoveBatches(Selector):
             remover=stk.Worst(5),
             selector=stk.Roulette(20),
         )
-        for mol, in selector.select(population):
-            # Do stuff with mol.
+        for batch in selector.select(population):
+            # Do stuff with batch. It was selected with roulette
+            # selection and is not one of the worst 5 batches.
 
     """
 
@@ -589,6 +590,23 @@ class RemoveMolecules(Selector):
 
     Examples
     --------
+    You want to prevent any of the molecules in the :class:`.Best`
+    5 batches from being selected by :class:`.Roulette`.
+
+    .. code-block:: python
+
+        import stk
+
+        population = stk.Population(...)
+        selector = stk.RemoveMolecules(
+            remover=stk.Best(num_batches=5, batch_size=3),
+            selector=stk.Roulette(num_batches=20, batch_size=3),
+        )
+
+        for batch in selector.select(population):
+            # Do stuff with batch. The batch is guaranteed not to
+            # contain any molecules which are found in the best 5
+            # batches of size 3.
 
     """
 
@@ -627,6 +645,21 @@ class FilterBatches(Selector):
 
     Examples
     --------
+    You only want the :class:`.Best` 10 batches to participate in
+    :class:`.Roulette`
+
+    .. code-block:: python
+
+        import stk
+
+        population = stk.Population(...)
+        selector = stk.FilterBatches(
+            filter=stk.Best(10),
+            selector=stk.Roulette(7),
+        )
+        for batch in selector.select(population):
+            # Do stuff with batch. It is one of the 10 best batches and
+            # was selected using roulette selection.
 
     """
 
@@ -670,6 +703,22 @@ class FilterMolecules(Selector):
 
     Examples
     --------
+    You want to use :class:`.Roulette` on the molecules which belong
+    to the :class:`.Best` 5 batches of size 3
+
+    .. code-block:: python
+
+        import stk
+
+        population = stk.Population(...)
+        selector = stk.FilterMolecules(
+            filter=stk.Best(num_batches=5, batch_size=3),
+            selector=stk.Roulette(num_batches=20, batch_size=3),
+        )
+        for batch in selector.select(population):
+            # Do stuff with batch. All the molecules in the batch
+            # belong to the top 5 batches of size 3. The batch
+            # was selected using roulette selection.
 
     """
 
