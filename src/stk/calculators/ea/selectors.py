@@ -1537,8 +1537,8 @@ class StochasticUniversalSampling(Selector):
         pointers = []
         pointer = self._generator.uniform(0, pointer_distance)
         for i in range(num_batches):
-            pointer += pointer_distance
             pointers.append(pointer)
+            pointer += pointer_distance
 
         batch_index = 0
         for pointer in pointers:
