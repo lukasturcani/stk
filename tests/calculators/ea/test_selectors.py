@@ -1,5 +1,6 @@
 import stk
 import numpy as np
+import itertools as it
 
 
 def _test_no_duplicate_batches(selection):
@@ -21,23 +22,19 @@ def _test_num_batches(selection, num_batches):
 
 
 def _test_batch_size(selection, batch_size):
-    ...
+    for batch in selection:
+        assert batch.get_size() == batch_size
 
 
 def _test_selection_determinism(selection1, selection2):
-    ...
+    for batch1, batch2 in it.zip_longest(selection1, selection2):
+        assert list(batch1) == list(batch2)
 
 
-def _test_expected_selection(selection, expected):
-    ...
-
-
-def _test_expected_unselected(selection, unselected):
-    ...
-
-
-def _test_selection_order(selection, expected):
-    ...
+def _test_selection(selection, expected, unselected):
+    for batch in selection:
+        assert batch.get_identity_key() in expected
+        assert batch.get_identity_key() not in unselected
 
 
 def test_fittest(generation):
