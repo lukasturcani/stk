@@ -3,15 +3,21 @@ import numpy as np
 
 
 def _test_no_duplicate_batches(selection):
-    ...
+    selected = set()
+    for batch in selection:
+        assert batch.get_identity_key() not in selected
+        selected.add(batch.get_identity_key())
 
 
 def _test_no_duplicate_mols(selection):
-    ...
+    selected = set()
+    for batch in selection:
+        assert all(mol not in selected for mol in batch)
+        selected.update(batch)
 
 
 def _test_num_batches(selection, num_batches):
-    ...
+    assert sum(1 for _ in selection) == num_batches
 
 
 def _test_batch_size(selection, batch_size):

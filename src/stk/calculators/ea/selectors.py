@@ -167,6 +167,19 @@ class Batch:
         self._fitness = sum(fitness_values[mol] for mol in mols)
         self._identity_key = frozenset(Counter(mols).items())
 
+    def get_size(self):
+        """
+        Get the number of molecules in the batch.
+
+        Returns
+        -------
+        :class:`int`
+            The number of molecules in the batch.
+
+        """
+
+        return len(self._mols)
+
     def get_fitness(self):
         """
         Get the fitness value of the batch.
