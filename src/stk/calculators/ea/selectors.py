@@ -670,8 +670,11 @@ class FilterBatches(Selector):
         Parameters
         ----------
         filter : :class:`.Selector`
+            Selects batches which can be yielded by `selector`.
 
         selector : :class:`.Selector`
+            Selects batches, but only if they were also selected by
+            `filter`.
 
         """
 
@@ -729,8 +732,11 @@ class FilterMolecules(Selector):
         Parameters
         ----------
         filter : :class:`.Selector`
+            Selects molecules which can be yielded by `selector`.
 
         selector : :class:`.Selector`
+            Selects batches of molecules. The batches can only
+            contain molecules yielded by `filter`.
 
         """
 
@@ -752,27 +758,22 @@ class SelectorSequence(Selector):
 
     Examples
     --------
-    First use :class:`Best` to select the 10 best batches and
-    then use :class:`Roulette` to select batches in proportion to their
-    fitness.
+    First use :class:`.Best` to select the 10 best batches and
+    then use :class:`.Roulette` to select batches in proportion to their
+    fitness
 
     .. code-block:: python
 
         import stk
 
-        # Make a population.
-        pop = stk.Population(...)
-
-        # Create a Selector which yields 10 batches of molecules and
-        # then uses roulette selection indefinitely.
-        best = stk.Best(batch_size=3)
-        roulette = stk.Roulette(batch_size=3)
-        elitist_roulette = stk.SelectorSequence(best, roulette)
-
-        # Use the selector to yield molecules.
-        for selected_mol in elitist_roulette.select(pop):
-            # Do something with the selected molecules.
-            ...
+        population = stk.Population(...)
+        selector = stk.SelectorSequence(
+            selector1=stk.Best(10),
+            selector2=stk.Roulette(20),
+        )
+        for batch in selector.select(population):
+            # Do stuff with batch. Batches are first selected with
+            # Best(10) and then with Roulette(20).
 
     """
 
@@ -783,10 +784,14 @@ class SelectorSequence(Selector):
         Parameters
         ----------
         selector1 : :class:`.Selector`
+            The selector from which batches are yielded first.
 
         selector2 : :class:`.Selector`
+            The selector from which batches are yielded second.
 
         num_batches : :class:`int`, optional
+            The maximum number of batches which can be yielded across
+            the entire sequence.
 
         """
 
@@ -795,22 +800,6 @@ class SelectorSequence(Selector):
         self._num_batches = num_batches
 
     def select(self, population):
-        """
-        Yield batches of molecules.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            A batch of selected molecules.
-
-        """
-
         yield from it.islice(
             it.chain(
                 self._selector1.select(population),
