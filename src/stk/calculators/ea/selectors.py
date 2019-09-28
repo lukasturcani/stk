@@ -863,11 +863,12 @@ class AboveAverage(Selector):
             for batch in batches
             for i in range(self._get_num_duplicates(batch, mean))
         )
-        # If duplicate molecules are not allowed, filter out batches
-        # with them.
+        # If duplicate molecules are not allowed, allow only
+        # batches with no yielded molecules.
         if not self._duplicate_mols:
             batches = filter(yielded.has_no_yielded_mols, batches)
-        # If duplicate batches are not allowed, filter them out.
+        # If duplicate batches are not allowed, allow only
+        # unyielded batches.
         if not self._duplicate_batches:
             batches = filter(yielded.is_unyielded_batch, batches)
         # Limit the number of yielded batches to _num_batches.
