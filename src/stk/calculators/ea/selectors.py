@@ -1116,9 +1116,6 @@ class AboveAverage(Selector):
     """
     Yields above average batches of molecules.
 
-    The fitness of a batch is the sum of all fitness values of the
-    molecules in the batch.
-
     Examples
     --------
     Yielding molecules one at a time. For example, if molecules need
@@ -1171,7 +1168,7 @@ class AboveAverage(Selector):
         fitness_modifier=None,
     ):
         """
-        Initialize a :class:`AboveAverage` instance.
+        Initialize an :class:`.AboveAverage` instance.
 
         Parameters
         ----------
@@ -1242,16 +1239,11 @@ class AboveAverage(Selector):
 
 class Tournament(Selector):
     """
-    Yields molecules by tournament selection.
+    Yields batches of molecules through tournament selection.
 
-    In tournament selection, a random number of members is chosen from
-    the population undergo a competition. In each competition, a random
-    number of batches is chosen to compete and batches with the highest
-    fitness are yielded. Competitions are repeated until the total
-    number of batches yielded is equal to the number of batches.
-    If batch size is greater than 1, the compared fitness is the
-    average fitness of the batch. This process is repeated until the
-    number of yielded batches is equal to `num_batches`.
+    In tournament selection, a random number of batches is chosen from
+    the population undergo a competition. In each competition, the
+    batch with the highest fitness value is yielded.
 
     Examples
     --------
@@ -1266,13 +1258,13 @@ class Tournament(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        tournament_selection = stk.Tournament(
+        tournament = stk.Tournament(
             num_batches=5,
             batch_size=1
         )
 
         # Select the molecules.
-        for selected, in tournament_selection.select(pop):
+        for selected, in tournament.select(pop):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
             mutant = mutator.mutate(selected)
@@ -1289,7 +1281,7 @@ class Tournament(Selector):
         random_seed=None,
     ):
         """
-        Initialize a :class:`TournamentSelection` instance.
+        Initialize a :class:`.Tournament` instance.
 
         Parameters
         ----------
@@ -1356,17 +1348,17 @@ class Tournament(Selector):
 
 class StochasticUniversalSampling(Selector):
     """
-    Yields molecules by stochastic universal sampling.
+    Yields batches of molecules through stochastic universal sampling.
 
-    Stochastic universal sampling yields molecules by sampling the population
-    across evenly spaced intervals. Members with greater fitness values occupy
-    a larger area and are therefore more likely to be sampled.
-    This approach means weaker members of the population
-    are given a greater chance to be chosen.
+    Stochastic universal sampling yields batches by sampling the
+    population across evenly spaced intervals. Members with greater
+    fitness values occupy a larger area and are therefore more likely
+    to be sampled. This approach means weaker members of the population
+    are given a greater chance to be chosen [#]_.
 
     References
     ----------
-    https://en.wikipedia.org/wiki/Stochastic_universal_sampling
+    .. [#] https://en.wikipedia.org/wiki/Stochastic_universal_sampling
 
     Examples
     --------
@@ -1381,7 +1373,7 @@ class StochasticUniversalSampling(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        stochastic_sampling = stk.StochasticUniversalSampling(num_batches=5)
+        stochastic_sampling = stk.StochasticUniversalSampling(5)
 
         # Select the molecules.
         for selected, in stochastic_samplng.select(pop):
@@ -1400,7 +1392,7 @@ class StochasticUniversalSampling(Selector):
         random_seed=None,
     ):
         """
-        Initialize a :class:`TournamentSelection` instance.
+        Initialize a :class:`.StochasticUniversalSampling` instance.
 
         Parameters
         ----------
