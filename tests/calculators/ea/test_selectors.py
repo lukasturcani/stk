@@ -2,6 +2,38 @@ import stk
 import numpy as np
 
 
+def _test_no_duplicate_batches(selection):
+    ...
+
+
+def _test_no_duplicate_mols(selection):
+    ...
+
+
+def _test_num_batches(selection, num_batches):
+    ...
+
+
+def _test_batch_size(selection, batch_size):
+    ...
+
+
+def _test_selection_determinism(selection1, selection2):
+    ...
+
+
+def _test_expected_selection(selection, expected):
+    ...
+
+
+def _test_expected_unselected(selection, unselected):
+    ...
+
+
+def _test_selection_order(selection, expected):
+    ...
+
+
 def test_fittest(generation):
     fittest = stk.Fittest(num_batches=10)
     selected = fittest.select(generation)
@@ -55,28 +87,6 @@ def test_selector_sequence(generation):
 
     for i, (mol, ) in enumerate(sequence.select(generation)):
         assert mol is selected[i]
-
-
-def test_selector_funnel(generation):
-    elitism = stk.Fittest(num_batches=5)
-    above_avg = stk.AboveAverage()
-    funnel = stk.SelectorFunnel(elitism, above_avg)
-
-    elites = set(
-        mol for batch in elitism.select(generation) for mol in batch
-    )
-    above_avg_elites = set(
-        mol for batch in above_avg.select([*elites]) for mol in batch
-    )
-    funnel_selected = set(
-        mol for batch in funnel.select(generation) for mol in batch
-    )
-
-    for mol in above_avg_elites:
-        assert mol in funnel_selected
-
-    for mol in funnel_selected:
-        assert mol in above_avg_elites
 
 
 def test_stochastic_universal(generation):
