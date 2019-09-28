@@ -149,6 +149,8 @@ class Batch:
 
     """
 
+    __slots__ = ['_mols', '_fitness', '_identity_key']
+
     def __init__(self, mols, fitness_values):
         """
         Initialize a :class:`.Batch`.
@@ -238,6 +240,8 @@ class _YieldedData:
     each time a new batch is yielded.
 
     """
+
+    __slots__ = ['_mols', '_batches', '_num']
 
     def __init__(self):
         # Has all molecules yielded by _select().
