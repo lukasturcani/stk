@@ -217,29 +217,94 @@ class Batch:
 
 
 class _YieldedData:
+    """
+    Keeps track of batches yielded by :meth:`.Selector._select`.
+
+    Each :meth:`.Selector._select` call should be paired with a
+    new :class:`._YieldedData` instance, which will be automatically
+    updated each time a new batch is yielded. See
+    :meth:`.Selector.__init_subclass__`, to see how the automated
+    update is set up.
+
+    """
+
     def __init__(self):
+        # Has all molecules yielded by _select().
         self._mols = set()
+        # Has the identity_key() of all batches yielded by select().
         self._batches = set()
+        # Counts the total number of times _select() has yielded.
         self._num = 0
 
     def update(self, batch):
+        """
+        Update tracked data with a new `batch`.
+
+        Parameters
+        ----------
+        batch : :class:`.Batch`
+            A batch yielded by :meth:`.Selector._select`.
+
+        Returns
+        -------
+        :class:`_YieldedData`
+            The data tracker.
+
+        """
+
         self._mols.update(batch)
         self._batches.add(batch.get_identity_key())
         self._num += 1
+        return self
 
     def get_num(self):
+        """
+        Get the number of times :meth:`.Selector._select` has yielded.
+
+        Returns
+        -------
+        :class:`int`
+            The total number of times :meth:`.Selector._select` has
+            yielded.
+
+        """
+
         return self._num
 
     def is_yielded_batch(self, batch):
+        """
+        Check if `batch` has already been yielded.
+
+        Parameters
+        ----------
+        batch : :class:
+
+        Returns
+        -------
+
+        """
+
         return batch.get_identity_key() in self._batches
 
     def is_unyielded_batch(self, batch):
+        """
+
+        """
+
         return batch.get_identity_key() not in self._batches
 
     def has_yielded_mols(self, batch):
+        """
+
+        """
+
         return any(mol in self._mols for mol in batch)
 
     def has_no_yielded_mols(self, batch):
+        """
+
+        """
+
         return all(mol not in self._mol for mol in batch)
 
 
