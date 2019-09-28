@@ -44,7 +44,51 @@ two selectors and yields from them one after the other
 
 
 What if you did not want Roulette to include any batches
+selected by Best? The :class:`.RemoveBatches` selector can be used
+for this. It takes two selectors, one called a `remover` and one
+called a `selector`. It first yields batches of molecules from a  with
+the population with the `remover`. It then passes the same population
+to the `selector` but prevents it from yielding any batches
+selected by the `remover`
 
+.. code-block:: python
+
+    roulette_without_elites = stk.RemoveBatches(
+        remover=stk.Best(5),
+        selector=stk.Roulettte(20),
+    )
+    # Select batches, excluding the top 5.
+    for mol, in roulette_without_elites.select(population):
+        # Do stuff with mol.
+
+You can combine :class:`.RemoveBatches` and :class:`.SelectorSequence`
+to get a selector which yields the top 5 batches first and then
+selects using roulette any of the other batches
+
+.. code-block:: python
+
+    elite_roulette2 = stk.SelectorSequence(
+        selector1=stk.Best(5),
+        selector2=roulette_without_elites,
+    )
+
+
+The same thing can be written more explicitly
+
+.. code-block:: python
+
+    elite_roulette2 = stk.SelectorSequence(
+        selector1=stk.Best(5),
+        selector2=stk.RemoveBatches(
+            remover=stk.Best(5),
+            selector=stk.Roulette(20),
+        ),
+    )
+
+
+You can also explore other combinations with :class:`.FilterBatches`,
+:class:`.FilterMolecules` and :class:`.RemoveMolecules`. Examples
+using these classes are given in their docstrings.
 
 
 .. _`adding selectors`:
