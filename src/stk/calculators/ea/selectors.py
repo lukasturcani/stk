@@ -811,10 +811,7 @@ class SelectorSequence(Selector):
 
 class Best(Selector):
     """
-    Selects batches of molecules, fittest first.
-
-    The fitness of a batch is the sum of the fitness values of the
-    molecules in the batch.
+    Selects batches of molecules, highest fitness value first.
 
     Examples
     --------
@@ -919,6 +916,13 @@ class Best(Selector):
 
 
 class Worst(Selector):
+    """
+    Selects batches of molecules, lowest fitness value first.
+
+    Examples
+    --------
+
+    """
 
     def __init__(
         self,
@@ -929,7 +933,7 @@ class Worst(Selector):
         fitness_modifier=None,
     ):
         """
-        Initialize a :class:`Best` instance.
+        Initialize a :class:`.Worst` instance.
 
         Parameters
         ----------
