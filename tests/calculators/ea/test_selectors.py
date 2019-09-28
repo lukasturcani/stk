@@ -1,5 +1,6 @@
 import stk
 import itertools as it
+from functools import partial
 
 
 def _test_no_duplicate_batches(selection):
@@ -55,7 +56,8 @@ def _base_tests(
 
     for batches, size, dup_batches, dup_mols in options:
         if use_random_seed:
-            selector = selector_class(
+            selector = partial(
+                selector_class,
                 num_batches=batches,
                 batch_size=size,
                 duplicate_batches=dup_batches,
@@ -63,7 +65,8 @@ def _base_tests(
                 random_seed=4,
             )
         else:
-            selector = selector_class(
+            selector = partial(
+                selector_class,
                 num_batches=batches,
                 batch_size=size,
                 duplicate_batches=dup_batches,
@@ -71,20 +74,20 @@ def _base_tests(
             )
 
         _test_selection_properties(
-            selection=selector.select(generation),
+            selection=selector().select(generation),
             num_batches=batches,
             batch_size=size,
         )
 
         _test_selection_determinism(
-            selection1=selector.select(generation),
-            selection2=selector.select(generation),
+            selection1=selector().select(generation),
+            selection2=selector().select(generation),
         )
 
         if not dup_batches:
-            _test_no_duplicate_batches(selector.select(generation))
+            _test_no_duplicate_batches(selector().select(generation))
         if not dup_mols:
-            _test_no_duplicate_mols(selector.select(generation))
+            _test_no_duplicate_mols(selector().select(generation))
 
 
 def test_best(generation):
@@ -173,7 +176,8 @@ def test_tournament(generation):
         duplicate_mols=[True, False],
         use_random_seed=True,
     )
+    tournament = stk.Tournament(duplicate_mols=False)
     _test_unselected(
-        selection=stk.Tournament().select(generation),
+        selection=tournament.select(generation),
         unselected={min(generation, key=lambda m: m.fitness)},
     )

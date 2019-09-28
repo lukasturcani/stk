@@ -1346,6 +1346,9 @@ class Tournament(Selector):
         """
 
         self._generator = np.random.RandomState(random_seed)
+        if num_batches is None:
+            num_batches = float('inf')
+
         super().__init__(
             num_batches=num_batches,
             batch_size=batch_size,
