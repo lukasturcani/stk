@@ -28,9 +28,13 @@ def _test_selection_determinism(selection1, selection2):
         assert list(batch1) == list(batch2)
 
 
-def _test_selection(selection, expected, unselected):
+def _test_expected(selection, expected):
     for mol, in selection:
         assert mol in expected
+
+
+def _test_unselected(selection, unselected):
+    for mol, in selection:
         assert mol not in unselected
 
 
@@ -102,7 +106,8 @@ def test_best(generation):
     )
     best = set(sorted_gen[:10])
     rest = set(sorted_gen[10:])
-    _test_selection(stk.Best(10), best, rest)
+    _test_expected(stk.Best(10).select(generation), best)
+    _test_unselected(stk.Best(10).select(generation), rest)
 
 
 def test_worst(generation):
@@ -119,7 +124,8 @@ def test_worst(generation):
     sorted_gen = sorted(generation, key=lambda m: m.fitness)
     worst = set(sorted_gen[:10])
     rest = set(sorted_gen[10:])
-    _test_selection(stk.Worst(10), worst, rest)
+    _test_expected(stk.Worst(10).select(generation), worst)
+    _test_unselected(stk.Worst(10).select(generation), rest)
 
 
 def test_roulette(generation):
@@ -130,7 +136,7 @@ def test_roulette(generation):
         batch_size=[1, 2, 4],
         duplicate_batches=[True, False],
         duplicate_mols=[True, False],
-        use_random_seed=False,
+        use_random_seed=True,
     )
 
 
@@ -146,61 +152,29 @@ def test_above_average(generation):
     )
 
 
-def test_selector_sequence(generation):
-    elitism = stk.Fittest(num_batches=5)
-    above_avg = stk.AboveAverage()
-    selected = (
-        *(mol for batch in elitism.select(generation) for mol in batch),
-        *(mol for batch in above_avg.select(generation) for mol in batch)
-    )
-    sequence = stk.SelectorSequence(elitism, above_avg)
-
-    for i, (mol, ) in enumerate(sequence.select(generation)):
-        assert mol is selected[i]
-
-
 def test_stochastic_universal_sampling(generation):
-    _base_tests(stk.StochasticUniversalSampling, generation, True)
+    _base_tests(
+        selector_class=stk.StochasticUniversalSampling,
+        generation=generation,
+        num_batches=[3, 5, 10],
+        batch_size=[1, 2, 4],
+        duplicate_batches=[True, False],
+        duplicate_mols=[True, False],
+        use_random_seed=True,
+    )
 
 
 def test_tournament(generation):
-    tournament = stk.Tournament(num_batches=2, batch_size=2)
-    pop_batches = tournament._batch(generation)
-    worst_batch = min(
-        pop_batches,
-        key=lambda batch: batch[-1]
+    _base_tests(
+        selector_class=stk.Tournament,
+        generation=generation,
+        num_batches=[3, 5, 10],
+        batch_size=[1, 2, 4],
+        duplicate_batches=[True, False],
+        duplicate_mols=[True, False],
+        use_random_seed=False,
     )
-    batches = enumerate(tournament.select(generation), 1)
-    for i, batch in batches:
-        assert len(batch) == 2
-        # Ensures the worst performing batch is never selected.
-        # This is impossible in tournament sampling.
-        assert worst_batch is not batch
-    assert i == 2
-
-    tournament_no_dupes = stk.Tournament(
-        num_batches=5,
-        batch_size=1,
-        duplicate_batches=False
+    _test_unselected(
+        selection=stk.Tournament().select(generation),
+        unselected={min(generation, key=lambda m: m.fitness)},
     )
-    tournament_no_dupes_selected = set(
-        mol for mol in tournament_no_dupes.select(generation)
-    )
-    # Assert that no duplicate molecules are in selected.
-    assert len(tournament_no_dupes_selected) == 5
-
-    small_pop = generation[:2]
-    small_tournament = stk.Tournament(
-        num_batches=10,
-        batch_size=1,
-        duplicate_batches=True
-    )
-    # Ensure that out of a choice of two, the lowest fitness
-    # is never chosen.
-    worst_mol = min(
-        small_pop,
-        key=lambda mol: mol.fitness
-    )
-    for batch in small_tournament.select(small_pop):
-        assert len(batch) == 1
-        assert worst_mol not in batch
