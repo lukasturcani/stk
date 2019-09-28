@@ -1,5 +1,4 @@
 import stk
-import numpy as np
 import itertools as it
 
 
@@ -93,7 +92,7 @@ def test_best(generation):
         selector_class=stk.Best,
         generation=generation,
         num_batches=[3, 5, 10],
-        batch_size=[1, 2, 4],
+        batch_size=[1, 2],
         duplicate_batches=[True, False],
         duplicate_mols=[True, False],
         use_random_seed=False,
@@ -115,7 +114,7 @@ def test_worst(generation):
         selector_class=stk.Worst,
         generation=generation,
         num_batches=[3, 5, 10],
-        batch_size=[1, 2, 4],
+        batch_size=[1, 2],
         duplicate_batches=[True, False],
         duplicate_mols=[True, False],
         use_random_seed=False,
@@ -133,7 +132,7 @@ def test_roulette(generation):
         selector_class=stk.Roulette,
         generation=generation,
         num_batches=[3, 5, 10],
-        batch_size=[1, 2, 4],
+        batch_size=[1, 2],
         duplicate_batches=[True, False],
         duplicate_mols=[True, False],
         use_random_seed=True,
@@ -145,7 +144,7 @@ def test_above_average(generation):
         selector_class=stk.AboveAverage,
         generation=generation,
         num_batches=[3, 5, 10],
-        batch_size=[1, 2, 4],
+        batch_size=[1, 2],
         duplicate_batches=[True, False],
         duplicate_mols=[True, False],
         use_random_seed=False,
@@ -157,7 +156,7 @@ def test_stochastic_universal_sampling(generation):
         selector_class=stk.StochasticUniversalSampling,
         generation=generation,
         num_batches=[3, 5, 10],
-        batch_size=[1, 2, 4],
+        batch_size=[1, 2],
         duplicate_batches=[True, False],
         duplicate_mols=[True, False],
         use_random_seed=True,
@@ -169,7 +168,7 @@ def test_tournament(generation):
         selector_class=stk.Tournament,
         generation=generation,
         num_batches=[3, 5, 10],
-        batch_size=[1, 2, 4],
+        batch_size=[1, 2],
         duplicate_batches=[True, False],
         duplicate_mols=[True, False],
         use_random_seed=True,

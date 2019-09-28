@@ -354,7 +354,7 @@ class _YieldedData:
 
         """
 
-        return all(mol not in self._mol for mol in batch)
+        return all(mol not in self._mols for mol in batch)
 
 
 class Selector:
@@ -412,9 +412,10 @@ class Selector:
         self._batch_size = batch_size
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
+        self._fitness_modifier = fitness_modifier
 
     def __init_subclass__(cls, **kwargs):
-        cls._selected = cls._update_yielded(cls._selected)
+        cls._select = cls._update_yielded(cls._select)
         return super().__init_subclass__(**kwargs)
 
     @staticmethod
