@@ -3,23 +3,48 @@ Selection
 =========
 
 #. :class:`.Best`
+#. :class:`.Worst`
 #. :class:`.Roulette`
 #. :class:`.AboveAverage`
-#. :class:`SelectorSequence`
-#. :class:`.SelectorFunnel`
+#. :class:`.Tournament`
+#. :class:`.StochasticUniversalSampling`
+#. :class:`.SelectorSequence`
+#. :class:`.RemoveBatches`
+#. :class:`.RemoveMolecules`
+#. :class:`.FilterBatches`
+#. :class:`.FilterMolecules`
 
 
-Selection is carried out by :class:`Selector` objects.
-Selectors are objects with a :meth:`~Selector.select`
+Selection is carried out by :class:`.Selector` objects.
+Selectors are objects with a :meth:`~.Selector.select`
 method, which is used to select molecules from a :class:`.Population`.
-Examples of how :class:`Selector` classes can be used is given their
-documentation, for example :class:`Best`, :class:`Roulette` or
-:class:`AboveAverage`.
+Examples of how :class:`.Selector` classes can be used is given their
+documentation, for example :class:`.Best`, :class:.`Roulette` or
+:class:`.AboveAverage`.
 
-:class:`Selector` can be combined to generate more complex selection
-processes, such as stochastic sampling, using
-:class:`.SelectorSequence` or :class:`SelectorFunnel`. Examples of how
-this can happen are given in the documentation of these two classes.
+Selectors can be combined to generate more complex selection
+processes. For example, let's say we want to implement elitism.
+Elitism is when the best molecules are guaranteed to be selected first
+before the selection algorithm is carried out. The
+:class:`.SelectorSequence` exists precisely for this reason. It takes
+two selectors and yields from them one after the other
+
+.. code-block:: python
+
+    import stk
+
+    population = stk.Population(...)
+    elite_roulette = stk.SelectorSequence(
+        selector1=stk.Best(5),
+        selector2=stk.Roulette(20),
+    )
+    # Select with Best first and then with Roulette.
+    for mol, in elite_roulette.select(population):
+        # Do stuff with mol.
+
+
+What if you did not want Roulette to include any batches
+
 
 
 .. _`adding selectors`:
@@ -505,8 +530,8 @@ class Best(Selector):
 
     def __init__(
         self,
-        batch_size=1,
         num_batches=None,
+        batch_size=1,
         duplicate_mols=True,
         duplicate_batches=True,
         fitness_modifier=None,
@@ -516,13 +541,13 @@ class Best(Selector):
 
         Parameters
         ----------
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
-
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
+
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
 
         duplicate_mols : :class:`bool`, optional
             If ``True`` the same molecule can be yielded in more than
@@ -566,8 +591,8 @@ class Worst(Selector):
 
     def __init__(
         self,
-        batch_size=1,
         num_batches=None,
+        batch_size=1,
         duplicate_mols=True,
         duplicate_batches=True,
         fitness_modifier=None,
@@ -577,13 +602,13 @@ class Worst(Selector):
 
         Parameters
         ----------
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
-
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
+
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
 
         duplicate_mols : :class:`bool`, optional
             If ``True`` the same molecule can be yielded in more than
@@ -685,8 +710,8 @@ class Roulette(Selector):
 
     def __init__(
         self,
-        batch_size=1,
         num_batches=None,
+        batch_size=1,
         duplicate_mols=True,
         duplicate_batches=True,
         fitness_modifier=None,
@@ -697,13 +722,13 @@ class Roulette(Selector):
 
         Parameters
         ----------
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
-
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
+
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
 
         duplicate_mols : :class:`bool`, optional
             If ``True`` the same molecule can be yielded in more than
@@ -804,8 +829,8 @@ class AboveAverage(Selector):
 
     def __init__(
         self,
-        batch_size=1,
         num_batches=None,
+        batch_size=1,
         duplicate_mols=True,
         duplicate_batches=True,
         fitness_modifier=None,
@@ -815,13 +840,13 @@ class AboveAverage(Selector):
 
         Parameters
         ----------
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
-
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
+
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
 
         duplicate_mols : :class:`bool`, optional
             If ``True`` the same molecule can be yielded in more than
@@ -921,8 +946,8 @@ class Tournament(Selector):
 
     def __init__(
         self,
-        batch_size=1,
         num_batches=None,
+        batch_size=1,
         duplicate_mols=True,
         duplicate_batches=True,
         fitness_modifier=None,
@@ -933,13 +958,13 @@ class Tournament(Selector):
 
         Parameters
         ----------
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
-
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
+
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
 
         duplicate_mols : :class:`bool`, optional
             If ``True`` the same molecule can be yielded in more than
@@ -1032,8 +1057,8 @@ class StochasticUniversalSampling(Selector):
 
     def __init__(
         self,
-        batch_size=1,
         num_batches=None,
+        batch_size=1,
         duplicate_mols=True,
         duplicate_batches=True,
         fitness_modifier=None,
@@ -1044,13 +1069,13 @@ class StochasticUniversalSampling(Selector):
 
         Parameters
         ----------
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
-
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
+
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
 
         duplicate_mols : :class:`bool`, optional
             If ``True`` the same molecule can be yielded in more than
