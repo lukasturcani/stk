@@ -1,6 +1,7 @@
 import stk
 import itertools as it
 from functools import partial
+import numpy as np
 
 
 def _test_no_duplicate_batches(selection):
@@ -152,6 +153,11 @@ def test_above_average(generation):
         duplicate_mols=[True, False],
         use_random_seed=False,
     )
+    mean = np.mean([m.fitness for m in generation])
+    expected = {m for m in generation if m.fitness > mean}
+    unselected = {m for m in generation if m.fitness < mean}
+    _test_expected(stk.AboveAverage().select(generation), expected)
+    _test_unselected(stk.AboveAverage().select(generation), unselected)
 
 
 def test_stochastic_universal_sampling(generation):
