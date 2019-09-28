@@ -17,13 +17,10 @@ def _test_no_duplicate_mols(selection):
         selected.update(batch)
 
 
-def _test_num_batches(selection, num_batches):
-    assert sum(1 for _ in selection) == num_batches
-
-
-def _test_batch_size(selection, batch_size):
-    for batch in selection:
+def _test_selection_properties(selection, num_batches, batch_size):
+    for i, batch in enumerate(selection, 1):
         assert batch.get_size() == batch_size
+    assert i == num_batches
 
 
 def _test_selection_determinism(selection1, selection2):
@@ -32,51 +29,86 @@ def _test_selection_determinism(selection1, selection2):
 
 
 def _test_selection(selection, expected, unselected):
-    for batch in selection:
-        assert batch.get_identity_key() in expected
-        assert batch.get_identity_key() not in unselected
+    for mol, in selection:
+        assert mol in expected
+        assert mol not in unselected
 
 
-def test_fittest(generation):
-    fittest = stk.Fittest(num_batches=10)
-    selected = fittest.select(generation)
-    sorted_pop = sorted(
-        generation,
-        reverse=True,
-        key=lambda mol: mol.fitness
+def _base_tests(selector_class, generation, use_random_seed):
+    num_batches = [3, 5, 10, 15]
+    batch_size = [1, 2, 4, 10]
+    duplicate_batches = [True, False]
+    duplicate_mols = [True, False]
+
+    options = it.product(
+        num_batches,
+        batch_size,
+        duplicate_batches,
+        duplicate_mols,
     )
-    for (mol1, ), mol2 in zip(selected, sorted_pop):
-        assert mol1 is mol2
 
-    fittest = stk.Fittest(batch_size=5)
-    for batch in fittest.select(generation):
-        assert len(batch) == 5
+    for batches, size, dup_batches, dup_mols in options:
+        if use_random_seed:
+            selector = selector_class(
+                num_batches=batches,
+                batch_size=size,
+                duplicate_batches=dup_batches,
+                duplicate_mols=dup_mols,
+                random_seed=4,
+            )
+        else:
+            selector = selector_class(
+                num_batches=batches,
+                batch_size=size,
+                duplicate_batches=dup_batches,
+                duplicate_mols=dup_mols,
+            )
+
+        _test_selection_properties(
+            selection=selector.select(generation),
+            num_batches=batches,
+            batch_size=size,
+        )
+
+        _test_selection_determinism(
+            selection1=selector.select(generation),
+            selection2=selector.select(generation),
+        )
+
+        if not dup_batches:
+            _test_no_duplicate_batches(selector.select(generation))
+        if not dup_mols:
+            _test_no_duplicate_mols(selector.select(generation))
+
+
+def test_best(generation):
+    _base_tests(stk.Best, generation, False)
+
+    sorted_gen = sorted(
+        generation,
+        key=lambda m: m.fitness,
+        reverse=True
+    )
+    best = set(sorted_gen[:10])
+    rest = set(sorted_gen[10:])
+    _test_selection(stk.Best(10), best, rest)
+
+
+def test_worst(generation):
+    _base_tests(stk.Worst, generation, False)
+
+    sorted_gen = sorted(generation, key=lambda m: m.fitness)
+    worst = set(sorted_gen[:10])
+    rest = set(sorted_gen[10:])
+    _test_selection(stk.Worst(10), worst, rest)
 
 
 def test_roulette(generation):
-    roulette = stk.Roulette(num_batches=5, batch_size=5)
-    for batch in roulette.select(generation):
-        assert len(batch) == 5
+    _base_tests(stk.Roulette, generation, True)
 
 
 def test_above_average(generation):
-    mean = np.mean([mol.fitness for mol in generation])
-    above_average = stk.AboveAverage()
-    selected = set(
-        mol
-        for batch in above_average.select(generation)
-        for mol in batch
-    )
-
-    for mol in generation:
-        if mol.fitness >= mean:
-            assert mol in selected
-        else:
-            assert mol not in selected
-
-    above_average = stk.AboveAverage(batch_size=5)
-    for batch in above_average.select(generation):
-        assert len(batch) == 5
+    _base_tests(stk.AboveAverage, generation, False)
 
 
 def test_selector_sequence(generation):
@@ -92,17 +124,8 @@ def test_selector_sequence(generation):
         assert mol is selected[i]
 
 
-def test_stochastic_universal(generation):
-    stochastic = stk.StochasticUniversalSampling(num_batches=5, batch_size=5)
-    for batch in stochastic.select(generation):
-        assert len(batch) == 5
-    assert len(list(stochastic.select(generation))) == 5
-    stochastic_ranked = stk.StochasticUniversalSampling(
-        num_batches=5,
-        batch_size=1,
-        use_rank=True
-    )
-    assert len(list(stochastic_ranked.select(generation))) == 5
+def test_stochastic_universal_sampling(generation):
+    _base_tests(stk.StochasticUniversalSampling, generation, True)
 
 
 def test_tournament(generation):
