@@ -1118,7 +1118,10 @@ class StochasticUniversalSampling(Selector):
             batch_position += batch.get_fitness()/total
             batch_positions.append(batch_position)
 
-        num_batches = self._num_batches - yielded.get_num()
+        num_batches = min(
+            self._num_batches - yielded.get_num(),
+            len(batches)
+        )
         pointer_distance = 1/num_batches
         pointers = []
         pointer = self._generator.uniform(0, pointer_distance)
