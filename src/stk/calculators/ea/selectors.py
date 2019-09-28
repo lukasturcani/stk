@@ -766,8 +766,8 @@ class SelectorSequence(Selector):
     Examples
     --------
     First use :class:`.Best` to select the 10 best batches and
-    then use :class:`.Roulette` to select batches in proportion to their
-    fitness
+    then use :class:`.Roulette` to select batches in proportion to
+    their fitness
 
     .. code-block:: python
 
@@ -872,7 +872,7 @@ class Best(Selector):
         fitness_modifier=None,
     ):
         """
-        Initialize a :class:`Best` instance.
+        Initialize a :class:`.Best` instance.
 
         Parameters
         ----------
@@ -928,6 +928,17 @@ class Worst(Selector):
 
     Examples
     --------
+    Select the worst 5 batches of size 3
+
+    .. code-block:: python
+
+        import stk
+
+        population = stk.Population(...)
+        worst = stk.Worst(num_batches=5, batch_size=3)
+        for batch in worst.select(population):
+            # Do stuff with batch.
+
 
     """
 
@@ -1250,7 +1261,8 @@ class Tournament(Selector):
 
     In tournament selection, a random number of batches is chosen from
     the population undergo a competition. In each competition, the
-    batch with the highest fitness value is yielded.
+    batch with the highest fitness value is yielded. This is repeated
+    until `num_batches` are yielded.
 
     Examples
     --------
