@@ -46,8 +46,8 @@ two selectors and yields from them one after the other
 What if you did not want Roulette to include any batches
 selected by Best? The :class:`.RemoveBatches` selector can be used
 for this. It takes two selectors, one called a `remover` and one
-called a `selector`. It first yields batches of molecules from a  with
-the population with the `remover`. It then passes the same population
+called a `selector`. It first yields batches of molecules from a
+population with the `remover`. It then passes the same population
 to the `selector` but prevents it from yielding any batches
 selected by the `remover`
 
