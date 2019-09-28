@@ -187,3 +187,59 @@ def test_tournament(generation):
         selection=tournament.select(generation),
         unselected={min(generation, key=lambda m: m.fitness)},
     )
+
+
+def test_remove_batches(generation):
+    sorted_gen = sorted(generation, key=lambda m: m.fitness)
+    worst = sorted_gen[:10]
+    next_worst = sorted_gen[10:20]
+
+    removed = stk.RemoveBatches(
+        remover=stk.Worst(10),
+        selector=stk.Worst(10),
+    )
+
+    _test_expected(removed.select(generation), next_worst)
+    _test_unselected(removed.select(generation), worst)
+
+
+def test_remove_molecules(generation):
+    sorted_gen = sorted(generation, key=lambda m: m.fitness)
+    worst = sorted_gen[:10]
+    next_worst = sorted_gen[10:20]
+
+    removed = stk.RemoveBatches(
+        remover=stk.Worst(10),
+        selector=stk.Worst(10),
+    )
+
+    _test_expected(removed.select(generation), next_worst)
+    _test_unselected(removed.select(generation), worst)
+
+
+def test_filter_batches(generation):
+    sorted_gen = sorted(generation, key=lambda m: m.fitness)
+    worst = sorted_gen[:10]
+    rest = sorted_gen[10:]
+
+    filtered = stk.FilterBatches(
+        filter=stk.Worst(10),
+        selector=stk.Worst(),
+    )
+
+    _test_expected(filtered.select(generation), worst)
+    _test_unselected(filtered.select(generation), rest)
+
+
+def test_filter_molecules(generation):
+    sorted_gen = sorted(generation, key=lambda m: m.fitness)
+    worst = sorted_gen[:10]
+    rest = sorted_gen[10:]
+
+    filtered = stk.FilterMolecules(
+        filter=stk.Worst(10),
+        selector=stk.Worst(),
+    )
+
+    _test_expected(filtered.select(generation), worst)
+    _test_unselected(filtered.select(generation), rest)
