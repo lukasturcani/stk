@@ -1442,9 +1442,8 @@ class EAPopulation(Population):
 
         mutants = []
         parents = self._mutation_selector.select(self)
-        num = self._mutation_selector._num_batches
         for i, (parent, ) in enumerate(parents, 1):
-            logger.info(f'Mutation number {i}. Finish when {num}.')
+            logger.info(f'Mutation number {i}.')
             mutant = self._mutator.mutate(parent)
             if mutant not in self:
                 mutants.append(mutant)
@@ -1488,9 +1487,8 @@ class EAPopulation(Population):
 
         offspring = []
         parent_batches = self._crossover_selector.select(self)
-        num = self._crossover_selector._num_batches
         for i, parents in enumerate(parent_batches, 1):
-            logger.info(f'Crossover number {i}. Finish when {num}.')
+            logger.info(f'Crossover number {i}.')
             for child in self._crosser.cross(*parents):
                 if child not in self:
                     offspring.append(child)

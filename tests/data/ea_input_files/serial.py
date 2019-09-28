@@ -59,9 +59,9 @@ generation_selector = stk.SelectorSequence(
     ),
     stk.Roulette(
         num_batches=22,
-        duplicates=False,
+        duplicate_mols=False,
         random_seed=random_seed
-    )
+    ),
 )
 
 # #####################################################################
@@ -74,7 +74,7 @@ crossover_selector = stk.AboveAverage(num_batches=5, batch_size=2)
 # Selector for selecting molecules for mutation.
 # #####################################################################
 
-mutation_selector = stk.SelectorFunnel(
+mutation_selector = stk.FilterBatches(
     stk.AboveAverage(duplicate_mols=False),
     stk.Roulette(num_batches=5, random_seed=random_seed)
 )

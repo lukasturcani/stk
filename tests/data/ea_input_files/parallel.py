@@ -53,9 +53,9 @@ generation_selector = stk.SelectorSequence(
     ),
     stk.Roulette(
         num_batches=22,
-        duplicates=False,
+        duplicate_mols=False,
         random_seed=random_seed
-    )
+    ),
 )
 
 # #####################################################################
