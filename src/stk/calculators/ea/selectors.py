@@ -1103,10 +1103,45 @@ class StochasticUniversalSampling(Selector):
         )
 
     def _select(self, batches, yielded_mols, yielded_batches):
+        has_no_yielded_mols = _has_no_yielded_mols(yielded_mols)
+        is_unyielded_batch = _is_unyielded_batch(yielded_batches)
+
+        batches = sorted(batches, reverse=True)
+
+        num_yielded = 0
+        while batches and num_yielded < self._num_batches:
+            selected = self._select_with_stochastic_universal_sampling(
+                batches=batches,
+                num_batches=self._num_batches - num_yielded,
+                yielded_mols=yielded_mols,
+                yielded_batches=yielded_batches,
+            )
+            for batch in selected:
+                num_yielded += 1
+                yield batch
+
+            if num_yielded < self._num_batches:
+                if not self._duplicate_mols:
+                    batches = filter(has_no_yielded_mols, batches)
+                if not self._duplicate_batches:
+                    batches = filter(is_unyielded_batch, batches)
+                if (
+                    not self._duplicate_mols
+                    or not self._duplicate_batches
+                ):
+                    batches = tuple(batches)
+
+    def _select_with_stochastic_universal_sampling(
+        self,
+        batches,
+        num_batches,
+        yielded_mols,
+        yielded_batches
+    ):
+
         has_yielded_mols = _has_yielded_mols(yielded_mols)
         is_yielded_batch = _is_yielded_batch(yielded_batches)
 
-        batches = sorted(batches, reverse=True)
         total = sum(batch.get_fitness() for batch in batches)
         batch_positions = []
         batch_position = 0
@@ -1114,10 +1149,10 @@ class StochasticUniversalSampling(Selector):
             batch_position += batch.get_fitness()/total
             batch_positions.append(batch_position)
 
-        pointer_distance = 1/self._num_batches
+        pointer_distance = 1/num_batches
         pointers = []
         pointer = self._generator.uniform(0, pointer_distance)
-        for i in range(self._num_batches):
+        for i in range(num_batches):
             pointer += pointer_distance
             pointers.append(pointer)
 
