@@ -1083,12 +1083,10 @@ class StochasticUniversalSampling(Selector):
         batches = sorted(batches, reverse=True)
 
         while batches and yielded.get_num() < self._num_batches:
-            selected = self._select_with_stochastic_universal_sampling(
+            yield from self._select_with_stochastic_universal_sampling(
                 batches=batches,
                 yielded=yielded,
             )
-            for batch in selected:
-                yield batch
 
             if yielded.get_num() < self._num_batches:
                 if not self._duplicate_mols:
