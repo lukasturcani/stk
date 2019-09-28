@@ -1369,11 +1369,15 @@ class StochasticUniversalSampling(Selector):
     """
     Yields batches of molecules through stochastic universal sampling.
 
-    Stochastic universal sampling yields batches by sampling the
-    population across evenly spaced intervals. Members with greater
-    fitness values occupy a larger area and are therefore more likely
-    to be sampled. This approach means weaker members of the population
-    are given a greater chance to be chosen [#]_.
+    Stochastic universal sampling lays out batches along a line, with
+    each batch taking up length proprotional to its fitness. It
+    then creates a set of evenly spaced pointers to different points
+    on the line, each of which is occupied by a batch. Batches which
+    are pointed to are yielded.
+
+    This approach means weaker members of the population
+    are given a greater chance to be chosen than in
+    :class:`.Roulette` selection [#]_.
 
     References
     ----------
@@ -1395,7 +1399,7 @@ class StochasticUniversalSampling(Selector):
         stochastic_sampling = stk.StochasticUniversalSampling(5)
 
         # Select the molecules.
-        for selected, in stochastic_samplng.select(pop):
+        for selected, in stochastic_sampling.select(pop):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
             mutant = mutator.mutate(selected)
