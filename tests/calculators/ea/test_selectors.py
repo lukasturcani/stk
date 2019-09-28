@@ -34,12 +34,15 @@ def _test_selection(selection, expected, unselected):
         assert mol not in unselected
 
 
-def _base_tests(selector_class, generation, use_random_seed):
-    num_batches = [3, 5, 10, 15]
-    batch_size = [1, 2, 4, 10]
-    duplicate_batches = [True, False]
-    duplicate_mols = [True, False]
-
+def _base_tests(
+    selector_class,
+    generation,
+    num_batches,
+    batch_size,
+    duplicate_batches,
+    duplicate_mols,
+    use_random_seed
+):
     options = it.product(
         num_batches,
         batch_size,
@@ -82,7 +85,15 @@ def _base_tests(selector_class, generation, use_random_seed):
 
 
 def test_best(generation):
-    _base_tests(stk.Best, generation, False)
+    _base_tests(
+        selector_class=stk.Best,
+        generation=generation,
+        num_batches=[3, 5, 10],
+        batch_size=[1, 2, 4],
+        duplicate_batches=[True, False],
+        duplicate_mols=[True, False],
+        use_random_seed=False,
+    )
 
     sorted_gen = sorted(
         generation,
@@ -95,7 +106,15 @@ def test_best(generation):
 
 
 def test_worst(generation):
-    _base_tests(stk.Worst, generation, False)
+    _base_tests(
+        selector_class=stk.Worst,
+        generation=generation,
+        num_batches=[3, 5, 10],
+        batch_size=[1, 2, 4],
+        duplicate_batches=[True, False],
+        duplicate_mols=[True, False],
+        use_random_seed=False,
+    )
 
     sorted_gen = sorted(generation, key=lambda m: m.fitness)
     worst = set(sorted_gen[:10])
@@ -104,11 +123,27 @@ def test_worst(generation):
 
 
 def test_roulette(generation):
-    _base_tests(stk.Roulette, generation, True)
+    _base_tests(
+        selector_class=stk.Roulette,
+        generation=generation,
+        num_batches=[3, 5, 10],
+        batch_size=[1, 2, 4],
+        duplicate_batches=[True, False],
+        duplicate_mols=[True, False],
+        use_random_seed=False,
+    )
 
 
 def test_above_average(generation):
-    _base_tests(stk.AboveAverage, generation, False)
+    _base_tests(
+        selector_class=stk.AboveAverage,
+        generation=generation,
+        num_batches=[3, 5, 10],
+        batch_size=[1, 2, 4],
+        duplicate_batches=[True, False],
+        duplicate_mols=[True, False],
+        use_random_seed=False,
+    )
 
 
 def test_selector_sequence(generation):
