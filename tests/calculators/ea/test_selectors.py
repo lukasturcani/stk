@@ -172,7 +172,7 @@ def test_tournament(generation):
         batch_size=[1, 2, 4],
         duplicate_batches=[True, False],
         duplicate_mols=[True, False],
-        use_random_seed=False,
+        use_random_seed=True,
     )
     _test_unselected(
         selection=stk.Tournament().select(generation),
