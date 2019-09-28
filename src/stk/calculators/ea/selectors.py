@@ -231,7 +231,7 @@ class Batch:
         return self._fitness <= other._fitness
 
     def __repr__(self):
-        return f'Batch({self._mols})'
+        return f'Batch({", ".join(str(m) for m in self._mols)})'
 
     def __str__(self):
         return repr(self)
