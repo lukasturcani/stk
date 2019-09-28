@@ -120,40 +120,31 @@ class Batch:
         return self._fitness <= other._fitness
 
 
-def _is_yielded_batch(yielded_batches):
-    def inner(batch):
-        return batch.get_identity_key() in yielded_batches
-    return inner
-
-
-def _is_unyielded_batch(yielded_batches):
-    def inner(batch):
-        return batch.get_identity_key() not in yielded_batches
-    return inner
-
-
-def _has_yielded_mols(yielded_mols):
-    def inner(batch):
-        return any(mol in yielded_mols for mol in batch)
-    return inner
-
-
-def _has_no_yielded_mols(yielded_mols):
-    def inner(batch):
-        return all(mol not in yielded_mols for mol in batch)
-    return inner
-
-
 class _YieldedData:
     def __init__(self):
-        self.mols = set()
-        self.batches = set()
-        self.num = 0
+        self._mols = set()
+        self._batches = set()
+        self._num = 0
 
     def update(self, batch):
-        self.mols.update(batch)
-        self.batches.add(batch.get_identity_key())
-        self.num += 1
+        self._mols.update(batch)
+        self._batches.add(batch.get_identity_key())
+        self._num += 1
+
+    def get_num(self):
+        return self._num
+
+    def is_yielded_batch(self, batch):
+        return batch.get_identity_key() in self._batches
+
+    def is_unyielded_batch(self, batch):
+        return batch.get_identity_key() not in self._batches
+
+    def has_yielded_mols(self, batch):
+        return any(mol in self._mols for mol in batch)
+
+    def has_no_yielded_mols(self, batch):
+        return all(mol not in self._mol for mol in batch)
 
 
 class Selector:
@@ -566,12 +557,10 @@ class Best(Selector):
         batches = sorted(batches, reverse=True)
 
         if not self._duplicate_mols:
-            has_no_yielded_mols = _has_no_yielded_mols(yielded.mols)
-            batches = filter(has_no_yielded_mols, batches)
+            batches = filter(yielded.has_no_yielded_mols, batches)
 
         if not self._duplicate_batches:
-            is_unyielded_batch = _is_unyielded_batch(yielded.batches)
-            batches = filter(is_unyielded_batch, batches)
+            batches = filter(yielded.is_unyielded_batch, batches)
 
         yield from it.islice(batches, self._num_batches)
 
@@ -629,12 +618,10 @@ class Worst(Selector):
         batches = sorted(batches)
 
         if not self._duplicate_mols:
-            has_no_yielded_mols = _has_no_yielded_mols(yielded.mols)
-            batches = filter(has_no_yielded_mols, batches)
+            batches = filter(yielded.has_no_yielded_mols, batches)
 
         if not self._duplicate_batches:
-            is_unyielded_batch = _is_unyielded_batch(yielded.batches)
-            batches = filter(is_unyielded_batch, batches)
+            batches = filter(yielded.is_unyielded_batch, batches)
 
         yield from it.islice(batches, self._num_batches)
 
@@ -753,22 +740,17 @@ class Roulette(Selector):
         )
 
     def _select(self, batches, yielded):
-        has_no_yielded_mols = _has_no_yielded_mols(yielded.mols)
-        is_unyielded_batch = _is_unyielded_batch(yielded.batches)
-
-        num_yields = 0
-        while batches and num_yields < self._num_batches:
+        while batches and yielded.get_num() < self._num_batches:
             total = sum(batch.get_fitness() for batch in batches)
             weights = [
                 batch.get_fitness() / total for batch in batches
             ]
-            num_yields += 1
             yield self._generator.choice(batches, p=weights)
 
             if not self._duplicate_mols:
-                batches = filter(has_no_yielded_mols, batches)
+                batches = filter(yielded.has_no_yielded_mols, batches)
             if not self._duplicate_batches:
-                batches = filter(is_unyielded_batch, batches)
+                batches = filter(yielded.is_unyielded_batch, batches)
             if not self._duplicate_mols or not self._duplicate_batches:
                 batches = tuple(batches)
 
@@ -887,12 +869,10 @@ class AboveAverage(Selector):
         # If duplicate molecules are not allowed, filter out batches
         # with them.
         if not self._duplicate_mols:
-            has_no_yielded_mols = _has_no_yielded_mols(yielded.mols)
-            batches = filter(has_no_yielded_mols, batches)
+            batches = filter(yielded.has_no_yielded_mols, batches)
         # If duplicate batches are not allowed, filter them out.
         if not self._duplicate_batches:
-            is_unyielded_batch = _is_unyielded_batch(yielded.batches)
-            batches = filter(is_unyielded_batch, batches)
+            batches = filter(yielded.is_unyielded_batch, batches)
         # Limit the number of yielded batches to _num_batches.
         yield from it.islice(batches, self._num_batches)
 
@@ -992,13 +972,11 @@ class Tournament(Selector):
         )
 
     def _select(self, batches, yielded):
-        has_no_yielded_mols = _has_no_yielded_mols(yielded.mols)
-        is_unyielded_batch = _is_unyielded_batch(yielded.batches)
-
-        num_yields = 0
         # The tournament can only take place if there is more than 1
         # batch.
-        while num_yields < self._num_batches and len(batches) > 1:
+        while (
+            len(batches) > 1 and yielded.get_num() < self._num_batches
+        ):
             tournament_size = self._generator.randint(
                 low=2,
                 high=len(batches)+1
@@ -1008,13 +986,12 @@ class Tournament(Selector):
                 size=tournament_size,
                 replace=False
             )
-            num_yields += 1
             yield max(competitors)
 
             if not self._duplicate_mols:
-                batches = filter(has_no_yielded_mols, batches)
+                batches = filter(yielded.has_no_yielded_mols, batches)
             if not self._duplicate_batches:
-                batches = filter(is_unyielded_batch, batches)
+                batches = filter(yielded.is_unyielded_batch, batches)
             if not self._duplicate_mols or not self._duplicate_batches:
                 batches = tuple(batches)
 
@@ -1106,12 +1083,9 @@ class StochasticUniversalSampling(Selector):
         )
 
     def _select(self, batches, yielded):
-        has_no_yielded_mols = _has_no_yielded_mols(yielded.mols)
-        is_unyielded_batch = _is_unyielded_batch(yielded.batches)
-
         batches = sorted(batches, reverse=True)
 
-        while batches and yielded.num < self._num_batches:
+        while batches and yielded.get_num() < self._num_batches:
             selected = self._select_with_stochastic_universal_sampling(
                 batches=batches,
                 yielded=yielded,
@@ -1119,11 +1093,15 @@ class StochasticUniversalSampling(Selector):
             for batch in selected:
                 yield batch
 
-            if yielded.num < self._num_batches:
+            if yielded.get_num() < self._num_batches:
                 if not self._duplicate_mols:
-                    batches = filter(has_no_yielded_mols, batches)
+                    batches = (
+                        filter(yielded.has_no_yielded_mols, batches)
+                    )
                 if not self._duplicate_batches:
-                    batches = filter(is_unyielded_batch, batches)
+                    batches = (
+                        filter(yielded.is_unyielded_batch, batches)
+                    )
                 if (
                     not self._duplicate_mols
                     or not self._duplicate_batches
@@ -1136,9 +1114,6 @@ class StochasticUniversalSampling(Selector):
         yielded,
     ):
 
-        has_yielded_mols = _has_yielded_mols(yielded.mols)
-        is_yielded_batch = _is_yielded_batch(yielded.batches)
-
         total = sum(batch.get_fitness() for batch in batches)
         batch_positions = []
         batch_position = 0
@@ -1146,7 +1121,7 @@ class StochasticUniversalSampling(Selector):
             batch_position += batch.get_fitness()/total
             batch_positions.append(batch_position)
 
-        num_batches = self._num_batches - yielded.num
+        num_batches = self._num_batches - yielded.get_num()
         pointer_distance = 1/num_batches
         pointers = []
         pointer = self._generator.uniform(0, pointer_distance)
@@ -1161,10 +1136,16 @@ class StochasticUniversalSampling(Selector):
 
             batch = batches[batch_index]
 
-            if not self._duplicate_mols and has_yielded_mols(batch):
+            if (
+                not self._duplicate_mols
+                and yielded.has_yielded_mols(batch)
+            ):
                 continue
 
-            if not self._duplicate_batches and is_yielded_batch(batch):
+            if (
+                not self._duplicate_batches
+                and yielded.is_yielded_batch(batch)
+            ):
                 continue
 
             yield batch
