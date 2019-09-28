@@ -97,9 +97,8 @@ Making New Selectors
 --------------------
 
 When a new :class:`Selector` class is made it must inherit
-:class:`Selector` and define a :meth:`~Selection.select` method.
-:meth:`~Selection.select` must take a single argument, which is the
-:class:`.Population` from which molecules are selected.
+:class:`.Selector` and override the virtual :meth:`~.Selector._select`
+method.
 
 """
 
@@ -119,6 +118,34 @@ class Batch:
     Batches can be compared, the comparison is based on their
     fitness values. Batches can also be iterated through, this
     iterates through all the molecules in the batch.
+
+    Examples
+    --------
+
+    Sorting batches causes them to be sorted by fitness value.
+
+    .. code-block:: python
+
+        batches = (Batch(...), Batch(...), Batch(...))
+        sorted_batches = sorted(batches)
+
+    Coparison is also based on fitness value
+
+    .. code-block:: python
+
+        batch1 = Batch(...)
+        batch2 = Batch(...)
+        if batch1 > batch2:
+            print('batch1 has a larger fitness value than batch2.')
+
+    Batches can be iterated through to get the molecules in the
+    batch
+
+    .. code-block:: python
+
+        batch = Batch(...)
+        for mol in batch:
+            # Do stuff with mol.
 
     """
 
