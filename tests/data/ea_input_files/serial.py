@@ -52,7 +52,11 @@ population = stk.EAPopulation.init_random(
 # #####################################################################
 
 generation_selector = stk.SelectorSequence(
-    stk.Fittest(num_batches=3, duplicates=False),
+    stk.Best(
+        num_batches=3,
+        duplicate_mols=False,
+        duplicate_batches=False
+    ),
     stk.Roulette(
         num_batches=22,
         duplicates=False,
@@ -71,7 +75,7 @@ crossover_selector = stk.AboveAverage(num_batches=5, batch_size=2)
 # #####################################################################
 
 mutation_selector = stk.SelectorFunnel(
-    stk.AboveAverage(num_batches=10, duplicates=False),
+    stk.AboveAverage(duplicate_mols=False),
     stk.Roulette(num_batches=5, random_seed=random_seed)
 )
 
