@@ -1570,8 +1570,7 @@ class EAPopulation(Population):
         for i, (parent, ) in enumerate(parents, 1):
             logger.info(f'Mutation number {i}.')
             mutant = self._mutator.mutate(parent)
-            if mutant not in self:
-                yield mutant
+            yield mutant
 
     def get_next_generation(self):
         """
@@ -1603,8 +1602,7 @@ class EAPopulation(Population):
         for i, parents in enumerate(parent_batches, 1):
             logger.info(f'Crossover number {i}.')
             for child in self._crosser.cross(*parents):
-                if child not in self:
-                    yield child
+                yield child
 
 
 class _Guard:
