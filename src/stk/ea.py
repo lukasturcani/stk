@@ -2,6 +2,7 @@ import warnings
 import os
 import logging
 import argparse
+import itertools as it
 from rdkit import RDLogger
 from os.path import join, basename
 import stk
@@ -335,8 +336,7 @@ def ea_run(filename, input_file):
             logger.debug(f'Population size is {len(pop)}.')
 
             logger.info('Adding offsping and mutants to population.')
-            pop.direct_members.extend(offspring)
-            pop.direct_members.extend(mutants)
+            pop.direct_members.extend(it.chain(offspring, mutants))
 
             logger.debug(f'Population size is {len(pop)}.')
 
@@ -367,12 +367,7 @@ def ea_run(filename, input_file):
             history.db(pop)
 
             logger.info('Selecting members of the next generation.')
-            # Don't use pop = pop.get_next_generation() here
-            # because you would create a new population which does
-            # not inherit the open process pool, causing the subsequent
-            # .optimize() and .calculate_member_fitness() calls to
-            # fail.
-            pop.members = list(generation_selector.select(pop))
+            pop.direct_members = list(pop.get_next_generation())
 
             history.log_pop(logger, pop)
 

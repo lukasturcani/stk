@@ -1507,70 +1507,54 @@ class EAPopulation(Population):
 
     def get_mutants(self):
         """
-        Perform mutations and return the mutants.
+        Yield mutants.
 
-        Returns
-        -------
-        :class:`list` of :class:`.Molecule`
-            The generated mutants, minus those already in the
-            population.
+        Yields
+        ------
+        :class:`.Molecule`
+            A mutant.
 
         """
 
-        mutants = []
         parents = self._mutation_selector.select(self)
         for i, (parent, ) in enumerate(parents, 1):
             logger.info(f'Mutation number {i}.')
             mutant = self._mutator.mutate(parent)
             if mutant not in self:
-                mutants.append(mutant)
-        return mutants
+                yield mutant
 
     def get_next_generation(self):
         """
-        Get the next genetic algorithm generation.
+        Yield members of the next generation.
 
-        Returns
-        -------
-        :class:`.EAPopulation`
-            The next generation.
+        Yields
+        ------
+        :class:`.Molecule`
+            A member of the next generation.
 
         """
 
-        cls = self.__class__
-        next_gen = cls(*(
+        yield from (
             mol for mol, in self._generation_selector.select(self)
-        ))
-        next_gen.set_ea_tools(
-            generation_selector=self._generation_selector,
-            mutation_selector=self._mutation_selector,
-            crossover_selector=self._crossover_selector,
-            mutator=self._mutator,
-            crosser=self._crosser
         )
-        return next_gen
 
     def get_offspring(self):
         """
-        Perform crossover operations and return the offspring.
+        Yield offspring.
 
-        Returns
-        -------
-        :class:`list` of :class:`.Molecule`
-            The generated offspring, minus those already in the
-            population.
+        Yields
+        ------
+        :class:`.Molecule`
+            An offspring.
 
         """
 
-        offspring = []
         parent_batches = self._crossover_selector.select(self)
         for i, parents in enumerate(parent_batches, 1):
             logger.info(f'Crossover number {i}.')
             for child in self._crosser.cross(*parents):
                 if child not in self:
-                    offspring.append(child)
-
-        return offspring
+                    yield child
 
 
 class _Guard:
