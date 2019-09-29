@@ -162,6 +162,25 @@ class Population:
         # Returns True.
         bb2 not in pop3
 
+    If you want to run multiple :meth:`optimize` calls in a row, use
+    the "with" statment. This keeps a single process pool open, and
+    means you do not create a new one for each :meth:`optimize` call.
+    It also automatically closes the pool for you when the block
+    exits
+
+    .. code-block:: python
+
+        population = stk.Population(...)
+        # Keep a process pool open through the "with" statment.
+        with population.open_process_pool(8):
+            # All optimize calls within this block will use the
+            # same process pool.
+            population.optimize(stk.UFF())
+            population.add_members(...)
+            population.optimize(stk.UFF())
+        # Process pool is automatically cleaned up when the block
+        # exits.
+
     """
 
     def __init__(self, *args):
