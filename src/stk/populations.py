@@ -994,6 +994,7 @@ class Population:
 
         if self._process_pool is not None:
             self._process_pool.close()
+            self._process_pool.clear()
             self._process_pool = None
         return self
 
