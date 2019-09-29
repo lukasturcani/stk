@@ -367,7 +367,12 @@ def ea_run(filename, input_file):
             history.db(pop)
 
             logger.info('Selecting members of the next generation.')
-            pop = pop.get_next_generation()
+            # Don't use pop = pop.get_next_generation() here
+            # because you would create a new population which does
+            # not inherit the open process pool, causing the subsequent
+            # .optimize() and .calculate_member_fitness() calls to
+            # fail.
+            pop.members = list(generation_selector.select(pop))
 
             history.log_pop(logger, pop)
 
