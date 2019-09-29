@@ -1530,7 +1530,10 @@ class EAPopulation(Population):
             )
             input_mol.__dict__ = dict(vars(output_mol))
             if fitness_calculator.is_caching():
-                fitness_calculator.add_to_cache(input_mol, new.fitness)
+                fitness_calculator.add_to_cache(
+                    mol=input_mol,
+                    fitness=input_mol.fitness
+                )
 
     def get_mutants(self):
         """
