@@ -440,9 +440,17 @@ class Selector:
                 yielded.update(batch)
                 yield batch
 
-            if yielded.get_num() != self._num_batches:
+            cls_name = self.__class__.__name__
+            logger.debug(
+                f'{cls_name} yielded {yielded.get_num()} batches.'
+            )
+
+            if (
+                self._num_batches is not None
+                and yielded.get_num() != self._num_batches
+            ):
                 logger.warning(
-                    f'{self.__class__.__name__} was asked to yield '
+                    f'{cls_name} was asked to yield '
                     f'{self._num_batches} batches but yielded '
                     f'{yielded.get_num()}.'
                 )
