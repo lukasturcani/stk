@@ -209,6 +209,24 @@ class Optimizer:
 
         self._cache.add(mol)
 
+    def is_in_cache(self, mol):
+        """
+        Return ``True`` if `mol` is cached.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule being checked.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `mol` is cached.
+
+        """
+
+        return mol in self._cache
+
     def optimize(self, mol):
         """
         Optimize `mol`.

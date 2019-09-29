@@ -981,31 +981,43 @@ class Population:
     def _optimize_parallel(self, optimizer, num_processes):
         opt_fn = _Guard(optimizer, optimizer.optimize)
 
-        # Apply the function to every member of the population, in
-        # parallel.
+        # Only send molecules which need to have a calculation peformed
+        # to the process pool - this should improve performance.
+        if optimizer.is_caching():
+            to_evaluate = (
+                mol for mol in self if not optimizer.is_in_cache(mol)
+            )
+        else:
+            to_evaluate = self
+
+        # Use an existing process pool, if it exists.
         opened_pool = False
         if self._process_pool is None:
             opened_pool = True
             self.open_process_pool(num_processes)
 
-        optimized = self._process_pool.map(opt_fn, self)
+        # Run the optimization.
+        evaluated = self._process_pool.map(opt_fn, to_evaluate)
 
         if opened_pool:
             self.close_process_pool()
 
         # If anything failed, raise an error.
-        for result in optimized:
+        for result in evaluated:
             if isinstance(result, Exception):
                 raise result
 
         # Update the structures in the population.
-        sorted_opt = sorted(optimized, key=lambda m: repr(m))
-        sorted_pop = sorted(self, key=lambda m: repr(m))
-        for old, new in zip(sorted_pop, sorted_opt):
-            assert old.get_identity_key() == new.get_identity_key()
-            old.__dict__ = dict(vars(new))
+        sorted_input = sorted(to_evaulate, key=lambda m: repr(m))
+        sorted_output = sorted(evaluated, key=lambda m: repr(m))
+        for input_mol, output_mol in zip(sorted_input, sorted_output):
+            assert (
+                input_mol.get_identity_key()
+                == output_mol.get_identity_key()
+            )
+            input_mol.__dict__ = dict(vars(output_mol))
             if optimizer.is_caching():
-                optimizer.add_to_cache(old)
+                optimizer.add_to_cache(input_mol)
 
     def _optimize_serial(self, optimizer):
         for member in self:
@@ -1479,13 +1491,6 @@ class EAPopulation(Population):
             fn=fitness_calculator.get_fitness
         )
 
-        # Apply the function to every member of the population, in
-        # parallel.
-        opened_pool = False
-        if self._process_pool is None:
-            opened_pool = True
-            self.open_process_pool(num_processes)
-
         # Only send molecules which need to have a calculation peformed
         # to the process pool - this should improve performance.
         if fitness_calculator.is_caching():
@@ -1498,6 +1503,13 @@ class EAPopulation(Population):
         else:
             to_evaluate = self
 
+        # Use an existing process pool, if it exists.
+        opened_pool = False
+        if self._process_pool is None:
+            opened_pool = True
+            self.open_process_pool(num_processes)
+
+        # Apply the function, in parallel.
         evaluated = self._process_pool.map(fitness_fn, to_evaluate)
 
         if opened_pool:
@@ -1509,13 +1521,16 @@ class EAPopulation(Population):
                 raise result
 
         # Update the molecules in the population.
-        sorted_input = sorted(evaluated, key=lambda m: repr(m))
-        sorted_output = sorted(to_evaluate, key=lambda m: repr(m))
-        for old, new in zip(sorted_input, sorted_output):
-            assert old.get_identity_key() == new.get_identity_key()
-            old.__dict__ = dict(vars(new))
+        sorted_input = sorted(to_evaluate, key=lambda m: repr(m))
+        sorted_output = sorted(evaluated, key=lambda m: repr(m))
+        for input_mol, output_mol in zip(sorted_input, sorted_output):
+            assert (
+                input_mol.get_identity_key()
+                == output_mol.get_identity_key()
+            )
+            input_mol.__dict__ = dict(vars(output_mol))
             if fitness_calculator.is_caching():
-                fitness_calculator.add_to_cache(old, new.fitness)
+                fitness_calculator.add_to_cache(input_mol, new.fitness)
 
     def get_mutants(self):
         """
