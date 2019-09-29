@@ -952,7 +952,14 @@ class Population:
 
         if self._process_pool is not None:
             raise RuntimeError('A process pool is already open.')
-        self._process_pool = pathos.pools.ProcessPool(num_processes)
+
+        if num_processes is None:
+            num_processes = psutil.cpu_count()
+
+        if num_processes != 1:
+            self._process_pool = pathos.pools.ProcessPool(
+                nodes=num_processes
+            )
         return self
 
     def close_process_pool(self):
@@ -964,17 +971,11 @@ class Population:
         :class:`.Population`
             The population.
 
-        Raises
-        ------
-        :class:`RuntimeError`
-            If there is no open process pool.
-
         """
 
-        if self._process_pool is None:
-            raise RuntimeError('There is no open process pool.')
-        self._process_pool.close()
-        self._process_pool = None
+        if self._process_pool is not None:
+            self._process_pool.close()
+            self._process_pool = None
         return self
 
     def _optimize_parallel(self, optimizer, num_processes):
@@ -1038,7 +1039,10 @@ class Population:
 
         """
 
-        if self._process_pool is not None and num_processes == 1:
+        if num_processes is None:
+            num_processes = psutil.cpu_count()
+
+        if self._process_pool is None and num_processes == 1:
             self._optimize_serial(optimizer)
         else:
             self._optimize_parallel(optimizer, num_processes)
@@ -1449,7 +1453,10 @@ class EAPopulation(Population):
 
         """
 
-        if self._process_pool is not None and num_processes == 1:
+        if num_processes is None:
+            num_processes = psutil.cpu_count()
+
+        if self._process_pool is None and num_processes == 1:
             self._calculate_fitness_serial(fitness_calculator)
         else:
             self._calculate_fitness_parallel(
