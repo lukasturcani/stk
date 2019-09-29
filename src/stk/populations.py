@@ -1486,7 +1486,19 @@ class EAPopulation(Population):
             opened_pool = True
             self.open_process_pool(num_processes)
 
-        evaluated = self._process_pool.map(fitness_fn, self)
+        # Only send molecules which need to have a calculation peformed
+        # to the process pool - this should improve performance.
+        if fitness_calculator.is_caching():
+            to_evaluate = []
+            for mol in self:
+                if fitness_calculator.is_in_cache(mol):
+                    fitness_calculator.get_fitness(mol)
+                else:
+                    to_evaluate.append(mol)
+        else:
+            to_evaluate = self
+
+        evaluated = self._process_pool.map(fitness_fn, to_evaluate)
 
         if opened_pool:
             self.close_process_pool()
@@ -1497,9 +1509,9 @@ class EAPopulation(Population):
                 raise result
 
         # Update the molecules in the population.
-        sorted_opt = sorted(evaluated, key=lambda m: repr(m))
-        sorted_pop = sorted(self, key=lambda m: repr(m))
-        for old, new in zip(sorted_pop, sorted_opt):
+        sorted_input = sorted(evaluated, key=lambda m: repr(m))
+        sorted_output = sorted(to_evaluate, key=lambda m: repr(m))
+        for old, new in zip(sorted_input, sorted_output):
             assert old.get_identity_key() == new.get_identity_key()
             old.__dict__ = dict(vars(new))
             if fitness_calculator.is_caching():
