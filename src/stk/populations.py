@@ -1008,7 +1008,7 @@ class Population:
                 raise result
 
         # Update the structures in the population.
-        sorted_input = sorted(to_evaulate, key=lambda m: repr(m))
+        sorted_input = sorted(to_evaluate, key=lambda m: repr(m))
         sorted_output = sorted(evaluated, key=lambda m: repr(m))
         for input_mol, output_mol in zip(sorted_input, sorted_output):
             assert (
