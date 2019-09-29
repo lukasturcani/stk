@@ -509,19 +509,34 @@ def kill_macromodel():
 
     """
 
-    if os.name == 'nt':
-        # In Windows, use the ``Taskkill`` command to force a close on
-        # the applications.
-        sp.run(["Taskkill", "/IM", "jserver-watcher.exe", "/F"],
-               stdout=sp.PIPE, stderr=sp.PIPE)
-        sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"],
-               stdout=sp.PIPE, stderr=sp.PIPE)
+    try:
+        if os.name == 'nt':
+            # In Windows, use the ``Taskkill`` command to force a close on
+            # the applications.
+            sp.run(
+                ["Taskkill", "/IM", "jserver-watcher.exe", "/F"],
+                stdout=sp.PIPE,
+                stderr=sp.PIPE,
+            )
+            sp.run(
+                ["Taskkill", "/IM", "jservergo.exe", "/F"],
+                stdout=sp.PIPE,
+                stderr=sp.PIPE,
+            )
 
-    if os.name == 'posix':
-        sp.run(["pkill", "jservergo"],
-               stdout=sp.PIPE, stderr=sp.PIPE)
-        sp.run(["pkill", "jserver-watcher"],
-               stdout=sp.PIPE, stderr=sp.PIPE)
+        if os.name == 'posix':
+            sp.run(
+                ["pkill", "jservergo"],
+                stdout=sp.PIPE,
+                stderr=sp.PIPE,
+            )
+            sp.run(
+                ["pkill", "jserver-watcher"],
+                stdout=sp.PIPE,
+                stderr=sp.PIPE,
+            )
+    except Exception:
+        pass
 
 
 def matrix_centroid(matrix):
