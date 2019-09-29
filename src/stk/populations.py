@@ -1038,10 +1038,7 @@ class Population:
 
         """
 
-        if num_processes is None:
-            num_processes = psutil.cpu_count()
-
-        if num_processes == 1:
+        if self._process_pool is not None and num_processes == 1:
             self._optimize_serial(optimizer)
         else:
             self._optimize_parallel(optimizer, num_processes)
@@ -1452,7 +1449,7 @@ class EAPopulation(Population):
 
         """
 
-        if num_processes == 1:
+        if self._process_pool is not None and num_processes == 1:
             self._calculate_fitness_serial(fitness_calculator)
         else:
             self._calculate_fitness_parallel(
