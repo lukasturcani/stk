@@ -52,15 +52,22 @@ population = stk.EAPopulation.init_random(
 # #####################################################################
 
 generation_selector = stk.SelectorSequence(
-    stk.Best(
+    selector1=stk.Best(
         num_batches=3,
         duplicate_mols=False,
         duplicate_batches=False
     ),
-    stk.Roulette(
-        num_batches=22,
-        duplicate_mols=False,
-        random_seed=random_seed
+    selector2=stk.RemoveBatches(
+        remover=stk.Best(
+            num_batches=3,
+            duplicate_mols=False,
+            duplicate_batches=False,
+        ),
+        selector=stk.Roulette(
+            num_batches=22,
+            duplicate_mols=False,
+            random_seed=random_seed,
+        ),
     ),
 )
 
