@@ -95,7 +95,7 @@ def tmp_population():
 @pytest.fixture('session')
 def generation():
     pop = stk.Population(
-        *(stk.BuildingBlock('C') for i in range(10))
+        *(stk.BuildingBlock('C') for i in range(50))
     )
     for i, mol in enumerate(pop):
         mol.fitness = i

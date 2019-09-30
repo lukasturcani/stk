@@ -2,24 +2,93 @@
 Selection
 =========
 
-#. :class:`.Fittest`
+#. :class:`.Best`
+#. :class:`.Worst`
 #. :class:`.Roulette`
 #. :class:`.AboveAverage`
-#. :class:`SelectorSequence`
-#. :class:`.SelectorFunnel`
+#. :class:`.Tournament`
+#. :class:`.StochasticUniversalSampling`
+#. :class:`.SelectorSequence`
+#. :class:`.RemoveBatches`
+#. :class:`.RemoveMolecules`
+#. :class:`.FilterBatches`
+#. :class:`.FilterMolecules`
 
 
-Selection is carried out by :class:`Selector` objects.
-Selectors are objects with a :meth:`~Selector.select`
-method, which is used to select molecules from a :class:`.Population`.
-Examples of how :class:`Selector` classes can be used is given their
-documentation, for example :class:`Fittest`, :class:`Roulette` or
-:class:`AboveAverage`.
+Selection is carried out by :class:`.Selector` objects.
+Selectors are objects with a :meth:`~.Selector.select`
+method, which is used to select batches of molecules from a
+:class:`.Population`. Examples of how :class:`.Selector` classes can be
+used is given their documentation, for example :class:`.Best`,
+:class:.`Roulette` or :class:`.AboveAverage`.
 
-:class:`Selector` can be combined to generate more complex selection
-processes, such as stochastic sampling, using
-:class:`.SelectorSequence` or :class:`SelectorFunnel`. Examples of how
-this can happen are given in the documentation of these two classes.
+Selectors can be combined to generate more complex selection
+processes. For example, let's say we want to implement elitism.
+Elitism is when the best batches are guaranteed to be selected first,
+before the selection algorithm is carried out. The
+:class:`.SelectorSequence` exists precisely for this reason. It takes
+two selectors and yields batches from them one after the other
+
+.. code-block:: python
+
+    import stk
+
+    population = stk.Population(...)
+    elite_roulette = stk.SelectorSequence(
+        selector1=stk.Best(5),
+        selector2=stk.Roulette(20),
+    )
+    # Select with Best first and then with Roulette.
+    for batch in elite_roulette.select(population):
+        # Do stuff with batch.
+
+
+What if you did not want Roulette to yield any batches
+selected by :class:`.Best`? The :class:`.RemoveBatches` selector can be
+used for this. It takes two selectors, one called a `remover` and one
+called a `selector`. It first yields batches of molecules from a
+population with the `remover`. It then passes the same population
+to the `selector` but prevents it from yielding any batches
+selected by the `remover`
+
+.. code-block:: python
+
+    roulette_without_elites = stk.RemoveBatches(
+        remover=stk.Best(5),
+        selector=stk.Roulettte(20),
+    )
+    # Select batches, excluding the top 5.
+    for batch in roulette_without_elites.select(population):
+        # Do stuff with batch.
+
+You can combine :class:`.RemoveBatches` and :class:`.SelectorSequence`
+to get a selector which yields the top 5 batches first and then,
+using roulette, selects any of the other batches
+
+.. code-block:: python
+
+    elite_roulette2 = stk.SelectorSequence(
+        selector1=stk.Best(5),
+        selector2=roulette_without_elites,
+    )
+
+
+The same thing can be written more explicitly
+
+.. code-block:: python
+
+    elite_roulette2 = stk.SelectorSequence(
+        selector1=stk.Best(5),
+        selector2=stk.RemoveBatches(
+            remover=stk.Best(5),
+            selector=stk.Roulette(20),
+        ),
+    )
+
+
+You can also explore other combinations with :class:`.FilterBatches`,
+:class:`.FilterMolecules` and :class:`.RemoveMolecules`. Examples
+using these classes are given in their docstrings.
 
 
 .. _`adding selectors`:
@@ -28,44 +97,274 @@ Making New Selectors
 --------------------
 
 When a new :class:`Selector` class is made it must inherit
-:class:`Selector` and define a :meth:`~Selection.select` method.
-:meth:`~Selection.select` must take a single argument, which is the
-:class:`.Population` from which molecules are selected.
+:class:`.Selector` and override the virtual :meth:`~.Selector._select`
+method.
 
 """
 
 import itertools as it
 import numpy as np
 import logging
-from functools import wraps
+from collections import Counter
 
 
 logger = logging.getLogger(__name__)
 
 
-def _add_yielded_reset(select):
+class Batch:
     """
-    Make every :meth:`~Selector.select` call empty :attr:`_yielded`.
+    Represents a batch of molecules.
 
-    Parameters
-    ----------
-    select : :class:`function`
-        The :meth:`~Selector.select` method to decorate.
+    Batches can be compared, the comparison is based on their
+    fitness values. Batches can also be iterated through, this
+    iterates through all the molecules in the batch.
 
-    Returns
-    -------
-    :class:`function`
-        The decorated :meth:`~Selector.select` method.
+    Examples
+    --------
+
+    Sorting batches causes them to be sorted by fitness value.
+
+    .. code-block:: python
+
+        batches = (Batch(...), Batch(...), Batch(...))
+        sorted_batches = sorted(batches)
+
+    Coparison is also based on fitness value
+
+    .. code-block:: python
+
+        batch1 = Batch(...)
+        batch2 = Batch(...)
+        if batch1 > batch2:
+            print('batch1 has a larger fitness value than batch2.')
+
+    Batches can be iterated through to get the molecules in the
+    batch
+
+    .. code-block:: python
+
+        batch = Batch(...)
+        for mol in batch:
+            # Do stuff with mol.
 
     """
 
-    @wraps(select)
-    def inner(self, population):
-        if self._reset_yielded:
-            self._yielded &= set()
-        return select(self, population)
+    __slots__ = ['_mols', '_fitness', '_identity_key']
 
-    return inner
+    def __init__(self, mols, fitness_values):
+        """
+        Initialize a :class:`.Batch`.
+
+        Parameters
+        ----------
+        mols : :class:`tuple` of :class:`.Molecule`
+            The molecules which are part of the batch.
+
+        fitness_values : :class:`dict`
+            Maps each molecule in `mols` to its fitness value.
+
+        """
+
+        self._mols = mols
+        self._fitness = sum(fitness_values[mol] for mol in mols)
+        self._identity_key = frozenset(Counter(mols).items())
+
+    def get_size(self):
+        """
+        Get the number of molecules in the batch.
+
+        Returns
+        -------
+        :class:`int`
+            The number of molecules in the batch.
+
+        """
+
+        return len(self._mols)
+
+    def get_fitness(self):
+        """
+        Get the fitness value of the batch.
+
+        Returns
+        -------
+        :class:`float`
+            The fitness value.
+
+        """
+
+        return self._fitness
+
+    def get_identity_key(self):
+        """
+        Get the identity key of the batch.
+
+        If two batches hold the same molecules, the same number of
+        times, they will have the same identity key.
+
+        Returns
+        -------
+        :class:`object`
+            A hashable object which can be used to compare if two
+            batches are the same.
+
+        """
+
+        return self._identity_key
+
+    def __iter__(self):
+        return iter(self._mols)
+
+    def __eq__(self, other):
+        return self._fitness == other._fitness
+
+    def __gt__(self, other):
+        return self._fitness > other._fitness
+
+    def __ge__(self, other):
+        return self._fitness >= other._fitness
+
+    def __lt__(self, other):
+        return self._fitness < other._fitness
+
+    def __le__(self, other):
+        return self._fitness <= other._fitness
+
+    def __repr__(self):
+        return f'Batch({", ".join(str(m) for m in self._mols)})'
+
+    def __str__(self):
+        return repr(self)
+
+
+class _YieldedData:
+    """
+    Keeps track of batches yielded by :meth:`.Selector._select`.
+
+    Each :meth:`.Selector._select` call should be paired with a
+    new :class:`._YieldedData` instance, which should be updated
+    each time a new batch is yielded.
+
+    """
+
+    __slots__ = ['_mols', '_batches', '_num']
+
+    def __init__(self):
+        # Has all molecules yielded by _select().
+        self._mols = set()
+        # Has the identity_key() of all batches yielded by select().
+        self._batches = set()
+        # Counts the total number of times _select() has yielded.
+        self._num = 0
+
+    def update(self, batch):
+        """
+        Update tracked data with a new `batch`.
+
+        Parameters
+        ----------
+        batch : :class:`.Batch`
+            A batch yielded by :meth:`.Selector._select`.
+
+        Returns
+        -------
+        :class:`_YieldedData`
+            The data tracker.
+
+        """
+
+        self._mols.update(batch)
+        self._batches.add(batch.get_identity_key())
+        self._num += 1
+        return self
+
+    def get_num(self):
+        """
+        Get the number of times :meth:`.Selector._select` has yielded.
+
+        Returns
+        -------
+        :class:`int`
+            The total number of times :meth:`.Selector._select` has
+            yielded.
+
+        """
+
+        return self._num
+
+    def is_yielded_batch(self, batch):
+        """
+        Check if `batch` has already been yielded.
+
+        Parameters
+        ----------
+        batch : :class:`.Batch`
+            The batch to check.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `batch` has already been yielded.
+
+        """
+
+        return batch.get_identity_key() in self._batches
+
+    def is_unyielded_batch(self, batch):
+        """
+        Check if `batch` has not been yielded.
+
+        Parameters
+        ----------
+        batch : :class:`.Batch`
+            The batch to check.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `batch` has not been yielded.
+
+        """
+
+        return batch.get_identity_key() not in self._batches
+
+    def has_yielded_mols(self, batch):
+        """
+        Check if `batch` contains any previously yielded molecules.
+
+        Parameters
+        ----------
+        batch : :class:`.Batch`
+            The batch to check.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `batch` contains any molecules which have
+            previously been yielded.
+
+        """
+
+        return any(mol in self._mols for mol in batch)
+
+    def has_no_yielded_mols(self, batch):
+        """
+        Check if `batch` consists only of unyielded molecules.
+
+        Parameters
+        ----------
+        batch : :class:`.Batch`
+            The batch to check.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `batch` does not have any previously yielded
+            molecules.
+
+        """
+
+        return all(mol not in self._mols for mol in batch)
 
 
 class Selector:
@@ -79,9 +378,16 @@ class Selector:
 
     """
 
-    def __init__(self, num_batches, duplicates, use_rank, batch_size):
+    def __init__(
+        self,
+        num_batches,
+        batch_size,
+        duplicate_mols,
+        duplicate_batches,
+        fitness_modifier,
+    ):
         """
-        Initialize a :class:`Selector` instance.
+        Initialize a :class:`.Selector` instance.
 
         Parameters
         ----------
@@ -90,83 +396,116 @@ class Selector:
             will continue forever or until the generator is exhausted,
             whichever comes first.
 
-        duplicates : :class:`bool`
-            If ``True`` the same member can be yielded in more than one
-            batch.
-
-        use_rank : :class:`bool`
-            When ``True`` the fitness value of a molecule is calculated
-            as ``f = 1/rank``.
-
         batch_size : :class:`int`
             The number of molecules yielded at once.
 
+        duplicate_mols : :class:`bool`
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
+
         """
 
-        if num_batches is None:
-            num_batches = float('inf')
+        if fitness_modifier is None:
+            fitness_modifier = self._get_fitness_values
 
         self._num_batches = num_batches
-        self._duplicates = duplicates
-        self._use_rank = use_rank
         self._batch_size = batch_size
-
-        # The previously yielded molecules.
-        self._yielded = set()
-        # If True, _yielded is emptied before each select() call.
-        self._reset_yielded = True
+        self._duplicate_mols = duplicate_mols
+        self._duplicate_batches = duplicate_batches
+        self._fitness_modifier = fitness_modifier
 
     def __init_subclass__(cls, **kwargs):
-        cls.select = _add_yielded_reset(cls.select)
+        cls._select = cls._update_yielded(cls._select)
         return super().__init_subclass__(**kwargs)
 
-    def _batch(self, population):
+    @staticmethod
+    def _update_yielded(_selected):
         """
-        Batch molecules of `population` together.
+        Decorate `_selected` to automatically update `yielded`.
+
+        """
+
+        def inner(self, batches, yielded):
+            for batch in _selected(self, batches, yielded):
+                yielded.update(batch)
+                yield batch
+
+            cls_name = self.__class__.__name__
+            logger.debug(
+                f'{cls_name} yielded {yielded.get_num()} batches.'
+            )
+
+            if (
+                self._num_batches is not None
+                and yielded.get_num() != self._num_batches
+            ):
+                logger.warning(
+                    f'{cls_name} was asked to yield '
+                    f'{self._num_batches} batches but yielded '
+                    f'{yielded.get_num()}.'
+                )
+
+        return inner
+
+    @staticmethod
+    def _get_fitness_values(population):
+        """
+        Map each molecule to its fitness value.
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
+        population : :class:`iterable`
+            The population from which batches are selected.
 
-        Yields
-        ------
-        :class:`tuple`
-            A :class:`tuple` of form ``(batch, fitness)`` where
-            ``batch`` is a :class:`tuple` of :class:`.Molecule` and
-            ``fitness`` is a :class:`float` which is the sum of all
-            fitness values of the molecules in the batch.
+        Returns
+        -------
+        :class:`dict`
+            Maps each molecule in `population` to the fitness value
+            in its :attr:`~.Molecule.fitness` attribute.
 
         """
 
-        for batch in it.combinations(population, self._batch_size):
-            yield batch, sum(m.fitness for m in batch)
+        return {mol: mol.fitness for mol in population}
 
-    def _no_duplicates(self, batches):
+    def _get_batches(self, population, fitness_values):
         """
-        Make sure that no molecule is yielded in more than one batch.
+        Get batches molecules from `population`.
 
         Parameters
         ----------
-        batches : :class:`iterable`
-            An :class:`iterable` yielding :class:`tuple` of form
-            ``(batch, fitness)`` where ``batch`` is a :class:`tuple`
-            of :class:`.Molecule`.
+        population : :class:`iterable`
+            The molecules which are to be batched.
+
+        fitness_values : :class:`dict`
+            Maps each molecule in `population` to the fitness value
+            the selection algorithm should use.
 
         Yields
         ------
-        :class:`tuple`
-            A :class:`tuple` of form ``(batch, fitness)`` where
-            ``batch`` is a :class:`tuple` of :class:`.Molecule` and
-            ``fitness`` is a :class:`float`.
+        :class:`.Batch`
+            A batch of molecules from `population`.
 
         """
 
-        for batch, fitness in batches:
-            if all(mol not in self._yielded for mol in batch):
-                self._yielded.update(batch)
-                yield batch, fitness
+        yield from (
+            Batch(
+                mols=mols,
+                fitness_values={
+                    mol: fitness_values[mol] for mol in mols
+                }
+            )
+            for mols in it.combinations(population, self._batch_size)
+        )
 
     def select(self, population):
         """
@@ -174,103 +513,282 @@ class Selector:
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
+        population : :class:`iterable`
+            A collection of molecules from which batches are selected.
 
         Yields
         ------
-        :class:`tuple` of :class:`.Molecule`
+        :class:`Batch` of :class:`.Molecule`
             A batch of selected molecules.
+
+        """
+
+        batches = tuple(self._get_batches(
+            population=population,
+            fitness_values=self._fitness_modifier(population)
+        ))
+
+        yield from self._select(batches, _YieldedData())
+
+    def _select(self, batches, yielded):
+        """
+        Apply a selection algorithm to `batches`.
+
+        Parameters
+        ----------
+        batches : :class:`tuple` of :class:`.Batch`
+            The batches, from which some should be selected.
+
+        yielded : :class:`._YieldedData`
+            A container holding information about previously
+            yielded batches. It is automatically updated each time
+            ``yield`` is used, due to the decorator
+            applied in :meth:`__init_subclass__`.
+
+        Yields
+        ------
+        :class:`.Batch`
+            A selected batch from `batches`.
 
         Raises
         ------
         :class:`NotImplementedError`
-            This is a virtual method which needs to be implemented in a
+            This is a virtual method and need to be implemented in a
             subclass.
 
         """
 
-        return NotImplementedError()
+        raise NotImplementedError()
 
 
-class SelectorFunnel(Selector):
+class RemoveBatches(Selector):
     """
-    Applies :class:`Selector` objects in order.
-
-    Each :class:`Selector` in :attr:`selectors` is used until
-    exhaustion. The molecules selected by each :class:`Selector`
-    are passed to the next one for selection. As a result, only the
-    final :class:`Selector` can yield batches of size greater than 1.
+    Prevents a :class:`.Selector` from selecting some batches.
 
     Examples
     --------
-    Use :class:`Roulette` on only the 10 molecules with the highest
-    fitness.
+    You want to use :class:`.Roulette` selection on all but the
+    5 :class:`.Worst` batches
 
     .. code-block:: python
 
         import stk
 
-        # Make a population with 20 molecules.
-        pop = stk.Population(...)
-
-        # Create a Selector which yields the top 10 molecules according
-        # to roulette selection.
-        fittest = stk.Fittest(num_batches=10)
-        roulette = stk.Roulette()
-        elitist_roulette = stk.SelectorFunnel(fittest, roulette)
-
-        # Use the selector to yield molecules.
-        for selected_mol in elitist_roulette.select(pop):
-            # Do something with the selected molecules.
-            ...
+        population = stk.Population(...)
+        selector = stk.RemoveBatches(
+            remover=stk.Worst(5),
+            selector=stk.Roulette(20),
+        )
+        for batch in selector.select(population):
+            # Do stuff with batch. It was selected with roulette
+            # selection and is not one of the worst 5 batches.
 
     """
 
-    def __init__(self, *selectors):
+    def __init__(self, remover, selector):
         """
-        Initialize a :class:`SelectorFunnel` instance.
+        Initialize a :class:`.RemoveBatches` instance.
 
         Parameters
         ----------
-        *selectors : :class:`Selector`
-            The :class:`Selector` objects used to select molecules. For
-            all, except the last, `num_batches` must be ``1``.
+        remover : :class:`.Selector`
+            Selects batches of molecules, which cannot be yielded by
+            `selector`.
+
+        selector : :class:`.Selector`
+            Selects batches of molecules, except those selected by
+            `remover`.
 
         """
 
-        self._selectors = selectors
-        self._num_batches = selectors[-1]._num_batches
-        self._yielded = set()
-        self._reset_yielded = True
-        # Make all the selectors share the same yielded set.
-        for selector in self._selectors:
-            # Only the funnel will reset yielded.
-            selector._reset_yielded = False
-            selector._yielded = self._yielded
+        self._remover = remover
+        self._selector = selector
 
     def select(self, population):
+        removed = {
+            batch.get_identity_key()
+            for batch in self._remover.select(population)
+        }
+        batches = self._selector._get_batches(
+            population=population,
+            fitness_values=self._selector._fitness_modifier(population)
+        )
+        filtered_batches = tuple(
+            batch for batch in batches
+            if batch.get_identity_key() not in removed
+        )
+        yield from self._selector._select(
+            batches=filtered_batches,
+            yielded=_YieldedData(),
+        )
+
+
+class RemoveMolecules(Selector):
+    """
+    Prevents a :class:`.Selector` from selecting some molecules.
+
+    Examples
+    --------
+    You want to prevent any of the molecules in the :class:`.Best`
+    5 batches from being selected by :class:`.Roulette`.
+
+    .. code-block:: python
+
+        import stk
+
+        population = stk.Population(...)
+        selector = stk.RemoveMolecules(
+            remover=stk.Best(num_batches=5, batch_size=3),
+            selector=stk.Roulette(num_batches=20, batch_size=3),
+        )
+
+        for batch in selector.select(population):
+            # Do stuff with batch. The batch is guaranteed not to
+            # contain any molecules which are found in the best 5
+            # batches of size 3.
+
+    """
+
+    def __init__(self, remover, selector):
         """
-        Yield batches of molecules.
+        Initialize a :class:`.RemoveMolecules` instance.
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
+        remover : :class:`.Selector`
+            Selects batches molecules, any molecule selected cannot
+            be selected by `selector`.
 
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            A batch of selected molecules.
+        selector : :class:`.Selector`
+            Selects batches of molecules, not containing any molecules
+            selected by `remover`.
 
         """
 
-        *head, tail = self._selectors
-        for selector in head:
-            population = [mol for mol, in selector.select(population)]
-        yield from tail.select(population)
+        self._remover = remover
+        self._selector = selector
+
+    def select(self, population):
+        removed = {
+            mol
+            for batch in self._remover.select(population)
+            for mol in batch
+        }
+        population = [mol for mol in population if mol not in removed]
+        yield from self._selector.select(population)
+
+
+class FilterBatches(Selector):
+    """
+    Allows a :class:`.Selector` to select only some batches.
+
+    Examples
+    --------
+    You only want the :class:`.Best` 10 batches to participate in
+    :class:`.Roulette`
+
+    .. code-block:: python
+
+        import stk
+
+        population = stk.Population(...)
+        selector = stk.FilterBatches(
+            filter=stk.Best(10),
+            selector=stk.Roulette(7),
+        )
+        for batch in selector.select(population):
+            # Do stuff with batch. It is one of the 10 best batches and
+            # was selected using roulette selection.
+
+    """
+
+    def __init__(self, filter, selector):
+        """
+        Initialize a :class:`.FilterBatches` instance.
+
+        Parameters
+        ----------
+        filter : :class:`.Selector`
+            Selects batches which can be yielded by `selector`.
+
+        selector : :class:`.Selector`
+            Selects batches, but only if they were also selected by
+            `filter`.
+
+        """
+
+        self._filter = filter
+        self._selector = selector
+
+    def select(self, population):
+        valid = {
+            batch.get_identity_key()
+            for batch in self._filter.select(population)
+        }
+        batches = self._selector._get_batches(
+            population=population,
+            fitness_values=self._selector._fitness_modifier(population)
+        )
+        filtered_batches = tuple(
+            batch for batch in batches
+            if batch.get_identity_key() in valid
+        )
+        yield from self._selector._select(
+            batches=filtered_batches,
+            yielded=_YieldedData(),
+        )
+
+
+class FilterMolecules(Selector):
+    """
+    Allows a :class:`.Selector` to select only some molecules.
+
+    Examples
+    --------
+    You want to use :class:`.Roulette` on the molecules which belong
+    to the :class:`.Best` 5 batches of size 3
+
+    .. code-block:: python
+
+        import stk
+
+        population = stk.Population(...)
+        selector = stk.FilterMolecules(
+            filter=stk.Best(num_batches=5, batch_size=3),
+            selector=stk.Roulette(num_batches=20, batch_size=3),
+        )
+        for batch in selector.select(population):
+            # Do stuff with batch. All the molecules in the batch
+            # belong to the top 5 batches of size 3. The batch
+            # was selected using roulette selection.
+
+    """
+
+    def __init__(self, filter, selector):
+        """
+        Initialize a :class:`.FilterMolecules` instance.
+
+        Parameters
+        ----------
+        filter : :class:`.Selector`
+            Selects molecules which can be yielded by `selector`.
+
+        selector : :class:`.Selector`
+            Selects batches of molecules. The batches can only
+            contain molecules yielded by `filter`.
+
+        """
+
+        self._filter = filter
+        self._selector = selector
+
+    def select(self, population):
+        population = [
+            mol
+            for batch in self._filter.select(population)
+            for mol in batch
+        ]
+        yield from self._selector.select(population)
 
 
 class SelectorSequence(Selector):
@@ -279,80 +797,60 @@ class SelectorSequence(Selector):
 
     Examples
     --------
-    First use :class:`Fittest` to select the 10 fittest batches and
-    then use :class:`Roulette` to select batches in proportion to their
-    fitness.
+    First use :class:`.Best` to select the 10 best batches and
+    then use :class:`.Roulette` to select batches in proportion to
+    their fitness
 
     .. code-block:: python
 
         import stk
 
-        # Make a population.
-        pop = stk.Population(...)
-
-        # Create a Selector which yields 10 batches of molecules and
-        # then uses roulette selection indefinitely.
-        fittest = stk.Fittest(batch_size=3)
-        roulette = stk.Roulette(batch_size=3)
-        elitist_roulette = stk.SelectorSequence(fittest, roulette)
-
-        # Use the selector to yield molecules.
-        for selected_mol in elitist_roulette.select(pop):
-            # Do something with the selected molecules.
-            ...
+        population = stk.Population(...)
+        selector = stk.SelectorSequence(
+            selector1=stk.Best(10),
+            selector2=stk.Roulette(20),
+        )
+        for batch in selector.select(population):
+            # Do stuff with batch. Batches are first selected with
+            # Best(10) and then with Roulette(20).
 
     """
 
-    def __init__(self, *selectors):
+    def __init__(self, selector1, selector2, num_batches=None):
         """
         Initialize a :class:`SelectorSequence` instance.
 
         Parameters
         ----------
-        *selectors : :class:`Selector`
-            The :class:`Selector` objects used to select molecules.
+        selector1 : :class:`.Selector`
+            The selector from which batches are yielded first.
+
+        selector2 : :class:`.Selector`
+            The selector from which batches are yielded second.
+
+        num_batches : :class:`int`, optional
+            The maximum number of batches which can be yielded across
+            the entire sequence.
 
         """
 
-        self._selectors = selectors
-        self._num_batches = sum(
-            selector._num_batches for selector in self._selectors
-        )
-        self._yielded = set()
-        self._reset_yielded = True
-        # Make all the selectors share the yielded set.
-        for selector in self._selectors:
-            # Only the sequence will reset yielded.
-            selector._reset_yielded = False
-            selector._yielded = self._yielded
+        self._selector1 = selector1
+        self._selector2 = selector2
+        self._num_batches = num_batches
 
     def select(self, population):
-        """
-        Yield batches of molecules.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            A batch of selected molecules.
-
-        """
-
-        for selector in self._selectors:
-            yield from selector.select(population)
+        yield from it.islice(
+            it.chain(
+                self._selector1.select(population),
+                self._selector2.select(population)
+            ),
+            self._num_batches
+        )
 
 
-class Fittest(Selector):
+class Best(Selector):
     """
-    Selects batches of molecules, fittest first.
-
-    The fitness of a batch is the sum of the fitness values of the
-    molecules in the batch.
+    Selects batches of molecules, highest fitness value first.
 
     Examples
     --------
@@ -367,10 +865,10 @@ class Fittest(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        fittest = stk.Fittest()
+        best = stk.Best()
 
         # Select the molecules.
-        for selected, in fittest.select(pop):
+        for selected, in best.select(pop):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
             mutant = mutator.mutate(selected)
@@ -386,10 +884,10 @@ class Fittest(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        fittest = stk.Fittest(batch_size=2)
+        best = stk.Best(batch_size=2)
 
         # Select the molecules.
-        for selected in fittest.select(pop):
+        for selected in best.select(pop):
             # selected is a tuple of length 2, holding the selected
             # molecules. You can do stuff with the selected molecules
             # Like apply crossover operations on them.
@@ -400,63 +898,139 @@ class Fittest(Selector):
     def __init__(
         self,
         num_batches=None,
-        duplicates=True,
-        batch_size=1
+        batch_size=1,
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
     ):
         """
-        Initialize a :class:`Fittest` instance.
+        Initialize a :class:`.Best` instance.
 
         Parameters
         ----------
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
-            will continue until the generator is exhausted.
-
-        duplicates : :class:`bool`, optional
-            If ``True``, the same molecule can be yielded in more than
-            one batch.
+            will continue forever or until the generator is exhausted,
+            whichever comes first.
 
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
+
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
 
         """
 
         super().__init__(
             num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=False,
-            batch_size=batch_size
+            batch_size=batch_size,
+            duplicate_mols=duplicate_mols,
+            # Note that duplicate batches can still occur in Best,
+            # if there a duplicates of an object in the population.
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
         )
 
-    def select(self, population):
+    def _select(self, batches, yielded):
+        batches = sorted(batches, reverse=True)
+
+        if not self._duplicate_mols:
+            batches = filter(yielded.has_no_yielded_mols, batches)
+
+        if not self._duplicate_batches:
+            batches = filter(yielded.is_unyielded_batch, batches)
+
+        yield from it.islice(batches, self._num_batches)
+
+
+class Worst(Selector):
+    """
+    Selects batches of molecules, lowest fitness value first.
+
+    Examples
+    --------
+    Select the worst 5 batches of size 3
+
+    .. code-block:: python
+
+        import stk
+
+        population = stk.Population(...)
+        worst = stk.Worst(num_batches=5, batch_size=3)
+        for batch in worst.select(population):
+            # Do stuff with batch.
+
+
+    """
+
+    def __init__(
+        self,
+        num_batches=None,
+        batch_size=1,
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
+    ):
         """
-        Yield batches of molecules, fittest first.
+        Initialize a :class:`.Worst` instance.
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
+        num_batches : :class:`int`, optional
+            The number of batches to yield. If ``None`` then yielding
+            will continue forever or until the generator is exhausted,
+            whichever comes first.
 
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            A batch of selected molecules.
+        batch_size : :class:`int`, optional
+            The number of molecules yielded at once.
+
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
 
         """
 
-        batches = self._batch(population)
+        super().__init__(
+            num_batches=num_batches,
+            batch_size=batch_size,
+            duplicate_mols=duplicate_mols,
+            # Note that duplicate batches can still occur in Worst,
+            # if there a duplicates of an object in the population.
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
+        )
 
-        # Sort by total fitness value of each batch.
-        batches = sorted(batches, reverse=True, key=lambda x: x[1])
+    def _select(self, batches, yielded):
+        batches = sorted(batches)
 
-        if not self._duplicates:
-            batches = self._no_duplicates(batches)
+        if not self._duplicate_mols:
+            batches = filter(yielded.has_no_yielded_mols, batches)
 
-        for i, (batch, fitness) in enumerate(batches):
-            if i >= self._num_batches:
-                break
-            yield batch
+        if not self._duplicate_batches:
+            batches = filter(yielded.is_unyielded_batch, batches)
+
+        yield from it.islice(batches, self._num_batches)
 
 
 class Roulette(Selector):
@@ -522,9 +1096,10 @@ class Roulette(Selector):
     def __init__(
         self,
         num_batches=None,
-        duplicates=True,
-        use_rank=False,
         batch_size=1,
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
         random_seed=None
     ):
         """
@@ -537,97 +1112,59 @@ class Roulette(Selector):
             will continue forever or until the generator is exhausted,
             whichever comes first.
 
-        duplicates : :class:`bool`, optional
-            If ``True`` the same member can be yielded in more than
-            one batch.
-
-        use_rank : :class:`bool`, optional
-            When ``True`` the fitness value of an individual is
-            calculated as ``f = 1/rank``.
-
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
+
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
 
         random_seed : :class:`int`, optional
             The random seed to use.
 
         """
 
+        if num_batches is None:
+            num_batches = float('inf')
+
         self._generator = np.random.RandomState(random_seed)
         super().__init__(
             num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=use_rank,
-            batch_size=batch_size
+            batch_size=batch_size,
+            duplicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
         )
 
-    def select(self, population):
-        """
-        Yield batches of molecules using roulette selection.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            A :class:`.Population` from which batches of molecules are
-            selected.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            A batch of selected molecules.
-
-        """
-
-        if not self._duplicates:
-            valid_pop = [
-                mol for mol in population if mol not in self._yielded
+    def _select(self, batches, yielded):
+        while batches and yielded.get_num() < self._num_batches:
+            total = sum(batch.get_fitness() for batch in batches)
+            weights = [
+                batch.get_fitness() / total for batch in batches
             ]
-        else:
-            valid_pop = list(population)
-        yields = 0
-        while (
-            len(valid_pop) >= self._batch_size
-            and yields < self._num_batches
-        ):
+            yield self._generator.choice(batches, p=weights)
 
-            if self._use_rank:
-                ranks = range(1, len(valid_pop)+1)
-                total = sum(1/rank for rank in ranks)
-
-                ranks = range(1, len(valid_pop)+1)
-                weights = [1/(rank*total) for rank in ranks]
-
-                valid_pop = sorted(
-                    valid_pop, key=lambda m: m.fitness, reverse=True
-                )
-
-            else:
-                total = sum(mol.fitness for mol in valid_pop)
-                weights = [mol.fitness / total for mol in valid_pop]
-
-            selected = tuple(self._generator.choice(
-                a=valid_pop,
-                size=self._batch_size,
-                replace=False,
-                p=weights
-            ))
-            yield selected
-            yields += 1
-            if not self._duplicates:
-                self._yielded.update(selected)
-                valid_pop = [
-                    mol for mol in population
-                    if mol not in self._yielded
-                ]
+            if not self._duplicate_mols:
+                batches = filter(yielded.has_no_yielded_mols, batches)
+            if not self._duplicate_batches:
+                batches = filter(yielded.is_unyielded_batch, batches)
+            if not self._duplicate_mols or not self._duplicate_batches:
+                batches = tuple(batches)
 
 
 class AboveAverage(Selector):
     """
     Yields above average batches of molecules.
-
-    The fitness of a batch is the sum of all fitness values of the
-    molecules in the batch. Contrary to the name, this selector will
-    also yield a batch which has exactly average fitness.
 
     Examples
     --------
@@ -674,108 +1211,90 @@ class AboveAverage(Selector):
 
     def __init__(
         self,
-        duplicate_batches=False,
         num_batches=None,
-        duplicates=True,
-        use_rank=False,
-        batch_size=1
+        batch_size=1,
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
     ):
         """
-        Initialize a :class:`AboveAverage` instance.
+        Initialize an :class:`.AboveAverage` instance.
 
         Parameters
         ----------
-        duplicate_batches : :class:`bool`, optional
-            If ``True``, the same batch may be yielded more than
-            once. For example, if the batch has a fitness twice above
-            average it will be yielded twice, if it has a fitness
-            three times above average, it will be yielded three times
-            and so on.
-
         num_batches : :class:`int`, optional
             The number of batches to yield. If ``None`` then yielding
             will continue forever or until the generator is exhausted,
             whichever comes first.
 
-        duplicates : :class:`bool`, optional
-            If ``True``, the same molecule can be yielded in more than
-            one batch.
-
-        use_rank : :class:`bool`, optional
-            When ``True`` the fitness value of an individual is
-            calculated as ``f = 1/rank``.
-
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
+
         """
 
-        self._duplicate_batches = duplicate_batches
         super().__init__(
             num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=use_rank,
-            batch_size=batch_size
+            batch_size=batch_size,
+            duplicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
         )
 
-    def select(self, population):
-        """
-        Yield above average fitness batches of molecules.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            The population from which individuals are to be selected.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            The next selected batch of molecules.
-
-        """
-
-        mean = np.mean([
-            fitness for batch, fitness in self._batch(population)
-        ])
-
-        # Sort the batches so that highest fitness batches are
-        # yielded first. This is necessary because if not all batches
-        # will be yielded, we want the molecules to appear in the
-        # batches of the highest fitness. The same is true for when
-        # self.duplicates is False. If duplicates is False then we want
-        # molecules to appear in their optimal batch only.
-        batches = sorted(
-            self._batch(population),
-            reverse=True,
-            key=lambda x: x[-1]
+    def _select(self, batches, yielded):
+        mean = np.mean([batch.get_fitness() for batch in batches])
+        # Yield highest fitness batches first.
+        batches = sorted(batches, reverse=True)
+        # Yield only batches with a fitness larger than the mean.
+        batches = it.takewhile(
+            lambda batch: batch.get_fitness() > mean,
+            batches
         )
+        # Yield batches which are multiple times better than the mean
+        # multiple times.
+        batches = (
+            batch
+            for batch in batches
+            for i in range(self._get_num_duplicates(batch, mean))
+        )
+        # If duplicate molecules are not allowed, allow only
+        # batches with no yielded molecules.
+        if not self._duplicate_mols:
+            batches = filter(yielded.has_no_yielded_mols, batches)
+        # If duplicate batches are not allowed, allow only
+        # unyielded batches.
+        if not self._duplicate_batches:
+            batches = filter(yielded.is_unyielded_batch, batches)
+        # Limit the number of yielded batches to _num_batches.
+        yield from it.islice(batches, self._num_batches)
 
-        if self._duplicates:
-            batches = self._no_duplicates(batches)
-
-        yielded = 0
-        for batch, fitness in batches:
-            if fitness >= mean:
-                n = fitness // mean if self._duplicate_batches else 1
-                for i in range(int(n)):
-                    yield batch
-                    yielded += 1
-                    if yielded >= self._num_batches:
-                        return
+    def _get_num_duplicates(self, batch, mean):
+        if self._duplicate_batches and self._duplicate_mols:
+            return int(batch.get_fitness() // mean)
+        return 1
 
 
 class Tournament(Selector):
     """
-    Yields molecules by tournament selection.
+    Yields batches of molecules through tournament selection.
 
-    In tournament selection, a random number of members is chosen from
-    the population undergo a competition. In each competition, a random
-    number of batches is chosen to compete and batches with the highest
-    fitness are yielded. Competitions are repeated until the total
-    number of batches yielded is equal to the number of batches.
-    If batch size is greater than 1, the compared fitness is the
-    average fitness of the batch. This process is repeated until the
-    number of yielded batches is equal to `num_batches`.
+    In tournament selection, a random number of batches is chosen from
+    the population undergo a competition. In each competition, the
+    batch with the highest fitness value is yielded. This is repeated
+    until `num_batches` are yielded.
 
     Examples
     --------
@@ -790,13 +1309,13 @@ class Tournament(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        tournament_selection = stk.Tournament(
+        tournament = stk.Tournament(
             num_batches=5,
             batch_size=1
         )
 
         # Select the molecules.
-        for selected, in tournament_selection.select(pop):
+        for selected, in tournament.select(pop):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
             mutant = mutator.mutate(selected)
@@ -806,14 +1325,14 @@ class Tournament(Selector):
     def __init__(
         self,
         num_batches=None,
-        duplicates=True,
-        use_rank=False,
         batch_size=1,
-        duplicate_batches=False,
-        random_seed=None
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
+        random_seed=None,
     ):
         """
-        Initialize a :class:`TournamentSelection` instance.
+        Initialize a :class:`.Tournament` instance.
 
         Parameters
         ----------
@@ -822,110 +1341,82 @@ class Tournament(Selector):
             will continue forever or until the generator is exhausted,
             whichever comes first.
 
-        duplicates : :class:`bool`, optional
-            If ``True``, the same molecule can be yielded in more than
-            one batch.
-
-        use_rank : :class:`bool`, optional
-            When ``True`` the fitness value of an individual is
-            calculated as ``f = 1/rank``. In tournament sampling, this
-            does not affect the selection process.
-
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
-        duplicate_batches: :class:`bool` optional
-            If ``True``, the same batch can be yielded from the
-            selection process multiple times, as the batch can be
-            selected to compete in a tournament multiple times.
-            If ``False``, the batch will be removed from the batch
-            population once it has been selected.
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
 
         random_seed : :class:`int`, optional
             The random seed to use.
 
         """
-        self._duplicate_batches = duplicate_batches
+
         self._generator = np.random.RandomState(random_seed)
+        if num_batches is None:
+            num_batches = float('inf')
+
         super().__init__(
             num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=use_rank,
             batch_size=batch_size,
+            duplicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
         )
 
-    def select(self, population):
-        """
-        Yield molecules by tournament selection.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            The population from which individuals are to be selected.
-
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            The next selected batch of molecules.
-
-        """
-
-        # Sort batches by fitness.
-        batches = sorted(
-            self._batch(population),
-            reverse=True,
-            key=lambda x: x[-1]
-        )
-        # Ensure duplicate molecules are not in each batch.
-        if not self._duplicates:
-            # Ensure batches do not contain duplicates.
-            batches = list(self._no_duplicates(batches))
-
-        yielded = 0
-
-        # If less than two members of the batch exist,
-        # the tournament cannot take place.
-        while yielded < self._num_batches and len(batches) >= 2:
-            # Randomly select number of members to choose from
-            # population.
-            num_selections = self._generator.randint(2, len(batches)+1)
-            # Get the indexes of all the batches to enter the
-            # tournament.
-            comparison_indexes = np.random.choice(
-                len(batches),
-                num_selections,
+    def _select(self, batches, yielded):
+        # The tournament can only take place if there is more than 1
+        # batch.
+        while (
+            len(batches) > 1 and yielded.get_num() < self._num_batches
+        ):
+            tournament_size = self._generator.randint(
+                low=2,
+                high=len(batches)+1
+            )
+            competitors = self._generator.choice(
+                a=batches,
+                size=tournament_size,
                 replace=False
             )
-            # Compare all batches, yielding the index of the batch
-            # with the highest fitness.
-            selected_index = max(
-                comparison_indexes,
-                key=lambda index: batches[index][-1]
-            )
-            # Add selected to yielded.
-            self._yielded.update(batches[selected_index])
-            yield batches[selected_index][0]
-            # If duplicate batches are not allowed, remove the yielded
-            #  batch from batches.
+            yield max(competitors)
+
+            if not self._duplicate_mols:
+                batches = filter(yielded.has_no_yielded_mols, batches)
             if not self._duplicate_batches:
-                batches.pop(selected_index)
-            yielded += 1
-        return
+                batches = filter(yielded.is_unyielded_batch, batches)
+            if not self._duplicate_mols or not self._duplicate_batches:
+                batches = tuple(batches)
 
 
 class StochasticUniversalSampling(Selector):
     """
-    Yields molecules by stochastic universal sampling.
+    Yields batches of molecules through stochastic universal sampling.
 
-    Stochastic universal sampling yields molecules by sampling the population
-    across evenly spaced intervals. Members with greater fitness values occupy
-    a larger area and are therefore more likely to be sampled.
+    Stochastic universal sampling lays out batches along a line, with
+    each batch taking up length proprotional to its fitness. It
+    then creates a set of evenly spaced pointers to different points
+    on the line, each of which is occupied by a batch. Batches which
+    are pointed to are yielded.
+
     This approach means weaker members of the population
-    are given a greater chance to be chosen.
+    are given a greater chance to be chosen than in
+    :class:`.Roulette` selection [#]_.
 
     References
     ----------
-    https://en.wikipedia.org/wiki/Stochastic_universal_sampling
+    .. [#] https://en.wikipedia.org/wiki/Stochastic_universal_sampling
 
     Examples
     --------
@@ -940,10 +1431,10 @@ class StochasticUniversalSampling(Selector):
         pop = stk.Population(...)
 
         # Make the selector.
-        stochastic_sampling = stk.StochasticUniversalSampling(num_batches=5)
+        stochastic_sampling = stk.StochasticUniversalSampling(5)
 
         # Select the molecules.
-        for selected, in stochastic_samplng.select(pop):
+        for selected, in stochastic_sampling.select(pop):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
             mutant = mutator.mutate(selected)
@@ -952,94 +1443,128 @@ class StochasticUniversalSampling(Selector):
     def __init__(
         self,
         num_batches=None,
-        duplicates=False,
-        use_rank=False,
-        batch_size=1
+        batch_size=1,
+        duplicate_mols=True,
+        duplicate_batches=True,
+        fitness_modifier=None,
+        random_seed=None,
     ):
         """
-        Initialize a :class:`StochasticUniversalSampling` instance.
+        Initialize a :class:`.StochasticUniversalSampling` instance.
 
         Parameters
         ----------
         num_batches : :class:`int`, optional
-            The number of batches to yield. Cannot be ``None``.
-            The number of positions that will be sampled evenly from the
-            population.
-
-        duplicates : :class:`bool`, optional
-            If ``True``, the same molecule can be yielded in more than
-            one batch.
-
-        use_rank : :class:`bool`, optional
-            When ``True`` the fitness value of an individual is
-            calculated as ``f = 1/rank``. The distance of each molecule along
-            is then given by ``f = 1/rank``.
+            The number of batches to yield. If ``None`` then yielding
+            will continue forever or until the generator is exhausted,
+            whichever comes first.
 
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
+        duplicate_mols : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more than
+            one batch.
+
+        duplicate_batches : :class:`bool`, optional
+            If ``True`` the same batch can be yielded more than once.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the population on which :meth:`select`is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+            If ``None``, each molecule is mapped to the fitness value
+            found in its :attr:`~.Molecule.fitness` attribute.
+
+        random_seed : :class:`int`, optional
+            The random seed to use.
+
         """
+
+        self._generator = np.random.RandomState(random_seed)
         super().__init__(
             num_batches=num_batches,
-            duplicates=duplicates,
-            use_rank=use_rank,
             batch_size=batch_size,
+            duplicate_mols=duplicate_mols,
+            duplicate_batches=duplicate_batches,
+            fitness_modifier=fitness_modifier,
         )
 
-    def select(self, population):
-        """
-        Yield molecules using stochastic universal sampling.
+    def _select(self, batches, yielded):
+        batches = sorted(batches, reverse=True)
 
-        Parameters
-        ----------
-        population : :class:`.Population`
-            The population from which individuals are to be selected.
+        # SUS may need to run multiple rounds if duplicate_mols or
+        # duplicate_batches is True. This is because in each round
+        # you can generate multiple pointers to the same batch or to
+        # batches sharings molecules. If this happens the lower fitness
+        # batch will not be yielded. Instead a second round of SUS will
+        # occur with any ineligible batches removed and a reduced
+        # number of pointers, to account for batches yielded in the
+        # previous roounds. This will repeat until the desired number
+        # of batches has been yielded, or there are no more valid
+        # batches.
+        while batches and yielded.get_num() < self._num_batches:
+            yield from self._select_with_stochastic_universal_sampling(
+                batches=batches,
+                yielded=yielded,
+            )
 
-        Yields
-        ------
-        :class:`tuple` of :class:`.Molecule`
-            The next selected batch of molecules.
+            if yielded.get_num() < self._num_batches:
+                if not self._duplicate_mols:
+                    batches = (
+                        filter(yielded.has_no_yielded_mols, batches)
+                    )
+                if not self._duplicate_batches:
+                    batches = (
+                        filter(yielded.is_unyielded_batch, batches)
+                    )
+                if (
+                    not self._duplicate_mols
+                    or not self._duplicate_batches
+                ):
+                    batches = tuple(batches)
 
-        """
-        # Get sorted batches of the population.
-        batches = sorted(
-            self._batch(population),
-            reverse=True,
-            key=lambda x: x[-1]
+    def _select_with_stochastic_universal_sampling(
+        self,
+        batches,
+        yielded,
+    ):
+
+        total = sum(batch.get_fitness() for batch in batches)
+        batch_positions = []
+        batch_position = 0
+        for batch in batches:
+            batch_position += batch.get_fitness()/total
+            batch_positions.append(batch_position)
+
+        num_batches = min(
+            self._num_batches - yielded.get_num(),
+            len(batches)
         )
-        if self._duplicates:
-            # Ensure batches do not contain duplicates.
-            batches = list(self._no_duplicates(batches))
+        pointer_distance = 1/num_batches
+        pointers = []
+        pointer = self._generator.uniform(0, pointer_distance)
+        for i in range(num_batches):
+            pointers.append(pointer)
+            pointer += pointer_distance
 
-        yielded = 0
-        if self._use_rank:
-            # Set distances according to the rank.
-            ranks = range(1, len(batches)+1)
-            total = sum(1/rank for rank in ranks)
-            distances = [1/(rank*total) for rank in ranks]
-        else:
-            # Set distances according to the fitness.
-            total = sum(fitness for _, fitness in batches)
-            distances = [fitness/total for _, fitness in batches]
-        # Distance to add each time to the pointer.
-        distance = 1/self._num_batches
+        batch_index = 0
+        for pointer in pointers:
+            while pointer > batch_positions[batch_index]:
+                batch_index += 1
 
-        # First pointer position is random between 0
-        # and first pointer.
-        first_pointer = np.random.uniform(0, distance)
-        pointer = first_pointer
-        cmltv_distance = 0
-        while yielded < self._num_batches:
-            # Track distance progress.
-            for i, dist in enumerate(distances):
-                cmltv_distance += dist
-                # If pointer value is less than the cumulative distance,
-                # yield the molecule.
-                if pointer < cmltv_distance:
-                    selected = batches[i][0]
-                    self._yielded.update(selected)
-                    yield selected
-                    yielded += 1
-                    break
-            pointer += distance
-        return
+            batch = batches[batch_index]
+
+            if (
+                not self._duplicate_mols
+                and yielded.has_yielded_mols(batch)
+            ):
+                continue
+
+            if (
+                not self._duplicate_batches
+                and yielded.is_yielded_batch(batch)
+            ):
+                continue
+
+            yield batch
