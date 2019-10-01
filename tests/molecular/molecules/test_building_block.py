@@ -272,14 +272,18 @@ def test_init_mol(bb_dir):
     )
 
 
-def test_clone(tmp_amine2):
-    clone = tmp_amine2.clone()
-    atoms = it.zip_longest(tmp_amine2.atoms, clone.atoms)
+def _test_atoms(atoms):
     for a1, a2 in atoms:
         assert a1 is not a2
         assert a1.id == a2.id
         assert a1.charge == a2.charge
         assert a1.__class__ is a2.__class__
+
+
+def test_clone(tmp_amine2):
+    clone = tmp_amine2.clone()
+    atoms = it.zip_longest(tmp_amine2.atoms, clone.atoms)
+    _test_atoms(atoms)
 
     bonds = it.zip_longest(tmp_amine2.bonds, clone.bonds)
     for b1, b2 in bonds:
@@ -289,6 +293,15 @@ def test_clone(tmp_amine2):
         assert b1.atom1.id == b2.atom1.id
         assert b1.atom2.id == b2.atom2.id
         assert b1.periodicity == b2.periodicity
+
+    fgs = it.zip_longest(tmp_amine2.func_groups, clone.func_groups)
+    for fg1, fg2 in fgs:
+        atoms = it.zip_longest(fg1.atoms, fg2.atoms)
+        _test_atoms(atoms)
+        bonders = it.zip_longest(fg1.bonders, fg2.bonders)
+        _test_atoms(bonders)
+        deleters = it.zip_longest(fg1.deleters, fg2.deleters)
+        _test_atoms(deleters)
 
 
 def test_init_pdb(bb_dir):
