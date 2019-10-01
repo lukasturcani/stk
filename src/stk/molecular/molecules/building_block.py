@@ -460,6 +460,27 @@ class BuildingBlock(Molecule):
             cls._cache[identity_key] = obj
         return obj
 
+    def clone(self):
+        """
+        Return a clone.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The clone.
+
+        """
+
+        clone = super().clone()
+        atom_map = {
+            original: clone
+            for original, clone in zip(self.atoms, clone.atoms)
+        }
+        clone.func_groups = tuple(
+            fg.clone(atom_map) for fg in self.func_groups
+        )
+        return clone
+
     def get_bonder_ids(self, fg_ids=None):
         """
         Yield ids of bonder atoms.
