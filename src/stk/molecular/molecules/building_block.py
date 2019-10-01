@@ -168,6 +168,49 @@ class BuildingBlock(Molecule):
         return obj
 
     @classmethod
+    def init_from_molecule(
+        cls,
+        mol,
+        functional_groups=None,
+        use_cache=False,
+    ):
+        """
+        Initialize from a :class:`.Molecule`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to initialize from. This can be a
+            any :class:`.Molecule`, such a :class:`.BuildingBlock` or
+            a :class:`.ConstructedMolecule`.
+
+        functional_groups : :class:`iterable` of :class:`str`, optional
+            The names of the functional group types which are to be
+            added to :attr:`func_groups`. If ``None``, then no
+            functional groups are added.
+
+        use_cache : :class:`bool`, optional
+            If ``True``, a new :class:`.BuildingBlock` will
+            not be made if a cached and identical one already exists,
+            the one which already exists will be returned. If ``True``
+            and a cached, identical :class:`BuildingBlock` does not
+            yet exist the created one will be added to the cache.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+             The building block. It will have the same atoms, bonds and
+             atomic positions as `mol`.
+
+        """
+
+        return cls.init_from_rdkit_mol(
+            mol=mol.to_rdkit_mol(),
+            functional_groups=functional_groups,
+            use_cache=use_cache,
+        )
+
+    @classmethod
     def init_from_file(
         cls,
         path,
@@ -459,6 +502,27 @@ class BuildingBlock(Molecule):
         if use_cache:
             cls._cache[identity_key] = obj
         return obj
+
+    def clone(self):
+        """
+        Return a clone.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The clone.
+
+        """
+
+        clone = super().clone()
+        atom_map = {
+            original: clone
+            for original, clone in zip(self.atoms, clone.atoms)
+        }
+        clone.func_groups = tuple(
+            fg.clone(atom_map) for fg in self.func_groups
+        )
+        return clone
 
     def get_bonder_ids(self, fg_ids=None):
         """

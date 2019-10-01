@@ -349,6 +349,39 @@ class ConstructedMolecule(Molecule):
 
         return obj
 
+    def clone(self):
+        """
+        Return a clone.
+
+        Returns
+        -------
+        :class:`.ConstructedMolecule`
+            The clone.
+
+        """
+
+        clone = super().clone()
+        clone.building_block_vertices = dict(
+            self.building_block_vertices
+        )
+        clone.building_block_counter = Counter(
+            self.building_block_counter
+        )
+        clone.topology_graph = self.topology_graph
+        construction_bonds = set(self.construction_bonds)
+        clone.construction_bonds = tuple(
+            clone.bonds[i] for i, bond in enumerate(self.bonds)
+            if bond in construction_bonds
+        )
+        atom_map = {
+            original: clone
+            for original, clone in zip(self.atoms, clone.atoms)
+        }
+        clone.func_groups = tuple(
+            fg.clone(atom_map) for fg in self.func_groups
+        )
+        return clone
+
     def get_building_blocks(self):
         """
         Yield the building blocks.

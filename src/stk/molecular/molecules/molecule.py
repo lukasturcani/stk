@@ -395,6 +395,30 @@ class Molecule(metaclass=_Cached):
         self.apply_displacement(origin)
         return self
 
+    def clone(self):
+        """
+        Return a clone.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The clone.
+
+        """
+
+        atom_map = {atom: atom.clone() for atom in self.atoms}
+        atoms = tuple(atom_map.values())
+        bonds = tuple(bond.clone(atom_map) for bond in self.bonds)
+        clone = self.__class__.__new__(self.__class__)
+        Molecule.__init__(
+            self=clone,
+            atoms=atoms,
+            bonds=bonds,
+            position_matrix=self.get_position_matrix(),
+            identity_key=self.get_identity_key(),
+        )
+        return clone
+
     def get_atom_positions(self, atom_ids=None):
         """
         Yield the positions of atoms.
