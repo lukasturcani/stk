@@ -304,6 +304,74 @@ def test_clone(tmp_amine2):
         _test_atoms(deleters)
 
 
+def test_init_from_molecule(amine2):
+    new_amine = stk.BuildingBlock.init_from_molecule(amine2)
+    atoms = it.zip_longest(amine2.atoms, new_amine.atoms)
+    _test_atoms(atoms)
+
+    bonds = it.zip_longest(amine2.bonds, new_amine.bonds)
+    for b1, b2 in bonds:
+        assert b1 is not b2
+        assert b1.__class__ is b2.__class__
+        assert b1.order == b2.order
+        assert b1.atom1.id == b2.atom1.id
+        assert b1.atom2.id == b2.atom2.id
+        assert b1.periodicity == b2.periodicity
+
+    assert not new_amine.func_groups
+    assert np.all(np.equal(
+        new_amine.get_position_matrix(),
+        amine2.get_position_matrix(),
+    ))
+
+    new_amine2 = stk.BuildingBlock.init_from_molecule(
+        mol=amine2,
+        functional_groups=['amine'],
+    )
+
+    atoms = it.zip_longest(amine2.atoms, new_amine2.atoms)
+    _test_atoms(atoms)
+
+    bonds = it.zip_longest(amine2.bonds, new_amine2.bonds)
+    for b1, b2 in bonds:
+        assert b1 is not b2
+        assert b1.__class__ is b2.__class__
+        assert b1.order == b2.order
+        assert b1.atom1.id == b2.atom1.id
+        assert b1.atom2.id == b2.atom2.id
+        assert b1.periodicity == b2.periodicity
+
+    fgs = it.zip_longest(amine2.func_groups, new_amine2.func_groups)
+    for fg1, fg2 in fgs:
+        atoms = it.zip_longest(fg1.atoms, fg2.atoms)
+        _test_atoms(atoms)
+        bonders = it.zip_longest(fg1.bonders, fg2.bonders)
+        _test_atoms(bonders)
+        deleters = it.zip_longest(fg1.deleters, fg2.deleters)
+        _test_atoms(deleters)
+
+    assert new_amine is not new_amine2
+
+    assert np.all(np.equal(
+        new_amine2.get_position_matrix(),
+        amine2.get_position_matrix(),
+    ))
+
+    # Test caching.
+    new_amine3 = stk.BuildingBlock.init_from_molecule(
+        mol=amine2,
+        functional_groups=['amine'],
+        use_cache=True,
+    )
+    new_amine4 = stk.BuildingBlock.init_from_molecule(
+        mol=amine2,
+        functional_groups=['amine'],
+        use_cache=True,
+    )
+    assert new_amine3 is not new_amine2
+    assert new_amine3 is new_amine4
+
+
 def test_init_pdb(bb_dir):
     mol0 = stk.BuildingBlock.init_from_file(
         path=join(bb_dir, 'neutral.pdb'),
