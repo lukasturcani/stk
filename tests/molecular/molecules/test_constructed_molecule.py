@@ -116,11 +116,11 @@ def test_clone(polymer):
     assert (
         polymer.building_block_counter == clone.building_block_counter
     )
-    contruction_bonds = it.zip_longest(
-        polymer.contruction_bonds,
+    construction_bonds = it.zip_longest(
+        polymer.construction_bonds,
         clone.construction_bonds,
     )
-    _test_bonds(contruction_bonds)
+    _test_bonds(construction_bonds)
 
 
 def test_get_building_blocks(
