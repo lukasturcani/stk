@@ -162,6 +162,25 @@ class Population:
         # Returns True.
         bb2 not in pop3
 
+    If you want to run multiple :meth:`optimize` calls in a row, use
+    the "with" statment. This keeps a single process pool open, and
+    means you do not create a new one for each :meth:`optimize` call.
+    It also automatically closes the pool for you when the block
+    exits
+
+    .. code-block:: python
+
+        population = stk.Population(...)
+        # Keep a process pool open through the "with" statement.
+        with population.open_process_pool(8):
+            # All optimize calls within this block will use the
+            # same process pool.
+            population.optimize(stk.UFF())
+            population.add_members(...)
+            population.optimize(stk.UFF())
+        # Process pool is automatically cleaned up when the block
+        # exits.
+
     """
 
     def __init__(self, *args):
@@ -192,6 +211,7 @@ class Population:
 
         self.direct_members = []
         self.subpopulations = []
+        self._process_pool = None
 
         for arg in args:
             if isinstance(arg, Population):
@@ -927,13 +947,70 @@ class Population:
 
         return cls.init_from_list(pop_list, use_cache)
 
+    def open_process_pool(self, num_processes=None):
+        """
+        Open a process pool.
+
+        Parameters
+        ----------
+        num_processes : :class:`int`, optional
+            The number of processes in the pool. If ``None``, then
+            creates a process for each core on the computer.
+
+        Returns
+        -------
+        :class:`.Population`
+            The population.
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If a process pool is already open.
+
+        """
+
+        if self._process_pool is not None:
+            raise RuntimeError('A process pool is already open.')
+
+        if num_processes is None:
+            num_processes = psutil.cpu_count()
+
+        if num_processes != 1:
+            self._process_pool = pathos.pools.ProcessPool(
+                nodes=num_processes
+            )
+        return self
+
+    def close_process_pool(self):
+        """
+        Close an open process pool.
+
+        Returns
+        -------
+        :class:`.Population`
+            The population.
+
+        """
+
+        if self._process_pool is not None:
+            self._process_pool.close()
+            self._process_pool = None
+        return self
+
     def _optimize_parallel(self, optimizer, num_processes):
         opt_fn = _Guard(optimizer, optimizer.optimize)
 
         # Apply the function to every member of the population, in
         # parallel.
-        with pathos.pools.ProcessPool(num_processes) as pool:
-            optimized = pool.map(opt_fn, self)
+        opened_pool = False
+        if self._process_pool is None:
+            opened_pool = True
+            self.open_process_pool(num_processes)
+
+        optimized = self._process_pool.map(opt_fn, self)
+
+        if opened_pool:
+            self.close_process_pool()
 
         # If anything failed, raise an error.
         for result in optimized:
@@ -972,7 +1049,8 @@ class Population:
         num_processes : :class:`int`, optional
             The number of parallel processes to create. Optimization
             will run serially if ``1``. If ``None``, creates a
-            process for each core on the computer.
+            process for each core on the computer. This parameter will
+            be ignored if the population has an open process pool.
 
         Returns
         -------
@@ -983,7 +1061,7 @@ class Population:
         if num_processes is None:
             num_processes = psutil.cpu_count()
 
-        if num_processes == 1:
+        if self._process_pool is None and num_processes == 1:
             self._optimize_serial(optimizer)
         else:
             self._optimize_parallel(optimizer, num_processes)
@@ -1273,6 +1351,12 @@ class Population:
     def __contains__(self, item):
         return any(mol is item for mol in self)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close_process_pool()
+
     def __str__(self):
         name = f'Population {id(self)}\n'
         dash = '-'
@@ -1377,8 +1461,10 @@ class EAPopulation(Population):
             fitness.
 
         num_processes : :class:`int`, optional
-            The number of processes to create. If ``1`` then fitness
-            values are calculated serially.
+            The number of parallel processes to create. Calculations
+            will run serially if ``1``. If ``None``, creates a
+            process for each core on the computer. This parameter will
+            be ignored if the population has an open process pool.
 
         Returns
         -------
@@ -1386,7 +1472,10 @@ class EAPopulation(Population):
 
         """
 
-        if num_processes == 1:
+        if num_processes is None:
+            num_processes = psutil.cpu_count()
+
+        if self._process_pool is None and num_processes == 1:
             self._calculate_fitness_serial(fitness_calculator)
         else:
             self._calculate_fitness_parallel(
@@ -1411,8 +1500,15 @@ class EAPopulation(Population):
 
         # Apply the function to every member of the population, in
         # parallel.
-        with pathos.pools.ProcessPool(num_processes) as pool:
-            evaluated = pool.map(fitness_fn, self)
+        opened_pool = False
+        if self._process_pool is None:
+            opened_pool = True
+            self.open_process_pool(num_processes)
+
+        evaluated = self._process_pool.map(fitness_fn, self)
+
+        if opened_pool:
+            self.close_process_pool()
 
         # If anything returned an exception, raise it.
         for result in evaluated:
