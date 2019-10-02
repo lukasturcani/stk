@@ -193,17 +193,24 @@ class ProgressPlotter(Plotter):
         fig = plt.figure(figsize=[8, 4.5])
 
         palette = sns.color_palette('deep')
-        sns.scatterplot(
-            x='Generation',
-            y=self._y_label,
-            hue='Type',
-            palette={
-                'Max': palette[3],
-                'Min': palette[0],
-                'Mean': palette[2]
-            },
-            data=df
-        )
+        # It's possible that all values were filtered out, and trying
+        # to plot an empty dataframe would raise an exception.
+        if len(df) != 0:
+            sns.scatterplot(
+                x='Generation',
+                y=self._y_label,
+                hue='Type',
+                palette={
+                    'Max': palette[3],
+                    'Min': palette[0],
+                    'Mean': palette[2]
+                },
+                data=df
+            )
+        # Set the length of the axes to account for all generations,
+        # as its possible the first or last ones were not included
+        # due to being filtered out.
+        plt.xlim(0, len(progress.subpopulations)+1)
 
         plt.legend(bbox_to_anchor=(1.15, 1), prop={'size': 9})
         plt.tight_layout()
