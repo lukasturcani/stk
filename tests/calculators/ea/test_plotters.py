@@ -38,7 +38,7 @@ def test_progress_plotter(progress):
         filename=join(odir, 'odd_fitness'),
         property_fn=lambda mol: mol.fitness,
         y_label='Odd Fitness',
-        filter=lambda mol: mol.fitness % 1 == 0,
+        filter=lambda mol: mol.fitness % 2 == 1,
     )
     plotter4.plot(progress)
 
