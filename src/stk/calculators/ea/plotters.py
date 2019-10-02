@@ -102,7 +102,13 @@ class ProgressPlotter(Plotter):
 
     """
 
-    def __init__(self, filename, property_fn, y_label):
+    def __init__(
+        self,
+        filename,
+        property_fn,
+        y_label,
+        filter=lambda mol: True,
+    ):
         """
         Initialize a :class:`ProgressPlotter` instance.
 
@@ -122,11 +128,17 @@ class ProgressPlotter(Plotter):
         y_label : :class:`str`
             The y label for the produced graph.
 
+        filter : :class:`callable`, optional
+            Takes a :class:`.Molecule` as input and returns ``True``
+            or ``False``. Only molecules which return ``True`` will
+            be plotted. Default is for all molecules to be plotted.
+
         """
 
         self._filename = filename
         self._property_fn = property_fn
         self._y_label = y_label
+        self._filter = filter
 
     def plot(self, progress):
         """
@@ -147,7 +159,14 @@ class ProgressPlotter(Plotter):
         sns.set(style='darkgrid')
         df = pd.DataFrame()
         for i, subpop in enumerate(progress.subpopulations, 1):
-            subpop_vals = list(map(self._property_fn, subpop))
+            filtered = filter(self._filter, subpop)
+            subpop_vals = list(map(self._property_fn, filtered))
+
+            # If there are no values after filtering, don't plot
+            # anything for the generation.
+            if not subpop_vals:
+                continue
+
             data = [
                 {
                     'Generation': i,
@@ -174,17 +193,24 @@ class ProgressPlotter(Plotter):
         fig = plt.figure(figsize=[8, 4.5])
 
         palette = sns.color_palette('deep')
-        sns.scatterplot(
-            x='Generation',
-            y=self._y_label,
-            hue='Type',
-            palette={
-                'Max': palette[3],
-                'Min': palette[0],
-                'Mean': palette[2]
-            },
-            data=df
-        )
+        # It's possible that all values were filtered out, and trying
+        # to plot an empty dataframe would raise an exception.
+        if len(df) != 0:
+            sns.scatterplot(
+                x='Generation',
+                y=self._y_label,
+                hue='Type',
+                palette={
+                    'Max': palette[3],
+                    'Min': palette[0],
+                    'Mean': palette[2]
+                },
+                data=df
+            )
+        # Set the length of the axes to account for all generations,
+        # as its possible the first or last ones were not included
+        # due to being filtered out.
+        plt.xlim(0, len(progress.subpopulations)+1)
 
         plt.legend(bbox_to_anchor=(1.15, 1), prop={'size': 9})
         plt.tight_layout()
