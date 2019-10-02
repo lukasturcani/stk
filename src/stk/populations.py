@@ -171,7 +171,7 @@ class Population:
     .. code-block:: python
 
         population = stk.Population(...)
-        # Keep a process pool open through the "with" statment.
+        # Keep a process pool open through the "with" statement.
         with population.open_process_pool(8):
             # All optimize calls within this block will use the
             # same process pool.
