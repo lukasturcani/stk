@@ -1004,9 +1004,9 @@ class Population:
         # Only send molecules which need to have a calculation peformed
         # to the process pool - this should improve performance.
         if optimizer.is_caching():
-            to_evaluate = (
+            to_evaluate = [
                 mol for mol in self if not optimizer.is_in_cache(mol)
-            )
+            ]
         else:
             to_evaluate = self
 
