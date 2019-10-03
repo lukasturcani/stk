@@ -162,6 +162,25 @@ class Population:
         # Returns True.
         bb2 not in pop3
 
+    If you want to run multiple :meth:`optimize` calls in a row, use
+    the "with" statment. This keeps a single process pool open, and
+    means you do not create a new one for each :meth:`optimize` call.
+    It also automatically closes the pool for you when the block
+    exits
+
+    .. code-block:: python
+
+        population = stk.Population(...)
+        # Keep a process pool open through the "with" statement.
+        with population.open_process_pool(8):
+            # All optimize calls within this block will use the
+            # same process pool.
+            population.optimize(stk.UFF())
+            population.add_members(...)
+            population.optimize(stk.UFF())
+        # Process pool is automatically cleaned up when the block
+        # exits.
+
     """
 
     def __init__(self, *args):
@@ -192,6 +211,7 @@ class Population:
 
         self.direct_members = []
         self.subpopulations = []
+        self._process_pool = None
 
         for arg in args:
             if isinstance(arg, Population):
@@ -927,27 +947,97 @@ class Population:
 
         return cls.init_from_list(pop_list, use_cache)
 
+    def open_process_pool(self, num_processes=None):
+        """
+        Open a process pool.
+
+        Parameters
+        ----------
+        num_processes : :class:`int`, optional
+            The number of processes in the pool. If ``None``, then
+            creates a process for each core on the computer.
+
+        Returns
+        -------
+        :class:`.Population`
+            The population.
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If a process pool is already open.
+
+        """
+
+        if self._process_pool is not None:
+            raise RuntimeError('A process pool is already open.')
+
+        if num_processes is None:
+            num_processes = psutil.cpu_count()
+
+        if num_processes != 1:
+            self._process_pool = pathos.pools.ProcessPool(
+                nodes=num_processes
+            )
+        return self
+
+    def close_process_pool(self):
+        """
+        Close an open process pool.
+
+        Returns
+        -------
+        :class:`.Population`
+            The population.
+
+        """
+
+        if self._process_pool is not None:
+            self._process_pool.close()
+            self._process_pool.clear()
+            self._process_pool = None
+        return self
+
     def _optimize_parallel(self, optimizer, num_processes):
         opt_fn = _Guard(optimizer, optimizer.optimize)
 
-        # Apply the function to every member of the population, in
-        # parallel.
-        with pathos.pools.ProcessPool(num_processes) as pool:
-            optimized = pool.map(opt_fn, self)
+        # Only send molecules which need to have a calculation peformed
+        # to the process pool - this should improve performance.
+        if optimizer.is_caching():
+            to_evaluate = (
+                mol for mol in self if not optimizer.is_in_cache(mol)
+            )
+        else:
+            to_evaluate = self
+
+        # Use an existing process pool, if it exists.
+        opened_pool = False
+        if self._process_pool is None:
+            opened_pool = True
+            self.open_process_pool(num_processes)
+
+        # Run the optimization.
+        evaluated = self._process_pool.map(opt_fn, to_evaluate)
+
+        if opened_pool:
+            self.close_process_pool()
 
         # If anything failed, raise an error.
-        for result in optimized:
+        for result in evaluated:
             if isinstance(result, Exception):
                 raise result
 
         # Update the structures in the population.
-        sorted_opt = sorted(optimized, key=lambda m: repr(m))
-        sorted_pop = sorted(self, key=lambda m: repr(m))
-        for old, new in zip(sorted_pop, sorted_opt):
-            assert old.get_identity_key() == new.get_identity_key()
-            old.__dict__ = dict(vars(new))
+        sorted_input = sorted(to_evaluate, key=lambda m: repr(m))
+        sorted_output = sorted(evaluated, key=lambda m: repr(m))
+        for input_mol, output_mol in zip(sorted_input, sorted_output):
+            assert (
+                input_mol.get_identity_key()
+                == output_mol.get_identity_key()
+            )
+            input_mol.__dict__ = dict(vars(output_mol))
             if optimizer.is_caching():
-                optimizer.add_to_cache(old)
+                optimizer.add_to_cache(input_mol)
 
     def _optimize_serial(self, optimizer):
         for member in self:
@@ -972,7 +1062,8 @@ class Population:
         num_processes : :class:`int`, optional
             The number of parallel processes to create. Optimization
             will run serially if ``1``. If ``None``, creates a
-            process for each core on the computer.
+            process for each core on the computer. This parameter will
+            be ignored if the population has an open process pool.
 
         Returns
         -------
@@ -983,7 +1074,7 @@ class Population:
         if num_processes is None:
             num_processes = psutil.cpu_count()
 
-        if num_processes == 1:
+        if self._process_pool is None and num_processes == 1:
             self._optimize_serial(optimizer)
         else:
             self._optimize_parallel(optimizer, num_processes)
@@ -1272,6 +1363,12 @@ class Population:
 
     def __contains__(self, item):
         return any(mol is item for mol in self)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close_process_pool()
 
     def __str__(self):
         name = f'Population {id(self)}\n'
