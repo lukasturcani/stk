@@ -466,7 +466,7 @@ class TryCatchOptimizer(Optimizer):
             :class:`.Molecule`.
 
         catch_optimizer : :class:`Optimizer`
-            If :attr:`try_optimizer` raises an error, this optimizer is
+            If `try_optimizer` raises an error, this optimizer is
             run on the :class:`.Molecule` instead.
 
         use_cache : :class:`bool`, optional
