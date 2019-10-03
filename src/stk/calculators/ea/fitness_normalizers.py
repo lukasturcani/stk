@@ -6,7 +6,7 @@ Fitness Normalizers
 #. :class:`.Power`
 #. :class:`.Multiply`
 #. :class:`.Sum`
-#. :class:`.ScaleByMean`
+#. :class:`.DivideByMean`
 #. :class:`.ShiftUp`
 #. :class:`.NormalizerSequence`
 
@@ -18,7 +18,7 @@ Calling :meth:`~FitnessNormalizer.normalize` directly modifies the
 
 To see how :class:`FitnessNormalizer` can be used, look at the
 documention of the classes which inherit it, for example
-:class:`Power`, :class:`Sum` :class:`ScaleByMean`. In addition,
+:class:`Power`, :class:`Sum` :class:`DivideByMean`. In addition,
 multiple :class:`FitnessNormalizer` can be chained using
 :meth:`.NormalizerSequence`.
 
@@ -559,7 +559,7 @@ class Sum(FitnessNormalizer):
             mol.fitness = sum(mol.fitness)
 
 
-class ScaleByMean(FitnessNormalizer):
+class DivideByMean(FitnessNormalizer):
     """
     Divides fitness values by the population mean.
 
@@ -609,7 +609,7 @@ class ScaleByMean(FitnessNormalizer):
         pop = stk.Population(mol1, mol2, mol3)
 
         # Create the normalizer.
-        mean_scaler = stk.ScaleByMean()
+        mean_scaler = stk.DivideByMean()
 
         # Normalize the fitness values.
         mean_scaler.normalize(pop)
@@ -630,7 +630,7 @@ class ScaleByMean(FitnessNormalizer):
         mol3.fitness = [3, 30, 300]
 
         # Create the normalizer.
-        mean_scaler = ScaleByMean()
+        mean_scaler = DivideByMean()
 
         # Normalize the fitness values.
         mean_scaler.normalize(pop)
@@ -660,7 +660,7 @@ class ScaleByMean(FitnessNormalizer):
         """
 
         mean = np.mean([mol.fitness for mol in population], axis=0)
-        logger.debug(f'Means used in ScaleByMean: {mean}')
+        logger.debug(f'Means used in DivideByMean: {mean}')
 
         for mol in population:
             mol.fitness = np.divide(mol.fitness, mean)
