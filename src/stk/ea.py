@@ -2,6 +2,7 @@ import warnings
 import os
 import logging
 import argparse
+import itertools as it
 from rdkit import RDLogger
 from os.path import join, basename
 import stk
@@ -304,76 +305,78 @@ def ea_run(filename, input_file):
     progress = history.progress
 
     # 3. Run the EA.
-    id_ = pop.set_mol_ids(0)
-    logger.info('Optimizing the population.')
-    pop.optimize(optimizer, num_processes)
-
-    logger.info('Calculating the fitness of population members.')
-    pop.calculate_member_fitness(fitness_calculator, num_processes)
-
-    logger.info('Normalizing fitness values.')
-    fitness_normalizer.normalize(pop)
-
-    history.log_pop(logger, pop)
-
-    logger.info('Recording progress.')
-    progress.add_subpopulation(pop)
-    history.db(pop)
-
-    gen = 0
-    while not terminator.terminate(progress):
-        gen += 1
-        logger.info(f'Starting generation {gen}.')
-
-        logger.info('Starting crossovers.')
-        offspring = pop.get_offspring()
-
-        logger.info('Starting mutations.')
-        mutants = pop.get_mutants()
-
-        logger.debug(f'Population size is {len(pop)}.')
-
-        logger.info('Adding offsping and mutants to population.')
-        pop.direct_members.extend(offspring)
-        pop.direct_members.extend(mutants)
-
-        logger.debug(f'Population size is {len(pop)}.')
-
-        logger.info('Removing duplicates, if any.')
-        pop.remove_duplicates()
-
-        logger.debug(f'Population size is {len(pop)}.')
-
-        id_ = pop.set_mol_ids(id_)
-
-        if debug_dumps:
-            pop.dump(
-                join('..', 'pop_dumps', f'gen_{x}_unselected.json')
-            )
-
+    with pop.open_process_pool(num_processes):
+        id_ = pop.set_mol_ids(0)
         logger.info('Optimizing the population.')
-        pop.optimize(optimizer, num_processes)
+        pop.optimize(optimizer)
 
         logger.info('Calculating the fitness of population members.')
-        pop.calculate_member_fitness(fitness_calculator, num_processes)
+        pop.calculate_member_fitness(fitness_calculator)
 
         logger.info('Normalizing fitness values.')
         fitness_normalizer.normalize(pop)
 
         history.log_pop(logger, pop)
-        history.db(pop)
-
-        logger.info('Selecting members of the next generation.')
-        pop = pop.get_next_generation()
-
-        history.log_pop(logger, pop)
 
         logger.info('Recording progress.')
         progress.add_subpopulation(pop)
+        history.db(pop)
 
-        if debug_dumps:
-            progress.dump(progress_dump_filename)
-            history.db_pop.dump(database_dump_filename)
+        gen = 0
+        while not terminator.terminate(progress):
+            gen += 1
+            logger.info(f'Starting generation {gen}.')
+
+            logger.info('Starting crossovers.')
+            offspring = pop.get_offspring()
+
+            logger.info('Starting mutations.')
+            mutants = pop.get_mutants()
+
+            logger.debug(f'Population size is {len(pop)}.')
+
+            logger.info('Adding offsping and mutants to population.')
+            pop.direct_members.extend(it.chain(offspring, mutants))
+
+            logger.debug(f'Population size is {len(pop)}.')
+
+            logger.info('Removing duplicates, if any.')
+            pop.remove_duplicates()
+
+            logger.debug(f'Population size is {len(pop)}.')
+
+            id_ = pop.set_mol_ids(id_)
+
+            if debug_dumps:
+                pop.dump(
+                    join('..', 'pop_dumps', f'gen_{x}_unselected.json')
+                )
+
+            logger.info('Optimizing the population.')
+            pop.optimize(optimizer)
+
+            logger.info(
+                'Calculating the fitness of population members.'
+            )
+            pop.calculate_member_fitness(fitness_calculator)
+
+            logger.info('Normalizing fitness values.')
+            fitness_normalizer.normalize(pop)
+
+            history.log_pop(logger, pop)
+            history.db(pop)
+
+            logger.info('Selecting members of the next generation.')
+            pop.direct_members = list(pop.get_next_generation())
+
+            history.log_pop(logger, pop)
+
+            logger.info('Recording progress.')
+            progress.add_subpopulation(pop)
+
+            if debug_dumps:
+                progress.dump(progress_dump_filename)
+                history.db_pop.dump(database_dump_filename)
 
     stk.kill_macromodel()
 

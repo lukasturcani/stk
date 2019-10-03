@@ -994,37 +994,50 @@ class Population:
 
         if self._process_pool is not None:
             self._process_pool.close()
+            self._process_pool.clear()
             self._process_pool = None
         return self
 
     def _optimize_parallel(self, optimizer, num_processes):
         opt_fn = _Guard(optimizer, optimizer.optimize)
 
-        # Apply the function to every member of the population, in
-        # parallel.
+        # Only send molecules which need to have a calculation peformed
+        # to the process pool - this should improve performance.
+        if optimizer.is_caching():
+            to_evaluate = (
+                mol for mol in self if not optimizer.is_in_cache(mol)
+            )
+        else:
+            to_evaluate = self
+
+        # Use an existing process pool, if it exists.
         opened_pool = False
         if self._process_pool is None:
             opened_pool = True
             self.open_process_pool(num_processes)
 
-        optimized = self._process_pool.map(opt_fn, self)
+        # Run the optimization.
+        evaluated = self._process_pool.map(opt_fn, to_evaluate)
 
         if opened_pool:
             self.close_process_pool()
 
         # If anything failed, raise an error.
-        for result in optimized:
+        for result in evaluated:
             if isinstance(result, Exception):
                 raise result
 
         # Update the structures in the population.
-        sorted_opt = sorted(optimized, key=lambda m: repr(m))
-        sorted_pop = sorted(self, key=lambda m: repr(m))
-        for old, new in zip(sorted_pop, sorted_opt):
-            assert old.get_identity_key() == new.get_identity_key()
-            old.__dict__ = dict(vars(new))
+        sorted_input = sorted(to_evaluate, key=lambda m: repr(m))
+        sorted_output = sorted(evaluated, key=lambda m: repr(m))
+        for input_mol, output_mol in zip(sorted_input, sorted_output):
+            assert (
+                input_mol.get_identity_key()
+                == output_mol.get_identity_key()
+            )
+            input_mol.__dict__ = dict(vars(output_mol))
             if optimizer.is_caching():
-                optimizer.add_to_cache(old)
+                optimizer.add_to_cache(input_mol)
 
     def _optimize_serial(self, optimizer):
         for member in self:
@@ -1498,14 +1511,26 @@ class EAPopulation(Population):
             fn=fitness_calculator.get_fitness
         )
 
-        # Apply the function to every member of the population, in
-        # parallel.
+        # Only send molecules which need to have a calculation peformed
+        # to the process pool - this should improve performance.
+        if fitness_calculator.is_caching():
+            to_evaluate = []
+            for mol in self:
+                if fitness_calculator.is_in_cache(mol):
+                    fitness_calculator.get_fitness(mol)
+                else:
+                    to_evaluate.append(mol)
+        else:
+            to_evaluate = self
+
+        # Use an existing process pool, if it exists.
         opened_pool = False
         if self._process_pool is None:
             opened_pool = True
             self.open_process_pool(num_processes)
 
-        evaluated = self._process_pool.map(fitness_fn, self)
+        # Apply the function, in parallel.
+        evaluated = self._process_pool.map(fitness_fn, to_evaluate)
 
         if opened_pool:
             self.close_process_pool()
@@ -1516,80 +1541,68 @@ class EAPopulation(Population):
                 raise result
 
         # Update the molecules in the population.
-        sorted_opt = sorted(evaluated, key=lambda m: repr(m))
-        sorted_pop = sorted(self, key=lambda m: repr(m))
-        for old, new in zip(sorted_pop, sorted_opt):
-            assert old.get_identity_key() == new.get_identity_key()
-            old.__dict__ = dict(vars(new))
+        sorted_input = sorted(to_evaluate, key=lambda m: repr(m))
+        sorted_output = sorted(evaluated, key=lambda m: repr(m))
+        for input_mol, output_mol in zip(sorted_input, sorted_output):
+            assert (
+                input_mol.get_identity_key()
+                == output_mol.get_identity_key()
+            )
+            input_mol.__dict__ = dict(vars(output_mol))
             if fitness_calculator.is_caching():
-                fitness_calculator.add_to_cache(old, new.fitness)
+                fitness_calculator.add_to_cache(
+                    mol=input_mol,
+                    fitness=input_mol.fitness
+                )
 
     def get_mutants(self):
         """
-        Perform mutations and return the mutants.
+        Yield mutants.
 
-        Returns
-        -------
-        :class:`list` of :class:`.Molecule`
-            The generated mutants, minus those already in the
-            population.
+        Yields
+        ------
+        :class:`.Molecule`
+            A mutant.
 
         """
 
-        mutants = []
         parents = self._mutation_selector.select(self)
         for i, (parent, ) in enumerate(parents, 1):
             logger.info(f'Mutation number {i}.')
             mutant = self._mutator.mutate(parent)
-            if mutant not in self:
-                mutants.append(mutant)
-        return mutants
+            yield mutant
 
     def get_next_generation(self):
         """
-        Get the next genetic algorithm generation.
+        Yield members of the next generation.
 
-        Returns
-        -------
-        :class:`.EAPopulation`
-            The next generation.
+        Yields
+        ------
+        :class:`.Molecule`
+            A member of the next generation.
 
         """
 
-        cls = self.__class__
-        next_gen = cls(*(
+        yield from (
             mol for mol, in self._generation_selector.select(self)
-        ))
-        next_gen.set_ea_tools(
-            generation_selector=self._generation_selector,
-            mutation_selector=self._mutation_selector,
-            crossover_selector=self._crossover_selector,
-            mutator=self._mutator,
-            crosser=self._crosser
         )
-        return next_gen
 
     def get_offspring(self):
         """
-        Perform crossover operations and return the offspring.
+        Yield offspring.
 
-        Returns
-        -------
-        :class:`list` of :class:`.Molecule`
-            The generated offspring, minus those already in the
-            population.
+        Yields
+        ------
+        :class:`.Molecule`
+            An offspring.
 
         """
 
-        offspring = []
         parent_batches = self._crossover_selector.select(self)
         for i, parents in enumerate(parent_batches, 1):
             logger.info(f'Crossover number {i}.')
             for child in self._crosser.cross(*parents):
-                if child not in self:
-                    offspring.append(child)
-
-        return offspring
+                yield child
 
 
 class _Guard:
