@@ -74,8 +74,8 @@ def test_sum(tmp_amine2, tmp_aldehyde2, tmp_bromine2):
     assert tmp_bromine2.fitness == 24
 
 
-def test_scale_by_mean(tmp_amine2, tmp_aldehyde2, tmp_bromine2):
-    normalizer = stk.ScaleByMean()
+def test_divide_by_mean(tmp_amine2, tmp_aldehyde2, tmp_bromine2):
+    normalizer = stk.DivideByMean()
     normalizer._handle_failed = False
 
     tmp_amine2.fitness = 1
