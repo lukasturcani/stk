@@ -80,6 +80,8 @@ from ...utilities import (
     XTBExtractor
 )
 
+from ..base_calculators import MoleculeCalculator
+
 
 logger = logging.getLogger(__name__)
 
@@ -128,28 +130,11 @@ def _add_cache_use(get_energy):
     return inner
 
 
-class EnergyCalculator:
+class EnergyCalculator(MoleculeCalculator):
     """
     Calculates the energy of molecules.
 
     """
-
-    def __init__(self, use_cache=False):
-        """
-        Initialize a :class:`EnergyCalculator` instance.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`get_energy` will not run twice on the
-            same molecule, but will instead return the previously
-            calculated value.
-
-        """
-
-        # Maps molecules to previously calculated energy values.
-        self._cache = {}
-        self._use_cache = use_cache
 
     def __init_subclass__(cls, **kwargs):
         cls.get_energy = _add_cache_use(cls.get_energy)
