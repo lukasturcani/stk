@@ -1,6 +1,6 @@
 """
-Logical Calculators
-===================
+Compound Calculators
+====================
 
 """
 
