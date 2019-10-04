@@ -8,7 +8,7 @@ Base Calculators
 This module provide calculator classes which serve as bases classes
 for other types for calculators. Note that calculators defined here do
 not act as base classes for calculators which are used by users. The
-ususal inhertince scheme is :class:`.Calculator` is subclassed by
+ususal inheritance scheme is :class:`.Calculator` is subclassed by
 :class:`CalculatorType` which is subclassed by
 :class:`UserCalculatorType`. For example, :class:`.Calculator` is
 subclassed by :class:`.Optimizer`
@@ -17,7 +17,7 @@ implementation detail which doesn't matter) and :class:`.Optimizer` is
 subclassed by :class:`.ETKDG`. Only :class:`ETKDG` is instantiated
 and used by the user.
 
-So :class:`.Calculator` simply serves as a common base clase class for
+So :class:`.Calculator` simply serves as a common base class for
 every other ``stk`` calculators. The direct subclass of
 :class:`.Calculator` is an abstract base class which defines a new
 type of calculator for ``stk``, for example :class:`.Optimizer`
