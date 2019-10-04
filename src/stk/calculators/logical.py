@@ -54,6 +54,7 @@ class TryCatch(Optimizer, EnergyCalculator):
         self,
         try_calculator,
         catch_calculator,
+        catch_type=Exception,
         use_cache=False,
     ):
         """
@@ -62,6 +63,7 @@ class TryCatch(Optimizer, EnergyCalculator):
 
         self._try_calculator = try_calculator
         self._catch_calculator = catch_calculator
+        self._catch_type = catch_type
         super().__init__(use_cache=use_cache)
 
     def _optimize(self, mol):
@@ -74,7 +76,7 @@ class TryCatch(Optimizer, EnergyCalculator):
     def _get_energy(self, mol):
         try:
             return self._try_calculator.get_energy(mol)
-        except Exception:
+        except self._catch_type:
             self._log_failure()
             return self._catch_calculator.get_energy(mol)
 
