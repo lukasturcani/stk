@@ -19,7 +19,7 @@ Making New Crossers
 
 To add a new :class:`Crosser`, make a new class which inherits
 :class:`Crosser` and defines a method called
-:meth:`~Crosser.cross`. The method is a generator, which can take
+:meth:`~Crosser._cross`. The method is a generator, which can take
 any number of molecules and yields the offspring molecules.
 
 """
@@ -28,6 +28,8 @@ import logging
 import numpy as np
 import itertools as it
 from collections import defaultdict
+from ..base_calculators import EAOperation
+
 
 from ...utilities import dedupe
 
@@ -35,41 +37,11 @@ from ...utilities import dedupe
 logger = logging.getLogger(__name__)
 
 
-class Crosser:
+class Crosser(EAOperation):
     """
     Carries out crossover on molecules.
 
     """
-
-    def __init__(self, use_cache):
-        """
-        Initialize a :class:`Crosser`.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            Toggles use of the molecular cache.
-
-        """
-
-        self._use_cache = use_cache
-
-    def set_cache_use(self, use_cache):
-        """
-        Set cache use on or off.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            ``True`` if the cache is to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self._use_cache = use_cache
 
     def cross(self, *mols):
         """
@@ -87,7 +59,31 @@ class Crosser:
 
         """
 
-        return NotImplementedError()
+        yield from self._cross(*mols)
+
+    def _cross(self, *mols):
+        """
+        Cross `mols`.
+
+        Parameters
+        ----------
+        *mols : :class:`.Molecule`
+            The molecules on which a crossover operation is performed.
+
+        Yields
+        -------
+        :class:`.Molecule`
+            The generated offspring.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
 
 
 class GeneticRecombination(Crosser):
@@ -241,7 +237,7 @@ class GeneticRecombination(Crosser):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def cross(self, *mols):
+    def _cross(self, *mols):
         """
         Cross `mols`.
 
@@ -393,7 +389,7 @@ class Jumble(Crosser):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def cross(self, *mols):
+    def _cross(self, *mols):
         """
         Cross `mols`.
 
