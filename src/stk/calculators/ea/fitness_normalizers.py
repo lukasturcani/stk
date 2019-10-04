@@ -66,7 +66,19 @@ class FitnessNormalizer:
 
     def normalize(self, population):
         """
+        Normalize the fitness values in `population`.
 
+        Parameters
+        ----------
+        population : :class:`.Population`
+            The molecules which need to have their fitness values
+            normalized.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+            The :attr:`fitness` attributes of the molecules in
+            `population` are modified in place.
 
         """
 
