@@ -112,10 +112,29 @@ class PopulationCalculator(Calculator):
 
 class EAOperation(Calculator):
     """
-    Base class for crosser and mutator calculators.
+    Base class for :class:`.Crosser` and :class:`.Mutator`.
 
     """
 
     def __init__(self, use_cache=False, **kwargs):
         self._use_cache = use_cache
         super().__init__(use_cache=use_cache, **kwargs)
+
+    def set_cache_use(self, use_cache):
+        """
+        Set use of the molecular cache on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the molecular cache is to be used.
+
+        Returns
+        -------
+        :class:`.EAOperation`
+            The calculator.
+
+        """
+
+        self._use_cache = use_cache
+        return self
