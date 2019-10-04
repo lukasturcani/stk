@@ -100,7 +100,7 @@ def test_optimizer_sequence(tmp_polymer):
     tmp_polymer.write(join(odir, 'optimize_sequence_before.mol'))
     etkdg = stk.ETKDG()
     mmff = stk.MMFF()
-    sequence = stk.OptimizerSequence(etkdg, mmff)
+    sequence = stk.Sequence(etkdg, mmff)
     sequence.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'optimize_sequence_after.mol'))
 
