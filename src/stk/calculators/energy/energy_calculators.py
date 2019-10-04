@@ -80,6 +80,8 @@ from ...utilities import (
     XTBExtractor
 )
 
+from ..calculator import Calculator
+
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +130,7 @@ def _add_cache_use(get_energy):
     return inner
 
 
-class EnergyCalculator:
+class EnergyCalculator(Calculator):
     """
     Calculates the energy of molecules.
 
@@ -147,9 +149,7 @@ class EnergyCalculator:
 
         """
 
-        # Maps molecules to previously calculated energy values.
-        self._cache = {}
-        self._use_cache = use_cache
+        super().__init__(use_cache=use_cache)
 
     def __init_subclass__(cls, **kwargs):
         cls.get_energy = _add_cache_use(cls.get_energy)
