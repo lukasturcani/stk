@@ -6,6 +6,7 @@ Compound Calculators
 
 import logging
 import numpy as np
+import itertools as it
 
 from .optimization import Optimizer
 from .energy import EnergyCalculator
@@ -63,6 +64,16 @@ class If(
             return self._true_calculator.get_fitness(mol)
         return self._false_calculator.get_fitness(mol)
 
+    def _mutate(self, mol):
+        if self._condition(mol):
+            return self._true_calculator.mutate(mol)
+        return self._false_calculator.mutate(mol)
+
+    def _cross(self, *mols):
+        if self._condition(*mols):
+            return self._true_calculator.cross(*mols)
+        return self._false_calculator.cross(*mols)
+
 
 class TryCatch(
     Optimizer,
@@ -94,7 +105,7 @@ class TryCatch(
     def _optimize(self, mol):
         try:
             return self._try_calculator.optimize(mol)
-        except Exception:
+        except self._catch_type:
             self._log_failure()
             return self._catch_calculator.optimize(mol)
 
@@ -108,9 +119,23 @@ class TryCatch(
     def _get_fitness(self, mol):
         try:
             return self._try_calculator.get_fitness(mol)
-        except Exception:
+        except self._catch_type:
             self._log_failure()
             return self._catch_calculator.get_fitness(mol)
+
+    def _mutate(self, mol):
+        try:
+            return self._try_calculator.mutate(mol)
+        except self._catch_type:
+            self._log_failure()
+            return self._catch_calculator.mutate(mol)
+
+    def _cross(self, *mols):
+        try:
+            return self._try_calculator.cross(*mols)
+        except self._catch_type:
+            self._log_failure()
+            return self._catch_calculator.cross(*mols)
 
     def _log_failure(self):
         try_name = self._try_calculator.__class__.__name__
@@ -137,6 +162,17 @@ class Sequence(Optimizer, FitnessNormalizer, Selector):
     def _optimize(self, mol):
         for calculator in self._calculators:
             calculator.optimize(mol)
+
+    def _normalize(self, population):
+        for calculator in self._calculators:
+            calculator.normalize(population)
+
+    def _select(self, population):
+        iterables = (
+            calculator.select(population)
+            for calculator in self._calculators
+        )
+        yield from it.islice(it.chain(*iterables), self._num_batches)
 
 
 class Random(Optimizer, EnergyCalculator, Mutator, Crosser):
@@ -167,6 +203,22 @@ class Random(Optimizer, EnergyCalculator, Mutator, Crosser):
         )
         self._log_choice(calculator)
         return calculator.get_energy(mol)
+
+    def _mutate(self, mol):
+        calculator = self._generator.choice(
+            a=self._calculators,
+            p=self._probabilities,
+        )
+        self._log_choice(calculator)
+        return calculator.mutate(mol)
+
+    def _cross(self, *mols):
+        calculator = self._generator.choice(
+            a=self._calculators,
+            p=self._probabilities,
+        )
+        self._log_choice(calculator)
+        return calculator.cross(*mols)
 
     def _log_choice(self, calculator):
         logger.info(
