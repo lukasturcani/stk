@@ -68,40 +68,44 @@ class FitnessNormalizer(Calculator):
         self._filter = filter
         super().__init__(filter=filter, **kwargs)
 
-    def normalize(self, population):
+    def normalize(self, population, fitness_values):
         """
         Normalize the fitness values in `population`.
 
         Parameters
         ----------
-        population : :class:`iterable`
+        population : :class:`.Population`
             The molecules which need to have their fitness values
             normalized.
 
+        fitness_values : :class:`dict`
+            Maps every molecule in `population` to its fitness value.
+
         Returns
         -------
-        None : :class:`NoneType`
-            The :attr:`fitness` attributes of the molecules in
-            `population` are modified in place.
+        :class:`dict`
+            Maps every molecule in `population` to its normalized
+            fitness value.
 
         """
 
-        self._normalize(filter(self._filter, population))
+        filtered = list(filter(self._filter, population))
+        self._normalize(filtered, fitness_values)
 
-    def _normalize(self, population):
+    def _normalize(self, population, fitness_values):
         """
         Normalize the fitness values in `population`.
 
         Parameters
         ----------
-        population : :class:`iterable`
+        population : :class:`.Population`
             The filtered molecules.
 
         Returns
         -------
-        None : :class:`NoneType`
-            The :attr:`fitness` attributes of the molecules in
-            `population` are modified in place.
+        :class:`dict`
+            Maps every molecule in `population` to its normalized
+            fitness value.
 
         Raises
         ------
@@ -122,7 +126,7 @@ class NullFitnessNormalizer(FitnessNormalizer):
 
     def __init__(self, filter=lambda mol: True):
         """'
-        Intialize a :class:`NullFitnessNormalizer`.
+        Initialize a :class:`NullFitnessNormalizer`.
 
         Parameters
         ----------
@@ -136,8 +140,8 @@ class NullFitnessNormalizer(FitnessNormalizer):
 
         super().__init__(filter=filter)
 
-    def _normalize(self, population):
-        return
+    def _normalize(self, population, fitness_values):
+        return dict(fitness_values)
 
 
 class Power(FitnessNormalizer):
@@ -245,18 +249,22 @@ class Power(FitnessNormalizer):
         self._power = power
         super().__init__(filter=filter)
 
-    def _normalize(self, population):
+    def _normalize(self, population, fitness_values):
+        normalized = {}
         for mol in population:
-            mol.fitness = np.float_power(mol.fitness, self.power)
+            normalized[mol] = (
+                np.float_power(fitness_values[mol], self.power)
+            )
+        return normalized
 
 
 class Multiply(FitnessNormalizer):
     """
-    Multiplies the fitness value by some coefficent.
+    Multiplies the fitness value by some coefficient.
 
     Examples
     --------
-    Multiplying a :attr:`fitness` value by a coefficent.
+    Multiplying a :attr:`fitness` value by a coefficient.
 
     .. code-block:: python
 
@@ -290,7 +298,7 @@ class Multiply(FitnessNormalizer):
         # mol2.fitness is now 4.
         # mol3.fitness is now 6
 
-    Multiplying a :attr:`fitness` vector by some coefficent.
+    Multiplying a :attr:`fitness` vector by some coefficient.
 
     .. code-block:: python
 
@@ -314,7 +322,7 @@ class Multiply(FitnessNormalizer):
         # mol2.fitness is now [8, 10, 12].
         # mol3.fitness is now [14, 16, 18]
 
-    Multiplying a :attr:`fitness` vector by different coefficents.
+    Multiplying a :attr:`fitness` vector by different coefficients.
 
     .. code-block:: python
 
@@ -343,8 +351,8 @@ class Multiply(FitnessNormalizer):
 
         Parameters
         ----------
-        coefficent : :class:`float` or :class:`list` of :class:`float`
-            The cofficients each :attr:`fitness` value by. Can be
+        coefficient : :class:`float` or :class:`list` of :class:`float`
+            The coefficients each :attr:`fitness` value by. Can be
             a single number or multiple numbers.
 
         filter : :class:`callable`, optional
@@ -358,9 +366,13 @@ class Multiply(FitnessNormalizer):
         self._coefficient = coefficient
         super().__init__(filter=filter)
 
-    def _normalize(self, population):
+    def _normalize(self, population, fitness_values):
+        normalized = {}
         for mol in population:
-            mol.fitness = np.multiply(mol.fitness, self._coefficient)
+            normalized[mol] = (
+                np.multiply(fitness_values[mol], self._coefficient)
+            )
+        return normalized
 
 
 class Sum(FitnessNormalizer):
@@ -417,9 +429,11 @@ class Sum(FitnessNormalizer):
 
         super().__init__(filter=filter)
 
-    def _normalize(self, population):
+    def _normalize(self, population, fitness_values):
+        normalized = {}
         for mol in population:
-            mol.fitness = sum(mol.fitness)
+            normalized[mol] = sum(fitness_values[mol])
+        return normalized
 
 
 class DivideByMean(FitnessNormalizer):
@@ -520,12 +534,17 @@ class DivideByMean(FitnessNormalizer):
 
         super().__init__(filter=filter)
 
-    def _normalize(self, population):
-        mean = np.mean([mol.fitness for mol in population], axis=0)
+    def _normalize(self, population, fitness_values):
+        mean = np.mean(
+            a=[fitness_values[mol] for mol in population],
+            axis=0,
+        )
         logger.debug(f'Means used in DivideByMean: {mean}')
 
+        normalized = {}
         for mol in population:
-            mol.fitness = np.divide(mol.fitness, mean)
+            normalized[mol] = np.divide(fitness_values[mol], mean)
+        return normalized
 
 
 class ShiftUp(FitnessNormalizer):
@@ -620,9 +639,9 @@ class ShiftUp(FitnessNormalizer):
 
         super().__init__(filter=filter)
 
-    def _normalize(self, population):
+    def _normalize(self, population, fitness_values):
         # Get all the fitness arrays in a matrix.
-        fmat = np.array([x.fitness for x in population])
+        fmat = np.array([fitness_values[mol] for mol in population])
 
         # Get the minimum values of each element in the population.
         mins = np.min(fmat, axis=0)
@@ -636,8 +655,10 @@ class ShiftUp(FitnessNormalizer):
             if min_ <= 0:
                 shift[i] = 1 - min_
 
+        normalized = {}
         for mol in population:
-            mol.fitness += shift
+            normalized[mol] = fitness_values[mol] + shift
+        return normalized
 
 
 class ReplaceFitness(FitnessNormalizer):
@@ -664,7 +685,7 @@ class ReplaceFitness(FitnessNormalizer):
 
         super().__init__(filter=filter)
 
-    def normalize(self, population):
+    def normalize(self, population, fitness_values):
         """
         Normalize the fitness values in `population`.
 
@@ -674,14 +695,19 @@ class ReplaceFitness(FitnessNormalizer):
             The molecules which need to have their fitness values
             normalized.
 
+        fitness_values : :class:`dict`
+            Maps every molecule in `population` to its fitness value.
+
         Returns
         -------
-        None : :class:`NoneType`
-            The :attr:`fitness` attributes of the molecules in
-            `population` are modified in place.
+        :class:`dict`
+            Maps every molecule in `population` to its normalized
+            fitness value.
 
         """
 
         replacement_value = self._replacement_fn(population)
+        normalized = dict(fitness_values)
         for mol in filter(self._filter, population):
-            mol.fitness = replacement_value
+            normalized[mol] = replacement_value
+        return normalized
