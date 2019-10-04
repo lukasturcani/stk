@@ -689,3 +689,50 @@ class ShiftUp(FitnessNormalizer):
 
         for mol in population:
             mol.fitness += shift
+
+
+class ReplaceFitness(FitnessNormalizer):
+    def __init__(self, replacement_fn, filter=lambda mol: True):
+        """
+        Initialize a :class:`.ReplaceFitness` instance.
+
+        Parameters
+        ----------
+        replacement_fn : :class:`callable`
+            Takes a single parameter, the :class:`.Population` which
+            needs to be normalized, before it is filtered, and
+            returns an :class:`object` which is used as the new
+            fitness value for all molecules which pass the
+            `filter`.
+
+        filter : :class:`callable`, optional
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values replaced. By
+            default, all molecules will have fitness values replaced.
+
+        """
+
+        super().__init__(filter=filter)
+
+    def normalize(self, population):
+        """
+        Normalize the fitness values in `population`.
+
+        Parameters
+        ----------
+        population : :class:`.Population`
+            The molecules which need to have their fitness values
+            normalized.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+            The :attr:`fitness` attributes of the molecules in
+            `population` are modified in place.
+
+        """
+
+        replacement_value = self._replacement_fn(population)
+        for mol in filter(self._filter, population):
+            mol.fitness = replacement_value
