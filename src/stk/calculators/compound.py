@@ -94,13 +94,13 @@ class Sequence(Optimizer):
 
     """
 
-    def __init__(self, *calculators, use_cache=False):
+    def __init__(self, *calculators, **kwargs):
         """
 
         """
 
         self._calculators = calculators
-        super().__init__(use_cache=use_cache)
+        super().__init__(**kwargs)
 
     def _optimize(self, mol):
         for calculator in self._calculators:
