@@ -29,7 +29,7 @@ Making New Fitness Normalizers
 ------------------------------
 
 A new class inheriting :class:`FitnessNormalizer` must be made.
-The class must define a :meth:`~FitnessNormalizer.normalize` method,
+The class must define a :meth:`~FitnessNormalizer._normalize` method,
 which takes one argument, which is a :class:`.Population` of
 :class:`.Molecule`.
 
@@ -38,78 +38,9 @@ which takes one argument, which is a :class:`.Population` of
 
 import numpy as np
 import logging
-from functools import wraps
-
-from ...utilities import dedupe
 
 
 logger = logging.getLogger(__name__)
-
-
-def _handle_failed_molecules(normalize):
-    """
-    Decorate :meth:`~FitnessNormalizer.normalize` methods.
-
-    This decorator makes :meth:`~FitnessNormalizer.normalize` methods
-    set the fitness of molecules with a :attr:`fitness` of ``None`` to
-    half the minimum fitness in the population, if
-    :attr:`_handle_failed` is ``True```.
-
-    Parameters
-    ----------
-    normalize : class:`function`
-        The :meth:`~FitnessNormalizer.normalize` method to decorate.
-
-    Returns
-    -------
-    :class:`function`
-        The decorated :meth:`~FitnessNormalizer.normalize` method.
-
-    """
-
-    @wraps(normalize)
-    def inner(self, population):
-        valid_pop = population.clone()
-        valid_pop.remove_members(
-            lambda m: m.fitness is None
-        )
-        r = normalize(self, valid_pop)
-
-        if self._handle_failed:
-            minimum_fitness = min(
-                (m.fitness for m in valid_pop),
-                default=1
-            )
-            for member in population:
-                if member.fitness is None:
-                    member.fitness = minimum_fitness/2
-        return r
-
-    return inner
-
-
-def _dedupe(normalize):
-    """
-    Make sure that duplicates are removed before normalization.
-
-    Parameters
-    ----------
-    normalize : class:`function`
-        The :meth:`~FitnessNormalizer.normalize` method to decorate.
-
-    Returns
-    -------
-    :class:`function`
-        The decorated :meth:`~FitnessNormalizer.normalize` method.
-
-    """
-
-    @wraps(normalize)
-    def inner(self, population):
-        cls = population.__class__
-        return normalize(self, cls(*dedupe(population)))
-
-    return inner
 
 
 class FitnessNormalizer:
@@ -118,13 +49,20 @@ class FitnessNormalizer:
 
     """
 
-    def __init__(self):
-        self._handle_failed = True
+    def __init__(self, filter):
+        """
+        Initialize a :class:`.FitnessNormalizer`.
 
-    def __init_subclass__(cls, **kwargs):
-        cls.normalize = _dedupe(cls.normalize)
-        cls.normalize = _handle_failed_molecules(cls.normalize)
-        return super().__init_subclass__(**kwargs)
+        Parameters
+        ----------
+        filter : :class:`callable`
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values normalized.
+
+        """
+
+        self._filter = filter
 
     def normalize(self, population):
         """
@@ -133,14 +71,39 @@ class FitnessNormalizer:
         Parameters
         ----------
         population : :class:`.Population`
-            A :class:`.Population` of molecules whose fitness values
-            should be normalized.
+            The molecules which need to have their fitness values
+            normalized.
 
         Returns
         -------
         None : :class:`NoneType`
             The :attr:`fitness` attributes of the molecules in
             `population` are modified in place.
+
+        """
+
+        self._normalize(filter(self._filter, population))
+
+    def _normalize(self, population):
+        """
+        Normalize the fitness values in `population`.
+
+        Parameters
+        ----------
+        population : :class:`iterable`
+            The filtered molecules.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+            The :attr:`fitness` attributes of the molecules in
+            `population` are modified in place.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
 
         """
 
@@ -153,23 +116,23 @@ class NullFitnessNormalizer(FitnessNormalizer):
 
     """
 
-    def normalize(self, population):
-        """
-        Do not normalize the fitness values in `population`.
+    def __init__(self, filter=lambda mol: True):
+        """'
+        Intialize a :class:`NullFitnessNormalizer`.
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` of molecules whose fitness values
-            are not normalized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-            This method does nothing.
+        filter : :class:`callable`, optional
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values normalized. By
+            default, all molecules will have fitness values normalized.
 
         """
 
+        super().__init__(filter=filter)
+
+    def _normalize(self, population):
         return
 
 
@@ -213,7 +176,7 @@ class NormalizerSequence(FitnessNormalizer):
 
     """
 
-    def __init__(self, *normalizers):
+    def __init__(self, *normalizers, filter=lambda mol: True):
         """
         Initialize a :class:`NormalizerSequence` instance.
 
@@ -223,35 +186,21 @@ class NormalizerSequence(FitnessNormalizer):
             The normalizers which get applied in sequence by
             :meth:`normalize`.
 
+        filter : :class:`callable`, optional
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values normalized. By
+            default, all molecules will have fitness values normalized.
+
         """
 
         self._normalizers = normalizers
-        super().__init__()
+        super().__init__(filter=filter)
 
-    def normalize(self, population):
-        """
-        Normalize the fitness values in `population`.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            A :class:`.Population` of molecules whose fitness values
-            should be normalized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-            The :attr:`fitness` attributes of the molecules in
-            `population` are modified in place.
-
-        """
-
+    def _normalize(self, population):
         for normalizer in self._normalizers:
-            handle_failed = normalizer._handle_failed
-            normalizer._handle_failed = False
             logger.info(f'Using {normalizer.__class__.__name__}.')
             normalizer.normalize(population)
-            normalizer._handle_failed = handle_failed
 
 
 class Power(FitnessNormalizer):
@@ -338,7 +287,7 @@ class Power(FitnessNormalizer):
 
     """
 
-    def __init__(self, power):
+    def __init__(self, power, filter=lambda mol: True):
         """
         Initialize a :class:`Power` instance.
 
@@ -348,29 +297,18 @@ class Power(FitnessNormalizer):
             The power to raise each :attr:`fitness` value to. Can be
             a single number or multiple numbers.
 
-        """
-
-        self.power = power
-        super().__init__()
-
-    def normalize(self, population):
-        """
-        Normalize the fitness values in `population`.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            A :class:`.Population` of molecules whose fitness values
-            should be normalized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-            The :attr:`fitness` attributes of the molecules in
-            `population` are modified in place.
+        filter : :class:`callable`, optional
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values normalized. By
+            default, all molecules will have fitness values normalized.
 
         """
 
+        self._power = power
+        super().__init__(filter=filter)
+
+    def _normalize(self, population):
         for mol in population:
             mol.fitness = np.float_power(mol.fitness, self.power)
 
@@ -462,7 +400,7 @@ class Multiply(FitnessNormalizer):
 
     """
 
-    def __init__(self, coefficient):
+    def __init__(self, coefficient, filter=lambda mol: True):
         """
         Initialize a :class:`Multiply` instance.
 
@@ -472,29 +410,18 @@ class Multiply(FitnessNormalizer):
             The cofficients each :attr:`fitness` value by. Can be
             a single number or multiple numbers.
 
+        filter : :class:`callable`, optional
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values normalized. By
+            default, all molecules will have fitness values normalized.
+
         """
 
         self._coefficient = coefficient
-        super().__init__()
+        super().__init__(filter=filter)
 
-    def normalize(self, population):
-        """
-        Normalize the fitness values in `population`.
-
-        Parameters
-        ----------
-        population : :class:`.Population`
-            A :class:`.Population` of molecules whose fitness values
-            should be normalized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-            The :attr:`fitness` attributes of the molecules in
-            `population` are modified in place.
-
-        """
-
+    def _normalize(self, population):
         for mol in population:
             mol.fitness = np.multiply(mol.fitness, self._coefficient)
 
@@ -537,24 +464,23 @@ class Sum(FitnessNormalizer):
 
     """
 
-    def normalize(self, population):
+    def __init__(self, filter=lambda mol: True):
         """
-        Normalize the fitness values in `population`.
+        Initialize a :class:`.Sum` instance.
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` of molecules whose fitness values
-            should be normalized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-            The :attr:`fitness` attributes of the molecules in
-            `population` are modified in place.
+        filter : :class:`callable`, optional
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values normalized. By
+            default, all molecules will have fitness values normalized.
 
         """
 
+        super().__init__(filter=filter)
+
+    def _normalize(self, population):
         for mol in population:
             mol.fitness = sum(mol.fitness)
 
@@ -641,24 +567,23 @@ class DivideByMean(FitnessNormalizer):
 
     """
 
-    def normalize(self, population):
+    def __init__(self, filter=lambda mol: True):
         """
-        Normalize the fitness values in `population`.
+        Initialize a :class:`.DivideByMean` instance.
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` of molecules whose fitness values
-            should be normalized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-            The :attr:`fitness` attributes of the molecules in
-            `population` are modified in place.
+        filter : :class:`callable`, optional
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values normalized. By
+            default, all molecules will have fitness values normalized.
 
         """
 
+        super().__init__(filter=filter)
+
+    def _normalize(self, population):
         mean = np.mean([mol.fitness for mol in population], axis=0)
         logger.debug(f'Means used in DivideByMean: {mean}')
 
@@ -742,24 +667,23 @@ class ShiftUp(FitnessNormalizer):
 
     """
 
-    def normalize(self, population):
+    def __init__(self, filter=lambda mol: True):
         """
-        Normalize the fitness values in `population`.
+        Initialize a :class:`.ShiftUp` instance.
 
         Parameters
         ----------
-        population : :class:`.Population`
-            A :class:`.Population` of molecules whose fitness values
-            should be normalized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-            The :attr:`fitness` attributes of the molecules in
-            `population` are modified in place.
+        filter : :class:`callable`, optional
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values normalized. By
+            default, all molecules will have fitness values normalized.
 
         """
 
+        super().__init__(filter=filter)
+
+    def _normalize(self, population):
         # Get all the fitness arrays in a matrix.
         fmat = np.array([x.fitness for x in population])
 
@@ -777,3 +701,50 @@ class ShiftUp(FitnessNormalizer):
 
         for mol in population:
             mol.fitness += shift
+
+
+class ReplaceFitness(FitnessNormalizer):
+    def __init__(self, replacement_fn, filter=lambda mol: True):
+        """
+        Initialize a :class:`.ReplaceFitness` instance.
+
+        Parameters
+        ----------
+        replacement_fn : :class:`callable`
+            Takes a single parameter, the :class:`.Population` which
+            needs to be normalized, before it is filtered, and
+            returns an :class:`object` which is used as the new
+            fitness value for all molecules which pass the
+            `filter`.
+
+        filter : :class:`callable`, optional
+            Takes a single parameter of type :class:`.Molecule` and
+            returns ``True`` or ``False``. Only molecules which
+            return ``True`` will have fitness values replaced. By
+            default, all molecules will have fitness values replaced.
+
+        """
+
+        super().__init__(filter=filter)
+
+    def normalize(self, population):
+        """
+        Normalize the fitness values in `population`.
+
+        Parameters
+        ----------
+        population : :class:`.Population`
+            The molecules which need to have their fitness values
+            normalized.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+            The :attr:`fitness` attributes of the molecules in
+            `population` are modified in place.
+
+        """
+
+        replacement_value = self._replacement_fn(population)
+        for mol in filter(self._filter, population):
+            mol.fitness = replacement_value
