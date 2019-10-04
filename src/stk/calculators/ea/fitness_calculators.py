@@ -43,14 +43,13 @@ Making New Fitness Calculators
 ------------------------------
 
 A new class inheriting :class:`FitnessCalculator` must be created.
-The class must define a :meth:`~FitnessCalculator.get_fitness` method,
+The class must define a :meth:`~FitnessCalculator._get_fitness` method,
 which takes one parameter, `mol`, which takes a
 :class:`.Molecule` object and is the molecule whose fitness is to be
 calculated.
 
 """
 
-from functools import wraps
 import logging
 import numpy as np
 
@@ -58,70 +57,6 @@ from ..calculator import Calculator
 
 
 logger = logging.getLogger(__name__)
-
-
-def _add_fitness_attribute_creation(get_fitness):
-    """
-    Make fitness functions add a :attr:`fitness` attribute.
-
-    The attribute is added to the :class:`.Molecule` objects evaluated
-    by the :meth:`~FitnessCalculator.get_fitness` method.
-
-    Parameters
-    ----------
-    get_fitness : :class:`function`
-        A fitness function, which is a
-        :meth:`~FitnessCalculator.get_fitness` method of a
-        :class:`FitnessCalculator`.
-
-    Returns
-    -------
-    :class:`function`
-        The decorated fitness function.
-
-    """
-
-    @wraps(get_fitness)
-    def inner(self, mol):
-        r = get_fitness(self, mol)
-        mol.fitness = r
-        return r
-
-    return inner
-
-
-def _add_cache_use(get_fitness):
-    """
-    Give fitness functions the option skip re-calculatations.
-
-    Parameters
-    ----------
-    fitness : :class:`function`
-        A fitness function, which is a
-        :meth:`~FitnessCalculator.get_fitness` method of a
-        :class:`FitnessCalculator`.
-
-    Returns
-    -------
-    :class:`function`
-        The decorated fitness function.
-
-    """
-
-    @wraps(get_fitness)
-    def inner(self, mol):
-        if self._use_cache and mol in self._cache:
-            logger.info(
-                f'Using cached fitness value for "{mol}".'
-            )
-            return self._cache[mol]
-        else:
-            r = get_fitness(self, mol)
-            if self._use_cache:
-                self._cache[mol] = r
-            return r
-
-    return inner
 
 
 class FitnessCalculator(Calculator):
@@ -135,16 +70,9 @@ class FitnessCalculator(Calculator):
 
     """
 
-    def __init_subclass__(cls, **kwargs):
-        cls.get_fitness = _add_cache_use(cls.get_fitness)
-        cls.get_fitness = _add_fitness_attribute_creation(
-            cls.get_fitness
-        )
-        return super().__init_subclass__(**kwargs)
-
     def get_fitness(self, mol):
         """
-        Get the fitness value of `mol`.
+        Return the fitness value of `mol`.
 
         Parameters
         ----------
@@ -154,8 +82,34 @@ class FitnessCalculator(Calculator):
         Returns
         -------
         :class:`object`
-            The fitness value of `mol`. Can be
-            ``None`` to indicate a failed calculation.
+            The fitness value of `mol`.
+
+        """
+
+        if self._use_cache and mol in self._cache:
+            fitness = self._cache[mol]
+        else:
+            fitness = self._get_fitness(mol)
+
+        mol.fitness = fitness
+        if self._use_cache:
+            self._cache[mol] = fitness
+
+        return fitness
+
+    def _get_fitness(self, mol):
+        """
+        Return the fitness value of `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule whose fitness should be calculated.
+
+        Returns
+        -------
+        :class:`object`
+            The fitness value of `mol`.
 
         Raises
         ------
@@ -227,7 +181,7 @@ class RaisingFitnessCalculator(FitnessCalculator):
         self._fail_chance = fail_chance
         super().__init__(use_cache=use_cache)
 
-    def get_fitness(self, mol):
+    def _get_fitness(self, mol):
         """
         Get the fitness value of `mol`.
 
@@ -409,7 +363,7 @@ class PropertyVector(FitnessCalculator):
         self._property_fns = property_fns
         super().__init__(use_cache=use_cache)
 
-    def get_fitness(self, mol):
+    def _get_fitness(self, mol):
         """
         Get the fitness of `mol`.
 
