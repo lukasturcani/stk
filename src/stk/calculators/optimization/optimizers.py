@@ -75,8 +75,8 @@ Making New Optimizers
 
 New optimizers can be made by simply making a class which inherits the
 :class:`.Optimizer` class. In addition to this, the new class must
-define a :meth:`~.Optimizer.optimize` method. The method must take 1
-mandatory `mol` parameter. :meth:`~.Optimizer.optimize` will take the
+define a :meth:`~.Optimizer._optimize` method. The method must take 1
+mandatory `mol` parameter. :meth:`~.Optimizer._optimize` will take the
 `mol` and change its structure in whatever way it likes. Beyond this
 there are no requirements. New optimizers can be added into the
 :mod:`.optimizers` submodule or into a new submodule.
@@ -88,7 +88,6 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import warnings
 import os
-from functools import wraps
 import subprocess as sp
 import uuid
 import shutil
@@ -99,133 +98,17 @@ from ...utilities import (
 )
 import pywindow
 
+from ..calculator import Calculator
+
+
 logger = logging.getLogger(__name__)
 
 
-def _add_cache_use(optimize):
-    """
-    Make :meth:`~Optimizer.optimize` use the :attr:`~Optimizer._cache`.
-
-    Decorates `optimize` so that before running it checks if the
-    :class:`.Molecule` has already been optimized by the
-    optimizer. If so, and :attr:`~Optimizer.use_cache` is ``True``,
-    then the molecule is skipped and no optimization is performed.
-
-    Parameters
-    ----------
-    optimize : :class:`function`
-        A function which is to have skipping added to it.
-
-    Returns
-    -------
-    :class:`function`
-        The decorated function.
-
-    """
-
-    @wraps(optimize)
-    def inner(self, mol):
-        if self._use_cache and mol in self._cache:
-            logger.info(f'Skipping optimization on {mol}.')
-        else:
-            optimize(self, mol)
-            if self._use_cache:
-                self._cache.add(mol)
-
-    return inner
-
-
-class Optimizer:
+class Optimizer(Calculator):
     """
     A base class for optimizers.
 
     """
-
-    def __init__(self, use_cache=False):
-        """
-        Initialize an :class:`Optimizer`.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will not run twice on the same
-            molecule.
-
-        """
-
-        # Holds every previously optimized molecule if use_cache is
-        # true.
-        self._cache = set()
-        self._use_cache = use_cache
-
-    def __init_subclass__(cls, **kwargs):
-        cls.optimize = _add_cache_use(cls.optimize)
-        return super().__init_subclass__(**kwargs)
-
-    def set_cache_use(self, use_cache):
-        """
-        Set cache use on or off.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            ``True`` if the cache is to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self._use_cache = use_cache
-
-    def is_caching(self):
-        """
-        ``True`` if the optimizer has caching turned on.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if the optimizer has caching turned on.
-
-        """
-
-        return self._use_cache
-
-    def add_to_cache(self, mol):
-        """
-        Add a molecule to the cache.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule to be added to the cache.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self._cache.add(mol)
-
-    def is_in_cache(self, mol):
-        """
-        Return ``True`` if `mol` is cached.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule being checked.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if `mol` is cached.
-
-        """
-
-        return mol in self._cache
 
     def optimize(self, mol):
         """
@@ -239,6 +122,35 @@ class Optimizer:
         Returns
         -------
         None : :class:`NoneType`
+
+        """
+
+        if self._use_cache and mol in self._cache:
+            logger.info(f'Skipping optimization on {mol}.')
+            return
+
+        self._optimize(mol)
+        if self._use_cache:
+            self._cache[mol] = None
+
+    def _optimize(self, mol):
+        """
+        Optimize `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
 
         """
 
@@ -283,7 +195,7 @@ class OptimizerSequence(Optimizer):
         self._optimizers = optimizers
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol):
+    def _optimize(self, mol):
         """
         Optimize `mol`.
 
@@ -351,7 +263,7 @@ class CageOptimizerSequence(Optimizer):
         self._optimizers = optimizers
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol):
+    def _optimize(self, mol):
         """
         Optimize `mol`.
 
@@ -391,7 +303,7 @@ class NullOptimizer(Optimizer):
 
     """
 
-    def optimize(self, mol):
+    def _optimize(self, mol):
         """
         Do not optimize `mol`.
 
@@ -479,7 +391,7 @@ class TryCatchOptimizer(Optimizer):
         self._catch_optimizer = catch_optimizer
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol):
+    def _optimize(self, mol):
         """
         Optimize `mol`.
 
@@ -558,7 +470,7 @@ class RaisingOptimizer(Optimizer):
         self._fail_chance = fail_chance
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol):
+    def _optimize(self, mol):
         """
         Optimize `mol`.
 
@@ -599,7 +511,7 @@ class MMFF(Optimizer):
 
     """
 
-    def optimize(self, mol):
+    def _optimize(self, mol):
         """
         Optimize `mol`.
 
@@ -637,7 +549,7 @@ class UFF(Optimizer):
 
     """
 
-    def optimize(self, mol):
+    def _optimize(self, mol):
         """
         Optimize `mol`.
 
@@ -697,7 +609,7 @@ class ETKDG(Optimizer):
         self._random_seed = random_seed
         super().__init__(use_cache=use_cache)
 
-    def optimize(self, mol):
+    def _optimize(self, mol):
         """
         Optimize `mol`.
 
@@ -1146,7 +1058,7 @@ class XTB(Optimizer):
                 break
         return opt_complete
 
-    def optimize(self, mol):
+    def _optimize(self, mol):
         """
         Optimize `mol`.
 

@@ -57,7 +57,7 @@ Making New Energy Calculators
 
 New energy calculators can be made by simply making a class which
 inherits the :class:`.EnergyCalculator` class. In addition to this,
-the new class must define a :meth:`~.EnergyCalculator.get_energy`
+the new class must define a :meth:`~.EnergyCalculator._get_energy`
 method. The method must take 1 parameter, `mol`. The method will then
 calculate and return the energy. There are no requirements regarding
 how it should go about calculating the energy. New energy calculators
@@ -68,7 +68,6 @@ new submodule.
 
 import rdkit.Chem.AllChem as rdkit
 import logging
-from functools import wraps
 import subprocess as sp
 import uuid
 import os
@@ -79,6 +78,8 @@ from ...utilities import (
     XTBInvalidSolventError,
     XTBExtractor
 )
+
+from ..calculator import Calculator
 
 
 logger = logging.getLogger(__name__)
@@ -93,67 +94,11 @@ class EnergyError(Exception):
     ...
 
 
-def _add_cache_use(get_energy):
-    """
-    Makes :meth:`~EnergyCalculator.get_energy` use the cache.
-
-    Decorates `get_energy` so that before running it checks if the
-    :class:`.Molecule` has already had its energy calculated. If so,
-    and :attr:`~EnergyCalculator._use_cache` is ``True``, then the
-    energy value in the cache is returned.
-
-    Parameters
-    ----------
-    get_energy : :class:`function`
-        A function which is to have cache use added to it.
-
-    Returns
-    -------
-    :class:`function`
-        The decorated function.
-
-    """
-
-    @wraps(get_energy)
-    def inner(self, mol):
-        if self._use_cache and mol in self._cache:
-            logger.info(f'Using cached energy value with {mol}.')
-            return self._cache[mol]
-        else:
-            e = get_energy(self, mol)
-            if self._use_cache:
-                self._cache[mol] = e
-            return e
-
-    return inner
-
-
-class EnergyCalculator:
+class EnergyCalculator(Calculator):
     """
     Calculates the energy of molecules.
 
     """
-
-    def __init__(self, use_cache=False):
-        """
-        Initialize a :class:`EnergyCalculator` instance.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`get_energy` will not run twice on the
-            same molecule, but will instead return the previously
-            calculated value.
-
-        """
-
-        # Maps molecules to previously calculated energy values.
-        self._cache = {}
-        self._use_cache = use_cache
-
-    def __init_subclass__(cls, **kwargs):
-        cls.get_energy = _add_cache_use(cls.get_energy)
-        return super().__init_subclass__(**kwargs)
 
     def get_energy(self, mol):
         """
@@ -169,9 +114,35 @@ class EnergyCalculator:
         :class:`float`
             The energy.
 
+        """
+
+        if self._use_cache and mol in self._cache:
+            return self._cache[mol]
+
+        energy = self._get_energy(mol)
+
+        if self._use_cache:
+            self._cache[mol] = energy
+
+        return energy
+
+    def _get_energy(self, mol):
+        """
+        Calculate the energy of `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The :class:`.Molecule` whose energy is to be calculated.
+
+        Returns
+        -------
+        :class:`float`
+            The energy.
+
         Raises
         ------
-        :class:`NotImplementedError`
+        :class:`NotImpelementedError`
             This is a virtual method and needs to be implemented in a
             subclass.
 
@@ -255,7 +226,7 @@ class FormationEnergy(EnergyCalculator):
         self._products = products
         super().__init__(use_cache=use_cache)
 
-    def get_energy(self, mol):
+    def _get_energy(self, mol):
         """
         Calculate the formation energy of `mol`.
 
@@ -307,7 +278,7 @@ class MMFFEnergy(EnergyCalculator):
 
     """
 
-    def get_energy(self, mol):
+    def _get_energy(self, mol):
         """
         Calculate the energy of `mol`.
 
@@ -354,7 +325,7 @@ class UFFEnergy(EnergyCalculator):
 
     """
 
-    def get_energy(self, mol):
+    def _get_energy(self, mol):
         """
         Calculate the energy of `mol`.
 
@@ -732,7 +703,7 @@ class XTBEnergy(EnergyCalculator):
                 shell=True
             )
 
-    def get_energy(self, mol):
+    def _get_energy(self, mol):
         """
         Calculate the energy of `mol`.
 
