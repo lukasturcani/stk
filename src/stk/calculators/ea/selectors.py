@@ -791,63 +791,6 @@ class FilterMolecules(Selector):
         yield from self._selector.select(population)
 
 
-class SelectorSequence(Selector):
-    """
-    Yields from selectors in order.
-
-    Examples
-    --------
-    First use :class:`.Best` to select the 10 best batches and
-    then use :class:`.Roulette` to select batches in proportion to
-    their fitness
-
-    .. code-block:: python
-
-        import stk
-
-        population = stk.Population(...)
-        selector = stk.SelectorSequence(
-            selector1=stk.Best(10),
-            selector2=stk.Roulette(20),
-        )
-        for batch in selector.select(population):
-            # Do stuff with batch. Batches are first selected with
-            # Best(10) and then with Roulette(20).
-
-    """
-
-    def __init__(self, selector1, selector2, num_batches=None):
-        """
-        Initialize a :class:`SelectorSequence` instance.
-
-        Parameters
-        ----------
-        selector1 : :class:`.Selector`
-            The selector from which batches are yielded first.
-
-        selector2 : :class:`.Selector`
-            The selector from which batches are yielded second.
-
-        num_batches : :class:`int`, optional
-            The maximum number of batches which can be yielded across
-            the entire sequence.
-
-        """
-
-        self._selector1 = selector1
-        self._selector2 = selector2
-        self._num_batches = num_batches
-
-    def select(self, population):
-        yield from it.islice(
-            it.chain(
-                self._selector1.select(population),
-                self._selector2.select(population)
-            ),
-            self._num_batches
-        )
-
-
 class Best(Selector):
     """
     Selects batches of molecules, highest fitness value first.
