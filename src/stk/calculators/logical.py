@@ -5,6 +5,7 @@ Logical Calculators
 """
 
 import logging
+import numpy as np
 
 from .optimization import Optimizer
 from .energy import EnergyCalculator
@@ -103,3 +104,36 @@ class Sequence(Optimizer):
     def _optimize(self, mol):
         for calculator in self._calculators:
             calculator.optimize(mol)
+
+
+class Random(Optimizer, EnergyCalculator):
+    def __init__(
+        self,
+        *calculators,
+        probabilities=None,
+        random_seed=None
+    ):
+        self._calculators = calculators
+        self._probabilities = probabilities
+        self._generator = np.random.RandomState(random_seed)
+
+    def _optimize(self, mol):
+        calculator = self._generator.choice(
+            a=self._calculators,
+            p=self._probabilities,
+        )
+        self._log_choice(calculator)
+        return calculator.optimize(mol)
+
+    def _get_energy(self, mol):
+        calculator = self._generator.choice(
+            a=self._calculators,
+            p=self._probabilities,
+        )
+        self._log_choice(calculator)
+        return calculator.get_energy(mol)
+
+    def _log_choice(self, calculator):
+        logger.info(
+            f'Random selected {calculator.__class__.__name__}.'
+        )
