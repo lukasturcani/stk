@@ -8,12 +8,13 @@ import logging
 
 from .optimization import Optimizer
 from .energy import EnergyCalculator
+from .ea import FitnessCalculator
 
 
 logger = logging.getLogger(__name__)
 
 
-class If(Optimizer, EnergyCalculator):
+class If(Optimizer, EnergyCalculator, FitnessCalculator):
     """
 
     """
@@ -44,8 +45,13 @@ class If(Optimizer, EnergyCalculator):
             return self._true_calculator.get_energy(mol)
         return self._false_calculator.get_energy(mol)
 
+    def _get_fitness(self, mol):
+        if self._condition(mol):
+            return self._true_calculator.get_fitness(mol)
+        return self._false_calculator.get_fitness(mol)
 
-class TryCatch(Optimizer, EnergyCalculator):
+
+class TryCatch(Optimizer, EnergyCalculator, FitnessCalculator):
     """
 
     """
@@ -77,6 +83,13 @@ class TryCatch(Optimizer, EnergyCalculator):
         except Exception:
             self._log_failure()
             return self._catch_calculator.get_energy(mol)
+
+    def _get_fitness(self, mol):
+        try:
+            return self._try_calculator.get_fitness(mol)
+        except Exception:
+            self._log_failure()
+            return self._catch_calculator.get_fitness(mol)
 
     def _log_failure(self):
         try_name = self._try_calculator.__class__.__name__
