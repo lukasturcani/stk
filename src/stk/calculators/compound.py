@@ -5,6 +5,7 @@ Compound Calculators
 """
 
 import logging
+import numpy as np
 
 from .optimization import Optimizer
 from .energy import EnergyCalculator
@@ -60,6 +61,7 @@ class TryCatch(Optimizer, EnergyCalculator, FitnessCalculator):
         self,
         try_calculator,
         catch_calculator,
+        catch_type=Exception,
         use_cache=False,
     ):
         """
@@ -68,6 +70,7 @@ class TryCatch(Optimizer, EnergyCalculator, FitnessCalculator):
 
         self._try_calculator = try_calculator
         self._catch_calculator = catch_calculator
+        self._catch_type = catch_type
         super().__init__(use_cache=use_cache)
 
     def _optimize(self, mol):
@@ -80,7 +83,7 @@ class TryCatch(Optimizer, EnergyCalculator, FitnessCalculator):
     def _get_energy(self, mol):
         try:
             return self._try_calculator.get_energy(mol)
-        except Exception:
+        except self._catch_type:
             self._log_failure()
             return self._catch_calculator.get_energy(mol)
 
@@ -97,4 +100,56 @@ class TryCatch(Optimizer, EnergyCalculator, FitnessCalculator):
         logger.error(
             f'{try_name} failed, trying {catch_name}.',
             exc_info=True
+        )
+
+
+class Sequence(Optimizer):
+    """
+
+    """
+
+    def __init__(self, *calculators, use_cache=False):
+        """
+
+        """
+
+        self._calculators = calculators
+        super().__init__(use_cache=use_cache)
+
+    def _optimize(self, mol):
+        for calculator in self._calculators:
+            calculator.optimize(mol)
+
+
+class Random(Optimizer, EnergyCalculator):
+    def __init__(
+        self,
+        *calculators,
+        probabilities=None,
+        random_seed=None,
+    ):
+        self._calculators = calculators
+        self._probabilities = probabilities
+        self._generator = np.random.RandomState(random_seed)
+        super().__init__(use_cache=False)
+
+    def _optimize(self, mol):
+        calculator = self._generator.choice(
+            a=self._calculators,
+            p=self._probabilities,
+        )
+        self._log_choice(calculator)
+        return calculator.optimize(mol)
+
+    def _get_energy(self, mol):
+        calculator = self._generator.choice(
+            a=self._calculators,
+            p=self._probabilities,
+        )
+        self._log_choice(calculator)
+        return calculator.get_energy(mol)
+
+    def _log_choice(self, calculator):
+        logger.info(
+            f'Random selected {calculator.__class__.__name__}.'
         )
