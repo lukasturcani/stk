@@ -100,21 +100,6 @@ class EnergyCalculator(Calculator):
 
     """
 
-    def __init__(self, use_cache=False):
-        """
-        Initialize a :class:`EnergyCalculator` instance.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`get_energy` will not run twice on the
-            same molecule, but will instead return the previously
-            calculated value.
-
-        """
-
-        super().__init__(use_cache=use_cache)
-
     def get_energy(self, mol):
         """
         Calculate the energy of `mol`.

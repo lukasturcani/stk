@@ -110,20 +110,6 @@ class Optimizer(Calculator):
 
     """
 
-    def __init__(self, use_cache=False):
-        """
-        Initialize an :class:`Optimizer`.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will not run twice on the same
-            molecule.
-
-        """
-
-        super().__init__(use_cache=use_cache)
-
     def optimize(self, mol):
         """
         Optimize `mol`.
