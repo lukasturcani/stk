@@ -31,15 +31,15 @@ def test_add_to_cache(tmp_amine2):
 
 def test_raising_optimizer(tmp_polymer):
     mmff = stk.MMFF()
-    always_raiser = stk.RaisingOptimizer(
-        optimizer=mmff,
+    always_raiser = stk.RaisingCalculator(
+        calculator=mmff,
         fail_chance=1
     )
-    with pytest.raises(stk.RaisingOptimizerError):
+    with pytest.raises(stk.RaisingCalculatorError):
         always_raiser.optimize(tmp_polymer)
 
-    never_raiser = stk.RaisingOptimizer(
-        optimizer=mmff,
+    never_raiser = stk.RaisingCalculator(
+        calculator=mmff,
         fail_chance=0
     )
     tmp_polymer.write(join(odir, 'raising_optimizer_before.mol'))
@@ -100,7 +100,7 @@ def test_optimizer_sequence(tmp_polymer):
     tmp_polymer.write(join(odir, 'optimize_sequence_before.mol'))
     etkdg = stk.ETKDG()
     mmff = stk.MMFF()
-    sequence = stk.OptimizerSequence(etkdg, mmff)
+    sequence = stk.Sequence(etkdg, mmff)
     sequence.optimize(tmp_polymer)
     tmp_polymer.write(join(odir, 'optimize_sequence_after.mol'))
 
@@ -139,17 +139,17 @@ def test_cage_optimizer_sequence(tmp_opt_cc3, tmp_cc3):
 
 def test_try_catch_optimizer(tmp_amine2):
     etkdg = stk.ETKDG()
-    always_raiser = stk.RaisingOptimizer(
-        optimizer=etkdg,
-        fail_chance=1
+    always_raiser = stk.RaisingCalculator(
+        calculator=etkdg,
+        fail_chance=1,
     )
-    success = stk.TryCatchOptimizer(
-        try_optimizer=etkdg,
-        catch_optimizer=None
+    success = stk.TryCatch(
+        try_calculator=etkdg,
+        catch_calculator=None,
     )
-    try_catch = stk.TryCatchOptimizer(
-        try_optimizer=always_raiser,
-        catch_optimizer=success
+    try_catch = stk.TryCatch(
+        try_calculator=always_raiser,
+        catch_calculator=success,
     )
     tmp_amine2.write(join(odir, 'try_catch_optimizer_before.mol'))
     try_catch.optimize(tmp_amine2)

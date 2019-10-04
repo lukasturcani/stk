@@ -44,6 +44,7 @@
    Introduction <calculators>
    Optimizers <stk.calculators.optimization.optimizers>
    Energy Calculators <stk.calculators.energy.energy_calculators>
+   Compound Calculators <stk.calculators.compound>
 
 .. toctree::
    :hidden:

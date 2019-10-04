@@ -2,6 +2,60 @@
 Compound Calculators
 ====================
 
+#. :class:`.If`
+#. :class:`.TryCatch`
+#. :class:`.Sequence`
+#. :class:`.Random`
+#. :class:`.RaisingCalculator`
+
+Compound calculators are calculators which are initialized with other
+calculators. They then control how and when those calculators are used.
+
+Compound calculators are special, because they take on the class
+of the calculators they hold. This means that if you initialize a
+compound calculator of a certain class it will be indistinguishable
+from any other calculator of that class. For example, if you
+initialize a :class:`.Sequence` with :class:`.Optimizer` instances,
+it will be usable in the same way as any other :class:`.Optimizer`
+
+.. code-block:: python
+
+    import stk
+
+    sequence = stk.Sequence(
+        stk.ETKDG(),
+        stk.MMFF(),
+    )
+    mol = stk.BuildingBlock('NCCN')
+    sequence.optimize(mol)
+
+Not all compound calculators can be used with every calculator type.
+A compound calculator is only compatible with classes with which it
+shares a base class. So if a compound calculator does not inherit
+:class:`.EnergyCalculator`, it cannot be used with instances of
+:class:`.EnergyCalculator`. However, if a compound calculator does
+inherit :class:`.EnergyCalculator`, it can be initialized with
+instances of :class:`.EnergyCalculator` and therefore it can also be
+used wherever an :class:`.EnergyCalculator` is required.
+
+If you really want to build up complexity, compound calculators
+can hold other compound calculators. For example, this is an
+:class:`Optimizer`, which will try to optimize a molecule with one
+:class:`.Sequence` and if it raises an error, it will try to
+optimize the molecule with a different :class:`.Sequence`
+
+.. code-block:: python
+
+    optimizer = stk.TryCatch(
+        try_calculator=stk.Sequence(stk.ETKDG(), stk.MMFF()),
+        catch_calculator=stk.Sequence(stk.ETKDG(), stk.UFF()),
+    )
+    # Try to optimize with ETKDG followed by MMFF first, and if that
+    # raises an error, try to optimize with ETKDG followed by
+    # UFF.
+    optimizer.optimize(mol)
+
+
 """
 
 import logging
@@ -224,3 +278,41 @@ class Random(Optimizer, EnergyCalculator, Mutator, Crosser):
         logger.info(
             f'Random selected {calculator.__class__.__name__}.'
         )
+
+
+class RaisingCalculatorError(Exception):
+    ...
+
+
+class RaisingCalculator(Optimizer, EnergyCalculator):
+    """
+
+    """
+
+    def __init__(
+        self,
+        calculator,
+        fail_chance=0.5,
+        random_seed=None,
+        **kwargs
+    ):
+        """
+
+        """
+
+        self._calculator = calculator
+        self._fail_chance = fail_chance
+        self._generator = np.random.RandomState(random_seed)
+        super().__init__(**kwargs)
+
+    def _try_raising(self):
+        if self._generator.rand() < self._fail_chance:
+            raise RaisingCalculatorError()
+
+    def _optimize(self, mol):
+        self._try_raising()
+        return self._calculator.optimize(mol)
+
+    def _get_energy(self, mol):
+        self._try_raising()
+        return self._calculator.get_energy(mol)

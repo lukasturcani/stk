@@ -10,10 +10,12 @@ Optimizers
 #. :class:`.MacroModelForceField`
 #. :class:`.MacroModelMD`
 #. :class:`.MOPAC`
-#. :class:`.OptimizerSequence`
 #. :class:`.CageOptimizerSequence`
-#. :class:`.TryCatchOptimizer`
-#. :class:`.RaisingOptimizer`
+#. :class:`.Sequence`
+#. :class:`.If`
+#. :class:`.TryCatch`
+#. :class:`.Random`
+#. :class:`.RaisingCalculator`
 
 
 Optimizers are objects used to optimize molecules. Each optimizer is
@@ -39,13 +41,13 @@ with :meth:`~.Optimizer.optimize`.
 Sometimes it is desirable to chain multiple optimizations, one after
 another. For example, before running an optimization, it may be
 desirable to embed a molecule first, to generate an initial structure.
-:class:`.OptimizerSequence` may be used for this.
+:class:`.Sequence` may be used for this.
 
 .. code-block:: python
 
     # Create a new optimizer which chains the previously defined
     # mmff and etkdg optimizers.
-    optimizer_sequence = stk.OptimizerSequence(etkdg, mmff)
+    optimizer_sequence = stk.Sequence(etkdg, mmff)
 
     # Run each optimizer in sequence.
     optimizer_sequence.optimize(polymer)
@@ -84,7 +86,6 @@ there are no requirements. New optimizers can be added into the
 """
 
 import logging
-import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import warnings
 import os
@@ -155,65 +156,6 @@ class Optimizer(MoleculeCalculator):
         """
 
         raise NotImplementedError()
-
-
-class OptimizerSequence(Optimizer):
-    """
-    Applies optimizers in sequence.
-
-    Examples
-    --------
-    Let's say we want to embed a molecule with ETKDG first and then
-    minimize it with the MMFF force field.
-
-    .. code-block:: python
-
-        import stk
-
-        mol = stk.BuildingBlock('NCCNCCN', ['amine'])
-        optimizer = stk.OptimizerSequence(stk.ETKDG(), stk.MMFF())
-        optimizer.optimize(mol)
-
-    """
-
-    def __init__(self, *optimizers, use_cache=False):
-        """
-        Initialize a :class:`OptimizerSequence` instance.
-
-        Parameters
-        ----------
-        *optimizers : :class:`Optimizer`
-            A number of optimizers, each of which gets applied to a
-            molecule, based on the order given.
-
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will not run twice on the same
-            molecule.
-
-        """
-
-        self._optimizers = optimizers
-        super().__init__(use_cache=use_cache)
-
-    def _optimize(self, mol):
-        """
-        Optimize `mol`.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule to be optimized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for optimizer in self._optimizers:
-            cls_name = optimizer.__class__.__name__
-            logger.info(f'Using {cls_name} on "{mol}".')
-            optimizer.optimize(mol)
 
 
 class CageOptimizerSequence(Optimizer):
@@ -324,175 +266,6 @@ class NullOptimizer(Optimizer):
         logger.debug('Message 1.')
         logger.debug('Message 2.')
         return
-
-
-class TryCatchOptimizer(Optimizer):
-    """
-    Try to optimize with a :class:`Optimizer`, use another on failure.
-
-    Examples
-    --------
-    .. code-block:: python
-
-        import stk
-
-        # Create some molecules to optimize.
-        mol1 = stk.BuildingBlock('NCCN', ['amine'])
-        mol2 = stk.BuildingBlock('CCCCC')
-        mol3 = stk.BuildingBlock('O=CCCN')
-
-        # Create an optimizer which may fail.
-        uff = stk.UFF()
-
-        # Create a backup optimizer.
-        mmff = stk.MMFF()
-
-        # Make an optimizer which tries to run raiser and if that
-        # raises an error, will run mmff on the molecule instead.
-        try_catch = stk.TryCatchOptimizer(
-            try_optimizer=uff,
-            catch_optimizer=mmff
-        )
-
-        # Optimize the molecules. In each case if the optimization with
-        # UFF fails, MMFF is used to optimize the molecule instead.
-        try_catch.optimize(mol1)
-        try_catch.optimize(mol2)
-        try_catch.optimzie(mol3)
-
-    """
-
-    def __init__(
-        self,
-        try_optimizer,
-        catch_optimizer,
-        use_cache=False
-    ):
-        """
-        Initialize a :class:`TryCatchOptimizer` instance.
-
-        Parameters
-        ----------
-        try_optimizer : :class:`Optimizer`
-            The optimizer which is used initially to try and optimize a
-            :class:`.Molecule`.
-
-        catch_optimizer : :class:`Optimizer`
-            If `try_optimizer` raises an error, this optimizer is
-            run on the :class:`.Molecule` instead.
-
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will not run twice on the same
-            molecule.
-
-        """
-
-        self._try_optimizer = try_optimizer
-        self._catch_optimizer = catch_optimizer
-        super().__init__(use_cache=use_cache)
-
-    def _optimize(self, mol):
-        """
-        Optimize `mol`.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule to be optimized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        try:
-            return self._try_optimizer.optimize(mol)
-        except Exception:
-            try_name = self._try_optimizer.__class__.__name__
-            catch_name = self._catch_optimizer.__class__.__name__
-            logger.error(
-                f'{try_name} failed, trying {catch_name}.',
-                exc_info=True
-            )
-            return self._catch_optimizer.optimize(mol)
-
-
-class RaisingOptimizerError(Exception):
-    ...
-
-
-class RaisingOptimizer(Optimizer):
-    """
-    Raises and optimizes at random.
-
-    This optimizer is used for debugging to simulate optimizations
-    which sometimes complete successfully and sometimes
-    randomly fail.
-
-    Examples
-    --------
-    .. code-block:: python
-
-        import stk
-
-        mol = stk.BuildingBlock('NCCNCCN', ['amine'])
-        partial_raiser = stk.RaisingOptimizer(
-            optimizer=stk.ETKDG(),
-            fail_chance=0.75
-        )
-        # 75 % chance an error will be raised by calling optimize.
-        partial_raiser.optimize(mol)
-
-    """
-
-    def __init__(self, optimizer, fail_chance=0.5, use_cache=False):
-        """
-        Initialize :class:`PartialRaiser`.
-
-        Parameters
-        ----------
-        optimizer : :class:`Optimizer`
-            When the optimizer does not fail, it uses this
-            :class:`Optimizer` to optimize molecules.
-
-        fail_chance : :class:`float`, optional
-            The probability that the optimizer will raise an error each
-            time :meth:`optimize` is used.
-
-        use_cache : :class:`bool`, optional
-            If ``True`` :meth:`optimize` will not run twice on the same
-            molecule.
-
-        """
-
-        self._optimizer = optimizer
-        self._fail_chance = fail_chance
-        super().__init__(use_cache=use_cache)
-
-    def _optimize(self, mol):
-        """
-        Optimize `mol`.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule to be optimized.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        Raises
-        ------
-        :class:`RaisingOptimizerError`
-            This error is raised at random.
-
-        """
-
-        if np.random.rand() < self._fail_chance:
-            raise RaisingOptimizerError('Used RaisingOptimizer.')
-        return self._optimizer.optimize(mol)
 
 
 class MMFF(Optimizer):
@@ -683,7 +456,7 @@ class XTB(Optimizer):
     --------
     Note that for :class:`.ConstructedMolecule` objects constructed by
     ``stk``, :class:`XTB` should usually be used in a
-    :class:`.OptimizerSequence`. This is because xTB only uses
+    :class:`.Sequence`. This is because xTB only uses
     xyz coordinates as input and so will not recognize the long bonds
     created during construction. An optimizer which can minimize
     these bonds should be used before :class:`XTB`.
@@ -699,7 +472,7 @@ class XTB(Optimizer):
             topology_graph=stk.polymer.Linear("AB", [0, 0], 3)
         )
 
-        xtb = stk.OptimizerSequence(
+        xtb = stk.Sequence(
             stk.UFF(),
             stk.XTB(xtb_path='/opt/gfnxtb/xtb', unlimited_memory=True)
         )
