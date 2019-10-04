@@ -38,78 +38,9 @@ which takes one argument, which is a :class:`.Population` of
 
 import numpy as np
 import logging
-from functools import wraps
-
-from ...utilities import dedupe
 
 
 logger = logging.getLogger(__name__)
-
-
-def _handle_failed_molecules(normalize):
-    """
-    Decorate :meth:`~FitnessNormalizer.normalize` methods.
-
-    This decorator makes :meth:`~FitnessNormalizer.normalize` methods
-    set the fitness of molecules with a :attr:`fitness` of ``None`` to
-    half the minimum fitness in the population, if
-    :attr:`_handle_failed` is ``True```.
-
-    Parameters
-    ----------
-    normalize : class:`function`
-        The :meth:`~FitnessNormalizer.normalize` method to decorate.
-
-    Returns
-    -------
-    :class:`function`
-        The decorated :meth:`~FitnessNormalizer.normalize` method.
-
-    """
-
-    @wraps(normalize)
-    def inner(self, population):
-        valid_pop = population.clone()
-        valid_pop.remove_members(
-            lambda m: m.fitness is None
-        )
-        r = normalize(self, valid_pop)
-
-        if self._handle_failed:
-            minimum_fitness = min(
-                (m.fitness for m in valid_pop),
-                default=1
-            )
-            for member in population:
-                if member.fitness is None:
-                    member.fitness = minimum_fitness/2
-        return r
-
-    return inner
-
-
-def _dedupe(normalize):
-    """
-    Make sure that duplicates are removed before normalization.
-
-    Parameters
-    ----------
-    normalize : class:`function`
-        The :meth:`~FitnessNormalizer.normalize` method to decorate.
-
-    Returns
-    -------
-    :class:`function`
-        The decorated :meth:`~FitnessNormalizer.normalize` method.
-
-    """
-
-    @wraps(normalize)
-    def inner(self, population):
-        cls = population.__class__
-        return normalize(self, cls(*dedupe(population)))
-
-    return inner
 
 
 class FitnessNormalizer:
@@ -117,14 +48,6 @@ class FitnessNormalizer:
     Normalizes fitness values across a :class:`.Population`.
 
     """
-
-    def __init__(self):
-        self._handle_failed = True
-
-    def __init_subclass__(cls, **kwargs):
-        cls.normalize = _dedupe(cls.normalize)
-        cls.normalize = _handle_failed_molecules(cls.normalize)
-        return super().__init_subclass__(**kwargs)
 
     def normalize(self, population):
         """
@@ -247,11 +170,8 @@ class NormalizerSequence(FitnessNormalizer):
         """
 
         for normalizer in self._normalizers:
-            handle_failed = normalizer._handle_failed
-            normalizer._handle_failed = False
             logger.info(f'Using {normalizer.__class__.__name__}.')
             normalizer.normalize(population)
-            normalizer._handle_failed = handle_failed
 
 
 class Power(FitnessNormalizer):
