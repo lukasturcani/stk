@@ -39,7 +39,7 @@ class MoleculeCalculator(Calculator):
 
         Returns
         -------
-        :class:`.Calculator`
+        :class:`.MoleculeCalculator`
             The calculator.
 
         """
@@ -73,7 +73,7 @@ class MoleculeCalculator(Calculator):
 
         Returns
         -------
-        :class:`.Calculator`
+        :class:`.MoleculeCalculator`
             The calculator.
 
         """
