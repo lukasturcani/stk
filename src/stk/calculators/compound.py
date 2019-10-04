@@ -56,7 +56,7 @@ class TryCatch(Optimizer, EnergyCalculator):
         try_calculator,
         catch_calculator,
         catch_type=Exception,
-        use_cache=False,
+        **kwargs,
     ):
         """
 
@@ -65,7 +65,7 @@ class TryCatch(Optimizer, EnergyCalculator):
         self._try_calculator = try_calculator
         self._catch_calculator = catch_calculator
         self._catch_type = catch_type
-        super().__init__(use_cache=use_cache)
+        super().__init__(**kwargs)
 
     def _optimize(self, mol):
         try:
@@ -95,13 +95,13 @@ class Sequence(Optimizer):
 
     """
 
-    def __init__(self, *calculators, use_cache=False):
+    def __init__(self, *calculators, **kwargs):
         """
 
         """
 
         self._calculators = calculators
-        super().__init__(use_cache=use_cache)
+        super().__init__(**kwargs)
 
     def _optimize(self, mol):
         for calculator in self._calculators:
