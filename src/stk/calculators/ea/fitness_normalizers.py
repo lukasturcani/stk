@@ -8,7 +8,6 @@ Fitness Normalizers
 #. :class:`.Sum`
 #. :class:`.DivideByMean`
 #. :class:`.ShiftUp`
-#. :class:`.NormalizerSequence`
 
 Fitness normalizers are classes which are responsible for normalizing
 the fitness values in a :class:`.Population`. They analyze the
@@ -52,7 +51,7 @@ class FitnessNormalizer(Calculator):
 
     """
 
-    def __init__(self, filter=lambda mol: True):
+    def __init__(self, filter=lambda mol: True, **kwargs):
         """
         Initialize a :class:`.FitnessNormalizer`.
 
@@ -67,7 +66,7 @@ class FitnessNormalizer(Calculator):
         """
 
         self._filter = filter
-        super().__init__(filter=filter)
+        super().__init__(filter=filter, **kwargs)
 
     def normalize(self, population):
         """
@@ -75,7 +74,7 @@ class FitnessNormalizer(Calculator):
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`iterable`
             The molecules which need to have their fitness values
             normalized.
 
@@ -157,8 +156,8 @@ class Power(FitnessNormalizer):
         import stk
 
         # Create the molecules and give them some arbitrary fitness.
-        # Normally the fitness would be set by the get_fitness() method of
-        # some a fitness calculator.
+        # Normally the fitness would be set by the get_fitness() method
+        # of some a fitness calculator.
         mol1 = stk.BuildingBlock('NCCCN')
         mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
         mol3 = stk.ConstructedMolecule(
