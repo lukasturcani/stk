@@ -312,7 +312,8 @@ def ea_run(filename, input_file):
         fitness_calculator=fitness_calculator,
         log_file=log_file,
         database_dump=database_dump,
-        progress_dump=progress_dump
+        progress_dump=progress_dump,
+        dump_attrs=dump_attrs,
     )
     progress = history.progress
 
@@ -392,7 +393,7 @@ def ea_run(filename, input_file):
 
     stk.kill_macromodel()
 
-    history.dump(dump_attrs)
+    history.dump()
 
     progress.calculate_member_fitness(
         fitness_calculator=fitness_calculator,
