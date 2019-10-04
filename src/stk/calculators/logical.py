@@ -113,11 +113,12 @@ class Random(Optimizer, EnergyCalculator):
         self,
         *calculators,
         probabilities=None,
-        random_seed=None
+        random_seed=None,
     ):
         self._calculators = calculators
         self._probabilities = probabilities
         self._generator = np.random.RandomState(random_seed)
+        super().__init__(use_cache=False)
 
     def _optimize(self, mol):
         calculator = self._generator.choice(
