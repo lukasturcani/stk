@@ -1,6 +1,6 @@
 """
-Calculator
-==========
+Base Calculators
+================
 
 
 
@@ -8,9 +8,25 @@ Calculator
 
 
 class Calculator:
-    def __init__(self, use_cache):
+    """
+    A base class for all calculators.
+
+    """
+
+    def __init__(self, **kwargs):
+        return
+
+
+class MoleculeCalculator(Calculator):
+    """
+    Base class for calculators which operate on single molecules.
+
+    """
+
+    def __init__(self, use_cache, **kwargs):
         self._use_cache = use_cache
         self._cache = {}
+        super().__init__(use_cache=use_cache, **kwargs)
 
     def set_cache_use(self, use_cache):
         """
@@ -82,3 +98,12 @@ class Calculator:
         """
 
         return mol in self._cache
+
+
+class PopulationCalculator(Calculator):
+    """
+    Base class for calculators which operate on populations.
+
+    """
+
+    pass
