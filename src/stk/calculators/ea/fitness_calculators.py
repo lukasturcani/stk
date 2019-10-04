@@ -122,6 +122,23 @@ class FitnessCalculator(Calculator):
         raise NotImplementedError()
 
 
+class FitnessFunction(FitnessCalculator):
+    """
+
+    """
+
+    def __init__(self, fitness_fn, use_cache=False):
+        """
+
+        """
+
+        self._fitness_fn = fitness_fn
+        super().__init__(use_cache=use_cache)
+
+    def _get_fitness(self, mol):
+        return self._fitness_fn(mol)
+
+
 class RaisingFitnessCalculatorError(Exception):
     ...
 
