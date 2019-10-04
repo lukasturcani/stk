@@ -108,3 +108,14 @@ class PopulationCalculator(Calculator):
     """
 
     pass
+
+
+class EAOperation(Calculator):
+    """
+    Base class for crosser and mutator calculators.
+
+    """
+
+    def __init__(self, use_cache=False, **kwargs):
+        self._use_cache = use_cache
+        super().__init__(use_cache=use_cache, **kwargs)
