@@ -85,3 +85,21 @@ class TryCatch(Optimizer, EnergyCalculator):
             f'{try_name} failed, trying {catch_name}.',
             exc_info=True
         )
+
+
+class Sequence(Optimizer):
+    """
+
+    """
+
+    def __init__(self, *calculators, use_cache=False):
+        """
+
+        """
+
+        self._calculators = calculators
+        super().__init__(use_cache=use_cache)
+
+    def _optimize(self, mol):
+        for calculator in self._calculators:
+            calculator.optimize(mol)
