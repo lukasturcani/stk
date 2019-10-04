@@ -1,6 +1,6 @@
 """
-Logical Calculators
-===================
+Compound Calculators
+====================
 
 """
 
@@ -24,7 +24,7 @@ class If(Optimizer, EnergyCalculator, FitnessCalculator):
         condition,
         true_calculator,
         false_calculator,
-        use_cache=False,
+        **kwargs,
     ):
         """
 
@@ -33,7 +33,7 @@ class If(Optimizer, EnergyCalculator, FitnessCalculator):
         self._condition = condition
         self._true_calculator = true_calculator
         self._false_calculator = false_calculator
-        super().__init__(use_cache=use_cache)
+        super().__init__(**kwargs)
 
     def _optimize(self, mol):
         if self._condition(mol):
