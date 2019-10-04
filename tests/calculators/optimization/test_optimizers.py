@@ -31,15 +31,15 @@ def test_add_to_cache(tmp_amine2):
 
 def test_raising_optimizer(tmp_polymer):
     mmff = stk.MMFF()
-    always_raiser = stk.RaisingOptimizer(
-        optimizer=mmff,
+    always_raiser = stk.RaisingCalculator(
+        calculator=mmff,
         fail_chance=1
     )
-    with pytest.raises(stk.RaisingOptimizerError):
+    with pytest.raises(stk.RaisingCalculatorError):
         always_raiser.optimize(tmp_polymer)
 
-    never_raiser = stk.RaisingOptimizer(
-        optimizer=mmff,
+    never_raiser = stk.RaisingCalculator(
+        calcualtor=mmff,
         fail_chance=0
     )
     tmp_polymer.write(join(odir, 'raising_optimizer_before.mol'))

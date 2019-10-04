@@ -141,3 +141,41 @@ class Random(Optimizer, EnergyCalculator):
         logger.info(
             f'Random selected {calculator.__class__.__name__}.'
         )
+
+
+class RaisingCalculatorError(Exception):
+    ...
+
+
+class RaisingCalculator(Optimizer, EnergyCalculator):
+    """
+
+    """
+
+    def __init__(
+        self,
+        calculator,
+        fail_chance=0.5,
+        random_seed=None,
+        **kwargs
+    ):
+        """
+
+        """
+
+        self._calculator = calculator
+        self._fail_chance = fail_chance
+        self._generator = np.random.RandomState(random_seed)
+        super().__init__(**kwargs)
+
+    def _try_raising(self):
+        if self._generator.rand() < self._fail_chance:
+            raise RaisingCalculatorError()
+
+    def _optimize(self, mol):
+        self._try_raising()
+        return self._calculator.optimize(mol)
+
+    def _get_energy(self, mol):
+        self._try_raising()
+        return self._calculator.get_energy(mol)
