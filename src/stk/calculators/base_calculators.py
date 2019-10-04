@@ -23,7 +23,7 @@ class MoleculeCalculator(Calculator):
 
     """
 
-    def __init__(self, use_cache, **kwargs):
+    def __init__(self, use_cache=False, **kwargs):
         self._use_cache = use_cache
         self._cache = {}
         super().__init__(use_cache=use_cache, **kwargs)
