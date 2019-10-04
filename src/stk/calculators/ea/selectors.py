@@ -379,6 +379,19 @@ class Selector(Calculator):
 
     """
 
+    def select(self, population):
+        """
+
+        """
+
+        raise NotImplementedError()
+
+
+class BoundedSelector(Selector):
+    """
+
+    """
+
     def __init__(self, num_batches=None, **kwargs):
         """
 
@@ -387,15 +400,8 @@ class Selector(Calculator):
         self._num_batches = num_batches
         super().__init__(num_batches=num_batches, **kwargs)
 
-    def select(self, poulation):
-        """
 
-        """
-
-        raise NotImplementedError()
-
-
-class BatchingSelector(Selector):
+class BatchingSelector(BoundedSelector):
     """
     A base class for selectors which create their own batches.
 

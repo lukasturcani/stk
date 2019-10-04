@@ -70,6 +70,7 @@ from .ea import (
     Crosser,
     FitnessNormalizer,
     Selector,
+    BoundedSelector,
 )
 
 
@@ -77,11 +78,13 @@ logger = logging.getLogger(__name__)
 
 
 class If(
-    Optimizer,
+    Crosser,
     EnergyCalculator,
     FitnessCalculator,
+    FitnessNormalizer,
     Mutator,
-    Crosser,
+    Optimizer,
+    Selector,
 ):
     """
 
@@ -103,10 +106,10 @@ class If(
         self._false_calculator = false_calculator
         super().__init__(**kwargs)
 
-    def _optimize(self, mol):
-        if self._condition(mol):
-            return self._true_calculator.optimize(mol)
-        return self._false_calculator.optimize(mol)
+    def _cross(self, *mols):
+        if self._condition(*mols):
+            return self._true_calculator.cross(*mols)
+        return self._false_calculator.cross(*mols)
 
     def _get_energy(self, mol):
         if self._condition(mol):
@@ -118,23 +121,34 @@ class If(
             return self._true_calculator.get_fitness(mol)
         return self._false_calculator.get_fitness(mol)
 
+    def _normalize(self, population):
+        if self._condition(population):
+            return self._true_calculator.normalize(population)
+        return self._false_calculator.normalize(population)
+
     def _mutate(self, mol):
         if self._condition(mol):
             return self._true_calculator.mutate(mol)
         return self._false_calculator.mutate(mol)
 
-    def _cross(self, *mols):
-        if self._condition(*mols):
-            return self._true_calculator.cross(*mols)
-        return self._false_calculator.cross(*mols)
+    def _optimize(self, mol):
+        if self._condition(mol):
+            return self._true_calculator.optimize(mol)
+        return self._false_calculator.optimize(mol)
+
+    def select(self, population):
+        if self._condition(population):
+            return self._true_calculator.select(population)
+        return self._false_calculator.select(population)
 
 
 class TryCatch(
-    Optimizer,
+    Crosser,
     EnergyCalculator,
     FitnessCalculator,
+    FitnessNormalizer,
     Mutator,
-    Crosser,
+    Optimizer,
 ):
     """
 
@@ -177,6 +191,13 @@ class TryCatch(
             self._log_failure()
             return self._catch_calculator.get_fitness(mol)
 
+    def _normalize(self, population):
+        try:
+            return self._try_calculator.normalize(population)
+        except self._catch_type:
+            self._log_failure()
+            return self._catch_calculator.normalize(population)
+
     def _mutate(self, mol):
         try:
             return self._try_calculator.mutate(mol)
@@ -200,7 +221,14 @@ class TryCatch(
         )
 
 
-class Sequence(Optimizer, FitnessNormalizer, Selector):
+class Sequence(
+    Optimizer,
+    FitnessNormalizer,
+    BoundedSelector,
+    # Putting Selector here is redundant but it makes it clear to
+    # users that Sequence is compatible with all Selectors.
+    Selector,
+):
     """
 
     """
@@ -229,7 +257,15 @@ class Sequence(Optimizer, FitnessNormalizer, Selector):
         yield from it.islice(it.chain(*iterables), self._num_batches)
 
 
-class Random(Optimizer, EnergyCalculator, Mutator, Crosser):
+class Random(
+    Crosser,
+    EnergyCalculator,
+    FitnessCalculator,
+    FitnessNormalizer,
+    Mutator,
+    Optimizer,
+    Selector,
+):
     def __init__(
         self,
         *calculators,
@@ -243,36 +279,33 @@ class Random(Optimizer, EnergyCalculator, Mutator, Crosser):
         super().__init__(**kwargs)
 
     def _optimize(self, mol):
-        calculator = self._generator.choice(
-            a=self._calculators,
-            p=self._probabilities,
-        )
-        self._log_choice(calculator)
-        return calculator.optimize(mol)
+        return self._get_calculator().optimize(mol)
 
     def _get_energy(self, mol):
-        calculator = self._generator.choice(
-            a=self._calculators,
-            p=self._probabilities,
-        )
-        self._log_choice(calculator)
-        return calculator.get_energy(mol)
+        return self._get_calculator().get_energy(mol)
+
+    def _get_fitness(self, mol):
+        return self._get_calculator().get_fitness(mol)
+
+    def _normalize(self, population):
+        return self._get_calculator().normalize(population)
 
     def _mutate(self, mol):
-        calculator = self._generator.choice(
-            a=self._calculators,
-            p=self._probabilities,
-        )
-        self._log_choice(calculator)
-        return calculator.mutate(mol)
+        return self._get_calculator().mutate(mol)
 
     def _cross(self, *mols):
+        return self._get_calculator().cross(*mols)
+
+    def select(self, population):
+        return self._get_calculator().select(population)
+
+    def _get_calculator(self):
         calculator = self._generator.choice(
             a=self._calculators,
             p=self._probabilities,
         )
         self._log_choice(calculator)
-        return calculator.cross(*mols)
+        return calculator
 
     def _log_choice(self, calculator):
         logger.info(
@@ -284,7 +317,15 @@ class RaisingCalculatorError(Exception):
     ...
 
 
-class RaisingCalculator(Optimizer, EnergyCalculator):
+class RaisingCalculator(
+    Crosser,
+    EnergyCalculator,
+    FitnessCalculator,
+    FitnessNormalizer,
+    Mutator,
+    Optimizer,
+    Selector,
+):
     """
 
     """
@@ -316,3 +357,23 @@ class RaisingCalculator(Optimizer, EnergyCalculator):
     def _get_energy(self, mol):
         self._try_raising()
         return self._calculator.get_energy(mol)
+
+    def _cross(self, *mols):
+        self._try_raising()
+        return self._calculator.cross(*mols)
+
+    def _get_fitness(self, mol):
+        self._try_raising()
+        return self._calculator.get_fitness(mol)
+
+    def _normalize(self, population):
+        self._try_raising()
+        return self._calculator.normalize(population)
+
+    def _mutate(self, mol):
+        self._try_raising()
+        return self._calculator.mutate(mol)
+
+    def select(self, population):
+        self._try_raising()
+        return self._calculator.select(population)
