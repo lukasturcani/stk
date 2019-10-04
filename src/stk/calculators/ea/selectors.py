@@ -8,7 +8,6 @@ Selection
 #. :class:`.AboveAverage`
 #. :class:`.Tournament`
 #. :class:`.StochasticUniversalSampling`
-#. :class:`.SelectorSequence`
 #. :class:`.RemoveBatches`
 #. :class:`.RemoveMolecules`
 #. :class:`.FilterBatches`
@@ -106,6 +105,8 @@ import itertools as it
 import numpy as np
 import logging
 from collections import Counter
+
+from ..base_calculators import Calculator
 
 
 logger = logging.getLogger(__name__)
@@ -367,7 +368,7 @@ class _YieldedData:
         return all(mol not in self._mols for mol in batch)
 
 
-class Selector:
+class Selector(Calculator):
     """
     Selects batches of molecules from a population.
 
@@ -375,6 +376,28 @@ class Selector:
     based on its fitness. The fitness of a batch is the sum of all
     fitness values of the molecules in the batch. Batches may be of
     size 1, if single molecules are to be yielded.
+
+    """
+
+    def __init__(self, num_batches=None, **kwargs):
+        """
+
+        """
+
+        self._num_batches = num_batches
+        super().__init__(num_batches=num_batches, **kwargs)
+
+    def select(self, poulation):
+        """
+
+        """
+
+        raise NotImplementedError()
+
+
+class BatchingSelector(Selector):
+    """
+    A base class for selectors which create their own batches.
 
     """
 
@@ -418,44 +441,11 @@ class Selector:
         if fitness_modifier is None:
             fitness_modifier = self._get_fitness_values
 
-        self._num_batches = num_batches
         self._batch_size = batch_size
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
         self._fitness_modifier = fitness_modifier
-
-    def __init_subclass__(cls, **kwargs):
-        cls._select = cls._update_yielded(cls._select)
-        return super().__init_subclass__(**kwargs)
-
-    @staticmethod
-    def _update_yielded(_selected):
-        """
-        Decorate `_selected` to automatically update `yielded`.
-
-        """
-
-        def inner(self, batches, yielded):
-            for batch in _selected(self, batches, yielded):
-                yielded.update(batch)
-                yield batch
-
-            cls_name = self.__class__.__name__
-            logger.debug(
-                f'{cls_name} yielded {yielded.get_num()} batches.'
-            )
-
-            if (
-                self._num_batches is not None
-                and yielded.get_num() != self._num_batches
-            ):
-                logger.warning(
-                    f'{cls_name} was asked to yield '
-                    f'{self._num_batches} batches but yielded '
-                    f'{yielded.get_num()}.'
-                )
-
-        return inner
+        super().__init__(num_batches=num_batches)
 
     @staticmethod
     def _get_fitness_values(population):
@@ -528,7 +518,25 @@ class Selector:
             fitness_values=self._fitness_modifier(population)
         ))
 
-        yield from self._select(batches, _YieldedData())
+        yielded = _YieldedData()
+        for batch in self._select(batches, yielded):
+            yielded.update(batch)
+            yield batch
+
+        cls_name = self.__class__.__name__
+        logger.debug(
+            f'{cls_name} yielded {yielded.get_num()} batches.'
+        )
+
+        if (
+            self._num_batches is not None
+            and yielded.get_num() != self._num_batches
+        ):
+            logger.warning(
+                f'{cls_name} was asked to yield '
+                f'{self._num_batches} batches but yielded '
+                f'{yielded.get_num()}.'
+            )
 
     def _select(self, batches, yielded):
         """
@@ -791,7 +799,7 @@ class FilterMolecules(Selector):
         yield from self._selector.select(population)
 
 
-class Best(Selector):
+class Best(BatchingSelector):
     """
     Selects batches of molecules, highest fitness value first.
 
@@ -897,7 +905,7 @@ class Best(Selector):
         yield from it.islice(batches, self._num_batches)
 
 
-class Worst(Selector):
+class Worst(BatchingSelector):
     """
     Selects batches of molecules, lowest fitness value first.
 
@@ -976,7 +984,7 @@ class Worst(Selector):
         yield from it.islice(batches, self._num_batches)
 
 
-class Roulette(Selector):
+class Roulette(BatchingSelector):
     """
     Uses roulette selection to select batches of molecules.
 
@@ -1105,7 +1113,7 @@ class Roulette(Selector):
                 batches = tuple(batches)
 
 
-class AboveAverage(Selector):
+class AboveAverage(BatchingSelector):
     """
     Yields above average batches of molecules.
 
@@ -1230,7 +1238,7 @@ class AboveAverage(Selector):
         return 1
 
 
-class Tournament(Selector):
+class Tournament(BatchingSelector):
     """
     Yields batches of molecules through tournament selection.
 
@@ -1343,7 +1351,7 @@ class Tournament(Selector):
                 batches = tuple(batches)
 
 
-class StochasticUniversalSampling(Selector):
+class StochasticUniversalSampling(BatchingSelector):
     """
     Yields batches of molecules through stochastic universal sampling.
 
