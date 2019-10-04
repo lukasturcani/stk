@@ -33,6 +33,7 @@ import numpy as np
 
 
 from ...utilities import dice_similarity
+from ..base_calculators import EAOperation
 
 
 logger = logging.getLogger(__name__)
@@ -47,41 +48,11 @@ class MutationError(Exception):
     ...
 
 
-class Mutator:
+class Mutator(EAOperation):
     """
     Creates mutants.
 
     """
-
-    def __init__(self, use_cache):
-        """
-        Initialize a :class:`Mutator`.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            Toggles use of the molecular cache.
-
-        """
-
-        self._use_cache = use_cache
-
-    def set_cache_use(self, use_cache):
-        """
-        Set cache use on or off.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            ``True`` if the cache is to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self._use_cache = use_cache
 
     def mutate(self, mol):
         """
