@@ -54,6 +54,9 @@ from functools import wraps
 import logging
 import numpy as np
 
+from ..calculator import Calculator
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -121,7 +124,7 @@ def _add_cache_use(get_fitness):
     return inner
 
 
-class FitnessCalculator:
+class FitnessCalculator(Calculator):
     """
     Calculates and stores fitness values of molecules.
 
@@ -132,96 +135,12 @@ class FitnessCalculator:
 
     """
 
-    def __init__(self, use_cache):
-        """
-        Initialize a :class:`FitnessCalculator` instance.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            If ``True`` then fitness values for molecules already held
-            in the cache are not re-calculated but the value already
-            stored is used.
-
-        """
-
-        self._use_cache = use_cache
-        self._cache = {}
-
     def __init_subclass__(cls, **kwargs):
         cls.get_fitness = _add_cache_use(cls.get_fitness)
         cls.get_fitness = _add_fitness_attribute_creation(
             cls.get_fitness
         )
         return super().__init_subclass__(**kwargs)
-
-    def set_cache_use(self, use_cache):
-        """
-        Set cache use on or off.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            ``True`` if the cache is to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self._use_cache = use_cache
-
-    def is_caching(self):
-        """
-        ``True`` if the optimizer has caching turned on.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if the optimizer has caching turned on.
-
-        """
-
-        return self._use_cache
-
-    def is_in_cache(self, mol):
-        """
-        Return ``True`` if `mol` is cached.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule being checked.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if `mol` is cached.
-
-        """
-
-        return mol in self._cache
-
-    def add_to_cache(self, mol, fitness):
-        """
-        Add the `fitness` of `mol` to the cache.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule whose `fitness` should be added to the cache.
-
-        fitness : :class:`object`
-            The fitness value to be added to the cache.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self._cache[mol] = fitness
 
     def get_fitness(self, mol):
         """
