@@ -99,7 +99,7 @@ from ...utilities import (
 )
 import pywindow
 
-from ..calculator import Calculator
+from ..base_calculators import MoleculeCalculator
 
 
 logger = logging.getLogger(__name__)
@@ -138,7 +138,7 @@ def _add_cache_use(optimize):
     return inner
 
 
-class Optimizer(Calculator):
+class Optimizer(MoleculeCalculator):
     """
     A base class for optimizers.
 
