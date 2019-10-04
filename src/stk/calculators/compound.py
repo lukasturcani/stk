@@ -9,13 +9,25 @@ import numpy as np
 
 from .optimization import Optimizer
 from .energy import EnergyCalculator
-from .ea import FitnessCalculator
+from .ea import (
+    FitnessCalculator,
+    Mutator,
+    Crosser,
+    FitnessNormalizer,
+    Selector,
+)
 
 
 logger = logging.getLogger(__name__)
 
 
-class If(Optimizer, EnergyCalculator, FitnessCalculator):
+class If(
+    Optimizer,
+    EnergyCalculator,
+    FitnessCalculator,
+    Mutator,
+    Crosser,
+):
     """
 
     """
@@ -52,7 +64,13 @@ class If(Optimizer, EnergyCalculator, FitnessCalculator):
         return self._false_calculator.get_fitness(mol)
 
 
-class TryCatch(Optimizer, EnergyCalculator, FitnessCalculator):
+class TryCatch(
+    Optimizer,
+    EnergyCalculator,
+    FitnessCalculator,
+    Mutator,
+    Crosser,
+):
     """
 
     """
@@ -103,7 +121,7 @@ class TryCatch(Optimizer, EnergyCalculator, FitnessCalculator):
         )
 
 
-class Sequence(Optimizer):
+class Sequence(Optimizer, FitnessNormalizer, Selector):
     """
 
     """
@@ -121,7 +139,7 @@ class Sequence(Optimizer):
             calculator.optimize(mol)
 
 
-class Random(Optimizer, EnergyCalculator):
+class Random(Optimizer, EnergyCalculator, Mutator, Crosser):
     def __init__(
         self,
         *calculators,
