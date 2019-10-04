@@ -79,7 +79,7 @@ from ...utilities import (
     XTBExtractor
 )
 
-from ..calculator import Calculator
+from ..base_calculators import MoleculeCalculator
 
 
 logger = logging.getLogger(__name__)
@@ -94,7 +94,7 @@ class EnergyError(Exception):
     ...
 
 
-class EnergyCalculator(Calculator):
+class EnergyCalculator(MoleculeCalculator):
     """
     Calculates the energy of molecules.
 
