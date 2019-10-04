@@ -40,29 +40,34 @@ import numpy as np
 import logging
 
 
+from ..base_calculators import Calculator
+
+
 logger = logging.getLogger(__name__)
 
 
-class FitnessNormalizer:
+class FitnessNormalizer(Calculator):
     """
     Normalizes fitness values across a :class:`.Population`.
 
     """
 
-    def __init__(self, filter):
+    def __init__(self, filter=lambda mol: True):
         """
         Initialize a :class:`.FitnessNormalizer`.
 
         Parameters
         ----------
-        filter : :class:`callable`
+        filter : :class:`callable`, optional
             Takes a single parameter of type :class:`.Molecule` and
             returns ``True`` or ``False``. Only molecules which
-            return ``True`` will have fitness values normalized.
+            return ``True`` will have fitness values normalized. By
+            default, all molecules will have fitness values normalized.
 
         """
 
         self._filter = filter
+        super().__init__(filter=filter)
 
     def normalize(self, population):
         """

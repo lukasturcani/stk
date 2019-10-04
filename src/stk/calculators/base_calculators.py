@@ -101,15 +101,6 @@ class MoleculeCalculator(Calculator):
         return mol in self._cache
 
 
-class PopulationCalculator(Calculator):
-    """
-    Base class for calculators which operate on populations.
-
-    """
-
-    pass
-
-
 class EAOperation(Calculator):
     """
     Base class for :class:`.Crosser` and :class:`.Mutator`.
