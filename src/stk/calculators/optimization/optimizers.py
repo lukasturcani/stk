@@ -99,6 +99,9 @@ from ...utilities import (
 )
 import pywindow
 
+from ..calculator import Calculator
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -135,7 +138,7 @@ def _add_cache_use(optimize):
     return inner
 
 
-class Optimizer:
+class Optimizer(Calculator):
     """
     A base class for optimizers.
 
@@ -153,79 +156,11 @@ class Optimizer:
 
         """
 
-        # Holds every previously optimized molecule if use_cache is
-        # true.
-        self._cache = set()
-        self._use_cache = use_cache
+        super().__init__(use_cache=use_cache)
 
     def __init_subclass__(cls, **kwargs):
         cls.optimize = _add_cache_use(cls.optimize)
         return super().__init_subclass__(**kwargs)
-
-    def set_cache_use(self, use_cache):
-        """
-        Set cache use on or off.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            ``True`` if the cache is to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self._use_cache = use_cache
-
-    def is_caching(self):
-        """
-        ``True`` if the optimizer has caching turned on.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if the optimizer has caching turned on.
-
-        """
-
-        return self._use_cache
-
-    def add_to_cache(self, mol):
-        """
-        Add a molecule to the cache.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule to be added to the cache.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self._cache.add(mol)
-
-    def is_in_cache(self, mol):
-        """
-        Return ``True`` if `mol` is cached.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule being checked.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if `mol` is cached.
-
-        """
-
-        return mol in self._cache
 
     def optimize(self, mol):
         """
