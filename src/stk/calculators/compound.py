@@ -80,7 +80,7 @@ class TryCatch(
         try_calculator,
         catch_calculator,
         catch_type=Exception,
-        use_cache=False,
+        **kwargs,
     ):
         """
 
@@ -89,7 +89,7 @@ class TryCatch(
         self._try_calculator = try_calculator
         self._catch_calculator = catch_calculator
         self._catch_type = catch_type
-        super().__init__(use_cache=use_cache)
+        super().__init__(**kwargs)
 
     def _optimize(self, mol):
         try:
@@ -126,13 +126,13 @@ class Sequence(Optimizer, FitnessNormalizer, Selector):
 
     """
 
-    def __init__(self, *calculators, use_cache=False):
+    def __init__(self, *calculators, **kwargs):
         """
 
         """
 
         self._calculators = calculators
-        super().__init__(use_cache=use_cache)
+        super().__init__(**kwargs)
 
     def _optimize(self, mol):
         for calculator in self._calculators:
@@ -145,11 +145,12 @@ class Random(Optimizer, EnergyCalculator, Mutator, Crosser):
         *calculators,
         probabilities=None,
         random_seed=None,
+        **kwargs,
     ):
         self._calculators = calculators
         self._probabilities = probabilities
         self._generator = np.random.RandomState(random_seed)
-        super().__init__(use_cache=False)
+        super().__init__(**kwargs)
 
     def _optimize(self, mol):
         calculator = self._generator.choice(
