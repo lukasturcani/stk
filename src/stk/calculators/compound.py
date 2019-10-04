@@ -70,7 +70,7 @@ class TryCatch(Optimizer, EnergyCalculator):
     def _optimize(self, mol):
         try:
             return self._try_calculator.optimize(mol)
-        except Exception:
+        except self._catch_type:
             self._log_failure()
             return self._catch_calculator.optimize(mol)
 

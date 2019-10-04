@@ -39,7 +39,7 @@ def test_raising_optimizer(tmp_polymer):
         always_raiser.optimize(tmp_polymer)
 
     never_raiser = stk.RaisingCalculator(
-        calcualtor=mmff,
+        calculator=mmff,
         fail_chance=0
     )
     tmp_polymer.write(join(odir, 'raising_optimizer_before.mol'))
@@ -139,17 +139,17 @@ def test_cage_optimizer_sequence(tmp_opt_cc3, tmp_cc3):
 
 def test_try_catch_optimizer(tmp_amine2):
     etkdg = stk.ETKDG()
-    always_raiser = stk.RaisingOptimizer(
-        optimizer=etkdg,
-        fail_chance=1
+    always_raiser = stk.RaisingCalculator(
+        calculator=etkdg,
+        fail_chance=1,
     )
-    success = stk.TryCatchOptimizer(
-        try_optimizer=etkdg,
-        catch_optimizer=None
+    success = stk.TryCatch(
+        try_calculator=etkdg,
+        catch_calculator=None,
     )
-    try_catch = stk.TryCatchOptimizer(
-        try_optimizer=always_raiser,
-        catch_optimizer=success
+    try_catch = stk.TryCatch(
+        try_calculator=always_raiser,
+        catch_calculator=success,
     )
     tmp_amine2.write(join(odir, 'try_catch_optimizer_before.mol'))
     try_catch.optimize(tmp_amine2)

@@ -2,6 +2,9 @@
 Base Calculators
 ================
 
+This module provide calculator classes which serve as bases classes
+for other types for calculators.
+
 
 
 """
@@ -14,6 +17,11 @@ class Calculator:
     """
 
     def __init__(self, **kwargs):
+        """
+        Initialize a :class:`.Calculator`.
+
+        """
+
         return
 
 
@@ -24,6 +32,17 @@ class MoleculeCalculator(Calculator):
     """
 
     def __init__(self, use_cache=False, **kwargs):
+        """
+        Initialize a :class:`.MoleculeCalculator`
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`, optional
+            If ``True``, the calculator will not perform a calculation
+            on the same molecule twice.
+
+        """
+
         self._use_cache = use_cache
         self._cache = {}
         super().__init__(use_cache=use_cache, **kwargs)
@@ -79,7 +98,7 @@ class MoleculeCalculator(Calculator):
 
         """
 
-        self._cache.add(mol)
+        self._cache[mol] = value
         return self
 
     def is_in_cache(self, mol):
