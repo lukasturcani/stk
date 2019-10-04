@@ -167,7 +167,7 @@ class Sequence(Optimizer, FitnessNormalizer, Selector):
         for calculator in self._calculators:
             calculator.normalize(population)
 
-    def _select(self, population):
+    def select(self, population):
         iterables = (
             calculator.select(population)
             for calculator in self._calculators
