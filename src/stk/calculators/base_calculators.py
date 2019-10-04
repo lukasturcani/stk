@@ -45,6 +45,7 @@ class MoleculeCalculator(Calculator):
         """
 
         self._use_cache = use_cache
+        return self
 
     def is_caching(self):
         """
