@@ -68,7 +68,7 @@ from .energy import EnergyCalculator
 logger = logging.getLogger(__name__)
 
 
-class If(Optimizer, EnergyCalculator):
+class If(EnergyCalculator, Optimizer):
     """
 
     """
@@ -100,7 +100,7 @@ class If(Optimizer, EnergyCalculator):
         return self._false_calculator.get_energy(mol)
 
 
-class TryCatch(Optimizer, EnergyCalculator):
+class TryCatch(EnergyCalculator, Optimizer):
     """
 
     """
@@ -162,7 +162,7 @@ class Sequence(Optimizer):
             calculator.optimize(mol)
 
 
-class Random(Optimizer, EnergyCalculator):
+class Random(EnergyCalculator, Optimizer):
     def __init__(
         self,
         *calculators,
@@ -176,20 +176,18 @@ class Random(Optimizer, EnergyCalculator):
         super().__init__(**kwargs)
 
     def _optimize(self, mol):
-        calculator = self._generator.choice(
-            a=self._calculators,
-            p=self._probabilities,
-        )
-        self._log_choice(calculator)
-        return calculator.optimize(mol)
+        return self._get_calculator().optimize(mol)
 
     def _get_energy(self, mol):
+        return self._get_calculator().get_energy(mol)
+
+    def _get_calculator(self):
         calculator = self._generator.choice(
             a=self._calculators,
             p=self._probabilities,
         )
         self._log_choice(calculator)
-        return calculator.get_energy(mol)
+        return calculator
 
     def _log_choice(self, calculator):
         logger.info(
