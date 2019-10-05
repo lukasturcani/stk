@@ -146,7 +146,7 @@ class NullFitnessNormalizer(FitnessNormalizer):
         super().__init__(filter=filter)
 
     def _normalize(self, population, fitness_values):
-        return dict(fitness_values)
+        yield from ()
 
 
 class Power(FitnessNormalizer):
@@ -255,12 +255,8 @@ class Power(FitnessNormalizer):
         super().__init__(filter=filter)
 
     def _normalize(self, population, fitness_values):
-        normalized = {}
         for mol in population:
-            normalized[mol] = (
-                np.float_power(fitness_values[mol], self.power)
-            )
-        return normalized
+            yield mol, np.float_power(fitness_values[mol], self.power)
 
 
 class Multiply(FitnessNormalizer):
@@ -372,12 +368,8 @@ class Multiply(FitnessNormalizer):
         super().__init__(filter=filter)
 
     def _normalize(self, population, fitness_values):
-        normalized = {}
         for mol in population:
-            normalized[mol] = (
-                np.multiply(fitness_values[mol], self._coefficient)
-            )
-        return normalized
+            yield mol, self._coefficient*fitness_values[mol]
 
 
 class Sum(FitnessNormalizer):
@@ -435,10 +427,8 @@ class Sum(FitnessNormalizer):
         super().__init__(filter=filter)
 
     def _normalize(self, population, fitness_values):
-        normalized = {}
         for mol in population:
-            normalized[mol] = sum(fitness_values[mol])
-        return normalized
+            yield mol, sum(fitness_values[mol])
 
 
 class DivideByMean(FitnessNormalizer):
@@ -546,10 +536,8 @@ class DivideByMean(FitnessNormalizer):
         )
         logger.debug(f'Means used in DivideByMean: {mean}')
 
-        normalized = {}
         for mol in population:
-            normalized[mol] = np.divide(fitness_values[mol], mean)
-        return normalized
+            yield mol, fitness_values[mol] / mean
 
 
 class ShiftUp(FitnessNormalizer):
@@ -648,22 +636,21 @@ class ShiftUp(FitnessNormalizer):
         # Get all the fitness arrays in a matrix.
         fmat = np.array([fitness_values[mol] for mol in population])
 
-        # Get the minimum values of each element in the population.
-        mins = np.min(fmat, axis=0)
-        # Convert all the ones which are not to be shifted to 0 and
-        # multiply the which are to be shifted by 1.01.
-        is_array = isinstance(mins, np.ndarray)
-        if not is_array:
-            mins = np.array([mins])
+        # Get the minimum value of each element across the population.
+        # keepdims ensures that np.min returns a 1-D array, because
+        # it will be True if fitness values are scalar and False if
+        # they are array-valued.
+        mins = np.min(fmat, axis=0, keepdims=len(fmat.shape) == 1)
+
+        # Convert all elements in mins which are not to be shifted to 0
+        # and make the shift equal to the minimum value + 1.
         shift = np.zeros(len(mins))
         for i, min_ in enumerate(mins):
             if min_ <= 0:
                 shift[i] = 1 - min_
 
-        normalized = {}
         for mol in population:
-            normalized[mol] = fitness_values[mol] + shift
-        return normalized
+            yield mol, fitness_values[mol] + shift
 
 
 class ReplaceFitness(FitnessNormalizer):
