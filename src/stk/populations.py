@@ -1436,6 +1436,7 @@ class EAPopulation(Population):
     def set_fitness_values(
         self,
         fitness_calculator,
+        fitness_normalizer=None,
         num_processes=None,
     ):
         """
@@ -1444,8 +1445,10 @@ class EAPopulation(Population):
         Parameters
         ----------
         fitness_calculator : :class:`.FitnessCalculator`
-            The :class:`.FitnessCalculator` used to calculate the
-            fitness values.
+            Used to calculate the initial fitness values.
+
+        fitness_normalizer : :class:`.FitnessNormalizer`, optional
+            Used to normalize the fitness values.
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create. Calculations

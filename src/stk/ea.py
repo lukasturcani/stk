@@ -303,10 +303,7 @@ def ea_run(filename, input_file):
         pop.optimize(optimizer)
 
         logger.info('Calculating the fitness of population members.')
-        pop.set_fitness_values(fitness_calculator)
-
-        logger.info('Normalizing fitness values.')
-        fitness_normalizer.normalize(pop)
+        pop.set_fitness_values(fitness_calculator, fitness_normalizer)
 
         history.log_pop(logger, pop)
 
@@ -350,10 +347,10 @@ def ea_run(filename, input_file):
             logger.info(
                 'Calculating the fitness of population members.'
             )
-            pop.set_fitness_values(fitness_calculator)
-
-            logger.info('Normalizing fitness values.')
-            fitness_normalizer.normalize(pop)
+            pop.set_fitness_values(
+                fitness_calculator=fitness_calculator,
+                fitness_normalizer=fitness_normalizer,
+            )
 
             history.log_pop(logger, pop)
             history.db(pop)
