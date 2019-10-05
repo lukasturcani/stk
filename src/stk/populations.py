@@ -30,7 +30,7 @@ class Population:
 
     :class:`Population` instances can be nested.
 
-    In addtion to holding :class:`.Molecule` objects, the
+    In addition to holding :class:`.Molecule` objects, the
     :class:`Population` class can be used to create large numbers of
     these instances through the class methods beginning with "init".
 
@@ -101,7 +101,7 @@ class Population:
         second_member = pop[1]
 
     Indices will first access direct members of the population and then
-    acess members in the subpopulations. Indices access nested members
+    access members in the subpopulations. Indices access nested members
     depth-first
 
     .. code-block:: python
@@ -163,7 +163,7 @@ class Population:
         bb2 not in pop3
 
     If you want to run multiple :meth:`optimize` calls in a row, use
-    the "with" statment. This keeps a single process pool open, and
+    the "with" statement. This keeps a single process pool open, and
     means you do not create a new one for each :meth:`optimize` call.
     It also automatically closes the pool for you when the block
     exits
@@ -1422,47 +1422,10 @@ class EAPopulation(Population):
 
     """
 
-    def set_ea_tools(
-        self,
-        generation_selector,
-        mutation_selector,
-        crossover_selector,
-        mutator,
-        crosser
-    ):
-        """
-        Set the genetic algorithm calculators.
-
-        Parameters
-        ----------
-        generation_selector : :class:`.Selector`
-            A :class:`.Selector` used to select molecules in the next
-            generation.
-
-        mutation_selector : :class:`.Selector`
-            A :class:`.Selector` used to select molecules for mutation.
-
-        crossover_selector : :class:`.Selector`
-            A :class:`.Selector` used to select molecules for crossover.
-
-        mutator : :class:`.Mutator`
-            Carries out the mutation of molecules.
-
-        crosser : :class:`.Crosser`
-            Carries out the crossover of molecules.
-
-        """
-
-        self._generation_selector = generation_selector
-        self._mutation_selector = mutation_selector
-        self._crossover_selector = crossover_selector
-        self._mutator = mutator
-        self._crosser = crosser
-
-    def calculate_member_fitness(
+    def get_fitness_values(
         self,
         fitness_calculator,
-        num_processes=None
+        num_processes=None,
     ):
         """
         Calculates the fitness values of molecules.
@@ -1471,7 +1434,7 @@ class EAPopulation(Population):
         ----------
         fitness_calculator : :class:`.FitnessCalculator`
             The :class:`.FitnessCalculator` used to calculate the
-            fitness.
+            fitness values.
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create. Calculations
@@ -1481,7 +1444,9 @@ class EAPopulation(Population):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`dict`
+            Maps every :class:`.Molecule` in the population to its
+            fitness value.
 
         """
 
@@ -1496,14 +1461,14 @@ class EAPopulation(Population):
                 num_processes=num_processes
             )
 
-    def _calculate_fitness_serial(self, fitness_calculator):
+    def _get_fitness_values_serial(self, fitness_calculator):
         for mol in self:
             fitness_calculator.get_fitness(mol)
 
-    def _calculate_fitness_parallel(
+    def _get_fitness_values_parallel(
         self,
         fitness_calculator,
-        num_processes
+        num_processes,
     ):
 
         fitness_fn = _Guard(
@@ -1555,9 +1520,17 @@ class EAPopulation(Population):
                     fitness=input_mol.fitness
                 )
 
-    def get_mutants(self):
+    def get_mutants(self, selector, mutator):
         """
         Yield mutants.
+
+        Parameters
+        ----------
+        selector : :class:`.Selector`
+            Selects the molecules which are mutated.
+
+        mutator : :class:`.Mutator`
+            Carries out the mutations.
 
         Yields
         ------
@@ -1566,15 +1539,18 @@ class EAPopulation(Population):
 
         """
 
-        parents = self._mutation_selector.select(self)
-        for i, (parent, ) in enumerate(parents, 1):
+        for i, (mol, ) in enumerate(selector.select(self), 1):
             logger.info(f'Mutation number {i}.')
-            mutant = self._mutator.mutate(parent)
-            yield mutant
+            yield mutator.mutate(mol)
 
-    def get_next_generation(self):
+    def get_next_generation(self, selector):
         """
         Yield members of the next generation.
+
+        Parameters
+        ----------
+        selector : :class:`.Selector`
+            Selects the molecules in the next generation.
 
         Yields
         ------
@@ -1583,13 +1559,19 @@ class EAPopulation(Population):
 
         """
 
-        yield from (
-            mol for mol, in self._generation_selector.select(self)
-        )
+        yield from (mol for mol, in selector.select(self))
 
-    def get_offspring(self):
+    def get_offspring(self, selector, crosser):
         """
         Yield offspring.
+
+        Parameters
+        ----------
+        selector : :class:`.Selector`
+            Selects the molecules which are crossed.
+
+        crosser : :class:`.Crosser`
+            Crosses the molecules to make the offspring.
 
         Yields
         ------
@@ -1598,11 +1580,9 @@ class EAPopulation(Population):
 
         """
 
-        parent_batches = self._crossover_selector.select(self)
-        for i, parents in enumerate(parent_batches, 1):
+        for i, parents in enumerate(selector.select(self), 1):
             logger.info(f'Crossover number {i}.')
-            for child in self._crosser.cross(*parents):
-                yield child
+            yield from self._crosser.cross(*parents)
 
 
 class _Guard:
