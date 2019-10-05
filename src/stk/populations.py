@@ -1454,16 +1454,18 @@ class EAPopulation(Population):
             num_processes = psutil.cpu_count()
 
         if self._process_pool is None and num_processes == 1:
-            self._calculate_fitness_serial(fitness_calculator)
+            self._get_fitness_values_serial(fitness_calculator)
         else:
-            self._calculate_fitness_parallel(
+            self._get_fitness_values_parallel(
                 fitness_calculator=fitness_calculator,
-                num_processes=num_processes
+                num_processes=num_processes,
             )
 
     def _get_fitness_values_serial(self, fitness_calculator):
-        for mol in self:
-            fitness_calculator.get_fitness(mol)
+        return {
+            mol: fitness_calculator.get_fitness(mol)
+            for mol in self
+        }
 
     def _get_fitness_values_parallel(
         self,
@@ -1473,21 +1475,14 @@ class EAPopulation(Population):
 
         fitness_fn = _Guard(
             calculator=fitness_calculator,
-            fn=fitness_calculator.get_fitness
+            fn=fitness_calculator.get_fitness,
         )
 
-        # Only send molecules which need to have a calculation peformed
-        # to the process pool - this should improve performance.
-        if fitness_calculator.is_caching():
-            to_evaluate = []
-            for mol in self:
-                if fitness_calculator.is_in_cache(mol):
-                    fitness_calculator.get_fitness(mol)
-                else:
-                    to_evaluate.append(mol)
-        else:
-            to_evaluate = self
-
+        fitness_values = {}
+        to_evaluate = self._handle_cached_mols(
+            fitness_calculator=fitness_calculator,
+            fitness_values=fitness_values,
+        )
         # Use an existing process pool, if it exists.
         opened_pool = False
         if self._process_pool is None:
@@ -1500,25 +1495,34 @@ class EAPopulation(Population):
         if opened_pool:
             self.close_process_pool()
 
-        # If anything returned an exception, raise it.
-        for result in evaluated:
+        # Collect results.
+        for mol, result in zip(to_evaluate, evaluated):
+
             if isinstance(result, Exception):
                 raise result
 
-        # Update the molecules in the population.
-        sorted_input = sorted(to_evaluate, key=lambda m: repr(m))
-        sorted_output = sorted(evaluated, key=lambda m: repr(m))
-        for input_mol, output_mol in zip(sorted_input, sorted_output):
-            assert (
-                input_mol.get_identity_key()
-                == output_mol.get_identity_key()
-            )
-            input_mol.__dict__ = dict(vars(output_mol))
+            _, fitness = result
+            fitness_values[mol] = fitness
+
             if fitness_calculator.is_caching():
-                fitness_calculator.add_to_cache(
-                    mol=input_mol,
-                    fitness=input_mol.fitness
-                )
+                fitness_calculator.add_to_cache(mol, fitness)
+
+        return fitness_values
+
+    def _handle_cached_mols(self, fitness_calculator, fitness_values):
+        # Only send molecules which need to have a calculation
+        # performed to the process pool - this should improve
+        # performance.
+        if fitness_calculator.is_caching():
+            for mol in self:
+                if fitness_calculator.is_in_cache(mol):
+                    fitness_values[mol] = (
+                        fitness_calculator.get_fitness(mol)
+                    )
+                else:
+                    yield mol
+        else:
+            yield from self
 
     def get_mutants(self, selector, mutator):
         """
@@ -1587,17 +1591,12 @@ class EAPopulation(Population):
 
 class _Guard:
     """
-    A decorator for optimization functions.
+    A decorator for parallelized functions.
 
     This decorator should be applied to all functions which are to
     be used with :mod:`pathos`. It prevents functions from
     raising if they fail, which prevents the :mod:`pathos` pool
     from hanging.
-
-    Attributes
-    ----------
-    _calc_name : :class:`str`
-        The name of the :class:`.Optimizer` class being used.
 
     """
 
@@ -1625,8 +1624,7 @@ class _Guard:
         cls = self._calc_name
         try:
             logger.info(f'Running "{cls}.{fn}()" on "{mol}"')
-            self.__wrapped__(mol)
-            return mol
+            return mol, self.__wrapped__(mol)
 
         except Exception as ex:
             errormsg = (
