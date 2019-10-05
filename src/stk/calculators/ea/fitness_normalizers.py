@@ -74,7 +74,7 @@ class FitnessNormalizer(Calculator):
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.iterable`
             The molecules which need to have their fitness values
             normalized.
 
@@ -89,23 +89,28 @@ class FitnessNormalizer(Calculator):
 
         """
 
-        filtered = list(filter(self._filter, population))
-        self._normalize(filtered, fitness_values)
+        normalized = dict(fitness_values)
+        filtered = filter(self._filter, population)
+        normalized.update(self._normalize(filtered, fitness_values))
+        return normalized
 
     def _normalize(self, population, fitness_values):
         """
-        Normalize the fitness values in `population`.
+        Yield normalized `population` fitness values.
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`iterable`
             The filtered molecules.
 
-        Returns
-        -------
-        :class:`dict`
-            Maps every molecule in `population` to its normalized
-            fitness value.
+        fitness_values : :class:`dict`
+            Maps every molecule in `population` to its fitness value.
+
+        Yields
+        ------
+        :class:`tuple`
+            Holds a :class:`.Molecule` from `population` and its
+            normalized value.
 
         Raises
         ------

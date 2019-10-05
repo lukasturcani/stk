@@ -245,9 +245,14 @@ class Sequence(
         for calculator in self._calculators:
             calculator.optimize(mol)
 
-    def _normalize(self, population):
+    def _normalize(self, population, fitness_values):
+        # Create a list as population is an iterable which gets used
+        # multiple times.
+        population = list(population)
+        normalized = dict(fitness_values)
         for calculator in self._calculators:
-            calculator.normalize(population)
+            normalized = calculator.normalize(population, normalized)
+        yield from normalized.items()
 
     def select(self, population):
         iterables = (
