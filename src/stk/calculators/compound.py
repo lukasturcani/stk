@@ -121,7 +121,7 @@ class If(
             return self._true_calculator.get_fitness(mol)
         return self._false_calculator.get_fitness(mol)
 
-    def _normalize(self, population):
+    def _normalize(self, population, fitness_values):
         if self._condition(population):
             return self._true_calculator.normalize(population)
         return self._false_calculator.normalize(population)
@@ -191,7 +191,7 @@ class TryCatch(
             self._log_failure()
             return self._catch_calculator.get_fitness(mol)
 
-    def _normalize(self, population):
+    def _normalize(self, population, fitness_values):
         try:
             return self._try_calculator.normalize(population)
         except self._catch_type:

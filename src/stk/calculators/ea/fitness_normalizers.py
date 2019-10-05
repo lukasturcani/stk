@@ -68,7 +68,7 @@ class FitnessNormalizer(Calculator):
         self._filter = filter
         super().__init__(filter=filter, **kwargs)
 
-    def normalize(self, population, fitness_values):
+    def normalize(self, population):
         """
         Normalize the fitness values in `population`.
 
@@ -78,9 +78,6 @@ class FitnessNormalizer(Calculator):
             The molecules which need to have their fitness values
             normalized.
 
-        fitness_values : :class:`dict`
-            Maps every molecule in `population` to its fitness value.
-
         Returns
         -------
         :class:`dict`
@@ -89,9 +86,11 @@ class FitnessNormalizer(Calculator):
 
         """
 
-        normalized = dict(fitness_values)
+        normalized = population.get_fitness_values()
         filtered = filter(self._filter, population)
-        normalized.update(self._normalize(filtered, fitness_values))
+        # dict(normalized) is a copy of the initial dict, ensuring that
+        # the dict used by _normalize does not change.
+        normalized.update(self._normalize(filtered, dict(normalized)))
         return normalized
 
     def _normalize(self, population, fitness_values):
