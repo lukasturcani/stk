@@ -258,14 +258,6 @@ def ea_run(filename, input_file):
         logging_level = input_file.logging_level
     rootlogger.setLevel(logging_level)
 
-    pop.set_ea_tools(
-        generation_selector=generation_selector,
-        mutation_selector=mutation_selector,
-        crossover_selector=crossover_selector,
-        mutator=mutator,
-        crosser=crosser
-    )
-
     # EA should always use the cache.
     optimizer.set_cache_use(True)
     fitness_calculator.set_cache_use(True)
@@ -311,10 +303,13 @@ def ea_run(filename, input_file):
         pop.optimize(optimizer)
 
         logger.info('Calculating the fitness of population members.')
-        pop.calculate_member_fitness(fitness_calculator)
+        fitness_values = pop.get_fitness_values(fitness_calculator)
 
         logger.info('Normalizing fitness values.')
-        fitness_normalizer.normalize(pop)
+        fitness_values = fitness_normalizer.normalize(
+            population=pop,
+            fitness_values=fitness_values,
+        )
 
         history.log_pop(logger, pop)
 
@@ -326,16 +321,12 @@ def ea_run(filename, input_file):
         while not terminator.terminate(progress):
             gen += 1
             logger.info(f'Starting generation {gen}.')
-
-            logger.info('Starting crossovers.')
-            offspring = pop.get_offspring()
-
-            logger.info('Starting mutations.')
-            mutants = pop.get_mutants()
-
             logger.debug(f'Population size is {len(pop)}.')
 
             logger.info('Adding offsping and mutants to population.')
+
+            offspring = pop.get_offspring(crossover_selector, crosser)
+            mutants = pop.get_mutants(mutation_selector, mutator)
             pop.direct_members.extend(it.chain(offspring, mutants))
 
             logger.debug(f'Population size is {len(pop)}.')
@@ -358,16 +349,21 @@ def ea_run(filename, input_file):
             logger.info(
                 'Calculating the fitness of population members.'
             )
-            pop.calculate_member_fitness(fitness_calculator)
+            fitness_values = pop.get_fitness_values(fitness_calculator)
 
             logger.info('Normalizing fitness values.')
-            fitness_normalizer.normalize(pop)
+            fitness_values = fitness_normalizer.normalize(
+                population=pop,
+                fitness_values=fitness_values,
+            )
 
             history.log_pop(logger, pop)
             history.db(pop)
 
             logger.info('Selecting members of the next generation.')
-            pop.direct_members = list(pop.get_next_generation())
+            pop.direct_members = list(
+                pop.get_next_generation(generation_selector)
+            )
 
             history.log_pop(logger, pop)
 
@@ -381,18 +377,9 @@ def ea_run(filename, input_file):
     stk.kill_macromodel()
 
     history.dump()
-    progress.calculate_member_fitness(
-        fitness_calculator=fitness_calculator,
-        num_processes=num_processes
-    )
-    # Keep the fitness of failed molecules as None. Plotters can ignore
-    # these values to make better graphs.
-    handle_failed = fitness_normalizer._handle_failed
-    fitness_normalizer._handle_failed = False
-    fitness_normalizer.normalize(progress)
+
     for plotter in plotters:
         plotter.plot(progress)
-    fitness_normalizer._handle_failed = handle_failed
 
     os.chdir(root_dir)
     os.rename('scratch/errors.log', 'errors.log')
