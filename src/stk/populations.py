@@ -1001,8 +1001,9 @@ class Population:
     def _optimize_parallel(self, optimizer, num_processes):
         opt_fn = _Guard(optimizer, optimizer.optimize)
 
-        # Only send molecules which need to have a calculation peformed
-        # to the process pool - this should improve performance.
+        # Only send molecules which need to have a calculation
+        # performed to the process pool - this should improve
+        # performance.
         if optimizer.is_caching():
             to_evaluate = [
                 mol for mol in self if not optimizer.is_in_cache(mol)
@@ -1022,20 +1023,15 @@ class Population:
         if opened_pool:
             self.close_process_pool()
 
-        # If anything failed, raise an error.
-        for result in evaluated:
+        # Update the structures in the population.
+        for input_mol, result in zip(to_evaluate, evaluated):
             if isinstance(result, Exception):
                 raise result
 
-        # Update the structures in the population.
-        sorted_input = sorted(to_evaluate, key=lambda m: repr(m))
-        sorted_output = sorted(evaluated, key=lambda m: repr(m))
-        for input_mol, output_mol in zip(sorted_input, sorted_output):
-            assert (
-                input_mol.get_identity_key()
-                == output_mol.get_identity_key()
+            output_mol, _ = result
+            input_mol.set_position_matrix(
+                position_matrix=output_mol.get_position_matrix()
             )
-            input_mol.__dict__ = dict(vars(output_mol))
             if optimizer.is_caching():
                 optimizer.add_to_cache(input_mol)
 
@@ -1052,7 +1048,7 @@ class Population:
         faster in cases where all molecules have already been
         optimized and the `optimizer` will skip them.
         In this case creating a parallel process pool creates
-        unncessary overhead.
+        unnecessary overhead.
 
         Parameters
         ----------
@@ -1611,12 +1607,13 @@ class _Guard:
         Parameters
         ----------
         mol : :class:`.Molecule`
-            The molecule to be optimized.
+            The molecule to be passed to the function.
 
         Returns
         -------
-        :class:`.Molecule`
-            The optimized molecule.
+        :class:`tuple`
+            The input molecule is the first element of the tuple and
+            the value returned by the function is the second element.
 
         """
 
