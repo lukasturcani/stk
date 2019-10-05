@@ -1405,7 +1405,7 @@ class Population:
 
 class EAPopulation(Population):
     """
-    A population which also carries out evolutionary operations.
+    A population which also stores fitness values of molecules.
 
     Attributes
     ----------
@@ -1420,13 +1420,26 @@ class EAPopulation(Population):
 
     """
 
-    def get_fitness_values(
+    def get_fitness_values(self):
+        """
+        Return the fitness values of molecules.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps a :class:`.Molecule` to its fitness value.
+
+        """
+
+        return dict(self._fitness_values)
+
+    def set_fitness_values(
         self,
         fitness_calculator,
         num_processes=None,
     ):
         """
-        Calculates the fitness values of molecules.
+        Set the fitness values of molecules.
 
         Parameters
         ----------
@@ -1442,9 +1455,8 @@ class EAPopulation(Population):
 
         Returns
         -------
-        :class:`dict`
-            Maps every :class:`.Molecule` in the population to its
-            fitness value.
+        :class:`.EAPopulation`
+            The population is returned.
 
         """
 
@@ -1452,20 +1464,20 @@ class EAPopulation(Population):
             num_processes = psutil.cpu_count()
 
         if self._process_pool is None and num_processes == 1:
-            self._get_fitness_values_serial(fitness_calculator)
+            self._set_fitness_values_serial(fitness_calculator)
         else:
-            self._get_fitness_values_parallel(
+            self._set_fitness_values_parallel(
                 fitness_calculator=fitness_calculator,
                 num_processes=num_processes,
             )
 
-    def _get_fitness_values_serial(self, fitness_calculator):
-        return {
+    def _set_fitness_values_serial(self, fitness_calculator):
+        self._fitness_values = {
             mol: fitness_calculator.get_fitness(mol)
             for mol in self
         }
 
-    def _get_fitness_values_parallel(
+    def _set_fitness_values_parallel(
         self,
         fitness_calculator,
         num_processes,
@@ -1476,13 +1488,12 @@ class EAPopulation(Population):
             fn=fitness_calculator.get_fitness,
         )
 
-        fitness_values = {}
+        self._fitness_values = {}
         # Use a list here because the to_evaluate is iterated through
         # twice.
-        to_evaluate = list(self._handle_cached_mols(
-            fitness_calculator=fitness_calculator,
-            fitness_values=fitness_values,
-        ))
+        to_evaluate = list(
+            self._handle_cached_mols(fitness_calculator)
+        )
         # Use an existing process pool, if it exists.
         opened_pool = False
         if self._process_pool is None:
@@ -1502,91 +1513,27 @@ class EAPopulation(Population):
                 raise result
 
             _, fitness = result
-            fitness_values[mol] = fitness
+            self._fitness_values[mol] = fitness
 
             if fitness_calculator.is_caching():
                 fitness_calculator.add_to_cache(mol, fitness)
 
-        return fitness_values
+        return self
 
-    def _handle_cached_mols(self, fitness_calculator, fitness_values):
+    def _handle_cached_mols(self, fitness_calculator):
         # Only send molecules which need to have a calculation
         # performed to the process pool - this should improve
         # performance.
         if fitness_calculator.is_caching():
             for mol in self:
                 if fitness_calculator.is_in_cache(mol):
-                    fitness_values[mol] = (
+                    self._fitness_values[mol] = (
                         fitness_calculator.get_fitness(mol)
                     )
                 else:
                     yield mol
         else:
             yield from self
-
-    def get_mutants(self, selector, mutator):
-        """
-        Yield mutants.
-
-        Parameters
-        ----------
-        selector : :class:`.Selector`
-            Selects the molecules which are mutated.
-
-        mutator : :class:`.Mutator`
-            Carries out the mutations.
-
-        Yields
-        ------
-        :class:`.Molecule`
-            A mutant.
-
-        """
-
-        for i, (mol, ) in enumerate(selector.select(self), 1):
-            logger.info(f'Mutation number {i}.')
-            yield mutator.mutate(mol)
-
-    def get_next_generation(self, selector):
-        """
-        Yield members of the next generation.
-
-        Parameters
-        ----------
-        selector : :class:`.Selector`
-            Selects the molecules in the next generation.
-
-        Yields
-        ------
-        :class:`.Molecule`
-            A member of the next generation.
-
-        """
-
-        yield from (mol for mol, in selector.select(self))
-
-    def get_offspring(self, selector, crosser):
-        """
-        Yield offspring.
-
-        Parameters
-        ----------
-        selector : :class:`.Selector`
-            Selects the molecules which are crossed.
-
-        crosser : :class:`.Crosser`
-            Crosses the molecules to make the offspring.
-
-        Yields
-        ------
-        :class:`.Molecule`
-            An offspring.
-
-        """
-
-        for i, parents in enumerate(selector.select(self), 1):
-            logger.info(f'Crossover number {i}.')
-            yield from self._crosser.cross(*parents)
 
 
 class _Guard:

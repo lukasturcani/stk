@@ -303,13 +303,10 @@ def ea_run(filename, input_file):
         pop.optimize(optimizer)
 
         logger.info('Calculating the fitness of population members.')
-        fitness_values = pop.get_fitness_values(fitness_calculator)
+        pop.set_fitness_values(fitness_calculator)
 
         logger.info('Normalizing fitness values.')
-        fitness_values = fitness_normalizer.normalize(
-            population=pop,
-            fitness_values=fitness_values,
-        )
+        fitness_normalizer.normalize(pop)
 
         history.log_pop(logger, pop)
 
@@ -325,8 +322,12 @@ def ea_run(filename, input_file):
 
             logger.info('Adding offsping and mutants to population.')
 
-            offspring = pop.get_offspring(crossover_selector, crosser)
-            mutants = pop.get_mutants(mutation_selector, mutator)
+            offspring_parents = crossover_selector.select(pop)
+            offspring = it.starmap(crosser.cross, offspring_parents)
+
+            mutant_parents = mutation_selector.select(pop)
+            mutants = it.starmap(mutator.mutate, mutant_parents)
+
             pop.direct_members.extend(it.chain(offspring, mutants))
 
             logger.debug(f'Population size is {len(pop)}.')
@@ -349,20 +350,17 @@ def ea_run(filename, input_file):
             logger.info(
                 'Calculating the fitness of population members.'
             )
-            fitness_values = pop.get_fitness_values(fitness_calculator)
+            pop.set_fitness_values(fitness_calculator)
 
             logger.info('Normalizing fitness values.')
-            fitness_values = fitness_normalizer.normalize(
-                population=pop,
-                fitness_values=fitness_values,
-            )
+            fitness_normalizer.normalize(pop)
 
             history.log_pop(logger, pop)
             history.db(pop)
 
             logger.info('Selecting members of the next generation.')
             pop.direct_members = list(
-                pop.get_next_generation(generation_selector)
+                mol for mol, in generation_selector.select(pop)
             )
 
             history.log_pop(logger, pop)
