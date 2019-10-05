@@ -1475,10 +1475,12 @@ class EAPopulation(Population):
         )
 
         fitness_values = {}
-        to_evaluate = self._handle_cached_mols(
+        # Use a list here because the to_evaluate is iterated through
+        # twice.
+        to_evaluate = list(self._handle_cached_mols(
             fitness_calculator=fitness_calculator,
             fitness_values=fitness_values,
-        )
+        ))
         # Use an existing process pool, if it exists.
         opened_pool = False
         if self._process_pool is None:
