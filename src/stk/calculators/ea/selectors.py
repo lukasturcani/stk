@@ -130,7 +130,7 @@ class Batch:
         batches = (Batch(...), Batch(...), Batch(...))
         sorted_batches = sorted(batches)
 
-    Coparison is also based on fitness value
+    Comparison is also based on fitness value
 
     .. code-block:: python
 
@@ -379,7 +379,7 @@ class Selector(Calculator):
 
     """
 
-    def select(self, population):
+    def select(self, population, fitness_values):
         """
 
         """
@@ -436,16 +436,15 @@ class BatchingSelector(BoundedSelector):
             If ``True`` the same batch can be yielded more than once.
 
         fitness_modifier : :class:`callable`
-            Takes the population on which :meth:`select`is called and
-            returns a :class:`dict` mapping molecules in the population
-            to the fitness values the :class:`.Selector` should use.
-            If ``None``, each molecule is mapped to the fitness value
-            found in its :attr:`~.Molecule.fitness` attribute.
+            Takes the `fitness_values` passed to :meth:`select` and
+            returns a new mapping of fitness values the selector
+            should use. If ``None``, then the provided fitness values
+            are used.
 
         """
 
         if fitness_modifier is None:
-            fitness_modifier = self._get_fitness_values
+            fitness_modifier = self._return_fitness_values
 
         self._batch_size = batch_size
         self._duplicate_mols = duplicate_mols
@@ -454,24 +453,8 @@ class BatchingSelector(BoundedSelector):
         super().__init__(num_batches=num_batches)
 
     @staticmethod
-    def _get_fitness_values(population):
-        """
-        Map each molecule to its fitness value.
-
-        Parameters
-        ----------
-        population : :class:`iterable`
-            The population from which batches are selected.
-
-        Returns
-        -------
-        :class:`dict`
-            Maps each molecule in `population` to the fitness value
-            in its :attr:`~.Molecule.fitness` attribute.
-
-        """
-
-        return {mol: mol.fitness for mol in population}
+    def _return_fitness_values(fitness_values):
+        return fitness_values
 
     def _get_batches(self, population, fitness_values):
         """
@@ -503,7 +486,7 @@ class BatchingSelector(BoundedSelector):
             for mols in it.combinations(population, self._batch_size)
         )
 
-    def select(self, population):
+    def select(self, population, fitness_values):
         """
         Select batches of molecules from `population`.
 
@@ -511,6 +494,10 @@ class BatchingSelector(BoundedSelector):
         ----------
         population : :class:`iterable`
             A collection of molecules from which batches are selected.
+
+        fitness_values : :class:`dict`
+            A mapping from every molecule in `population` to its
+            fitness value.
 
         Yields
         ------
@@ -521,7 +508,7 @@ class BatchingSelector(BoundedSelector):
 
         batches = tuple(self._get_batches(
             population=population,
-            fitness_values=self._fitness_modifier(population)
+            fitness_values=self._fitness_modifier(fitness_values)
         ))
 
         yielded = _YieldedData()
