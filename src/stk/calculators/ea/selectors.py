@@ -379,7 +379,7 @@ class Selector(Calculator):
 
     """
 
-    def select(self, population, fitness_values):
+    def select(self, population):
         """
 
         """
@@ -436,10 +436,12 @@ class BatchingSelector(BoundedSelector):
             If ``True`` the same batch can be yielded more than once.
 
         fitness_modifier : :class:`callable`
-            Takes the `fitness_values` passed to :meth:`select` and
-            returns a new mapping of fitness values the selector
-            should use. If ``None``, then the provided fitness values
-            are used.
+            Takes a :class:`dict` mapping molecules to fitness values
+            and returns a new :class:`dict` mapping of molecules to
+            fitness values. The mapping passed to the
+            `fitness_modifier` is the one returned by the population
+            passed to :meth:`select`. If ``None``, then no modification
+            to these values is performed.
 
         """
 
@@ -486,18 +488,14 @@ class BatchingSelector(BoundedSelector):
             for mols in it.combinations(population, self._batch_size)
         )
 
-    def select(self, population, fitness_values):
+    def select(self, population):
         """
         Select batches of molecules from `population`.
 
         Parameters
         ----------
-        population : :class:`iterable`
+        population : :class:`.EAPopulation`
             A collection of molecules from which batches are selected.
-
-        fitness_values : :class:`dict`
-            A mapping from every molecule in `population` to its
-            fitness value.
 
         Yields
         ------
@@ -508,7 +506,10 @@ class BatchingSelector(BoundedSelector):
 
         batches = tuple(self._get_batches(
             population=population,
-            fitness_values=self._fitness_modifier(fitness_values)
+            fitness_values=self._fitness_modifier(
+                # Positional only as parameter can be called anything.
+                population.get_fitness_values()
+            )
         ))
 
         yielded = _YieldedData()
@@ -612,7 +613,10 @@ class RemoveBatches(Selector):
         }
         batches = self._selector._get_batches(
             population=population,
-            fitness_values=self._selector._fitness_modifier(population)
+            fitness_values=self._selector._fitness_modifier(
+                # Positional only as parameter can be called anything.
+                population.get_fitness_values()
+            )
         )
         filtered_batches = tuple(
             batch for batch in batches
@@ -728,7 +732,10 @@ class FilterBatches(Selector):
         }
         batches = self._selector._get_batches(
             population=population,
-            fitness_values=self._selector._fitness_modifier(population)
+            fitness_values=self._selector._fitness_modifier(
+                # Positional only as parameter can be called anything.
+                population.get_fitness_values()
+            )
         )
         filtered_batches = tuple(
             batch for batch in batches
