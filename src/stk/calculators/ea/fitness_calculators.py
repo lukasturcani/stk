@@ -61,12 +61,7 @@ logger = logging.getLogger(__name__)
 
 class FitnessCalculator(Calculator):
     """
-    Calculates and stores fitness values of molecules.
-
-    A :class:`FitnessCalculator` will automatically add a
-    :attr:`fitness` attribute to any :class:`.Molecule` objects
-    it calculates a fitness value for. The attribute will hold the
-    calculated fitness value
+    Calculates fitness values of molecules.
 
     """
 
@@ -77,7 +72,7 @@ class FitnessCalculator(Calculator):
         Parameters
         ----------
         mol : :class:`.Molecule`
-            The molecule whose fitness should be calculated.
+            The molecule whose fitness value should be calculated.
 
         Returns
         -------
@@ -87,11 +82,10 @@ class FitnessCalculator(Calculator):
         """
 
         if self._use_cache and mol in self._cache:
-            fitness = self._cache[mol]
-        else:
-            fitness = self._get_fitness(mol)
+            return self._cache[mol]
 
-        mol.fitness = fitness
+        fitness = self._get_fitness(mol)
+
         if self._use_cache:
             self._cache[mol] = fitness
 
