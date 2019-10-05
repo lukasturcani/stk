@@ -1005,6 +1005,8 @@ class Population:
         # performed to the process pool - this should improve
         # performance.
         if optimizer.is_caching():
+            # Use a list here because to_evaluate is iterated through
+            # twice.
             to_evaluate = [
                 mol for mol in self if not optimizer.is_in_cache(mol)
             ]
