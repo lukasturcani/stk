@@ -595,22 +595,15 @@ class RemoveBatches(_CompoundSelector, Selector):
         self._remover = remover
         super().__init__(selector=selector)
 
-    def _select(batches, yielded):
-        removed = set(self._get_removed_batches(batches))
-        filtered_batches = tuple(
-            batch for batch in batches
-            if batch.get_identity_key() not in removed
-        )
-        yield from self._selector._select(
-            batches=filtered_batches,
-            yielded=yielded,
-        )
+    def _select(self, batches, yielded):
+        valid_batches = tuple(self._get_valid_batches(batches))
+        yield from self._selector._select(valid_batches, yielded)
 
-    def _get_removed_batches(self, batches):
+    def _get_valid_batches(self, batches):
         yielded = _YieldedData()
         for batch in self._remover._select(batches, yielded):
             yielded.update(batch)
-            yield batch.get_identity_key()
+        return filter(yielded.is_unyielded_batch, batches)
 
 
 class RemoveMolecules(_CompoundSelector, Selector):
@@ -656,18 +649,18 @@ class RemoveMolecules(_CompoundSelector, Selector):
         """
 
         self._remover = remover
-        self._selector = selector
+        super().__init__(selector=selector)
 
-    def select(self, population):
-        removed = {
-            mol
-            for batch in self._remover.select(population)
-            for mol in batch
-        }
-        population = [mol for mol in population if mol not in removed]
-        yield from self._selector.select(population)
+    def _select(self, batches, yielded):
+        valid_batches = tuple(self._get_valid_batches(batches))
+        yield from self._selector._select(valid_batches, yielded)
 
-    def _
+    def _get_valid_batches(self, batches):
+        yielded = _YieldedData()
+        for batch in self._remover._select(batches, yielded):
+            yielded.update(batch)
+        yield from filter(yielded.has_no_yielded_mols, batches)
+
 
 class FilterBatches(_Selector, Selector):
     """
