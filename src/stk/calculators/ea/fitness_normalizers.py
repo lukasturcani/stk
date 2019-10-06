@@ -51,30 +51,13 @@ class FitnessNormalizer(Calculator):
 
     """
 
-    def __init__(self, filter=lambda mol: True, **kwargs):
-        """
-        Initialize a :class:`.FitnessNormalizer`.
-
-        Parameters
-        ----------
-        filter : :class:`callable`, optional
-            Takes a single parameter of type :class:`.Molecule` and
-            returns ``True`` or ``False``. Only molecules which
-            return ``True`` will have fitness values normalized. By
-            default, all molecules will have fitness values normalized.
-
-        """
-
-        self._filter = filter
-        super().__init__(filter=filter, **kwargs)
-
     def normalize(self, population):
         """
         Normalize the fitness values in `population`.
 
         Parameters
         ----------
-        population : :class:`.iterable`
+        population : :class:`.EAPopulation`
             The molecules which need to have their fitness values
             normalized.
 
@@ -87,7 +70,7 @@ class FitnessNormalizer(Calculator):
         """
 
         normalized = population.get_fitness_values()
-        filtered = filter(self._filter, population)
+        filtered = filter(self._get_filter(), population)
         # dict(normalized) is a copy of the initial dict, ensuring that
         # the dict used by _normalize does not change.
         normalized.update(self._normalize(filtered, dict(normalized)))
@@ -121,8 +104,24 @@ class FitnessNormalizer(Calculator):
 
         raise NotImplementedError()
 
+    def _get_filter(self):
+        raise NotImplementedError()
 
-class NullFitnessNormalizer(FitnessNormalizer):
+
+class _FitnessNormalizer(FitnessNormalizer):
+    """
+    Implements a part of the :class:`.FitnessNormalizer` interface.
+
+    """
+
+    def __init__(self, filter):
+        self._filter = filter
+
+    def _get_filter(self):
+        return self._filter
+
+
+class NullFitnessNormalizer(_FitnessNormalizer, FitnessNormalizer):
     """
     Does nothing.
 
@@ -148,7 +147,7 @@ class NullFitnessNormalizer(FitnessNormalizer):
         yield from ()
 
 
-class Power(FitnessNormalizer):
+class Power(_FitnessNormalizer, FitnessNormalizer):
     """
     Raises fitness values to some power.
 
@@ -258,7 +257,7 @@ class Power(FitnessNormalizer):
             yield mol, np.float_power(fitness_values[mol], self.power)
 
 
-class Multiply(FitnessNormalizer):
+class Multiply(_FitnessNormalizer, FitnessNormalizer):
     """
     Multiplies the fitness value by some coefficient.
 
@@ -371,7 +370,7 @@ class Multiply(FitnessNormalizer):
             yield mol, self._coefficient*fitness_values[mol]
 
 
-class Sum(FitnessNormalizer):
+class Sum(_FitnessNormalizer, FitnessNormalizer):
     """
     Sums the values in a :class:`list`.
 
@@ -430,7 +429,7 @@ class Sum(FitnessNormalizer):
             yield mol, sum(fitness_values[mol])
 
 
-class DivideByMean(FitnessNormalizer):
+class DivideByMean(_FitnessNormalizer, FitnessNormalizer):
     """
     Divides fitness values by the population mean.
 
@@ -539,7 +538,7 @@ class DivideByMean(FitnessNormalizer):
             yield mol, fitness_values[mol] / mean
 
 
-class ShiftUp(FitnessNormalizer):
+class ShiftUp(_FitnessNormalizer, FitnessNormalizer):
     """
     Shifts negative values to be positive.
 
@@ -652,7 +651,7 @@ class ShiftUp(FitnessNormalizer):
             yield mol, fitness_values[mol] + shift
 
 
-class ReplaceFitness(FitnessNormalizer):
+class ReplaceFitness(_FitnessNormalizer, FitnessNormalizer):
     def __init__(self, replacement_fn, filter=lambda mol: True):
         """
         Initialize a :class:`.ReplaceFitness` instance.
