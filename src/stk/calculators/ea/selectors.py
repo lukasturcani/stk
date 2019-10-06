@@ -843,6 +843,8 @@ class Best(_Selector, Selector):
 
         duplicate_batches : :class:`bool`, optional
             If ``True`` the same batch can be yielded more than once.
+            Duplicate batches can occur if the same molecule is found
+            multiple times in a population.
 
         fitness_modifier : :class:`callable`, optional
             Takes the population on which :meth:`select`is called and
@@ -853,13 +855,11 @@ class Best(_Selector, Selector):
 
         """
 
+        self._duplicate_mols = duplicate_mols
+        self._duplicate_batches = duplicate_batches
         super().__init__(
             num_batches=num_batches,
             batch_size=batch_size,
-            duplicate_mols=duplicate_mols,
-            # Note that duplicate batches can still occur in Best,
-            # if there a duplicates of an object in the population.
-            duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
 
@@ -922,6 +922,8 @@ class Worst(_Selector, Selector):
 
         duplicate_batches : :class:`bool`, optional
             If ``True`` the same batch can be yielded more than once.
+            Duplicate batches can occur if the same molecule is found
+            multiple times in a population.
 
         fitness_modifier : :class:`callable`, optional
             Takes the population on which :meth:`select`is called and
@@ -932,13 +934,11 @@ class Worst(_Selector, Selector):
 
         """
 
+        self._duplicate_mols = duplicate_mols
+        self._duplicate_batches = duplicate_batches
         super().__init__(
             num_batches=num_batches,
             batch_size=batch_size,
-            duplicate_mols=duplicate_mols,
-            # Note that duplicate batches can still occur in Worst,
-            # if there a duplicates of an object in the population.
-            duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
 
@@ -1059,11 +1059,11 @@ class Roulette(_Selector, Selector):
             num_batches = float('inf')
 
         self._generator = np.random.RandomState(random_seed)
+        self._duplicate_mols = duplicate_mols
+        self._duplicate_batches = duplicate_batches
         super().__init__(
             num_batches=num_batches,
             batch_size=batch_size,
-            duplicate_mols=duplicate_mols,
-            duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
 
@@ -1167,11 +1167,11 @@ class AboveAverage(_Selector, Selector):
 
         """
 
+        self._duplicate_mols = duplicate_mols
+        self._duplicate_batches = duplicate_batches
         super().__init__(
             num_batches=num_batches,
             batch_size=batch_size,
-            duplicate_mols=duplicate_mols,
-            duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
 
@@ -1288,11 +1288,11 @@ class Tournament(_Selector, Selector):
         if num_batches is None:
             num_batches = float('inf')
 
+        self._duplicate_mols = duplicate_mols
+        self._duplicate_batches = duplicate_batches
         super().__init__(
             num_batches=num_batches,
             batch_size=batch_size,
-            duplicate_mols=duplicate_mols,
-            duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
 
@@ -1326,7 +1326,7 @@ class StochasticUniversalSampling(_Selector, Selector):
     Yields batches of molecules through stochastic universal sampling.
 
     Stochastic universal sampling lays out batches along a line, with
-    each batch taking up length proprotional to its fitness. It
+    each batch taking up length proportional to its fitness. It
     then creates a set of evenly spaced pointers to different points
     on the line, each of which is occupied by a batch. Batches which
     are pointed to are yielded.
@@ -1403,11 +1403,11 @@ class StochasticUniversalSampling(_Selector, Selector):
         """
 
         self._generator = np.random.RandomState(random_seed)
+        self._duplicate_mols = duplicate_mols
+        self._duplicate_batches = duplicate_batches
         super().__init__(
             num_batches=num_batches,
             batch_size=batch_size,
-            duplicate_mols=duplicate_mols,
-            duplicate_batches=duplicate_batches,
             fitness_modifier=fitness_modifier,
         )
 
@@ -1421,7 +1421,7 @@ class StochasticUniversalSampling(_Selector, Selector):
         # batch will not be yielded. Instead a second round of SUS will
         # occur with any ineligible batches removed and a reduced
         # number of pointers, to account for batches yielded in the
-        # previous roounds. This will repeat until the desired number
+        # previous rounds. This will repeat until the desired number
         # of batches has been yielded, or there are no more valid
         # batches.
         while batches and yielded.get_num() < self._num_batches:
