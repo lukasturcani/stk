@@ -107,6 +107,7 @@ class ProgressPlotter(Plotter):
         filename,
         property_fn,
         y_label,
+        progress_fn=None,
         filter=lambda mol: True,
     ):
         """
@@ -118,7 +119,7 @@ class ProgressPlotter(Plotter):
             The basename of the files. This means it should not include
             file extensions.
 
-        propety_fn : :class:`callable`
+        property_fn : :class:`callable`
             A :class:`callable` which takes a :class:`.Molecule`
             object and returns a property value of that molecule,
             which is used for the plot. The :class:`callable` must
@@ -127,6 +128,12 @@ class ProgressPlotter(Plotter):
 
         y_label : :class:`str`
             The y label for the produced graph.
+
+        progress_fn : :class:`callable`, optional
+            Takes the population passed to :meth:`plot` and excutes a
+            computation on it. This may be useful if you want to
+            apply a normalization to the fitness values in the
+            progress population, for example.
 
         filter : :class:`callable`, optional
             Takes a :class:`.Molecule` as input and returns ``True``
@@ -139,6 +146,7 @@ class ProgressPlotter(Plotter):
         self._property_fn = property_fn
         self._y_label = y_label
         self._filter = filter
+        self._progress_fn = progress_fn
 
     def plot(self, progress):
         """
@@ -155,6 +163,9 @@ class ProgressPlotter(Plotter):
         None : :class:`NoneType`
 
         """
+
+        if self._progress_fn is not None:
+            self._progress_fn(progress)
 
         sns.set(style='darkgrid')
         df = pd.DataFrame()
