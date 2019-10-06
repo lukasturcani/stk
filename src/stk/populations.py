@@ -1474,6 +1474,8 @@ class EAPopulation(Population):
                 num_processes=num_processes,
             )
 
+        self._fitness_values = fitness_normalizer.normalize(self)
+
     def _set_fitness_values_serial(self, fitness_calculator):
         self._fitness_values = {
             mol: fitness_calculator.get_fitness(mol)
