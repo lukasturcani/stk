@@ -662,7 +662,7 @@ class RemoveMolecules(_CompoundSelector, Selector):
         yield from filter(yielded.has_no_yielded_mols, batches)
 
 
-class FilterBatches(_Selector, Selector):
+class FilterBatches(_CompoundSelector, Selector):
     """
     Allows a :class:`.Selector` to select only some batches.
 
@@ -702,31 +702,20 @@ class FilterBatches(_Selector, Selector):
         """
 
         self._filter = filter
-        self._selector = selector
+        super().__init__(selector=selector)
 
-    def select(self, population):
-        valid = {
-            batch.get_identity_key()
-            for batch in self._filter.select(population)
-        }
-        batches = self._selector._get_batches(
-            population=population,
-            fitness_values=self._selector._fitness_modifier(
-                # Positional only as parameter can be called anything.
-                population.get_fitness_values()
-            )
-        )
-        filtered_batches = tuple(
-            batch for batch in batches
-            if batch.get_identity_key() in valid
-        )
-        yield from self._selector._select(
-            batches=filtered_batches,
-            yielded=_YieldedData(),
-        )
+    def _select(self, batches, yielded):
+        valid_batches = tuple(self._get_valid_batches(batches))
+        yield from self._selector._select(valid_batches, yielded)
+
+    def _get_valid_batches(self, batches):
+        yielded = _YieldedData()
+        for batch in self._filter._select(batches, yielded):
+            yielded.update(batch)
+        return filter(yielded.is_yielded_batch, batches)
 
 
-class FilterMolecules(_Selector, Selector):
+class FilterMolecules(_CompoundSelector, Selector):
     """
     Allows a :class:`.Selector` to select only some molecules.
 
@@ -767,15 +756,17 @@ class FilterMolecules(_Selector, Selector):
         """
 
         self._filter = filter
-        self._selector = selector
+        super().__init__(selector=selector)
 
-    def select(self, population):
-        population = [
-            mol
-            for batch in self._filter.select(population)
-            for mol in batch
-        ]
-        yield from self._selector.select(population)
+    def _select(self, batches, yielded):
+        valid_batches = tuple(self._get_valid_batches(batches))
+        yield from self._selector._select(valid_batches, yielded)
+
+    def _get_valid_batches(self, batches):
+        yielded = _YieldedData()
+        for batch in self._filter._select(batches, yielded):
+            yielded.update(batch)
+        return filter(yielded.has_yielded_mols, batches)
 
 
 class Best(_Selector, Selector):
