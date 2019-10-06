@@ -28,7 +28,7 @@ import logging
 import numpy as np
 import itertools as it
 from collections import defaultdict
-from ..base_calculators import EAOperation
+from ..base_calculators import EAOperation, _EAOperation
 
 
 from ...utilities import dedupe
@@ -86,7 +86,7 @@ class Crosser(EAOperation):
         raise NotImplementedError()
 
 
-class GeneticRecombination(Crosser):
+class GeneticRecombination(_EAOperation, Crosser):
     """
     Recombine building blocks using biological systems as a model.
 
@@ -300,7 +300,7 @@ class GeneticRecombination(Crosser):
             )
 
 
-class Jumble(Crosser):
+class Jumble(_EAOperation, Crosser):
     """
     Distributes all building blocks among offspring.
 

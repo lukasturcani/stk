@@ -40,36 +40,12 @@ class Calculator:
 
     """
 
-    def __init__(self, **kwargs):
-        """
-        Initialize a :class:`.Calculator`.
-
-        """
-
-        return
-
 
 class MoleculeCalculator(Calculator):
     """
     Base class for calculators which operate on single molecules.
 
     """
-
-    def __init__(self, use_cache=False, **kwargs):
-        """
-        Initialize a :class:`.MoleculeCalculator`
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`, optional
-            If ``True``, the calculator will not perform a calculation
-            on the same molecule twice.
-
-        """
-
-        self._use_cache = use_cache
-        self._cache = {}
-        super().__init__(use_cache=use_cache, **kwargs)
 
     def set_cache_use(self, use_cache):
         """
@@ -144,6 +120,13 @@ class MoleculeCalculator(Calculator):
         return mol in self._cache
 
 
+class _MoleculeCalculator(MoleculeCalculator):
+    """
+    Implements the :class:`.MoleculeCalculator` interface.
+
+    """
+
+
 class EAOperation(Calculator):
     """
     Base class for :class:`.Crosser` and :class:`.Mutator`.
@@ -172,3 +155,10 @@ class EAOperation(Calculator):
 
         self._use_cache = use_cache
         return self
+
+
+class _EAOperation(EAOperation):
+    """
+    Implements the :class:`.EAOperation` interface.
+
+    """
