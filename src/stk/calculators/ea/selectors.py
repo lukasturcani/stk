@@ -379,81 +379,6 @@ class Selector(Calculator):
 
     """
 
-    def select(self, population):
-        """
-
-        """
-
-        raise NotImplementedError()
-
-
-class BoundedSelector(Selector):
-    """
-
-    """
-
-    def __init__(self, num_batches=None, **kwargs):
-        """
-
-        """
-
-        self._num_batches = num_batches
-        super().__init__(num_batches=num_batches, **kwargs)
-
-
-class BatchingSelector(BoundedSelector):
-    """
-    A base class for selectors which create their own batches.
-
-    """
-
-    def __init__(
-        self,
-        num_batches,
-        batch_size,
-        duplicate_mols,
-        duplicate_batches,
-        fitness_modifier,
-    ):
-        """
-        Initialize a :class:`.Selector` instance.
-
-        Parameters
-        ----------
-        num_batches : :class:`int`
-            The number of batches to yield. If ``None`` then yielding
-            will continue forever or until the generator is exhausted,
-            whichever comes first.
-
-        batch_size : :class:`int`
-            The number of molecules yielded at once.
-
-        duplicate_mols : :class:`bool`
-            If ``True`` the same molecule can be yielded in more than
-            one batch.
-
-        duplicate_batches : :class:`bool`
-            If ``True`` the same batch can be yielded more than once.
-
-        fitness_modifier : :class:`callable`
-            Takes a :class:`dict` mapping molecules to fitness values
-            and returns a new :class:`dict` mapping of molecules to
-            fitness values. The mapping passed to the
-            `fitness_modifier` is the one returned by the population
-            passed to :meth:`select`. If ``None``, then no modification
-            to these values is performed.
-
-        """
-
-        if fitness_modifier is None:
-            fitness_modifier = self._return_fitness_values
-
-        self._batch_size = batch_size
-        self._duplicate_mols = duplicate_mols
-        self._duplicate_batches = duplicate_batches
-        self._fitness_modifier = fitness_modifier
-        super().__init__(num_batches=num_batches)
-
     @staticmethod
     def _return_fitness_values(fitness_values):
         return fitness_values
@@ -478,6 +403,7 @@ class BatchingSelector(BoundedSelector):
 
         """
 
+        batches = it.combinations(population, self._get_batch_size())
         yield from (
             Batch(
                 mols=mols,
@@ -485,7 +411,7 @@ class BatchingSelector(BoundedSelector):
                     mol: fitness_values[mol] for mol in mols
                 }
             )
-            for mols in it.combinations(population, self._batch_size)
+            for mols in batches
         )
 
     def select(self, population):
@@ -506,7 +432,7 @@ class BatchingSelector(BoundedSelector):
 
         batches = tuple(self._get_batches(
             population=population,
-            fitness_values=self._fitness_modifier(
+            fitness_values=self._get_fitness_modifier()(
                 # Positional only as parameter can be called anything.
                 population.get_fitness_values()
             )
@@ -523,12 +449,12 @@ class BatchingSelector(BoundedSelector):
         )
 
         if (
-            self._num_batches is not None
-            and yielded.get_num() != self._num_batches
+            self._get_num_batches() is not None
+            and yielded.get_num() != self._get_num_batches()
         ):
             logger.warning(
                 f'{cls_name} was asked to yield '
-                f'{self._num_batches} batches but yielded '
+                f'{self._get_num_batches()} batches but yielded '
                 f'{yielded.get_num()}.'
             )
 
@@ -562,8 +488,71 @@ class BatchingSelector(BoundedSelector):
 
         raise NotImplementedError()
 
+    def _get_num_batches(self):
+        """
 
-class RemoveBatches(Selector):
+        """
+
+        raise NotImplementedError()
+
+    def _get_batch_size(self):
+        """
+
+        """
+
+        raise NotImplementedError()
+
+    def _get_fitness_modifier(self):
+        """
+
+        """
+
+        raise NotImplementedError()
+
+
+class _Selector(Selector):
+    """
+    Implements a part of the :class:`.Selector` interface.
+
+    """
+
+    def __init__(self, num_batches, batch_size, fitness_modifier):
+        self._num_batches = num_batches
+        self._batch_size = batch_size
+        self._fitness_modifier = fitness_modifier
+
+    def _get_num_batches(self):
+        return self._num_batches
+
+    def _get_batch_size(self):
+        return self._get_batch_size
+
+    def _get_fitness_modifier(self):
+        if self._fitness_modifier is None:
+            return self._return_fitness_values
+        return self._fitness_modifier
+
+
+class _CompoundSelector(Selector):
+    """
+    Implements a part of the :class:`.Selector` interface.
+
+    """
+
+    def __init__(self, selector):
+        self._selector = selector
+
+    def _get_num_batches(self):
+        return self._selector._get_num_batches()
+
+    def _get_batch_size(self):
+        return self._selector._get_batch_size()
+
+    def _get_fitness_modifier(self):
+        return self._selector._get_fitness_modifier()
+
+
+class RemoveBatches(_CompoundSelector, Selector):
     """
     Prevents a :class:`.Selector` from selecting some batches.
 
@@ -604,31 +593,27 @@ class RemoveBatches(Selector):
         """
 
         self._remover = remover
-        self._selector = selector
+        super().__init__(selector=selector)
 
-    def select(self, population):
-        removed = {
-            batch.get_identity_key()
-            for batch in self._remover.select(population)
-        }
-        batches = self._selector._get_batches(
-            population=population,
-            fitness_values=self._selector._fitness_modifier(
-                # Positional only as parameter can be called anything.
-                population.get_fitness_values()
-            )
-        )
+    def _select(batches, yielded):
+        removed = set(self._get_removed_batches(batches))
         filtered_batches = tuple(
             batch for batch in batches
             if batch.get_identity_key() not in removed
         )
         yield from self._selector._select(
             batches=filtered_batches,
-            yielded=_YieldedData(),
+            yielded=yielded,
         )
 
+    def _get_removed_batches(self, batches):
+        yielded = _YieldedData()
+        for batch in self._remover._select(batches, yielded):
+            yielded.update(batch)
+            yield batch.get_identity_key()
 
-class RemoveMolecules(Selector):
+
+class RemoveMolecules(_CompoundSelector, Selector):
     """
     Prevents a :class:`.Selector` from selecting some molecules.
 
@@ -682,8 +667,9 @@ class RemoveMolecules(Selector):
         population = [mol for mol in population if mol not in removed]
         yield from self._selector.select(population)
 
+    def _
 
-class FilterBatches(Selector):
+class FilterBatches(_Selector, Selector):
     """
     Allows a :class:`.Selector` to select only some batches.
 
@@ -747,7 +733,7 @@ class FilterBatches(Selector):
         )
 
 
-class FilterMolecules(Selector):
+class FilterMolecules(_Selector, Selector):
     """
     Allows a :class:`.Selector` to select only some molecules.
 
@@ -799,7 +785,7 @@ class FilterMolecules(Selector):
         yield from self._selector.select(population)
 
 
-class Best(BatchingSelector):
+class Best(_Selector, Selector):
     """
     Selects batches of molecules, highest fitness value first.
 
@@ -905,7 +891,7 @@ class Best(BatchingSelector):
         yield from it.islice(batches, self._num_batches)
 
 
-class Worst(BatchingSelector):
+class Worst(_Selector, Selector):
     """
     Selects batches of molecules, lowest fitness value first.
 
@@ -984,7 +970,7 @@ class Worst(BatchingSelector):
         yield from it.islice(batches, self._num_batches)
 
 
-class Roulette(BatchingSelector):
+class Roulette(_Selector, Selector):
     """
     Uses roulette selection to select batches of molecules.
 
@@ -1113,7 +1099,7 @@ class Roulette(BatchingSelector):
                 batches = tuple(batches)
 
 
-class AboveAverage(BatchingSelector):
+class AboveAverage(_Selector, Selector):
     """
     Yields above average batches of molecules.
 
@@ -1238,7 +1224,7 @@ class AboveAverage(BatchingSelector):
         return 1
 
 
-class Tournament(BatchingSelector):
+class Tournament(_Selector, Selector):
     """
     Yields batches of molecules through tournament selection.
 
@@ -1351,7 +1337,7 @@ class Tournament(BatchingSelector):
                 batches = tuple(batches)
 
 
-class StochasticUniversalSampling(BatchingSelector):
+class StochasticUniversalSampling(_Selector, Selector):
     """
     Yields batches of molecules through stochastic universal sampling.
 
