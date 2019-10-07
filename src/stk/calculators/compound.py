@@ -303,18 +303,68 @@ class Sequence(
             calculator.optimize(mol)
 
 
-class Random(EnergyCalculator, Optimizer):
+class Random(
+    _MoleculeCalculator,
+    EnergyCalculator,
+    Optimizer,
+):
+    """
+    Pick a calculator to use at random.
+
+    Examples
+    --------
+    Pick a random mutation operation
+
+    .. code-block:: python
+
+        mutator = stk.Random(
+            stk.RandomBuildingBlock(...),
+            stk.RandomTopologyGraph(...),
+        )
+        mol = stk.ConstructedMolecule(...)
+
+        # Mutate mol with either RandomBuildingBlock or
+        # RandomTopologyGraph, at random.
+        mutant = mutator.mutate(mol)
+
+    """
+
     def __init__(
         self,
         *calculators,
         probabilities=None,
         random_seed=None,
-        **kwargs,
+        use_cache=False,
     ):
+        """
+        Initialize a :class:`.Random` instance.
+
+        Parameters
+        ----------
+        calculators : see base classes
+            The calculator, one of which is picked at random each
+            time a calculation is requested.
+
+        probabilities : :class:`tuple` of :class:`float`, optional
+            The probability of picking each calculator in
+            `calculators`. If ``None``, all calculators have an
+            equal chance of being picked.
+
+        random_seed : :class:`int`, optional
+            The random seed for picking the calculator.
+
+        use_cache : :class:`bool`, optional
+            When used as a :class:`.MoleculeCalculator`, this toggles
+            use of the results cache. When is used as an
+            :class:`EAOperation`, this toggles use of the molecular
+            cache.
+
+        """
+
         self._calculators = calculators
         self._probabilities = probabilities
         self._generator = np.random.RandomState(random_seed)
-        super().__init__(**kwargs)
+        self._use_cache = use_cache
 
     def _optimize(self, mol):
         return self._get_calculator().optimize(mol)
