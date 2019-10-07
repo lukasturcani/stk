@@ -398,7 +398,11 @@ class RaisingCalculator(
 
         import stk
 
-
+        energy_calculator = stk.RaisingCalculator(stk.UFFEnergy())
+        mol = stk.BuildingBlock('NCCN')
+        # 50% chance of getting the energy with UFF and 50% chance
+        # of raising an error.
+        energy = energy_calculator.get_energy(mol)
 
     """
 
