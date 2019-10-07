@@ -129,13 +129,9 @@ class _MoleculeCalculator(MoleculeCalculator):
 
 class EAOperation(Calculator):
     """
-    Base class for :class:`.Crosser` and :class:`.Mutator`.
+    Abstract base class for EA operations such as mutation and crossover.
 
     """
-
-    def __init__(self, use_cache=False, **kwargs):
-        self._use_cache = use_cache
-        super().__init__(use_cache=use_cache, **kwargs)
 
     def set_cache_use(self, use_cache):
         """
@@ -151,14 +147,26 @@ class EAOperation(Calculator):
         :class:`.EAOperation`
             The calculator.
 
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
         """
 
-        self._use_cache = use_cache
-        return self
+        raise NotImplementedError()
 
 
-class _EAOperation(EAOperation):
+class _EAOperation(Calculator):
     """
     Implements the :class:`.EAOperation` interface.
 
     """
+
+    def __init__(self, use_cache):
+        self._use_cache = use_cache
+
+    def set_cache_use(self, use_cache):
+        self._use_cache = use_cache
+        return self
