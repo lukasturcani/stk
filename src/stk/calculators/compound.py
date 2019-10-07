@@ -253,19 +253,50 @@ class TryCatch(
 
 
 class Sequence(
+    _MoleculeCalculator,
     Optimizer,
 ):
     """
     Use calculators in sequence.
+
+    Examples
+    --------
+    First use :class:`.ETKDG` to optimize a molecule and then use
+    :class:`.UFF`
+
+    .. code-block:: python
+
+        import stk
+
+        optimizer = stk.Sequence(
+            stk.ETKDG(),
+            stk.UFF(),
+        )
+
+        mol = stk.BuildingBlock('NCCN')
+        optimizer.optimize(mol)
+
+
     """
 
-    def __init__(self, *calculators, **kwargs):
+    def __init__(self, *calculators, use_cache=False):
         """
+        Initialize a :class:`.Sequence` instance.
+
+        Parameters
+        ----------
+        calculators : see base classes
+            The calculators to be applied in sequence.
+
+
+        use_cache : :class:`bool`, optional
+            When used as a :class:`.MoleculeCalculator`, this toggles
+            use of the results cache.
 
         """
 
         self._calculators = calculators
-        super().__init__(**kwargs)
+        self._use_cache = use_cache
 
     def _optimize(self, mol):
         for calculator in self._calculators:
