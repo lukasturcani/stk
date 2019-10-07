@@ -402,8 +402,8 @@ class Selector(Calculator):
         yield from self._select(population)
 
     @staticmethod
-    def _return_fitness_values(fitness_values):
-        return fitness_values
+    def _return_fitness_values(population):
+        return population.get_fitness_values()
 
     def _get_batches(self, population, fitness_values):
         """
@@ -457,7 +457,7 @@ class Selector(Calculator):
             population=population,
             fitness_values=self._get_fitness_modifier()(
                 # Positional only as parameter can be called anything.
-                population.get_fitness_values()
+                population
             )
         ))
 
@@ -487,9 +487,6 @@ class Selector(Calculator):
 
         Parameters
         -----------
-        population : :class:`.EAPopulation`
-            The population from which the `batches` were made.
-
         batches : :class:`tuple` of :class:`.Batch`
             The batches from which some are selected.
 
@@ -504,12 +501,46 @@ class Selector(Calculator):
         raise NotImplementedError()
 
     def _get_num_batches(self):
+        """
+        Return the maximum number of batches which can be yielded.
+
+        Returns
+        -------
+        :class:`int`
+            The maximum number of batches which can be yielded.
+            If ``None`` then yielding may continue indefinitely or
+            until the selector is exhausted.
+
+        """
+
         raise NotImplementedError()
 
     def _get_batch_sizes(self):
+        """
+        Return the possible sizes the selected batches may have.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`int`
+            The possible sizes yielded batches may have.
+
+        """
+
         raise NotImplementedError()
 
     def _get_fitness_modifier(self):
+        """
+        Return the modifier applied to fintess values before batching.
+
+        Returns
+        -------
+        :class:`callable`
+            Takes the population on which :meth:`select` is called and
+            returns a :class:`dict` mapping molecules in the population
+            to the fitness values the :class:`.Selector` should use.
+
+        """
+
         raise NotImplementedError()
 
 
@@ -569,11 +600,22 @@ class RemoveBatches(_CompoundSelector, Selector):
 
     def _select_from_batches(self, batches, yielded):
         valid_batches = tuple(self._get_valid_batches(batches))
-        yield from self._selector._select(valid_batches, yielded)
+        yield from self._selector._select_from_batches(
+            batches=valid_batches,
+            yielded=yielded
+        )
 
     def _get_valid_batches(self, batches):
+        valid_sizes = self._remover._get_batch_sizes()
+        valid_batches = tuple(
+            filter(lambda b: b.get_size() in valid_sizes, batches)
+        )
         yielded = _YieldedData()
-        for batch in self._remover._select(batches, yielded):
+        selected_batches = self._remover._select_from_batches(
+            batches=valid_batches,
+            yielded=yielded
+        )
+        for batch in selected_batches:
             yielded.update(batch)
         return filter(yielded.is_unyielded_batch, batches)
 

@@ -60,7 +60,6 @@ optimize the molecule with a different :class:`.Sequence`
 
 import logging
 import numpy as np
-import itertools as it
 
 from .optimization import Optimizer
 from .energy import EnergyCalculator
@@ -71,6 +70,7 @@ from .ea import (
     FitnessNormalizer,
     Selector,
 )
+from .ea.selectors import _YieldedData
 from .base_calculators import _MoleculeCalculator, MoleculeCalculator
 
 
@@ -358,7 +358,12 @@ class Sequence(
 
     """
 
-    def __init__(self, *calculators, use_cache=False):
+    def __init__(
+        self,
+        *calculators,
+        use_cache=False,
+        num_batches=None,
+    ):
         """
         Initialize a :class:`.Sequence` instance.
 
@@ -367,15 +372,21 @@ class Sequence(
         calculators : see base classes
             The calculators to be applied in sequence.
 
-
         use_cache : :class:`bool`, optional
             When used as a :class:`.MoleculeCalculator`, this toggles
             use of the results cache.
+
+        num_batches : :class:`int`, optional
+            The maximum number of batches to yield across the
+            sequence. If ``None``, will yield forever or until
+            exhausted. This option is only used when used as a
+            :class:`.Selector`.
 
         """
 
         self._calculators = calculators
         self._use_cache = use_cache
+        self._num_batches = num_batches
 
     def _optimize(self, mol):
         for calculator in self._calculators:
@@ -397,12 +408,39 @@ class Sequence(
 
         return normalized
 
-    def select(self, population):
-        iterables = (
-            calculator.select(population)
+    def _get_batch_sizes(self):
+        return tuple(set(
+            size
             for calculator in self._calculators
-        )
-        yield from it.islice(it.chain(*iterables), self._num_batches)
+            for size in calculator._get_batch_sizes()
+        ))
+
+    def _get_fitness_modifier(self):
+        return self._return_fitness_values
+
+    def _select_from_batches(self, batches, yielded):
+        for calculator in self._calculators:
+            valid_sizes = calculator._get_batch_sizes()
+            valid_batches = tuple(
+                filter(lambda b: b.get_size() in valid_sizes, batches)
+            )
+            local_yielded = _YieldedData()
+            selected_batches = calculator._select_from_batches(
+                batches=valid_batches,
+                yielded=local_yielded
+            )
+            for batch in selected_batches:
+                local_yielded.update(batch)
+                yield batch
+
+                if (
+                    self._num_batches is not None
+                    and yielded.get_num() >= self._num_batches
+                ):
+                    return
+
+    def _get_num_batches(self):
+        return self._num_batches
 
 
 class Random(
