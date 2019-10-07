@@ -70,7 +70,6 @@ from .ea import (
     Crosser,
     FitnessNormalizer,
     Selector,
-    BoundedSelector,
 )
 from .base_calculators import _MoleculeCalculator
 
