@@ -132,8 +132,11 @@ class _FilteringNormalizer(FitnessNormalizer):
 
         """
 
+        def filter_fn(mol):
+            return self._filter(population, mol)
+
         normalized = population.get_fitness_values()
-        filtered = filter(self._filter, population)
+        filtered = filter(filter_fn, population)
         # dict(normalized) is a copy of the initial dict, ensuring that
         # the dict used by _get_normalized_values does not change.
         normalized.update(
@@ -236,7 +239,7 @@ class Power(_FilteringNormalizer, FitnessNormalizer):
 
     """
 
-    def __init__(self, power, filter=lambda mol: True):
+    def __init__(self, power, filter=lambda population, mol: True):
         """
         Initialize a :class:`Power` instance.
 
@@ -247,10 +250,14 @@ class Power(_FilteringNormalizer, FitnessNormalizer):
             a single number or multiple numbers.
 
         filter : :class:`callable`, optional
-            Takes a single parameter of type :class:`.Molecule` and
+            Takes a two parameters, first is a :class:`.EAPopulation`
+            and the second is a :class:`.Molecule`, and
             returns ``True`` or ``False``. Only molecules which
             return ``True`` will have fitness values normalized. By
             default, all molecules will have fitness values normalized.
+            The :class:`.EAPopulation` on which :meth:`normalize` is
+            called is passed as the first argument while the second
+            argument will be passed every :class:`.Molecule` in it.
 
         """
 
@@ -314,7 +321,11 @@ class Multiply(_FilteringNormalizer, FitnessNormalizer):
 
     """
 
-    def __init__(self, coefficient, filter=lambda mol: True):
+    def __init__(
+        self,
+        coefficient,
+        filter=lambda population, mol: True,
+    ):
         """
         Initialize a :class:`Multiply` instance.
 
@@ -325,10 +336,14 @@ class Multiply(_FilteringNormalizer, FitnessNormalizer):
             a single number or multiple numbers.
 
         filter : :class:`callable`, optional
-            Takes a single parameter of type :class:`.Molecule` and
+            Takes a two parameters, first is a :class:`.EAPopulation`
+            and the second is a :class:`.Molecule`, and
             returns ``True`` or ``False``. Only molecules which
             return ``True`` will have fitness values normalized. By
             default, all molecules will have fitness values normalized.
+            The :class:`.EAPopulation` on which :meth:`normalize` is
+            called is passed as the first argument while the second
+            argument will be passed every :class:`.Molecule` in it.
 
         """
 
@@ -360,17 +375,21 @@ class Sum(_FilteringNormalizer, FitnessNormalizer):
 
     """
 
-    def __init__(self, filter=lambda mol: True):
+    def __init__(self, filter=lambda population, mol: True):
         """
         Initialize a :class:`.Sum` instance.
 
         Parameters
         ----------
         filter : :class:`callable`, optional
-            Takes a single parameter of type :class:`.Molecule` and
+            Takes a two parameters, first is a :class:`.EAPopulation`
+            and the second is a :class:`.Molecule`, and
             returns ``True`` or ``False``. Only molecules which
             return ``True`` will have fitness values normalized. By
             default, all molecules will have fitness values normalized.
+            The :class:`.EAPopulation` on which :meth:`normalize` is
+            called is passed as the first argument while the second
+            argument will be passed every :class:`.Molecule` in it.
 
         """
 
@@ -444,17 +463,21 @@ class DivideByMean(_FilteringNormalizer, FitnessNormalizer):
 
     """
 
-    def __init__(self, filter=lambda mol: True):
+    def __init__(self, filter=lambda population, mol: True):
         """
         Initialize a :class:`.DivideByMean` instance.
 
         Parameters
         ----------
         filter : :class:`callable`, optional
-            Takes a single parameter of type :class:`.Molecule` and
+            Takes a two parameters, first is a :class:`.EAPopulation`
+            and the second is a :class:`.Molecule`, and
             returns ``True`` or ``False``. Only molecules which
             return ``True`` will have fitness values normalized. By
             default, all molecules will have fitness values normalized.
+            The :class:`.EAPopulation` on which :meth:`normalize` is
+            called is passed as the first argument while the second
+            argument will be passed every :class:`.Molecule` in it.
 
         """
 
@@ -536,17 +559,21 @@ class ShiftUp(_FilteringNormalizer, FitnessNormalizer):
 
     """
 
-    def __init__(self, filter=lambda mol: True):
+    def __init__(self, filter=lambda population, mol: True):
         """
         Initialize a :class:`.ShiftUp` instance.
 
         Parameters
         ----------
         filter : :class:`callable`, optional
-            Takes a single parameter of type :class:`.Molecule` and
+            Takes a two parameters, first is a :class:`.EAPopulation`
+            and the second is a :class:`.Molecule`, and
             returns ``True`` or ``False``. Only molecules which
             return ``True`` will have fitness values normalized. By
             default, all molecules will have fitness values normalized.
+            The :class:`.EAPopulation` on which :meth:`normalize` is
+            called is passed as the first argument while the second
+            argument will be passed every :class:`.Molecule` in it.
 
         """
 
@@ -601,7 +628,11 @@ class ReplaceFitness(FitnessNormalizer):
 
     """
 
-    def __init__(self, replacement_fn, filter=lambda mol: True):
+    def __init__(
+        self,
+        replacement_fn,
+        filter=lambda population, mol: True,
+    ):
         """
         Initialize a :class:`.ReplaceFitness` instance.
 
@@ -615,10 +646,14 @@ class ReplaceFitness(FitnessNormalizer):
             `filter`.
 
         filter : :class:`callable`, optional
-            Takes a single parameter of type :class:`.Molecule` and
+            Takes a two parameters, first is a :class:`.EAPopulation`
+            and the second is a :class:`.Molecule`, and
             returns ``True`` or ``False``. Only molecules which
             return ``True`` will have fitness values replaced. By
             default, all molecules will have fitness values replaced.
+            The :class:`.EAPopulation` on which :meth:`normalize` is
+            called is passed as the first argument while the second
+            argument will be passed every :class:`.Molecule` in it.
 
         """
 
