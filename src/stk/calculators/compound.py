@@ -71,7 +71,7 @@ from .ea import (
     FitnessNormalizer,
     Selector,
 )
-from .base_calculators import _MoleculeCalculator
+from .base_calculators import _MoleculeCalculator, MoleculeCalculator
 
 
 logger = logging.getLogger(__name__)
@@ -169,7 +169,7 @@ class If(
             return self._true_calculator.get_fitness(mol)
         return self._false_calculator.get_fitness(mol)
 
-    def _normalize(self, population, fitness_values):
+    def _normalize(self, population):
         if self._condition(population):
             return self._true_calculator.normalize(population)
         return self._false_calculator.normalize(population)
@@ -188,6 +188,24 @@ class If(
         if self._condition(population):
             return self._true_calculator.select(population)
         return self._false_calculator.select(population)
+
+    def set_cache_use(self, use_cache):
+        # When the contained calculators are MoleculeCalculators,
+        # use the implementation provided by _MoleculeCalculator.
+        # This will mean that the use_cache option on the contained
+        # calculators will not be changed. Instead If will use its own
+        # cache to return previously calculated results.
+        if isinstance(self._true_calculator, MoleculeCalculator):
+            return super().set_cache_use(use_cache)
+
+        # If the contained calculators are EAOperations then set their
+        # use_cache option to what is passed here. This is because
+        # the If instance does not control the molecular cache.
+        # So the contained calculators need to be made aware of this
+        # change directly.
+        self._true_calculator.set_cache_use(use_cache)
+        self._false_calculator.set_cache_use(use_cache)
+        return self
 
 
 class TryCatch(

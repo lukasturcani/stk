@@ -8,18 +8,21 @@ Fitness Normalizers
 #. :class:`.Sum`
 #. :class:`.DivideByMean`
 #. :class:`.ShiftUp`
+#. :class:`.If`
+#. :class:`.TryCatch`
+#. :class:`.Sequence`
+#. :class:`.Random`
+#. :class:`.RaisingCalculator`
 
 Fitness normalizers are classes which are responsible for normalizing
-the fitness values in a :class:`.Population`. They analyze the
-:attr:`fitness` values across the entire population and update them.
-Calling :meth:`~FitnessNormalizer.normalize` directly modifies the
-:attr:`fitness` attribute of :class:`.Molecule` objects.
+the fitness values in an :class:`.EAPopulation`. They analyze the
+fitness values across the entire population and calculate new ones.
 
 To see how :class:`FitnessNormalizer` can be used, look at the
 documention of the classes which inherit it, for example
-:class:`Power`, :class:`Sum` :class:`DivideByMean`. In addition,
-multiple :class:`FitnessNormalizer` can be chained using
-:meth:`.NormalizerSequence`.
+:class:`.Power`, :class:`.Sum` :class:`.DivideByMean`. In addition,
+multiple :class:`.FitnessNormalizer` can be chained using
+:meth:`.Sequence`.
 
 
 .. _`adding fitness normalizers`:
@@ -28,10 +31,8 @@ Making New Fitness Normalizers
 ------------------------------
 
 A new class inheriting :class:`FitnessNormalizer` must be made.
-The class must define a :meth:`~FitnessNormalizer._normalize` method,
-which takes one argument, which is a :class:`.Population` of
-:class:`.Molecule`.
-
+This is an abstract base class so its virtual methods need to be
+implemented.
 
 """
 
@@ -47,7 +48,15 @@ logger = logging.getLogger(__name__)
 
 class FitnessNormalizer(Calculator):
     """
-    Normalizes fitness values across a :class:`.Population`.
+    Abstract base class for fitness normalizers.
+
+    A fitness normalizer takes an :class:`EAPopulation` and
+    returns a new set of normalized fitness values for all
+    molecules in it. The primary benefit of a normalizer vs a
+    :class:`.FitnessCalculator` is that a :class:`.FitnessNormalizer`
+    has access to all members in the population when it is calculating
+    the new fitness value, whereas a :class:`.FitnessCalculator` does
+    not.
 
     """
 
@@ -69,30 +78,24 @@ class FitnessNormalizer(Calculator):
 
         """
 
-        normalized = population.get_fitness_values()
-        filtered = filter(self._get_filter(), population)
-        # dict(normalized) is a copy of the initial dict, ensuring that
-        # the dict used by _normalize does not change.
-        normalized.update(self._normalize(filtered, dict(normalized)))
-        return normalized
+        # This method can be used to decorate _normalize in the future.
+        return self._normalize(population)
 
-    def _normalize(self, population, fitness_values):
+    def _normalize(self, population):
         """
-        Yield normalized `population` fitness values.
+        Normalize fitness value in `population`.
 
         Parameters
         ----------
-        population : :class:`iterable`
-            The filtered molecules.
+        population : :class:`.EAPopulation`
+            The molecules which need to have their fitness values
+            normalized.
 
-        fitness_values : :class:`dict`
-            Maps every molecule in `population` to its fitness value.
-
-        Yields
-        ------
-        :class:`tuple`
-            Holds a :class:`.Molecule` from `population` and its
-            normalized value.
+        Returns
+        -------
+        :class:`dict`
+            Maps every molecule in `population` to its normalized
+            fitness value.
 
         Raises
         ------
@@ -104,130 +107,132 @@ class FitnessNormalizer(Calculator):
 
         raise NotImplementedError()
 
-    def _get_filter(self):
+
+class _FilteringNormalizer(FitnessNormalizer):
+    """
+    Implements some of the :class:`.FitnessNormalizer` interface.
+
+    """
+
+    def _normalize(self, population, fitness_values):
+        """
+        Normalize fitness value in `population`.
+
+        Parameters
+        ----------
+        population : :class:`.EAPopulation`
+            The molecules which need to have their fitness values
+            normalized.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps every molecule in `population` to its normalized
+            fitness value.
+
+        """
+
+        normalized = population.get_fitness_values()
+        filtered = filter(self._filter, population)
+        # dict(normalized) is a copy of the initial dict, ensuring that
+        # the dict used by _get_normalized_values does not change.
+        normalized.update(
+            self._get_normalized_values(filtered, dict(normalized))
+        )
+        return normalized
+
+    def _get_normalized_values(self, filtered, fitness_values):
+        """
+        Yield normalized `filtered` fitness values.
+
+        Parameters
+        ----------
+        filtered : :class:`iterable` of :class:`.Molecule`
+            The molecules which passed the filter.
+
+        fitness_values : :class:`dict`
+            A mapping from every molecule in `filtered` to its
+            fitness value.
+
+        Yields
+        ------
+        :class:`tuple`
+            Holds the :class:`.Molecule` as its first element and its
+            normalized fitness value as its second.
+
+        """
+
         raise NotImplementedError()
 
 
-class _FitnessNormalizer(FitnessNormalizer):
-    """
-    Implements a part of the :class:`.FitnessNormalizer` interface.
-
-    """
-
-    def __init__(self, filter):
-        self._filter = filter
-
-    def _get_filter(self):
-        return self._filter
-
-
-class NullFitnessNormalizer(_FitnessNormalizer, FitnessNormalizer):
+class NullFitnessNormalizer(FitnessNormalizer):
     """
     Does nothing.
 
     """
 
-    def __init__(self, filter=lambda mol: True):
-        """'
-        Initialize a :class:`NullFitnessNormalizer`.
-
-        Parameters
-        ----------
-        filter : :class:`callable`, optional
-            Takes a single parameter of type :class:`.Molecule` and
-            returns ``True`` or ``False``. Only molecules which
-            return ``True`` will have fitness values normalized. By
-            default, all molecules will have fitness values normalized.
-
-        """
-
-        super().__init__(filter=filter)
-
-    def _normalize(self, population, fitness_values):
-        yield from ()
+    def _normalize(self, population):
+        return population.get_fitness_values()
 
 
-class Power(_FitnessNormalizer, FitnessNormalizer):
+class Power(_FilteringNormalizer, FitnessNormalizer):
     """
     Raises fitness values to some power.
 
-    This works for cases where the :attr:`fitness` is single
+    This works for cases where the fitness value is single
     :class:`float` and where it is :class:`list` of :class:`float`.
 
     Examples
     --------
-    Raising a :attr:`fitness` value by some power.
+    Raising a fitness value by some power
 
     .. code-block:: python
 
         import stk
 
-        # Create the molecules and give them some arbitrary fitness.
-        # Normally the fitness would be set by the get_fitness() method
-        # of some a fitness calculator.
-        mol1 = stk.BuildingBlock('NCCCN')
-        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
-        mol3 = stk.ConstructedMolecule(
-            building_blocks=[mol2],
-            topology_graph=stk.polymer.Linear('A', [0], 5)
-        )
-        mol1.fitness = 1
-        mol2.fitness = 2
-        mol3.fitness = 3
-
-        # Place the molecules in a Population.
-        pop = stk.Population(mol1, mol2, mol3)
+        pop = stk.Population(...)
+        # Assume this returns {mol1: 1, mol2: 2, mol3: 3}.
+        pop.get_fitness_values()
 
         # Create the normalizer.
         power = stk.Power(2)
 
         # Normalize the fitness values.
-        power.normalize(pop)
+        normalized = power.normalize(pop)
 
-        # mol1.fitness is now 1.
-        # mol2.fitness is now 4.
-        # mol3.fitness is now 9
+        # normalized is {mol1: 1, mol2: 4, mol3: 9}.
 
-    Raising a :attr:`fitness` vector by some power.
+
+    Raising vector valued fitness values by some power
 
     .. code-block:: python
-
-        # Normally the fitness would be set by the get_fitness() method
-        # of some a fitness calculator.
-        mol1.fitness = [1, 2, 3]
-        mol2.fitness = [4, 5, 6]
-        mol3.fitness = [7, 8, 9]
 
         # Create the normalizer.
         power = stk.Power(2)
 
-        # Normalize the fitness values.
-        power.normalize(pop)
+        # Normalize the fitness values. Assume the fitness values are
+        # {mol1: [1, 2, 3], mol2: [4, 5, 6], mol3: [7, 8, 9]}.
+        normalized = power.normalize(pop)
 
-        # mol1.fitness is now [1, 4, 9].
-        # mol2.fitness is now [16, 25, 36].
-        # mol3.fitness is now [49, 64, 81]
+        # normalized is
+        # {mol1: [1, 4, 9], mol2: [16, 25, 36], mol3: [49, 64, 81]}.
 
-    Raising a :attr:`get_fitness` vector by different powers.
+
+    Raising vector valued fitness values by different powers
 
     .. code-block:: python
-
-        # Give the molecules some arbitrary fitness vectors.
-        # Normally the fitness would be set by the get_fitness() method
-        # of some a fitness calculator.
-        mol1.fitness = [1, 2, 3]
-        mol2.fitness = [4, 5, 6]
-        mol3.fitness = [7, 8, 9]
 
         # Create the normalizer.
         power = stk.Power([1, 2, 3])
 
-        # Normalize the fitness values.
-        power.normalize(pop)
+        # Normalize the fitness values. Assume the fitness values are
+        # {mol1: [1, 2, 3], mol2: [4, 5, 6], mol3: [7, 8, 9]}.
 
-        # mol1.fitness is now [1, 4, 27].
-        # mol2.fitness is now [4, 25, 216].
-        # mol3.fitness is now [7, 64, 729]
+        # Normalize the fitness values.
+        normalized = power.normalize(pop)
+
+        # normalized is
+        # {mol1: [1, 4, 27], mol2: [4, 25, 216], mol3: [7, 64, 729]}.
 
     """
 
@@ -250,14 +255,14 @@ class Power(_FitnessNormalizer, FitnessNormalizer):
         """
 
         self._power = power
-        super().__init__(filter=filter)
+        self._filter = filter
 
-    def _normalize(self, population, fitness_values):
-        for mol in population:
+    def _get_normalized_values(self, filtered, fitness_values):
+        for mol in filtered:
             yield mol, np.float_power(fitness_values[mol], self.power)
 
 
-class Multiply(_FitnessNormalizer, FitnessNormalizer):
+class Multiply(_FilteringNormalizer, FitnessNormalizer):
     """
     Multiplies the fitness value by some coefficient.
 
