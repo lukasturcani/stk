@@ -133,8 +133,6 @@ class If(
         use_cache : :class:`bool`, optional
             When :class:`.If` is used as a
             :class:`.MoleculeCalculator`, this toggles the results
-            cache. When :class:`.If` is used as an
-            :class:`EAOperation`, this toggles use of the molecular
             cache.
 
         """
@@ -218,9 +216,7 @@ class TryCatch(
 
         use_cache : :class:`bool`, optional
             When used as a :class:`.MoleculeCalculator`, this toggles
-            use of the results cache. When is used as an
-            :class:`EAOperation`, this toggles use of the molecular
-            cache.
+            use of the results cache.
 
         """
 
@@ -355,9 +351,7 @@ class Random(
 
         use_cache : :class:`bool`, optional
             When used as a :class:`.MoleculeCalculator`, this toggles
-            use of the results cache. When is used as an
-            :class:`EAOperation`, this toggles use of the molecular
-            cache.
+            use of the results cache.
 
         """
 
@@ -390,8 +384,21 @@ class RaisingCalculatorError(Exception):
     ...
 
 
-class RaisingCalculator(Optimizer, EnergyCalculator):
+class RaisingCalculator(
+    _MoleculeCalculator,
+    Optimizer,
+    EnergyCalculator,
+):
     """
+    Raise an error at random or use another calculator.
+
+    This calculator is mainly used for debugging.
+
+    .. code-block:: python
+
+        import stk
+
+
 
     """
 
@@ -400,16 +407,32 @@ class RaisingCalculator(Optimizer, EnergyCalculator):
         calculator,
         fail_chance=0.5,
         random_seed=None,
-        **kwargs
+        use_cache=False,
     ):
         """
+        Initialize a :class:`.RaisingCalculator` instance.
+
+        Parameters
+        ----------
+        calculator : see base classes
+            The calculator to use when an error is not raised.
+
+        fail_chance : :class:`float`, optional
+            The probability of raising an error.
+
+        random_seed : :class:`int`, optional
+            The random seed to use for raising an error.
+
+        use_cache : :class:`bool`, optional
+            When used as a :class:`.MoleculeCalculator`, this toggles
+            use of the results cache.
 
         """
 
         self._calculator = calculator
         self._fail_chance = fail_chance
         self._generator = np.random.RandomState(random_seed)
-        super().__init__(**kwargs)
+        self._use_cache = use_cache
 
     def _try_raising(self):
         if self._generator.rand() < self._fail_chance:
