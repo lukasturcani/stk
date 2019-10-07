@@ -90,7 +90,6 @@ class If(
     """
     Use a `condition` to pick a calculator.
 
-
     Examples
     --------
     Use ETKDG to optimize the structure of a molecule if it has
