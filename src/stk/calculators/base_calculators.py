@@ -146,6 +146,30 @@ class MoleculeCalculator(Calculator):
 
         raise NotImplementedError()
 
+    def get_cached_value(self, mol):
+        """
+        Return the value stored in the cache for `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule whose cached value is to be returned.
+
+        Returns
+        -------
+        :class:`object`
+            The cached value.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
+
 
 class _MoleculeCalculator(MoleculeCalculator):
     """
@@ -238,3 +262,21 @@ class _MoleculeCalculator(MoleculeCalculator):
         """
 
         return mol in self._cache
+
+    def get_cached_value(self, mol):
+        """
+        Return the value stored in the cache for `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule whose cached value is to be returned.
+
+        Returns
+        -------
+        :class:`object`
+            The cached value.
+
+        """
+
+        return self._cache[mol]
