@@ -477,75 +477,62 @@ class ShiftUp(_FilteringNormalizer, FitnessNormalizer):
     """
     Shifts negative fitness values to be positive.
 
-    Assume you have a vector valued fitness value, where each number
+    Assume you have a vector-valued fitness value, where each number
     represents a different property of the molecule
 
     .. code-block:: python
 
-        mol.fitness = [1, -10, 1]
+        {mol1: [1, -10, 1]}
 
-    One way to convert the fitness array into a fitness value is
-    by summing the elements, and the result in this case would be
-    ``-8``. Clearly this doesn't work, because the resulting fitness
-    value is not a positive number. To fix this, the ``-10`` should be
-    shifted to a positive value.
+    One way to convert the vector-valued fitness value into a
+    scalar fitness value is by summing the elements, and the result in
+    this case would be ``-8``. Clearly this doesn't work, because the
+    resulting fitness value is not a positive number. To fix this,
+    the ``-10`` should be shifted to a positive value.
 
-    This :class:`FitnessNormalizer` finds the minimum value of each
-    property across the entire population, and for properties where
-    this minimum value is less than ``0``, shifts up the property value
-    for every molecule in the population, so that the minimum value is
-    ``1``.
+    :class:`.ShiftUp` finds the minimum value of each element in the
+    vector-valued fitness value across the entire population, and for
+    element where this minimum value is less than ``0``, shifts up
+    the element value for every molecule in the population, so that the
+    minimum value in the entire population is ``1``.
 
-    For example, take a population with the fitness vectors
-
-    .. code-block:: python
-
-        mol1.fitness = [1, -5, 5]
-        mol2.fitness = [3, -10, 2]
-        mol3.fitness = [2, 20, 1]
-
-    After normalization fitness vectors will be.
+    For example, take a population with the vector-valued fitness
+    values
 
     .. code-block:: python
 
-        mol1.fitness  # [1, 6, 5]
-        mol2.fitness  # [3, 1, 2]
-        mol3.fitness  # [2, 31, 1]
+        fitness_values = {
+            mol1: [1, -5, 5],
+            mol2: [3, -10, 2],
+            mol3: [2, 20, 1],
+        }
 
-    This :class:`FitnessNormalizer` also works when the :attr:`fitness`
-    is a single value.
+    After normalization the fitness values will be.
+
+    .. code-block:: python
+
+        normalized  = {
+            mol1: [1, 6, 5],
+            mol2: [3, 1, 2],
+            mol3: [2, 31, 1],
+        }
+
+    This :class:`.ShiftUp` also works when the fitness value is a
+    single value.
 
     Examples
     --------
     .. code-block:: python
 
-        # Create the molecules and give them some arbitrary fitness
-        # vectors.
-        # Normally the fitness would be set by the fitness() method of
-        # some a fitness calculator.
-        mol1 = stk.BuildingBlock('NCCCN')
-        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
-        mol3 = stk.ConstructedMolecule(
-            building_blocks=[mol2],
-            topology_graph=stk.polymer.Linear('A', [0], 5)
-        )
-
-        mol1.fitness = [1, -2, 3]
-        mol2.fitness = [4, 5, -6]
-        mol3.fitness = [7, 8, 9]
-
-        # Place the molecules in a Population.
-        pop = Population(mol1, mol2, mol3)
-
         # Create the normalizer.
-        shifter = ShiftUp([1, 2, 3])
+        shifter = ShiftUp()
 
-        # Normalize the fitness values.
-        shifter.normalize(pop)
+        # Normalize the fitness values. Assume the fitness values are
+        # {mol1: [1, -2, 3], mol2: [4, 5, -6], mol3: [7, 8, 9]}.
+        normalized = shifter.normalize(pop)
 
-        # mol1.fitness is now [1, 1, 10].
-        # mol2.fitness is now [4, 8, 1].
-        # mol3.fitness is now [7, 11, 16]
+        # normalized is
+        # {mol1: [1, 1, 10], mol2: [4, 8, 1], mol3: [7, 11, 16]}.
 
     """
 
@@ -563,11 +550,14 @@ class ShiftUp(_FilteringNormalizer, FitnessNormalizer):
 
         """
 
-        super().__init__(filter=filter)
+        self._filter = filter
 
-    def _normalize(self, population, fitness_values):
+    def _get_normalized_values(self, filtered, fitness_values):
+        # filtered is iterated through multiple times.
+        filtered = list(filtered)
+
         # Get all the fitness arrays in a matrix.
-        fmat = np.array([fitness_values[mol] for mol in population])
+        fmat = np.array([fitness_values[mol] for mol in filtered])
 
         # Get the minimum value of each element across the population.
         # keepdims ensures that np.min returns a 1-D array, because
@@ -582,7 +572,7 @@ class ShiftUp(_FilteringNormalizer, FitnessNormalizer):
             if min_ <= 0:
                 shift[i] = 1 - min_
 
-        for mol in population:
+        for mol in filtered:
             yield mol, fitness_values[mol] + shift
 
 
