@@ -63,13 +63,46 @@ import numpy as np
 
 from .optimization import Optimizer
 from .energy import EnergyCalculator
+from .base_calculators import _MoleculeCalculator
 
 
 logger = logging.getLogger(__name__)
 
 
-class If(EnergyCalculator, Optimizer):
+class If(
+    _MoleculeCalculator,
+    EnergyCalculator,
+    Optimizer,
+):
     """
+    Use a `condition` to pick a calculator.
+
+
+    Examples
+    --------
+    Use ETKDG to optimize the structure of a molecule if it has
+    less than 200 atoms, else use the MMFF force field
+
+    .. code-block:: python
+
+        import stk
+
+        optimizer = stk.If(
+            condition=lambda mol: len(mol.atoms) < 200,
+            true_calculator=stk.ETKDG(),
+            false_calculator=stk.MMFF(),
+        )
+
+        # ETKDG will be run on this molecule.
+        small_mol = stk.BuildingBlock('NCCN', ['amine'])
+        optimizer.optimize(small_mol)
+
+        # MMFF will be run on polymer.
+        polymer = stk.ConstructedMolecule(
+            building_blocks=[bb],
+            topology_graph=stk.polymer.Linear('A', 500),
+        )
+        optimizer.optimize(polymer)
 
     """
 
@@ -78,16 +111,38 @@ class If(EnergyCalculator, Optimizer):
         condition,
         true_calculator,
         false_calculator,
-        **kwargs,
+        use_cache=False,
     ):
         """
+        Initialize a :class:`.If` instance.
+
+        Parameters
+        ----------
+        condition : :class:`callable`
+            A callable which is passed the arguments which are to
+            be passed to the calculators. If it returns ``True``
+            then `true_calculator` will be used, if ``False``, then
+            `false_calculator` will be used.
+
+        true_calculator : see base classes
+            The calculator to use if `condition` returns ``True``.
+
+        false_calculator : see base classes
+            The calculator to use if `condition` returns ``False``.
+
+        use_cache : :class:`bool`, optional
+            When :class:`.If` is used as a
+            :class:`.MoleculeCalculator`, this toggles the results
+            cache. When :class:`.If` is used as an
+            :class:`EAOperation`, this toggles use of the molecular
+            cache.
 
         """
 
         self._condition = condition
         self._true_calculator = true_calculator
         self._false_calculator = false_calculator
-        super().__init__(**kwargs)
+        self._use_cache = use_cache
 
     def _optimize(self, mol):
         if self._condition(mol):
@@ -100,8 +155,41 @@ class If(EnergyCalculator, Optimizer):
         return self._false_calculator.get_energy(mol)
 
 
-class TryCatch(EnergyCalculator, Optimizer):
+class TryCatch(
+    _MoleculeCalculator,
+    EnergyCalculator,
+    Optimizer,
+):
     """
+    Try one calculator and if it raises an error use another.
+
+    Examples
+    --------
+    Try using the MMFF force field to optimize a molecule and if it
+    fails use the UFF force field
+
+    .. code-block:: python
+
+        import stk
+
+        optimizer = stk.TryCatch(
+            try_calculator=stk.MMFF(),
+            catch_calculator=stk.UFF(),
+        )
+        mol = stk.BuildingBlock('NCCN')
+        optimizer.optimize(mol)
+
+    Try using the MMFF force field to calculate energy and if it
+    fails use the UFF force field
+
+    .. code-block:: python
+
+        energy_calculator = stk.TryCatch(
+            try_calculator=stk.MMFFEnergy(),
+            catch_calculator=stk.UFFEnergy(),
+        )
+        mol = stk.BuildingBlock('NCCN')
+        energy = energy_calculator.get_energy(mol)
 
     """
 
@@ -110,16 +198,36 @@ class TryCatch(EnergyCalculator, Optimizer):
         try_calculator,
         catch_calculator,
         catch_type=Exception,
-        **kwargs,
+        use_cache=True,
     ):
         """
+        Initialize a :class:`.TryCatch` instance.
+
+        Parameters
+        ----------
+        try_calculator : see base classes
+            The calculator to try using first.
+
+        catch_calculator : see base classes
+            The calculator to use if `try_calculator` raises an
+            error.
+
+        catch_type : :class:`Exception`
+            The `catch_calculator` will only be run if the
+            `try_calculator` raises an exception of this type.
+
+        use_cache : :class:`bool`, optional
+            When used as a :class:`.MoleculeCalculator`, this toggles
+            use of the results cache. When is used as an
+            :class:`EAOperation`, this toggles use of the molecular
+            cache.
 
         """
 
         self._try_calculator = try_calculator
         self._catch_calculator = catch_calculator
         self._catch_type = catch_type
-        super().__init__(**kwargs)
+        self._use_cache = use_cache
 
     def _optimize(self, mol):
         try:
@@ -144,9 +252,11 @@ class TryCatch(EnergyCalculator, Optimizer):
         )
 
 
-class Sequence(Optimizer):
+class Sequence(
+    Optimizer,
+):
     """
-
+    Use calculators in sequence.
     """
 
     def __init__(self, *calculators, **kwargs):
