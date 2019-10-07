@@ -85,7 +85,6 @@ class If(
     FitnessNormalizer,
     Mutator,
     Optimizer,
-    Selector,
 ):
     """
     Use a `condition` to pick a calculator.
@@ -183,11 +182,6 @@ class If(
         if self._condition(mol):
             return self._true_calculator.optimize(mol)
         return self._false_calculator.optimize(mol)
-
-    def _select(self, population):
-        if self._condition(population):
-            return self._true_calculator.select(population)
-        return self._false_calculator.select(population)
 
     def set_cache_use(self, use_cache):
         # When the contained calculators are MoleculeCalculators,
@@ -524,7 +518,6 @@ class RaisingCalculator(
     FitnessNormalizer,
     Mutator,
     Optimizer,
-    Selector,
 ):
     """
     Raise an error at random or use another calculator.
@@ -602,7 +595,3 @@ class RaisingCalculator(
     def _mutate(self, mol):
         self._try_raising()
         return self._calculator.mutate(mol)
-
-    def select(self, population):
-        self._try_raising()
-        return self._calculator.select(population)
