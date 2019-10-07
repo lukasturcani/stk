@@ -146,6 +146,30 @@ class MoleculeCalculator(Calculator):
 
         raise NotImplementedError()
 
+    def get_cached_value(self, mol):
+        """
+        Return the value stored in the cache for `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule whose cached value is to be returned.
+
+        Returns
+        -------
+        :class:`object`
+            The cached value.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
+
 
 class _MoleculeCalculator(MoleculeCalculator):
     """
@@ -153,7 +177,18 @@ class _MoleculeCalculator(MoleculeCalculator):
 
     """
 
-    def __init__(self, use_cache):
+    def __init__(self, use_cache=False):
+        """
+        Initialize the :class:`.Calculator`.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`, optional
+            If ``True``, a calculation will not be performed on the
+            same molecule twice.
+
+        """
+
         self._use_cache = use_cache
 
     def set_cache_use(self, use_cache):
@@ -227,6 +262,24 @@ class _MoleculeCalculator(MoleculeCalculator):
         """
 
         return mol in self._cache
+
+    def get_cached_value(self, mol):
+        """
+        Return the value stored in the cache for `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule whose cached value is to be returned.
+
+        Returns
+        -------
+        :class:`object`
+            The cached value.
+
+        """
+
+        return self._cache[mol]
 
 
 class EAOperation(Calculator):

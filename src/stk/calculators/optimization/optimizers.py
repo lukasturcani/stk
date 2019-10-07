@@ -76,12 +76,8 @@ Making New Optimizers
 ---------------------
 
 New optimizers can be made by simply making a class which inherits the
-:class:`.Optimizer` class. In addition to this, the new class must
-define a :meth:`~.Optimizer._optimize` method. The method must take 1
-mandatory `mol` parameter. :meth:`~.Optimizer._optimize` will take the
-`mol` and change its structure in whatever way it likes. Beyond this
-there are no requirements. New optimizers can be added into the
-:mod:`.optimizers` submodule or into a new submodule.
+:class:`.Optimizer` class. This is an abstract base class and its
+virtual methods must be implemented.
 
 """
 
@@ -99,7 +95,7 @@ from ...utilities import (
 )
 import pywindow
 
-from ..base_calculators import MoleculeCalculator
+from ..base_calculators import MoleculeCalculator, _MoleculeCalculator
 
 
 logger = logging.getLogger(__name__)
@@ -107,7 +103,7 @@ logger = logging.getLogger(__name__)
 
 class Optimizer(MoleculeCalculator):
     """
-    A base class for optimizers.
+    An abstract base class for optimizers.
 
     """
 
@@ -126,13 +122,13 @@ class Optimizer(MoleculeCalculator):
 
         """
 
-        if self._use_cache and mol in self._cache:
+        if self.is_caching() and self.is_in_cache(mol):
             logger.info(f'Skipping optimization on {mol}.')
             return
 
         self._optimize(mol)
-        if self._use_cache:
-            self._cache[mol] = None
+        if self.is_caching():
+            self.add_to_cache(mol)
 
     def _optimize(self, mol):
         """
@@ -158,7 +154,7 @@ class Optimizer(MoleculeCalculator):
         raise NotImplementedError()
 
 
-class CageOptimizerSequence(Optimizer):
+class CageOptimizerSequence(_MoleculeCalculator, Optimizer):
     """
     Applies :class:`Optimizer` objects to a cage.
 
@@ -181,18 +177,30 @@ class CageOptimizerSequence(Optimizer):
             building_blocks=[bb1, bb2],
             topology_graph=stk.cage.FourPlusSix()
         )
-        optimizer = stk.CageOptimizerSequence(stk.ETKDG(), stk.MMFF())
+        optimizer = stk.CageOptimizerSequence(
+            num_expected_windows=4,
+            optimizers=(stk.ETKDG(), stk.MMFF()),
+        )
         optimizer.optimize(cage)
 
     """
 
-    def __init__(self, *optimizers, use_cache=False):
+    def __init__(
+        self,
+        num_expected_windows,
+        optimizers,
+        use_cache=False
+    ):
         """
         Initialize a :class:`CageOptimizerSequence` instance.
 
         Parameters
         ----------
-        *optimizers : :class:`Optimizer`
+        num_expected_windows : class:`int`
+            The number of windows expected if the cage is not
+            collapsed.
+
+        optimizers : :class:`tuple` of :class:`Optimizer`
             The :class:`Optimizers` used in sequence to optimize
             cage molecules.
 
@@ -202,6 +210,7 @@ class CageOptimizerSequence(Optimizer):
 
         """
 
+        self._num_expected_windows = num_expected_windows
         self._optimizers = optimizers
         super().__init__(use_cache=use_cache)
 
@@ -212,9 +221,7 @@ class CageOptimizerSequence(Optimizer):
         Parameters
         ----------
         mol : :class:`.Molecule`
-            The cage to be optimized. It must have an attribute
-            :attr:`num_windows`, which contains the expected number
-            of windows if the cage is not collapsed.
+            The cage to be optimized.
 
         Returns
         -------
@@ -230,7 +237,10 @@ class CageOptimizerSequence(Optimizer):
                 windows = pw_molecule.calculate_windows()
             logger.debug(f'Windows found: {windows}.')
 
-            if windows is None or len(windows) != mol.num_windows:
+            if (
+                windows is None
+                or len(windows) != self._num_expected_windows
+            ):
                 logger.info(f'"{mol}" is collapsed, exiting early.')
                 return
 
@@ -239,7 +249,7 @@ class CageOptimizerSequence(Optimizer):
             optimizer.optimize(mol)
 
 
-class NullOptimizer(Optimizer):
+class NullOptimizer(_MoleculeCalculator, Optimizer):
     """
     Does not perform optimizations.
 
@@ -268,7 +278,7 @@ class NullOptimizer(Optimizer):
         return
 
 
-class MMFF(Optimizer):
+class MMFF(_MoleculeCalculator, Optimizer):
     """
     Use the MMFF force field to optimize molecules.
 
@@ -306,7 +316,7 @@ class MMFF(Optimizer):
         mol.update_from_rdkit_mol(rdkit_mol)
 
 
-class UFF(Optimizer):
+class UFF(_MoleculeCalculator, Optimizer):
     """
     Use the UFF force field to optimize molecules.
 
@@ -344,7 +354,7 @@ class UFF(Optimizer):
         mol.update_from_rdkit_mol(rdkit_mol)
 
 
-class ETKDG(Optimizer):
+class ETKDG(_MoleculeCalculator, Optimizer):
     """
     Uses the ETKDG [#]_ v2 algorithm to find an optimized structure.
 
@@ -416,7 +426,7 @@ class XTBConvergenceError(XTBOptimizerError):
     ...
 
 
-class XTB(Optimizer):
+class XTB(_MoleculeCalculator, Optimizer):
     """
     Uses GFN-xTB [1]_ to optimize molecules.
 
