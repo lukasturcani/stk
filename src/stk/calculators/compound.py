@@ -184,7 +184,7 @@ class If(
             return self._true_calculator.optimize(mol)
         return self._false_calculator.optimize(mol)
 
-    def select(self, population):
+    def _select(self, population):
         if self._condition(population):
             return self._true_calculator.select(population)
         return self._false_calculator.select(population)

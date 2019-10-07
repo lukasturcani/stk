@@ -369,6 +369,10 @@ class _YieldedData:
 
 
 class Selector(Calculator):
+
+
+
+class _BatchingSelector(Selector):
     """
     Selects batches of molecules from a population.
 

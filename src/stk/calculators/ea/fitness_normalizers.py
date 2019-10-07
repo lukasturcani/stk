@@ -259,93 +259,58 @@ class Power(_FilteringNormalizer, FitnessNormalizer):
 
     def _get_normalized_values(self, filtered, fitness_values):
         for mol in filtered:
-            yield mol, np.float_power(fitness_values[mol], self.power)
+            yield mol, np.float_power(fitness_values[mol], self._power)
 
 
 class Multiply(_FilteringNormalizer, FitnessNormalizer):
     """
-    Multiplies the fitness value by some coefficient.
+    Multiplies the fitness values by some coefficient.
 
     Examples
     --------
-    Multiplying a :attr:`fitness` value by a coefficient.
+    Multiplying a fitness value by a coefficient.
 
     .. code-block:: python
 
         import stk
 
-        # Create the molecules and give them some arbitrary fitness.
-        # Normally the fitness would be set by the get_fitness() method
-        # of some a fitness calculator.
-
-        mol1 = stk.BuildingBlock('NCCCN')
-        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
-        mol3 = stk.ConstructedMolecule(
-            building_blocks=[mol2],
-            topology_graph=stk.polymer.Linear('A', [0], 5)
-        )
-
-        mol1.fitness = 1
-        mol2.fitness = 2
-        mol3.fitness = 3
-
-        # Place the molecules in a Population.
-        pop = stk.Population(mol1, mol2, mol3)
-
         # Create the normalizer.
         multiply = stk.Multiply(2)
 
-        # Normalize the fitness values.
-        multiply.normalize(pop)
+        # Normalize the fitness values. Assume the fitness values are
+        # {mol1: 1, mol2: 2, mol3: 3}.
+        normalized = multiply.normalize(pop)
 
-        # mol1.fitness is now 2.
-        # mol2.fitness is now 4.
-        # mol3.fitness is now 6
+        # normalized is
+        # {mol1: 2, mol2: 4, mol3: 6}.
 
-    Multiplying a :attr:`fitness` vector by some coefficient.
+
+    Multiplying a vector of fitness values by some coefficient
 
     .. code-block:: python
 
-        # Give the molecules some arbitrary fitness vectors.
-        # Normally the fitness would be set by the get_fitness() method
-        # of some a fitness calculator.
-        mol1.fitness = [1, 2, 3]
-        mol2.fitness = [4, 5, 6]
-        mol3.fitness = [7, 8, 9]
-
-        # Place the molecules in a Population.
-        pop = stk.Population(mol1, mol2, mol3)
-
-        # Create the normalizer.
         multiply = stk.Multiply(2)
 
-        # Normalize the fitness values.
-        multiply.normalize(pop)
+        # Normalize the fitness values. Assume the fitness values are
+        # {mol1: [1, 2, 3], mol2: [4, 5, 6], mol3: [7, 8, 9]}.
+        normalized = multiply.normalize(pop)
 
-        # mol1.fitness is now [2, 4, 6].
-        # mol2.fitness is now [8, 10, 12].
-        # mol3.fitness is now [14, 16, 18]
+        # normalized is
+        # {mol1: [2, 4, 6], mol2: [8, 10, 12], mol3: [14, 16, 18]}.
 
-    Multiplying a :attr:`fitness` vector by different coefficients.
+
+    Multiplying a vector of fitness values by different coefficients
 
     .. code-block:: python
 
-        # Give the molecules some arbitrary fitness vectors.
-        # Normally the fitness would be set by the get_fitness() method
-        # of some a fitness calculator.
-        mol1.fitness = [1, 2, 3]
-        mol2.fitness = [4, 5, 6]
-        mol3.fitness = [7, 8, 9]
+        multiple = stk.Multiply([1, 2, 3])
 
-        # Create the normalizer.
-        multiply = stk.Multiply([1, 2, 3])
+        # Normalize the fitness values. Assume the fitness values are
+        # {mol1: [1, 2, 3], mol2: [4, 5, 6], mol3: [7, 8, 9]}.
+        normalized = multiply.normalize(pop)
 
-        # Normalize the fitness values.
-        multiply.normalize(pop)
-
-        # mol1.fitness is now [1, 4, 9].
-        # mol2.fitness is now [4, 10, 18].
-        # mol3.fitness is now [7, 16, 27]
+        # normalized is
+        # {mol1: [1, 4, 9], mol2: [4, 10, 18], mol3: [7, 16, 27]}.
 
     """
 
@@ -368,14 +333,14 @@ class Multiply(_FilteringNormalizer, FitnessNormalizer):
         """
 
         self._coefficient = coefficient
-        super().__init__(filter=filter)
+        self._filter = filter
 
-    def _normalize(self, population, fitness_values):
-        for mol in population:
+    def _get_normalized_values(self, filtered, fitness_values):
+        for mol in filtered:
             yield mol, self._coefficient*fitness_values[mol]
 
 
-class Sum(_FitnessNormalizer, FitnessNormalizer):
+class Sum(_FilteringNormalizer, FitnessNormalizer):
     """
     Sums the values in a :class:`list`.
 
@@ -383,33 +348,15 @@ class Sum(_FitnessNormalizer, FitnessNormalizer):
     --------
     .. code-block:: python
 
-        mol1 = stk.BuildingBlock('NCCCN')
-        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
-        mol3 = stk.ConstructedMolecule(
-            building_blocks=[mol2],
-            topology_graph=stk.polymer.Linear('A', [0], 5)
-        )
-
-        # Create the molecules and give them some arbitrary fitness
-        # vectors.
-        # Normally the fitness would be set by the fitness() method of
-        # some a fitness calculator.
-        mol1.fitness = [1, 2, 3]
-        mol2.fitness = [4, 5, 6]
-        mol3.fitness = [7, 8, 9]
-
-        # Place the molecules in a Population.
-        pop = stk.Population(mol1, mol2, mol3)
-
         # Create the normalizer.
         sum_normalizer = stk.Sum()
 
-        # Normalize the fitness values.
-        sum_normalizer.normalize(pop)
+        # Normalize the fitness values. Assume the fitness values are
+        # {mol1: [1, 2, 3], mol2: [4, 5, 6], mol3: [7, 8, 9]}.
+        normalized = sum_normalizer.normalize(pop)
 
-        # mol1.fitness is now 6.
-        # mol2.fitness is now 15.
-        # mol3.fitness is now 24.
+        # normalized is
+        # {mol1: 6, mol2: 15, mol3: 24}
 
     """
 
@@ -427,92 +374,73 @@ class Sum(_FitnessNormalizer, FitnessNormalizer):
 
         """
 
-        super().__init__(filter=filter)
+        self._filter = filter
 
-    def _normalize(self, population, fitness_values):
-        for mol in population:
+    def _get_normalized_values(self, filtered, fitness_values):
+        for mol in filtered:
             yield mol, sum(fitness_values[mol])
 
 
-class DivideByMean(_FitnessNormalizer, FitnessNormalizer):
+class DivideByMean(_FilteringNormalizer, FitnessNormalizer):
     """
     Divides fitness values by the population mean.
 
-    While this function can be used if the :attr:`fitness` attribute
-    of each :class:`.Molecule` in the :class:`.Population` is a single
-    number it is most useful when :attr:`fitness` is a :class:`list`
-    of numbers. In this case, it is necessary to somehow combine the
-    numbers so that a single :attr:`fitness` value is produced.
-    For example, take a :attr:`fitness` vector holding the properties
-    ``[energy, diameter, num_atoms]``. For a given molecule these
-    numbers may be something like ``[200,000, 12, 140]``. If we were
-    to sum these numbers, the energy term would dominate the final
+    While this function can be used if the fitness value of each
+    :class:`.Molecule` in the :class:`.EAPopulation` is a single
+    number, it is most useful when the fitness values is a
+    :class:`list` of numbers. In this case, it is necessary to somehow
+    combine the numbers so that a single fitness value is produced.
+    For example, take a fitness value which is the vector holding the
+    properties ``[energy, diameter, num_atoms]``. For a given molecule
+    these numbers may be something like ``[200,000, 12, 140]``. If we
+    were to sum these numbers, the energy term would dominate the final
     fitness value. In order to combine these numbers we can divide them
     by the population averages. For example, if the average energy
     of molecules in the population is ``300,000`` the average diameter
     is ``10`` and the average number of atoms is ``70`` then the
     fitness vector would be scaled to ``[0.5, 1.2, 2]``. These
-    numbers are now of a similar magnitude and can be some to give a
-    reasonable value. After scaling each parameter represents how
+    numbers are now of a similar magnitude and can be summed to give a
+    reasonable value. After division , each value represents how
     much better than the population average each property value is.
     In essence we have removed the units from each parameter.
 
     Examples
     --------
-    Scale fitness values.
+    Scale fitness values
 
     .. code-block:: python
 
         import stk
 
-        # Create the molecules and give them some arbitrary fitness
-        # vectors.
-        # Normally the fitness would be set by the fitness() method of
-        # some a fitness calculator.
-        mol1 = stk.BuildingBlock('NCCCN')
-        mol2 = stk.BuildingBlock('[Br]CCC[Br]', ['bromine'])
-        mol3 = stk.ConstructedMolecule(
-            building_blocks=[mol2],
-            topology_graph=stk.polymer.Linear('A', [0], 5)
-        )
-
-        mol1.fitness = 1
-        mol2.fitness = 2
-        mol3.fitness = 3
-
-        # Place the molecules in a Population.
-        pop = stk.Population(mol1, mol2, mol3)
-
-        # Create the normalizer.
         mean_scaler = stk.DivideByMean()
 
         # Normalize the fitness values.
-        mean_scaler.normalize(pop)
+        # Assume the fitness values are
+        # {mol1: 1, mol2: 2, mol3: 3}
+        normalized = mean_scaler.normalize(pop)
 
-        # mol1.fitness is now 0.5.
-        # mol2.fitness is now 1.
-        # mol3.fitness is now 1.5.
+        # normalized is
+        # {mol1: 0.5, mol2: 1, mol3: 1.5}
 
-    Scale fitness vectors.
+
+    Scale fitness vectors
 
     .. code-block:: python
 
-        # Give the molecules some arbitrary fitness vectors.
-        # Normally the fitness would be set by the get_fitness() method
-        # of some a fitness calculator.
-        mol1.fitness = [1, 10, 100]
-        mol2.fitness = [2, 20, 200]
-        mol3.fitness = [3, 30, 300]
-
         # Create the normalizer.
-        mean_scaler = DivideByMean()
+        # mean_scaler = DivideByMean()
 
         # Normalize the fitness values.
-        mean_scaler.normalize(pop)
+        # Assume the fitness values are
+        # {mol1: [1, 10, 100], mol2: [2, 20, 100], mol3: [3, 30, 100]}.
+        normalized = mean_scaler.normalize(pop)
 
-        # mol1.fitness is now [0.5, 0.5, 0.5].
-        # mol2.fitness is now [1, 1, 1].
-        # mol3.fitness is now [1.5, 1.5, 1.5].
+        # normalized is
+        # {
+        #     mol1: [0.5, 0.5, 0.5],
+        #     mol2: [1, 1, 1],
+        #     mol3: [1.5, 1.5, 1.5]
+        # }.
 
     """
 
@@ -530,25 +458,27 @@ class DivideByMean(_FitnessNormalizer, FitnessNormalizer):
 
         """
 
-        super().__init__(filter=filter)
+        self._filter = filter
 
-    def _normalize(self, population, fitness_values):
+    def _get_normalized_values(self, filtered, fitness_values):
+        # filtered gets iterated through multiple times.
+        filtered = list(filtered)
         mean = np.mean(
-            a=[fitness_values[mol] for mol in population],
+            a=[fitness_values[mol] for mol in filtered],
             axis=0,
         )
         logger.debug(f'Means used in DivideByMean: {mean}')
 
-        for mol in population:
+        for mol in filtered:
             yield mol, fitness_values[mol] / mean
 
 
-class ShiftUp(_FitnessNormalizer, FitnessNormalizer):
+class ShiftUp(_FilteringNormalizer, FitnessNormalizer):
     """
-    Shifts negative values to be positive.
+    Shifts negative fitness values to be positive.
 
-    Assume you have a fitness vector, where each number represents
-    a different property of the molecule
+    Assume you have a vector valued fitness value, where each number
+    represents a different property of the molecule
 
     .. code-block:: python
 
