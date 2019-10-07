@@ -1433,6 +1433,25 @@ class EAPopulation(Population):
 
         return dict(self._fitness_values)
 
+    def set_fitness_values_from_dict(self, fitness_values):
+        """
+        Set the fitness values of molecules.
+
+        Parameters
+        ----------
+        fitness_values : :class:`dict`
+            Maps molecules in the population to their fitness
+            values.
+
+        Returns
+        -------
+        :class:`.EAPopulation`
+            The population is returned.
+
+        """
+
+        self._fitness_values = dict(fitness_values)
+
     def set_fitness_values(
         self,
         fitness_calculator,

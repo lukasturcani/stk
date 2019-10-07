@@ -305,7 +305,7 @@ class TryCatch(
             self._log_failure()
             return self._catch_calculator.get_fitness(mol)
 
-    def _normalize(self, population, fitness_values):
+    def _normalize(self, population):
         try:
             return self._try_calculator.normalize(population)
         except self._catch_type:
@@ -387,14 +387,21 @@ class Sequence(
         for calculator in self._calculators:
             calculator.optimize(mol)
 
-    def _normalize(self, population, fitness_values):
-        # Create a list as population is an iterable which gets used
-        # multiple times.
-        population = list(population)
-        normalized = dict(fitness_values)
-        for calculator in self._calculators:
-            normalized = calculator.normalize(population, normalized)
-        yield from normalized.items()
+    def _normalize(self, population):
+        # A FitnessNormalizer is not expected to change the
+        # fitness values of a population when normalize() is called.
+        # However this needs to happen in order to chain normalizers.
+        # Therefore, make sure the original fitness values are restored
+        # when the method exits.
+        normalized = initial = population.get_fitness_values()
+        try:
+            for calculator in self._calculators:
+                normalized = calculator.normalize(population)
+                population.set_fitness_values_from_dict(normalized)
+        finally:
+            population.set_fitness_values_from_dict(initial)
+
+        return normalized
 
     def select(self, population):
         iterables = (
