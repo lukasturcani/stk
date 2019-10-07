@@ -153,7 +153,18 @@ class _MoleculeCalculator(MoleculeCalculator):
 
     """
 
-    def __init__(self, use_cache):
+    def __init__(self, use_cache=False):
+        """
+        Initialize the :class:`.Calculator`.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`, optional
+            If ``True``, a calculation will not be performed on the
+            same molecule twice.
+
+        """
+
         self._use_cache = use_cache
 
     def set_cache_use(self, use_cache):
