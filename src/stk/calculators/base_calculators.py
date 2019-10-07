@@ -147,7 +147,7 @@ class MoleculeCalculator(Calculator):
         raise NotImplementedError()
 
 
-class _MoleculeCalculator(Calculator):
+class _MoleculeCalculator(MoleculeCalculator):
     """
     Implements the :class:`.MoleculeCalculator` interface.
 
