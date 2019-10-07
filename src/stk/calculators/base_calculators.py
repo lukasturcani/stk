@@ -4,48 +4,157 @@ Base Calculators
 
 #. :class:`.Calculator`
 #. :class:`.MoleculeCalculator`
+#. :class:`.EAOperation`
 
-This module provide calculator classes which serve as bases classes
-for other types for calculators. Note that calculators defined here do
-not act as base classes for calculators which are used by users. The
-ususal inheritance scheme is :class:`.Calculator` is subclassed by
-:class:`CalculatorType` which is subclassed by
+This module provides calculator classes which serve as abstract base
+classes for other types for calculators. Note that calculators defined
+here do not act as direct base classes for calculators which are used
+by users. The ususal inheritance scheme is :class:`.Calculator` is
+subclassed by :class:`CalculatorType` which is subclassed by
 :class:`UserCalculatorType`. For example, :class:`.Calculator` is
-subclassed by :class:`.Optimizer`
-(technically via :class:`.MolecularCalculator` but that is an
-implementation detail which doesn't matter) and :class:`.Optimizer` is
-subclassed by :class:`.ETKDG`. Only :class:`ETKDG` is instantiated
-and used by the user.
+subclassed by :class:`.Optimizer` and :class:`.Optimizer` is
+subclassed by :class:`.ETKDG`. Only :class:`.ETKDG` is instantiated
+and used by the user. Note that :class:`.Optimizer` does not
+subclass :class:`.Calculator` directly, it is subclassed via
+:class:`.MolecularCalculator`, this is an implementation detail of the
+:class:`.Optimizer` class.
 
-So :class:`.Calculator` simply serves as a common base class for
-every other ``stk`` calculators. The direct subclass of
+:class:`.Calculator` simply serves as a common abstract base class
+for every other ``stk`` calculator. The direct subclass of
 :class:`.Calculator` is an abstract base class which defines a new
 type of calculator for ``stk``, for example :class:`.Optimizer`
-or :class:`.EnergyCalculator`. These define the type of calculation.
-Finally the subclasses of :class:`.Optimizer` or
+or :class:`.EnergyCalculator`. These define an interface for the new
+type of calculation. Finally the subclasses of :class:`.Optimizer` or
 :class:`EnergyCalculator` implement the calculation. For example
 :class:`.ETKDG` or :class:`.MMFF``or different implementations of an
 optimization, which the user can use.
 
-Of course there can be intermediate classes between any of these
-subclasses to allow code re-use, :class:`.MoleculeCalculator` is an
-example of such a class.
+For some of the abstract base classes provided here, an implementation
+is also provided. If the implementation is inherited, the abstract base
+class it implements should also be inherited, explicitly and directly.
+This is because inheriting the implementation class is purely an
+implementation detail that should be treated as invisible to the user
+of the class.
 
 """
 
 
 class Calculator:
     """
-    A base class for all calculators.
+    Abstract base class for all calculators.
 
     """
 
 
 class MoleculeCalculator(Calculator):
     """
-    Base class for calculators which operate on single molecules.
+    Abstract base class for calculators used on single molecules.
 
     """
+
+    def set_cache_use(self, use_cache):
+        """
+        Set cache use on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the cache is to be used.
+
+        Returns
+        -------
+        :class:`.MoleculeCalculator`
+            The calculator.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
+
+    def is_caching(self):
+        """
+        ``True`` if the calculator has caching turned on.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if the calculator has caching turned on.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
+
+    def add_to_cache(self, mol, value=None):
+        """
+        Add a molecule to the cache.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be added to the cache.
+
+        value : class:`object`, optional
+            The cached value associated with the molecule.
+
+        Returns
+        -------
+        :class:`.MoleculeCalculator`
+            The calculator.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
+
+    def is_in_cache(self, mol):
+        """
+        Return ``True`` if `mol` is cached.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule being checked.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `mol` is cached.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
+
+
+class _MoleculeCalculator(MoleculeCalculator):
+    """
+    Implements the :class:`.MoleculeCalculator` interface.
+
+    """
+
+    def __init__(self, use_cache):
+        self._use_cache = use_cache
 
     def set_cache_use(self, use_cache):
         """
@@ -120,16 +229,9 @@ class MoleculeCalculator(Calculator):
         return mol in self._cache
 
 
-class _MoleculeCalculator(MoleculeCalculator):
-    """
-    Implements the :class:`.MoleculeCalculator` interface.
-
-    """
-
-
 class EAOperation(Calculator):
     """
-    Abstract base class for EA operations such as mutation and crossover.
+    Abstract base class for operations such as mutation or crossover.
 
     """
 
@@ -158,7 +260,7 @@ class EAOperation(Calculator):
         raise NotImplementedError()
 
 
-class _EAOperation(Calculator):
+class _EAOperation(EAOperation):
     """
     Implements the :class:`.EAOperation` interface.
 
@@ -168,5 +270,20 @@ class _EAOperation(Calculator):
         self._use_cache = use_cache
 
     def set_cache_use(self, use_cache):
+        """
+        Set use of the molecular cache on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the molecular cache is to be used.
+
+        Returns
+        -------
+        :class:`.EAOperation`
+            The calculator.
+
+        """
+
         self._use_cache = use_cache
         return self
