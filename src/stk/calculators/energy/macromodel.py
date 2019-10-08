@@ -4,9 +4,10 @@ import subprocess as sp
 
 from ...utilities import move_generated_macromodel_files
 from .energy_calculators import EnergyCalculator, EnergyError
+from ..base_calculators import _MoleculeCalculator
 
 
-class MacroModelEnergy(EnergyCalculator):
+class MacroModelEnergy(_MoleculeCalculator, EnergyCalculator):
     """
     Calculates the energy using MacroModel.
 

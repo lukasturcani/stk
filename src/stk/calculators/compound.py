@@ -153,6 +153,7 @@ class If(
         self._true_calculator = true_calculator
         self._false_calculator = false_calculator
         self._use_cache = use_cache
+        self._cache = {}
 
     def _cross(self, *mols):
         if self._condition(*mols):
@@ -310,6 +311,7 @@ class TryCatch(
         self._catch_calculator = catch_calculator
         self._catch_type = catch_type
         self._use_cache = use_cache
+        self._cache = {}
 
     def _optimize(self, mol):
         try:
@@ -456,6 +458,7 @@ class Sequence(
         self._calculators = calculators
         self._use_cache = use_cache
         self._num_batches = num_batches
+        self._cache = {}
 
     def _optimize(self, mol):
         for calculator in self._calculators:
@@ -569,6 +572,7 @@ class Random(
         self._probabilities = probabilities
         self._generator = np.random.RandomState(random_seed)
         self._use_cache = use_cache
+        self._cache = {}
 
     def _optimize(self, mol):
         return self._get_calculator().optimize(mol)
@@ -709,6 +713,7 @@ class RaisingCalculator(
         self._fail_chance = fail_chance
         self._generator = np.random.RandomState(random_seed)
         self._use_cache = use_cache
+        self._cache = {}
 
     def _try_raising(self):
         if self._generator.rand() < self._fail_chance:

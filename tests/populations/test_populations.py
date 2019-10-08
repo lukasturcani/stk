@@ -280,8 +280,8 @@ def test_optimize(tmp_population):
     tmp_population.optimize(optimizer)
     assert len(optimizer._cache) == len(set(tmp_population))
 
-    raiser = stk.RaisingOptimizer(optimizer, 1)
-    with pytest.raises(stk.RaisingOptimizerError):
+    raiser = stk.RaisingCalculator(optimizer, 1)
+    with pytest.raises(stk.RaisingCalculatorError):
         tmp_population.optimize(raiser)
 
 

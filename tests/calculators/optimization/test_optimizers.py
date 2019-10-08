@@ -125,7 +125,10 @@ def test_cage_optimizer_sequence(tmp_opt_cc3, tmp_cc3):
     init_cc3 = energy_calculator.get_energy(tmp_cc3)
 
     mmff = stk.MMFF()
-    sequence = stk.CageOptimizerSequence(mmff)
+    sequence = stk.CageOptimizerSequence(
+        num_expected_windows=4,
+        optimizers=(mmff, ),
+    )
     sequence.optimize(tmp_opt_cc3)
     sequence.optimize(tmp_cc3)
 
