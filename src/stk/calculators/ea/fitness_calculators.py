@@ -4,20 +4,20 @@ Fitness Calculators
 
 #. :class:`.PropertyVector`
 #. :class:`.RaisingFitnessCalculator`
+#. :class:`.If`
+#. :class:`.TryCatch`
+#. :class:`.Random`
+#. :class:`.RaisingCalculator`
 
 Fitness calculators are classes which inherit
 :class:`FitnessCalculator` and define a
 :meth:`~FitnessCalculator.get_fitness` method. This method is
 used to calculate the fitness of molecules. A
 :class:`FitnessCalculator` will hold calculated fitness values in a
-cache. The method will also create a :attr:`fitness` attribute on the
-molecules it evaluates, which holds the fitness value. The values
-calculated by :meth:`~FitnessCalculator.get_fitness` can be any Python
-object, as long as the :attr:`fitness` value after
+cache. The values calculated by :meth:`~FitnessCalculator.get_fitness`
+can be any Python object, as long as the value after
 :class:`FitnessNormalizer.normalize` is
-applied is set to a positive, non-zero :class:`float`. The calculated
-fitness may also be ``None`` to indicate a failed calculation.
-
+applied is set to a positive, non-zero :class:`float`.
 The :class:`FitnessCalculator` can be pickled if the calculated values
 are to be saved.
 
@@ -25,7 +25,7 @@ For examples of how a :class:`FitnessCalculator` may be used, look
 at the documentation of classes which inherit it, for example
 :class:`PropertyVector`.
 
-During the GA, fitness values are initially calculated by a
+During the EA, fitness values are initially calculated by a
 fitness calculator, which is an instance of a
 :class:`FitnessCalculator`. After this, fitness normalization takes
 place through an instance of a :class:`.FitnessNormalizer`. The
@@ -43,23 +43,21 @@ Making New Fitness Calculators
 ------------------------------
 
 A new class inheriting :class:`FitnessCalculator` must be created.
-The class must define a :meth:`~FitnessCalculator._get_fitness` method,
-which takes one parameter, `mol`, which takes a
-:class:`.Molecule` object and is the molecule whose fitness is to be
-calculated.
+:class:`FitnessCalculator` is an abstract base class and its virtual
+methods must be implemented.
 
 """
 
 import logging
 import numpy as np
 
-from ..calculator import Calculator
+from ..base_calculators import MoleculeCalculator, _MoleculeCalculator
 
 
 logger = logging.getLogger(__name__)
 
 
-class FitnessCalculator(Calculator):
+class FitnessCalculator(MoleculeCalculator):
     """
     Calculates fitness values of molecules.
 
@@ -81,13 +79,13 @@ class FitnessCalculator(Calculator):
 
         """
 
-        if self._use_cache and mol in self._cache:
-            return self._cache[mol]
+        if self.is_caching() and self.is_in_cache(mol):
+            return self.get_cached_value(mol)
 
         fitness = self._get_fitness(mol)
 
-        if self._use_cache:
-            self._cache[mol] = fitness
+        if self.is_caching():
+            self.add_to_cache(mol, fitness)
 
         return fitness
 
@@ -116,13 +114,27 @@ class FitnessCalculator(Calculator):
         raise NotImplementedError()
 
 
-class FitnessFunction(FitnessCalculator):
+class FitnessFunction(_MoleculeCalculator, FitnessCalculator):
     """
+    Takes a function and uses it as a calculator.
 
     """
 
     def __init__(self, fitness_fn, use_cache=False):
         """
+        Initialize a :class:`.FitnessFunction` instance.
+
+        Parameters
+        ----------
+        fitness_fn : :class:`callable`
+            Take a single parameter, the :class:`.Molecule` whose
+            fitness needs to be calculated, and returns its
+            fitness value.
+
+        use_cache : :class:`bool`, optional
+            If ``True`` a fitness calculation will not be performed on
+            the same molecule twice, instead the previously returned
+            value will be returned.
 
         """
 
@@ -133,95 +145,7 @@ class FitnessFunction(FitnessCalculator):
         return self._fitness_fn(mol)
 
 
-class RaisingFitnessCalculatorError(Exception):
-    ...
-
-
-class RaisingFitnessCalculator(FitnessCalculator):
-    """
-    Raises and calculates fitness at random.
-
-    This fitness calculator is used for debugging to simulate
-    cases where the fitness calculation raises an error.
-
-    Examples
-    --------
-    .. code-block:: python
-
-        import stk
-
-        mol = stk.BuildingBlock('NCCNCCN', ['amine'])
-        calc = stk.PropertyVector(lambda mol: len(mol.atoms))
-        partial_raiser = RaisingFitnessCalculator(
-            fitness_calculator=calc,
-            fail_chance=0.75
-        )
-        # 75 % chance an error will be raised by calling get_fitness.
-        partial_raiser.get_fitness(mol)
-
-    """
-
-    def __init__(
-        self,
-        fitness_calculator,
-        fail_chance=0.5,
-        use_cache=False
-    ):
-        """
-        Initialize a :class:`RaisingFitnessCalculator` instance.
-
-        Parameters
-        ----------
-        fitness_calculator : :class:`FitnessCalculator`
-            When the fitness calculator does not fail, it uses this
-            :class:`FitnessCalculator` to calculate fitness of
-            molecules.
-
-        fail_chance : :class:`float`, optional
-            The probability that the fitness calculator will raise an
-            error each time :meth:`fitness` is used.
-
-        use_cache : :class:`bool`, optional
-            If ``True`` then fitness values for molecules already held
-            in the cache are not re-calculated but the value already
-            stored is used.
-
-        """
-
-        self._fitness_calculator = fitness_calculator
-        self._fail_chance = fail_chance
-        super().__init__(use_cache=use_cache)
-
-    def _get_fitness(self, mol):
-        """
-        Get the fitness value of `mol`.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule whose fitness should be calculated.
-
-        Returns
-        -------
-        :class:`object`
-            Whatever the :meth:`get_fitness` method of
-            :attr:`fitness_calculator` returns.
-
-        Raises
-        ------
-        :class:`RaisingFitnessCalculatorError`
-            This error is raised at random.
-
-        """
-
-        if np.random.rand() < self._fail_chance:
-            raise RaisingFitnessCalculatorError(
-                    'Used RaisingFitnessCalculator'
-            )
-        return self._fitness_calculator.get_fitness(mol)
-
-
-class PropertyVector(FitnessCalculator):
+class PropertyVector(_MoleculeCalculator, FitnessCalculator):
     """
     Calculates a set of properties of a molecule.
 
@@ -230,11 +154,6 @@ class PropertyVector(FitnessCalculator):
     to a :class:`list`. The :class:`list` forms the property vector of
     the molecule and it is returned as the fitness value of the
     molecule.
-
-    If any of the :class:`function` returns ``None``, then instead of
-    a :class:`list` the fitness value will be ``None``. In essence,
-    :class:`PropertyVector` requires that all properties were
-    successfully calculated.
 
     Examples
     --------
@@ -272,28 +191,16 @@ class PropertyVector(FitnessCalculator):
         # holding the number of atoms, diameter and energy of mol1,
         # respectively.
         mol1_fitness = fitness_calculator.get_fitness(mol1)
-        # The molecule will also have a fitness attribute holding the
-        # result.
-        if mol1.fitness == mol1_fitness:
-            print('Fitness attribute added.')
 
         # Calculate the fitness vector of mol2. It will be a list
         # holding the number of atoms, diameter and energy of mol2,
         # respectively.
         mol2_fitness = fitness_calculator.get_fitness(mol2)
-        # The molecule will also have a fitness attribute holding the
-        # result.
-        if mol2.fitness == mol2_fitness:
-            print('Fitness attribute added.')
 
         # Calculate the fitness vector of mol3. It will be a list
         # holding the number of atoms, diameter and energy of mol3,
         # respectively.
         mol3_fitness = fitness_calculator.get_fitness(mol3)
-        # The molecule will also have a fitness attribute holding the
-        # result.
-        if mol3.fitness == mol3_fitness:
-            print('Fitness attribute added.')
 
 
     Use on :class:`.ConstructedMolecule` objects
@@ -301,7 +208,7 @@ class PropertyVector(FitnessCalculator):
     .. code-block:: python
 
         # First create molecules whose fitness value we wish to
-        # caclculate.
+        # calculate.
         bb1 = stk.BuildingBlock('[Br]CC[Br]', ['bromine'])
         polymer1 = stk.ConstructedMolecule(
             building_blocks=[bb1],
@@ -319,7 +226,7 @@ class PropertyVector(FitnessCalculator):
             return len(mol.atoms)
 
         def diameter(mol):
-            return mol.maximum_diamater()
+            return mol.maximum_diameter()
 
         def monomer_number(mol):
             return sum(mol.building_block_counter.values())
@@ -333,21 +240,13 @@ class PropertyVector(FitnessCalculator):
 
         # Calculate the fitness vector of polymer1. It will be a list
         # holding the number of atoms, diameter and the number of
-        # monomers in polymer1, espectively.
+        # monomers in polymer1, respectively.
         polymer1_fitness = fitness_calculator.get_fitness(polymer1)
-        # The molecule will also have a fitness attribute holding the
-        # result.
-        if polymer1.fitness == polymer1_fitness:
-            print('Fitness attribute added.')
 
         # Calculate the fitness vector of polymer2. It will be a list
         # holding the number of atoms, diameter and the number of
-        # monomers in polymer2, espectively.
+        # monomers in polymer2, respectively.
         polymer2_fitness = fitness_calculator.get_fitness(polymer2)
-        # The molecule will also have a fitness attribute holding the
-        # result.
-        if polymer2.fitness == polymer2_fitness:
-            print('Fitness attribute added.')
 
     """
 
@@ -396,14 +295,5 @@ class PropertyVector(FitnessCalculator):
             logger.info(
                 f'Using {property_fn.__name__} on "{mol}".'
             )
-            r = property_fn(mol)
-            if r is None:
-                logger.warning(
-                    f'Using '
-                    f'{property_fn.__name__} on "{mol}" failed.'
-                )
-            property_vector.append(r)
-        if None in property_vector:
-            return None
-        else:
-            return property_vector
+            property_vector.append(property_fn(mol))
+        return property_vector
