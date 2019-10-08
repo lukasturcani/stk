@@ -1495,7 +1495,9 @@ class EAPopulation(Population):
                 num_processes=num_processes,
             )
 
-        self._fitness_values = fitness_normalizer.normalize(self)
+        if fitness_normalizer is not None:
+            self._fitness_values = fitness_normalizer.normalize(self)
+
         for pop in self.subpopulations:
             pop.set_fitness_values_from_dict(self._fitness_values)
 

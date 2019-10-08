@@ -386,19 +386,19 @@ def test_contains(tmp_population, population):
     assert all(m in population for m in population.clone())
 
 
-def test_calculate_member_fitness(tmp_population):
+def test_set_fitness_values_from_calculators(tmp_population):
 
     pop = stk.EAPopulation(*tmp_population)
 
     fitness_calculator = stk.PropertyVector(lambda m: 12)
     pop.set_fitness_values_from_calculators(fitness_calculator)
 
-    for mol, fitness in pop.get_fitness_values():
+    for mol, fitness in pop.get_fitness_values().items():
         assert fitness == [12]
 
     with pytest.raises(stk.RaisingCalculatorError):
         calc = stk.RaisingCalculator(
-            fitness_calculator=fitness_calculator,
+            calculator=fitness_calculator,
             fail_chance=1,
         )
         pop.set_fitness_values_from_calculators(calc)
