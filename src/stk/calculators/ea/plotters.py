@@ -400,7 +400,7 @@ class SelectionPlotter(Plotter):
             return self._heat_map_value(population, mol)
 
        def order_by(mol):
-           return self._order_by(population, mol)
+            return self._order_by(population, mol)
 
         self._plots += 1
         sns.set(style='darkgrid')
