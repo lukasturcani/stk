@@ -285,10 +285,13 @@ class SelectionPlotter(Plotter):
         filename,
         selector,
         x_label='Molecule: name - fitness value',
-        molecule_label=lambda mol: f'{mol} - {mol.fitness}',
-        heat_map_value=lambda mol: mol.fitness,
+        molecule_label=lambda population, mol:
+            f'{mol} - {population.get_fitness_values()[mol]}',
+        heat_map_value=lambda population, mol:
+            population.get_fitness_values()[mol],
         heat_map_label='Fitness',
-        order_by=lambda mol: mol.fitness
+        order_by=lambda population, mol:
+            population.get_fitness_values()[mol],
     ):
         """
         Initialize a :class:`SelectionPlotter` instance.
@@ -307,25 +310,27 @@ class SelectionPlotter(Plotter):
             The label use for the x axis.
 
         molecule_label : :class:`callable`, optional
-            A :class:`callable` which takes one parameter, a
-            :class:`.Molecule` which is to be included on the x-axis
-            of the counter plot. It shoud return a string, which is the
-            label used for the :class:`.Molecule` on the plot.
+            A :class:`callable` which takes a :class:`.EAPopulation`
+            and a :class:`.Molecule`, for each molecule which is to be
+            included on the x-axis of the counter plot. It should
+            return a string, which is the label used for the
+            :class:`.Molecule` on the plot.
 
         heat_map_value : :class:`callable`, optional
-            A :class:`callable`, which takes a single parameter,
-             a :class:`.Molecule` which is to be included on the x-axis
-             and returns a value. The value is used for coloring the
-             heat map used in the plot.
+            A :class:`callable`, which takes a :class:`.EAPopulation`
+            and a :class:`.Molecule`, for each molecule which is to be
+            included on the x-axis, and returns a value. The value is
+            used for coloring the heat map used in the plot.
 
         heat_map_label : :class:`str`, optional
             The label used for the heat map key.
 
         order_by : :class:`callable`, optional
-            A :class:`callable`, which takes a single parameter, a
-            :class:`.Molecule` which is to be included on the x-axis
-            and returns a value. The value is used to sort the plotted
-            molecules along the x-axis in descending order.
+            A :class:`callable`, which takes a :class:`.EAPopulation`
+            and a :class:`.Molecule`, for each molecule which is to be
+            included on the x-axis, and returns a value. The value is
+            used to sort the plotted molecules along the x-axis in
+            descending order.
 
         """
 
@@ -365,16 +370,19 @@ class SelectionPlotter(Plotter):
             for selected in select(population):
                 counter.update(selected)
                 yield selected
-            self._plot(counter)
+            self._plot(population, counter)
 
         return inner
 
-    def _plot(self, counter):
+    def _plot(self, population, counter):
         """
         Plot a selection counter.
 
         Parameters
         ----------
+        population : :class:`.EAPopulation`
+            The population from which molecules were selected.
+
         counter : :class:`collections.Counter`
             A counter specifying which molecules were selected and how
             many times.
@@ -385,18 +393,27 @@ class SelectionPlotter(Plotter):
 
         """
 
+        def molecule_label(mol):
+            return self._molecule_label(population, mol)
+
+        def heat_map_value(mol):
+            return self._heat_map_value(population, mol)
+
+       def order_by(mol):
+           return self._order_by(population, mol)
+
         self._plots += 1
         sns.set(style='darkgrid')
         fig = plt.figure()
 
         df = pd.DataFrame()
         for mol, selection_count in counter.items():
-            label = self._molecule_label(mol)
+            label = molecule_label(mol)
             data = {
                 self._x_label: label,
                 'Number of times selected': selection_count,
-                'order': self._order_by(mol),
-                'heat_map': self._heat_map_value(mol)
+                'order': order_by(mol),
+                'heat_map': heat_map_value(mol)
             }
             df = df.append(data, ignore_index=True)
 
