@@ -533,8 +533,12 @@ class Random(
     def _cross(self, *mols):
         return self._get_calculator().cross(*mols)
 
-    def select(self, population):
-        return self._get_calculator().select(population)
+    def _select(self, population, included_batches, excluded_baches):
+        return self._get_calculator().select(
+            population=population,
+            included_batches=included_batches,
+            excluded_baches=excluded_baches,
+        )
 
     def _get_calculator(self):
         calculator = self._generator.choice(
