@@ -1452,7 +1452,7 @@ class EAPopulation(Population):
 
         self._fitness_values = dict(fitness_values)
 
-    def set_fitness_values(
+    def set_fitness_values_from_calculators(
         self,
         fitness_calculator,
         fitness_normalizer=None,
