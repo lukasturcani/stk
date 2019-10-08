@@ -49,7 +49,6 @@ methods must be implemented.
 """
 
 import logging
-import numpy as np
 
 from ..base_calculators import MoleculeCalculator, _MoleculeCalculator
 
