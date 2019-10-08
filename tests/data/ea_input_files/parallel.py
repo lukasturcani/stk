@@ -152,7 +152,7 @@ plotters = [
     stk.ProgressPlotter(
         filename='fitness_plot',
         property_fn=lambda progress, mol:
-            population.get_fitness_values()[mol],
+            progress.get_fitness_values()[mol],
         y_label='Fitness',
         progress_fn=lambda progress:
             progress.set_fitness_values_from_calculators(
