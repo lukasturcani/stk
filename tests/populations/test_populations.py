@@ -389,18 +389,16 @@ def test_contains(tmp_population, population):
 def test_calculate_member_fitness(tmp_population):
 
     pop = stk.EAPopulation(*tmp_population)
-    for mol in pop:
-        assert not hasattr(mol, 'fitness')
 
     fitness_calculator = stk.PropertyVector(lambda m: 12)
-    pop.calculate_member_fitness(fitness_calculator)
+    pop.set_fitness_values_from_calculators(fitness_calculator)
 
-    for mol in pop:
-        assert mol.fitness == [12]
+    for mol, fitness in pop.get_fitness_values():
+        assert fitness == [12]
 
-    with pytest.raises(stk.RaisingFitnessCalculatorError):
-        calc = stk.RaisingFitnessCalculator(
+    with pytest.raises(stk.RaisingCalculatorError):
+        calc = stk.RaisingCalculator(
             fitness_calculator=fitness_calculator,
-            fail_chance=1
+            fail_chance=1,
         )
-        pop.calculate_member_fitness(calc)
+        pop.set_fitness_values_from_calculators(calc)

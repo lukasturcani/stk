@@ -97,8 +97,10 @@ def generation():
     pop = stk.Population(
         *(stk.BuildingBlock('C') for i in range(50))
     )
-    for i, mol in enumerate(pop):
-        mol.fitness = i
+    pop.set_fitness_values_from_dict(
+        {mol: i for i, mol in enumerate(pop)}
+    )
+
     return pop
 
 
@@ -111,7 +113,8 @@ def progress():
         )
         pop.subpopulations.append(subpop)
 
-    for i, mol in enumerate(pop):
-        mol.fitness = i
+    pop.set_fitness_values_from_dict(
+        {mol: i for i, mol in enumerate(pop)}
+    )
 
     return pop

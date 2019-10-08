@@ -114,7 +114,7 @@ class _FilteringNormalizer(FitnessNormalizer):
 
     """
 
-    def _normalize(self, population, fitness_values):
+    def _normalize(self, population):
         """
         Normalize fitness value in `population`.
 

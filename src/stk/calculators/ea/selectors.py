@@ -812,7 +812,7 @@ class FilterMolecules(Selector):
         """
 
         self._filter = filter
-        super().__init__(selector=selector)
+        self._selector = selector
 
     def _select(self, population, included_batches, excluded_batches):
         valid_batches = self._filter.select(
@@ -1467,6 +1467,9 @@ class StochasticUniversalSampling(_BatchingSelector, Selector):
             The random seed to use.
 
         """
+
+        if fitness_modifier is None:
+            self._fitness_modifier = fitness_modifier
 
         self._generator = np.random.RandomState(random_seed)
         self._duplicate_mols = duplicate_mols

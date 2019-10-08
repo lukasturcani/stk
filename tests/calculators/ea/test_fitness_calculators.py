@@ -60,18 +60,11 @@ def test_cache_use(tmp_amine2):
     assert calls == 3
 
 
-def test_attribute_creation(tmp_amine2):
-    calc = stk.PropertyVector(lambda mol: 1)
-    assert not hasattr(tmp_amine2, 'fitness')
-    calc.get_fitness(tmp_amine2)
-    assert tmp_amine2.fitness == [1]
-
-
 def test_raising_fitness_calculator(tmp_amine2):
     fitness_calculator = stk.PropertyVector(lambda m: 1)
-    never_raiser = stk.RaisingFitnessCalculator(fitness_calculator, 0)
+    never_raiser = stk.RaisingCalculator(fitness_calculator, 0)
     never_raiser.get_fitness(tmp_amine2)
 
-    always_raiser = stk.RaisingFitnessCalculator(fitness_calculator, 1)
-    with pytest.raises(stk.RaisingFitnessCalculatorError):
+    always_raiser = stk.RaisingCalculator(fitness_calculator, 1)
+    with pytest.raises(stk.RaisingCalculatorError):
         always_raiser.get_fitness(tmp_amine2)
