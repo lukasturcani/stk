@@ -351,8 +351,12 @@ class Multiply(_FilteringNormalizer, FitnessNormalizer):
         self._filter = filter
 
     def _get_normalized_values(self, filtered, fitness_values):
+        # Shorter alias.
+        coeff = self._coefficient
         for mol in filtered:
-            yield mol, self._coefficient*fitness_values[mol]
+            # Use np.multiply here so that both lists and arrays work
+            # properly. If * is used [8]*3 will wrongly make [8, 8, 8].
+            yield mol, np.multiply(coeff, fitness_values[mol])
 
 
 class Sum(_FilteringNormalizer, FitnessNormalizer):
@@ -493,7 +497,9 @@ class DivideByMean(_FilteringNormalizer, FitnessNormalizer):
         logger.debug(f'Means used in DivideByMean: {mean}')
 
         for mol in filtered:
-            yield mol, fitness_values[mol] / mean
+            # Use divide here so that both lists and arrays work
+            # properly.
+            yield mol, np.divide(fitness_values[mol], mean)
 
 
 class ShiftUp(_FilteringNormalizer, FitnessNormalizer):

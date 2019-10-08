@@ -57,9 +57,9 @@ def test_multiply(tmp_amine2, tmp_aldehyde2, tmp_bromine2):
 
     normalized = normalizer.normalize(pop)
 
-    assert normalized[tmp_amine2] == [2, 4, 6]
-    assert normalized[tmp_aldehyde2] == [8, 10, 12]
-    assert normalized[tmp_bromine2] == [14, 16, 18]
+    assert normalized[tmp_amine2].tolist() == [2, 4, 6]
+    assert normalized[tmp_aldehyde2].tolist() == [8, 10, 12]
+    assert normalized[tmp_bromine2].tolist() == [14, 16, 18]
 
 
 def test_sum(tmp_amine2, tmp_aldehyde2, tmp_bromine2):
@@ -93,7 +93,7 @@ def test_divide_by_mean(tmp_amine2, tmp_aldehyde2, tmp_bromine2):
     assert normalized[tmp_aldehyde2] == 1
     assert normalized[tmp_bromine2] == 1.5
 
-    stk.EAPopulation({
+    pop.set_fitness_values_from_dict({
         tmp_amine2: [1, 10, 100],
         tmp_aldehyde2: [2, 20, 200],
         tmp_bromine2: [3, 30, 300],
