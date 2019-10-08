@@ -908,23 +908,24 @@ class Best(_BatchingSelector, Selector):
             multiple times in a population.
 
         fitness_modifier : :class:`callable`, optional
-            Takes the population on which :meth:`select`is called and
+            Takes the population on which :meth:`select` is called and
             returns a :class:`dict` mapping molecules in the population
             to the fitness values the :class:`.Selector` should use.
-            If ``None``, each molecule is mapped to the fitness value
-            found in its :attr:`~.Molecule.fitness` attribute.
+            If ``None`` then :meth:`.EAPopulation.get_fitness_values`
+            is used.
 
         """
 
+        if fitness_modifier is None:
+            fitness_modifier = self._return_fitness_values
+
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
-        super().__init__(
-            num_batches=num_batches,
-            batch_size=batch_size,
-            fitness_modifier=fitness_modifier,
-        )
+        self._num_batches = num_batches
+        self._batch_size = batch_size
+        self._fitness_modifier = fitness_modifier
 
-    def _select(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded):
         batches = sorted(batches, reverse=True)
 
         if not self._duplicate_mols:
@@ -936,7 +937,7 @@ class Best(_BatchingSelector, Selector):
         yield from it.islice(batches, self._num_batches)
 
 
-class Worst(_Selector, Selector):
+class Worst(_BatchingSelector, Selector):
     """
     Selects batches of molecules, lowest fitness value first.
 
@@ -987,23 +988,24 @@ class Worst(_Selector, Selector):
             multiple times in a population.
 
         fitness_modifier : :class:`callable`, optional
-            Takes the population on which :meth:`select`is called and
+            Takes the population on which :meth:`select` is called and
             returns a :class:`dict` mapping molecules in the population
             to the fitness values the :class:`.Selector` should use.
-            If ``None``, each molecule is mapped to the fitness value
-            found in its :attr:`~.Molecule.fitness` attribute.
+            If ``None`` then :meth:`.EAPopulation.get_fitness_values`
+            is used.
 
         """
 
+        if fitness_modifier is None:
+            fitness_modifier = self._return_fitness_values
+
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
-        super().__init__(
-            num_batches=num_batches,
-            batch_size=batch_size,
-            fitness_modifier=fitness_modifier,
-        )
+        self._num_batches = num_batches
+        self._batch_size = batch_size
+        self._fitness_modifier = fitness_modifier
 
-    def _select(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded):
         batches = sorted(batches)
 
         if not self._duplicate_mols:
@@ -1015,7 +1017,7 @@ class Worst(_Selector, Selector):
         yield from it.islice(batches, self._num_batches)
 
 
-class Roulette(_Selector, Selector):
+class Roulette(_BatchingSelector, Selector):
     """
     Uses roulette selection to select batches of molecules.
 
@@ -1105,11 +1107,11 @@ class Roulette(_Selector, Selector):
             If ``True`` the same batch can be yielded more than once.
 
         fitness_modifier : :class:`callable`, optional
-            Takes the population on which :meth:`select`is called and
+            Takes the population on which :meth:`select` is called and
             returns a :class:`dict` mapping molecules in the population
             to the fitness values the :class:`.Selector` should use.
-            If ``None``, each molecule is mapped to the fitness value
-            found in its :attr:`~.Molecule.fitness` attribute.
+            If ``None`` then :meth:`.EAPopulation.get_fitness_values`
+            is used.
 
         random_seed : :class:`int`, optional
             The random seed to use.
@@ -1119,16 +1121,17 @@ class Roulette(_Selector, Selector):
         if num_batches is None:
             num_batches = float('inf')
 
+        if fitness_modifier is None:
+            fitness_modifier = self._return_fitness_values
+
         self._generator = np.random.RandomState(random_seed)
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
-        super().__init__(
-            num_batches=num_batches,
-            batch_size=batch_size,
-            fitness_modifier=fitness_modifier,
-        )
+        self._num_batches = num_batches
+        self._batch_size = batch_size
+        self._fitness_modifier = fitness_modifier
 
-    def _select(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded):
         while batches and yielded.get_num() < self._num_batches:
             total = sum(batch.get_fitness() for batch in batches)
             weights = [
@@ -1144,7 +1147,7 @@ class Roulette(_Selector, Selector):
                 batches = tuple(batches)
 
 
-class AboveAverage(_Selector, Selector):
+class AboveAverage(_BatchingSelector, Selector):
     """
     Yields above average batches of molecules.
 
@@ -1220,21 +1223,22 @@ class AboveAverage(_Selector, Selector):
             If ``True`` the same batch can be yielded more than once.
 
         fitness_modifier : :class:`callable`, optional
-            Takes the population on which :meth:`select`is called and
+            Takes the population on which :meth:`select` is called and
             returns a :class:`dict` mapping molecules in the population
             to the fitness values the :class:`.Selector` should use.
-            If ``None``, each molecule is mapped to the fitness value
-            found in its :attr:`~.Molecule.fitness` attribute.
+            If ``None`` then :meth:`.EAPopulation.get_fitness_values`
+            is used.
 
         """
 
+        if fitness_modifier is None:
+            fitness_modifier = fitness_modifier
+
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
-        super().__init__(
-            num_batches=num_batches,
-            batch_size=batch_size,
-            fitness_modifier=fitness_modifier,
-        )
+        self._num_batches = num_batches
+        self._batch_size = batch_size
+        self._fitness_modifier = fitness_modifier
 
     def _select(self, batches, yielded):
         mean = np.mean([batch.get_fitness() for batch in batches])
