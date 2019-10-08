@@ -1232,7 +1232,7 @@ class AboveAverage(_BatchingSelector, Selector):
         """
 
         if fitness_modifier is None:
-            fitness_modifier = fitness_modifier
+            fitness_modifier = self._return_fitness_values
 
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches

@@ -102,9 +102,10 @@ def test_best(generation):
         use_random_seed=False,
     )
 
+    fitness_values = generation.get_fitness_values()
     sorted_gen = sorted(
         generation,
-        key=lambda m: m.fitness,
+        key=lambda m: fitness_values[m],
         reverse=True
     )
     best = set(sorted_gen[:10])
@@ -124,7 +125,8 @@ def test_worst(generation):
         use_random_seed=False,
     )
 
-    sorted_gen = sorted(generation, key=lambda m: m.fitness)
+    fitness_values = generation.get_fitness_values()
+    sorted_gen = sorted(generation, key=lambda m: fitness_values[m])
     worst = set(sorted_gen[:10])
     rest = set(sorted_gen[10:])
     _test_expected(stk.Worst(10).select(generation), worst)
@@ -153,9 +155,10 @@ def test_above_average(generation):
         duplicate_mols=[True, False],
         use_random_seed=False,
     )
-    mean = np.mean([m.fitness for m in generation])
-    expected = {m for m in generation if m.fitness > mean}
-    unselected = {m for m in generation if m.fitness < mean}
+    fitness_values = generation.get_fitness_values()
+    mean = np.mean([fitness_values[m] for m in generation])
+    expected = {m for m in generation if fitness_values[m] > mean}
+    unselected = {m for m in generation if fitness_values[m] < mean}
     _test_expected(stk.AboveAverage().select(generation), expected)
     _test_unselected(stk.AboveAverage().select(generation), unselected)
 
