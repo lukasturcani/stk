@@ -399,7 +399,7 @@ class SelectionPlotter(Plotter):
         def heat_map_value(mol):
             return self._heat_map_value(population, mol)
 
-       def order_by(mol):
+        def order_by(mol):
             return self._order_by(population, mol)
 
         self._plots += 1
