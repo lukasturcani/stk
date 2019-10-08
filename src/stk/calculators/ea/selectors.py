@@ -706,6 +706,9 @@ class RemoveMolecules(Selector):
         valid_pop = population.__class__(*(
             mol for mol in population if mol not in removed
         ))
+        valid_pop.set_fitness_values_from_dict(
+            fitness_values=population.get_fitness_values(),
+        )
         yield from self._selector.select(
             population=valid_pop,
             included_batches=included_batches,
@@ -823,6 +826,9 @@ class FilterMolecules(Selector):
         valid_pop = population.__class__(*(
             mol for batch in valid_batches for mol in batch
         ))
+        valid_pop.set_fitness_values_from_dict(
+            fitness_values=population.get_fitness_values(),
+        )
         yield from self._selector.select(
             population=valid_pop,
             included_batches=included_batches,
