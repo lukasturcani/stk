@@ -1240,7 +1240,7 @@ class AboveAverage(_BatchingSelector, Selector):
         self._batch_size = batch_size
         self._fitness_modifier = fitness_modifier
 
-    def _select(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded):
         mean = np.mean([batch.get_fitness() for batch in batches])
         # Yield highest fitness batches first.
         batches = sorted(batches, reverse=True)
@@ -1273,7 +1273,7 @@ class AboveAverage(_BatchingSelector, Selector):
         return 1
 
 
-class Tournament(_Selector, Selector):
+class Tournament(_BatchingSelector, Selector):
     """
     Yields batches of molecules through tournament selection.
 
@@ -1338,16 +1338,19 @@ class Tournament(_Selector, Selector):
             If ``True`` the same batch can be yielded more than once.
 
         fitness_modifier : :class:`callable`, optional
-            Takes the population on which :meth:`select`is called and
+            Takes the population on which :meth:`select` is called and
             returns a :class:`dict` mapping molecules in the population
             to the fitness values the :class:`.Selector` should use.
-            If ``None``, each molecule is mapped to the fitness value
-            found in its :attr:`~.Molecule.fitness` attribute.
+            If ``None`` then :meth:`.EAPopulation.get_fitness_values`
+            is used.
 
         random_seed : :class:`int`, optional
             The random seed to use.
 
         """
+
+        if fitness_modifier is None:
+            fitness_modifier = self._return_fitness_values
 
         self._generator = np.random.RandomState(random_seed)
         if num_batches is None:
@@ -1355,13 +1358,11 @@ class Tournament(_Selector, Selector):
 
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
-        super().__init__(
-            num_batches=num_batches,
-            batch_size=batch_size,
-            fitness_modifier=fitness_modifier,
-        )
+        self._batch_size = batch_size
+        self._num_batches = num_batches
+        self._fitness_modifier = fitness_modifier
 
-    def _select(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded):
         # The tournament can only take place if there is more than 1
         # batch.
         while (
@@ -1386,7 +1387,7 @@ class Tournament(_Selector, Selector):
                 batches = tuple(batches)
 
 
-class StochasticUniversalSampling(_Selector, Selector):
+class StochasticUniversalSampling(_BatchingSelector, Selector):
     """
     Yields batches of molecules through stochastic universal sampling.
 
@@ -1456,11 +1457,11 @@ class StochasticUniversalSampling(_Selector, Selector):
             If ``True`` the same batch can be yielded more than once.
 
         fitness_modifier : :class:`callable`, optional
-            Takes the population on which :meth:`select`is called and
+            Takes the population on which :meth:`select` is called and
             returns a :class:`dict` mapping molecules in the population
             to the fitness values the :class:`.Selector` should use.
-            If ``None``, each molecule is mapped to the fitness value
-            found in its :attr:`~.Molecule.fitness` attribute.
+            If ``None`` then :meth:`.EAPopulation.get_fitness_values`
+            is used.
 
         random_seed : :class:`int`, optional
             The random seed to use.
@@ -1470,13 +1471,11 @@ class StochasticUniversalSampling(_Selector, Selector):
         self._generator = np.random.RandomState(random_seed)
         self._duplicate_mols = duplicate_mols
         self._duplicate_batches = duplicate_batches
-        super().__init__(
-            num_batches=num_batches,
-            batch_size=batch_size,
-            fitness_modifier=fitness_modifier,
-        )
+        self._num_batches = num_batches
+        self._batch_size = batch_size
+        self._fitness_modifier = fitness_modifier
 
-    def _select(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded):
         batches = sorted(batches, reverse=True)
 
         # SUS may need to run multiple rounds if duplicate_mols or
