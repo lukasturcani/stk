@@ -108,7 +108,7 @@ class ProgressPlotter(Plotter):
         property_fn,
         y_label,
         progress_fn=None,
-        filter=lambda mol: True,
+        filter=lambda progress, mol: True,
     ):
         """
         Initialize a :class:`ProgressPlotter` instance.
@@ -120,11 +120,11 @@ class ProgressPlotter(Plotter):
             file extensions.
 
         property_fn : :class:`callable`
-            A :class:`callable` which takes a :class:`.Molecule`
-            object and returns a property value of that molecule,
-            which is used for the plot. The :class:`callable` must
-            return a valid value for each :class:`.Molecule` in the
-            population.
+            A :class:`callable` which takes a :class:`.EAPopulation`
+            and a :class:`.Molecule` object and returns a property
+            value of that molecule, which is used for the plot.
+            The :class:`callable` must return a valid value for each
+            :class:`.Molecule` in the population.
 
         y_label : :class:`str`
             The y label for the produced graph.
@@ -136,9 +136,10 @@ class ProgressPlotter(Plotter):
             progress population, for example.
 
         filter : :class:`callable`, optional
-            Takes a :class:`.Molecule` as input and returns ``True``
-            or ``False``. Only molecules which return ``True`` will
-            be plotted. Default is for all molecules to be plotted.
+            Takes an :class:`.EAPopulation` and a :class:`.Molecule` as
+            input and returns ``True`` or ``False``. Only molecules
+            which return ``True`` will be plotted. Default is for all
+            molecules to be plotted.
 
         """
 
@@ -167,11 +168,17 @@ class ProgressPlotter(Plotter):
         if self._progress_fn is not None:
             self._progress_fn(progress)
 
+        def filter_fn(mol):
+            return self._filter(progress, mol)
+
+        def property_fn(mol):
+            return self._property_fn(progress, mol)
+
         sns.set(style='darkgrid')
         df = pd.DataFrame()
         for i, subpop in enumerate(progress.subpopulations, 1):
-            filtered = filter(self._filter, subpop)
-            subpop_vals = list(map(self._property_fn, filtered))
+            filtered = filter(filter_fn, subpop)
+            subpop_vals = list(map(property_fn, filtered))
 
             # If there are no values after filtering, don't plot
             # anything for the generation.

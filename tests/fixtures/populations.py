@@ -108,7 +108,7 @@ def generation():
 def progress():
     pop = stk.EAPopulation()
     for i in range(15):
-        subpop = stk.Population(
+        subpop = stk.EAPopulation(
             *(stk.BuildingBlock('C') for j in range(5))
         )
         pop.subpopulations.append(subpop)

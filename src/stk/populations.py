@@ -1451,6 +1451,8 @@ class EAPopulation(Population):
         """
 
         self._fitness_values = dict(fitness_values)
+        for pop in self.subpopulations:
+            pop.set_fitness_values_from_dict(fitness_values)
 
     def set_fitness_values_from_calculators(
         self,
@@ -1494,6 +1496,8 @@ class EAPopulation(Population):
             )
 
         self._fitness_values = fitness_normalizer.normalize(self)
+        for pop in self.subpopulations:
+            pop.set_fitness_values_from_dict(self._fitness_values)
 
     def _set_fitness_values_serial(self, fitness_calculator):
         self._fitness_values = {

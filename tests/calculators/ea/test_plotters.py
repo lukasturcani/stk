@@ -11,14 +11,15 @@ if not os.path.exists(odir):
 def test_progress_plotter(progress):
     plotter1 = stk.ProgressPlotter(
         filename=join(odir, 'fitness'),
-        property_fn=lambda mol: mol.fitness,
+        property_fn=lambda progress, mol:
+            progress.get_fitness_values()[mol],
         y_label='Fitness',
     )
     plotter1.plot(progress)
 
     plotter2 = stk.ProgressPlotter(
         filename=join(odir, 'atoms'),
-        property_fn=lambda mol: len(mol.atoms),
+        property_fn=lambda progress, mol: len(mol.atoms),
         y_label='Atom Number',
     )
     plotter2.plot(progress)
@@ -26,9 +27,10 @@ def test_progress_plotter(progress):
     # Make a plot where all fitness values are filtered out.
     plotter3 = stk.ProgressPlotter(
         filename=join(odir, 'no_fitness'),
-        property_fn=lambda mol: mol.fitness,
+        property_fn=lambda progress, mol:
+            progress.get_fitness_values()[mol],
         y_label='No Fitness',
-        filter=lambda mol: False,
+        filter=lambda progress, mol: False,
     )
     plotter3.plot(progress)
 
@@ -36,9 +38,11 @@ def test_progress_plotter(progress):
     # Ie by plotting only odd fitness values.
     plotter4 = stk.ProgressPlotter(
         filename=join(odir, 'odd_fitness'),
-        property_fn=lambda mol: mol.fitness,
+        property_fn=lambda progress, mol:
+            progress.get_fitness_values()[mol],
         y_label='Odd Fitness',
-        filter=lambda mol: mol.fitness % 2 == 1,
+        filter=lambda progress, mol:
+            progress.get_fitness_values()[mol] % 2 == 1,
     )
     plotter4.plot(progress)
 
