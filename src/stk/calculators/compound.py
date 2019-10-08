@@ -198,6 +198,25 @@ class If(
         return self._false_calculator.optimize(mol)
 
     def set_cache_use(self, use_cache):
+        """
+        Toggle use of the cache.
+
+        If used as a :class:`.MoleculeCalculator` this method toggles
+        use of the results cache. If used as a :class:`.EAOperation`,
+        toggles use of the molecular cache.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            Whether the cache should be used.
+
+        Returns
+        -------
+        :class:`.If`
+            The calculator is returned.
+
+        """
+
         # When the contained calculators are MoleculeCalculators,
         # use the implementation provided by _MoleculeCalculator.
         # This will mean that the use_cache option on the contained
@@ -333,6 +352,42 @@ class TryCatch(
         except self._catch_type:
             self._log_failure()
             return self._catch_calculator.cross(*mols)
+
+    def set_cache_use(self, use_cache):
+        """
+        Toggle use of the cache.
+
+        If used as a :class:`.MoleculeCalculator` this method toggles
+        use of the results cache. If used as a :class:`.EAOperation`,
+        toggles use of the molecular cache.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            Whether the cache should be used.
+
+        Returns
+        -------
+        :class:`.If`
+            The calculator is returned.
+
+        """
+
+        # When the contained calculators are MoleculeCalculators,
+        # use the implementation provided by _MoleculeCalculator.
+        # This will mean that the use_cache option on the contained
+        # calculators will not be changed. Instead it will use its own
+        # cache to return previously calculated results.
+        if isinstance(self._try_calculator, MoleculeCalculator):
+            return super().set_cache_use(use_cache)
+
+        # If the contained calculators are EAOperations then set their
+        # use_cache option to what is passed here. This is because
+        # the instance does not control the molecular cache.
+        # So the contained calculators need to be made aware of this
+        # change directly.
+        self._try_calculator.set_cache_use(use_cache)
+        self._catch_calculator.set_cache_use(use_cache)
 
     def _log_failure(self):
         try_name = self._try_calculator.__class__.__name__
@@ -533,6 +588,45 @@ class Random(
     def _cross(self, *mols):
         return self._get_calculator().cross(*mols)
 
+    def set_cache_use(self, use_cache):
+        """
+        Toggle use of the cache.
+
+        If used as a :class:`.MoleculeCalculator` this method toggles
+        use of the results cache. If used as a :class:`.EAOperation`,
+        toggles use of the molecular cache.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            Whether the cache should be used.
+
+        Returns
+        -------
+        :class:`.If`
+            The calculator is returned.
+
+        """
+
+        # When the contained calculators are MoleculeCalculators,
+        # use the implementation provided by _MoleculeCalculator.
+        # This will mean that the use_cache option on the contained
+        # calculators will not be changed. Instead it will use its own
+        # cache to return previously calculated results.
+        if (
+            self._calculators
+            and isinstance(self._calculators[0], MoleculeCalculator)
+        ):
+            return super().set_cache_use(use_cache)
+
+        # If the contained calculators are EAOperations then set their
+        # use_cache option to what is passed here. This is because
+        # the instance does not control the molecular cache.
+        # So the contained calculators need to be made aware of this
+        # change directly.
+        for calculator in self._calculators:
+            calculator.set_cache_use(use_cache)
+
     def _select(self, population, included_batches, excluded_baches):
         return self._get_calculator().select(
             population=population,
@@ -631,6 +725,41 @@ class RaisingCalculator(
     def _cross(self, *mols):
         self._try_raising()
         return self._calculator.cross(*mols)
+
+    def set_cache_use(self, use_cache):
+        """
+        Toggle use of the cache.
+
+        If used as a :class:`.MoleculeCalculator` this method toggles
+        use of the results cache. If used as a :class:`.EAOperation`,
+        toggles use of the molecular cache.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            Whether the cache should be used.
+
+        Returns
+        -------
+        :class:`.If`
+            The calculator is returned.
+
+        """
+
+        # When the contained calculators are MoleculeCalculators,
+        # use the implementation provided by _MoleculeCalculator.
+        # This will mean that the use_cache option on the contained
+        # calculators will not be changed. Instead it will use its own
+        # cache to return previously calculated results.
+        if isinstance(self._calculator, MoleculeCalculator):
+            return super().set_cache_use(use_cache)
+
+        # If the contained calculators are EAOperations then set their
+        # use_cache option to what is passed here. This is because
+        # the instance does not control the molecular cache.
+        # So the contained calculators need to be made aware of this
+        # change directly.
+        self._calculator.set_cache_use(use_cache)
 
     def _get_fitness(self, mol):
         self._try_raising()

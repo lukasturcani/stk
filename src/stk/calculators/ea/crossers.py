@@ -4,23 +4,26 @@ Crossover
 
 #. :class:`.GeneticRecombination`
 #. :class:`.Jumble`
+#. :class:`.If`
+#. :class:`.TryCatch`
+#. :class:`.Random`
+#. :class:`.RaisingCalculator`
 
-Crossover is implement through :class:`Crosser` objects. Crossers take
+Crossover is implement through :class:`.Crosser` objects. Crossers take
 a group of molecules and recombine
 them to produce offspring molecules. How crossers are used can be
-seen in the documentation of the various :class:`Crosser` classes,
-for example :class:`GeneticRecombination` or
-:class:`Jumble`.
+seen in the documentation of the various :class:`.Crosser` classes,
+for example :class:`.GeneticRecombination` or
+:class:`.Jumble`.
 
 .. _`adding crossers`:
 
 Making New Crossers
 -------------------
 
-To add a new :class:`Crosser`, make a new class which inherits
-:class:`Crosser` and defines a method called
-:meth:`~Crosser._cross`. The method is a generator, which can take
-any number of molecules and yields the offspring molecules.
+To add a new :class:`.Crosser`, make a new class which inherits
+:class:`.Crosser`. This is an abstract base class and all of its
+virtual methods need to be implemented.
 
 """
 
@@ -39,7 +42,10 @@ logger = logging.getLogger(__name__)
 
 class Crosser(EAOperation):
     """
-    Carries out crossover on molecules.
+    Abstract base class for crossers.
+
+    Crossers take multiple molecules and recombine them to make
+    new, offspring, molecules.
 
     """
 
@@ -59,6 +65,7 @@ class Crosser(EAOperation):
 
         """
 
+        # Can be used to decorate _cross in the future.
         yield from self._cross(*mols)
 
     def _cross(self, *mols):
@@ -149,7 +156,7 @@ class GeneticRecombination(_EAOperation, Crosser):
     the `key` parameter. Then, to generate a single offspring, it
     picks a random building block for every gene. The picked
     building blocks are used to construct the offspring. The
-    topoogy graph of the offspring is one of the parent's.
+    topology graph of the offspring is one of the parent's.
     For obvious reasons, this approach works with any number of
     parents.
 
@@ -166,14 +173,14 @@ class GeneticRecombination(_EAOperation, Crosser):
         bb2 = stk.BuildingBlock('O=CCCCC=O', ['aldehyde'])
         polymer1  = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2],
-            topolgy_graph=stk.polymer.Linear('AB', [0, 0], n=2)
+            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
         )
 
         bb3 = stk.BuildingBlock('NCCCN', ['amine'])
         bb4 = stk.BuildingBlock('O=C[Si]CCC=O', ['aldehyde'])
         polymer2  = stk.ConstructedMolecule(
             building_blocks=[bb3, bb4],
-            topolog_graph=stk.polymer.Linear('AB', [0, 0], n=2)
+            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
         )
 
         bb5 = stk.BuildingBlock('NC[Si]CN', ['amine'])
