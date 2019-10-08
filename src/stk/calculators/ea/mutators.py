@@ -5,6 +5,10 @@ Mutation
 #. :class:`RandomBuildingBlock`
 #. :class:`.SimilarBuildingBlock`
 #. :class:`.RandomTopology`
+#. :class:`.If`
+#. :class:`.TryCatch`
+#. :class:`.Random`
+#. :class:`.RaisingCalculator`
 
 Mutation is carried by :class:`.Mutator` objects. They inherit
 :class:`.Mutator` and define a method :meth:`~Mutator.mutate`. This
@@ -21,9 +25,8 @@ or :class:`RandomMutation`.
 Making New Mutators
 -------------------
 
-Mutators must simple inherit the :class:`.Mutator` class and define a
-method called :meth:`~Mutatator.mutate`, which take a single molecule
-and returns a mutant molecule. There are no requirements besides this.
+Mutators must simply inherit the :class:`.Mutator` class. This is an
+abstract base class and its virtual methods must be implemented.
 
 """
 
@@ -32,7 +35,7 @@ import numpy as np
 
 
 from ...utilities import dice_similarity
-from ..base_calculators import EAOperation
+from ..base_calculators import EAOperation, _EAOperation
 
 
 logger = logging.getLogger(__name__)
@@ -67,6 +70,25 @@ class Mutator(EAOperation):
         mol : :class:`.Molecule`
             The mutant.
 
+        """
+
+        # Can be used to decorate _mutate in the future.
+        return self._mutate(mol)
+
+    def _mutate(self, mol):
+        """
+        Return a mutant of `mol`.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be mutated.
+
+        Returns
+        -------
+        mol : :class:`.Molecule`
+            The mutant.
+
         Raises
         ------
         :class:`NotImplementedError`
@@ -78,7 +100,7 @@ class Mutator(EAOperation):
         raise NotImplementedError()
 
 
-class RandomBuildingBlock(Mutator):
+class RandomBuildingBlock(_EAOperation, Mutator):
     """
     Substitutes random building blocks.
 
@@ -165,7 +187,7 @@ class RandomBuildingBlock(Mutator):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def mutate(self, mol):
+    def _mutate(self, mol):
         """
         Return a mutant of `mol`.
 
@@ -219,7 +241,7 @@ class RandomBuildingBlock(Mutator):
         )
 
 
-class SimilarBuildingBlock(Mutator):
+class SimilarBuildingBlock(_EAOperation, Mutator):
     """
     Substitutes similar building blocks.
 
@@ -307,7 +329,7 @@ class SimilarBuildingBlock(Mutator):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def mutate(self, mol):
+    def _mutate(self, mol):
         """
         Return a mutant of `mol`.
 
@@ -382,7 +404,7 @@ class SimilarBuildingBlock(Mutator):
         )
 
 
-class RandomTopologyGraph(Mutator):
+class RandomTopologyGraph(_EAOperation, Mutator):
     """
     Changes topology graphs at random.
 
@@ -448,7 +470,7 @@ class RandomTopologyGraph(Mutator):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def mutate(self, mol):
+    def _mutate(self, mol):
         """
         Return a mutant of `mol`.
 
