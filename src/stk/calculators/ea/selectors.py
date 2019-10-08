@@ -382,7 +382,12 @@ class Selector(Calculator):
 
     """
 
-    def select(self, population):
+    def select(
+        self,
+        population,
+        included_batches=None,
+        excluded_batches=None
+    ):
         """
         Select batches of molecules from `population`.
 
@@ -390,6 +395,16 @@ class Selector(Calculator):
         ----------
         population : :class:`.EAPopulation`
             A collection of molecules from which batches are selected.
+
+        included_batches : :class:`set`, optional
+            The identity keys of batches which are allowed to be
+            yielded, if ``None`` all batches can be yielded. If not
+            ``None`` only batches `included_batches` will be yielded.
+
+        excluded_batches : class:`set`, optional
+            The identity keys of batches which are not allowed to be
+            yielded. If ``None``, no batch is forbidden from being
+            yielded.
 
         Yields
         ------
@@ -399,13 +414,60 @@ class Selector(Calculator):
         """
 
         # This method can be used to decorate _select in the future.
-        yield from self._select(population)
+        yield from self._select(
+            population=population,
+            included_batches=included_batches,
+            excluded_batches=excluded_batches,
+        )
+
+    def _select(self, population, included_batches, excluded_batches):
+        """
+        Select batches of molecules from `population`.
+
+        Parameters
+        ----------
+        population : :class:`.EAPopulation`
+            A collection of molecules from which batches are selected.
+
+        included_batches : :class:`set`
+            The identity keys of batches which are allowed to be
+            yielded, if ``None`` all batches can be yielded. If not
+            ``None`` only batches `included_batches` will be yielded.
+
+        excluded_batches : class:`set`
+            The identity keys of batches which are not allowed to be
+            yielded. If ``None``, no batch is forbidden from being
+            yielded.
+
+        Yields
+        ------
+        :class:`Batch` of :class:`.Molecule`
+            A batch of selected molecules.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
+
+
+class _BatchingSelector(Selector):
 
     @staticmethod
     def _return_fitness_values(population):
         return population.get_fitness_values()
 
-    def _get_batches(self, population, fitness_values):
+    def _get_batches(
+        self,
+        population,
+        fitness_values,
+        included_batches,
+        excluded_batches,
+    ):
         """
         Get batches molecules from `population`.
 
@@ -427,17 +489,35 @@ class Selector(Calculator):
 
         for batch_size in self._get_batch_sizes():
             batches = it.combinations(population, batch_size)
-            yield from (
-                Batch(
+            for mols in batches:
+                batch = Batch(
                     mols=mols,
                     fitness_values={
                         mol: fitness_values[mol] for mol in mols
                     }
                 )
-                for mols in batches
-            )
+                is_included = self._is_included(
+                    batch=batch,
+                    included_batches=included_batches,
+                )
+                is_excluded = self._is_excluded(
+                    batch=batch,
+                    excluded_batches=excluded_batches,
+                )
+                if is_included and not is_excluded:
+                    yield batch
 
-    def _select(self, population):
+    def _is_included(self, batch, included_batches):
+        if included_batches is None:
+            return True
+        return batch.get_identity_key() in included_batches
+
+    def _is_excluded(self, batch, excluded_batches):
+        if excluded_batches is None:
+            return False
+        return batch.get_identity_key() in excluded_batches
+
+    def _select(self, population, included_batches, excluded_batches):
         """
         Select batches of molecules from `population`.
 
@@ -445,6 +525,16 @@ class Selector(Calculator):
         ----------
         population : :class:`.EAPopulation`
             A collection of molecules from which batches are selected.
+
+        included_batches : :class:`set`
+            The identity keys of batches which are allowed to be
+            yielded, if ``None`` all batches can be yielded. If not
+            ``None`` only batches `included_batches` will be yielded.
+
+        excluded_batches : class:`set`
+            The identity keys of batches which are not allowed to be
+            yielded. If ``None``, no batch is forbidden from being
+            yielded.
 
         Yields
         ------
@@ -458,7 +548,9 @@ class Selector(Calculator):
             fitness_values=self._get_fitness_modifier()(
                 # Positional only as parameter can be called anything.
                 population
-            )
+            ),
+            included_batches=included_batches,
+            excluded_batches=excluded_batches,
         ))
 
         yielded = _YieldedData()
@@ -496,6 +588,9 @@ class Selector(Calculator):
 
         Yields
         ------
+        :class:`.Batch`
+            A selected batch.
+
         """
 
         raise NotImplementedError()
@@ -544,18 +639,7 @@ class Selector(Calculator):
         raise NotImplementedError()
 
 
-class _CompoundSelector(Selector):
-    def _get_num_batches(self):
-        return self._selector._get_num_batches()
-
-    def _get_batch_sizes(self):
-        return self._selector._get_batch_sizes()
-
-    def _get_fitness_modifier(self):
-        return self._selector._get_fitness_modifier()
-
-
-class RemoveBatches(_CompoundSelector, Selector):
+class RemoveBatches(Selector):
     """
     Prevents a :class:`.Selector` from selecting some batches.
 
@@ -598,26 +682,28 @@ class RemoveBatches(_CompoundSelector, Selector):
         self._remover = remover
         self._selector = selector
 
-    def _select_from_batches(self, batches, yielded):
-        valid_batches = tuple(self._get_valid_batches(batches))
-        yield from self._selector._select_from_batches(
-            batches=valid_batches,
-            yielded=yielded
-        )
+    def select(
+        self,
+        population,
+        included_batches=None,
+        excluded_batches=None,
+    ):
+        removed_batches = {
+            batch.get_identity_key()
+            for batch in self._remover.select(
+                population=population,
+                included_batches=included_batches,
+                excluded_batches=excluded_batches,
+            )
+        }
+        if excluded_batches is not None:
+            excluded_batches |= removed_batches
 
-    def _get_valid_batches(self, batches):
-        valid_sizes = self._remover._get_batch_sizes()
-        valid_batches = tuple(
-            filter(lambda b: b.get_size() in valid_sizes, batches)
+        yield from self._selector.select(
+            population=population,
+            included_batches=included_batches,
+            excluded_batches=excluded_batches,
         )
-        yielded = _YieldedData()
-        selected_batches = self._remover._select_from_batches(
-            batches=valid_batches,
-            yielded=yielded
-        )
-        for batch in selected_batches:
-            yielded.update(batch)
-        return filter(yielded.is_unyielded_batch, batches)
 
 
 class RemoveMolecules(_CompoundSelector, Selector):

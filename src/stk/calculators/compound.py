@@ -60,6 +60,7 @@ optimize the molecule with a different :class:`.Sequence`
 
 import logging
 import numpy as np
+import itertools as it
 
 from .optimization import Optimizer
 from .energy import EnergyCalculator
@@ -70,7 +71,6 @@ from .ea import (
     FitnessNormalizer,
     Selector,
 )
-from .ea.selectors import _YieldedData
 from .base_calculators import _MoleculeCalculator, MoleculeCalculator
 
 
@@ -85,6 +85,7 @@ class If(
     FitnessNormalizer,
     Mutator,
     Optimizer,
+    Selector,
 ):
     """
     Use a `condition` to pick a calculator.
@@ -172,6 +173,19 @@ class If(
         if self._condition(population):
             return self._true_calculator.normalize(population)
         return self._false_calculator.normalize(population)
+
+    def _select(self, population, included_batches, excluded_batches):
+        if self._condition(population):
+            return self._true_calculator.select(
+                population=population,
+                included_batches=included_batches,
+                excluded_batches=excluded_batches,
+            )
+        return self._false_calculator.select(
+            population=population,
+            included_batches=included_batches,
+            excluded_batches=excluded_batches,
+        )
 
     def _mutate(self, mol):
         if self._condition(mol):
@@ -408,39 +422,31 @@ class Sequence(
 
         return normalized
 
-    def _get_batch_sizes(self):
-        return tuple(set(
-            size
-            for calculator in self._calculators
-            for size in calculator._get_batch_sizes()
-        ))
+    def _select(
+        self,
+        population,
+        included_batches=None,
+        excluded_batches=None,
+    ):
+        selections = self._get_selections(
+            population=population,
+            included_batches=included_batches,
+            excluded_batches=excluded_batches,
+        )
+        yield from it.islice(it.chain(*selections), self._num_batches)
 
-    def _get_fitness_modifier(self):
-        return self._return_fitness_values
-
-    def _select_from_batches(self, batches, yielded):
+    def _get_selections(
+        self,
+        population,
+        included_batches,
+        excluded_batches
+    ):
         for calculator in self._calculators:
-            valid_sizes = calculator._get_batch_sizes()
-            valid_batches = tuple(
-                filter(lambda b: b.get_size() in valid_sizes, batches)
+            yield calculator.select(
+                population=population,
+                included_batches=included_batches,
+                excluded_batches=excluded_batches,
             )
-            local_yielded = _YieldedData()
-            selected_batches = calculator._select_from_batches(
-                batches=valid_batches,
-                yielded=local_yielded
-            )
-            for batch in selected_batches:
-                local_yielded.update(batch)
-                yield batch
-
-                if (
-                    self._num_batches is not None
-                    and yielded.get_num() >= self._num_batches
-                ):
-                    return
-
-    def _get_num_batches(self):
-        return self._num_batches
 
 
 class Random(
