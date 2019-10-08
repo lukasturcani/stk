@@ -1469,7 +1469,7 @@ class StochasticUniversalSampling(_BatchingSelector, Selector):
         """
 
         if fitness_modifier is None:
-            self._fitness_modifier = fitness_modifier
+            fitness_modifier = self._return_fitness_values
 
         self._generator = np.random.RandomState(random_seed)
         self._duplicate_mols = duplicate_mols
