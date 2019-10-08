@@ -94,7 +94,7 @@ def tmp_population():
 
 @pytest.fixture('session')
 def generation():
-    pop = stk.Population(
+    pop = stk.EAPopulation(
         *(stk.BuildingBlock('C') for i in range(50))
     )
     pop.set_fitness_values_from_dict(
@@ -106,7 +106,7 @@ def generation():
 
 @pytest.fixture('session')
 def progress():
-    pop = stk.Population()
+    pop = stk.EAPopulation()
     for i in range(15):
         subpop = stk.Population(
             *(stk.BuildingBlock('C') for j in range(5))
