@@ -189,6 +189,7 @@ class _MoleculeCalculator(MoleculeCalculator):
 
         """
 
+        self._cache = {}
         self._use_cache = use_cache
 
     def set_cache_use(self, use_cache):
