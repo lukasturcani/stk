@@ -178,7 +178,7 @@ class EAHistory:
             u = '-'*os.get_terminal_size().columns
         except OSError:
             # When testing os.get_terminal_size() will fail because
-            # stdout is not connceted to a terminal.
+            # stdout is not connected to a terminal.
             u = '-'*100
 
         molecule = 'molecule'
@@ -186,9 +186,16 @@ class EAHistory:
         normalized_fitness = 'normalized fitness'
         rank = 'rank'
 
-        sorted_pop = sorted(pop, reverse=True, key=lambda m: m.fitness)
+        fitness_values = pop.get_fitness_values()
+        sorted_pop = sorted(
+            pop,
+            reverse=True,
+            key=lambda m: fitness_values[m],
+        )
 
-        mols = '\n'.join(self.pop_log_content(sorted_pop, u))
+        mols = '\n'.join(
+            self.pop_log_content(sorted_pop, u, fitness_values)
+        )
         s = (
             f'Population log:\n\n'
             f'{u}\n'
@@ -199,12 +206,12 @@ class EAHistory:
         )
         logger.info(s)
 
-    def pop_log_content(self, pop, underline):
+    def pop_log_content(self, pop, underline, fitness_values):
         for i, mol in enumerate(pop, 1):
             fitness = self.fitness_calculator._cache[mol]
             yield (
                 f'{i:<10}\t{mol}\t\t{fitness!r:<40}\t'
-                f'{mol.fitness}\n{underline}'
+                f'{fitness_values[mol]}\n{underline}'
             )
 
 
@@ -268,15 +275,8 @@ def ea_run(filename, input_file):
     logging_level = logging.INFO
     if hasattr(input_file, 'logging_level'):
         logging_level = input_file.logging_level
-    rootlogger.setLevel(logging_level)
-
-    pop.set_ea_tools(
-        generation_selector=generation_selector,
-        mutation_selector=mutation_selector,
-        crossover_selector=crossover_selector,
-        mutator=mutator,
-        crosser=crosser
-    )
+    logging.getLogger('stk').setLevel(logging_level)
+    logger.setLevel(logging_level)
 
     # EA should always use the cache.
     optimizer.set_cache_use(True)
@@ -321,13 +321,16 @@ def ea_run(filename, input_file):
     with pop.open_process_pool(num_processes):
         id_ = pop.set_mol_ids(0)
         logger.info('Optimizing the population.')
-        pop.optimize(optimizer)
+        # num_processes needs to be used explicitly in case
+        # num_processes is set to 1.
+        pop.optimize(optimizer, num_processes=num_processes)
 
         logger.info('Calculating the fitness of population members.')
-        pop.calculate_member_fitness(fitness_calculator)
-
-        logger.info('Normalizing fitness values.')
-        fitness_normalizer.normalize(pop)
+        pop.set_fitness_values_from_calculators(
+            fitness_calculator=fitness_calculator,
+            fitness_normalizer=fitness_normalizer,
+            num_processes=num_processes,
+        )
 
         history.log_pop(logger, pop)
 
@@ -339,16 +342,33 @@ def ea_run(filename, input_file):
         while not terminator.terminate(progress):
             gen += 1
             logger.info(f'Starting generation {gen}.')
-
-            logger.info('Starting crossovers.')
-            offspring = pop.get_offspring()
-
-            logger.info('Starting mutations.')
-            mutants = pop.get_mutants()
-
             logger.debug(f'Population size is {len(pop)}.')
 
-            logger.info('Adding offsping and mutants to population.')
+            logger.info('Creating offspring.')
+
+            offspring_parents = crossover_selector.select(pop)
+            offspring_batches = it.starmap(
+                crosser.cross,
+                offspring_parents
+            )
+            # These need to be made here, outside of pop.extend
+            # because otherwise the selector may select the things
+            # which just got added, before their fitness got
+            # calculated.
+            offspring = list(
+                offspring
+                for offspring_batch in offspring_batches
+                for offspring in offspring_batch
+            )
+
+            logger.info('Creating mutants.')
+
+            mutant_parents = mutation_selector.select(pop)
+            mutants = list(it.starmap(mutator.mutate, mutant_parents))
+
+            logger.info(
+                'Adding offspring and mutants into population.'
+            )
             pop.direct_members.extend(it.chain(offspring, mutants))
 
             logger.debug(f'Population size is {len(pop)}.')
@@ -366,21 +386,24 @@ def ea_run(filename, input_file):
                 )
 
             logger.info('Optimizing the population.')
-            pop.optimize(optimizer)
+            pop.optimize(optimizer, num_processes=num_processes)
 
             logger.info(
                 'Calculating the fitness of population members.'
             )
-            pop.calculate_member_fitness(fitness_calculator)
-
-            logger.info('Normalizing fitness values.')
-            fitness_normalizer.normalize(pop)
+            pop.set_fitness_values_from_calculators(
+                fitness_calculator=fitness_calculator,
+                fitness_normalizer=fitness_normalizer,
+                num_processes=num_processes,
+            )
 
             history.log_pop(logger, pop)
             history.db(pop)
 
             logger.info('Selecting members of the next generation.')
-            pop.direct_members = list(pop.get_next_generation())
+            pop.direct_members = list(
+                mol for mol, in generation_selector.select(pop)
+            )
 
             history.log_pop(logger, pop)
 
@@ -395,18 +418,8 @@ def ea_run(filename, input_file):
 
     history.dump()
 
-    progress.calculate_member_fitness(
-        fitness_calculator=fitness_calculator,
-        num_processes=num_processes
-    )
-    # Keep the fitness of failed molecules as None. Plotters can ignore
-    # these values to make better graphs.
-    handle_failed = fitness_normalizer._handle_failed
-    fitness_normalizer._handle_failed = False
-    fitness_normalizer.normalize(progress)
     for plotter in plotters:
         plotter.plot(progress)
-    fitness_normalizer._handle_failed = handle_failed
 
     os.chdir(root_dir)
     os.rename('scratch/errors.log', 'errors.log')

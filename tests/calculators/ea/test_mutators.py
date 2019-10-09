@@ -84,8 +84,8 @@ def test_random_mutation(polymer):
     chain2 = stk.polymer.Linear('AB', 5)
     t1 = stk.RandomTopologyGraph([chain1])
     t2 = stk.RandomTopologyGraph([chain2])
-    mutator1 = stk.RandomMutation(t1, t2, weights=[1, 0])
-    mutator2 = stk.RandomMutation(t1, t2, weights=[0, 1])
+    mutator1 = stk.Random(t1, t2, probabilities=[1, 0])
+    mutator2 = stk.Random(t1, t2, probabilities=[0, 1])
 
     mutant1 = mutator1.mutate(polymer)
     expected1 = stk.ConstructedMolecule(

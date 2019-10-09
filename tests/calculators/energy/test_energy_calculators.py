@@ -15,7 +15,7 @@ def test_cache_use(amine2):
     mmff = stk.MMFFEnergy()
     mmff.get_energy(amine2)
     # Since use_cache is False the cache should be empty.
-    assert not mmff._cache
+    assert not mmff.is_in_cache(amine2)
 
     # To test that the cache is not being used, put a random object
     # into it, and test that it was not returned.
@@ -27,11 +27,11 @@ def test_cache_use(amine2):
     cached_mmff = stk.MMFFEnergy(use_cache=True)
     assert not cached_mmff._cache
     cached_mmff.get_energy(amine2)
-    assert cached_mmff._cache
+    assert cached_mmff.is_in_cache(amine2)
 
     # Test that the cache is being used by putting a random object into
     # it and making sure it gets returned.
-    cached_mmff._cache[amine2] = obj
+    cached_mmff.add_to_cache(amine2, obj)
     assert cached_mmff.get_energy(amine2) is obj
 
 

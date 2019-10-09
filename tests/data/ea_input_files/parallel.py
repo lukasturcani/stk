@@ -45,13 +45,13 @@ population = stk.EAPopulation.init_random(
 # Selector for selecting the next generation.
 # #####################################################################
 
-generation_selector = stk.SelectorSequence(
-    selector1=stk.Best(
+generation_selector = stk.Sequence(
+    stk.Best(
         num_batches=3,
         duplicate_mols=False,
         duplicate_batches=False
     ),
-    selector2=stk.RemoveBatches(
+    stk.RemoveBatches(
         remover=stk.Best(
             num_batches=3,
             duplicate_mols=False,
@@ -93,7 +93,7 @@ crosser = stk.Jumble(
 # Mutator.
 # #####################################################################
 
-mutator = stk.RandomMutation(
+mutator = stk.Random(
     stk.RandomTopologyGraph(topology_graphs, random_seed=random_seed),
     stk.RandomBuildingBlock(
         building_blocks=building_blocks,
@@ -133,7 +133,7 @@ fitness_calculator = stk.PropertyVector(num_atoms)
 # The PropertyVector fitness calculator will set the fitness as
 # [n_atoms] use the Sum() fitness normalizer to convert the fitness to
 # just n_atoms^0.5. The sqrt is because we use the Power normalizer.
-fitness_normalizer = stk.NormalizerSequence(
+fitness_normalizer = stk.Sequence(
     stk.Power(0.5),
     stk.Sum()
 )
@@ -151,12 +151,18 @@ terminator = stk.NumGenerations(25)
 plotters = [
     stk.ProgressPlotter(
         filename='fitness_plot',
-        property_fn=lambda mol: mol.fitness,
+        property_fn=lambda progress, mol:
+            progress.get_fitness_values()[mol],
         y_label='Fitness',
+        progress_fn=lambda progress:
+            progress.set_fitness_values_from_calculators(
+                fitness_calculator=fitness_calculator,
+                fitness_normalizer=fitness_normalizer,
+            )
     ),
     stk.ProgressPlotter(
         filename='atom_number_plot',
-        property_fn=lambda mol: len(mol.atoms),
+        property_fn=lambda progress, mol: len(mol.atoms),
         y_label='Number of Atoms',
     )
 ]
@@ -164,18 +170,21 @@ plotters = [
 stk.SelectionPlotter(
     filename='generational_selection',
     selector=generation_selector,
-    molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+    molecule_label=lambda population, mol:
+        f'{mol.id} - {population.get_fitness_values()[mol]}',
     x_label='Molecule: id - fitness value'
 )
 stk.SelectionPlotter(
     filename='crossover_selection',
     selector=crossover_selector,
-    molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+    molecule_label=lambda population, mol:
+        f'{mol.id} - {population.get_fitness_values()[mol]}',
     x_label='Molecule: id - fitness value'
 )
 stk.SelectionPlotter(
     filename='mutation_selection',
     selector=mutation_selector,
-    molecule_label=lambda mol: f'{mol.id} - {mol.fitness}',
+    molecule_label=lambda population, mol:
+        f'{mol.id} - {population.get_fitness_values()[mol]}',
     x_label='Molecule: id - fitness value'
 )
