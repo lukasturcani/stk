@@ -60,7 +60,7 @@ class MoleculeCalculator(Calculator):
         ----------
         fn : :class:`callable`
             Takes a :class:`.Molecule` as a parameter and returns
-            some result, which is cached, depending on if the
+            some result, which is cached, depending on if
             caching is turned on.
 
         mol : :class:`.Molecule`
