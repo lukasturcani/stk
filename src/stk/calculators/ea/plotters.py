@@ -364,10 +364,10 @@ class SelectionPlotter(Plotter):
         """
 
         @wraps(select)
-        def inner(population):
+        def inner(population, *args, **kwargs):
 
             counter = Counter({mol: 0 for mol in population})
-            for selected in select(population):
+            for selected in select(population, *args, **kwargs):
                 counter.update(selected)
                 yield selected
             self._plot(population, counter)

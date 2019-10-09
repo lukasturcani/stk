@@ -264,6 +264,7 @@ def ea_run(filename, input_file):
     if hasattr(input_file, 'logging_level'):
         logging_level = input_file.logging_level
     logging.getLogger('stk').setLevel(logging_level)
+    logger.setLevel(logging_level)
 
     # EA should always use the cache.
     optimizer.set_cache_use(True)
@@ -327,22 +328,31 @@ def ea_run(filename, input_file):
             logger.info(f'Starting generation {gen}.')
             logger.debug(f'Population size is {len(pop)}.')
 
-            logger.info('Adding offsping and mutants to population.')
+            logger.info('Creating offspring.')
 
             offspring_parents = crossover_selector.select(pop)
             offspring_batches = it.starmap(
                 crosser.cross,
                 offspring_parents
             )
-            offspring = (
+            # These need to be made here, outside of pop.extend
+            # because otherwise the selector may select the things
+            # which just got added, before their fitness got
+            # calculated.
+            offspring = list(
                 offspring
                 for offspring_batch in offspring_batches
                 for offspring in offspring_batch
             )
 
-            mutant_parents = mutation_selector.select(pop)
-            mutants = it.starmap(mutator.mutate, mutant_parents)
+            logger.info('Creating mutants.')
 
+            mutant_parents = mutation_selector.select(pop)
+            mutants = list(it.starmap(mutator.mutate, mutant_parents))
+
+            logger.info(
+                'Adding offspring and mutants into population.'
+            )
             pop.direct_members.extend(it.chain(offspring, mutants))
 
             logger.debug(f'Population size is {len(pop)}.')
