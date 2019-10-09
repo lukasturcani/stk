@@ -308,12 +308,15 @@ def ea_run(filename, input_file):
     with pop.open_process_pool(num_processes):
         id_ = pop.set_mol_ids(0)
         logger.info('Optimizing the population.')
-        pop.optimize(optimizer)
+        # num_processes needs to be used explicitly in case
+        # num_processes is set to 1.
+        pop.optimize(optimizer, num_processes=num_processes)
 
         logger.info('Calculating the fitness of population members.')
         pop.set_fitness_values_from_calculators(
             fitness_calculator=fitness_calculator,
             fitness_normalizer=fitness_normalizer,
+            num_processes=num_processes,
         )
 
         history.log_pop(logger, pop)
@@ -370,7 +373,7 @@ def ea_run(filename, input_file):
                 )
 
             logger.info('Optimizing the population.')
-            pop.optimize(optimizer)
+            pop.optimize(optimizer, num_processes=num_processes)
 
             logger.info(
                 'Calculating the fitness of population members.'
@@ -378,6 +381,7 @@ def ea_run(filename, input_file):
             pop.set_fitness_values_from_calculators(
                 fitness_calculator=fitness_calculator,
                 fitness_normalizer=fitness_normalizer,
+                num_processes=num_processes,
             )
 
             history.log_pop(logger, pop)
