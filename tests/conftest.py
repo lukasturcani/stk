@@ -9,13 +9,6 @@ from collections import Counter, defaultdict
 from .fixtures import *
 
 
-logging.basicConfig(
-    format='\n\n%(levelname)s:%(module)s:%(message)s',
-    stream=sys.stdout
-)
-logging.getLogger('stk').setLevel(logging.DEBUG)
-
-
 # Run tests in a directory so that that generated files are easy to
 # delete.
 output_dir = 'tests_output'

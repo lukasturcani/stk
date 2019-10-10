@@ -7,18 +7,18 @@ def test_random_crossover(polymer, polymer_alt1):
     recombination = stk.GeneticRecombination(
         key=lambda mol: mol.func_groups[0].fg_type.name
     )
-    random_crossover = stk.RandomCrossover(
+    random_crossover = stk.Random(
         jumble,
         recombination,
-        weights=[0, 1]
+        probabilities=[0, 1]
     )
     cohort1 = list(random_crossover.cross(polymer, polymer_alt1))
     assert len(cohort1) == 6
 
-    random_crossover = stk.RandomCrossover(
+    random_crossover = stk.Random(
         jumble,
         recombination,
-        weights=[1, 0]
+        probabilities=[1, 0]
     )
     cohort1 = list(random_crossover.cross(polymer, polymer_alt1))
     assert len(cohort1) == 10

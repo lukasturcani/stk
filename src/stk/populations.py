@@ -30,7 +30,7 @@ class Population:
 
     :class:`Population` instances can be nested.
 
-    In addtion to holding :class:`.Molecule` objects, the
+    In addition to holding :class:`.Molecule` objects, the
     :class:`Population` class can be used to create large numbers of
     these instances through the class methods beginning with "init".
 
@@ -101,7 +101,7 @@ class Population:
         second_member = pop[1]
 
     Indices will first access direct members of the population and then
-    acess members in the subpopulations. Indices access nested members
+    access members in the subpopulations. Indices access nested members
     depth-first
 
     .. code-block:: python
@@ -163,7 +163,7 @@ class Population:
         bb2 not in pop3
 
     If you want to run multiple :meth:`optimize` calls in a row, use
-    the "with" statment. This keeps a single process pool open, and
+    the "with" statement. This keeps a single process pool open, and
     means you do not create a new one for each :meth:`optimize` call.
     It also automatically closes the pool for you when the block
     exits
@@ -1001,9 +1001,12 @@ class Population:
     def _optimize_parallel(self, optimizer, num_processes):
         opt_fn = _Guard(optimizer, optimizer.optimize)
 
-        # Only send molecules which need to have a calculation peformed
-        # to the process pool - this should improve performance.
+        # Only send molecules which need to have a calculation
+        # performed to the process pool - this should improve
+        # performance.
         if optimizer.is_caching():
+            # Use a list here because to_evaluate is iterated through
+            # twice.
             to_evaluate = [
                 mol for mol in self if not optimizer.is_in_cache(mol)
             ]
@@ -1022,20 +1025,15 @@ class Population:
         if opened_pool:
             self.close_process_pool()
 
-        # If anything failed, raise an error.
-        for result in evaluated:
+        # Update the structures in the population.
+        for input_mol, result in zip(to_evaluate, evaluated):
             if isinstance(result, Exception):
                 raise result
 
-        # Update the structures in the population.
-        sorted_input = sorted(to_evaluate, key=lambda m: repr(m))
-        sorted_output = sorted(evaluated, key=lambda m: repr(m))
-        for input_mol, output_mol in zip(sorted_input, sorted_output):
-            assert (
-                input_mol.get_identity_key()
-                == output_mol.get_identity_key()
+            output_mol, _ = result
+            input_mol.set_position_matrix(
+                position_matrix=output_mol.get_position_matrix()
             )
-            input_mol.__dict__ = dict(vars(output_mol))
             if optimizer.is_caching():
                 optimizer.add_to_cache(input_mol)
 
@@ -1052,7 +1050,7 @@ class Population:
         faster in cases where all molecules have already been
         optimized and the `optimizer` will skip them.
         In this case creating a parallel process pool creates
-        unncessary overhead.
+        unnecessary overhead.
 
         Parameters
         ----------
@@ -1407,7 +1405,7 @@ class Population:
 
 class EAPopulation(Population):
     """
-    A population which also carries out evolutionary operations.
+    A population which also stores fitness values of molecules.
 
     Attributes
     ----------
@@ -1422,56 +1420,56 @@ class EAPopulation(Population):
 
     """
 
-    def set_ea_tools(
-        self,
-        generation_selector,
-        mutation_selector,
-        crossover_selector,
-        mutator,
-        crosser
-    ):
+    def get_fitness_values(self):
         """
-        Set the genetic algorithm calculators.
+        Return the fitness values of molecules.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps a :class:`.Molecule` to its fitness value.
+
+        """
+
+        return dict(self._fitness_values)
+
+    def set_fitness_values_from_dict(self, fitness_values):
+        """
+        Set the fitness values of molecules.
 
         Parameters
         ----------
-        generation_selector : :class:`.Selector`
-            A :class:`.Selector` used to select molecules in the next
-            generation.
+        fitness_values : :class:`dict`
+            Maps molecules in the population to their fitness
+            values.
 
-        mutation_selector : :class:`.Selector`
-            A :class:`.Selector` used to select molecules for mutation.
-
-        crossover_selector : :class:`.Selector`
-            A :class:`.Selector` used to select molecules for crossover.
-
-        mutator : :class:`.Mutator`
-            Carries out the mutation of molecules.
-
-        crosser : :class:`.Crosser`
-            Carries out the crossover of molecules.
+        Returns
+        -------
+        :class:`.EAPopulation`
+            The population is returned.
 
         """
 
-        self._generation_selector = generation_selector
-        self._mutation_selector = mutation_selector
-        self._crossover_selector = crossover_selector
-        self._mutator = mutator
-        self._crosser = crosser
+        self._fitness_values = dict(fitness_values)
+        for pop in self.subpopulations:
+            pop.set_fitness_values_from_dict(fitness_values)
 
-    def calculate_member_fitness(
+    def set_fitness_values_from_calculators(
         self,
         fitness_calculator,
-        num_processes=None
+        fitness_normalizer=None,
+        num_processes=None,
     ):
         """
-        Calculates the fitness values of molecules.
+        Set the fitness values of molecules.
 
         Parameters
         ----------
         fitness_calculator : :class:`.FitnessCalculator`
-            The :class:`.FitnessCalculator` used to calculate the
-            fitness.
+            Used to calculate the initial fitness values.
+
+        fitness_normalizer : :class:`.FitnessNormalizer`, optional
+            Used to normalize the fitness values.
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create. Calculations
@@ -1481,7 +1479,8 @@ class EAPopulation(Population):
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`.EAPopulation`
+            The population is returned.
 
         """
 
@@ -1489,40 +1488,42 @@ class EAPopulation(Population):
             num_processes = psutil.cpu_count()
 
         if self._process_pool is None and num_processes == 1:
-            self._calculate_fitness_serial(fitness_calculator)
+            self._set_fitness_values_serial(fitness_calculator)
         else:
-            self._calculate_fitness_parallel(
+            self._set_fitness_values_parallel(
                 fitness_calculator=fitness_calculator,
-                num_processes=num_processes
+                num_processes=num_processes,
             )
 
-    def _calculate_fitness_serial(self, fitness_calculator):
-        for mol in self:
-            fitness_calculator.get_fitness(mol)
+        if fitness_normalizer is not None:
+            self._fitness_values = fitness_normalizer.normalize(self)
 
-    def _calculate_fitness_parallel(
+        for pop in self.subpopulations:
+            pop.set_fitness_values_from_dict(self._fitness_values)
+
+    def _set_fitness_values_serial(self, fitness_calculator):
+        self._fitness_values = {
+            mol: fitness_calculator.get_fitness(mol)
+            for mol in self
+        }
+
+    def _set_fitness_values_parallel(
         self,
         fitness_calculator,
-        num_processes
+        num_processes,
     ):
 
         fitness_fn = _Guard(
             calculator=fitness_calculator,
-            fn=fitness_calculator.get_fitness
+            fn=fitness_calculator.get_fitness,
         )
 
-        # Only send molecules which need to have a calculation peformed
-        # to the process pool - this should improve performance.
-        if fitness_calculator.is_caching():
-            to_evaluate = []
-            for mol in self:
-                if fitness_calculator.is_in_cache(mol):
-                    fitness_calculator.get_fitness(mol)
-                else:
-                    to_evaluate.append(mol)
-        else:
-            to_evaluate = self
-
+        self._fitness_values = {}
+        # Use a list here because the to_evaluate is iterated through
+        # twice.
+        to_evaluate = list(
+            self._handle_cached_mols(fitness_calculator)
+        )
         # Use an existing process pool, if it exists.
         opened_pool = False
         if self._process_pool is None:
@@ -1535,89 +1536,44 @@ class EAPopulation(Population):
         if opened_pool:
             self.close_process_pool()
 
-        # If anything returned an exception, raise it.
-        for result in evaluated:
+        # Collect results.
+        for mol, result in zip(to_evaluate, evaluated):
+
             if isinstance(result, Exception):
                 raise result
 
-        # Update the molecules in the population.
-        sorted_input = sorted(to_evaluate, key=lambda m: repr(m))
-        sorted_output = sorted(evaluated, key=lambda m: repr(m))
-        for input_mol, output_mol in zip(sorted_input, sorted_output):
-            assert (
-                input_mol.get_identity_key()
-                == output_mol.get_identity_key()
-            )
-            input_mol.__dict__ = dict(vars(output_mol))
+            _, fitness = result
+            self._fitness_values[mol] = fitness
+
             if fitness_calculator.is_caching():
-                fitness_calculator.add_to_cache(
-                    mol=input_mol,
-                    fitness=input_mol.fitness
-                )
+                fitness_calculator.add_to_cache(mol, fitness)
 
-    def get_mutants(self):
-        """
-        Yield mutants.
+        return self
 
-        Yields
-        ------
-        :class:`.Molecule`
-            A mutant.
-
-        """
-
-        parents = self._mutation_selector.select(self)
-        for i, (parent, ) in enumerate(parents, 1):
-            logger.info(f'Mutation number {i}.')
-            mutant = self._mutator.mutate(parent)
-            yield mutant
-
-    def get_next_generation(self):
-        """
-        Yield members of the next generation.
-
-        Yields
-        ------
-        :class:`.Molecule`
-            A member of the next generation.
-
-        """
-
-        yield from (
-            mol for mol, in self._generation_selector.select(self)
-        )
-
-    def get_offspring(self):
-        """
-        Yield offspring.
-
-        Yields
-        ------
-        :class:`.Molecule`
-            An offspring.
-
-        """
-
-        parent_batches = self._crossover_selector.select(self)
-        for i, parents in enumerate(parent_batches, 1):
-            logger.info(f'Crossover number {i}.')
-            for child in self._crosser.cross(*parents):
-                yield child
+    def _handle_cached_mols(self, fitness_calculator):
+        # Only send molecules which need to have a calculation
+        # performed to the process pool - this should improve
+        # performance.
+        if fitness_calculator.is_caching():
+            for mol in self:
+                if fitness_calculator.is_in_cache(mol):
+                    self._fitness_values[mol] = (
+                        fitness_calculator.get_fitness(mol)
+                    )
+                else:
+                    yield mol
+        else:
+            yield from self
 
 
 class _Guard:
     """
-    A decorator for optimization functions.
+    A decorator for parallelized functions.
 
     This decorator should be applied to all functions which are to
     be used with :mod:`pathos`. It prevents functions from
     raising if they fail, which prevents the :mod:`pathos` pool
     from hanging.
-
-    Attributes
-    ----------
-    _calc_name : :class:`str`
-        The name of the :class:`.Optimizer` class being used.
 
     """
 
@@ -1632,12 +1588,13 @@ class _Guard:
         Parameters
         ----------
         mol : :class:`.Molecule`
-            The molecule to be optimized.
+            The molecule to be passed to the function.
 
         Returns
         -------
-        :class:`.Molecule`
-            The optimized molecule.
+        :class:`tuple`
+            The input molecule is the first element of the tuple and
+            the value returned by the function is the second element.
 
         """
 
@@ -1645,8 +1602,7 @@ class _Guard:
         cls = self._calc_name
         try:
             logger.info(f'Running "{cls}.{fn}()" on "{mol}"')
-            self.__wrapped__(mol)
-            return mol
+            return mol, self.__wrapped__(mol)
 
         except Exception as ex:
             errormsg = (

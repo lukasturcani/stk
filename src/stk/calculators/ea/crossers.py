@@ -2,26 +2,28 @@
 Crossover
 =========
 
-#. :class:`.RandomCrossover`
 #. :class:`.GeneticRecombination`
 #. :class:`.Jumble`
+#. :class:`.If`
+#. :class:`.TryCatch`
+#. :class:`.Random`
+#. :class:`.RaisingCalculator`
 
-Crossover is implement through :class:`Crosser` objects. Crossers take
+Crossover is implement through :class:`.Crosser` objects. Crossers take
 a group of molecules and recombine
 them to produce offspring molecules. How crossers are used can be
-seen in the documentation of the various :class:`Crosser` classes,
-for example :class:`GeneticRecombination`,
-:class:`Jumble` or :class:`RandomCrossover`.
+seen in the documentation of the various :class:`.Crosser` classes,
+for example :class:`.GeneticRecombination` or
+:class:`.Jumble`.
 
 .. _`adding crossers`:
 
 Making New Crossers
 -------------------
 
-To add a new :class:`Crosser`, make a new class which inherits
-:class:`Crosser` and defines a method called
-:meth:`~Crosser.cross`. The method is a generator, which can take
-any number of molecules and yields the offspring molecules.
+To add a new :class:`.Crosser`, make a new class which inherits
+:class:`.Crosser`. This is an abstract base class and all of its
+virtual methods need to be implemented.
 
 """
 
@@ -29,6 +31,8 @@ import logging
 import numpy as np
 import itertools as it
 from collections import defaultdict
+from ..base_calculators import EAOperation, _EAOperation
+
 
 from ...utilities import dedupe
 
@@ -36,41 +40,14 @@ from ...utilities import dedupe
 logger = logging.getLogger(__name__)
 
 
-class Crosser:
+class Crosser(EAOperation):
     """
-    Carries out crossover on molecules.
+    Abstract base class for crossers.
+
+    Crossers take multiple molecules and recombine them to make
+    new, offspring, molecules.
 
     """
-
-    def __init__(self, use_cache):
-        """
-        Initialize a :class:`Crosser`.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            Toggles use of the molecular cache.
-
-        """
-
-        self._use_cache = use_cache
-
-    def set_cache_use(self, use_cache):
-        """
-        Set cache use on or off.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            ``True`` if the cache is to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self._use_cache = use_cache
 
     def cross(self, *mols):
         """
@@ -88,140 +65,35 @@ class Crosser:
 
         """
 
-        return NotImplementedError()
+        # Can be used to decorate _cross in the future.
+        yield from self._cross(*mols)
 
-
-class RandomCrossover(Crosser):
-    """
-    Uses a random :class:`Crosser` to carry out crossovers.
-
-    Examples
-    --------
-    Note that the crossover operations used in this example accept
-    any number of parents.
-
-    .. code-block:: python
-
-        import stk
-
-        # Create the molecules which will be crossed.
-        bb1 = stk.BuildingBlock('NCCN', ['amine'])
-        bb2 = stk.BuildingBlock('O=CCCCC=O', ['aldehyde'])
-        polymer1  = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
-            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
-        )
-
-        bb3 = stk.BuildingBlock('NCCCN', ['amine'])
-        bb4 = stk.BuildingBlock('O=C[Si]CCC=O', ['aldehyde'])
-        polymer2  = stk.ConstructedMolecule(
-            building_blocks=[bb3, bb4],
-            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
-        )
-
-        bb5 = stk.BuildingBlock('NC[Si]CN', ['amine'])
-        bb6 = stk.BuildingBlock('O=CCNNCCC=O', ['aldehyde'])
-        polymer3  = stk.ConstructedMolecule(
-            building_blocks=[bb5, bb6],
-            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
-        )
-
-        # Create the crossers.
-        recombination = stk.GeneticRecombination(
-            key=lambda mol: mol.func_groups[0].fg_type.name
-        )
-        jumble = stk.Jumble(num_offspring_building_blocks=2)
-        random_crossover = stk.RandomCrossover(recombination, jumble)
-
-        # Get the offspring molecules, either recombination or jumble
-        # will be used to make them.
-        cohort1 = list(
-            random_crossover.cross(polymer1, polymer2, polymer3)
-        )
-
-        # Get a second set of offspring molecules, either recombination
-        # or jumble will be used to make them.
-        cohort2 = list(
-            random_crossover.cross(polymer1, polymer2, polymer3)
-        )
-
-        # Make a third set of offspring molecules by crossing two of
-        # the offspring molecules. Either recombination or jumble will
-        # be used to make them.
-        offspring1, offspring2, *rest = cohort1
-        cohort3 = list(
-            random_crossover.cross(offspring1, offspring2)
-        )
-
-    """
-
-    def __init__(self, *crossers, weights=None, random_seed=None):
-        """
-        Initialize a :class:`RandomCrossover` instance.
-
-        Parameters
-        ----------
-        *crossers : :class:`Crosser`
-            :class:`Crosser` objects which are used to carry out the
-            crossovers.
-
-        weights : :class:`list` of :class:`float`, optional
-            The probability that each :class:`Crosser` will be selected
-            to carry out a crossover.
-
-        random_seed : :class:`int`, optional
-            The random seed to use.
-
-        """
-
-        self._crossers = crossers
-        self._weights = weights
-        self._generator = np.random.RandomState(random_seed)
-        super().__init__(use_cache=False)
-
-    def set_cache_use(self, use_cache):
-        """
-        Set cache use on or off.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            ``True`` if the cache is to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for crosser in self._crossers:
-            crosser.set_cache_use(use_cache)
-        super().set_cache_use(use_cache)
-
-    def cross(self, *mols):
+    def _cross(self, *mols):
         """
         Cross `mols`.
 
         Parameters
         ----------
         *mols : :class:`.Molecule`
-            The molecules to be crossed.
+            The molecules on which a crossover operation is performed.
 
         Yields
         -------
         :class:`.Molecule`
-            A generated offspring
+            The generated offspring.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
 
         """
 
-        crosser = self._generator.choice(
-            a=self._crossers,
-            p=self._weights
-        )
-        yield from crosser.cross(*mols)
+        raise NotImplementedError()
 
 
-class GeneticRecombination(Crosser):
+class GeneticRecombination(_EAOperation, Crosser):
     """
     Recombine building blocks using biological systems as a model.
 
@@ -284,7 +156,7 @@ class GeneticRecombination(Crosser):
     the `key` parameter. Then, to generate a single offspring, it
     picks a random building block for every gene. The picked
     building blocks are used to construct the offspring. The
-    topoogy graph of the offspring is one of the parent's.
+    topology graph of the offspring is one of the parent's.
     For obvious reasons, this approach works with any number of
     parents.
 
@@ -301,14 +173,14 @@ class GeneticRecombination(Crosser):
         bb2 = stk.BuildingBlock('O=CCCCC=O', ['aldehyde'])
         polymer1  = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2],
-            topolgy_graph=stk.polymer.Linear('AB', [0, 0], n=2)
+            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
         )
 
         bb3 = stk.BuildingBlock('NCCCN', ['amine'])
         bb4 = stk.BuildingBlock('O=C[Si]CCC=O', ['aldehyde'])
         polymer2  = stk.ConstructedMolecule(
             building_blocks=[bb3, bb4],
-            topolog_graph=stk.polymer.Linear('AB', [0, 0], n=2)
+            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
         )
 
         bb5 = stk.BuildingBlock('NC[Si]CN', ['amine'])
@@ -372,7 +244,7 @@ class GeneticRecombination(Crosser):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def cross(self, *mols):
+    def _cross(self, *mols):
         """
         Cross `mols`.
 
@@ -435,7 +307,7 @@ class GeneticRecombination(Crosser):
             )
 
 
-class Jumble(Crosser):
+class Jumble(_EAOperation, Crosser):
     """
     Distributes all building blocks among offspring.
 
@@ -524,7 +396,7 @@ class Jumble(Crosser):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def cross(self, *mols):
+    def _cross(self, *mols):
         """
         Cross `mols`.
 

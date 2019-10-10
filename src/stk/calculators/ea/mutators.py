@@ -5,7 +5,10 @@ Mutation
 #. :class:`RandomBuildingBlock`
 #. :class:`.SimilarBuildingBlock`
 #. :class:`.RandomTopology`
-#. :class:`.RandomMutation`
+#. :class:`.If`
+#. :class:`.TryCatch`
+#. :class:`.Random`
+#. :class:`.RaisingCalculator`
 
 Mutation is carried by :class:`.Mutator` objects. They inherit
 :class:`.Mutator` and define a method :meth:`~Mutator.mutate`. This
@@ -22,9 +25,8 @@ or :class:`RandomMutation`.
 Making New Mutators
 -------------------
 
-Mutators must simple inherit the :class:`.Mutator` class and define a
-method called :meth:`~Mutatator.mutate`, which take a single molecule
-and returns a mutant molecule. There are no requirements besides this.
+Mutators must simply inherit the :class:`.Mutator` class. This is an
+abstract base class and its virtual methods must be implemented.
 
 """
 
@@ -33,6 +35,7 @@ import numpy as np
 
 
 from ...utilities import dice_similarity
+from ..base_calculators import EAOperation, _EAOperation
 
 
 logger = logging.getLogger(__name__)
@@ -47,43 +50,32 @@ class MutationError(Exception):
     ...
 
 
-class Mutator:
+class Mutator(EAOperation):
     """
     Creates mutants.
 
     """
 
-    def __init__(self, use_cache):
+    def mutate(self, mol):
         """
-        Initialize a :class:`Mutator`.
+        Return a mutant of `mol`.
 
         Parameters
         ----------
-        use_cache : :class:`bool`
-            Toggles use of the molecular cache.
-
-        """
-
-        self._use_cache = use_cache
-
-    def set_cache_use(self, use_cache):
-        """
-        Set cache use on or off.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            ``True`` if the cache is to be used.
+        mol : :class:`.Molecule`
+            The molecule to be mutated.
 
         Returns
         -------
-        None : :class:`NoneType`
+        mol : :class:`.Molecule`
+            The mutant.
 
         """
 
-        self._use_cache = use_cache
+        # Can be used to decorate _mutate in the future.
+        return self._mutate(mol)
 
-    def mutate(self, mol):
+    def _mutate(self, mol):
         """
         Return a mutant of `mol`.
 
@@ -108,137 +100,7 @@ class Mutator:
         raise NotImplementedError()
 
 
-class RandomMutation(Mutator):
-    """
-    Uses a random :class:`Mutator` to carry out mutations.
-
-    Examples
-    --------
-    .. code-block:: python
-
-        import stk
-
-        # Create a molecule which is to be mutated.
-        bb1 = stk.BuildingBlock('NCCN', ['amine'])
-        bb2 = stk.BuildingBlock('O=CCC(=O)CC=O', ['aldehyde'])
-        cage = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
-            topology_graph=stk.cage.FourPlusSix()
-        )
-
-
-        # Create the first mutator.
-        topology_graphs = [
-            stk.cage.TwoPlusThree(),
-            stk.cage.EightPlusTwelve(),
-            stk.cage.TwentyPlusThirty()
-        ]
-        random_topology = stk.RandomTopologyGraph(topology_graphs)
-
-        # Create the second and third mutator.
-        building_blocks = [
-            stk.BuildingBlock('NC[Si]CCN', ['amine']),
-            stk.BuildingBlock('NCCCCCCCN', ['amine']),
-            stk.BuildingBlock('NC1CCCCC1N', ['amine'])
-        ]
-
-        random_bb = stk.RandomBuildingBlock(
-            building_blocks=building_blocks,
-            key=lambda mol: mol.func_groups[0].fg_type.name == 'amine'
-        )
-
-        similar_bb = stk.SimilarBuildingBlock(
-            building_blocks=building_blocks,
-            key=lambda mol: mol.func_groups[0].fg_type.name == 'amine'
-        )
-
-        # Create the mutator used to carry out the mutations.
-        random_mutator = stk.RandomMutation(
-            random_topology,
-            random_bb,
-            similar_bb
-        )
-
-        # Mutate a molecule, one of random_topology,
-        # random_bb or similar_bb will be used.
-        mutant1 = random_mutator.mutate(cage)
-
-        # Mutate the molecule a second time, one of random_topology,
-        # random_bb or similar_bb will be used.
-        mutant2 = random_mutator.mutate(cage)
-
-        # Mutate a mutant, one of random_topology,
-        # random_bb or similar_bb will be used.
-        mutant3 = random_mutator.mutate(mutant1)
-
-    """
-
-    def __init__(self, *mutators, weights=None, random_seed=None):
-        """
-        Initialize a :class:`RandomMutation` instance.
-
-        Parameters
-        ----------
-        *mutators : :class:`Mutator`
-            :class:`Mutator` objects which are used to carry out the
-            mutations.
-
-        weights : :class:`list` of :class:`float`, optional
-            The probability that each :class:`Mutator` will be selected
-            to carry out a mutation.
-
-        random_seed : :class:`bool`, optional
-            The random seed to use.
-
-        """
-
-        self._mutators = mutators
-        self._weights = weights
-        self._generator = np.random.RandomState(random_seed)
-
-    def set_cache_use(self, use_cache):
-        """
-        Set cache use on or off.
-
-        Parameters
-        ----------
-        use_cache : :class:`bool`
-            ``True`` if the cache is to be used.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        for mutator in self._mutators:
-            mutator.set_cache_use(use_cache)
-        super().set_cache_use(use_cache)
-
-    def mutate(self, mol):
-        """
-        Return a mutant of `mol`.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule to be mutated.
-
-        Returns
-        -------
-        mol : :class:`.Molecule`
-            The mutant.
-
-        """
-
-        mutator = self._generator.choice(
-            a=self._mutators,
-            p=self._weights
-        )
-        return mutator.mutate(mol)
-
-
-class RandomBuildingBlock(Mutator):
+class RandomBuildingBlock(_EAOperation, Mutator):
     """
     Substitutes random building blocks.
 
@@ -325,7 +187,7 @@ class RandomBuildingBlock(Mutator):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def mutate(self, mol):
+    def _mutate(self, mol):
         """
         Return a mutant of `mol`.
 
@@ -379,7 +241,7 @@ class RandomBuildingBlock(Mutator):
         )
 
 
-class SimilarBuildingBlock(Mutator):
+class SimilarBuildingBlock(_EAOperation, Mutator):
     """
     Substitutes similar building blocks.
 
@@ -467,7 +329,7 @@ class SimilarBuildingBlock(Mutator):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def mutate(self, mol):
+    def _mutate(self, mol):
         """
         Return a mutant of `mol`.
 
@@ -542,7 +404,7 @@ class SimilarBuildingBlock(Mutator):
         )
 
 
-class RandomTopologyGraph(Mutator):
+class RandomTopologyGraph(_EAOperation, Mutator):
     """
     Changes topology graphs at random.
 
@@ -608,7 +470,7 @@ class RandomTopologyGraph(Mutator):
         self._generator = np.random.RandomState(random_seed)
         super().__init__(use_cache=use_cache)
 
-    def mutate(self, mol):
+    def _mutate(self, mol):
         """
         Return a mutant of `mol`.
 

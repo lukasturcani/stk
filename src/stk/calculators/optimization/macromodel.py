@@ -15,6 +15,7 @@ import gzip
 
 from ...utilities import MAEExtractor, move_generated_macromodel_files
 from .optimizers import Optimizer
+from ..base_calculators import _MoleculeCalculator
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class MacroModelInputError(Exception):
     ...
 
 
-class _MacroModel(Optimizer):
+class _MacroModel(_MoleculeCalculator, Optimizer):
     """
     Base class for MacroModel optimzers.
 
