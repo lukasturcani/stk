@@ -78,15 +78,7 @@ class FitnessCalculator(MoleculeCalculator):
 
         """
 
-        if self.is_caching() and self.is_in_cache(mol):
-            return self.get_cached_value(mol)
-
-        fitness = self._get_fitness(mol)
-
-        if self.is_caching():
-            self.add_to_cache(mol, fitness)
-
-        return fitness
+        return self._cache_result(self._get_fitness, mol)
 
     def _get_fitness(self, mol):
         """

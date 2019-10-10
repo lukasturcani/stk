@@ -115,15 +115,7 @@ class EnergyCalculator(MoleculeCalculator):
 
         """
 
-        if self.is_caching() and self.is_in_cache(mol):
-            return self.get_cached_value(mol)
-
-        energy = self._get_energy(mol)
-
-        if self.is_caching():
-            self.add_to_cache(mol, energy)
-
-        return energy
+        return self._cache_result(self._get_energy, mol)
 
     def _get_energy(self, mol):
         """
