@@ -150,7 +150,7 @@ class EAHistory:
     def log_file_content(progress):
         for sp in progress.subpopulations:
             for mol in sp:
-                yield f'{mol.id} {mol}'
+                yield f'{mol.id} {mol} {mol.get_fitness_values()}'
             yield '\n'
 
     def log_pop(self, logger, pop):
