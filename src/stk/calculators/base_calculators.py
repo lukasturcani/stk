@@ -52,6 +52,37 @@ class MoleculeCalculator(Calculator):
 
     """
 
+    def _cache_result(self, fn, mol):
+        """
+        Apply `fn` to `mol` and cache the result.
+
+        Parameters
+        ----------
+        fn : :class:`callable`
+            Takes a :class:`.Molecule` as a parameter and returns
+            some result, which is cached, depending on if
+            caching is turned on.
+
+        mol : :class:`.Molecule`
+            The molecule onto which `fn` is applied.
+
+        Returns
+        -------
+        :class:`object`
+            The value returned by ``fn(mol)``.
+
+        """
+
+        if self.is_caching() and self.is_in_cache(mol):
+            return self.get_cached_value(mol)
+
+        value = fn(mol)
+
+        if self.is_caching():
+            self.add_to_cache(mol, value)
+
+        return value
+
     def set_cache_use(self, use_cache):
         """
         Set cache use on or off.
