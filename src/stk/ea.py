@@ -70,6 +70,9 @@ class EAHistory:
     db_pop : :class:`.EAPopulation` or :class:`NoneType`
         A population which holds every molecule made by the EA.
 
+    dump_attrs : :class:`list` of :class:`str`, optional
+        The names of attributes of the molecule to be added to
+        the JSON.
     """
 
     def __init__(
@@ -77,7 +80,8 @@ class EAHistory:
         fitness_calculator,
         log_file,
         progress_dump,
-        database_dump
+        database_dump,
+        dump_attrs,
     ):
         self.fitness_calculator = fitness_calculator
         self.log_file = log_file
@@ -85,6 +89,7 @@ class EAHistory:
         self.database_dump = database_dump
         self.progress = stk.EAPopulation()
         self.db_pop = stk.EAPopulation()
+        self.dump_attrs = dump_attrs
 
     def db(self, mols):
         """
@@ -115,7 +120,7 @@ class EAHistory:
             progress.log
                 This file holds the progress of the EA in text form.
                 Each generation is reprented by the names of the
-                molecules and their key and fitness.
+                molecules and their key.
 
             progress.json
                 A population dump file holding `progress`. Only made if
@@ -134,7 +139,10 @@ class EAHistory:
                 )
 
         if self.progress_dump:
-            self.progress.dump('progress.json')
+            self.progress.dump(
+                'progress.json',
+                include_attrs=self.dump_attrs,
+            )
         if self.database_dump:
             self.db_pop.dump('database.json')
 
@@ -252,6 +260,10 @@ def ea_run(filename, input_file):
     if hasattr(input_file, 'progress_dump'):
         progress_dump = input_file.progress_dump
 
+    dump_attrs = None
+    if hasattr(input_file, 'dump_attrs'):
+        dump_attrs = input_file.dump_attrs
+
     debug_dumps = False
     if hasattr(input_file, 'debug_dumps'):
         debug_dumps = input_file.debug_dumps
@@ -304,7 +316,8 @@ def ea_run(filename, input_file):
         fitness_calculator=fitness_calculator,
         log_file=log_file,
         database_dump=database_dump,
-        progress_dump=progress_dump
+        progress_dump=progress_dump,
+        dump_attrs=dump_attrs,
     )
     progress = history.progress
 
