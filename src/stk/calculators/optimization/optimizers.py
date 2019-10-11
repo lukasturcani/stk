@@ -122,13 +122,7 @@ class Optimizer(MoleculeCalculator):
 
         """
 
-        if self.is_caching() and self.is_in_cache(mol):
-            logger.info(f'Skipping optimization on {mol}.')
-            return
-
-        self._optimize(mol)
-        if self.is_caching():
-            self.add_to_cache(mol)
+        return self._cache_result(self._optimize, mol)
 
     def _optimize(self, mol):
         """
