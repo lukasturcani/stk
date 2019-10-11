@@ -268,6 +268,10 @@ def ea_run(filename, input_file):
     if hasattr(input_file, 'debug_dumps'):
         debug_dumps = input_file.debug_dumps
 
+    generation_dumps = True
+    if hasattr(input_file, 'generation_dumps'):
+        generation_dumps = input_file.generation_dumps
+
     tar_output = False
     if hasattr(input_file, 'tar_output'):
         tar_output = input_file.tar_output
@@ -409,6 +413,9 @@ def ea_run(filename, input_file):
 
             logger.info('Recording progress.')
             progress.add_subpopulation(pop)
+
+            if generation_dumps:
+                pop.dump(f'generation_{x}.json')
 
             if debug_dumps:
                 progress.dump(progress_dump_filename)
