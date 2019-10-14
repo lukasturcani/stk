@@ -385,9 +385,9 @@ def ea_run(filename, input_file):
             id_ = pop.set_mol_ids(id_)
 
             if debug_dumps:
-                pop.dump(
-                    join('..', 'pop_dumps', f'gen_{x}_unselected.json')
-                )
+                pop.dump(join(
+                    '..', 'pop_dumps', f'gen_{gen}_unselected.json'
+                ))
 
             logger.info('Optimizing the population.')
             pop.optimize(optimizer, num_processes=num_processes)
@@ -415,7 +415,7 @@ def ea_run(filename, input_file):
             progress.add_subpopulation(pop)
 
             if generation_dumps:
-                pop.dump(f'generation_{x}.json')
+                pop.dump(f'generation_{gen}.json')
 
             if debug_dumps:
                 progress.dump(progress_dump_filename)
