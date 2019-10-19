@@ -450,6 +450,7 @@ if __name__ == '__main__':
     )
 
     args = parser.parse_args()
+    args.input_file = os.path.abspath(args.input_file)
     loader = SourceFileLoader('input_file', args.input_file)
     input_file = loader.load_module()
 
