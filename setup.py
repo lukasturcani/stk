@@ -25,6 +25,7 @@ setup(name='stk',
           'pathos',
           'seaborn',
           'numpy',
-          'setuptools'
+          'setuptools',
+          'pywindowx',
        ],
       python_requires='>=3.6')
