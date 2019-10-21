@@ -1,8 +1,0 @@
-scipy
-matplotlib
-psutil
-pandas
-seaborn
-pathos
-setuptools
-numpy
