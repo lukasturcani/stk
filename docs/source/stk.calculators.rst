@@ -15,3 +15,11 @@ Subpackages
    stk.calculators.electronic_property
    stk.calculators.energy
    stk.calculators.optimization
+
+Submodules
+----------
+
+.. toctree::
+
+   stk.calculators.base_calculators
+   stk.calculators.compound
