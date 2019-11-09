@@ -5,6 +5,7 @@ import numpy as np
 
 @pytest.fixture(params=[
     stk.BuildingBlock('NCCN'),
+    stk.BuildingBlock('NCCN').set_position_matrix(np.zeros((12, 3))),
 ])
 def molecule(request):
     return request.param

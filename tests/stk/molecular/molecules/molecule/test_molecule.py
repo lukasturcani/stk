@@ -1,6 +1,7 @@
 from fixtures import *
 
 import numpy as np
+import itertools as it
 import stk
 
 
@@ -67,3 +68,36 @@ def test_get_atom_positions(molecule, get_atom_ids):
         assert np.all(np.equal(position, position_matrix[atom_id]))
 
     assert i+1 == len(atom_ids)
+
+
+def test_get_atom_distance(molecule):
+    position_matrix = molecule.get_position_matrix()
+    positions_1 = np.repeat([position_matrix], len(molecule.atoms), 0)
+    positions_2 = positions_1.swapaxes(0, 1)
+    distance_matrix = np.linalg.norm(positions_1 - positions_2, axis=2)
+
+    atom_ids = range(len(molecule.atoms))
+    for atom1, atom2 in it.product(atom_ids, atom_ids):
+        true_distance = distance_matrix[atom1, atom2]
+        distance = molecule.get_atom_distance(atom1, atom2)
+        assert abs(true_distance - distance) < 1e-13
+
+
+def test_get_centroid(molecule, get_atom_ids):
+    atom_ids = get_atom_ids(molecule)
+    if len(atom_ids) == 0:
+        assert np.all(np.isnan(molecule.get_centroid(atom_ids)))
+    else:
+        true_centroid = np.divide(
+            np.sum(
+                a=molecule.get_position_matrix()[atom_ids, :],
+                axis=0
+            ),
+            len(atom_ids),
+        )
+        centroid = molecule.get_centroid(atom_ids)
+        assert np.allclose(
+            a=true_centroid,
+            b=centroid,
+            atol=1e-32,
+        )
