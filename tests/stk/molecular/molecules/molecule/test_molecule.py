@@ -1,5 +1,3 @@
-from fixtures import *
-
 import numpy as np
 import itertools as it
 import stk
