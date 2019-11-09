@@ -1066,9 +1066,9 @@ def vector_angle(vector1, vector2):
     # This if statement prevents returns of NaN due to floating point
     # incurracy.
     term = numerator/denominator
-    if np.isclose(term, 1, atol=1e-12):
+    if term >= 1.:
         return 0.0
-    if np.isclose(term, -1, atol=1e-12):
+    if term <= -1.:
         return np.pi
     return np.arccos(term)
 
