@@ -74,31 +74,15 @@ class GetAtomPositionsTestCase:
         )
 
 
-def get_atom_positions_test_case_1(molecule):
-    return GetAtomPositionsTestCase(
-        molecule=molecule,
-        atom_ids=tuple(range(len(molecule.atoms))),
-    )
-
-
-def get_atom_positions_test_case_2(molecule):
-    return GetAtomPositionsTestCase(
-        molecule=molecule,
-        atom_ids=tuple(range(0, len(molecule.atoms), 2)),
-    )
-
-
-def get_atom_positions_test_case_3(molecule):
-    return GetAtomPositionsTestCase(
-        molecule=molecule,
-        atom_ids=(),
-    )
-
-
 @pytest.fixture(params=[
-    get_atom_positions_test_case_1,
-    get_atom_positions_test_case_2,
-    get_atom_positions_test_case_3,
+    lambda molecule: tuple(range(len(molecule.atoms))),
+    lambda molecule: tuple(range(0, len(molecule.atoms), 2)),
+    lambda molecule: (),
 ])
-def get_atom_positions_test_case(request, molecule):
-    return request.param(molecule)
+def get_atom_ids(request):
+    return request.param
+
+
+@pytest.fixture
+def get_atom_positions_test_case(molecule, get_atom_ids):
+    return GetAtomPositionsTestCase(molecule, get_atom_ids(molecule))
