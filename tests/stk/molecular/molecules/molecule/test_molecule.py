@@ -56,14 +56,14 @@ def test_apply_rotation_about_axis(molecule, angle, axis, origin):
         assert abs(abs(angle) - applied_rotation) < 1e-13
 
 
-def test_get_atom_positions(get_atom_positions_test_case):
-    molecule = get_atom_positions_test_case.molecule
-    atom_ids = get_atom_positions_test_case.atom_ids
-    true_positions = get_atom_positions_test_case.true_positions
+def test_get_atom_positions(molecule, get_atom_ids):
+    position_matrix = molecule.get_position_matrix()
+    atom_ids = get_atom_ids(molecule)
 
     i = -1
     positions = enumerate(molecule.get_atom_positions(atom_ids))
     for i, position in positions:
-        assert np.all(np.equal(position, true_positions[i]))
+        atom_id = atom_ids[i]
+        assert np.all(np.equal(position, position_matrix[atom_id]))
 
     assert i+1 == len(atom_ids)

@@ -45,35 +45,6 @@ def origin(request):
     return request.param
 
 
-class GetAtomPositionsTestCase:
-    """
-    Represents a test case for :func:`test_get_atom_positions`.
-
-    Attributes
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule being tested.
-
-    atom_ids : :class:`tuple` of :class:`int`
-        The ids of atoms being tested.
-
-    true_positions : :class:`np.ndarray`
-        An ``[n, 3]`` matrix, where ``n`` is the number of atoms
-        in :attr:`atom_ids`. For each atom in :attr:`atom_ids`
-        this matrix holds the correct position.
-
-    """
-
-    __slots__ = ['molecule', 'atom_ids', 'true_positions']
-
-    def __init__(self, molecule, atom_ids):
-        self.molecule = molecule
-        self.atom_ids = atom_ids
-        self.true_positions = (
-            molecule.get_position_matrix()[atom_ids, :]
-        )
-
-
 @pytest.fixture(params=[
     lambda molecule: tuple(range(len(molecule.atoms))),
     lambda molecule: tuple(range(0, len(molecule.atoms), 2)),
@@ -81,8 +52,3 @@ class GetAtomPositionsTestCase:
 ])
 def get_atom_ids(request):
     return request.param
-
-
-@pytest.fixture
-def get_atom_positions_test_case(molecule, get_atom_ids):
-    return GetAtomPositionsTestCase(molecule, get_atom_ids(molecule))
