@@ -368,6 +368,28 @@ class TestUpdateFromFile1:
         )
 
 
+class TestUpdateFromFile2:
+    @pytest.fixture
+    def path(self, datadir, request):
+        return datadir / request.param
+
+    def case1():
+        return stk.BuildingBlock('NCCN'), 'NCCN.mae'
+
+    @pytest.mark.parametrize(
+        'molecule,path',
+        [
+            case1(),
+        ],
+        indirect=['path'],
+    )
+    def test(self, molecule, path):
+        before = molecule.get_maximum_diameter()
+        molecule.update_from_file(path)
+        after = molecule.get_maximum_diameter()
+        assert abs(before - after) > 1
+
+
 def test_update_from_rdkit_mol(molecule):
     before = molecule.get_position_matrix()
     rdkit_molecule = molecule.to_rdkit_mol()
