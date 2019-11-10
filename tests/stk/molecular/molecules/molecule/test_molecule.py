@@ -14,46 +14,60 @@ def test_apply_displacement(molecule, displacement):
     )
 
 
-def rotational_space_positions(molecule, axis, origin):
-    """
-    Get the atomic coordinates on the plane of the rotation.
+class TestApplyRotationAboutAxis:
+    def _rotational_space_positions(self, molecule, axis, origin):
+        """
+        Get the atomic coordinates on the plane of the rotation.
 
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule being rotated.
+        Parameters
+        ----------
+        molecule : :class:`.Molecule`
+            The molecule being rotated.
 
-    axis : :class:`numpy.ndarray`
-        The axis about which the rotation happens.
+        axis : :class:`numpy.ndarray`
+            The axis about which the rotation happens.
 
-    origin : :class:`numpy.ndarray`
-        The origin about which the rotation happens.
+        origin : :class:`numpy.ndarray`
+            The origin about which the rotation happens.
 
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        An ``[n, 3]`` of atomic positions of `molecule`, projected
-        onto the plane about which the rotation happens. The
-        `axis` is the normal to this plane.
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            An ``[n, 3]`` of atomic positions of `molecule`, projected
+            onto the plane about which the rotation happens. The
+            `axis` is the normal to this plane.
 
-    """
+        """
 
-    axis_matrix = np.repeat([axis], len(molecule.atoms), 0).T
-    positions = molecule.get_position_matrix() - origin
-    return positions - (axis_matrix * (positions @ axis)).T
+        axis_matrix = np.repeat([axis], len(molecule.atoms), 0).T
+        positions = molecule.get_position_matrix() - origin
+        return positions - (axis_matrix * (positions @ axis)).T
 
-
-def test_apply_rotation_about_axis(molecule, angle, axis, origin):
-    before = rotational_space_positions(molecule, axis, origin)
-    molecule.apply_rotation_about_axis(angle, axis, origin)
-    after = rotational_space_positions(molecule, axis, origin)
-
-    for atom_id in range(len(molecule.atoms)):
-        applied_rotation = stk.vector_angle(
-            vector1=before[atom_id],
-            vector2=after[atom_id],
+    def test(
+        self,
+        molecule,
+        angle,
+        axis,
+        origin
+    ):
+        before = self._rotational_space_positions(
+            molecule=molecule,
+            axis=axis,
+            origin=origin,
         )
-        assert abs(abs(angle) - applied_rotation) < 1e-13
+        molecule.apply_rotation_about_axis(angle, axis, origin)
+        after = self._rotational_space_positions(
+            molecule=molecule,
+            axis=axis,
+            origin=origin,
+        )
+
+        for atom_id in range(len(molecule.atoms)):
+            applied_rotation = stk.vector_angle(
+                vector1=before[atom_id],
+                vector2=after[atom_id],
+            )
+            assert abs(abs(angle) - applied_rotation) < 1e-13
 
 
 def test_get_atom_positions(molecule, get_atom_ids_no_fail):
@@ -269,4 +283,28 @@ class TestGetPlaneNormal:
         assert not np.all(np.equal(
             molecule.get_plane_normal(atom_ids),
             normal,
+        ))
+
+
+class TestPositionMatrix:
+    def case1():
+        molecule = stk.BuildingBlock('NCCN')
+        return molecule, np.zeros((len(molecule.atoms), 3))
+
+    def case2():
+        molecule = stk.BuildingBlock('NCCN')
+        return molecule, np.ones((len(molecule.atoms), 3))
+
+    @pytest.mark.parametrize(
+        'molecule,position_matrix',
+        [
+            case1(),
+            case2(),
+        ],
+    )
+    def test(self, molecule, position_matrix):
+        molecule.set_position_matrix(position_matrix)
+        assert np.all(np.equal(
+            molecule.get_position_matrix(),
+            position_matrix,
         ))
