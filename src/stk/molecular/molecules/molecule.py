@@ -515,6 +515,11 @@ class Molecule(metaclass=_Cached):
         :class:`numpy.ndarray`
             The coordinates of the center of mass.
 
+        Raises
+        ------
+        :class:`ValueError`
+            If `atom_ids` has a length of ``0``.
+
         References
         ----------
         https://en.wikipedia.org/wiki/Center_of_mass
@@ -527,6 +532,9 @@ class Molecule(metaclass=_Cached):
             # Iterable gets used twice, once in get_atom_positions
             # and once in zip.
             atom_ids = list(atom_ids)
+
+        if len(atom_ids) == 0:
+            raise ValueError('atom_ids was of length 0.')
 
         center = 0
         total_mass = 0.
@@ -552,12 +560,20 @@ class Molecule(metaclass=_Cached):
         :class:`numpy.ndarray`
             The centroid of atoms specified by `atom_ids`.
 
+        Raises
+        ------
+        :class:`ValueError`
+            If `atom_ids` has a length of ``0``.
+
         """
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
+
+        if len(atom_ids) == 0:
+            raise ValueError('atom_ids was of length 0.')
 
         return np.divide(
             self._position_matrix[:, atom_ids].sum(axis=1),
@@ -579,12 +595,20 @@ class Molecule(metaclass=_Cached):
         :class:`numpy.ndarray`
             The vector of best fit.
 
+        Raises
+        ------
+        :class:`ValueError`
+            If `atom_ids` has a length of ``0``.
+
         """
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
+
+        if len(atom_ids) == 0:
+            raise ValueError('atom_ids was of length 0.')
 
         pos = self._position_matrix[:, atom_ids].T
         return np.linalg.svd(pos - pos.mean(axis=0))[-1][0]
@@ -627,12 +651,20 @@ class Molecule(metaclass=_Cached):
         :class:`float`
             The maximum diameter in the molecule.
 
+        Raises
+        ------
+        :class:`ValueError`
+            If `atom_ids` has a length of ``0``.
+
         """
 
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
+
+        if len(atom_ids) == 0:
+            raise ValueError('atom_ids was of length 0.')
 
         coords = self._position_matrix[:, atom_ids]
         return float(euclidean(coords.min(axis=1), coords.max(axis=1)))
@@ -652,6 +684,11 @@ class Molecule(metaclass=_Cached):
         :class:`numpy.ndarray`
             Vector orthonormal to the plane of the molecule.
 
+        Raises
+        ------
+        :class:`ValueError`
+            If `atom_ids` has a length of ``0``.
+
         """
 
         if atom_ids is None:
@@ -660,6 +697,9 @@ class Molecule(metaclass=_Cached):
         # is always created for equivalent inputs.
         elif not isinstance(atom_ids, range):
             atom_ids = sorted(atom_ids)
+
+        if len(atom_ids) == 0:
+            raise ValueError('atom_ids was of length 0.')
 
         pos = self._position_matrix[:, atom_ids].T
         centroid = self.get_centroid(atom_ids)
