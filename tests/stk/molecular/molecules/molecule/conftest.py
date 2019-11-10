@@ -47,10 +47,19 @@ def origin(request):
 
 
 @pytest.fixture(params=[
+    lambda molecule: None,
     lambda molecule: range(len(molecule.atoms)),
     lambda molecule: range(0, len(molecule.atoms), 2),
     lambda molecule: range(0, min(1, len(molecule.atoms))),
-    lambda molecule: (),
+    lambda molecule: list(range(0, min(1, len(molecule.atoms)))),
+    lambda molecule: tuple(range(0, min(1, len(molecule.atoms)))),
+    lambda molecule: (
+        i for i in range(0, min(1, len(molecule.atoms)))
+    ),
+    pytest.param(
+        lambda molecule: (),
+        marks=pytest.mark.xfail(raises=ValueError),
+    ),
 ])
 def get_atom_ids(request):
     return request.param

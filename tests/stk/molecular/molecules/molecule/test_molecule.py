@@ -1,3 +1,4 @@
+import types
 import pytest
 import numpy as np
 import itertools as it
@@ -59,14 +60,12 @@ def test_apply_rotation_about_axis(molecule, angle, axis, origin):
 def test_get_atom_positions(molecule, get_atom_ids):
     position_matrix = molecule.get_position_matrix()
     atom_ids = get_atom_ids(molecule)
-
-    i = -1
-    positions = enumerate(molecule.get_atom_positions(atom_ids))
-    for i, position in positions:
-        atom_id = atom_ids[i]
+    positions = it.zip_longest(
+        range(len(molecule.atoms)) if atom_ids is None else atom_ids,
+        molecule.get_atom_positions(get_atom_ids(molecule)),
+    )
+    for atom_id, position in positions:
         assert np.all(np.equal(position, position_matrix[atom_id]))
-
-    assert i+1 == len(atom_ids)
 
 
 def test_get_atom_distance(molecule):
@@ -84,65 +83,105 @@ def test_get_atom_distance(molecule):
 
 def test_get_center_of_mass(molecule, get_atom_ids):
     atom_ids = get_atom_ids(molecule)
-    if len(atom_ids) == 0:
-        assert np.all(np.isnan(molecule.get_center_of_mass(atom_ids)))
+    center_of_mass = molecule.get_center_of_mass(atom_ids),
+
+    if atom_ids is None:
+        atom_ids = range(len(molecule.atoms))
     else:
-        valid_atom_ids = set(atom_ids)
-        atoms = filter(
-            lambda atom: atom.id in valid_atom_ids,
-            molecule.atoms
-        )
-        masses = [[atom.mass] for atom in atoms]
-        true_center_of_mass = np.divide(
-            np.sum(
-                a=masses*molecule.get_position_matrix()[atom_ids, :],
-                axis=0,
-            ),
-            sum(mass for mass, in masses),
-        )
-        assert np.allclose(
-            a=true_center_of_mass,
-            b=molecule.get_center_of_mass(atom_ids),
-            atol=1e-32,
-        )
+        atom_ids = list(get_atom_ids(molecule))
+
+    valid_atom_ids = set(atom_ids)
+    atoms = filter(
+        lambda atom: atom.id in valid_atom_ids,
+        molecule.atoms
+    )
+    masses = [[atom.mass] for atom in atoms]
+    true_center_of_mass = np.divide(
+        np.sum(
+            a=masses*molecule.get_position_matrix()[atom_ids, :],
+            axis=0,
+        ),
+        sum(mass for mass, in masses),
+    )
+    assert np.allclose(
+        a=true_center_of_mass,
+        b=center_of_mass,
+        atol=1e-32,
+    )
 
 
 def test_get_centroid(molecule, get_atom_ids):
     atom_ids = get_atom_ids(molecule)
-    if len(atom_ids) == 0:
-        assert np.all(np.isnan(molecule.get_centroid(atom_ids)))
+    centroid = molecule.get_centroid(atom_ids)
+
+    if atom_ids is None:
+        atom_ids = range(len(molecule.atoms))
     else:
-        true_centroid = np.divide(
-            np.sum(
-                a=molecule.get_position_matrix()[atom_ids, :],
-                axis=0
-            ),
-            len(atom_ids),
-        )
-        assert np.allclose(
-            a=true_centroid,
-            b=molecule.get_centroid(atom_ids),
-            atol=1e-32,
-        )
+        atom_ids = list(get_atom_ids(molecule))
+
+    true_centroid = np.divide(
+        np.sum(
+            a=molecule.get_position_matrix()[atom_ids, :],
+            axis=0
+        ),
+        len(atom_ids),
+    )
+    assert np.allclose(
+        a=true_centroid,
+        b=centroid,
+        atol=1e-32,
+    )
 
 
 class TestGetDirection:
-    bb1 = stk.BuildingBlock('NCCN')
-    bb1.set_position_matrix(
-        np.array([[i, 0, 0] for i in range(len(bb1.atoms))])
-    )
-    test_case_1 = (bb1, [1, 0, 0])
+
+    class _Test1:
+        @staticmethod
+        def case1():
+            bb = stk.BuildingBlock('NCCN')
+            bb.set_position_matrix(
+                np.array([[i, 0, 0] for i in range(len(bb.atoms))])
+            )
+            return bb, [1, 0, 0]
 
     @pytest.mark.parametrize(
         'molecule,direction',
         [
-            test_case_1,
+            _Test1.case1()
         ]
     )
-    def test_get_direction(self, molecule, get_atom_ids, direction):
+    def test_get_direction_1(self, molecule, get_atom_ids, direction):
         atom_ids = get_atom_ids(molecule)
         assert np.allclose(
             a=molecule.get_direction(atom_ids),
             b=direction,
+            atol=1e-32,
+        )
+
+    class _Test2:
+        @staticmethod
+        def case1():
+            bb = stk.BuildingBlock('NCCN')
+            coords = bb.get_position_matrix()
+            coords[[1, 3]] = [[1, 1, 1], [3, 3, 3]]
+            bb.set_position_matrix(coords)
+            return bb, [1/np.sqrt(3)]*3
+
+    @pytest.fixture(params=[
+        (1, 3),
+    ])
+    def atom_ids(self, request):
+        return request.param
+
+    @pytest.mark.parametrize(
+        'molecule,direction',
+        [
+            _Test2.case1()
+        ]
+    )
+    def test_get_direction_2(self, molecule, atom_ids, direction):
+        assert np.allclose(
+            a=molecule.get_direction(atom_ids),
+            b=[1/np.sqrt(3), 1/np.sqrt(3), 1/np.sqrt(3)],
             atol=1e-32,
         )
