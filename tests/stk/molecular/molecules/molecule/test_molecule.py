@@ -1,3 +1,4 @@
+import os
 import pytest
 import numpy as np
 import itertools as it
@@ -308,3 +309,45 @@ class TestPositionMatrix:
             molecule.get_position_matrix(),
             position_matrix,
         ))
+
+
+class TestUpdateFromFile1:
+    @pytest.fixture(params=[
+        'molecule.mol',
+        'molecule.xyz',
+    ])
+    def path(self, request, tmpdir):
+        return os.path.join(tmpdir, request.param)
+
+    def case1():
+        def get_conformers():
+            conformer1 = stk.BuildingBlock('NCCN')
+            conformer2 = stk.BuildingBlock('NCCN')
+            conformer2.set_position_matrix(
+                position_matrix=np.zeros((len(conformer2.atoms), 3)),
+            )
+            return conformer1, conformer2
+        return get_conformers
+
+    @pytest.mark.parametrize(
+        'get_conformers',
+        [
+            case1(),
+        ],
+    )
+    def test_update_from_file(self, get_conformers, path):
+        conformer1, conformer2 = get_conformers()
+        assert not np.allclose(
+            a=conformer1.get_position_matrix(),
+            b=conformer2.get_position_matrix(),
+            atol=1e-4,
+        )
+
+        conformer2.write(path)
+        conformer1.update_from_file(path)
+
+        assert np.allclose(
+            a=conformer1.get_position_matrix(),
+            b=conformer2.get_position_matrix(),
+            atol=1e-4,
+        )
