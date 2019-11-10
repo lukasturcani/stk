@@ -320,19 +320,34 @@ class TestUpdateFromFile1:
         return os.path.join(tmpdir, request.param)
 
     def case1():
-        def get_conformers():
-            conformer1 = stk.BuildingBlock('NCCN')
-            conformer2 = stk.BuildingBlock('NCCN')
-            conformer2.set_position_matrix(
-                position_matrix=np.zeros((len(conformer2.atoms), 3)),
-            )
-            return conformer1, conformer2
-        return get_conformers
+        conformer1 = stk.BuildingBlock('NCCN')
+        conformer2 = stk.BuildingBlock('NCCN')
+        conformer2.set_position_matrix(
+            position_matrix=np.zeros((len(conformer2.atoms), 3)),
+        )
+        return conformer1, conformer2
+
+    def case2():
+        bb = stk.BuildingBlock('BrCCBr', ['bromine'])
+        topology_graph = stk.polymer.Linear('A', 3)
+        conformer1 = stk.ConstructedMolecule(
+            building_blocks=[bb],
+            topology_graph=topology_graph,
+        )
+        conformer2 = stk.ConstructedMolecule(
+            building_blocks=[bb],
+            topology_graph=topology_graph,
+        )
+        conformer2.set_position_matrix(
+            position_matrix=np.zeros((len(conformer2.atoms), 3)),
+        )
+        return conformer1, conformer2
 
     @pytest.mark.parametrize(
         'get_conformers',
         [
-            case1(),
+            case1,
+            case2,
         ],
     )
     def test_update_from_file(self, get_conformers, path):
