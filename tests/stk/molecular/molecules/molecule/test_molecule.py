@@ -366,3 +366,35 @@ class TestUpdateFromFile1:
             b=conformer2.get_position_matrix(),
             atol=1e-4,
         )
+
+
+def test_update_from_rdkit_mol(molecule):
+    before = molecule.get_position_matrix()
+    rdkit_molecule = molecule.to_rdkit_mol()
+    conformer = rdkit_molecule.GetConformer()
+    for atom_id, position in enumerate(conformer.GetPositions()):
+        conformer.SetAtomPosition(atom_id, 0.5*position)
+
+    molecule.update_from_rdkit_mol(rdkit_molecule)
+    after = molecule.get_position_matrix()
+    assert np.allclose(conformer.GetPositions(), after, 1e-32)
+    assert not np.allclose(before, after, 1e-32)
+
+
+def test_to_rdkit_mol(molecule):
+    rdkit_molecule = molecule.to_rdkit_mol()
+    assert rdkit_molecule.GetNumConformers() == 1
+
+    assert rdkit_molecule.GetNumAtoms() == len(molecule.atoms)
+    atoms = zip(molecule.atoms, rdkit_molecule.GetAtoms())
+    for atom, rdkit_atom in atoms:
+        assert atom.charge == rdkit_atom.GetFormalCharge()
+        assert atom.atomic_number == rdkit_atom.GetAtomicNum()
+        assert atom.mass == rdkit_atom.GetMass()
+
+    assert len(molecule.bonds) == rdkit_molecule.GetNumBonds()
+    bonds = zip(molecule.bonds, rdkit_molecule.GetBonds())
+    for bond, rdkit_bond in bonds:
+        assert bond.order == rdkit_bond.GetBondTypeAsDouble()
+        assert bond.atom1.id == rdkit_bond.GetBeginAtomIdx()
+        assert bond.atom2.id == rdkit_bond.GetEndAtomIdx()
