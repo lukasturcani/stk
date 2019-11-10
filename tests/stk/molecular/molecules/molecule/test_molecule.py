@@ -350,7 +350,7 @@ class TestUpdateFromFile1:
             case2,
         ],
     )
-    def test_update_from_file(self, get_conformers, path):
+    def test(self, get_conformers, path):
         conformer1, conformer2 = get_conformers()
         assert not np.allclose(
             a=conformer1.get_position_matrix(),
