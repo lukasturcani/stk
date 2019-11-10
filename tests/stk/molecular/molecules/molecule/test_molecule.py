@@ -146,7 +146,7 @@ class TestGetDirection:
     @pytest.mark.parametrize(
         'molecule,direction',
         [
-            _Test1.case1()
+            _Test1.case1(),
         ]
     )
     def test_get_direction_1(self, molecule, get_atom_ids, direction):
@@ -175,7 +175,7 @@ class TestGetDirection:
     @pytest.mark.parametrize(
         'molecule,direction',
         [
-            _Test2.case1()
+            _Test2.case1(),
         ]
     )
     def test_get_direction_2(self, molecule, atom_ids, direction):
