@@ -80,6 +80,17 @@ def test_get_atom_distance(molecule):
         assert abs(true_distance - distance) < 1e-13
 
 
+def test_get_cached_mol():
+    bb1 = stk.BuildingBlock('NCCN')
+    with pytest.raises(KeyError):
+        stk.BuildingBlock.get_cached_mol(bb1.get_identity_key())
+
+    bb2 = stk.BuildingBlock('NCCN', use_cache=True)
+    assert (
+        stk.BuildingBlock.get_cached_mol(bb2.get_identity_key()) is bb2
+    )
+
+
 def test_get_center_of_mass(molecule, get_atom_ids):
     atom_ids = get_atom_ids(molecule)
     center_of_mass = molecule.get_center_of_mass(atom_ids),
@@ -134,7 +145,7 @@ def test_get_centroid(molecule, get_atom_ids):
 
 class TestGetDirection:
 
-    class _Test1:
+    class TestCases1:
         @staticmethod
         def case1():
             bb = stk.BuildingBlock('NCCN')
@@ -146,8 +157,8 @@ class TestGetDirection:
     @pytest.mark.parametrize(
         'molecule,direction',
         [
-            _Test1.case1(),
-        ]
+            TestCases1.case1(),
+        ],
     )
     def test_get_direction_1(self, molecule, get_atom_ids, direction):
         atom_ids = get_atom_ids(molecule)
@@ -157,7 +168,7 @@ class TestGetDirection:
             atol=1e-32,
         )
 
-    class _Test2:
+    class TestCases2:
         @staticmethod
         def case1():
             bb = stk.BuildingBlock('NCCN')
@@ -175,8 +186,8 @@ class TestGetDirection:
     @pytest.mark.parametrize(
         'molecule,direction',
         [
-            _Test2.case1(),
-        ]
+            TestCases2.case1(),
+        ],
     )
     def test_get_direction_2(self, molecule, atom_ids, direction):
         assert np.allclose(
@@ -184,3 +195,90 @@ class TestGetDirection:
             b=[1/np.sqrt(3), 1/np.sqrt(3), 1/np.sqrt(3)],
             atol=1e-32,
         )
+
+
+class TestGetMaximumDiameter:
+    class TestCases:
+        @staticmethod
+        def case1():
+            molecule = stk.BuildingBlock('NCCN')
+            num_atoms = len(molecule.atoms)
+            coords = np.array([[i, 0, 0] for i in range(num_atoms)])
+            molecule.set_position_matrix(coords)
+            return molecule, None, num_atoms-1
+
+        @staticmethod
+        def case2(atom_ids, maximum_diameter):
+            molecule = stk.BuildingBlock('NCCN')
+            num_atoms = len(molecule.atoms)
+            coords = np.zeros((num_atoms, 3))
+            coords[[1]] = [0, -50, 0]
+            coords[[9]] = [0, 50, 0]
+            molecule.set_position_matrix(coords)
+            return molecule, atom_ids, maximum_diameter
+
+    @pytest.mark.parametrize(
+        'molecule,atom_ids,maximum_diameter',
+        [
+            TestCases.case1(),
+            TestCases.case2(atom_ids=None, maximum_diameter=100),
+            TestCases.case2(atom_ids=(1, 9), maximum_diameter=100),
+            TestCases.case2(atom_ids=(1, 0), maximum_diameter=50),
+            TestCases.case2(atom_ids=(0, 9), maximum_diameter=50),
+            TestCases.case2(atom_ids=(0, 2, 3, 4), maximum_diameter=0),
+        ],
+    )
+    def test_get_maximum_diameter(
+        self,
+        molecule,
+        atom_ids,
+        maximum_diameter
+    ):
+        assert (
+            molecule.get_maximum_diameter(atom_ids) == maximum_diameter
+        )
+
+
+class TestGetPlaneNormal:
+    class TestCases:
+        @staticmethod
+        def case1(atom_ids, normal):
+            molecule = stk.BuildingBlock('NCCN')
+            coords = molecule.get_position_matrix()
+            coords[[1, 9], 2] = 0
+            molecule.set_position_matrix(coords)
+            return molecule, atom_ids, normal
+
+        @staticmethod
+        def case2(atom_ids, normal):
+            molecule = stk.BuildingBlock('NCCN')
+            coords = molecule.get_position_matrix()
+            coords[:, 2] = 0
+            molecule.set_position_matrix(coords)
+            return molecule, atom_ids, normal
+
+    @pytest.mark.parametrize(
+        'molecule,atom_ids,normal',
+        [
+            TestCases.case1(atom_ids=(1, 9), normal=[0, 0, 1]),
+            TestCases.case2(atom_ids=None, normal=[0, 0, 1]),
+            TestCases.case2(atom_ids=(1, 9), normal=[0, 0, 1]),
+        ],
+    )
+    def test_get_plane_normal_1(self, molecule, atom_ids, normal):
+        assert np.all(np.equal(
+            molecule.get_plane_normal(atom_ids),
+            normal,
+        ))
+
+    @pytest.mark.parametrize(
+        'molecule,atom_ids,normal',
+        [
+            TestCases.case1(atom_ids=None, normal=[0, 0, 1])
+        ]
+    )
+    def test_get_plane_normal_2(self, molecule, atom_ids, normal):
+        assert not np.all(np.equal(
+            molecule.get_plane_normal(atom_ids),
+            normal,
+        ))
