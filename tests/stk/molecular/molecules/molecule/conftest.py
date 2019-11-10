@@ -46,6 +46,8 @@ def origin(request):
     return request.param
 
 
+# Values for get_atom_ids should never cause any dependent test
+# function to fail.
 never_fail_get_atom_ids = [
     lambda molecule: None,
     lambda molecule: range(len(molecule.atoms)),
@@ -59,6 +61,8 @@ never_fail_get_atom_ids = [
 ]
 
 
+# Values for get_atom_ids which might cause some functions to fail.
+# Functions which expect to fail depend on this fixture.
 @pytest.fixture(params=[
     *never_fail_get_atom_ids,
     pytest.param(
@@ -70,6 +74,8 @@ def get_atom_ids(request):
     return request.param
 
 
+# Values for get_atom_ids which might cause some functions to fail.
+# Functions which do not expect to fail depend on this fixture.
 @pytest.fixture(params=[
     *never_fail_get_atom_ids,
     lambda molecule: (),
