@@ -46,7 +46,7 @@ def origin(request):
     return request.param
 
 
-@pytest.fixture(params=[
+never_fail_get_atom_ids = [
     lambda molecule: None,
     lambda molecule: range(len(molecule.atoms)),
     lambda molecule: range(0, len(molecule.atoms), 2),
@@ -56,10 +56,23 @@ def origin(request):
     lambda molecule: (
         i for i in range(0, min(1, len(molecule.atoms)))
     ),
+]
+
+
+@pytest.fixture(params=[
+    *never_fail_get_atom_ids,
     pytest.param(
         lambda molecule: (),
-        marks=pytest.mark.xfail(raises=ValueError),
+        marks=pytest.mark.xfail(strict=True, raises=ValueError),
     ),
 ])
 def get_atom_ids(request):
+    return request.param
+
+
+@pytest.fixture(params=[
+    *never_fail_get_atom_ids,
+    lambda molecule: (),
+])
+def get_atom_ids_no_fail(request):
     return request.param

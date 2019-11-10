@@ -1,4 +1,3 @@
-import types
 import pytest
 import numpy as np
 import itertools as it
@@ -57,12 +56,12 @@ def test_apply_rotation_about_axis(molecule, angle, axis, origin):
         assert abs(abs(angle) - applied_rotation) < 1e-13
 
 
-def test_get_atom_positions(molecule, get_atom_ids):
+def test_get_atom_positions(molecule, get_atom_ids_no_fail):
     position_matrix = molecule.get_position_matrix()
-    atom_ids = get_atom_ids(molecule)
+    atom_ids = get_atom_ids_no_fail(molecule)
     positions = it.zip_longest(
         range(len(molecule.atoms)) if atom_ids is None else atom_ids,
-        molecule.get_atom_positions(get_atom_ids(molecule)),
+        molecule.get_atom_positions(get_atom_ids_no_fail(molecule)),
     )
     for atom_id, position in positions:
         assert np.all(np.equal(position, position_matrix[atom_id]))
