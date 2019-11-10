@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 import itertools as it
 import stk
@@ -121,5 +122,27 @@ def test_get_centroid(molecule, get_atom_ids):
         assert np.allclose(
             a=true_centroid,
             b=molecule.get_centroid(atom_ids),
+            atol=1e-32,
+        )
+
+
+class TestGetDirection:
+    bb1 = stk.BuildingBlock('NCCN')
+    bb1.set_position_matrix(
+        np.array([[i, 0, 0] for i in range(len(bb1.atoms))])
+    )
+    test_case_1 = (bb1, [1, 0, 0])
+
+    @pytest.mark.parametrize(
+        'molecule,direction',
+        [
+            test_case_1,
+        ]
+    )
+    def test_get_direction(self, molecule, get_atom_ids, direction):
+        atom_ids = get_atom_ids(molecule)
+        assert np.allclose(
+            a=molecule.get_direction(atom_ids),
+            b=direction,
             atol=1e-32,
         )
