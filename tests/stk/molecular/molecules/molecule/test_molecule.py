@@ -145,7 +145,7 @@ def test_get_centroid(molecule, get_atom_ids):
 
 class TestGetDirection:
 
-    class TestCases1:
+    class TestCases:
         @staticmethod
         def case1():
             bb = stk.BuildingBlock('NCCN')
@@ -154,10 +154,21 @@ class TestGetDirection:
             )
             return bb, [1, 0, 0]
 
+        @staticmethod
+        def case2():
+            bb = stk.BuildingBlock('NCCN')
+            atom_ids = [1, 3]
+
+            coords = bb.get_position_matrix()
+            coords[atom_ids] = [[1, 1, 1], [3, 3, 3]]
+            bb.set_position_matrix(coords)
+
+            return bb, atom_ids, [1/np.sqrt(3)]*3
+
     @pytest.mark.parametrize(
         'molecule,direction',
         [
-            TestCases1.case1(),
+            TestCases.case1(),
         ],
     )
     def test_get_direction_1(self, molecule, get_atom_ids, direction):
@@ -168,31 +179,16 @@ class TestGetDirection:
             atol=1e-32,
         )
 
-    class TestCases2:
-        @staticmethod
-        def case1():
-            bb = stk.BuildingBlock('NCCN')
-            coords = bb.get_position_matrix()
-            coords[[1, 3]] = [[1, 1, 1], [3, 3, 3]]
-            bb.set_position_matrix(coords)
-            return bb, [1/np.sqrt(3)]*3
-
-    @pytest.fixture(params=[
-        (1, 3),
-    ])
-    def atom_ids(self, request):
-        return request.param
-
     @pytest.mark.parametrize(
-        'molecule,direction',
+        'molecule,atom_ids,direction',
         [
-            TestCases2.case1(),
+            TestCases.case2(),
         ],
     )
     def test_get_direction_2(self, molecule, atom_ids, direction):
         assert np.allclose(
             a=molecule.get_direction(atom_ids),
-            b=[1/np.sqrt(3), 1/np.sqrt(3), 1/np.sqrt(3)],
+            b=direction,
             atol=1e-32,
         )
 
