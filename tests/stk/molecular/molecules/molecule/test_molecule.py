@@ -71,6 +71,23 @@ class TestApplyRotationAboutAxis:
             assert abs(abs(angle) - applied_rotation) < 1e-13
 
 
+def test_apply_rotation_between_vectors(valid_molecule):
+    position1, position2 = valid_molecule.get_atom_positions((0, 1))
+    valid_molecule.apply_rotation_between_vectors(
+        start=position1-position2,
+        target=[1, 0, 0],
+        origin=valid_molecule.get_centroid(),
+    )
+
+    position1, position2 = valid_molecule.get_atom_positions((0, 1))
+    print(position1, position2)
+    assert np.allclose(
+        a=stk.normalize_vector(position1-position2),
+        b=[1, 0, 0],
+        atol=1e-12,
+    )
+
+
 def test_get_atom_positions(molecule, get_atom_ids_no_fail):
     position_matrix = molecule.get_position_matrix()
     atom_ids = get_atom_ids_no_fail(molecule)

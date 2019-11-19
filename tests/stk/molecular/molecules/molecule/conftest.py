@@ -3,16 +3,28 @@ import stk
 import numpy as np
 
 
-@pytest.fixture(params=[
+valid_molecules = [
     stk.BuildingBlock('NCCN'),
-    stk.BuildingBlock('NCCN').set_position_matrix(np.zeros((12, 3))),
     stk.BuildingBlock('N[C+][C+2]N'),
     stk.ConstructedMolecule(
         building_blocks=[stk.BuildingBlock('BrCCBr', ['bromine'])],
         topology_graph=stk.polymer.Linear('A', 3),
     ),
+]
+
+
+@pytest.fixture(params=[
+    *valid_molecules,
+    stk.BuildingBlock('NCCN').set_position_matrix(np.zeros((12, 3))),
 ])
 def molecule(request):
+    return request.param
+
+
+@pytest.fixture(params=[
+    *valid_molecules
+])
+def valid_molecule(request):
     return request.param
 
 
