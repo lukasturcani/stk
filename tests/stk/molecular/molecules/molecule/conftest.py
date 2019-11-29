@@ -17,7 +17,7 @@ valid_molecules = [
     params=[
         *valid_molecules,
         stk.BuildingBlock('NCCN').set_position_matrix(
-            position_matrix=np.zeros((12, 3))
+            position_matrix=np.zeros((12, 3)),
         ),
     ],
 )

@@ -80,7 +80,6 @@ def test_apply_rotation_between_vectors(valid_molecule):
     )
 
     position1, position2 = valid_molecule.get_atom_positions((0, 1))
-    print(position1, position2)
     assert np.allclose(
         a=stk.normalize_vector(position1-position2),
         b=[1, 0, 0],
