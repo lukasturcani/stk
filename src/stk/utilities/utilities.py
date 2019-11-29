@@ -1062,7 +1062,7 @@ def vector_angle(vector1, vector2):
     """
 
     numerator = np.dot(vector1, vector2)
-    denominator = (np.linalg.norm(vector1) * np.linalg.norm(vector2))
+    denominator = np.linalg.norm(vector1) * np.linalg.norm(vector2)
     # This if statement prevents returns of NaN due to floating point
     # incurracy.
     term = numerator/denominator

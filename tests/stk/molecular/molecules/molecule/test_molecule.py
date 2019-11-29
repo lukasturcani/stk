@@ -46,24 +46,24 @@ class TestApplyRotationAboutAxis:
 
     def test(
         self,
-        molecule,
+        valid_molecule,
         angle,
         axis,
         origin
     ):
         before = self._rotational_space_positions(
-            molecule=molecule,
+            molecule=valid_molecule,
             axis=axis,
             origin=origin,
         )
-        molecule.apply_rotation_about_axis(angle, axis, origin)
+        valid_molecule.apply_rotation_about_axis(angle, axis, origin)
         after = self._rotational_space_positions(
-            molecule=molecule,
+            molecule=valid_molecule,
             axis=axis,
             origin=origin,
         )
 
-        for atom_id in range(len(molecule.atoms)):
+        for atom_id in range(len(valid_molecule.atoms)):
             applied_rotation = stk.vector_angle(
                 vector1=before[atom_id],
                 vector2=after[atom_id],
