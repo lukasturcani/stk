@@ -20,6 +20,7 @@ valid_molecules = [
             position_matrix=np.zeros((12, 3)),
         ),
     ],
+    scope='function',
 )
 def molecule(request):
     return request.param.clone()
@@ -29,6 +30,7 @@ def molecule(request):
     params=[
         *valid_molecules
     ],
+    scope='function',
 )
 def valid_molecule(request):
     return request.param.clone()

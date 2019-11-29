@@ -407,7 +407,6 @@ class TestUpdateFromFile2:
 
 
 def test_update_from_rdkit_mol(molecule):
-    before = molecule.get_position_matrix()
     rdkit_molecule = molecule.to_rdkit_mol()
     conformer = rdkit_molecule.GetConformer()
     for atom_id, position in enumerate(conformer.GetPositions()):
@@ -416,7 +415,6 @@ def test_update_from_rdkit_mol(molecule):
     molecule.update_from_rdkit_mol(rdkit_molecule)
     after = molecule.get_position_matrix()
     assert np.allclose(conformer.GetPositions(), after, 1e-32)
-    assert not np.allclose(before, after, 1e-32)
 
 
 def test_to_rdkit_mol(molecule):
