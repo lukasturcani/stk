@@ -348,6 +348,18 @@ class TestPositionMatrix:
         ))
 
 
+def test_set_centroid(molecule, get_atom_ids):
+    molecule.set_centroid(
+        position=[1, 2, 3],
+        atom_ids=get_atom_ids(molecule),
+    )
+    assert np.allclose(
+        a=molecule.get_centroid(atom_ids=get_atom_ids(molecule)),
+        b=[1, 2, 3],
+        atol=1e-32,
+    )
+
+
 class TestUpdateFromFile1:
     @pytest.fixture(params=[
         'molecule.mol',
