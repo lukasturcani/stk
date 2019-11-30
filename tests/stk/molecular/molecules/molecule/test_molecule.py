@@ -49,7 +49,7 @@ class TestApplyRotationAboutAxis:
         valid_molecule,
         angle,
         axis,
-        origin
+        origin,
     ):
         before = self._rotational_space_positions(
             molecule=valid_molecule,
@@ -83,6 +83,27 @@ def test_apply_rotation_between_vectors(valid_molecule):
     assert np.allclose(
         a=stk.normalize_vector(position1-position2),
         b=[1, 0, 0],
+        atol=1e-12,
+    )
+
+
+def test_apply_rotation_to_minimize_angle(valid_molecule):
+    positions = valid_molecule.get_atom_positions((0, 1, 2))
+    position1, position2, position3 = positions
+    start = stk.normalize_vector(position2-position1)
+    target = stk.normalize_vector(position3 - position1)
+    valid_molecule.apply_rotation_to_minimize_angle(
+        start=start,
+        target=target,
+        axis=np.cross(start, target),
+        origin=position1,
+    )
+
+    new_positions = valid_molecule.get_atom_positions((0, 1))
+    new_position1, new_position2 = new_positions
+    assert np.allclose(
+        a=target,
+        b=stk.normalize_vector(new_position2-new_position1),
         atol=1e-12,
     )
 
