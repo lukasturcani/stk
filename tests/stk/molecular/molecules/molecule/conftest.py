@@ -2,7 +2,7 @@ import pytest
 import stk
 import numpy as np
 
-
+# Molecules which should pass every test.
 valid_molecules = [
     stk.BuildingBlock('NCCN'),
     stk.BuildingBlock('N[C+][C+2]N'),
@@ -16,6 +16,7 @@ valid_molecules = [
 @pytest.fixture(
     params=[
         *valid_molecules,
+        # Molecules which may not pass every test.
         stk.BuildingBlock('NCCN').set_position_matrix(
             position_matrix=np.zeros((12, 3)),
         ),
@@ -23,6 +24,11 @@ valid_molecules = [
     scope='function',
 )
 def molecule(request):
+    """
+    Return molecule which may not work with every test.
+
+    """
+
     return request.param.clone()
 
 
@@ -33,6 +39,11 @@ def molecule(request):
     scope='function',
 )
 def valid_molecule(request):
+    """
+    Return molecule which should work with every test.
+
+    """
+
     return request.param.clone()
 
 
