@@ -420,7 +420,7 @@ class TestUpdateFromFile1:
 class TestUpdateFromFile2:
     @pytest.fixture
     def path(self, datadir, request):
-        return datadir / request.param
+        return str(datadir / request.param)
 
     def case1():
         return stk.BuildingBlock('NCCN'), 'NCCN.mae'

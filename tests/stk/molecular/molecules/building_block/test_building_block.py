@@ -1,3 +1,4 @@
+import itertools as it
 import stk
 import pytest
 import rdkit.Chem.AllChem as rdkit
@@ -92,4 +93,58 @@ class TestInitFromRdkitMol:
             assert tuple(fg.get_bonder_ids()) == expected_fg.bonder_ids
             assert (
                 tuple(fg.get_deleter_ids()) == expected_fg.deleter_ids
+            )
+
+
+class TestInitFromFile:
+    @pytest.fixture(
+        params=[
+            'building_block.mol',
+            'building_block.pdb',
+        ],
+    )
+    def filename(self, request):
+        return request.param
+
+    def test(self, tmpdir, filename, building_block):
+        path = str(tmpdir / filename)
+        building_block.write(path)
+
+        loaded = stk.BuildingBlock.init_from_file(
+            path=path,
+            functional_groups={
+                fg.fg_type.name for fg in building_block.func_groups
+            },
+        )
+
+        atoms = it.zip_longest(building_block.atoms, loaded.atoms)
+        for a1, a2 in atoms:
+            assert a1.id == a2.id
+            assert a1.charge == a2.charge
+            assert a1.__class__ is a2.__class__
+
+        bonds = it.zip_longest(building_block.bonds, loaded.bonds)
+        for b1, b2 in bonds:
+            assert b1 is not b2
+            assert b1.__class__ is b2.__class__
+            assert b1.order == b2.order
+            assert b1.atom1.id == b2.atom1.id
+            assert b1.atom2.id == b2.atom2.id
+            assert b1.periodicity == b2.periodicity
+
+        fgs = it.zip_longest(
+            building_block.func_groups,
+            loaded.func_groups
+        )
+        for fg1, fg2 in fgs:
+            assert (
+                tuple(fg1.get_atom_ids()) == tuple(fg2.get_atom_ids())
+            )
+            assert (
+                tuple(fg1.get_bonder_ids()) ==
+                tuple(fg2.get_bonder_ids())
+            )
+            assert (
+                tuple(fg1.get_deleter_ids()) ==
+                tuple(fg2.get_deleter_ids())
             )
