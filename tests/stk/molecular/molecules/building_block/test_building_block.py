@@ -96,6 +96,67 @@ class TestInitFromRdkitMol:
             )
 
 
+def is_equivalent_atom(atom1, atom2):
+    return (
+        atom1.id == atom2.id
+        and atom1.charge == atom2.charge
+        and atom1.__class__ is atom2.__class__
+    )
+
+
+def is_equivalent_bond(bond1, bond2):
+    return (
+        bond1.__class__ is bond2.__class__
+        and bond1.order == bond2.order
+        and is_equivalent_atom(bond1.atom1, bond2.atom1)
+        and is_equivalent_atom(bond1.atom2, bond2.atom2)
+        and bond1.periodicity == bond2.periodicity
+    )
+
+
+def is_equivalent_fg(fg1, fg2):
+    atoms = it.zip_longest(fg1.get_atom_ids(), fg2.get_atom_ids())
+    for a1, a2 in atoms:
+        assert is_equivalent_atom(a1, a2)
+
+    bonders = it.zip_longest(
+        fg1.get_bonder_ids(),
+        fg2.get_bonder_ids(),
+    )
+    for b1, b2 in bonders:
+        assert is_equivalent_atom(b1, b2)
+
+    deleters = it.zip_longest(
+        fg1.get_deleter_ids(),
+        fg2.get_deleter_ids(),
+    )
+    for d1, d2 in deleters:
+        assert is_equivalent_atom(d1, d2)
+
+
+def is_equivalent_building_block(building_block1, building_block2):
+    atoms = it.zip_longest(
+        building_block1.atoms,
+        building_block2.atoms,
+    )
+    for a1, a2 in atoms:
+        assert is_equivalent_atom(a1, a2)
+
+    bonds = it.zip_longest(
+        building_block1.bonds,
+        building_block2.bonds,
+    )
+    for b1, b2 in bonds:
+        assert is_equivalent_bond(b1, b2)
+
+    fgs = it.zip_longest(
+        building_block1.func_groups,
+        building_block2.func_groups,
+    )
+    for fg1, fg2 in fgs:
+        assert is_equivalent_fg(fg1, fg2)
+
+
 class TestInitFromFile:
     @pytest.fixture(
         params=[
@@ -119,32 +180,75 @@ class TestInitFromFile:
 
         atoms = it.zip_longest(building_block.atoms, loaded.atoms)
         for a1, a2 in atoms:
-            assert a1.id == a2.id
-            assert a1.charge == a2.charge
-            assert a1.__class__ is a2.__class__
+            assert is_equivalent_atom(a1, a2)
 
         bonds = it.zip_longest(building_block.bonds, loaded.bonds)
         for b1, b2 in bonds:
-            assert b1 is not b2
-            assert b1.__class__ is b2.__class__
-            assert b1.order == b2.order
-            assert b1.atom1.id == b2.atom1.id
-            assert b1.atom2.id == b2.atom2.id
-            assert b1.periodicity == b2.periodicity
+            assert is_equivalent_bond(b1, b2)
 
         fgs = it.zip_longest(
             building_block.func_groups,
             loaded.func_groups
         )
         for fg1, fg2 in fgs:
-            assert (
-                tuple(fg1.get_atom_ids()) == tuple(fg2.get_atom_ids())
-            )
-            assert (
-                tuple(fg1.get_bonder_ids()) ==
-                tuple(fg2.get_bonder_ids())
-            )
-            assert (
-                tuple(fg1.get_deleter_ids()) ==
-                tuple(fg2.get_deleter_ids())
-            )
+            assert is_equivalent_fg(fg1, fg2)
+
+
+def test_clone(building_block):
+    clone = building_block.clone()
+    fgs = it.zip_longest(clone.func_groups, building_block.func_groups)
+    for fg1, fg2 in fgs:
+        assert is_equivalent_fg(fg1, fg2)
+
+
+def test_init_from_molecule(molecule, functional_groups):
+    building_block = stk.BuildingBlock.init_from_molecule(
+        molecule=molecule,
+        functional_groups=functional_groups,
+    )
+    assert is_equivalent_building_block(molecule, building_block)
+
+
+def test_init_from_random_file(glob):
+    ...
+
+
+def test_init_from_smiles(
+    smiles,
+    expected_atoms,
+    expected_bonds,
+    expected_functional_groups
+):
+    ...
+
+
+def test_get_bonder_ids(building_block):
+    ...
+
+
+def test_get_bonder_centroids(building_block):
+    ...
+
+
+def test_get_bonder_plane(building_block):
+    ...
+
+
+def test_get_bonder_plane_normal(building_block):
+    ...
+
+
+def test_get_bonder_distances(building_block):
+    ...
+
+
+def test_get_bonder_direction_vectors(building_block):
+    ...
+
+
+def test_get_centroid_centroid_direction_vector(building_block):
+    ...
+
+
+def test_dump_and_load(building_block):
+    ...
