@@ -209,17 +209,31 @@ def test_init_from_molecule(molecule, functional_groups):
     assert is_equivalent_building_block(molecule, building_block)
 
 
-def test_init_from_random_file(glob):
-    ...
+def test_init_from_random_file(
+    file_glob,
+    functional_groups,
+    expected_building_block
+):
+    building_block = stk.BuildingBlock.init_from_random_filem(
+        file_glob=file_glob,
+        functional_groups=functional_groups,
+    )
+    assert is_equivalent_building_block(
+        building_block1=building_block,
+        building_block2=expected_building_block,
+    )
 
 
 def test_init_from_smiles(
     smiles,
-    expected_atoms,
-    expected_bonds,
-    expected_functional_groups
+    functional_groups,
+    expected_building_block,
 ):
-    ...
+    building_block = stk.BuildingBlock(smiles, functional_groups)
+    assert is_equivalent_building_block(
+        building_block1=building_block,
+        building_block2=expected_building_block,
+    )
 
 
 def test_get_bonder_ids(building_block):
@@ -250,5 +264,11 @@ def test_get_centroid_centroid_direction_vector(building_block):
     ...
 
 
-def test_dump_and_load(building_block):
-    ...
+def test_dump_and_load(tmpdir, building_block):
+    path = str(tmpdir / 'building_block.json')
+    building_block.dump(path)
+    new_building_block = stk.BuildingBlock.load(path)
+    assert is_equivalent_building_block(
+        building_block1=building_block,
+        building_block2=new_building_block,
+    )
