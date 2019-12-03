@@ -217,22 +217,40 @@ class TestInitFromMolecule:
             smiles='NCCN',
             functional_groups=functional_groups,
         )
-        return building_block, functional_groups, building_block
+        return (
+            building_block,
+            functional_groups,
+            building_block.atoms,
+            building_block.bonds,
+            building_block.func_groups,
+        )
 
     def case2():
-        functional_groups = ['amine']
-        building_block = stk.BuildingBlock('NCCN', functional_groups)
+        functional_groups = ['bromine']
         molecule = stk.ConstructedMolecule(
-            building_blocks=[building_block],
-            topology_graph=stk.polymer.Linear('A', 1),
+            building_blocks=[
+                stk.BuildingBlock('BrCCBr', functional_groups),
+            ],
+            topology_graph=stk.polymer.Linear('AA', 1),
         )
-        return molecule, functional_groups, building_block
+        expected_functional_groups = (
+
+        )
+        return (
+            molecule,
+            functional_groups,
+            molecule.atoms,
+            molecule.bonds,
+            expected_functional_groups,
+        )
 
     @pytest.mark.parametrize(
         argnames=(
             'molecule',
             'functional_groups',
-            'expected_building_block',
+            'expected_atoms',
+            'expected_bonds',
+            'expected_functional_groups',
         ),
         argvalues=(
             case1(),
@@ -243,16 +261,34 @@ class TestInitFromMolecule:
         self,
         molecule,
         functional_groups,
-        expected_building_block,
+        expected_atoms,
+        expected_bonds,
+        expected_functional_groups,
     ):
         building_block = stk.BuildingBlock.init_from_molecule(
-            molecule=molecule,
+            mol=molecule,
             functional_groups=functional_groups,
         )
-        assert is_equivalent_building_block(
-            building_block1=building_block,
-            building_block2=expected_building_block,
+        atoms = it.zip_longest(
+            building_block.atoms,
+            expected_atoms,
         )
+        for a1, a2 in atoms:
+            assert is_equivalent_atom(a1, a2)
+
+        bonds = it.zip_longest(
+            building_block.bonds,
+            expected_bonds,
+        )
+        for b1, b2 in bonds:
+            assert is_equivalent_bond(b1, b2)
+
+        fgs = it.zip_longest(
+            building_block.func_groups,
+            expected_functional_groups,
+        )
+        for fg1, fg2 in fgs:
+            assert is_equivalent_fg(fg1, fg2)
 
 
 class TestInitFromRandomFile:
