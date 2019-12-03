@@ -116,27 +116,21 @@ def is_equivalent_bond(bond1, bond2):
 
 
 def is_equivalent_fg(fg1, fg2):
-    atoms = it.zip_longest(fg1.get_atom_ids(), fg2.get_atom_ids())
     equivalent_atoms = all(
-        is_equivalent_atom(a1, a2) for a1, a2 in atoms
-    )
-
-    bonders = it.zip_longest(
-        fg1.get_bonder_ids(),
-        fg2.get_bonder_ids(),
+        id1 == id2
+        for id1, id2
+        in it.zip_longest(fg1.get_atom_ids(), fg2.get_atom_ids())
     )
     equivalent_bonders = all(
-        is_equivalent_atom(b1, b2) for b1, b2 in bonders
-    )
-
-    deleters = it.zip_longest(
-        fg1.get_deleter_ids(),
-        fg2.get_deleter_ids(),
+        id1 == id2
+        for id1, id2
+        in it.zip_longest(fg1.get_bonder_ids(), fg2.get_bonder_ids())
     )
     equivalent_deleters = all(
-        is_equivalent_atom(d1, d2) for d1, d2 in deleters
+        id1 == id2
+        for id1, id2
+        in it.zip_longest(fg1.get_deleter_ids(), fg2.get_deleter_ids())
     )
-
     return (
         equivalent_atoms and equivalent_bonders and equivalent_deleters
     )
@@ -263,9 +257,10 @@ class TestInitFromRandomFile:
             case2(),
             case3(),
         ),
-        indirect=['path'],
+        indirect=['file_glob'],
     )
     def test(
+        self,
         file_glob,
         functional_groups,
         expected_building_block,
@@ -280,16 +275,65 @@ class TestInitFromRandomFile:
         )
 
 
-def test_init_from_smiles(
-    smiles,
-    functional_groups,
-    expected_building_block,
-):
-    building_block = stk.BuildingBlock(smiles, functional_groups)
-    assert is_equivalent_building_block(
-        building_block1=building_block,
-        building_block2=expected_building_block,
+class TestInitFromSmiles:
+    def case1():
+        expected_atoms = (
+
+        )
+        expected_bonds = (
+
+        )
+        expected_functional_groups = (
+
+        )
+        return (
+            'NCCN',
+            ['amine'],
+            expected_atoms,
+            expected_bonds,
+            expected_functional_groups,
+        )
+
+    @pytest.mark.parametrize(
+        argnames=(
+            'smiles',
+            'functional_groups',
+            'expected_atoms',
+            'expected_bonds',
+            'expected_functional_groups',
+        ),
+        argvalues=(
+            case1(),
+        ),
     )
+    def test(
+        smiles,
+        functional_groups,
+        expected_atoms,
+        expected_bonds,
+        expected_functional_groups,
+    ):
+        building_block = stk.BuildingBlock(smiles, functional_groups)
+        atoms = it.zip_longest(
+            building_block.atoms,
+            expected_atoms,
+        )
+        for a1, a2 in atoms:
+            assert is_equivalent_atom(a1, a2)
+
+        bonds = it.zip_longest(
+            building_block.bonds,
+            expected_bonds,
+        )
+        for b1, b2 in bonds:
+            assert is_equivalent_bond(b1, b2)
+
+        fgs = it.zip_longest(
+            building_block.func_groups,
+            expected_functional_groups,
+        )
+        for fg1, fg2 in fgs:
+            assert is_equivalent_fg(fg1, fg2)
 
 
 def test_get_bonder_ids(
