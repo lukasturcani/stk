@@ -132,7 +132,10 @@ def is_equivalent_fg(fg1, fg2):
         in it.zip_longest(fg1.get_deleter_ids(), fg2.get_deleter_ids())
     )
     return (
-        equivalent_atoms and equivalent_bonders and equivalent_deleters
+        fg1.fg_type is fg2.fg_type
+        and equivalent_atoms
+        and equivalent_bonders
+        and equivalent_deleters
     )
 
 
@@ -278,13 +281,45 @@ class TestInitFromRandomFile:
 class TestInitFromSmiles:
     def case1():
         expected_atoms = (
-
+            stk.N(0),
+            stk.C(1),
+            stk.C(2),
+            stk.N(3),
+            stk.H(4),
+            stk.H(5),
+            stk.H(6),
+            stk.H(7),
+            stk.H(8),
+            stk.H(9),
+            stk.H(10),
+            stk.H(11),
         )
         expected_bonds = (
-
+            stk.Bond(stk.N(0), stk.C(1), 1),
+            stk.Bond(stk.C(1), stk.C(2), 1),
+            stk.Bond(stk.C(2), stk.N(3), 1),
+            stk.Bond(stk.N(0), stk.H(4), 1),
+            stk.Bond(stk.N(0), stk.H(5), 1),
+            stk.Bond(stk.C(1), stk.H(6), 1),
+            stk.Bond(stk.C(1), stk.H(7), 1),
+            stk.Bond(stk.C(2), stk.H(8), 1),
+            stk.Bond(stk.C(2), stk.H(9), 1),
+            stk.Bond(stk.N(3), stk.H(10), 1),
+            stk.Bond(stk.N(3), stk.H(11), 1),
         )
         expected_functional_groups = (
-
+            stk.FunctionalGroup(
+                atoms=(stk.N(0), stk.H(4), stk.H(5)),
+                bonders=(stk.N(0),),
+                deleters=(stk.H(4), stk.H(5)),
+                fg_type=stk.functional_groups.fg_types['amine'],
+            ),
+            stk.FunctionalGroup(
+                atoms=(stk.N(3), stk.H(10), stk.H(11)),
+                bonders=(stk.N(3), ),
+                deleters=(stk.H(10), stk.H(11)),
+                fg_type=stk.functional_groups.fg_types['amine'],
+            ),
         )
         return (
             'NCCN',
