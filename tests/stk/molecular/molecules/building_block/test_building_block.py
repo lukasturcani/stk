@@ -221,19 +221,63 @@ def test_init_from_molecule(molecule, functional_groups):
     assert is_equivalent_building_block(molecule, building_block)
 
 
-def test_init_from_random_file(
-    file_glob,
-    functional_groups,
-    expected_building_block
-):
-    building_block = stk.BuildingBlock.init_from_random_filem(
-        file_glob=file_glob,
-        functional_groups=functional_groups,
+class TestInitFromRandomFile:
+    @pytest.fixture
+    def file_glob(self, datadir, request):
+        return str(datadir / request.param)
+
+    def case1():
+        functional_groups = ['amine']
+        building_block = stk.BuildingBlock(
+            smiles='NCCCN',
+            functional_groups=functional_groups,
+        )
+        return 'neutral.mol', functional_groups, building_block
+
+    def case2():
+        functional_groups = ['amine']
+        building_block = stk.BuildingBlock(
+            smiles='NC[C-]CN',
+            functional_groups=functional_groups,
+        )
+        return 'negative_carbon.mol', functional_groups, building_block
+
+    def case3():
+        functional_groups = ['amine']
+        building_block = stk.BuildingBlock(
+            smiles='[N-]CCCN',
+            functional_groups=functional_groups,
+        )
+        return (
+            'negative_nitrogen.mol', functional_groups, building_block
+        )
+
+    @pytest.mark.parametrize(
+        argnames=(
+            'file_glob',
+            'functional_groups',
+            'expected_building_block',
+        ),
+        argvalues=(
+            case1(),
+            case2(),
+            case3(),
+        ),
+        indirect=['path'],
     )
-    assert is_equivalent_building_block(
-        building_block1=building_block,
-        building_block2=expected_building_block,
-    )
+    def test(
+        file_glob,
+        functional_groups,
+        expected_building_block,
+    ):
+        building_block = stk.BuildingBlock.init_from_random_file(
+            file_glob=file_glob,
+            functional_groups=functional_groups,
+        )
+        assert is_equivalent_building_block(
+            building_block1=building_block,
+            building_block2=expected_building_block,
+        )
 
 
 def test_init_from_smiles(
@@ -251,7 +295,7 @@ def test_init_from_smiles(
 def test_get_bonder_ids(
     building_block,
     get_fg_ids,
-    expected_bonders_ids
+    expected_bonders_ids,
 ):
     ids = building_block.get_bonder_ids(
         fg_ids=get_fg_ids(building_block),
