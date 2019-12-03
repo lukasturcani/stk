@@ -234,7 +234,18 @@ class TestInitFromMolecule:
             topology_graph=stk.polymer.Linear('AA', 1),
         )
         expected_functional_groups = (
-
+            stk.FunctionalGroup(
+                atoms=(stk.C(1), stk.Br(2)),
+                bonders=(stk.C(1), ),
+                deleters=(stk.Br(2), ),
+                fg_type=stk.functional_groups.fg_types['bromine'],
+            ),
+            stk.FunctionalGroup(
+                atoms=(stk.C(8), stk.Br(7)),
+                bonders=(stk.C(8), ),
+                deleters=(stk.Br(7), ),
+                fg_type=stk.functional_groups.fg_types['bromine'],
+            ),
         )
         return (
             molecule,
