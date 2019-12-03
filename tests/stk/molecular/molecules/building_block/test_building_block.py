@@ -210,12 +210,49 @@ def test_clone(building_block):
         assert is_equivalent_fg(fg1, fg2)
 
 
-def test_init_from_molecule(molecule, functional_groups):
-    building_block = stk.BuildingBlock.init_from_molecule(
-        molecule=molecule,
-        functional_groups=functional_groups,
+class TestInitFromMolecule:
+    def case1():
+        functional_groups = ['amine']
+        building_block = stk.BuildingBlock(
+            smiles='NCCN',
+            functional_groups=functional_groups,
+        )
+        return building_block, functional_groups, building_block
+
+    def case2():
+        functional_groups = ['amine']
+        building_block = stk.BuildingBlock('NCCN', functional_groups)
+        molecule = stk.ConstructedMolecule(
+            building_blocks=[building_block],
+            topology_graph=stk.polymer.Linear('A', 1),
+        )
+        return molecule, functional_groups, building_block
+
+    @pytest.mark.parametrize(
+        argnames=(
+            'molecule',
+            'functional_groups',
+            'expected_building_block',
+        ),
+        argvalues=(
+            case1(),
+            case2(),
+        ),
     )
-    assert is_equivalent_building_block(molecule, building_block)
+    def test(
+        self,
+        molecule,
+        functional_groups,
+        expected_building_block,
+    ):
+        building_block = stk.BuildingBlock.init_from_molecule(
+            molecule=molecule,
+            functional_groups=functional_groups,
+        )
+        assert is_equivalent_building_block(
+            building_block1=building_block,
+            building_block2=expected_building_block,
+        )
 
 
 class TestInitFromRandomFile:
@@ -342,6 +379,7 @@ class TestInitFromSmiles:
         ),
     )
     def test(
+        self,
         smiles,
         functional_groups,
         expected_atoms,
