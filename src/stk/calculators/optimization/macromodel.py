@@ -283,7 +283,7 @@ class _MacroModel(_MoleculeCalculator, Optimizer):
             if time.time() - start > 600:
                 break
 
-    def _license_found(self, run_name, output, mol=None):
+    def _license_found(self, run_name, output, mol=None, timeout=60):
         """
         Check to see if minimization failed due to a missing license.
 
@@ -307,6 +307,10 @@ class _MacroModel(_MoleculeCalculator, Optimizer):
             The molecule being optimized. If the ``.log`` file is not
             to be checked, the default ``None`` should be used.
 
+        timeout : :class:`int`, optional
+            The number of seconds for the log file to be
+            populated before timing out. 
+
         Returns
         -------
         :class:`bool`
@@ -324,8 +328,12 @@ class _MacroModel(_MoleculeCalculator, Optimizer):
         # If it is empty, the calculation has most likely failed and
         # will need to be re-run.
 
-        if os.path.getsize(f'{run_name}.log'):
-            return False
+        timeout = time.time() + timeout
+        while True:
+            # Specifies the timeout period.
+            if (not os.path.getsize(f'{run_name}.log') or
+               time.time() > timeout):
+                break
 
         # To check if the log file mentions a missing license file open
         # the log file and scan for the appropriate string.
