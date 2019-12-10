@@ -324,7 +324,7 @@ class _MacroModel(_MoleculeCalculator, Optimizer):
         # If it is empty, the calculation has most likely failed and
         # will need to be re-run.
 
-        if os.path.getsize(run_name):
+        if os.path.getsize(f'{run_name}.log'):
             return False
 
         # To check if the log file mentions a missing license file open
