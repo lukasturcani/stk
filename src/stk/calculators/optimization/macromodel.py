@@ -333,7 +333,7 @@ class _MacroModel(_MoleculeCalculator, Optimizer):
             # Specifies the timeout period.
             if (not os.path.getsize(f'{run_name}.log') or
                time.time() > timeout):
-                break
+                return False
 
         # To check if the log file mentions a missing license file open
         # the log file and scan for the appropriate string.
