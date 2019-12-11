@@ -327,13 +327,13 @@ class _MacroModel(_MoleculeCalculator, Optimizer):
         # Check if the log file is empty.
         # If it is empty, the calculation has most likely failed and
         # will need to be re-run.
-
         timeout = time.time() + timeout
         while True:
-            # Specifies the timeout period.
-            if (not os.path.getsize(f'{run_name}.log') or
-               time.time() > timeout):
+            if os.path.getsize(f'{run_name}.log'):
+                break
+            elif time.time() > timeout:
                 return False
+            
 
         # To check if the log file mentions a missing license file open
         # the log file and scan for the appropriate string.
