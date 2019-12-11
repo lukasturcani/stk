@@ -333,7 +333,6 @@ class _MacroModel(_MoleculeCalculator, Optimizer):
                 break
             elif time.time() > timeout:
                 return False
-            
 
         # To check if the log file mentions a missing license file open
         # the log file and scan for the appropriate string.
