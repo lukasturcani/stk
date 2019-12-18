@@ -1,0 +1,6 @@
+name: base
+channels:
+  - rdkit
+  - defaults
+dependencies:
+  - rdkit
