@@ -1,12 +1,9 @@
 :author: Lukas Turcani
-:Documentation: https://lukasturcani.github.io/stk_docs/html/introduction.html
+:Documentation: https://stk.readthedocs.io
 
 .. figure:: docs/source/figures/stk.png
 
 Requires Python 3.6+.
-
-I began developing this code when I was doing my PhD in the Jelfs
-group, http://www.jelfs-group.org/.
 
 Overview
 ========
@@ -67,3 +64,11 @@ __ https://chemrxiv.org/articles/Computationally-Inspired_Discovery_of_an_Unsymm
 * `Maximising the Hydrogen Evolution Activity in Organic Photocatalysts by co-Polymerisation`_
 
 .. _`Maximising the Hydrogen Evolution Activity in Organic Photocatalysts by co-Polymerisation`: https://pubs.rsc.org/en/Content/ArticleLanding/TA/2018/C8TA04186E#!divAbstract
+
+
+Acknowledgements
+================
+
+I began developing this code when I was working in the Jelfs group,
+http://www.jelfs-group.org/, whose members often provide me with
+very valuable feedback, which I gratefully acknowledge.
