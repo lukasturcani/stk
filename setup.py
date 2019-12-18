@@ -27,5 +27,6 @@ setup(name='stk',
           'numpy',
           'setuptools',
           'pywindowx',
+          'numpydoc',
        ],
       python_requires='>=3.6')
