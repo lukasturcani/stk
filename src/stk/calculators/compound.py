@@ -60,10 +60,18 @@ optimize the molecule with a different :class:`.Sequence`
 
 import logging
 import numpy as np
+import itertools as it
 
 from .optimization import Optimizer
 from .energy import EnergyCalculator
-from .base_calculators import _MoleculeCalculator
+from .ea import (
+    FitnessCalculator,
+    Mutator,
+    Crosser,
+    FitnessNormalizer,
+    Selector,
+)
+from .base_calculators import _MoleculeCalculator, MoleculeCalculator
 
 
 logger = logging.getLogger(__name__)
@@ -71,8 +79,13 @@ logger = logging.getLogger(__name__)
 
 class If(
     _MoleculeCalculator,
+    Crosser,
     EnergyCalculator,
+    FitnessCalculator,
+    FitnessNormalizer,
+    Mutator,
     Optimizer,
+    Selector,
 ):
     """
     Use a `condition` to pick a calculator.
@@ -142,20 +155,94 @@ class If(
         self._use_cache = use_cache
         self._cache = {}
 
-    def _optimize(self, mol):
-        if self._condition(mol):
-            return self._true_calculator.optimize(mol)
-        return self._false_calculator.optimize(mol)
+    def _cross(self, *mols):
+        if self._condition(*mols):
+            return self._true_calculator.cross(*mols)
+        return self._false_calculator.cross(*mols)
 
     def _get_energy(self, mol):
         if self._condition(mol):
             return self._true_calculator.get_energy(mol)
         return self._false_calculator.get_energy(mol)
 
+    def _get_fitness(self, mol):
+        if self._condition(mol):
+            return self._true_calculator.get_fitness(mol)
+        return self._false_calculator.get_fitness(mol)
+
+    def _normalize(self, population):
+        if self._condition(population):
+            return self._true_calculator.normalize(population)
+        return self._false_calculator.normalize(population)
+
+    def _select(self, population, included_batches, excluded_batches):
+        if self._condition(population):
+            return self._true_calculator.select(
+                population=population,
+                included_batches=included_batches,
+                excluded_batches=excluded_batches,
+            )
+        return self._false_calculator.select(
+            population=population,
+            included_batches=included_batches,
+            excluded_batches=excluded_batches,
+        )
+
+    def _mutate(self, mol):
+        if self._condition(mol):
+            return self._true_calculator.mutate(mol)
+        return self._false_calculator.mutate(mol)
+
+    def _optimize(self, mol):
+        if self._condition(mol):
+            return self._true_calculator.optimize(mol)
+        return self._false_calculator.optimize(mol)
+
+    def set_cache_use(self, use_cache):
+        """
+        Toggle use of the cache.
+
+        If used as a :class:`.MoleculeCalculator` this method toggles
+        use of the results cache. If used as a :class:`.EAOperation`,
+        toggles use of the molecular cache.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            Whether the cache should be used.
+
+        Returns
+        -------
+        :class:`.If`
+            The calculator is returned.
+
+        """
+
+        # When the contained calculators are MoleculeCalculators,
+        # use the implementation provided by _MoleculeCalculator.
+        # This will mean that the use_cache option on the contained
+        # calculators will not be changed. Instead If will use its own
+        # cache to return previously calculated results.
+        if isinstance(self._true_calculator, MoleculeCalculator):
+            return super().set_cache_use(use_cache)
+
+        # If the contained calculators are EAOperations then set their
+        # use_cache option to what is passed here. This is because
+        # the If instance does not control the molecular cache.
+        # So the contained calculators need to be made aware of this
+        # change directly.
+        self._true_calculator.set_cache_use(use_cache)
+        self._false_calculator.set_cache_use(use_cache)
+        return self
+
 
 class TryCatch(
     _MoleculeCalculator,
+    Crosser,
     EnergyCalculator,
+    FitnessCalculator,
+    FitnessNormalizer,
+    Mutator,
     Optimizer,
 ):
     """
@@ -240,6 +327,70 @@ class TryCatch(
             self._log_failure()
             return self._catch_calculator.get_energy(mol)
 
+    def _get_fitness(self, mol):
+        try:
+            return self._try_calculator.get_fitness(mol)
+        except self._catch_type:
+            self._log_failure()
+            return self._catch_calculator.get_fitness(mol)
+
+    def _normalize(self, population):
+        try:
+            return self._try_calculator.normalize(population)
+        except self._catch_type:
+            self._log_failure()
+            return self._catch_calculator.normalize(population)
+
+    def _mutate(self, mol):
+        try:
+            return self._try_calculator.mutate(mol)
+        except self._catch_type:
+            self._log_failure()
+            return self._catch_calculator.mutate(mol)
+
+    def _cross(self, *mols):
+        try:
+            return self._try_calculator.cross(*mols)
+        except self._catch_type:
+            self._log_failure()
+            return self._catch_calculator.cross(*mols)
+
+    def set_cache_use(self, use_cache):
+        """
+        Toggle use of the cache.
+
+        If used as a :class:`.MoleculeCalculator` this method toggles
+        use of the results cache. If used as a :class:`.EAOperation`,
+        toggles use of the molecular cache.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            Whether the cache should be used.
+
+        Returns
+        -------
+        :class:`.If`
+            The calculator is returned.
+
+        """
+
+        # When the contained calculators are MoleculeCalculators,
+        # use the implementation provided by _MoleculeCalculator.
+        # This will mean that the use_cache option on the contained
+        # calculators will not be changed. Instead it will use its own
+        # cache to return previously calculated results.
+        if isinstance(self._try_calculator, MoleculeCalculator):
+            return super().set_cache_use(use_cache)
+
+        # If the contained calculators are EAOperations then set their
+        # use_cache option to what is passed here. This is because
+        # the instance does not control the molecular cache.
+        # So the contained calculators need to be made aware of this
+        # change directly.
+        self._try_calculator.set_cache_use(use_cache)
+        self._catch_calculator.set_cache_use(use_cache)
+
     def _log_failure(self):
         try_name = self._try_calculator.__class__.__name__
         catch_name = self._catch_calculator.__class__.__name__
@@ -252,6 +403,8 @@ class TryCatch(
 class Sequence(
     _MoleculeCalculator,
     Optimizer,
+    FitnessNormalizer,
+    Selector,
 ):
     """
     Use calculators in sequence.
@@ -276,7 +429,12 @@ class Sequence(
 
     """
 
-    def __init__(self, *calculators, use_cache=False):
+    def __init__(
+        self,
+        *calculators,
+        use_cache=False,
+        num_batches=None,
+    ):
         """
         Initialize a :class:`.Sequence` instance.
 
@@ -285,26 +443,79 @@ class Sequence(
         calculators : see base classes
             The calculators to be applied in sequence.
 
-
         use_cache : :class:`bool`, optional
             When used as a :class:`.MoleculeCalculator`, this toggles
             use of the results cache.
+
+        num_batches : :class:`int`, optional
+            The maximum number of batches to yield across the
+            sequence. If ``None``, will yield forever or until
+            exhausted. This option is only used when used as a
+            :class:`.Selector`.
 
         """
 
         self._calculators = calculators
         self._use_cache = use_cache
+        self._num_batches = num_batches
         self._cache = {}
 
     def _optimize(self, mol):
         for calculator in self._calculators:
             calculator.optimize(mol)
 
+    def _normalize(self, population):
+        # A FitnessNormalizer is not expected to change the
+        # fitness values of a population when normalize() is called.
+        # However this needs to happen in order to chain normalizers.
+        # Therefore, make sure the original fitness values are restored
+        # when the method exits.
+        normalized = initial = population.get_fitness_values()
+        try:
+            for calculator in self._calculators:
+                normalized = calculator.normalize(population)
+                population.set_fitness_values_from_dict(normalized)
+        finally:
+            population.set_fitness_values_from_dict(initial)
+
+        return normalized
+
+    def _select(
+        self,
+        population,
+        included_batches=None,
+        excluded_batches=None,
+    ):
+        selections = self._get_selections(
+            population=population,
+            included_batches=included_batches,
+            excluded_batches=excluded_batches,
+        )
+        yield from it.islice(it.chain(*selections), self._num_batches)
+
+    def _get_selections(
+        self,
+        population,
+        included_batches,
+        excluded_batches
+    ):
+        for calculator in self._calculators:
+            yield calculator.select(
+                population=population,
+                included_batches=included_batches,
+                excluded_batches=excluded_batches,
+            )
+
 
 class Random(
     _MoleculeCalculator,
+    Crosser,
     EnergyCalculator,
+    FitnessCalculator,
+    FitnessNormalizer,
+    Mutator,
     Optimizer,
+    Selector,
 ):
     """
     Pick a calculator to use at random.
@@ -369,6 +580,64 @@ class Random(
     def _get_energy(self, mol):
         return self._get_calculator().get_energy(mol)
 
+    def _get_fitness(self, mol):
+        return self._get_calculator().get_fitness(mol)
+
+    def _normalize(self, population):
+        return self._get_calculator().normalize(population)
+
+    def _mutate(self, mol):
+        return self._get_calculator().mutate(mol)
+
+    def _cross(self, *mols):
+        return self._get_calculator().cross(*mols)
+
+    def set_cache_use(self, use_cache):
+        """
+        Toggle use of the cache.
+
+        If used as a :class:`.MoleculeCalculator` this method toggles
+        use of the results cache. If used as a :class:`.EAOperation`,
+        toggles use of the molecular cache.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            Whether the cache should be used.
+
+        Returns
+        -------
+        :class:`.If`
+            The calculator is returned.
+
+        """
+
+        # When the contained calculators are MoleculeCalculators,
+        # use the implementation provided by _MoleculeCalculator.
+        # This will mean that the use_cache option on the contained
+        # calculators will not be changed. Instead it will use its own
+        # cache to return previously calculated results.
+        if (
+            self._calculators
+            and isinstance(self._calculators[0], MoleculeCalculator)
+        ):
+            return super().set_cache_use(use_cache)
+
+        # If the contained calculators are EAOperations then set their
+        # use_cache option to what is passed here. This is because
+        # the instance does not control the molecular cache.
+        # So the contained calculators need to be made aware of this
+        # change directly.
+        for calculator in self._calculators:
+            calculator.set_cache_use(use_cache)
+
+    def _select(self, population, included_batches, excluded_baches):
+        return self._get_calculator().select(
+            population=population,
+            included_batches=included_batches,
+            excluded_baches=excluded_baches,
+        )
+
     def _get_calculator(self):
         calculator = self._generator.choice(
             a=self._calculators,
@@ -389,8 +658,12 @@ class RaisingCalculatorError(Exception):
 
 class RaisingCalculator(
     _MoleculeCalculator,
-    Optimizer,
+    Crosser,
     EnergyCalculator,
+    FitnessCalculator,
+    FitnessNormalizer,
+    Mutator,
+    Optimizer,
 ):
     """
     Raise an error at random or use another calculator.
@@ -453,3 +726,54 @@ class RaisingCalculator(
     def _get_energy(self, mol):
         self._try_raising()
         return self._calculator.get_energy(mol)
+
+    def _cross(self, *mols):
+        self._try_raising()
+        return self._calculator.cross(*mols)
+
+    def set_cache_use(self, use_cache):
+        """
+        Toggle use of the cache.
+
+        If used as a :class:`.MoleculeCalculator` this method toggles
+        use of the results cache. If used as a :class:`.EAOperation`,
+        toggles use of the molecular cache.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            Whether the cache should be used.
+
+        Returns
+        -------
+        :class:`.If`
+            The calculator is returned.
+
+        """
+
+        # When the contained calculators are MoleculeCalculators,
+        # use the implementation provided by _MoleculeCalculator.
+        # This will mean that the use_cache option on the contained
+        # calculators will not be changed. Instead it will use its own
+        # cache to return previously calculated results.
+        if isinstance(self._calculator, MoleculeCalculator):
+            return super().set_cache_use(use_cache)
+
+        # If the contained calculators are EAOperations then set their
+        # use_cache option to what is passed here. This is because
+        # the instance does not control the molecular cache.
+        # So the contained calculators need to be made aware of this
+        # change directly.
+        self._calculator.set_cache_use(use_cache)
+
+    def _get_fitness(self, mol):
+        self._try_raising()
+        return self._calculator.get_fitness(mol)
+
+    def _normalize(self, population):
+        self._try_raising()
+        return self._calculator.normalize(population)
+
+    def _mutate(self, mol):
+        self._try_raising()
+        return self._calculator.mutate(mol)

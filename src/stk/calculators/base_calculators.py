@@ -312,3 +312,63 @@ class _MoleculeCalculator(MoleculeCalculator):
         """
 
         return self._cache[mol]
+
+
+class EAOperation(Calculator):
+    """
+    Abstract base class for operations such as mutation or crossover.
+
+    """
+
+    def set_cache_use(self, use_cache):
+        """
+        Set use of the molecular cache on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the molecular cache is to be used.
+
+        Returns
+        -------
+        :class:`.EAOperation`
+            The calculator.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
+            This is a virtual method and needs to be implemented in a
+            subclass.
+
+        """
+
+        raise NotImplementedError()
+
+
+class _EAOperation(EAOperation):
+    """
+    Implements the :class:`.EAOperation` interface.
+
+    """
+
+    def __init__(self, use_cache):
+        self._use_cache = use_cache
+
+    def set_cache_use(self, use_cache):
+        """
+        Set use of the molecular cache on or off.
+
+        Parameters
+        ----------
+        use_cache : :class:`bool`
+            ``True`` if the molecular cache is to be used.
+
+        Returns
+        -------
+        :class:`.EAOperation`
+            The calculator.
+
+        """
+
+        self._use_cache = use_cache
+        return self
