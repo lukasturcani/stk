@@ -4,3 +4,14 @@ channels:
   - defaults
 dependencies:
   - rdkit
+  pip:
+    - scipy
+    - matplotlib
+    - psutil
+    - pandas
+    - pathos
+    - seaborn
+    - numpy
+    - setuptools
+    - pywindowx
+    - numpydoc
