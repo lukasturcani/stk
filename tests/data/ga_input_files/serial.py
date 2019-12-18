@@ -6,10 +6,10 @@ import stk
 import logging
 
 # #####################################################################
-# Pick a random seed.
+# Run GA serially.
 # #####################################################################
 
-random_seed = 12
+processes = 1
 
 # #####################################################################
 # Set logging level.
@@ -28,41 +28,25 @@ building_blocks = [
 ]
 
 topology_graphs = [
-    stk.polymer.Linear('A', 3),
-    stk.polymer.Linear('A', 6),
-    stk.polymer.Linear('A', 12)
+    stk.polymer.Linear('A', [0], 3),
+    stk.polymer.Linear('A', [0], 6),
+    stk.polymer.Linear('A', [0], 12)
 ]
 
-population = stk.EAPopulation.init_random(
+population = stk.GAPopulation.init_random(
     building_blocks=[building_blocks],
     topology_graphs=topology_graphs,
     size=25,
-    use_cache=True,
-    random_seed=random_seed
+    use_cache=True
 )
 
 # #####################################################################
 # Selector for selecting the next generation.
 # #####################################################################
 
-generation_selector = stk.Sequence(
-    stk.Best(
-        num_batches=3,
-        duplicate_mols=False,
-        duplicate_batches=False
-    ),
-    stk.RemoveBatches(
-        remover=stk.Best(
-            num_batches=3,
-            duplicate_mols=False,
-            duplicate_batches=False,
-        ),
-        selector=stk.Roulette(
-            num_batches=22,
-            duplicate_mols=False,
-            random_seed=random_seed,
-        ),
-    ),
+generation_selector = stk.SelectorSequence(
+    stk.Fittest(num_batches=3, duplicates=False),
+    stk.Roulette(num_batches=22, duplicates=False)
 )
 
 # #####################################################################
@@ -75,38 +59,25 @@ crossover_selector = stk.AboveAverage(num_batches=5, batch_size=2)
 # Selector for selecting molecules for mutation.
 # #####################################################################
 
-mutation_selector = stk.FilterBatches(
-    stk.AboveAverage(duplicate_mols=False),
-    stk.Roulette(num_batches=5, random_seed=random_seed)
+mutation_selector = stk.SelectorFunnel(
+    stk.AboveAverage(num_batches=10, duplicates=False),
+    stk.Roulette(num_batches=5)
 )
 
 # #####################################################################
 # Crosser.
 # #####################################################################
 
-crosser = stk.Jumble(
-    num_offspring_building_blocks=3,
-    random_seed=random_seed
-)
+crosser = stk.Jumble(num_offspring_building_blocks=3)
 
 # #####################################################################
 # Mutator.
 # #####################################################################
 
-mutator = stk.Random(
-    stk.RandomTopologyGraph(topology_graphs, random_seed=random_seed),
-    stk.RandomBuildingBlock(
-        building_blocks=building_blocks,
-        key=lambda mol: True,
-        random_seed=random_seed
-    ),
-    stk.SimilarBuildingBlock(
-        building_blocks=building_blocks,
-        key=lambda mol: True,
-        duplicate_building_blocks=False,
-        random_seed=random_seed
-    ),
-    random_seed=random_seed
+mutator = stk.RandomMutation(
+    stk.RandomTopologyGraph(topology_graphs),
+    stk.RandomBuildingBlock(building_blocks, lambda mol: True),
+    stk.SimilarBuildingBlock(building_blocks, lambda mol: True, False)
 )
 
 # #####################################################################
@@ -133,7 +104,7 @@ fitness_calculator = stk.PropertyVector(num_atoms)
 # The PropertyVector fitness calculator will set the fitness as
 # [n_atoms] use the Sum() fitness normalizer to convert the fitness to
 # just n_atoms^0.5. The sqrt is because we use the Power normalizer.
-fitness_normalizer = stk.Sequence(
+fitness_normalizer = stk.NormalizerSequence(
     stk.Power(0.5),
     stk.Sum()
 )
@@ -142,7 +113,7 @@ fitness_normalizer = stk.Sequence(
 # Exit condition.
 # #####################################################################
 
-terminator = stk.NumGenerations(25)
+exiter = stk.NumGenerations(25)
 
 # #####################################################################
 # Make plotters.
@@ -151,40 +122,25 @@ terminator = stk.NumGenerations(25)
 plotters = [
     stk.ProgressPlotter(
         filename='fitness_plot',
-        property_fn=lambda progress, mol:
-            progress.get_fitness_values()[mol],
+        property_fn=lambda mol: mol.fitness,
         y_label='Fitness',
-        progress_fn=lambda progress:
-            progress.set_fitness_values_from_calculators(
-                fitness_calculator=fitness_calculator,
-                fitness_normalizer=fitness_normalizer,
-            )
     ),
     stk.ProgressPlotter(
         filename='atom_number_plot',
-        property_fn=lambda progress, mol: len(mol.atoms),
+        property_fn=lambda mol: len(mol.atoms),
         y_label='Number of Atoms',
     )
 ]
 
 stk.SelectionPlotter(
     filename='generational_selection',
-    selector=generation_selector,
-    molecule_label=lambda population, mol:
-        f'{mol.id} - {population.get_fitness_values()[mol]}',
-    x_label='Molecule: id - fitness value'
+    selector=generation_selector
 )
 stk.SelectionPlotter(
     filename='crossover_selection',
-    selector=crossover_selector,
-    molecule_label=lambda population, mol:
-        f'{mol.id} - {population.get_fitness_values()[mol]}',
-    x_label='Molecule: id - fitness value'
+    selector=crossover_selector
 )
 stk.SelectionPlotter(
     filename='mutation_selection',
-    selector=mutation_selector,
-    molecule_label=lambda population, mol:
-        f'{mol.id} - {population.get_fitness_values()[mol]}',
-    x_label='Molecule: id - fitness value'
+    selector=mutation_selector
 )

@@ -30,7 +30,7 @@ class Population:
 
     :class:`Population` instances can be nested.
 
-    In addtion to holding :class:`.Molecule` objects, the
+    In addition to holding :class:`.Molecule` objects, the
     :class:`Population` class can be used to create large numbers of
     these instances through the class methods beginning with "init".
 
@@ -101,7 +101,7 @@ class Population:
         second_member = pop[1]
 
     Indices will first access direct members of the population and then
-    acess members in the subpopulations. Indices access nested members
+    access members in the subpopulations. Indices access nested members
     depth-first
 
     .. code-block:: python
@@ -163,7 +163,7 @@ class Population:
         bb2 not in pop3
 
     If you want to run multiple :meth:`optimize` calls in a row, use
-    the "with" statment. This keeps a single process pool open, and
+    the "with" statement. This keeps a single process pool open, and
     means you do not create a new one for each :meth:`optimize` call.
     It also automatically closes the pool for you when the block
     exits
@@ -1401,6 +1401,169 @@ class Population:
 
     def __repr__(self):
         return str(self)
+
+
+class EAPopulation(Population):
+    """
+    A population which also stores fitness values of molecules.
+
+    Attributes
+    ----------
+    direct_members : :class:`list` of :class:`.Molecule`
+        Held here are direct members of the :class:`Population`.
+        In other words, these are the molecules not held by any
+        subpopulations. As a result, not all members of a
+        :class:`Population` are stored in this attribute.
+
+    subpopulations : :class:`list` of :class:`Population`
+        A :class:`list` holding the subpopulations.
+
+    """
+
+    def get_fitness_values(self):
+        """
+        Return the fitness values of molecules.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps a :class:`.Molecule` to its fitness value.
+
+        """
+
+        return dict(self._fitness_values)
+
+    def set_fitness_values_from_dict(self, fitness_values):
+        """
+        Set the fitness values of molecules.
+
+        Parameters
+        ----------
+        fitness_values : :class:`dict`
+            Maps molecules in the population to their fitness
+            values.
+
+        Returns
+        -------
+        :class:`.EAPopulation`
+            The population is returned.
+
+        """
+
+        self._fitness_values = dict(fitness_values)
+        for pop in self.subpopulations:
+            pop.set_fitness_values_from_dict(fitness_values)
+
+    def set_fitness_values_from_calculators(
+        self,
+        fitness_calculator,
+        fitness_normalizer=None,
+        num_processes=None,
+    ):
+        """
+        Set the fitness values of molecules.
+
+        Parameters
+        ----------
+        fitness_calculator : :class:`.FitnessCalculator`
+            Used to calculate the initial fitness values.
+
+        fitness_normalizer : :class:`.FitnessNormalizer`, optional
+            Used to normalize the fitness values.
+
+        num_processes : :class:`int`, optional
+            The number of parallel processes to create. Calculations
+            will run serially if ``1``. If ``None``, creates a
+            process for each core on the computer. This parameter will
+            be ignored if the population has an open process pool.
+
+        Returns
+        -------
+        :class:`.EAPopulation`
+            The population is returned.
+
+        """
+
+        if num_processes is None:
+            num_processes = psutil.cpu_count()
+
+        if self._process_pool is None and num_processes == 1:
+            self._set_fitness_values_serial(fitness_calculator)
+        else:
+            self._set_fitness_values_parallel(
+                fitness_calculator=fitness_calculator,
+                num_processes=num_processes,
+            )
+
+        if fitness_normalizer is not None:
+            self._fitness_values = fitness_normalizer.normalize(self)
+
+        for pop in self.subpopulations:
+            pop.set_fitness_values_from_dict(self._fitness_values)
+
+    def _set_fitness_values_serial(self, fitness_calculator):
+        self._fitness_values = {
+            mol: fitness_calculator.get_fitness(mol)
+            for mol in self
+        }
+
+    def _set_fitness_values_parallel(
+        self,
+        fitness_calculator,
+        num_processes,
+    ):
+
+        fitness_fn = _Guard(
+            calculator=fitness_calculator,
+            fn=fitness_calculator.get_fitness,
+        )
+
+        self._fitness_values = {}
+        # Use a list here because the to_evaluate is iterated through
+        # twice.
+        to_evaluate = list(
+            self._handle_cached_mols(fitness_calculator)
+        )
+        # Use an existing process pool, if it exists.
+        opened_pool = False
+        if self._process_pool is None:
+            opened_pool = True
+            self.open_process_pool(num_processes)
+
+        # Apply the function, in parallel.
+        evaluated = self._process_pool.map(fitness_fn, to_evaluate)
+
+        if opened_pool:
+            self.close_process_pool()
+
+        # Collect results.
+        for mol, result in zip(to_evaluate, evaluated):
+
+            if isinstance(result, Exception):
+                raise result
+
+            _, fitness = result
+            self._fitness_values[mol] = fitness
+
+            if fitness_calculator.is_caching():
+                fitness_calculator.add_to_cache(mol, fitness)
+
+        return self
+
+    def _handle_cached_mols(self, fitness_calculator):
+        # Only send molecules which need to have a calculation
+        # performed to the process pool - this should improve
+        # performance.
+        if fitness_calculator.is_caching():
+            for mol in self:
+                if fitness_calculator.is_in_cache(mol):
+                    self._fitness_values[mol] = (
+                        fitness_calculator.get_fitness(mol)
+                    )
+                else:
+                    yield mol
+        else:
+            yield from self
 
 
 class _Guard:
