@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   - rdkit
-  pip:
+  - pip:
     - scipy
     - matplotlib
     - psutil
