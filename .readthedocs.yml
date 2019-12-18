@@ -5,3 +5,5 @@ conda:
 
 python:
   install:
+    - method: setuptools
+    - path: setup.py
