@@ -5,6 +5,6 @@ conda:
 
 python:
   install:
-    - requirements:
+    - requirements: requirements.txt
     - method: setuptools
     - path: .
