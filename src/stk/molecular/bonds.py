@@ -204,8 +204,8 @@ class Bond:
         for attr, val in vars(self).items():
             if not attr.startswith('_'):
                 setattr(obj, attr, val)
-        obj.atom1 = atom_map.get(obj.atom1, obj.atom1)
-        obj.atom2 = atom_map.get(obj.atom2, obj.atom2)
+        obj.atom1 = atom_map.get(obj.atom1, obj.atom1.clone())
+        obj.atom2 = atom_map.get(obj.atom2, obj.atom2.clone())
         return obj
 
     def is_periodic(self):
