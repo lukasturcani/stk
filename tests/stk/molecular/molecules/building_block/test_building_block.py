@@ -517,19 +517,53 @@ class TestGetBonderCentroids:
             )
 
 
-def test_get_bonder_plane(
-    building_block,
-    get_fg_ids,
-    expected_bonder_plane,
-):
-    bonder_plane = building_block.get_bonder_plane(
-        fg_ids=get_fg_ids(building_block),
+class TestGetBonderPlane:
+    class Point:
+        def __init__(self, x, y, z, distance):
+            self.x = x
+            self.y = y
+            self.z = z
+            self.distance = distance
+
+    def case1(Point):
+        building_block = stk.BuildingBlock(
+            smiles='BrCC(CBr)(CBr)CBr',
+            functional_groups=['bromine'],
+        )
+        bonder_ids = list(building_block.get_bonder_ids())
+        coords = building_block.get_position_matrix()
+        coords[bonder_ids[0]] = [1, 1, 0]
+        coords[bonder_ids[1]] = [0, 0, 0.5]
+        coords[bonder_ids[2]] = [0, 0, -0.5]
+        coords[bonder_ids[3]] = [1, -1, 0]
+        building_block.set_position_matrix(coords)
+
+        points = (
+            Point(1, 1, 0, 0),
+            Point(0, 0, 0.5, 0.5),
+            Point(0, 0, -0.5, 0.5),
+            Point(1, -1, 0, 0),
+        )
+
+        return building_block, None, points
+
+    @pytest.mark.parametrize(
+        argnames=(
+            'building_block',
+            'fg_ids',
+            'points',
+        ),
+        argvalues=(
+            case1(Point),
+        ),
     )
-    assert np.allclose(
-        a=bonder_plane,
-        b=expected_bonder_plane,
-        atol=1e-32,
-    )
+    def test(self, building_block, fg_ids, points):
+        a, b, c, d = building_block.get_bonder_plane(
+            fg_ids=fg_ids,
+        )
+        for point in points:
+            product = a*point.x + b*point.y + c*point.z
+            assert abs(point.distance - abs(product-d)) < 1e-16
 
 
 def test_get_bonder_plane_normal(
