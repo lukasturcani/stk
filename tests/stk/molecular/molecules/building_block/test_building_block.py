@@ -580,7 +580,8 @@ class TestGetBonderPlaneNormal:
         coords[bonder_ids[1]] = [0, 0, 0.5]
         coords[bonder_ids[2]] = [0, 0, -0.5]
         coords[bonder_ids[3]] = [1, -1, 0]
-        return building_block, None, [0, 0, 1]
+        building_block.set_position_matrix(coords)
+        return building_block, None, [0, 0, -1]
 
     @pytest.mark.parametrize(
         argnames=(
