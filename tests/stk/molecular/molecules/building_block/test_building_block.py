@@ -517,15 +517,17 @@ class TestGetBonderCentroids:
             )
 
 
-class TestGetBonderPlane:
-    class Point:
-        def __init__(self, x, y, z, distance):
-            self.x = x
-            self.y = y
-            self.z = z
-            self.distance = distance
+class _BonderPlanePoint:
+    def __init__(self, x, y, z, distance):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.distance = distance
 
-    def case1(make_point):
+
+class TestGetBonderPlane:
+
+    def case1():
         building_block = stk.BuildingBlock(
             smiles='BrCC(CBr)(CBr)CBr',
             functional_groups=['bromine'],
@@ -539,10 +541,10 @@ class TestGetBonderPlane:
         building_block.set_position_matrix(coords)
 
         points = (
-            make_point(1, 1, 0, 0),
-            make_point(0, 0, 0.5, 0.5),
-            make_point(0, 0, -0.5, 0.5),
-            make_point(1, -1, 0, 0),
+            _BonderPlanePoint(1, 1, 0, 0),
+            _BonderPlanePoint(0, 0, 0.5, 0.5),
+            _BonderPlanePoint(0, 0, -0.5, 0.5),
+            _BonderPlanePoint(1, -1, 0, 0),
         )
 
         return building_block, None, points
@@ -554,7 +556,7 @@ class TestGetBonderPlane:
             'points',
         ),
         argvalues=(
-            case1(Point),
+            case1(),
         ),
     )
     def test(self, building_block, fg_ids, points):
