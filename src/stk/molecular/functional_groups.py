@@ -319,10 +319,16 @@ class FunctionalGroup:
             atom_map = {}
 
         return self.__class__(
-            atoms=tuple(atom_map.get(a, a) for a in self.atoms),
-            bonders=tuple(atom_map.get(a, a) for a in self.bonders),
-            deleters=tuple(atom_map.get(a, a)for a in self.deleters),
-            fg_type=self.fg_type
+            atoms=tuple(
+                atom_map.get(a, a.clone()) for a in self.atoms
+            ),
+            bonders=tuple(
+                atom_map.get(a, a.clone()) for a in self.bonders
+            ),
+            deleters=tuple(
+                atom_map.get(a, a.clone()) for a in self.deleters
+            ),
+            fg_type=self.fg_type,
         )
 
     def get_atom_ids(self):
