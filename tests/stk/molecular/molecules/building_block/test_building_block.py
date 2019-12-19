@@ -525,7 +525,7 @@ class TestGetBonderPlane:
             self.z = z
             self.distance = distance
 
-    def case1(Point):
+    def case1(make_point):
         building_block = stk.BuildingBlock(
             smiles='BrCC(CBr)(CBr)CBr',
             functional_groups=['bromine'],
@@ -539,10 +539,10 @@ class TestGetBonderPlane:
         building_block.set_position_matrix(coords)
 
         points = (
-            Point(1, 1, 0, 0),
-            Point(0, 0, 0.5, 0.5),
-            Point(0, 0, -0.5, 0.5),
-            Point(1, -1, 0, 0),
+            make_point(1, 1, 0, 0),
+            make_point(0, 0, 0.5, 0.5),
+            make_point(0, 0, -0.5, 0.5),
+            make_point(1, -1, 0, 0),
         )
 
         return building_block, None, points
