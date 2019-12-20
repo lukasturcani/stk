@@ -30,13 +30,13 @@ def test_get_position(make_vertex, position):
     assert np.all(np.equal(vertex.get_position(), position))
 
 
-def test_get_num_edges(make_vertex, make_edges, edge_ids):
-    vertex = make_vertex(edges=make_edges(edge_ids))
+def test_get_num_edges(make_vertex, edge_ids):
+    vertex = make_vertex(edge_ids=edge_ids)
     assert vertex.get_num_edges() == len(edge_ids)
 
 
-def test_get_edge_ids(make_vertex, make_edges, edge_ids):
-    vertex = make_vertex(edges=make_edges(edge_ids))
+def test_get_edge_ids(make_vertex, edge_ids):
+    vertex = make_vertex(edge_ids=edge_ids)
     assert tuple(vertex.get_edge_ids()) == edge_ids
 
 
@@ -78,12 +78,12 @@ def test_get_edge_centroid(graph):
     )
 
 
-def test_get_edge_plane_normal(graph, reference):
+def test_get_edge_plane_normal(graph):
     plane_edges = tuple(
         graph.edges[edge_id] for edge_id in graph.vertex.get_edge_ids()
     )
     normal = graph.vertex.test_get_edge_plane_normal(
-        reference=reference,
+        reference=graph.reference,
         plane_edges=plane_edges,
         vertices=graph.vertices,
     )
@@ -101,9 +101,10 @@ def test_get_molecule_centroid(
     position,
 ):
     vertex = make_vertex()
-    constructed_molecule.set_position(position)
+    atom_ids = get_atom_ids(constructed_molecule)
+    constructed_molecule.set_position(position, atom_ids)
     constructed_molecule._position_matrix = (
         constructed_molecule._position_matrix.T
     )
     vertex.set_constructed_molecule(constructed_molecule)
-    assert vertex.test_get_molecule_centroid() == position
+    assert vertex._get_molecule_centroid(atom_ids) == position

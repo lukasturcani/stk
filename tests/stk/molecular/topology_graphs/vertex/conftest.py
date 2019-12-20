@@ -26,10 +26,11 @@ def graph(request):
 
 @pytest.fixture(
     params=[
-
+        lambda molecule: None,
+        lambda molecule: range(0, len(molecule.atoms), 2),
     ],
 )
-def make_edges(request):
+def get_atom_ids(request):
     return request.param
 
 
@@ -67,11 +68,14 @@ def position(request):
 
 @pytest.fixture(
     params=[
-
+        (0, 3, 5),
+        (5, 3, 2),
+        (1, 12),
+        (),
     ],
 )
 def edge_ids(request):
-    return list(request.param)
+    return tuple(request.param)
 
 
 @pytest.fixture(
