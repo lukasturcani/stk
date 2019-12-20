@@ -45,25 +45,66 @@ def test_get_cell(make_vertex, cell):
     assert vertex.get_cell() == cell
 
 
-def test_set_constructed_molecule(make_vertex, constructed_molecule):
+def test_set_constructed_molecule(
+    make_vertex,
+    constructed_molecule,
+    get_atom_ids,
+):
     vertex = make_vertex()
-    vertex.set_constructed_molecule(molecule)
-    assert
-
-
-def test_get_edge_centroid(vertex_test_case, edges):
-    vertex = vertex_test_case.vertex
-    centroid_edges = vertex_test_case.centroid_edges
-    vertices = vertex_test_case.vertices
+    vertex.set_constructed_molecule(constructed_molecule)
+    atom_ids = get_atom_ids(constructed_molecule)
+    centroid = constructed_molecule.get_centroid(atom_ids)
+    constructed_molecule._position_matrix = (
+        constructed_molecule._position_matrix.T
+    )
     assert (
-        vertex._get_edge_centroid(centroid_edges, vertices)
-        == vertex_test_case.edge_centroid
+        vertex.test_get_molecule_centroid(atom_ids=atom_ids)
+        == centroid
     )
 
 
-def test_get_edge_plane_normal(vertex_test_case, edges):
-    vertex = vertex_test_case.vertex
+def test_get_edge_centroid(graph):
+    centroid_edges = tuple(
+        graph.edges[edge_id] for edge_id in graph.vertex.get_edge_ids()
+    )
+    centroid = graph.vertex._get_edge_centroid(
+        centroid_edges=centroid_edges,
+        vertices=graph.vertices,
+    )
+    assert np.allclose(
+        a=centroid,
+        b=graph.edge_centroid,
+        atol=1e-32,
+    )
 
 
-def test_get_molecule_centroid(vertex_test_case, edges, molecule):
-    assert False
+def test_get_edge_plane_normal(graph, reference):
+    plane_edges = tuple(
+        graph.edges[edge_id] for edge_id in graph.vertex.get_edge_ids()
+    )
+    centroid = graph.vertex._get_edge_centroid(
+    normal = graph.vertex.test_get_edge_plane_normal(
+        reference=reference,
+        plane_edges=plane_edges,
+        vertices=graph.vertices,
+    )
+    assert np.allclose(
+        a=normal,
+        b=graph.edge_plane_normal,
+        atol=1e-32,
+    )
+
+
+def test_get_molecule_centroid(
+    make_vertex,
+    constructed_molecule,
+    get_atom_ids,
+    position,
+):
+    vertex = make_vertex()
+    constructed_molecule.set_position(position)
+    constructed_molecule._position_matrix = (
+        constructed_molecule._position_matrix.T
+    )
+    vertex.set_constructed_molecule(constructed_molecule)
+    assert vertex.test_get_molecule_centroid() == position
