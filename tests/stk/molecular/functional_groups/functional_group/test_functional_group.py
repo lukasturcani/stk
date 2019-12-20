@@ -26,3 +26,30 @@ def test_clone(functional_group):
     for d1, d2 in deleters:
         assert d1 is not d2
         assert d1.id == d2.id
+
+
+def test_get_atom_ids(functional_group):
+    atoms = it.zip_longest(
+        functional_group.atoms,
+        functional_group.get_atom_ids(),
+    )
+    for atom, id_ in atoms:
+        assert atom.id == id_
+
+
+def test_get_bonder_ids(functional_group):
+    atoms = it.zip_longest(
+        functional_group.bonders,
+        functional_group.get_bonder_ids(),
+    )
+    for atom, id_ in atoms:
+        assert atom.id == id_
+
+
+def test_get_deleter_ids(functional_group):
+    atoms = it.zip_longest(
+        functional_group.deleters,
+        functional_group.get_deleter_ids(),
+    )
+    for atom, id_ in atoms:
+        assert atom.id == id_
