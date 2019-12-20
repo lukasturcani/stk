@@ -315,7 +315,7 @@ class Vertex:
 
         return np.array(self._cell)
 
-    def set_contructed_molecule(self, mol):
+    def set_constructed_molecule(self, mol):
         """
         Set the :class:`.ConstructedMolecule` being constructed.
 
@@ -1252,7 +1252,7 @@ class TopologyGraph:
             yield (
                 vertex
                 .clone()
-                .set_contructed_molecule(mol)
+                .set_constructed_molecule(mol)
                 .apply_scale(scale)
             )
 
