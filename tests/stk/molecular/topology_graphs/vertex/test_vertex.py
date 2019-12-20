@@ -82,7 +82,6 @@ def test_get_edge_plane_normal(graph, reference):
     plane_edges = tuple(
         graph.edges[edge_id] for edge_id in graph.vertex.get_edge_ids()
     )
-    centroid = graph.vertex._get_edge_centroid(
     normal = graph.vertex.test_get_edge_plane_normal(
         reference=reference,
         plane_edges=plane_edges,

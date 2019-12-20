@@ -1,13 +1,27 @@
 import numpy as np
 import pytest
+import fixtures
 import stk
 
 
 @pytest.fixture(
-    params=,
+    params=[
+        fn for name, fn in fixtures.make_vertex.__dict__.items()
+        if not name.startswith('_') and callable(fn)
+    ],
 )
 def make_vertex(request):
     return request.param
+
+
+@pytest.fixture(
+    params=[
+        fn for name, fn in fixtures.graph.__dict__.items()
+        if not name.startswith('_') and callable(fn)
+    ],
+)
+def graph(request):
+    return request.param()
 
 
 @pytest.fixture(
@@ -17,6 +31,18 @@ def make_vertex(request):
 )
 def make_edges(request):
     return request.param
+
+
+@pytest.fixture(
+    params=[
+        stk.ConstructedMolecule(
+            building_blocks=[stk.BuildingBlock('BrCCBr', ['bromine'])],
+            topology_graph=stk.polymer.Linear('A', 3),
+        ),
+    ]
+)
+def constructed_molecule(request):
+    return request.param.clone()
 
 
 @pytest.fixture(
@@ -58,28 +84,3 @@ def edge_ids(request):
 )
 def cell(request):
     return tuple(request.param)
-
-
-class Graph:
-    def __init__(
-        self,
-        vertex,
-        vertices,
-        edges,
-        edge_centroid,
-        edge_plane_normal,
-    ):
-        self.vertex = vertex
-        self.vertices = vertices
-        self.edges = edges
-        self.edge_centroid = edge_centroid
-        self.edge_plane_normal = edge_plane_normal
-
-
-@pytest.fixture(
-    params=[
-
-    ],
-)
-def graph(request):
-    return request.param
