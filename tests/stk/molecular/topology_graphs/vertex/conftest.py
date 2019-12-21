@@ -10,8 +10,8 @@ import stk
         if not name.startswith('_') and callable(fn)
     ],
 )
-def graph(request):
-    return request.param()
+def graph(request, make_vertex_data):
+    return request.param(make_vertex_data)
 
 
 @pytest.fixture(
@@ -86,62 +86,98 @@ def linear_vertex_data(request):
 
 @pytest.fixture
 def linear_vertex(linear_vertex_data):
-    return linear_vertex_data(0, 0, 0, flip=True)
+
+    def inner(x, y, z):
+        return linear_vertex_data(0, 0, 0, flip=True)
+
+    return inner
 
 
 @pytest.fixture
 def cage_vertex():
-    return stk.cage.base._CageVertexData(
-        0, 0, 0,
-        use_bonder_placement=True,
-    )
+
+    def inner(x, y, z):
+        return stk.cage.base._CageVertexData(
+            x, y, z,
+            use_bonder_placement=True,
+        )
+
+    return inner
 
 
 @pytest.fixture
 def one_plus_one_vertex():
-    return stk.cage.three_plus_three._OnePlusOneVertexData(
-        0, 0, 0,
-        edge_normal=[1, 0, 0],
-        use_bonder_placement=True,
-    )
+
+    def inner(x, y, z):
+        return stk.cage.three_plus_three._OnePlusOneVertexData(
+            x, y, z,
+            edge_normal=[1, 0, 0],
+            use_bonder_placement=True,
+        )
+
+    return inner
 
 
 @pytest.fixture
 def cof_vertex():
-    return stk.cof._COFVertexData(0, 0, 0)
+
+    def inner(x, y, z):
+        return stk.cof._COFVertexData(0, 0, 0)
+
+    return inner
 
 
 @pytest.fixture
 def macrocycle_vertex():
-    return stk.macrocycle._CycleVertexData(
-        0, 0, 0,
-        flip=True,
-        angle=1,
-    )
+
+    def inner(x, y, z):
+        return stk.macrocycle._CycleVertexData(
+            x, y, z,
+            flip=True,
+            angle=1,
+        )
+
+    return inner
 
 
 @pytest.fixture
 def host_vertex():
-    return stk.host_guest._HostVertexData(0, 0, 0)
+
+    def inner(x, y, z):
+        return stk.host_guest._HostVertexData(x, y, z)
+
+    return inner
 
 
 @pytest.fixture
 def guest_vertex():
-    return stk.host_guest._GuestVertexData(
-        0, 0, 0,
-        start=[0, 0, 1],
-        target=[1, 0, 0],
-    )
+
+    def inner(x, y, z):
+        return stk.host_guest._GuestVertexData(
+            x, y, z,
+            start=[0, 0, 1],
+            target=[1, 0, 0],
+        )
+
+    return inner
 
 
 @pytest.fixture
 def axle_vertex():
-    return stk.rotaxane._AxleVertexData(0, 0, 0)
+
+    def inner(x, y, z):
+        return stk.rotaxane._AxleVertexData(x, y, z)
+
+    return inner
 
 
 @pytest.fixture
 def cycle_vertex():
-    return stk.rotaxane._CycleVertexData(0, 0, 0, True)
+
+    def inner(x, y, z):
+        return stk.rotaxane._CycleVertexData(x, y, z, True)
+
+    return inner
 
 
 @pytest.fixture(
@@ -157,5 +193,10 @@ def cycle_vertex():
         pytest.lazy_fixture('cycle_vertex'),
     ],
 )
-def vertex_data(request):
+def make_vertex_data(request):
     return request.param
+
+
+@pytest.fixture
+def vertex_data(make_vertex_data):
+    return make_vertex_data(0, 0, 0)

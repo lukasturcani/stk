@@ -73,7 +73,7 @@ def test_set_constructed_molecule(
     )
 
 
-def _test_get_edge_centroid(graph):
+def test_get_edge_centroid(graph):
     centroid_edges = tuple(
         graph.edges[edge_id] for edge_id in graph.vertex.get_edge_ids()
     )
@@ -88,11 +88,11 @@ def _test_get_edge_centroid(graph):
     )
 
 
-def _test_get_edge_plane_normal(graph):
+def test_get_edge_plane_normal(graph):
     plane_edges = tuple(
         graph.edges[edge_id] for edge_id in graph.vertex.get_edge_ids()
     )
-    normal = graph.vertex.test_get_edge_plane_normal(
+    normal = graph.vertex._get_edge_plane_normal(
         reference=graph.reference,
         plane_edges=plane_edges,
         vertices=graph.vertices,
