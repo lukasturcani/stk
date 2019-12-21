@@ -1,17 +1,8 @@
 import numpy as np
+import pytest_cases
 import pytest
 import fixtures
 import stk
-
-
-@pytest.fixture(
-    params=[
-        fn for name, fn in fixtures.make_vertex.__dict__.items()
-        if not name.startswith('_') and callable(fn)
-    ],
-)
-def make_vertex(request):
-    return request.param
 
 
 @pytest.fixture(
@@ -67,15 +58,15 @@ def position(request):
 
 
 @pytest.fixture(
-    params=[
-        (0, 3, 5),
-        (5, 3, 2),
-        (1, 12),
-        (),
-    ],
+    params=[0, 1, 2, 3],
 )
-def edge_ids(request):
-    return tuple(request.param)
+def add_edge_data(num_edges):
+    def inner(data):
+        return [
+            stk.EdgeData(data, position=[1, 2, 3])
+            for i in range(num_edges)
+        ]
+    return inner
 
 
 @pytest.fixture(
@@ -88,3 +79,31 @@ def edge_ids(request):
 )
 def cell(request):
     return tuple(request.param)
+
+
+@pytest.fixture(
+    params=[
+        stk.polymer._LinearVertexData,
+        stk.polymer._TailVertexData,
+        stk.polymer._HeadVertexData,
+    ]
+)
+def linear_vertex_data(request):
+    return request.param
+
+
+@pytest_cases.pytest_fixture_plus
+def linear_vertex(
+    linear_vertex_data,
+    position,
+    add_edge_data,
+    cell,
+    flip
+):
+    data = linear_vertex_data(
+        position=position,
+        cell=cell,
+        flip=flip,
+    )
+    add_edge_data(data)
+    return data

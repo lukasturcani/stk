@@ -1,8 +1,8 @@
 import numpy as np
 
 
-def test_apply_scale(make_vertex, position, scale):
-    vertex = make_vertex(position)
+def test_apply_scale(vertex_data, position, scale):
+    vertex = vertex_data.get_vertex()
     before = vertex.get_position()
     vertex.apply_scale(scale)
     assert np.allclose(
@@ -12,8 +12,8 @@ def test_apply_scale(make_vertex, position, scale):
     )
 
 
-def test_clone(make_vertex):
-    vertex = make_vertex()
+def test_clone(vertex_data):
+    vertex = vertex_data.get_vertex()
     vertex.attr = 1
     vertex._attr = 2
     clone = vertex.clone()
@@ -25,19 +25,22 @@ def test_clone(make_vertex):
     assert clone.get_cell() == vertex.get_cell()
 
 
-def test_get_position(make_vertex, position):
-    vertex = make_vertex(position)
+def test_get_position(vertex_data, position):
+    vertex = vertex_data.get_vertex()
     assert np.all(np.equal(vertex.get_position(), position))
 
 
-def test_get_num_edges(make_vertex, edge_ids):
-    vertex = make_vertex(edge_ids=edge_ids)
-    assert vertex.get_num_edges() == len(edge_ids)
+def test_get_num_edges(vertex_data):
+    vertex = vertex_data.get_vertex()
+    assert vertex.get_num_edges() == len(edge_data)
 
 
-def test_get_edge_ids(make_vertex, edge_ids):
-    vertex = make_vertex(edge_ids=edge_ids)
-    assert tuple(vertex.get_edge_ids()) == edge_ids
+def test_get_edge_ids(make_vertex, edge_data):
+    vertex = make_vertex(edge_data=edge_data)
+    assert (
+        tuple(vertex.get_edge_ids())
+        == tuple(data.id for data in edge_data)
+    )
 
 
 def test_get_cell(make_vertex, cell):
