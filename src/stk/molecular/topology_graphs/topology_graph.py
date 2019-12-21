@@ -259,7 +259,9 @@ class Vertex:
         """
 
         clone = self.__class__.__new__(self.__class__)
-        clone.id = self.id
+        for name, value in self.__dict__.items():
+            if not name.startswith('_'):
+                setattr(clone, name, value)
         clone._position = np.array(self._position)
         clone._cell = np.array(self._cell)
         clone._edge_ids = [] if clear_edges else list(self._edge_ids)
