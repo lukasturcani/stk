@@ -169,7 +169,10 @@ class VertexData:
         """
 
         clone = self.__class__.__new__(self.__class__)
-        clone.id = self.id
+        for name, value in self.__dict__.items():
+            if not name.startswith('_'):
+                setattr(clone, name, value)
+
         clone.position = list(self.position)
         clone.edges = [] if clear_edges else list(self.edges)
         clone.cell = np.array(self.cell)

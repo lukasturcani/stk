@@ -1,5 +1,4 @@
 import numpy as np
-import pytest_cases
 import pytest
 import fixtures
 import stk
@@ -38,7 +37,7 @@ def constructed_molecule(request):
 
 
 @pytest.fixture(
-    params=[0, 1, 0.5, 2],
+    params=[0., 1., 0.5, 2.],
 )
 def scale(request):
     return request.param
@@ -46,11 +45,11 @@ def scale(request):
 
 @pytest.fixture(
     params=[
-        np.array([0, 0, 0]),
-        np.array([10, 3, 5]),
-        np.array([-1, -2, 0]),
-        np.array([-1, -20, -3]),
-        np.array([-23, 34, 12]),
+        np.array([0., 0., 0.]),
+        np.array([10., 3., 5.]),
+        np.array([-1., -2., 0.]),
+        np.array([-1., -20., -3.]),
+        np.array([-23., 34., 12.]),
     ],
 )
 def position(request):
@@ -85,93 +84,78 @@ def linear_vertex_data(request):
     return request.param
 
 
-@pytest_cases.pytest_fixture_plus
-def linear_vertex(
-    linear_vertex_data,
-    position,
-    add_edge_data,
-):
-    data = linear_vertex_data(
-        position=position,
-        flip=True,
-    )
-    return add_edge_data(data)
+@pytest.fixture
+def linear_vertex(linear_vertex_data):
+    return linear_vertex_data(0, 0, 0, flip=True)
 
 
-@pytest_cases.pytest_fixture_plus
-def cage_vertex(position, add_edge_data):
-    data = stk.cage._CageVertexData(
-        *position,
+@pytest.fixture
+def cage_vertex():
+    return stk.cage.base._CageVertexData(
+        0, 0, 0,
         use_bonder_placement=True,
     )
-    return add_edge_data(data)
 
 
-@pytest_cases.pytest_fixture_plus
-def one_plus_one_vertex(position, add_edge_data):
-    data = stk.cage._OnePlusOneVertexData(
-        *position,
+@pytest.fixture
+def one_plus_one_vertex():
+    return stk.cage.three_plus_three._OnePlusOneVertexData(
+        0, 0, 0,
         edge_normal=[1, 0, 0],
         use_bonder_placement=True,
     )
-    return add_edge_data(data)
 
 
-@pytest_cases.pytest_fixture_plus
-def cof_vertex(position, add_edge_data):
-    data = stk.cof._COFVertexData(*position)
-    return add_edge_data(data)
+@pytest.fixture
+def cof_vertex():
+    return stk.cof._COFVertexData(0, 0, 0)
 
 
-@pytest_cases.pytest_fixture_plus
-def macrocycle_vertex(position, add_edge_data):
-    data = stk.macrocycle._CycleVertexData(
-        *position,
+@pytest.fixture
+def macrocycle_vertex():
+    return stk.macrocycle._CycleVertexData(
+        0, 0, 0,
         flip=True,
         angle=1,
     )
-    return add_edge_data(data)
 
 
-@pytest_cases.pytest_fixture_plus
-def host_vertex(position, add_edge_data):
-    data = stk.host_guest._HostVertexData(*position)
-    return add_edge_data(data)
+@pytest.fixture
+def host_vertex():
+    return stk.host_guest._HostVertexData(0, 0, 0)
 
 
-@pytest_cases.pytest_fixture_plus
-def guest_vertex(position, add_edge_data):
-    data = stk.host_guest._GuestVertexData(
-        *position,
+@pytest.fixture
+def guest_vertex():
+    return stk.host_guest._GuestVertexData(
+        0, 0, 0,
         start=[0, 0, 1],
         target=[1, 0, 0],
     )
-    return add_edge_data(data)
 
 
-@pytest_cases.pytest_fixture_plus
-def axle_vertex(position, add_edge_data):
-    data = stk.rotaxane._AxleVertexData(*position)
-    return add_edge_data(data)
+@pytest.fixture
+def axle_vertex():
+    return stk.rotaxane._AxleVertexData(0, 0, 0)
 
 
-@pytest_cases.pytest_fixture_plus
-def cycle_vertex(position, add_edge_data):
-    data = stk.rotaxane._CycleVertexData(*position, True)
-    return add_edge_data(data)
+@pytest.fixture
+def cycle_vertex():
+    return stk.rotaxane._CycleVertexData(0, 0, 0, True)
 
 
-pytest_cases.fixture_union(
-    name='vertex_data',
-    fixtures=[
-        linear_vertex,
-        cage_vertex,
-        one_plus_one_vertex,
-        cof_vertex,
-        macrocycle_vertex,
-        host_vertex,
-        guest_vertex,
-        axle_vertex,
-        cycle_vertex,
-    ]
+@pytest.fixture(
+    params=[
+        pytest.lazy_fixture('linear_vertex'),
+        pytest.lazy_fixture('cage_vertex'),
+        pytest.lazy_fixture('one_plus_one_vertex'),
+        pytest.lazy_fixture('cof_vertex'),
+        pytest.lazy_fixture('macrocycle_vertex'),
+        pytest.lazy_fixture('host_vertex'),
+        pytest.lazy_fixture('guest_vertex'),
+        pytest.lazy_fixture('axle_vertex'),
+        pytest.lazy_fixture('cycle_vertex'),
+    ],
 )
+def vertex_data(request):
+    return request.param
