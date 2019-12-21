@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def test_apply_scale(vertex_data, position, scale):
+def test_apply_scale(vertex_data, scale):
     vertex = vertex_data.get_vertex()
     before = vertex.get_position()
     vertex.apply_scale(scale)
@@ -25,35 +25,35 @@ def test_clone(vertex_data):
     assert clone.get_cell() == vertex.get_cell()
 
 
-def test_get_position(vertex_data, position):
-    vertex = vertex_data.get_vertex()
-    assert np.all(np.equal(vertex.get_position(), position))
+def test_get_position(vertex_data):
+    position = vertex_data.get_vertex().get_position()
+    assert np.all(np.equal(position, vertex_data.position))
 
 
 def test_get_num_edges(vertex_data):
     vertex = vertex_data.get_vertex()
-    assert vertex.get_num_edges() == len(edge_data)
+    assert vertex.get_num_edges() == len(vertex_data.edges)
 
 
-def test_get_edge_ids(make_vertex, edge_data):
-    vertex = make_vertex(edge_data=edge_data)
+def test_get_edge_ids(vertex_data):
+    vertex = vertex_data.get_vertex()
     assert (
         tuple(vertex.get_edge_ids())
-        == tuple(data.id for data in edge_data)
+        == tuple(data.id for data in vertex_data.edges)
     )
 
 
-def test_get_cell(make_vertex, cell):
-    vertex = make_vertex(cell=cell)
-    assert vertex.get_cell() == cell
+def test_get_cell(vertex_data):
+    vertex = vertex_data.get_vertex()
+    assert vertex.get_cell() == vertex_data.cell
 
 
 def test_set_constructed_molecule(
-    make_vertex,
+    vertex_data,
     constructed_molecule,
     get_atom_ids,
 ):
-    vertex = make_vertex()
+    vertex = vertex_data.get_vertex()
     vertex.set_constructed_molecule(constructed_molecule)
     atom_ids = get_atom_ids(constructed_molecule)
     centroid = constructed_molecule.get_centroid(atom_ids)
@@ -98,16 +98,17 @@ def test_get_edge_plane_normal(graph):
 
 
 def test_get_molecule_centroid(
-    make_vertex,
+    vertex_data,
     constructed_molecule,
     get_atom_ids,
-    position,
 ):
-    vertex = make_vertex()
+    vertex = vertex_data.get_vertex()
     atom_ids = get_atom_ids(constructed_molecule)
-    constructed_molecule.set_position(position, atom_ids)
+    constructed_molecule.set_position(vertex_data.position, atom_ids)
     constructed_molecule._position_matrix = (
         constructed_molecule._position_matrix.T
     )
     vertex.set_constructed_molecule(constructed_molecule)
-    assert vertex._get_molecule_centroid(atom_ids) == position
+    assert (
+        vertex._get_molecule_centroid(atom_ids) == vertex_data.position
+    )

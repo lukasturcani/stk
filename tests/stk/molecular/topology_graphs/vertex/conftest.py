@@ -61,11 +61,16 @@ def position(request):
     params=[0, 1, 2, 3],
 )
 def add_edge_data(num_edges):
+
     def inner(data):
-        return [
+        edges = [
             stk.EdgeData(data, position=[1, 2, 3])
             for i in range(num_edges)
         ]
+        for i, edge in enumerate(edges):
+            edge.id = i
+        return edges
+
     return inner
 
 
