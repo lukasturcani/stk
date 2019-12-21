@@ -60,30 +60,18 @@ def position(request):
 @pytest.fixture(
     params=[0, 1, 2, 3],
 )
-def add_edge_data(num_edges):
+def add_edge_data(request):
 
     def inner(data):
         edges = [
             stk.EdgeData(data, position=[1, 2, 3])
-            for i in range(num_edges)
+            for i in range(request.param)
         ]
         for i, edge in enumerate(edges):
             edge.id = i
-        return edges
+        return data
 
     return inner
-
-
-@pytest.fixture(
-    params=[
-        (0, 0, 0),
-        (1, 0, 0),
-        (-1, 0, 0),
-        (10, 3, -1),
-    ],
-)
-def cell(request):
-    return tuple(request.param)
 
 
 @pytest.fixture(
@@ -102,13 +90,88 @@ def linear_vertex(
     linear_vertex_data,
     position,
     add_edge_data,
-    cell,
-    flip
 ):
     data = linear_vertex_data(
         position=position,
-        cell=cell,
-        flip=flip,
+        flip=True,
     )
-    add_edge_data(data)
-    return data
+    return add_edge_data(data)
+
+
+@pytest_cases.pytest_fixture_plus
+def cage_vertex(position, add_edge_data):
+    data = stk.cage._CageVertexData(
+        *position,
+        use_bonder_placement=True,
+    )
+    return add_edge_data(data)
+
+
+@pytest_cases.pytest_fixture_plus
+def one_plus_one_vertex(position, add_edge_data):
+    data = stk.cage._OnePlusOneVertexData(
+        *position,
+        edge_normal=[1, 0, 0],
+        use_bonder_placement=True,
+    )
+    return add_edge_data(data)
+
+
+@pytest_cases.pytest_fixture_plus
+def cof_vertex(position, add_edge_data):
+    data = stk.cof._COFVertexData(*position)
+    return add_edge_data(data)
+
+
+@pytest_cases.pytest_fixture_plus
+def macrocycle_vertex(position, add_edge_data):
+    data = stk.macrocycle._CycleVertexData(
+        *position,
+        flip=True,
+        angle=1,
+    )
+    return add_edge_data(data)
+
+
+@pytest_cases.pytest_fixture_plus
+def host_vertex(position, add_edge_data):
+    data = stk.host_guest._HostVertexData(*position)
+    return add_edge_data(data)
+
+
+@pytest_cases.pytest_fixture_plus
+def guest_vertex(position, add_edge_data):
+    data = stk.host_guest._GuestVertexData(
+        *position,
+        start=[0, 0, 1],
+        target=[1, 0, 0],
+    )
+    return add_edge_data(data)
+
+
+@pytest_cases.pytest_fixture_plus
+def axle_vertex(position, add_edge_data):
+    data = stk.rotaxane._AxleVertexData(*position)
+    return add_edge_data(data)
+
+
+@pytest_cases.pytest_fixture_plus
+def cycle_vertex(position, add_edge_data):
+    data = stk.rotaxane._CycleVertexData(*position, True)
+    return add_edge_data(data)
+
+
+pytest_cases.fixture_union(
+    name='vertex_data',
+    fixtures=[
+        linear_vertex,
+        cage_vertex,
+        one_plus_one_vertex,
+        cof_vertex,
+        macrocycle_vertex,
+        host_vertex,
+        guest_vertex,
+        axle_vertex,
+        cycle_vertex,
+    ]
+)
