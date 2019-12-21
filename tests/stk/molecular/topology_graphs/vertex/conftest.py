@@ -6,12 +6,12 @@ import stk
 
 @pytest.fixture(
     params=[
-        fn for name, fn in fixtures.graph.__dict__.items()
-        if not name.startswith('_') and callable(fn)
+        pytest.lazy_fixture(name)
+        for name in fixtures.__dict__ if name.startswith('graph')
     ],
 )
-def graph(request, make_vertex_data):
-    return request.param(make_vertex_data)
+def graph(request):
+    return request.param
 
 
 @pytest.fixture(
