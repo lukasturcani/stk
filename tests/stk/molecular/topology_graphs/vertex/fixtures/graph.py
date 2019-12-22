@@ -20,10 +20,25 @@ class _Graph:
         self.reference = reference
         self.edge_plane_normal = edge_plane_normal
 
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return (
+            f'_Graph('
+            f'vertex={self.vertex!r}, '
+            f'vertices={self.vertices!r}, '
+            f'edges={self.edges!r}, '
+            f'edge_centroid={self.edge_centroid!r}, '
+            f'reference={self.reference!r}, '
+            f'edge_plane_normal={self.edge_plane_normal!r}'
+            ')'
+        )
+
 
 def set_ids(data):
-    for i in enumerate(data):
-        data.id = i
+    for i, datum in enumerate(data):
+        datum.id = i
 
 
 @pytest.fixture
@@ -62,7 +77,7 @@ def graph1(make_vertex_data):
 @pytest.fixture(
     params=[
         (0, np.array([0., 0., 0.])),
-        (1, np.array([0., 0., 0.])),
+        (1, np.array([1., 0., 0.])),
     ]
 )
 def graph2(request, make_vertex_data):
@@ -74,11 +89,11 @@ def graph2(request, make_vertex_data):
         stk.EdgeData(
             vertex_data[0],
             vertex_data[1],
-            periodicity=(1, 0, 0),
+            periodicity=(-1, 0, 0),
             lattice_constants=(
-                np.array([1., 0., 0.]),
-                np.array([0., 1., 0.]),
-                np.array([0., 0., 1.]),
+                np.array([2., 0., 0.]),
+                np.array([0., 2., 0.]),
+                np.array([0., 0., 2.]),
             ),
         ),
         stk.EdgeData(
@@ -96,8 +111,8 @@ def graph2(request, make_vertex_data):
         vertices=vertices,
         edges=tuple(e.get_edge() for e in edge_data),
         edge_centroid=edge_centroid,
-        reference=np.array([0., 0., 1.]),
-        edge_plane_normal=np.array([0., 0., 1.]),
+        reference=None,
+        edge_plane_normal=None,
     )
 
 

@@ -1,16 +1,28 @@
 import numpy as np
 import pytest
-import fixtures
+from fixtures.graph import (
+    graph1,
+    graph2,
+)
 import stk
 
 
 @pytest.fixture(
     params=[
-        pytest.lazy_fixture(name)
-        for name in fixtures.__dict__ if name.startswith('graph')
+        pytest.lazy_fixture(graph1.__name__),
+        pytest.lazy_fixture(graph2.__name__),
     ],
 )
-def graph(request):
+def centroid_graph(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=[
+        pytest.lazy_fixture(graph1.__name__),
+    ],
+)
+def plane_graph(request):
     return request.param
 
 
@@ -88,7 +100,7 @@ def linear_vertex_data(request):
 def linear_vertex(linear_vertex_data):
 
     def inner(x, y, z):
-        return linear_vertex_data(0, 0, 0, flip=True)
+        return linear_vertex_data(x, y, z, flip=True)
 
     return inner
 
@@ -122,7 +134,7 @@ def one_plus_one_vertex():
 def cof_vertex():
 
     def inner(x, y, z):
-        return stk.cof._COFVertexData(0, 0, 0)
+        return stk.cof._COFVertexData(x, y, z)
 
     return inner
 
