@@ -1,5 +1,5 @@
 """
-Defines classes which represent bonds.
+Defines :class:`Bond`.
 
 """
 
@@ -27,82 +27,9 @@ class Bond:
         periodic across the y axis and is periodic across the z axis
         in the negative direction.
 
-    Examples
-    --------
-    *Adding additional attributes.*
-
-    Each bond can be given additional attributes. For example
-
-    .. code-block:: python
-
-        import stk
-
-        bond1 = stk.Bond(stk.H(0), stk.H(1), 1)
-        bond1.attr1 = 12.2
-        bond1.attr2 = 'something'
-
-    A :class:`.Bond` can also initialized with additional attributes
-    directly
-
-    .. code-block:: python
-
-        bond2 = stk.Bond(
-            atom1=stk.C(2),
-            atom2=stk.C(3),
-            order=1,
-            attr1=123,
-            attr2='hi'
-        )
-
-        bond2.attr1  # Holds 123.
-        bond2.attr2  # Holds 'hi'.
-
-    *Printing*
-
-    To print a brief summary of a bond you can run
-
-    .. code-block:: python
-
-        # Prints Bond(C(2), C(3), 1).
-        print(bond2)
-
-    To print a complete description of a bond, including additional
-    attributes, you can run
-
-    .. code-block:: python
-
-        # Prints Bond(C(2), C(3), 1, attr1=123, attr2='hi')
-        print(repr(bond2))
-
-    If the atoms have additional attributes, they will be printed too
-
-    .. code-block:: python
-
-        # Add a custom attribute to an atom.
-        bond2.atom1.alpha = 1
-
-        # Prints Bond(C(2, alpha=1), C(3), 1, attr1=123, attr2='hi')
-        print(repr(bond2))
-
-    If private attributes were added to a bond, they will not be
-    printed
-
-    .. code-block:: python
-
-        bond2._attr3 = 'private'
-        # Prints Bond(C(2, alpha=1), C(3), 1, attr1=123, attr2='hi')
-        print(repr(bond2))
-
     """
 
-    def __init__(
-        self,
-        atom1,
-        atom2,
-        order,
-        periodicity=(0, 0, 0),
-        **kwargs
-    ):
+    def __init__(self, atom1, atom2, order, periodicity=(0, 0, 0)):
         """
         Initialize a :class:`Bond`.
 
@@ -125,17 +52,12 @@ class Bond:
             not periodic across the y axis and is periodic across the z
             axis in the negative direction.
 
-        **kwargs : :class:`object`, optional
-            Additional attributes to be added to the bond.
-
         """
 
         self.atom1 = atom1
         self.atom2 = atom2
         self.order = order
         self.periodicity = periodicity
-        for attr, val in kwargs.items():
-            setattr(self, attr, val)
 
     def clone(self, atom_map=None):
         """
@@ -146,11 +68,10 @@ class Bond:
         Parameters
         ----------
         atom_map : :class:`dict`, optional
-            If the clone should hold different :class:`.Atom`
+            If the clone should hold specific :class:`.Atom`
             instances, then a :class:`dict` should be provided, which
-            maps atoms in the current :class:`.Bond` to the
-            atoms which should be used in the clone. Only atoms which
-            need to be remapped need to be present in the `atom_map`.
+            maps atom ids of atoms in the current :class:`.Bond` to the
+            :class:`.Atom` which the clone should hold.
 
         Returns
         -------
@@ -164,13 +85,11 @@ class Bond:
             import stk
 
             c0 = stk.C(0)
-            c1 = stk.C(1)
-            bond = stk.Bond(c0, c1, 1, custom_attr=12, _private_attr=1)
+            c5 = stk.C(5)
+            bond = stk.Bond(c0, c5, 1)
 
-            # bond_clone holds c0 and c1 in its atom1 and atom2
-            # attributes, respectively. It also has a custom_attr
-            # with a value of 12 but it does not have a _private_attr
-            # attribute.
+            # bond_clone holds clones of c0 and c5 in its atom1 and
+            # atom2 attributes, respectively.
             bond_clone = bond.clone()
 
         It is possible to make sure that the clone holds different
@@ -182,17 +101,17 @@ class Bond:
             n3 = stk.N(3)
 
             # clone2 is also a clone, except that it holds
-            # li2 in the atom2 attribute. Its atom1 attribute still
-            # holds c0.
+            # li2 in the atom2 attribute. Its atom1 attribute holds a
+            # clone of c0.
             clone2 = bond.clone(atom_map={
-                c1: li2
+                c5.id: li2,
             })
 
             # clone3 is also a clone, except that it holds n3 and
             # li2 in its atom1 and atom2 attributes, respectively.
             clone3 = bond.clone(atom_map={
-                c0: n3,
-                c1: li2
+                c0.id: n3,
+                c5.id: li2,
             })
 
         """
@@ -200,13 +119,13 @@ class Bond:
         if atom_map is None:
             atom_map = {}
 
-        obj = self.__class__.__new__(self.__class__)
+        clone = self.__class__.__new__(self.__class__)
         for attr, val in vars(self).items():
             if not attr.startswith('_'):
-                setattr(obj, attr, val)
-        obj.atom1 = atom_map.get(obj.atom1, obj.atom1.clone())
-        obj.atom2 = atom_map.get(obj.atom2, obj.atom2.clone())
-        return obj
+                setattr(clone, attr, val)
+        clone.atom1 = atom_map.get(self.atom1.id, self.atom1.clone())
+        clone.atom2 = atom_map.get(self.atom2.id, self.atom2.clone())
+        return clone
 
     def is_periodic(self):
         """
@@ -226,31 +145,16 @@ class Bond:
             self.order = int(self.order)
 
         periodicity = (
-            '' if not self.is_periodic()
-            else f', periodicity={self.periodicity}'
+            f', periodicity={self.periodicity}'
+            if self.is_periodic()
+            else ''
         )
 
-        mandatory = {'atom1', 'atom2', 'order', 'periodicity'}
-        attrs = ', '.join(
-            f'{attr}={val!r}' for attr, val in vars(self).items()
-            if attr not in mandatory and not attr.startswith('_')
-        )
         cls_name = self.__class__.__name__
         return (
             f'{cls_name}({self.atom1!r}, {self.atom2!r}, '
-            f'{self.order}{periodicity}{", " if attrs else ""}{attrs})'
+            f'{self.order}{periodicity})'
         )
 
     def __str__(self):
-        cls_name = self.__class__.__name__
-        if isinstance(self.order, float) and self.order.is_integer():
-            self.order = int(self.order)
-
-        periodicity = (
-            '' if not self.is_periodic()
-            else f', {self.periodicity}'
-        )
-        return (
-            f'{cls_name}({self.atom1}, {self.atom2}, '
-            f'{self.order}{periodicity})'
-        )
+        return repr(self)
