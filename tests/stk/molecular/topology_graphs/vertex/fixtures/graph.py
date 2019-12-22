@@ -114,7 +114,3 @@ def graph2(request, make_vertex_data):
         reference=None,
         edge_plane_normal=None,
     )
-
-
-def _graph3(vertex_data):
-    pass
