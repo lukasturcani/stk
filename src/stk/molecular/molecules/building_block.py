@@ -19,7 +19,6 @@ from ..elements import Atom
 from .. import bonds
 from ..bonds import Bond
 from .molecule import Molecule, _Molecule
-from ..functional_groups import fg_types
 from ...utilities import vector_angle, dedupe, remake
 
 
@@ -33,30 +32,10 @@ class BuildingBlock(Molecule, _Molecule):
     A :class:`BuildingBlock` can represent either an entire molecule or
     a molecular fragments used to construct a
     :class:`.ConstructedMolecule`. The building block uses
-    :attr:`func_groups` to identify which atoms are modified during
-    construction. Available functional group types can be seen in
-    :attr:`functional_group_types`. Additional functional groups
-    can be added at runtime by adding a :class:`.FGType` instance
-    into :data:`stk.fg_types`. See :ref:`adding functional groups` for
-    an example.
-
-    Attributes
-    ----------
-    atoms : :class:`tuple` of :class:`.Atom`
-        The atoms of the molecule.
-
-    bonds : :class:`tuple` of :class:`.Bond`
-        The bonds of the molecule.
-
-    func_groups : :class:`tuple` of :class:`.FunctionalGroup`
-        The functional groups present in the molecule. The
-        id of a :class:`.FunctionalGroup` is its index.
+    :class:`.FunctionalGroup` instances to identify which atoms are
+    modified during construction.
 
     """
-
-    # Put this here so that available functional groups appear in the
-    # compiled documentation.
-    functional_group_types = list(fg_types.keys())
 
     # Maps file extensions to functions which can be used to
     # create an rdkit molecule from that file type.
@@ -80,12 +59,7 @@ class BuildingBlock(Molecule, _Molecule):
         ),
     }
 
-    def __init__(
-        self,
-        smiles,
-        functional_groups=None,
-        random_seed=4,
-    ):
+    def __init__(self, smiles, functional_groups=None, random_seed=4):
         """
         Initialize a :class:`.BuildingBlock`.
 
@@ -99,10 +73,9 @@ class BuildingBlock(Molecule, _Molecule):
         smiles : :class:`str`
             A SMILES string of the molecule.
 
-        functional_groups : :class:`iterable` of :class:`str`, optional
-            The names of the functional group types which are to be
-            added to :attr:`func_groups`. If ``None``, then no
-            functional groups are added.
+        functional_groups : :class:`iterable` of :class:`.FunctionalGroupFactory`, optional
+            Factories used to create the :class:`.FunctionalGroup`
+            instances of the building block.
 
         random_seed : :class:`int`, optional
             Random seed passed to :func:`rdkit.ETKDGv2`
@@ -144,9 +117,7 @@ class BuildingBlock(Molecule, _Molecule):
         Parameters
         ----------
         molecule : :class:`.Molecule`
-            The molecule to initialize from. This can be a
-            any :class:`.Molecule`, such a :class:`.BuildingBlock` or
-            a :class:`.ConstructedMolecule`.
+            The molecule to initialize from.
 
         functional_groups : :class:`iterable` of :class:`str`, optional
             The names of the functional group types which are to be
@@ -263,11 +234,9 @@ class BuildingBlock(Molecule, _Molecule):
                 )
 
             except Exception:
-                msg = (
-                    'Could not initialize '
-                    f'{cls.__name__} from {path}.'
+                logger.warning(
+                    f'Could not initialize {cls.__name__} from {path}.'
                 )
-                logger.warning(msg)
         raise RuntimeError(
             f'No files in "{file_glob}" could be initialized from.'
         )
@@ -287,13 +256,6 @@ class BuildingBlock(Molecule, _Molecule):
             added to :attr:`func_groups`. If ``None``, then no
             functional groups are added.
 
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`BuildingBlock` does not
-            yet exist the created one will be added to the cache.
-
         Returns
         -------
         :class:`BuildingBlock`
@@ -303,15 +265,14 @@ class BuildingBlock(Molecule, _Molecule):
 
         key = cls._get_identity_key_from_rdkit_mol(
             molecule=molecule,
-            functional_groups=functional_groups
+            functional_groups=functional_groups,
         )
 
         bb = cls.__new__(cls)
-        cls._init_from_rdkit_mol(
-            self=bb,
+        bb._init_from_rdkit_mol(
             molecule=molecule,
             functional_groups=functional_groups,
-            identity_key=key
+            identity_key=key,
         )
 
         return bb
@@ -320,7 +281,7 @@ class BuildingBlock(Molecule, _Molecule):
         self,
         molecule,
         functional_groups,
-        identity_key
+        identity_key,
     ):
         """
         Initialize from an :mod:`rdkit` molecule.
@@ -361,10 +322,11 @@ class BuildingBlock(Molecule, _Molecule):
         )
         position_matrix = molecule.GetConformer().GetPositions()
 
-        super().__init__(atoms, bonds, position_matrix, identity_key)
+        _Molecule.__init__(atoms, bonds, position_matrix)
+        self._identity_key = identity_key
 
         fg_makers = (fg_types[name] for name in functional_groups)
-        self.func_groups = tuple(
+        self._func_groups = tuple(
             func_group
             for fg_maker in fg_makers
             for func_group in fg_maker.get_functional_groups(self)
@@ -373,7 +335,7 @@ class BuildingBlock(Molecule, _Molecule):
     @classmethod
     def _init_from_dict(cls, molecule_dict):
         """
-        Intialize from a :class:`dict` representation.
+        Initialize from a :class:`dict` representation.
 
         Parameters
         ----------
@@ -399,14 +361,14 @@ class BuildingBlock(Molecule, _Molecule):
         obj._position_matrix = np.array(d.pop('position_matrix')).T
         # If the cache is not being used, make sure to update all the
         # atoms and attributes to those in the dict.
-        obj.atoms = eval(d.pop('atoms'), vars(elements))
-        obj.bonds = eval(d.pop('bonds'), vars(bonds))
-        for bond in obj.bonds:
+        obj._atoms = eval(d.pop('atoms'), vars(elements))
+        obj._bonds = eval(d.pop('bonds'), vars(bonds))
+        for bond in obj._bonds:
             bond.atom1 = obj.atoms[bond.atom1]
             bond.atom2 = obj.atoms[bond.atom2]
 
         fg_makers = (fg_types[name] for name in functional_groups)
-        obj.func_groups = tuple(
+        obj._func_groups = tuple(
             func_group
             for fg_maker in fg_makers
             for func_group in fg_maker.get_functional_groups(obj)
@@ -430,10 +392,10 @@ class BuildingBlock(Molecule, _Molecule):
         clone = super().clone()
         atom_map = {
             original: clone
-            for original, clone in zip(self.atoms, clone.atoms)
+            for original, clone in zip(self._atoms, clone._atoms)
         }
-        clone.func_groups = tuple(
-            fg.clone(atom_map) for fg in self.func_groups
+        clone._func_groups = tuple(
+            fg.clone(atom_map) for fg in self._func_groups
         )
         return clone
 
