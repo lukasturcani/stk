@@ -18,7 +18,7 @@ from .. import elements
 from ..elements import Atom
 from .. import bonds
 from ..bonds import Bond
-from .molecule import Molecule
+from .molecule import Molecule, _Molecule
 from ..functional_groups import fg_types
 from ...utilities import vector_angle, dedupe, remake
 
@@ -26,7 +26,7 @@ from ...utilities import vector_angle, dedupe, remake
 logger = logging.getLogger(__name__)
 
 
-class BuildingBlock(Molecule):
+class BuildingBlock(Molecule, _Molecule):
     """
     Represents a building block of a :class:`.ConstructedMolecule`.
 
@@ -85,10 +85,9 @@ class BuildingBlock(Molecule):
         smiles,
         functional_groups=None,
         random_seed=4,
-        use_cache=False
     ):
         """
-        Initialize from a SMILES string.
+        Initialize a :class:`.BuildingBlock`.
 
         Notes
         -----
@@ -108,78 +107,43 @@ class BuildingBlock(Molecule):
         random_seed : :class:`int`, optional
             Random seed passed to :func:`rdkit.ETKDGv2`
 
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`BuildingBlock` does not
-            yet exist the created one will be added to the cache.
+        Raises
+        ------
+        :class:`RuntimeError`
+            If embedding the molecule fails.
 
         """
 
-        # This method does not get called, See _construct().
-        raise RuntimeError('This method should not be getting called.')
-
-    @classmethod
-    def _construct(
-        cls,
-        smiles,
-        functional_groups=None,
-        random_seed=4,
-        use_cache=False
-    ):
-        obj = cls.__new__(cls)
         if functional_groups is None:
             functional_groups = ()
 
-        mol = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+        molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
         params = rdkit.ETKDGv2()
         params.randomSeed = random_seed
-        for i in range(100):
-            failed = rdkit.EmbedMolecule(mol, params) == -1
-            if failed:
-                params.randomSeed += 1
-            else:
-                break
-
-        if params.randomSeed != random_seed:
-            msg = (
-                'Embedding with seed value of '
-                f'"{random_seed}" failed. Using alternative value '
-                f'of "{params.randomSeed}" was successful.'
+        if rdkit.EmbedMolecule(molecule, params) == -1:
+            raise RuntimeError(
+                f'Embedding with seed value of {random_seed} failed.'
             )
-            logger.warning(msg)
-
-        identity_key = cls._get_identity_key_from_rdkit_mol(
-            mol=mol,
-            functional_groups=functional_groups
-        )
-        if use_cache and identity_key in cls._cache:
-            return cls._cache[identity_key]
-
-        rdkit.Kekulize(mol)
-        obj._init_from_rdkit_mol(
-            mol=mol,
+        identity_key = self._get_identity_key_from_rdkit_mol(
+            molecule=molecule,
             functional_groups=functional_groups,
-            identity_key=identity_key
         )
-        if use_cache:
-            cls._cache[identity_key] = obj
-        return obj
+
+        rdkit.Kekulize(molecule)
+        self._init_from_rdkit_mol(
+            molecule=molecule,
+            functional_groups=functional_groups,
+            identity_key=identity_key,
+        )
 
     @classmethod
-    def init_from_molecule(
-        cls,
-        mol,
-        functional_groups=None,
-        use_cache=False,
-    ):
+    def init_from_molecule(cls, molecule, functional_groups=None):
         """
         Initialize from a :class:`.Molecule`.
 
         Parameters
         ----------
-        mol : :class:`.Molecule`
+        molecule : :class:`.Molecule`
             The molecule to initialize from. This can be a
             any :class:`.Molecule`, such a :class:`.BuildingBlock` or
             a :class:`.ConstructedMolecule`.
@@ -188,13 +152,6 @@ class BuildingBlock(Molecule):
             The names of the functional group types which are to be
             added to :attr:`func_groups`. If ``None``, then no
             functional groups are added.
-
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`BuildingBlock` does not
-            yet exist the created one will be added to the cache.
 
         Returns
         -------
@@ -205,18 +162,12 @@ class BuildingBlock(Molecule):
         """
 
         return cls.init_from_rdkit_mol(
-            mol=mol.to_rdkit_mol(),
+            molecule=molecule.to_rdkit_mol(),
             functional_groups=functional_groups,
-            use_cache=use_cache,
         )
 
     @classmethod
-    def init_from_file(
-        cls,
-        path,
-        functional_groups=None,
-        use_cache=False
-    ):
+    def init_from_file(cls, path, functional_groups=None):
         """
         Initialize from a file.
 
@@ -233,13 +184,6 @@ class BuildingBlock(Molecule):
             The names of the functional group types which are to be
             added to :attr:`func_groups`. If ``None``, then no
             functional groups are added.
-
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`BuildingBlock` does not
-            yet exist the created one will be added to the cache.
 
         Returns
         -------
@@ -264,12 +208,11 @@ class BuildingBlock(Molecule):
             # with rdkit often have issues, because rdkit tries to do
             # bits of structural analysis like stereocenters. remake
             # gets rid of all this problematic metadata.
-            mol = remake(cls._init_funcs[ext](path))
+            molecule = remake(cls._init_funcs[ext](path))
 
         return cls.init_from_rdkit_mol(
-            mol=mol,
+            molecule=molecule,
             functional_groups=functional_groups,
-            use_cache=use_cache
         )
 
     @classmethod
@@ -278,7 +221,6 @@ class BuildingBlock(Molecule):
         file_glob,
         functional_groups=None,
         random_seed=None,
-        use_cache=False
     ):
         """
         Initialize from a random file in `file_glob`.
@@ -296,13 +238,6 @@ class BuildingBlock(Molecule):
 
         random_seed : :class:`int`, optional
             The random seed to use.
-
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.BuildingBlock` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`BuildingBlock` does not
-            yet exist the created one will be added to the cache.
 
         Returns
         -------
@@ -325,7 +260,6 @@ class BuildingBlock(Molecule):
                 return cls.init_from_file(
                     path=path,
                     functional_groups=functional_groups,
-                    use_cache=use_cache
                 )
 
             except Exception:
@@ -339,18 +273,13 @@ class BuildingBlock(Molecule):
         )
 
     @classmethod
-    def init_from_rdkit_mol(
-        cls,
-        mol,
-        functional_groups=None,
-        use_cache=False
-    ):
+    def init_from_rdkit_mol(cls, molecule, functional_groups=None):
         """
         Initialize from an :mod:`rdkit` molecule.
 
         Parameters
         ----------
-        mol : :class:`rdkit.Mol`
+        molecule : :class:`rdkit.Mol`
             The molecule.
 
         functional_groups : :class:`iterable` of :class:`str`, optional
@@ -373,28 +302,23 @@ class BuildingBlock(Molecule):
         """
 
         key = cls._get_identity_key_from_rdkit_mol(
-            mol=mol,
+            molecule=molecule,
             functional_groups=functional_groups
         )
-        if use_cache and key in cls._cache:
-            return cls._cache[key]
 
         bb = cls.__new__(cls)
         cls._init_from_rdkit_mol(
             self=bb,
-            mol=mol,
+            molecule=molecule,
             functional_groups=functional_groups,
             identity_key=key
         )
-
-        if use_cache:
-            cls._cache[key] = bb
 
         return bb
 
     def _init_from_rdkit_mol(
         self,
-        mol,
+        molecule,
         functional_groups,
         identity_key
     ):
@@ -403,7 +327,7 @@ class BuildingBlock(Molecule):
 
         Parameters
         ----------
-        mol : :class:`rdkit.Mol`
+        molecule : :class:`rdkit.Mol`
             The molecule.
 
         functional_groups : :class:`iterable` of :class:`str`
@@ -425,7 +349,7 @@ class BuildingBlock(Molecule):
 
         atoms = tuple(
             Atom(a.GetIdx(), a.GetAtomicNum(), a.GetFormalCharge())
-            for a in mol.GetAtoms()
+            for a in molecule.GetAtoms()
         )
         bonds = tuple(
             Bond(
@@ -433,9 +357,9 @@ class BuildingBlock(Molecule):
                 atoms[b.GetEndAtomIdx()],
                 b.GetBondTypeAsDouble()
             )
-            for b in mol.GetBonds()
+            for b in molecule.GetBonds()
         )
-        position_matrix = mol.GetConformer().GetPositions()
+        position_matrix = molecule.GetConformer().GetPositions()
 
         super().__init__(atoms, bonds, position_matrix, identity_key)
 
@@ -447,22 +371,15 @@ class BuildingBlock(Molecule):
         )
 
     @classmethod
-    def _init_from_dict(cls, mol_dict, use_cache):
+    def _init_from_dict(cls, molecule_dict):
         """
         Intialize from a :class:`dict` representation.
 
         Parameters
         ----------
-        mol_dict : :class:`dict`
+        molecule_dict : :class:`dict`
             A :class:`dict` representation of a molecule generated
             by :meth:`to_dict`.
-
-        use_cache : :class:`bool`
-            If ``True``, a new instance will not be made if a cached
-            and identical one already exists, the one which already
-            exists will be returned. If ``True`` and a cached,
-            identical instance does not yet exist the created one will
-            be added to the cache.
 
         Returns
         -------
@@ -471,10 +388,8 @@ class BuildingBlock(Molecule):
 
         """
 
-        d = dict(mol_dict)
+        d = dict(molecule_dict)
         identity_key = eval(d.pop('identity_key'))
-        if use_cache and identity_key in cls._cache:
-            return cls._cache[identity_key]
 
         d.pop('class')
         functional_groups = d.pop('func_groups')
@@ -499,8 +414,6 @@ class BuildingBlock(Molecule):
         for attr, val in d.items():
             setattr(obj, attr, eval(val))
 
-        if use_cache:
-            cls._cache[identity_key] = obj
         return obj
 
     def clone(self):
