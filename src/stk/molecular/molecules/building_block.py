@@ -14,10 +14,9 @@ from glob import glob
 from functools import partial
 from scipy.spatial.distance import euclidean
 
-from .. import elements
-from ..elements import Atom
-from .. import bonds
-from ..bonds import Bond
+from .. import atoms
+from ..atoms import Atom
+from ..bond import Bond
 from .molecule import Molecule, _Molecule
 from ...utilities import vector_angle, dedupe, remake
 
@@ -361,7 +360,7 @@ class BuildingBlock(Molecule, _Molecule):
         obj._position_matrix = np.array(d.pop('position_matrix')).T
         # If the cache is not being used, make sure to update all the
         # atoms and attributes to those in the dict.
-        obj._atoms = eval(d.pop('atoms'), vars(elements))
+        obj._atoms = eval(d.pop('atoms'), vars(atoms))
         obj._bonds = eval(d.pop('bonds'), vars(bonds))
         for bond in obj._bonds:
             bond.atom1 = obj.atoms[bond.atom1]

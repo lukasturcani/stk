@@ -9,5 +9,5 @@ from .topology_graphs import (
 from .topology_graphs.topology_graph import *
 from .functional_groups import *
 from .molecules import *
-from .elements import *
-from .bonds import *
+from .atoms import *
+from .bond import *

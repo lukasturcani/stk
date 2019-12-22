@@ -8,7 +8,7 @@ Read the docstring of :class:`.Atom`.
 
 class Atom:
     """
-    Represents an atom.
+    An abstract base class for atoms.
 
     A subclass is made for each element. The name of each subclass is
     the periodic table symbol of that element.
@@ -63,54 +63,6 @@ class Atom:
         c0 = stk.Atom(id=4, atomic_number=6)
         c1 = stk.C(id=5)
 
-    *Adding additional atom attributes.*
-
-    Each atom can be given additional attributes. For example
-
-    .. code-block:: python
-
-        c0.custom_attribute = 51
-        c0.other_attr = 'something'
-
-    We can initialize an :class:`.Atom` with additional, custom
-    attributes directly
-
-    .. code-block:: python
-
-        h2 = stk.H(id=6, custom_attr1=123, other_attr2='thing')
-        h2.custom_attr1  # Holds 123.
-        h2.other_attr2  # Holds 'thing'.
-
-    Providing the additional attributes to the initializer is
-    functionally equivalent to assigning them to the object
-    manually.
-
-    *Printing*
-
-    To print a brief summary of an atom you can run
-
-    .. code-block:: python
-
-        # Prints C(4).
-        print(c0)
-
-    To print a complete description of an atom, including additional
-    attributes, you can run
-
-    .. code-block:: python
-
-        # Prints C(4, custom_attribute=51, other_attr='something').
-        print(repr(c0))
-
-    If private attributes were added to an atom, they will not be
-    printed
-
-    .. code-block:: python
-
-        c0._attr_name = 12
-        # Prints C(4, custom_attribute=51, other_attr='something').
-        print(repr(c0))
-
     """
 
     # Maps each atomic number (int) to the relevant Atom subclass.
@@ -123,7 +75,7 @@ class Atom:
         cls._elements[cls.atomic_number] = cls
 
     @staticmethod
-    def _subclass_init(self, id, charge=0, **kwargs):
+    def _subclass_init(self, id, charge=0):
         """
         Initialize an atom of the element.
 
@@ -135,14 +87,11 @@ class Atom:
         charge : :class:`int`
             The formal charge.
 
-        **kwargs : :class:`object`
-            Additional attributes to be added to the atom.
-
         """
 
-        Atom.__init__(self, id, self.atomic_number, charge, **kwargs)
+        Atom.__init__(self, id, self.atomic_number, charge)
 
-    def __init__(self, id, atomic_number, charge=0, **kwargs):
+    def __init__(self, id, atomic_number, charge=0):
         """
         Initialize an :class:`Atom`.
 
@@ -162,26 +111,16 @@ class Atom:
 
         """
 
+        self.__class__ = self._elements[atomic_number]
         self.id = id
         self.charge = charge
-        self.__class__ = self._elements[atomic_number]
-        for attr, val in kwargs.items():
-            setattr(self, attr, val)
 
     def __repr__(self):
         charge = f', charge={self.charge}' if self.charge != 0 else ''
-        mandatory = {'charge', 'id'}
-        attrs = ', '.join(
-            f'{attr}={val!r}' for attr, val in vars(self).items()
-            if attr not in mandatory and not attr.startswith('_')
-        )
-        return (
-            f'{self.__class__.__name__}'
-            f'({self.id}{charge}{", " if attrs else ""}{attrs})'
-        )
+        return f'{self.__class__.__name__}({self.id}{charge})'
 
     def __str__(self):
-        return f'{self.__class__.__name__}({self.id})'
+        return repr(self)
 
     def clone(self):
         """
@@ -196,11 +135,11 @@ class Atom:
 
         """
 
-        obj = self.__class__.__new__(self.__class__)
+        clone = self.__class__.__new__(self.__class__)
         for attr, val in vars(self).items():
             if not attr.startswith('_'):
-                setattr(obj, attr, val)
-        return obj
+                setattr(clone, attr, val)
+        return clone
 
 
 class H(Atom):

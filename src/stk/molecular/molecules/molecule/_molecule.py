@@ -3,7 +3,7 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 
 from .molecule import Molecule
-from ...utilities import (
+from stk.utilities import (
     vector_angle,
     rotation_matrix,
     rotation_matrix_arbitrary_axis,
@@ -11,7 +11,7 @@ from ...utilities import (
 )
 
 
-class _Molecule(Molecule):
+class _Molecule:
     """
     A partial implementation of the :class:`.Molecule` interface.
 

@@ -1,4 +1,7 @@
-import stk
+def test_init(atom_cls, id, charge):
+    atom = atom_cls(id, charge)
+    assert atom.id == id
+    assert atom.charge == charge
 
 
 def test_clone(atom):
@@ -10,28 +13,6 @@ def test_clone(atom):
     assert clone.id == atom.id
     assert clone.charge == atom.charge
     assert clone.attr == atom.attr
+    assert clone.atomic_number == atom.atomic_number
+    assert clone.mass == atom.mass
     assert not hasattr(clone, '_attr')
-
-
-def test_str(atom):
-    atom.attr = 1
-    atom._attr = 2
-    other = eval(str(atom), dict(stk.__dict__))
-    assert other is not atom
-    assert other.__class__ is atom.__class__
-    assert other.id == atom.id
-    assert other.charge == atom.charge
-    assert not hasattr(other, 'attr')
-    assert not hasattr(other, '_attr')
-
-
-def test_repr(atom):
-    atom.attr = 1
-    atom._attr = 2
-    other = eval(repr(atom), dict(stk.__dict__))
-    assert other is not atom
-    assert other.__class__ is atom.__class__
-    assert other.id == atom.id
-    assert other.charge == atom.charge
-    assert other.attr == atom.attr
-    assert not hasattr(other, '_attr')

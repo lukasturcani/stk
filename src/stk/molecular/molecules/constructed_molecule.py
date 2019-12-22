@@ -8,7 +8,7 @@ import logging
 import numpy as np
 from collections import Counter
 
-from .. import elements, bonds, topology_graphs
+from .. import atoms, topology_graphs
 from .molecule import Molecule
 from ..functional_groups import FunctionalGroup, fg_types
 
@@ -550,7 +550,7 @@ class ConstructedMolecule(Molecule):
         obj.topology_graph = topology_graph
         obj._position_matrix = np.array(d.pop('position_matrix')).T
 
-        obj.atoms = eval(d.pop('atoms'), vars(elements))
+        obj.atoms = eval(d.pop('atoms'), vars(atoms))
         for atom in obj.atoms:
             atom.building_block = bbs[atom.building_block]
 

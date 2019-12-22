@@ -2,7 +2,7 @@ import json
 import os
 import rdkit.Chem.AllChem as rdkit
 
-from ...utilities import mol_from_mae_file, remake
+from stk.utilities import mol_from_mae_file, remake
 
 
 class Molecule:

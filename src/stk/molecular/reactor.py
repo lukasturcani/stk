@@ -14,8 +14,8 @@ from collections import Counter
 import numpy as np
 from scipy.spatial.distance import euclidean
 
-from . import elements
-from .bonds import Bond
+from . import atoms
+from .bond import Bond
 
 
 class _ReactionKey:
@@ -494,47 +494,47 @@ class Reactor:
         c1_coord = np.array(self._mol._position_matrix[c1.id])
         c2_coord = np.array(self._mol._position_matrix[c2.id])
 
-        n_joiner = elements.C(len(self._mol.atoms))
+        n_joiner = atoms.C(len(self._mol.atoms))
         self._mol.atoms.append(n_joiner)
         n_joiner_coord = (n1_coord + n2_coord) / 2
         self._mol._position_matrix.append(n_joiner_coord)
 
-        nh1 = elements.H(len(self._mol.atoms))
+        nh1 = atoms.H(len(self._mol.atoms))
         self._mol.atoms.append(nh1)
         nh1_coord = n_joiner_coord + np.array([0, 0, 1])
         self._mol._position_matrix.append(nh1_coord)
 
-        nh2 = elements.H(len(self._mol.atoms))
+        nh2 = atoms.H(len(self._mol.atoms))
         self._mol.atoms.append(nh2)
         nh2_coord = n_joiner_coord + np.array([0, 0, -1])
         self._mol._position_matrix.append(nh2_coord)
 
-        nc_joiner1 = elements.C(len(self._mol.atoms))
+        nc_joiner1 = atoms.C(len(self._mol.atoms))
         self._mol.atoms.append(nc_joiner1)
         nc_joiner1_coord = (c1_coord + n2_coord) / 2
         self._mol._position_matrix.append(nc_joiner1_coord)
 
-        nc1h1 = elements.H(len(self._mol.atoms))
+        nc1h1 = atoms.H(len(self._mol.atoms))
         self._mol.atoms.append(nc1h1)
         nc1h1_coord = nc_joiner1_coord + np.array([0, 0, 1])
         self._mol._position_matrix.append(nc1h1_coord)
 
-        nc1h2 = elements.H(len(self._mol.atoms))
+        nc1h2 = atoms.H(len(self._mol.atoms))
         self._mol.atoms.append(nc1h2)
         nc1h2_coord = nc_joiner1_coord + np.array([0, 0, -1])
         self._mol._position_matrix.append(nc1h2_coord)
 
-        nc_joiner2 = elements.C(len(self._mol.atoms))
+        nc_joiner2 = atoms.C(len(self._mol.atoms))
         self._mol.atoms.append(nc_joiner2)
         nc_joiner2_coord = (c2_coord + n1_coord) / 2
         self._mol._position_matrix.append(nc_joiner2_coord)
 
-        nc2h1 = elements.H(len(self._mol.atoms))
+        nc2h1 = atoms.H(len(self._mol.atoms))
         self._mol.atoms.append(nc2h1)
         nc2h1_coord = nc_joiner2_coord + np.array([0, 0, 1])
         self._mol._position_matrix.append(nc2h1_coord)
 
-        nc2h2 = elements.H(len(self._mol.atoms))
+        nc2h2 = atoms.H(len(self._mol.atoms))
         self._mol.atoms.append(nc2h2)
         nc2h2_coord = nc_joiner2_coord + np.array([0, 0, -1])
         self._mol._position_matrix.append(nc2h2_coord)
