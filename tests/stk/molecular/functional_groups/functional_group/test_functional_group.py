@@ -14,32 +14,40 @@ def test_clone(functional_group, make_atom_map):
         clone.get_atoms(),
     )
     for a1, a2 in atoms:
-        assert is_equivalent_atom(a1, a2, atom_map)
+        _test_cloned_atom(a1, a2, atom_map)
 
     bonders = it.zip_longest(
         functional_group.get_bonders(),
         clone.get_bonders(),
     )
     for b1, b2 in bonders:
-        assert is_equivalent_atom(b1, b2, atom_map)
+        _test_cloned_atom(b1, b2, atom_map)
 
     deleters = it.zip_longest(
         functional_group.get_deleters(),
         clone.get_deleters(),
     )
     for d1, d2 in deleters:
-        assert is_equivalent_atom(d1, d2, atom_map)
+        _test_cloned_atom(d1, d2, atom_map)
 
 
-def is_equivalent_atom(atom1, atom2, atom_map):
-    if atom1.id not in atom_map:
-        return (
-            atom1 is not atom2
-            and atom1.id == atom2.id
-            and atom1.__class__ is atom2.__class__
-        )
+def _test_cloned_atom(atom, clone, atom_map):
+    if atom_map is None or atom.id not in atom_map:
+        assert clone is not atom
+        assert clone.id == atom.id
+        assert clone.__class__ is atom.__class__
     else:
-        return atom2 is atom_map[atom1.id]
+        assert clone is not atom_map[atom.id]
+        assert clone.id == atom_map[atom.id].id
+        assert clone.__class__ is atom_map[atom.id].__class__
+
+
+def is_equivalent_atom(atom1, atom2):
+    return (
+        atom1 is not atom2
+        and atom1.id == atom2.id
+        and atom1.__class__ is atom2.__class__
+    )
 
 
 def test_get_atoms(make_functional_group):

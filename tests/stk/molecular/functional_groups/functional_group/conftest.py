@@ -71,7 +71,6 @@ class FunctionalGroupData:
 @pytest.fixture(
     params=[
         stk.Amine,
-        stk.SecondaryAmine,
         stk.Aldehyde,
         stk.CarboxylicAcid,
         stk.Amide,

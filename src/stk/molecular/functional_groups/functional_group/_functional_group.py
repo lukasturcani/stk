@@ -35,7 +35,7 @@ class _FunctionalGroup:
         )
 
         clone = self.__class__.__new__(self.__class__)
-        for attr, value in vars(self):
+        for attr, value in vars(self).items():
             if not attr.startswith('_'):
                 setattr(clone, attr, value)
 
