@@ -1,4 +1,4 @@
-class _FunctionalGroup:
+class FunctionalGroup_:
     """
     An implementation of :class:`.FunctionalGroup` interface.
 

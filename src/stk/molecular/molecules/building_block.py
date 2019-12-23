@@ -24,7 +24,7 @@ from ...utilities import vector_angle, dedupe, remake
 logger = logging.getLogger(__name__)
 
 
-class BuildingBlock(Molecule, _Molecule):
+class BuildingBlock(Molecule_):
     """
     Represents a building block of a :class:`.ConstructedMolecule`.
 

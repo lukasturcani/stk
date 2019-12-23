@@ -3,10 +3,10 @@ import itertools as it
 from .smarts_functional_group_factory import (
     SmartsFunctionalGroupFactory,
 )
-from .. import FunctionalGroup, _FunctionalGroup
+from .. import FunctionalGroup_
 
 
-class Amine(_FunctionalGroup, FunctionalGroup):
+class Amine(FunctionalGroup_):
     """
     Represents an amine functional group.
 
@@ -72,7 +72,7 @@ class SecondaryAmineFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([H][N]([#6])[#6])]']
 
 
-class Aldehyde(_FunctionalGroup, FunctionalGroup):
+class Aldehyde(FunctionalGroup_):
     """
     Represents an aldehyde functional group.
 
@@ -93,7 +93,7 @@ class AldehydeFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([O]=[C][H])]']
 
 
-class CarboxylicAcid(_FunctionalGroup, FunctionalGroup):
+class CarboxylicAcid(FunctionalGroup_):
     """
     Represents a carboxylic acid functional group.
 
@@ -117,7 +117,7 @@ class CarboxylicAcidFactory(SmartsFunctionalGroupFactory):
     ]
 
 
-class Amide(_FunctionalGroup, FunctionalGroup):
+class Amide(FunctionalGroup_):
     """
     Represents an amide functional group.
 
@@ -141,7 +141,7 @@ class AmideFactory(SmartsFunctionalGroupFactory):
     )
 
 
-class Thioacid(_FunctionalGroup, FunctionalGroup):
+class Thioacid(FunctionalGroup_):
     """
     Represents a thioacid functional group.
 
@@ -165,7 +165,7 @@ class ThioacidFactory(SmartsFunctionalGroupFactory):
     ]
 
 
-class Alcohol(_FunctionalGroup, FunctionalGroup):
+class Alcohol(FunctionalGroup_):
     """
     Represents an alcohol functional group.
 
@@ -186,7 +186,7 @@ class AlcoholFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([H][O])]']
 
 
-class Thiol(_FunctionalGroup, FunctionalGroup):
+class Thiol(FunctionalGroup_):
     """
     Represents a thiol functional group.
 
@@ -202,7 +202,7 @@ class ThiolFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([H][S])]']
 
 
-class Fluoro(_FunctionalGroup, FunctionalGroup):
+class Fluoro(FunctionalGroup_):
     """
     Represents a fluoro functional group.
 
@@ -223,7 +223,7 @@ class FluoroFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([F]*)]']
 
 
-class Bromo(_FunctionalGroup, FunctionalGroup):
+class Bromo(FunctionalGroup_):
     """
     Represents a bromo functional group.
 
@@ -242,7 +242,7 @@ class BromoFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([Br]*)]']
 
 
-class Iodo(_FunctionalGroup, FunctionalGroup):
+class Iodo(FunctionalGroup_):
     """
     Represents an iodo functional group.
 
@@ -263,7 +263,7 @@ class IodoFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([I]*)]']
 
 
-class TerminalAlkyne(_FunctionalGroup, FunctionalGroup):
+class TerminalAlkyne(FunctionalGroup_):
     """
     Represents an alkyne functional group.
 
@@ -328,7 +328,7 @@ class TerminalAlkyneFactory(SmartsFunctionalGroupFactory):
         )
 
 
-class TerminalAlkene(_FunctionalGroup, FunctionalGroup):
+class TerminalAlkene(FunctionalGroup_):
     """
     Represents a terminal alkene functional group.
 
@@ -352,7 +352,7 @@ class TerminalAlkeneFactory(SmartsFunctionalGroupFactory):
     )
 
 
-class BoronicAcid(_FunctionalGroup, FunctionalGroup):
+class BoronicAcid(FunctionalGroup_):
     """
     Represents a boronic acid functional group.
 
@@ -376,7 +376,7 @@ class BoronicAcidFactory(SmartsFunctionalGroupFactory):
     )
 
 
-class Diol(_FunctionalGroup, FunctionalGroup):
+class Diol(FunctionalGroup_):
     """
     Represents a diol functional group.
 
@@ -397,7 +397,7 @@ class DiolFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([H][O][#6]~[#6][O][H])]']*2
 
 
-class Difluoro(_FunctionalGroup, FunctionalGroup):
+class Difluoro(FunctionalGroup_):
     """
     Represents a difluoro functional group.
 
@@ -418,7 +418,7 @@ class DifluoroFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([F][#6]~[#6][F])]']*2
 
 
-class Dibromo(_FunctionalGroup, FunctionalGroup):
+class Dibromo(FunctionalGroup_):
     """
     Represents a dibromo functional group.
 
@@ -439,7 +439,7 @@ class DibromoFactory(SmartsFunctionalGroupFactory):
     _deleter_smarts = ['[$([Br][#6]~[#6][Br])]']*2
 
 
-class RingAmine(_FunctionalGroup, FunctionalGroup):
+class RingAmine(FunctionalGroup_):
     """
     Represents an amine bonded to a ring.
 

@@ -11,7 +11,7 @@ from stk.utilities import (
 )
 
 
-class _Molecule:
+class Molecule_:
     """
     A partial implementation of the :class:`.Molecule` interface.
 
