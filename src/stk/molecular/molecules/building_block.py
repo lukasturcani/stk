@@ -17,7 +17,7 @@ from scipy.spatial.distance import euclidean
 from .. import atoms
 from ..atoms import Atom
 from ..bond import Bond
-from .molecule import Molecule, _Molecule
+from .molecule import Molecule, Molecule_
 from ...utilities import vector_angle, dedupe, remake
 
 

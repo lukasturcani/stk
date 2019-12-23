@@ -39,7 +39,7 @@ class FunctionalGroup_:
             if not attr.startswith('_'):
                 setattr(clone, attr, value)
 
-        _FunctionalGroup.__init__(
+        FunctionalGroup_.__init__(
             self=clone,
             atoms=tuple(atom_map[a.id] for a in self._atoms),
             bonders=tuple(atom_map[a.id] for a in self._bonders),
