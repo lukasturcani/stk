@@ -58,6 +58,18 @@ class AmineFactory(SmartsFunctionalGroupFactory):
         )
 
 
+class SecondaryAmineFactory(SmartsFunctionalGroupFactory):
+    """
+    Creates :class:`.Amine` instances.
+
+    """
+
+    _functional_group = Amine
+    _functional_group_smarts = '[H][N]([#6])[#6]'
+    _bonder_smarts = ['[$([N]([H])([#6])[#6])]']
+    _deleter_smarts = ['[$([H][N]([#6])[#6])]']
+
+
 class Aldehyde(FunctionalGroup, _FunctionalGroup):
     """
     Represents an aldehyde functional group.
@@ -288,7 +300,7 @@ class TerminalAlkyneFactory(SmartsFunctionalGroupFactory):
             atoms = tuple(molecule.get_atoms(ids.atom_ids))
             bonder_ids = set(ids.bonder_ids)
             deleter_ids = set(ids.deleter_ids)
-            yield self._functional_group(
+            yield TerminalAlkyne(
                 atoms=atoms,
                 bonders=tuple(
                     a for a in atoms if a.id in bonder_ids
@@ -362,41 +374,91 @@ class BoronicAcidFactory(SmartsFunctionalGroupFactory):
     )
 
 
-class SecondaryAmine(FunctionalGroup, _FunctionalGroup):
-    pass
-
-
-class SecondaryAmineFactory(SmartsFunctionalGroupFactory):
-    pass
-
-
 class Diol(FunctionalGroup, _FunctionalGroup):
+    """
+    Represents a diol functional group.
+
+    """
+
     pass
 
 
 class DiolFactory(SmartsFunctionalGroupFactory):
+    """
+    Creates :class:`.Diol` instances.
+
+    """
+
+    _functional_group = Diol
+    _functional_group_smarts = '[H][O][#6]~[#6][O][H]'
+    _bonder_smarts = ['[$([O]([H])[#6]~[#6][O][H])]']*2,
+    _deleter_smarts = ['[$([H][O][#6]~[#6][O][H])]']*2
+
+
+class Difluoro(FunctionalGroup, _FunctionalGroup):
+    """
+    Represents a difluoro functional group.
+
+    """
+
     pass
 
 
-class Difluorene(FunctionalGroup, _FunctionalGroup):
+class DifluoroFactory(SmartsFunctionalGroupFactory):
+    """
+    Creates :class:`.Difluoro` instances.
+
+    """
+
+    _functional_group = Difluoro
+    _functional_group_smarts = '[F][#6]~[#6][F]'
+    _bonder_smarts = ['[$([#6]([F])~[#6][F])]']*2
+    _deleter_smarts = ['[$([F][#6]~[#6][F])]']*2
+
+
+class Dibromo(FunctionalGroup, _FunctionalGroup):
+    """
+    Represents a dibromo functional group.
+
+    """
+
     pass
 
 
-class DifluoreneFactory(SmartsFunctionalGroupFactory):
-    pass
+class DibromoFactory(SmartsFunctionalGroupFactory):
+    """
+    Creates :class:`.Dibromo` instances.
 
+    """
 
-class Dibromine(FunctionalGroup, _FunctionalGroup):
-    pass
-
-
-class DibromineFactory(SmartsFunctionalGroupFactory):
-    pass
+    _functional_group = Dibromo
+    _functional_group_smarts = '[Br][#6]~[#6][Br]'
+    _bonder_smarts = ['[$([#6]([Br])~[#6][Br])]']*2
+    _deleter_smarts = ['[$([Br][#6]~[#6][Br])]']*2
 
 
 class RingAmine(FunctionalGroup, _FunctionalGroup):
+    """
+    Represents an amine bonded to a ring.
+
+    """
+
     pass
 
 
 class RingAmineFactory(SmartsFunctionalGroupFactory):
-    pass
+    """
+    Creates :class:`.RingAmine` functional groups.
+
+    """
+
+    _functional_group = RingAmine
+    _functional_group_smarts = '[N]([H])([H])[#6]~[#6]([H])~[#6R1]'
+    _bonder_smarts = [
+        '[$([N]([H])([H])[#6]~[#6]([H])~[#6R1])]',
+        '[$([#6]([H])(~[#6R1])~[#6][N]([H])[H])]',
+    ]
+    _deleter_smarts = (
+            ['[$([H][N]([H])[#6]~[#6]([H])~[#6R1])]']*2 +
+            ['[$([H][#6](~[#6R1])~[#6][N]([H])[H])]']
+    )
