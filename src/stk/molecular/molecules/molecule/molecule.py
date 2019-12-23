@@ -239,9 +239,15 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def get_atoms(self):
+    def get_atoms(self, atom_ids=None):
         """
         Yield the atoms in the molecule, ordered by id.
+
+        Parameters
+        ----------
+        atom_ids : :class:`iterable` of :class:`int`, optional
+            The ids of atoms to yield. If ``None`` then all atoms are
+            yielded.
 
         Yields
         ------

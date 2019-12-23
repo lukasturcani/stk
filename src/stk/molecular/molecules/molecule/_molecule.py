@@ -182,9 +182,12 @@ class _Molecule:
             center += mass*coord
         return np.divide(center, total_mass)
 
-    def get_atoms(self):
-        for atom in self._atoms:
-            yield atom.clone()
+    def get_atoms(self, atom_ids=None):
+        if atom_ids is None:
+            atom_ids = range(len(self._atoms))
+
+        for atom_id in atom_ids:
+            yield self._atoms[atom_id].clone()
 
     def get_bonds(self):
         for bond in self._bonds:
