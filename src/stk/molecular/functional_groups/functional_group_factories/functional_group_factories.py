@@ -1,7 +1,9 @@
 import itertools as it
 
+from .smarts_functional_group_factory import (
+    SmartsFunctionalGroupFactory,
+)
 from .. import FunctionalGroup, _FunctionalGroup
-from . import SmartsFunctionalGroupFactory
 
 
 class Amine(FunctionalGroup, _FunctionalGroup):
@@ -131,7 +133,7 @@ class AmideFactory(SmartsFunctionalGroupFactory):
     """
 
     _functional_group = Amide
-    functional_group_smarts = '[C](=[O])[N]([H])[H]'
+    _functional_group_smarts = '[C](=[O])[N]([H])[H]'
     _bonder_smarts = ['[$([C](=[O])[N]([H])[H])]']
     _deleter_smarts = (
         ['[$([N]([H])([H])[C](=[O]))]'] +
@@ -156,7 +158,7 @@ class ThioacidFactory(SmartsFunctionalGroupFactory):
 
     _functional_group = Thioacid
     _functional_group_smarts = '[C](=[O])[S][H]'
-    _bonder_smarts = ['[$([C](=[O])[S][H])]'],
+    _bonder_smarts = ['[$([C](=[O])[S][H])]']
     _deleter_smarts = [
         '[$([H][S][C](=[O]))]',
         '[$([S]([H])[C](=[O]))]',
@@ -391,7 +393,7 @@ class DiolFactory(SmartsFunctionalGroupFactory):
 
     _functional_group = Diol
     _functional_group_smarts = '[H][O][#6]~[#6][O][H]'
-    _bonder_smarts = ['[$([O]([H])[#6]~[#6][O][H])]']*2,
+    _bonder_smarts = ['[$([O]([H])[#6]~[#6][O][H])]']*2
     _deleter_smarts = ['[$([H][O][#6]~[#6][O][H])]']*2
 
 

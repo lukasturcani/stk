@@ -8,9 +8,9 @@ import logging
 import numpy as np
 from collections import Counter
 
-from .. import atoms, topology_graphs
 from .molecule import Molecule
-from ..functional_groups import FunctionalGroup, fg_types
+from ..functional_groups import FunctionalGroup
+from .. import atoms, topology_graphs
 
 logger = logging.getLogger(__name__)
 

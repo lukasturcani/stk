@@ -1,7 +1,8 @@
 import rdkit.Chem.AllChem as rdkit
 from collections import Counter
 
-from stk import FunctionalGroupFactory, flatten
+from .functional_group_factory import FunctionalGroupFactory
+from stk import flatten
 
 
 class _FunctionalGroupIds:
