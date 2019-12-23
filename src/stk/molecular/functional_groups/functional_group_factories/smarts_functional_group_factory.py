@@ -16,29 +16,45 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
 
     """
 
-    functional_group_smarts = None
-    bonder_smarts = None
-    deleter_smarts = None
+    _functional_group = None
+    _functional_group_smarts = None
+    _bonder_smarts = None
+    _deleter_smarts = None
 
-    def __init__(self):
-        self._functional_group = rdkit.MolFromSmarts(
-            SMARTS=self.functional_group_smarts,
+    def __init_subclass__(cls):
+        cls._functional_group_query = rdkit.MolFromSmarts(
+            SMARTS=cls._functional_group_smarts,
         )
-        self._bonders = [
+        cls._bonder_queries = [
             (rdkit.MolFromSmarts(smarts), count)
-            for smarts, count in Counter(self.bonder_smarts).items()
+            for smarts, count in Counter(cls._bonder_smarts).items()
         ]
-        self._deleters = [
+        cls._deleter_queries = [
             (rdkit.MolFromSmarts(smarts), count)
-            for smarts, count in Counter(self.deleter_smarts).items()
+            for smarts, count in Counter(cls._deleter_smarts).items()
         ]
+
+    def get_functional_groups(self, molecule):
+        for ids in self._get_ids(molecule):
+            atoms = tuple(molecule.get_atoms(ids.atom_ids))
+            bonder_ids = set(ids.bonder_ids)
+            deleter_ids = set(ids.deleter_ids)
+            yield self._functional_group(
+                atoms=atoms,
+                bonders=tuple(
+                    a for a in atoms if a.id in bonder_ids
+                ),
+                deleters=tuple(
+                    a for a in atoms if a.id in deleter_ids
+                ),
+            )
 
     def _get_ids(self, molecule):
         rdkit_mol = molecule.to_rdkit_mol()
         rdkit.SanitizeMol(rdkit_mol)
 
         functional_groups = rdkit_mol.GetSubstructMatches(
-            query=self._functional_group,
+            query=self._functional_group_query,
         )
 
         ids = zip(
@@ -58,7 +74,7 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
 
         """
 
-        for bonder, count in self._bonders:
+        for bonder, count in self._bonder_queries:
             matches = set(flatten(
                 molecule.GetSubstructMatches(bonder)
             ))
@@ -76,7 +92,7 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
 
         """
 
-        for deleter, count in self._deleters:
+        for deleter, count in self._deleter_queries:
             matches = set(flatten(
                 molecule.GetSubstructMatches(deleter)
             ))
