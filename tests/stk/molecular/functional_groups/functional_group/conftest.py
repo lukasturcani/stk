@@ -2,9 +2,16 @@ import pytest
 import stk
 
 
+def make_atom_map_0(functional_group):
+    atoms = (stk.Li(200), )
+    return dict(zip(functional_group.get_atom_ids(), atoms))
+
+
 @pytest.fixture(
     params=[
-
+        lambda functional_group: None,
+        lambda functional_group: {},
+        make_atom_map_0,
     ],
 )
 def make_atom_map(request):
@@ -33,14 +40,19 @@ class FunctionalGroupAtoms:
             deleters=(),
         ),
         FunctionalGroupAtoms(
-            atoms=(),
-            bonders=(),
+            atoms=(stk.N(0), stk.H(21), stk.K(3)),
+            bonders=(stk.N(0), ),
+            deleters=(stk.K(3), ),
+        ),
+        FunctionalGroupAtoms(
+            atoms=(stk.H(120), stk.K(32), stk.H(1)),
+            bonders=(stk.K(32), ),
             deleters=(),
         ),
         FunctionalGroupAtoms(
-            atoms=(),
+            atoms=(stk.C(7), stk.N(12), stk.Li(2)),
             bonders=(),
-            deleters=(),
+            deleters=(stk.N(12), ),
         ),
     ],
 )
@@ -48,9 +60,56 @@ def functional_group_atoms(request):
     return request.param.clone()
 
 
+class FunctionalGroupData:
+    def __init__(self, functional_group, atoms, bonders, deleters):
+        self.functional_group = functional_group
+        self.atoms = atoms
+        self.bonders = bonders
+        self.deleters = deleters
+
+
 @pytest.fixture(
     params=[
+        stk.Amine,
+        stk.SecondaryAmine,
+        stk.Aldehyde,
+        stk.CarboxylicAcid,
+        stk.Amide,
+        stk.Thioacid,
+        stk.Alcohol,
+        stk.Thiol,
+        stk.Fluoro,
+        stk.Bromo,
+        stk.Iodo,
+        stk.TerminalAlkyne,
+        stk.TerminalAlkene,
+        stk.BoronicAcid,
+        stk.Diol,
+        stk.Difluoro,
+        stk.Dibromo,
+        stk.RingAmine,
+    ],
+)
+def make_functional_group_0(request, functional_group_atoms):
 
+    def inner():
+        return FunctionalGroupData(
+            functional_group=request.param(
+                atoms=functional_group_atoms.atoms,
+                bonders=functional_group_atoms.bonders,
+                deleters=functional_group_atoms.deleters,
+            ),
+            atoms=functional_group_atoms.atoms,
+            bonders=functional_group_atoms.bonders,
+            deleters=functional_group_atoms.deleters,
+        )
+
+    return inner
+
+
+@pytest.fixture(
+    params=[
+        pytest.lazy_fixture('make_functional_group_0'),
     ],
 )
 def make_functional_group(request):
@@ -59,8 +118,4 @@ def make_functional_group(request):
 
 @pytest.fixture
 def functional_group(make_functional_group):
-    return make_functional_group(
-        atoms=(stk.C(0), stk.H(2), stk.N(4), stk.P(32)),
-        bonders=(stk.C(0), stk.P(32)),
-        deleters=(stk.H(2), ),
-    )
+    return make_functional_group().functional_group
