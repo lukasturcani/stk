@@ -33,21 +33,19 @@ def test_clone(functional_group, make_atom_map):
 
 def _test_cloned_atom(atom, clone, atom_map):
     if atom_map is None or atom.id not in atom_map:
-        assert clone is not atom
-        assert clone.id == atom.id
-        assert clone.__class__ is atom.__class__
+        assert atom is not clone
+        assert atom.id == clone.id
+        assert atom.__class__ is clone.__class__
     else:
-        assert clone is not atom_map[atom.id]
-        assert clone.id == atom_map[atom.id].id
-        assert clone.__class__ is atom_map[atom.id].__class__
+        assert atom_map[atom.id] is not clone
+        assert atom_map[atom.id].id == clone.id
+        assert atom_map[atom.id].__class__ is clone.__class__
 
 
-def is_equivalent_atom(atom1, atom2):
-    return (
-        atom1 is not atom2
-        and atom1.id == atom2.id
-        and atom1.__class__ is atom2.__class__
-    )
+def _test_atom(atom1, atom2):
+    assert atom1 is not atom2
+    assert atom1.id == atom2.id
+    assert atom1.__class__ is atom2.__class__
 
 
 def test_get_atoms(make_functional_group):
@@ -57,7 +55,7 @@ def test_get_atoms(make_functional_group):
         fg_data.atoms,
     )
     for atom1, atom2 in atoms:
-        assert is_equivalent_atom(atom1, atom2)
+        _test_atom(atom1, atom2)
 
 
 def test_get_atom_ids(make_functional_group):
@@ -77,7 +75,7 @@ def test_get_bonders(make_functional_group):
         fg_data.bonders,
     )
     for atom1, atom2 in atoms:
-        assert is_equivalent_atom(atom1, atom2)
+        _test_atom(atom1, atom2)
 
 
 def test_get_bonder_ids(make_functional_group):
@@ -97,7 +95,7 @@ def test_get_deleters(make_functional_group):
         fg_data.deleters,
     )
     for atom1, atom2 in atoms:
-        assert is_equivalent_atom(atom1, atom2)
+        _test_atom(atom1, atom2)
 
 
 def test_get_deleter_ids(make_functional_group):
