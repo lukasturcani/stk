@@ -72,9 +72,16 @@ class BuildingBlock(Molecule, _Molecule):
         smiles : :class:`str`
             A SMILES string of the molecule.
 
-        functional_groups : :class:`iterable` of :class:`.FunctionalGroupFactory`, optional
-            Factories used to create the :class:`.FunctionalGroup`
-            instances of the building block.
+        functional_groups : :class:`iterable`, optional
+            An :class:`iterable` of :class:`.FunctionalGroup` or
+            :class:`.FunctionalGroupFactory` or both.
+            :class:`.FunctionalGroup` instances are added to the
+            building block and :class:`.FunctionalGroupFactory`
+            instances are used to create :class:`.FunctionalGroup`
+            instances the building block should hold.
+            :class:`.FunctionalGroup` instances are used to identify
+            which atoms are modified during
+            :class:`.ConstructedMolecule` construction.
 
         random_seed : :class:`int`, optional
             Random seed passed to :func:`rdkit.ETKDGv2`
