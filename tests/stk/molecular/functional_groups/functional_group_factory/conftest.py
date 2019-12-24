@@ -102,6 +102,22 @@ class GetFunctionalGroupsTestCase:
             ),
         ),
 
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('O=C(O)CCCC(O)=O'),
+            factory=stk.CarboxylicAcidFactory(),
+            functional_groups=(
+                stk.CarboxylicAcid(
+                    atoms=(stk.O(0), stk.C(1), stk.O(2), stk.H(9)),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.O(2), stk.H(9)),
+                ),
+                stk.CarboxylicAcid(
+                    atoms=(stk.O(7), stk.O(8), stk.C(6), stk.H(16)),
+                    bonders=(stk.C(6), ),
+                    deleters=(stk.O(7), stk.H(16)),
+                ),
+            ),
+        ),
     ],
 )
 def get_functional_groups_test_case(request):
