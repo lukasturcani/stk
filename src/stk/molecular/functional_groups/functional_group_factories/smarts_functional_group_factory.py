@@ -23,16 +23,20 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
     _deleter_smarts = None
 
     def __init_subclass__(cls):
-        cls._functional_group_query = rdkit.MolFromSmarts(
-            SMARTS=cls._functional_group_smarts,
+        cls._set_queries(cls)
+
+    @staticmethod
+    def _set_queries(obj):
+        obj._functional_group_query = rdkit.MolFromSmarts(
+            SMARTS=obj._functional_group_smarts,
         )
-        cls._bonder_queries = [
+        obj._bonder_queries = [
             (rdkit.MolFromSmarts(smarts), count)
-            for smarts, count in Counter(cls._bonder_smarts).items()
+            for smarts, count in Counter(obj._bonder_smarts).items()
         ]
-        cls._deleter_queries = [
+        obj._deleter_queries = [
             (rdkit.MolFromSmarts(smarts), count)
-            for smarts, count in Counter(cls._deleter_smarts).items()
+            for smarts, count in Counter(obj._deleter_smarts).items()
         ]
 
     def get_functional_groups(self, molecule):

@@ -283,7 +283,7 @@ class GetFunctionalGroupsTestCase:
             functional_groups=(
                 stk.TerminalAlkyne(
                     atoms=(stk.C(0), stk.C(1), stk.H(5)),
-                    bonders=(stk.C(0), ),
+                    bonders=(stk.C(1), ),
                     deleters=(stk.H(5), stk.C(0)),
                 ),
             ),

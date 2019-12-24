@@ -280,8 +280,8 @@ class TerminalAlkyneFactory(SmartsFunctionalGroupFactory):
 
     _functional_group = TerminalAlkyne
     _functional_group_smarts = '[C]#[C][H]'
-    _bonder_smarts = ['[$([C]([H])#[C])]']
-    _deleter_smarts = ['[$([H][C]#[C])]', '[$([C]([H])#[C])]']
+    _bonder_smarts = ()
+    _deleter_smarts = ()
 
     def __init__(self, delete_carbon=False):
         """
@@ -296,6 +296,17 @@ class TerminalAlkyneFactory(SmartsFunctionalGroupFactory):
         """
 
         self._delete_carbon = delete_carbon
+        if delete_carbon:
+            self._bonder_smarts = ['[$([C]#[C][H])]']
+            self._deleter_smarts = [
+                '[$([H][C]#[C])]',
+                '[$([C]([H])#[C])]',
+            ]
+        else:
+            self._bonder_smarts = ['[$([C]([H])#[C])]']
+            self._deleter_smarts = ['[$([H][C]#[C])]']
+
+        self._set_queries(self)
 
     def get_functional_groups(self, molecule):
         for ids in self._get_ids(molecule):
