@@ -277,6 +277,18 @@ class GetFunctionalGroupsTestCase:
             ),
         ),
 
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('C#CC#CC'),
+            factory=stk.TerminalAlkyneFactory(delete_carbon=True),
+            functional_groups=(
+                stk.TerminalAlkyne(
+                    atoms=(stk.C(0), stk.C(1), stk.H(5)),
+                    bonders=(stk.C(0), ),
+                    deleters=(stk.H(5), stk.C(0)),
+                ),
+            ),
+        ),
+
     ],
 )
 def get_functional_groups_test_case(request):
