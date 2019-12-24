@@ -5,12 +5,18 @@ import itertools as it
 import stk
 
 
+def _test_unchanged(molecule1, molecule2):
+    assert np.all(np.equal(
+        a=molecule1.get_position_matrix(),
+        b=molecule2.get_position_matrix(),
+    ))
+
+
 def test_apply_displacement(molecule, displacement):
-    before = molecule.get_position_matrix()
-    molecule.apply_displacement(displacement)
+    new = molecule.apply_displacement(displacement)
     assert np.allclose(
-        a=before+displacement,
-        b=molecule.get_position_matrix(),
+        a=molecule.get_position_matrix()+displacement,
+        b=new.get_position_matrix(),
         atol=1e-32,
     )
 
@@ -40,7 +46,7 @@ class TestApplyRotationAboutAxis:
 
         """
 
-        axis_matrix = np.repeat([axis], len(molecule.atoms), 0).T
+        axis_matrix = np.repeat([axis], molecule.get_num_atoms(), 0).T
         positions = molecule.get_position_matrix() - origin
         return positions - (axis_matrix * (positions @ axis)).T
 
@@ -56,14 +62,18 @@ class TestApplyRotationAboutAxis:
             axis=axis,
             origin=origin,
         )
-        valid_molecule.apply_rotation_about_axis(angle, axis, origin)
+        new = valid_molecule.apply_rotation_about_axis(
+            angle=angle,
+            axis=axis,
+            origin=origin,
+        )
         after = self._rotational_space_positions(
-            molecule=valid_molecule,
+            molecule=new,
             axis=axis,
             origin=origin,
         )
 
-        for atom_id in range(len(valid_molecule.atoms)):
+        for atom_id in range(valid_molecule.get_num_atoms()):
             applied_rotation = stk.vector_angle(
                 vector1=before[atom_id],
                 vector2=after[atom_id],
@@ -72,40 +82,48 @@ class TestApplyRotationAboutAxis:
 
 
 def test_apply_rotation_between_vectors(valid_molecule):
+    # Use to check that immutability is not violated.
+    clone = valid_molecule.clone()
+
     position1, position2 = valid_molecule.get_atom_positions((0, 1))
-    valid_molecule.apply_rotation_between_vectors(
+    new = valid_molecule.apply_rotation_between_vectors(
         start=position1-position2,
         target=[1, 0, 0],
         origin=valid_molecule.get_centroid(),
     )
 
-    position1, position2 = valid_molecule.get_atom_positions((0, 1))
+    position1, position2 = new.get_atom_positions((0, 1))
     assert np.allclose(
         a=stk.normalize_vector(position1-position2),
         b=[1, 0, 0],
         atol=1e-12,
     )
+    _test_unchanged(valid_molecule, clone)
 
 
 def test_apply_rotation_to_minimize_angle(valid_molecule):
-    positions = valid_molecule.get_atom_positions((0, 1, 2))
-    position1, position2, position3 = positions
+    # Use to check that immutability is not violated.
+    clone = valid_molecule.clone()
+
+    position1, position2, position3 = (
+        valid_molecule.get_atom_positions((0, 1, 2))
+    )
     start = stk.normalize_vector(position2-position1)
     target = stk.normalize_vector(position3 - position1)
-    valid_molecule.apply_rotation_to_minimize_angle(
+    new = valid_molecule.apply_rotation_to_minimize_angle(
         start=start,
         target=target,
         axis=np.cross(start, target),
         origin=position1,
     )
 
-    new_positions = valid_molecule.get_atom_positions((0, 1))
-    new_position1, new_position2 = new_positions
+    new_position1, new_position2 = new.get_atom_positions((0, 1))
     assert np.allclose(
         a=target,
         b=stk.normalize_vector(new_position2-new_position1),
         atol=1e-12,
     )
+    _test_unchanged(valid_molecule, clone)
 
 
 def test_get_atom_positions(molecule, get_atom_ids_no_fail):
@@ -130,17 +148,6 @@ def test_get_atom_distance(molecule):
         true_distance = distance_matrix[atom1, atom2]
         distance = molecule.get_atom_distance(atom1, atom2)
         assert abs(true_distance - distance) < 1e-13
-
-
-def test_get_cached_mol():
-    bb1 = stk.BuildingBlock('NCCN')
-    with pytest.raises(KeyError):
-        stk.BuildingBlock.get_cached_mol(bb1.get_identity_key())
-
-    bb2 = stk.BuildingBlock('NCCN', use_cache=True)
-    assert (
-        stk.BuildingBlock.get_cached_mol(bb2.get_identity_key()) is bb2
-    )
 
 
 def test_get_center_of_mass(molecule, get_atom_ids):
@@ -198,8 +205,8 @@ def test_get_centroid(molecule, get_atom_ids):
 class TestGetDirection1:
     def case1():
         bb = stk.BuildingBlock('NCCN')
-        bb.set_position_matrix(
-            np.array([[i, 0, 0] for i in range(len(bb.atoms))])
+        bb = bb.set_position_matrix(
+            np.array([[i, 0, 0] for i in range(bb.get_num_atoms())])
         )
         return bb, [1, 0, 0]
 
@@ -225,7 +232,7 @@ class TestGetDirection2:
 
         coords = bb.get_position_matrix()
         coords[atom_ids] = [[1, 1, 1], [3, 3, 3]]
-        bb.set_position_matrix(coords)
+        bb = bb.set_position_matrix(coords)
 
         return bb, atom_ids, [1/np.sqrt(3)]*3
 
@@ -246,18 +253,18 @@ class TestGetDirection2:
 class TestGetMaximumDiameter:
     def case1():
         molecule = stk.BuildingBlock('NCCN')
-        num_atoms = len(molecule.atoms)
-        coords = np.array([[i, 0, 0] for i in range(num_atoms)])
-        molecule.set_position_matrix(coords)
-        return molecule, None, num_atoms-1
+        coords = np.array([
+            [i, 0, 0] for i in range(molecule.get_num_atoms())
+        ])
+        molecule = molecule.set_position_matrix(coords)
+        return molecule, None, molecule.get_num_atoms()-1
 
     def case2(atom_ids, maximum_diameter):
         molecule = stk.BuildingBlock('NCCN')
-        num_atoms = len(molecule.atoms)
-        coords = np.zeros((num_atoms, 3))
+        coords = np.zeros((molecule.get_num_atoms(), 3))
         coords[[1]] = [0, -50, 0]
         coords[[9]] = [0, 50, 0]
-        molecule.set_position_matrix(coords)
+        molecule = molecule.set_position_matrix(coords)
         return molecule, atom_ids, maximum_diameter
 
     @pytest.mark.parametrize(
@@ -287,14 +294,14 @@ class TestGetPlaneNormal:
         molecule = stk.BuildingBlock('NCCN')
         coords = molecule.get_position_matrix()
         coords[[1, 9], 2] = 0
-        molecule.set_position_matrix(coords)
+        molecule = molecule.set_position_matrix(coords)
         return molecule, atom_ids, normal
 
     def case2(atom_ids, normal):
         molecule = stk.BuildingBlock('NCCN')
         coords = molecule.get_position_matrix()
         coords[:, 2] = 0
-        molecule.set_position_matrix(coords)
+        molecule = molecule.set_position_matrix(coords)
         return molecule, atom_ids, normal
 
     @pytest.mark.parametrize(

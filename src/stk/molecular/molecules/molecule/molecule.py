@@ -9,9 +9,6 @@ class Molecule:
     """
     An abstract base class for all molecules.
 
-    Molecules are immutable, set methods return a new copy of the
-    molecule.
-
     """
 
     @classmethod
@@ -34,27 +31,30 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def apply_displacement(self, displacement):
+    def with_displacement(self, displacement):
         """
-        Shift the centroid by `displacement`.
+        Return a displaced clone.
 
         Parameters
         ----------
         displacement : :class:`numpy.ndarray`
-            A displacement vector applied to the molecule.
+            The displacement vector applied.
 
         Returns
         -------
         :class:`.Molecule`
-            A displaced molecule.
+            A displaced clone.
 
         """
 
         raise NotImplementedError()
 
-    def apply_rotation_about_axis(self, angle, axis, origin):
+    def with_rotation_about_axis(self, angle, axis, origin):
         """
-        Rotate by `angle` about `axis` on the `origin`.
+        Return a rotated clone.
+
+        The clone is rotated by `angle` about `axis` on the
+        `origin`.
 
         Parameters
         ----------
@@ -70,28 +70,30 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A rotated molecule.
+            A rotated clone.
 
         """
 
         raise NotImplementedError()
 
-    def apply_rotation_between_vectors(self, start, target, origin):
+    def with_rotation_between_vectors(self, start, target, origin):
         """
-        Rotate by a rotation from `start` to `target`.
+        Return a rotated clone.
+
+        The rotatin is equal to a rotation from `start` to `target`.
 
         Given two direction vectors, `start` and `target`, this method
         applies the rotation required transform `start` to `target`
-        onto the molecule. The rotation occurs about the `origin`.
+        onto the clone. The rotation occurs about the `origin`.
 
         For example, if the `start` and `target` vectors
         are 45 degrees apart, a 45 degree rotation will be applied to
-        the molecule. The rotation will be along the appropriate
+        the clone. The rotation will be along the appropriate
         direction.
 
         The great thing about this method is that you as long as you
         can associate a geometric feature of the molecule with a
-        vector, then the molecule can be rotated so that this vector is
+        vector, then the clone can be rotated so that this vector is
         aligned with `target`. The defined vector can be virtually
         anything. This means that any geometric feature of the molecule
         can be easily aligned with any arbitrary axis.
@@ -111,13 +113,13 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A rotated molecule.
+            A rotated clone.
 
         """
 
         raise NotImplementedError()
 
-    def apply_rotation_to_minimize_angle(
+    def with_rotation_to_minimize_angle(
         self,
         start,
         target,
@@ -125,7 +127,10 @@ class Molecule:
         origin
     ):
         """
-        Rotate to minimize the angle between `start` and `target`.
+        Return a rotated clone.
+
+        The clone is rotated by the rotation required to minimize
+        the angle between `start` and `target`.
 
         Note that this function will not necessarily overlay the
         `start` and `target` vectors. This is because the possible
@@ -148,7 +153,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A rotated molecule.
+            A rotated clone.
 
         """
 
@@ -190,7 +195,7 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def get_atom_distance(self, atom1_id, atom2_id):
+    def get_atomic_distance(self, atom1_id, atom2_id):
         """
         Return the distance between 2 atoms.
 
@@ -256,6 +261,19 @@ class Molecule:
         ------
         :class:`.Atom`
             An atom in the molecule.
+
+        """
+
+        raise NotImplementedError()
+
+    def get_num_atoms(self):
+        """
+        Return the number of atoms in the molecule.
+
+        Returns
+        -------
+        :class:`int`
+            The number of atoms in the molecule.
 
         """
 
@@ -407,15 +425,15 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def set_centroid(self, position, atom_ids=None):
+    def with_centroid(self, position, atom_ids=None):
         """
-        Set the centroid to `position`.
+        Return a clone with its centroid at `position`.
 
         Parameters
         ----------
         position : :class:`numpy.ndarray`
             This array holds the position on which the centroid of the
-            molecule is going to be placed.
+            clone is going to be placed.
 
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should have their centroid set to
@@ -424,26 +442,26 @@ class Molecule:
         Returns
         -------
         :class:`Molecule`
-            A molecule at `centroid`.
+            A clone with its centroid at `position`.
 
         """
 
         raise NotImplementedError()
 
-    def set_position_matrix(self, position_matrix):
+    def with_position_matrix(self, position_matrix):
         """
-        Set the coordinates to those in `position_matrix`.
+        Return a clone with atomic positions set by `position_matrix`.
 
         Parameters
         ----------
         position_matrix : :class:`numpy.ndarray`
-            A position matrix of the molecule. The shape of the matrix
+            A position matrix of the clone. The shape of the matrix
             is ``(n, 3)``.
 
         Returns
         -------
         :class:`Molecule`
-            The molecule.
+            The clone.
 
         """
 
@@ -540,9 +558,9 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def set_atomic_positions_from_file(self, path, extension=None):
+    def with_atomic_positions_from_file(self, path, extension=None):
         """
-        Update the structure from a file.
+        Return a clone, with its structure taken from a file.
 
         Multiple file types are supported, namely:
 
@@ -564,7 +582,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            The molecule.
+            A clone with atomic positions found in `path`.
 
         """
 
@@ -572,17 +590,17 @@ class Molecule:
             _, extension = os.path.splitext(path)
 
         update_fns = {
-            '.mol': self._set_atomic_positions_from_mol,
-            '.sdf': self._set_atomic_positions_from_mol,
-            '.mae': self._set_atomic_positions_from_mae,
-            '.xyz': self._set_atomic_positions_from_xyz,
-            '.coord': self._set_atomic_positions_from_turbomole,
+            '.mol': self._with_atomic_positions_from_mol,
+            '.sdf': self._with_atomic_positions_from_mol,
+            '.mae': self._with_atomic_positions_from_mae,
+            '.xyz': self._with_atomic_positions_from_xyz,
+            '.coord': self._with_atomic_positions_from_turbomole,
         }
         return update_fns[extension](path=path)
 
-    def _set_atomic_positions_from_mae(self, path):
+    def _with_atomic_positions_from_mae(self, path):
         """
-        Update the structure to match an ``.mae`` file.
+        Return a clone, with its structure taken from an ``.mae`` file.
 
         Parameters
         ----------
@@ -593,7 +611,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A molecule with atomic positions found in `path`.
+            A clone with atomic positions found in `path`.
 
         """
 
@@ -602,9 +620,9 @@ class Molecule:
             position_matrix=molecule.GetConformer().GetPositions()
         )
 
-    def _set_atomic_positions_from_mol(self, path):
+    def _with_atomic_positions_from_mol(self, path):
         """
-        Update the structure to match a ``.mol`` file.
+        Return a clone, with its structure taken from a ``.mol`` file.
 
         Parameters
         ----------
@@ -615,7 +633,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A molecule with atomic positions found in `path`.
+            A clone with atomic positions found in `path`.
 
         """
 
@@ -630,9 +648,9 @@ class Molecule:
             position_matrix=molecule.GetConformer().GetPositions()
         )
 
-    def _set_atomic_positions_from_xyz(self, path):
+    def _with_atomic_positions_from_xyz(self, path):
         """
-        Update the structure to match an ``.xyz`` file.
+        Return a clone, with its structure taken from an ``.xyz`` file.
 
         Parameters
         ----------
@@ -643,7 +661,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A molecule with atomic positions found in `path`.
+            A clone with atomic positions found in `path`.
 
         Raises
         ------
@@ -656,9 +674,9 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def _set_atomic_positions_from_turbomole(self, path):
+    def _with_atomic_positions_from_turbomole(self, path):
         """
-        Update the structure from a Turbomole ``.coord`` file.
+        Return a clone, with its structure taken from a Turbomole file.
 
         Note that coordinates in ``.coord`` files are given in Bohr.
 
@@ -671,7 +689,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A molecule with atomic positions found in `path`.
+            A clone with atomic positions found in `path`.
 
         Raises
         ------

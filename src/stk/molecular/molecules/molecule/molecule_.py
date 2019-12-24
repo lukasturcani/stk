@@ -231,6 +231,9 @@ class Molecule_(Molecule):
         for atom_id in atom_ids:
             yield self._atoms[atom_id].clone()
 
+    def get_num_atoms(self):
+        return len(self._atoms)
+
     def get_bonds(self):
         for bond in self._bonds:
             yield bond.clone()
