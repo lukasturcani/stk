@@ -751,3 +751,11 @@ def test_dump_and_load(tmpdir, building_block):
         building_block1=building_block,
         building_block2=new_building_block,
     )
+
+
+def test_with_functional_group():
+    assert False
+
+
+def test_wth_functional_groups():
+    assert False

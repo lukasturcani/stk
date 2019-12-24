@@ -15,7 +15,7 @@ from functools import partial
 from scipy.spatial.distance import euclidean
 
 from .. import atoms
-from ..functional_groups import FunctionalGroup, FunctionalGroupFactory
+from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bond import Bond
 from .molecule import Molecule_
