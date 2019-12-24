@@ -14,7 +14,7 @@ from glob import glob
 from functools import partial
 from scipy.spatial.distance import euclidean
 
-from .. import atoms
+from .. import atoms, bond, functional_groups
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bond import Bond
@@ -104,17 +104,9 @@ class BuildingBlock(Molecule_):
             raise RuntimeError(
                 f'Embedding with seed value of {random_seed} failed.'
             )
-        identity_key = self._get_identity_key_from_rdkit_mol(
-            molecule=molecule,
-            functional_groups=functional_groups,
-        )
-
+        key = self._get_identity_key_from_rdkit_mol(molecule)
         rdkit.Kekulize(molecule)
-        self._init_from_rdkit_mol(
-            molecule=molecule,
-            functional_groups=functional_groups,
-            identity_key=identity_key,
-        )
+        self._init_from_rdkit_mol(molecule, functional_groups, key)
 
     @classmethod
     def init_from_molecule(cls, molecule, functional_groups=None):
@@ -249,21 +241,9 @@ class BuildingBlock(Molecule_):
 
         files = glob(file_glob)
         generator = np.random.RandomState(random_seed)
-        generator.shuffle(files)
-
-        for path in files:
-            try:
-                return cls.init_from_file(
-                    path=path,
-                    functional_groups=functional_groups,
-                )
-
-            except Exception:
-                logger.warning(
-                    f'Could not initialize {cls.__name__} from {path}.'
-                )
-        raise RuntimeError(
-            f'No files in "{file_glob}" could be initialized from.'
+        return cls.init_from_file(
+            path=generator.choice(files),
+            functional_groups=functional_groups,
         )
 
     @classmethod
@@ -294,11 +274,7 @@ class BuildingBlock(Molecule_):
 
         """
 
-        key = cls._get_identity_key_from_rdkit_mol(
-            molecule=molecule,
-            functional_groups=functional_groups,
-        )
-
+        key = cls._get_identity_key_from_rdkit_mol(molecule)
         bb = cls.__new__(cls)
         bb._init_from_rdkit_mol(
             molecule=molecule,
@@ -480,7 +456,7 @@ class BuildingBlock(Molecule_):
         Returns
         -------
         :class:`BuildingBlock`
-            The molecule described by `mol_dict`.
+            The molecule described by `molecule_dict`.
 
         """
 
@@ -488,27 +464,20 @@ class BuildingBlock(Molecule_):
         identity_key = eval(d.pop('identity_key'))
 
         d.pop('class')
-        functional_groups = d.pop('func_groups')
 
         obj = cls.__new__(cls)
         obj._identity_key = identity_key
         obj._position_matrix = np.array(d.pop('position_matrix')).T
-        # If the cache is not being used, make sure to update all the
-        # atoms and attributes to those in the dict.
         obj._atoms = eval(d.pop('atoms'), vars(atoms))
-        obj._bonds = eval(d.pop('bonds'), vars(bonds))
-        for bond in obj._bonds:
-            bond.atom1 = obj.atoms[bond.atom1]
-            bond.atom2 = obj.atoms[bond.atom2]
+        obj._bonds = eval(d.pop('bonds'), vars(bond))
+        for bond_ in obj._bonds:
+            bond.atom1 = obj._atoms[bond_.atom1]
+            bond.atom2 = obj._atoms[bond_.atom2]
 
-        fg_makers = (fg_types[name] for name in functional_groups)
-        obj._func_groups = tuple(
-            func_group
-            for fg_maker in fg_makers
-            for func_group in fg_maker.get_functional_groups(obj)
-        )
-        for attr, val in d.items():
-            setattr(obj, attr, eval(val))
+        obj._functional_groups = []
+        fgs = eval(d.pop('functional_groups'), vars(functional_groups))
+        for functional_group in fgs:
+            obj._with_functional_group(functional_group)
 
         return obj
 
@@ -525,6 +494,7 @@ class BuildingBlock(Molecule_):
 
         clone = super().clone()
         atom_map = {a.id: a for a in clone._atoms}
+        clone._identity_key = str(self._identity_key)
         clone._functional_groups = [
             fg.clone(atom_map) for fg in self._functional_groups
         ]
@@ -822,21 +792,9 @@ class BuildingBlock(Molecule_):
         )
         return self.get_centroid() - bonder_centroid
 
-    def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
+    def to_dict(self):
         """
         Return a :class:`dict` representation.
-
-        Parameters
-        ----------
-        include_attrs : :class:`list` of :class:`str`, optional
-            The names of additional attributes of the molecule to be
-            added to the :class:`dict`. Each attribute is saved as a
-            string using :func:`repr`.
-
-        ignore_missing_attrs : :class:`bool`, optional
-            If ``False`` and an attribute in `include_attrs` is not
-            held by the :class:`BuildingBlock`, an error will be
-            raised.
 
         Returns
         -------
@@ -845,56 +803,28 @@ class BuildingBlock(Molecule_):
 
         """
 
-        if include_attrs is None:
-            include_attrs = []
-
-        fgs = list(dedupe(
-            fg.fg_type.name for fg in self._functional_groups
-        ))
-
         bonds = []
-        for bond in self.bonds:
-            clone = bond.clone()
+        for bond_ in self._bonds:
+            clone = bond_.clone()
             clone.atom1 = clone.atom1.id
             clone.atom2 = clone.atom2.id
             bonds.append(clone)
 
-        d = {
+        return {
             'class': self.__class__.__name__,
-            'func_groups': fgs,
+            'functional_groups': repr(self._functional_groups),
             'position_matrix': self.get_position_matrix().tolist(),
             'atoms': repr(self._atoms),
             'bonds': repr(bonds),
             'identity_key': repr(self._identity_key)
         }
 
-        if ignore_missing_attrs:
-            d.update({
-                attr: repr(getattr(self, attr))
-                for attr in include_attrs
-                if hasattr(self, attr)
-            })
-        else:
-            d.update({
-                attr: repr(getattr(self, attr))
-                for attr in include_attrs
-            })
-
-        return d
-
     @staticmethod
-    def _get_identity_key_from_rdkit_mol(molecule, functional_groups):
-        if functional_groups is None:
-            functional_groups = ()
-        functional_groups = sorted(functional_groups)
-
+    def _get_identity_key_from_rdkit_mol(molecule):
         # Don't modify the original molecule.
         mol = rdkit.Mol(molecule)
         rdkit.SanitizeMol(mol)
-        return (
-            *functional_groups,
-            rdkit.MolToSmiles(molecule, canonical=True)
-        )
+        return rdkit.MolToSmiles(molecule, canonical=True)
 
     def __str__(self):
         smiles = rdkit.MolToSmiles(rdkit.RemoveHs(self.to_rdkit_mol()))
