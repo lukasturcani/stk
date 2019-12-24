@@ -62,6 +62,29 @@ class GetFunctionalGroupsTestCase:
             ),
         ),
 
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('CCCC'),
+            factory=stk.AmineFactory(),
+            functional_groups=(),
+        ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('CNCCNCC'),
+            factory=stk.SecondaryAmineFactory(),
+            functional_groups=(
+                stk.Amine(
+                    atoms=(stk.N(1), stk.C(0), stk.C(2), stk.H(10)),
+                    bonders=(stk.N(1), ),
+                    deleters=(stk.H(10), ),
+                ),
+                stk.Amine(
+                    atoms=(stk.N(4), stk.C(3), stk.C(5), stk.H(15)),
+                    bonders=(stk.N(4), ),
+                    deleters=(stk.H(15), ),
+                ),
+            ),
+        ),
+
     ],
 )
 def get_functional_groups_test_case(request):

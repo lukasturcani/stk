@@ -8,21 +8,25 @@ def _test_equivalent_atoms(atoms1, atoms2):
         assert a1.__class__ is a2.__class__
 
 
+def atom_id(atom):
+    return atom.id
+
+
 def _test_equivalent_functional_group(
     functional_group1,
     functional_group2,
 ):
     _test_equivalent_atoms(
-        atoms1=functional_group1.get_atoms(),
-        atoms2=functional_group2.get_atoms(),
+        atoms1=sorted(functional_group1.get_atoms(), key=atom_id),
+        atoms2=sorted(functional_group2.get_atoms(), key=atom_id),
     )
     _test_equivalent_atoms(
-        atoms1=functional_group1.get_bonders(),
-        atoms2=functional_group2.get_bonders(),
+        atoms1=sorted(functional_group1.get_bonders(), key=atom_id),
+        atoms2=sorted(functional_group2.get_bonders(), key=atom_id),
     )
     _test_equivalent_atoms(
-        atoms1=functional_group1.get_deleters(),
-        atoms2=functional_group2.get_deleters(),
+        atoms1=sorted(functional_group1.get_deleters(), key=atom_id),
+        atoms2=sorted(functional_group2.get_deleters(), key=atom_id),
     )
 
 
