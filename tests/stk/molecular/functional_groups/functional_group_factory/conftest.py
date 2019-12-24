@@ -335,6 +335,69 @@ class GetFunctionalGroupsTestCase:
             ),
         ),
 
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('CC(O)C(O)CC'),
+            factory=stk.DiolFactory(),
+            functional_groups=(
+                stk.Diol(
+                    atoms=(
+                        stk.C(1),
+                        stk.O(2),
+                        stk.C(3),
+                        stk.O(4),
+                        stk.H(11),
+                        stk.H(13),
+                    ),
+                    bonders=(stk.O(2), stk.O(4)),
+                    deleters=(stk.H(11), stk.H(13)),
+                ),
+            ),
+        ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('CC(F)C(F)CC'),
+            factory=stk.DifluoroFactory(),
+            functional_groups=(
+                stk.Difluoro(
+                    atoms=(stk.C(1), stk.F(2), stk.C(3), stk.F(4)),
+                    bonders=(stk.C(1), stk.C(3)),
+                    deleters=(stk.F(2), stk.F(4)),
+                ),
+            ),
+        ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('CC(Br)C(Br)CC'),
+            factory=stk.DibromoFactory(),
+            functional_groups=(
+                stk.Dibromo(
+                    atoms=(stk.C(1), stk.Br(2), stk.C(3), stk.Br(4)),
+                    bonders=(stk.C(1), stk.C(3)),
+                    deleters=(stk.Br(2), stk.Br(4)),
+                ),
+            ),
+        ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('NCC(Br)c1c(Br)cccc1'),
+            factory=stk.RingAmineFactory(),
+            functional_groups=(
+                stk.RingAmine(
+                    atoms=(
+                        stk.N(0),
+                        stk.C(1),
+                        stk.C(2),
+                        stk.C(4),
+                        stk.H(11),
+                        stk.H(12),
+                        stk.H(15),
+                    ),
+                    bonders=(stk.N(0), stk.C(2)),
+                    deleters=(stk.H(11), stk.H(12), stk.H(15)),
+                ),
+            ),
+        ),
+
     ],
 )
 def get_functional_groups_test_case(request):
