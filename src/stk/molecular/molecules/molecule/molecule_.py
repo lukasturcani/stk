@@ -1,13 +1,16 @@
 import rdkit.Chem.AllChem as rdkit
 import numpy as np
 from scipy.spatial.distance import euclidean
+import os
 
 from .molecule import Molecule
 from stk.utilities import (
     vector_angle,
     rotation_matrix,
     rotation_matrix_arbitrary_axis,
-    periodic_table
+    periodic_table,
+    mol_from_mae_file,
+    remake,
 )
 
 
@@ -45,7 +48,7 @@ class Molecule_(Molecule):
         # multiplications faster.
         self._position_matrix = position_matrix.T
 
-    def _apply_displacement(self, displacement):
+    def _with_displacement(self, displacement):
         """
         Modify molecule.
 
@@ -56,17 +59,17 @@ class Molecule_(Molecule):
         ).T
         return self
 
-    def apply_displacement(self, displacement):
-        return self.clone()._apply_displacement(displacement)
+    def with_displacement(self, displacement):
+        return self.clone()._with_displacement(displacement)
 
-    def _apply_rotation_about_axis(self, angle, axis, origin):
+    def _with_rotation_about_axis(self, angle, axis, origin):
         """
         Modify molecule.
 
         """
 
         # Set the origin of the rotation to "origin".
-        self._apply_displacement(-origin)
+        self._with_displacement(-origin)
         rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
 
         # Apply the rotation matrix on the position matrix, to get the
@@ -74,20 +77,20 @@ class Molecule_(Molecule):
         self._position_matrix = rot_mat @ self._position_matrix
 
         # Return the centroid of the molecule to the original position.
-        self._apply_displacement(origin)
+        self._with_displacement(origin)
         return self
 
-    def apply_rotation_about_axis(self, angle, axis, origin):
-        return self.clone()._apply_displacement(angle, axis, origin)
+    def with_rotation_about_axis(self, angle, axis, origin):
+        return self.clone()._with_displacement(angle, axis, origin)
 
-    def _apply_rotation_between_vectors(self, start, target, origin):
+    def _with_rotation_between_vectors(self, start, target, origin):
         """
         Modify molecule.
 
         """
 
         # Set the origin of the rotation to "origin".
-        self._apply_displacement(-origin)
+        self._with_displacement(-origin)
         rot_mat = rotation_matrix(start, target)
 
         # Apply the rotation matrix to the atomic positions to yield
@@ -95,17 +98,17 @@ class Molecule_(Molecule):
         self._position_matrix = rot_mat @ self._position_matrix
 
         # Restore original position.
-        self._apply_displacement(origin)
+        self._with_displacement(origin)
         return self
 
-    def apply_rotation_between_vectors(self, start, target, origin):
-        return self.clone()._apply_rotation_between_vectors(
+    def with_rotation_between_vectors(self, start, target, origin):
+        return self.clone()._with_rotation_between_vectors(
             start=start,
             target=target,
             origin=origin,
         )
 
-    def _apply_rotation_to_minimize_angle(
+    def _with_rotation_to_minimize_angle(
         self,
         start,
         target,
@@ -117,7 +120,7 @@ class Molecule_(Molecule):
         if not all(np.isfinite(x) for x in start):
             return self
 
-        self._apply_displacement(-origin)
+        self._with_displacement(-origin)
 
         # 1. First transform the problem.
         # 2. The rotation axis is set equal to the z-axis.
@@ -133,7 +136,7 @@ class Molecule_(Molecule):
         # If the `tstart` vector is 0 after these transformations it
         # means that it is parallel to the rotation axis, stop.
         if np.allclose(tstart, [0, 0, 0], 1e-8):
-            self._apply_displacement(origin)
+            self._with_displacement(origin)
             return self
 
         tend = np.dot(rotmat, target)
@@ -153,17 +156,17 @@ class Molecule_(Molecule):
 
         rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
         self._position_matrix = rot_mat @ self._position_matrix
-        self._apply_displacement(origin)
+        self._with_displacement(origin)
         return self
 
-    def apply_rotation_to_minimize_angle(
+    def with_rotation_to_minimize_angle(
         self,
         start,
         target,
         axis,
         origin,
     ):
-        return self.clone()._apply_rotation_to_minimize_angle(
+        return self.clone()._with_rotation_to_minimize_angle(
             start=start,
             target=target,
             axis=axis,
@@ -306,7 +309,7 @@ class Molecule_(Molecule):
     def get_position_matrix(self):
         return np.array(self._position_matrix.T)
 
-    def _set_position_matrix(self, position_matrix):
+    def _with_position_matrix(self, position_matrix):
         """
         Modify molecule.
 
@@ -315,16 +318,16 @@ class Molecule_(Molecule):
         self._position_matrix = np.array(position_matrix.T)
         return self
 
-    def set_position_matrix(self, position_matrix):
-        return self.clone()._set_position_matrix(position_matrix)
+    def with_position_matrix(self, position_matrix):
+        return self.clone()._with_position_matrix(position_matrix)
 
-    def _set_centroid(self, position, atom_ids):
+    def _with_centroid(self, position, atom_ids):
         centroid = self.get_centroid(atom_ids=atom_ids)
-        self._apply_displacement(position-centroid)
+        self._with_displacement(position-centroid)
         return self
 
-    def set_centroid(self, position, atom_ids=None):
-        return self.clone()._set_centroid(position, atom_ids)
+    def with_centroid(self, position, atom_ids=None):
+        return self.clone()._with_centroid(position, atom_ids)
 
     def _to_mdl_mol_block(self, atom_ids=None):
         if atom_ids is None:
@@ -408,7 +411,94 @@ class Molecule_(Molecule):
         mol.AddConformer(rdkit_conf)
         return mol
 
-    def _set_atomic_positions_from_xyz(self, path):
+    def with_atomic_positions_from_file(self, path, extension=None):
+        if extension is None:
+            _, extension = os.path.splitext(path)
+
+        clone = self.clone()
+        update_fns = {
+            '.mol': clone._with_atomic_positions_from_mol,
+            '.sdf': clone._with_atomic_positions_from_mol,
+            '.mae': clone._with_atomic_positions_from_mae,
+            '.xyz': clone._with_atomic_positions_from_xyz,
+            '.coord': clone._with_atomic_positions_from_turbomole,
+        }
+        return update_fns[extension](path=path)
+
+    def _with_atomic_positions_from_mae(self, path):
+        """
+        Change structure to match an ``.mae`` file.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.mae`` file from which the structure
+            should be updated.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The molecule.
+
+        """
+
+        molecule = mol_from_mae_file(path)
+        return self._with_position_matrix(
+            position_matrix=molecule.GetConformer().GetPositions()
+        )
+
+    def _with_atomic_positions_from_mol(self, path):
+        """
+        Change structure to match a ``.mol`` file.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.mol`` file from which the structure
+            should be updated.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The molecule.
+
+        """
+
+        molecule = remake(
+            rdkit.MolFromMolFile(
+                molFileName=path,
+                sanitize=False,
+                removeHs=False,
+            )
+        )
+        return self._with_position_matrix(
+            position_matrix=molecule.GetConformer().GetPositions()
+        )
+
+    def _with_atomic_positions_from_xyz(self, path):
+        """
+        Return a clone, with its structure taken from an ``.xyz`` file.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.mol`` file from which the structure
+            should be updated.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            A clone with atomic positions found in `path`.
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If the number of atoms in the file does not match the
+            number of atoms in the molecule or if atom elements in the
+            file do not agree with the atom elements in the molecule.
+
+        """
+
         with open(path, 'r') as f:
             atom_count, _, *content = f.readlines()
 
@@ -446,9 +536,34 @@ class Molecule_(Molecule):
 
         # Update the structure.
         new_coords = np.array(new_coords)
-        self.set_position_matrix(new_coords)
+        return self._with_position_matrix(new_coords)
 
-    def _set_atomic_positions_from_turbomole(self, path):
+    def _with_atomic_positions_from_turbomole(self, path):
+        """
+        Return a clone, with its structure taken from a Turbomole file.
+
+        Note that coordinates in ``.coord`` files are given in Bohr.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.coord`` file from which the
+            structure should be updated.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            A clone with atomic positions found in `path`.
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If the number of atoms in the file does not match the
+            number of atoms in the molecule or if atom elements in the
+            file do not agree with the atom elements in the molecule.
+
+        """
+
         bohr_to_ang = 0.5291772105638411
 
         with open(path, 'r') as f:
@@ -487,8 +602,7 @@ class Molecule_(Molecule):
             )
 
         # Update the structure.
-        new_coords = np.array(new_coords)
-        self.set_position_matrix(new_coords)
+        return self._with_position_matrix(np.array(new_coords))
 
     def _write_xyz_file(self, path, atom_ids):
         if atom_ids is None:
