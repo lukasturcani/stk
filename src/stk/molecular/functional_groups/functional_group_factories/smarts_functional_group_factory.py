@@ -60,8 +60,8 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
 
         ids = zip(
             functional_groups,
-            self._get_bonders(rdkit_mol, functional_groups),
-            self._get_deleters(rdkit_mol, functional_groups),
+            self._get_bonder_ids(rdkit_mol, functional_groups),
+            self._get_deleter_ids(rdkit_mol, functional_groups),
         )
         for atom_ids, bonder_ids, deleter_ids in ids:
             yield _FunctionalGroupIds(
@@ -70,10 +70,12 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
                 deleter_ids=deleter_ids,
             )
 
-    def _get_bonders(self, molecule, functional_groups):
+    def _get_bonder_ids(self, molecule, functional_groups):
         """
 
         """
+
+        bonders = [[] for _ in range(len(functional_groups))]
 
         for bonder, count in self._bonder_queries:
             matches = set(flatten(
@@ -84,14 +86,17 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
                 [aid for aid in fg if aid in matches]
                 for fg in functional_groups
             ]
+            for fg_id, bonder_ids in enumerate(matched_bonders):
+                bonders[fg_id].extend(bonder_ids[:count])
 
-            for fg_id, fg in enumerate(functional_groups):
-                yield matched_bonders[fg_id][:count]
+        yield from bonders
 
-    def _get_deleters(self, molecule, functional_groups):
+    def _get_deleter_ids(self, molecule, functional_groups):
         """
 
         """
+
+        deleters = [[] for _ in range(len(functional_groups))]
 
         for deleter, count in self._deleter_queries:
             matches = set(flatten(
@@ -103,8 +108,10 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
                 for fg in functional_groups
             ]
 
-            for fg_id, fg in enumerate(functional_groups):
-                yield matched_deleters[fg_id][:count]
+            for fg_id, deleter_ids in enumerate(matched_deleters):
+                deleters[fg_id].extend(deleter_ids[:count])
+
+        yield from deleters
 
     def __repr__(self):
         return f'{self.__class__.__name__}()'
