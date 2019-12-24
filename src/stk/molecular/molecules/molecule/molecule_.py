@@ -11,7 +11,7 @@ from stk.utilities import (
 )
 
 
-class Molecule_:
+class Molecule_(Molecule):
     """
     A partial implementation of the :class:`.Molecule` interface.
 
@@ -45,15 +45,28 @@ class Molecule_:
         # multiplications faster.
         self._position_matrix = position_matrix.T
 
-    def apply_displacement(self, displacement):
+    def _apply_displacement(self, displacement):
+        """
+        Modify molecule.
+
+        """
+
         self._position_matrix = (
             self._position_matrix.T + displacement
         ).T
         return self
 
-    def apply_rotation_about_axis(self, angle, axis, origin):
+    def apply_displacement(self, displacement):
+        return self.clone()._apply_displacement(displacement)
+
+    def _apply_rotation_about_axis(self, angle, axis, origin):
+        """
+        Modify molecule.
+
+        """
+
         # Set the origin of the rotation to "origin".
-        self.apply_displacement(-origin)
+        self._apply_displacement(-origin)
         rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
 
         # Apply the rotation matrix on the position matrix, to get the
@@ -61,12 +74,20 @@ class Molecule_:
         self._position_matrix = rot_mat @ self._position_matrix
 
         # Return the centroid of the molecule to the original position.
-        self.apply_displacement(origin)
+        self._apply_displacement(origin)
         return self
 
-    def apply_rotation_between_vectors(self, start, target, origin):
+    def apply_rotation_about_axis(self, angle, axis, origin):
+        return self.clone()._apply_displacement(angle, axis, origin)
+
+    def _apply_rotation_between_vectors(self, start, target, origin):
+        """
+        Modify molecule.
+
+        """
+
         # Set the origin of the rotation to "origin".
-        self.apply_displacement(-origin)
+        self._apply_displacement(-origin)
         rot_mat = rotation_matrix(start, target)
 
         # Apply the rotation matrix to the atomic positions to yield
@@ -74,10 +95,17 @@ class Molecule_:
         self._position_matrix = rot_mat @ self._position_matrix
 
         # Restore original position.
-        self.apply_displacement(origin)
+        self._apply_displacement(origin)
         return self
 
-    def apply_rotation_to_minimize_angle(
+    def apply_rotation_between_vectors(self, start, target, origin):
+        return self.clone()._apply_rotation_between_vectors(
+            start=start,
+            target=target,
+            origin=origin,
+        )
+
+    def _apply_rotation_to_minimize_angle(
         self,
         start,
         target,
@@ -89,7 +117,7 @@ class Molecule_:
         if not all(np.isfinite(x) for x in start):
             return self
 
-        self.apply_displacement(-origin)
+        self._apply_displacement(-origin)
 
         # 1. First transform the problem.
         # 2. The rotation axis is set equal to the z-axis.
@@ -105,7 +133,7 @@ class Molecule_:
         # If the `tstart` vector is 0 after these transformations it
         # means that it is parallel to the rotation axis, stop.
         if np.allclose(tstart, [0, 0, 0], 1e-8):
-            self.apply_displacement(origin)
+            self._apply_displacement(origin)
             return self
 
         tend = np.dot(rotmat, target)
@@ -125,15 +153,29 @@ class Molecule_:
 
         rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
         self._position_matrix = rot_mat @ self._position_matrix
-        self.apply_displacement(origin)
+        self._apply_displacement(origin)
         return self
 
+    def apply_rotation_to_minimize_angle(
+        self,
+        start,
+        target,
+        axis,
+        origin,
+    ):
+        return self.clone()._apply_rotation_to_minimize_angle(
+            start=start,
+            target=target,
+            axis=axis,
+            origin=origin,
+        )
+
     def clone(self):
-        atom_map = {atom: atom.clone() for atom in self.atoms}
+        atom_map = {atom.id: atom.clone() for atom in self._atoms}
         atoms = tuple(atom_map.values())
-        bonds = tuple(bond.clone(atom_map) for bond in self.bonds)
+        bonds = tuple(bond.clone(atom_map) for bond in self._bonds)
         clone = self.__class__.__new__(self.__class__)
-        _Molecule.__init__(
+        Molecule_.__init__(
             self=clone,
             atoms=atoms,
             bonds=bonds,
@@ -145,7 +187,7 @@ class Molecule_:
 
         return clone
 
-    def get_atom_positions(self, atom_ids=None):
+    def get_atomic_positions(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self.atoms))
         elif not isinstance(atom_ids, (list, tuple)):
@@ -166,7 +208,7 @@ class Molecule_:
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
         elif not isinstance(atom_ids, (list, tuple)):
-            # Iterable gets used twice, once in get_atom_positions
+            # Iterable gets used twice, once in get_atomic_positions
             # and once in zip.
             atom_ids = list(atom_ids)
 
@@ -175,7 +217,7 @@ class Molecule_:
 
         center = 0
         total_mass = 0.
-        coords = self.get_atom_positions(atom_ids)
+        coords = self.get_atomic_positions(atom_ids)
         for atom_id, coord in zip(atom_ids, coords):
             mass = self.atoms[atom_id].mass
             total_mass += mass
@@ -247,7 +289,7 @@ class Molecule_:
         # Normal must always be acute with reference vector. This
         # ensures the normal is always the same, even if the molecule
         # is rotated.
-        atom1, atom2 = self.get_atom_positions(atom_ids[:2])
+        atom1, atom2 = self.get_atomic_positions(atom_ids[:2])
         reference = atom1 - atom2
         normal = np.linalg.svd(pos - centroid)[-1][2, :]
         if (
@@ -261,9 +303,25 @@ class Molecule_:
     def get_position_matrix(self):
         return np.array(self._position_matrix.T)
 
-    def set_position_matrix(self, position_matrix):
+    def _set_position_matrix(self, position_matrix):
+        """
+        Modify molecule.
+
+        """
+
         self._position_matrix = np.array(position_matrix.T)
         return self
+
+    def set_position_matrix(self, position_matrix):
+        return self.clone()._set_position_matrix(position_matrix)
+
+    def _set_centroid(self, position, atom_ids):
+        centroid = self.get_centroid(atom_ids=atom_ids)
+        self._apply_displacement(position-centroid)
+        return self
+
+    def set_centroid(self, position, atom_ids=None):
+        return self.clone()._set_centroid(position, atom_ids)
 
     def _to_mdl_mol_block(self, atom_ids=None):
         if atom_ids is None:

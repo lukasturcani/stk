@@ -9,6 +9,9 @@ class Molecule:
     """
     An abstract base class for all molecules.
 
+    Molecules are immutable, set methods return a new copy of the
+    molecule.
+
     """
 
     @classmethod
@@ -43,7 +46,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            The molecule.
+            A displaced molecule.
 
         """
 
@@ -67,7 +70,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            The molecule.
+            A rotated molecule.
 
         """
 
@@ -108,7 +111,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            The molecule.
+            A rotated molecule.
 
         """
 
@@ -145,7 +148,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            The molecule.
+            A rotated molecule.
 
         """
 
@@ -167,7 +170,7 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def get_atom_positions(self, atom_ids=None):
+    def get_atomic_positions(self, atom_ids=None):
         """
         Yield the positions of atoms.
 
@@ -414,20 +417,18 @@ class Molecule:
             This array holds the position on which the centroid of the
             molecule is going to be placed.
 
-        atom_ids : :class:`iterable` of :class:`int`
+        atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should have their centroid set to
             `position`. If ``None`` then all atoms are used.
 
         Returns
         -------
         :class:`Molecule`
-            The molecule.
+            A molecule at `centroid`.
 
         """
 
-        centroid = self.get_centroid(atom_ids=atom_ids)
-        self.apply_displacement(position-centroid)
-        return self
+        raise NotImplementedError()
 
     def set_position_matrix(self, position_matrix):
         """
@@ -539,27 +540,7 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def update_from_rdkit_mol(self, molecule):
-        """
-        Update the structure to match `molecule`.
-
-        Parameters
-        ----------
-        molecule : :class:`rdkit.Mol`
-            The :mod:`rdkit` molecule to use for the structure update.
-
-        Returns
-        -------
-        :class:`.Molecule`
-            The molecule.
-
-        """
-
-        pos_mat = molecule.GetConformer().GetPositions()
-        self.set_position_matrix(pos_mat)
-        return self
-
-    def update_from_file(self, path):
+    def set_atomic_positions_from_file(self, path, extension=None):
         """
         Update the structure from a file.
 
@@ -576,6 +557,10 @@ class Molecule:
             The path to a molecular structure file holding updated
             coordinates for the :class:`.Molecule`.
 
+        extension : :class:`str, optional
+            If you want to treat the file as though it has a
+            particular extension, put it here. Include the dot.
+
         Returns
         -------
         :class:`.Molecule`
@@ -583,18 +568,19 @@ class Molecule:
 
         """
 
-        update_fns = {
-            '.mol': self._update_from_mol,
-            '.sdf': self._update_from_mol,
-            '.mae': self._update_from_mae,
-            '.xyz': self._update_from_xyz,
-            '.coord': self._update_from_turbomole,
-        }
-        _, ext = os.path.splitext(path)
-        update_fns[ext](path=path)
-        return self
+        if extension is None:
+            _, extension = os.path.splitext(path)
 
-    def _update_from_mae(self, path):
+        update_fns = {
+            '.mol': self._set_atomic_positions_from_mol,
+            '.sdf': self._set_atomic_positions_from_mol,
+            '.mae': self._set_atomic_positions_from_mae,
+            '.xyz': self._set_atomic_positions_from_xyz,
+            '.coord': self._set_atomic_positions_from_turbomole,
+        }
+        return update_fns[extension](path=path)
+
+    def _set_atomic_positions_from_mae(self, path):
         """
         Update the structure to match an ``.mae`` file.
 
@@ -606,13 +592,17 @@ class Molecule:
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`.Molecule`
+            A molecule with atomic positions found in `path`.
 
         """
 
-        self.update_from_rdkit_mol(mol_from_mae_file(path))
+        molecule = mol_from_mae_file(path)
+        return self.set_position_matrix(
+            position_matrix=molecule.GetConformer().GetPositions()
+        )
 
-    def _update_from_mol(self, path):
+    def _set_atomic_positions_from_mol(self, path):
         """
         Update the structure to match a ``.mol`` file.
 
@@ -624,7 +614,8 @@ class Molecule:
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`.Molecule`
+            A molecule with atomic positions found in `path`.
 
         """
 
@@ -635,9 +626,11 @@ class Molecule:
                 removeHs=False,
             )
         )
-        self.update_from_rdkit_mol(molecule=molecule)
+        return self.set_position_matrix(
+            position_matrix=molecule.GetConformer().GetPositions()
+        )
 
-    def _update_from_xyz(self, path):
+    def _set_atomic_positions_from_xyz(self, path):
         """
         Update the structure to match an ``.xyz`` file.
 
@@ -649,7 +642,8 @@ class Molecule:
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`.Molecule`
+            A molecule with atomic positions found in `path`.
 
         Raises
         ------
@@ -662,7 +656,7 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def _update_from_turbomole(self, path):
+    def _set_atomic_positions_from_turbomole(self, path):
         """
         Update the structure from a Turbomole ``.coord`` file.
 
@@ -676,7 +670,8 @@ class Molecule:
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`.Molecule`
+            A molecule with atomic positions found in `path`.
 
         Raises
         ------
