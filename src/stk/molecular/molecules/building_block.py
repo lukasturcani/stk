@@ -899,9 +899,14 @@ class BuildingBlock(Molecule_):
     def __str__(self):
         smiles = rdkit.MolToSmiles(rdkit.RemoveHs(self.to_rdkit_mol()))
         func_groups = list(dedupe(
-            fg.fg_type.name for fg in self.functional_groups
+            fg.fg_type.name for fg in self._functional_groups
         ))
-        return f'{self.__class__.__name__}({smiles!r}, {func_groups})'
+        if func_groups:
+            fg_repr = f', {func_groups}'
+        else:
+            fg_repr = ''
+
+        return f'{self.__class__.__name__}({smiles!r}{fg_repr})'
 
     def __repr__(self):
         return str(self)

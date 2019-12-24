@@ -435,7 +435,7 @@ class TestWithStructureFromFile1:
             b=conformer2.get_position_matrix(),
             atol=1e-4,
         )
-        _test_unchanged(clone, new)
+        _test_unchanged(clone, conformer1)
 
 
 class TestWithStructureFromFile2:
