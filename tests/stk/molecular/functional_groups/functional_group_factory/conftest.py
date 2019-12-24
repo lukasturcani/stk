@@ -148,6 +148,23 @@ class GetFunctionalGroupsTestCase:
             ),
         ),
 
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('O=C(S)CC(S)=O'),
+            factory=stk.ThioacidFactory(),
+            functional_groups=(
+                stk.Thioacid(
+                    atoms=(stk.O(0), stk.C(1), stk.S(2), stk.H(7)),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.S(2), stk.H(7)),
+                ),
+                stk.Thioacid(
+                    atoms=(stk.C(4), stk.S(5), stk.O(6), stk.H(10)),
+                    bonders=(stk.C(4), ),
+                    deleters=(stk.S(5), stk.H(10)),
+                ),
+            ),
+        ),
+
     ],
 )
 def get_functional_groups_test_case(request):
