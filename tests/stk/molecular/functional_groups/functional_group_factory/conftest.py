@@ -118,6 +118,36 @@ class GetFunctionalGroupsTestCase:
                 ),
             ),
         ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('O=C(N)CCC(=O)N'),
+            factory=stk.AmideFactory(),
+            functional_groups=(
+                stk.Amide(
+                    atoms=(
+                        stk.O(0),
+                        stk.C(1),
+                        stk.N(2),
+                        stk.H(8),
+                        stk.H(9),
+                    ),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.N(2), stk.H(8), stk.H(9)),
+                ),
+                stk.Amide(
+                    atoms=(
+                        stk.C(5),
+                        stk.O(6),
+                        stk.N(7),
+                        stk.H(14),
+                        stk.H(15),
+                    ),
+                    bonders=(stk.C(5), ),
+                    deleters=(stk.N(7), stk.H(14), stk.H(15)),
+                ),
+            ),
+        ),
+
     ],
 )
 def get_functional_groups_test_case(request):
