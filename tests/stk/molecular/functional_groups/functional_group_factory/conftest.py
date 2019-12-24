@@ -165,6 +165,22 @@ class GetFunctionalGroupsTestCase:
             ),
         ),
 
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('OCCCO'),
+            factory=stk.AlcoholFactory(),
+            functional_groups=(
+                stk.Alcohol(
+                    atoms=(stk.O(0), stk.H(5)),
+                    bonders=(stk.O(0), ),
+                    deleters=(stk.H(5), ),
+                ),
+                stk.Alcohol(
+                    atoms=(stk.O(4), stk.H(12)),
+                    bonders=(stk.O(4), ),
+                    deleters=(stk.H(12), ),
+                ),
+            ),
+        ),
     ],
 )
 def get_functional_groups_test_case(request):
