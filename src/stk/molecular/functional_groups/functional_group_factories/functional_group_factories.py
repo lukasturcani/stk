@@ -281,7 +281,7 @@ class TerminalAlkyneFactory(SmartsFunctionalGroupFactory):
     _functional_group = TerminalAlkyne
     _functional_group_smarts = '[C]#[C][H]'
     _bonder_smarts = ['[$([C]([H])#[C])]']
-    _deleter_smarts = ['[$([H][C]#[C])]', '[$([C](#[C])[H])]']
+    _deleter_smarts = ['[$([H][C]#[C])]', '[$([C]([H])#[C])]']
 
     def __init__(self, delete_carbon=False):
         """

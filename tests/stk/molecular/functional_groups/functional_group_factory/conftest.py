@@ -181,6 +181,102 @@ class GetFunctionalGroupsTestCase:
                 ),
             ),
         ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('SCCCS'),
+            factory=stk.ThiolFactory(),
+            functional_groups=(
+                stk.Thiol(
+                    atoms=(stk.S(0), stk.H(5)),
+                    bonders=(stk.S(0), ),
+                    deleters=(stk.H(5), ),
+                ),
+                stk.Thiol(
+                    atoms=(stk.S(4), stk.H(12)),
+                    bonders=(stk.S(4), ),
+                    deleters=(stk.H(12), ),
+                ),
+            ),
+        ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('FCC(F)CCF'),
+            factory=stk.FluoroFactory(),
+            functional_groups=(
+                stk.Fluoro(
+                    atoms=(stk.F(0), stk.C(1)),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.F(0), ),
+                ),
+                stk.Fluoro(
+                    atoms=(stk.F(3), stk.C(2)),
+                    bonders=(stk.C(2), ),
+                    deleters=(stk.F(3), ),
+                ),
+                stk.Fluoro(
+                    atoms=(stk.F(6), stk.C(5)),
+                    bonders=(stk.C(5), ),
+                    deleters=(stk.F(6), ),
+                ),
+            ),
+        ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('BrCC(Br)CCBr'),
+            factory=stk.BromoFactory(),
+            functional_groups=(
+                stk.Bromo(
+                    atoms=(stk.Br(0), stk.C(1)),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.Br(0), ),
+                ),
+                stk.Bromo(
+                    atoms=(stk.Br(3), stk.C(2)),
+                    bonders=(stk.C(2), ),
+                    deleters=(stk.Br(3), ),
+                ),
+                stk.Bromo(
+                    atoms=(stk.Br(6), stk.C(5)),
+                    bonders=(stk.C(5), ),
+                    deleters=(stk.Br(6), ),
+                ),
+            ),
+        ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('ICC(I)CCI'),
+            factory=stk.IodoFactory(),
+            functional_groups=(
+                stk.Iodo(
+                    atoms=(stk.I(0), stk.C(1)),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.I(0), ),
+                ),
+                stk.Iodo(
+                    atoms=(stk.I(3), stk.C(2)),
+                    bonders=(stk.C(2), ),
+                    deleters=(stk.I(3), ),
+                ),
+                stk.Iodo(
+                    atoms=(stk.I(6), stk.C(5)),
+                    bonders=(stk.C(5), ),
+                    deleters=(stk.I(6), ),
+                ),
+            ),
+        ),
+
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('C#CC#CC'),
+            factory=stk.TerminalAlkyneFactory(),
+            functional_groups=(
+                stk.TerminalAlkyne(
+                    atoms=(stk.C(0), stk.C(1), stk.H(5)),
+                    bonders=(stk.C(0), ),
+                    deleters=(stk.H(5), ),
+                ),
+            ),
+        ),
+
     ],
 )
 def get_functional_groups_test_case(request):

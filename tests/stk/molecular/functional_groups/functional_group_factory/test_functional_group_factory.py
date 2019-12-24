@@ -16,6 +16,8 @@ def _test_equivalent_functional_group(
     functional_group1,
     functional_group2,
 ):
+    assert functional_group1.__class__ is functional_group2.__class__
+
     _test_equivalent_atoms(
         atoms1=sorted(functional_group1.get_atoms(), key=atom_id),
         atoms2=sorted(functional_group2.get_atoms(), key=atom_id),
