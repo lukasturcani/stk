@@ -85,6 +85,23 @@ class GetFunctionalGroupsTestCase:
             ),
         ),
 
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('O=CCC=O'),
+            factory=stk.AldehydeFactory(),
+            functional_groups=(
+                stk.Aldehyde(
+                    atoms=(stk.O(0), stk.C(1), stk.H(5)),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.O(0), ),
+                ),
+                stk.Aldehyde(
+                    atoms=(stk.O(4), stk.C(3), stk.H(8)),
+                    bonders=(stk.C(3), ),
+                    deleters=(stk.O(4), ),
+                ),
+            ),
+        ),
+
     ],
 )
 def get_functional_groups_test_case(request):
