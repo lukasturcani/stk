@@ -1,6 +1,6 @@
 class FunctionalGroup_:
     """
-    An implementation of :class:`.FunctionalGroup` interface.
+    An implementation of the :class:`.FunctionalGroup` interface.
 
     """
 

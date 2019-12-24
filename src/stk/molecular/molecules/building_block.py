@@ -15,9 +15,10 @@ from functools import partial
 from scipy.spatial.distance import euclidean
 
 from .. import atoms
+from ..functional_groups import FunctionalGroup, FunctionalGroupFactory
 from ..atoms import Atom
 from ..bond import Bond
-from .molecule import Molecule, Molecule_
+from .molecule import Molecule_
 from ...utilities import vector_angle, dedupe, remake
 
 
@@ -125,10 +126,16 @@ class BuildingBlock(Molecule_):
         molecule : :class:`.Molecule`
             The molecule to initialize from.
 
-        functional_groups : :class:`iterable` of :class:`str`, optional
-            The names of the functional group types which are to be
-            added to :attr:`func_groups`. If ``None``, then no
-            functional groups are added.
+        functional_groups : :class:`iterable`, optional
+            An :class:`iterable` of :class:`.FunctionalGroup` or
+            :class:`.FunctionalGroupFactory` or both.
+            :class:`.FunctionalGroup` instances are added to the
+            building block and :class:`.FunctionalGroupFactory`
+            instances are used to create :class:`.FunctionalGroup`
+            instances the building block should hold.
+            :class:`.FunctionalGroup` instances are used to identify
+            which atoms are modified during
+            :class:`.ConstructedMolecule` construction.
 
         Returns
         -------
@@ -157,10 +164,16 @@ class BuildingBlock(Molecule_):
                 #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
                 #. ``.pdb`` - PDB file
 
-        functional_groups : :class:`iterable` of :class:`str`, optional
-            The names of the functional group types which are to be
-            added to :attr:`func_groups`. If ``None``, then no
-            functional groups are added.
+        functional_groups : :class:`iterable`, optional
+            An :class:`iterable` of :class:`.FunctionalGroup` or
+            :class:`.FunctionalGroupFactory` or both.
+            :class:`.FunctionalGroup` instances are added to the
+            building block and :class:`.FunctionalGroupFactory`
+            instances are used to create :class:`.FunctionalGroup`
+            instances the building block should hold.
+            :class:`.FunctionalGroup` instances are used to identify
+            which atoms are modified during
+            :class:`.ConstructedMolecule` construction.
 
         Returns
         -------
@@ -208,10 +221,16 @@ class BuildingBlock(Molecule_):
             A glob specifying files, one of which is used to initialize
             a :class:`.BuildingBlock` at random.
 
-        functional_groups : :class:`iterable` of :class:`str`, optional
-            The names of the functional group types which are to be
-            added to :attr:`func_groups`. If ``None``, then no
-            functional groups are added.
+        functional_groups : :class:`iterable`, optional
+            An :class:`iterable` of :class:`.FunctionalGroup` or
+            :class:`.FunctionalGroupFactory` or both.
+            :class:`.FunctionalGroup` instances are added to the
+            building block and :class:`.FunctionalGroupFactory`
+            instances are used to create :class:`.FunctionalGroup`
+            instances the building block should hold.
+            :class:`.FunctionalGroup` instances are used to identify
+            which atoms are modified during
+            :class:`.ConstructedMolecule` construction.
 
         random_seed : :class:`int`, optional
             The random seed to use.
@@ -257,10 +276,16 @@ class BuildingBlock(Molecule_):
         molecule : :class:`rdkit.Mol`
             The molecule.
 
-        functional_groups : :class:`iterable` of :class:`str`, optional
-            The names of the functional group types which are to be
-            added to :attr:`func_groups`. If ``None``, then no
-            functional groups are added.
+        functional_groups : :class:`iterable`, optional
+            An :class:`iterable` of :class:`.FunctionalGroup` or
+            :class:`.FunctionalGroupFactory` or both.
+            :class:`.FunctionalGroup` instances are added to the
+            building block and :class:`.FunctionalGroupFactory`
+            instances are used to create :class:`.FunctionalGroup`
+            instances the building block should hold.
+            :class:`.FunctionalGroup` instances are used to identify
+            which atoms are modified during
+            :class:`.ConstructedMolecule` construction.
 
         Returns
         -------
@@ -297,10 +322,16 @@ class BuildingBlock(Molecule_):
         molecule : :class:`rdkit.Mol`
             The molecule.
 
-        functional_groups : :class:`iterable` of :class:`str`
-            The names of the functional group types which are to be
-            added to :attr:`func_groups`. If ``None`, then no
-            functional groups are added.
+        functional_groups : :class:`iterable`, optional
+            An :class:`iterable` of :class:`.FunctionalGroup` or
+            :class:`.FunctionalGroupFactory` or both.
+            :class:`.FunctionalGroup` instances are added to the
+            building block and :class:`.FunctionalGroupFactory`
+            instances are used to create :class:`.FunctionalGroup`
+            instances the building block should hold.
+            :class:`.FunctionalGroup` instances are used to identify
+            which atoms are modified during
+            :class:`.ConstructedMolecule` construction.
 
         identity_key : :class:`tuple`
             The identity key of the molecule.
@@ -328,15 +359,78 @@ class BuildingBlock(Molecule_):
         )
         position_matrix = molecule.GetConformer().GetPositions()
 
-        _Molecule.__init__(atoms, bonds, position_matrix)
+        super().__init__(atoms, bonds, position_matrix)
         self._identity_key = identity_key
+        self._functional_groups = []
+        for functional_group in functional_groups:
+            if isinstance(functional_group, FunctionalGroup):
+                self.add_functional_group(functional_group)
+            # Else it is a factory.
+            else:
+                self.add_functional_groups(functional_group)
 
-        fg_makers = (fg_types[name] for name in functional_groups)
-        self._func_groups = tuple(
-            func_group
-            for fg_maker in fg_makers
-            for func_group in fg_maker.get_functional_groups(self)
+    def _add_functional_group(self, functional_group):
+        """
+        Add a functional group.
+
+        Parameters
+        ----------
+        functional_group : :class:`.FunctionalGroup`
+            The functional group to add.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The building block.
+
+        """
+
+        # Use atom_map to make sure the clone stored in the building
+        # block uses the atoms in _atoms, so that multiple Atom
+        # instances are not held by the building block, wasting
+        # space.
+        self._functional_groups.append(functional_group.clone({
+            atom.id: self._atoms[atom.id]
+            for atom in functional_group.get_atoms()
+        }))
+        return self
+
+    def _add_functional_groups(self, factory):
+        """
+        Add functional groups produced by `factory`.
+
+        Parameters
+        ----------
+        factory : :class:`.FunctionalGroupFactory`
+            Produces a set of functional groups, which are added to
+            the bulding block.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The building block.
+
+        """
+
+        functional_groups = factory.get_functional_groups(
+            molecule=self.to_rdkit_mol,
         )
+        for functional_group in functional_groups:
+            self.add_functional_group(functional_group)
+        return self
+
+    def get_functional_groups(self):
+        """
+        Yield the functional groups, ordered by id.
+
+        Yields
+        ------
+        :class:`.FunctionalGroup`
+            A functional group of the building block.
+
+        """
+
+        yield from (fg.clone() for fg in self._functional_groups)
 
     @classmethod
     def _init_from_dict(cls, molecule_dict):

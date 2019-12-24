@@ -6,10 +6,10 @@ import numpy as np
 valid_molecules = [
     stk.BuildingBlock('NCCN'),
     stk.BuildingBlock('N[C+][C+2]N'),
-    stk.ConstructedMolecule(
-        building_blocks=[stk.BuildingBlock('BrCCBr', ['bromine'])],
-        topology_graph=stk.polymer.Linear('A', 3),
-    ),
+    #stk.ConstructedMolecule(
+    #    building_blocks=[stk.BuildingBlock('BrCCBr', ['bromine'])],
+    #    topology_graph=stk.polymer.Linear('A', 3),
+    #),
 ]
 
 
