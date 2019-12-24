@@ -17,7 +17,7 @@ class TestInitFromRdkitMol:
         rdkit_molecule = rdkit.AddHs(rdkit.MolFromSmiles('NCCN'))
         rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
 
-        functional_groups = ['amine']
+        functional_groups = [stk.AmineFactory()]
 
         expected_functional_groups = [
             _FunctionalGroup(
@@ -45,7 +45,7 @@ class TestInitFromRdkitMol:
     def case3():
         rdkit_molecule = rdkit.AddHs(rdkit.MolFromSmiles('NCCN'))
         rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
-        return rdkit_molecule, ['aldehyde'], []
+        return rdkit_molecule, [stk.AldehydeFactory()], []
 
     @pytest.mark.parametrize(
         argnames=(
@@ -132,7 +132,7 @@ def is_equivalent_fg(fg1, fg2):
         in it.zip_longest(fg1.get_deleter_ids(), fg2.get_deleter_ids())
     )
     return (
-        fg1.fg_type is fg2.fg_type
+        fg1.__class__ is fg2.__class__
         and equivalent_atoms
         and equivalent_bonders
         and equivalent_deleters
@@ -212,7 +212,7 @@ def test_clone(building_block):
 
 class TestInitFromMolecule:
     def case1():
-        functional_groups = ['amine']
+        functional_groups = [stk.AmineFactory()]
         building_block = stk.BuildingBlock(
             smiles='NCCN',
             functional_groups=functional_groups,
@@ -226,7 +226,7 @@ class TestInitFromMolecule:
         )
 
     def case2():
-        functional_groups = ['bromine']
+        functional_groups = [stk.BromoFactory()]
         molecule = stk.ConstructedMolecule(
             building_blocks=[
                 stk.BuildingBlock('BrCCBr', functional_groups),
@@ -234,17 +234,15 @@ class TestInitFromMolecule:
             topology_graph=stk.polymer.Linear('AA', 1),
         )
         expected_functional_groups = (
-            stk.FunctionalGroup(
+            stk.Bromo(
                 atoms=(stk.C(1), stk.Br(2)),
                 bonders=(stk.C(1), ),
                 deleters=(stk.Br(2), ),
-                fg_type=stk.functional_groups.fg_types['bromine'],
             ),
-            stk.FunctionalGroup(
+            stk.Bromo(
                 atoms=(stk.C(8), stk.Br(7)),
                 bonders=(stk.C(8), ),
                 deleters=(stk.Br(7), ),
-                fg_type=stk.functional_groups.fg_types['bromine'],
             ),
         )
         return (
@@ -265,7 +263,7 @@ class TestInitFromMolecule:
         ),
         argvalues=(
             case1(),
-            case2(),
+            # case2(),
         ),
     )
     def test(
@@ -281,21 +279,21 @@ class TestInitFromMolecule:
             functional_groups=functional_groups,
         )
         atoms = it.zip_longest(
-            building_block.atoms,
+            building_block.get_atoms(),
             expected_atoms,
         )
         for a1, a2 in atoms:
             assert is_equivalent_atom(a1, a2)
 
         bonds = it.zip_longest(
-            building_block.bonds,
+            building_block.get_bonds(),
             expected_bonds,
         )
         for b1, b2 in bonds:
             assert is_equivalent_bond(b1, b2)
 
         fgs = it.zip_longest(
-            building_block.func_groups,
+            building_block.get_functional_groups(),
             expected_functional_groups,
         )
         for fg1, fg2 in fgs:
@@ -308,7 +306,7 @@ class TestInitFromRandomFile:
         return str(datadir / request.param)
 
     def case1():
-        functional_groups = ['amine']
+        functional_groups = [stk.AmineFactory()]
         building_block = stk.BuildingBlock(
             smiles='NCCCN',
             functional_groups=functional_groups,
@@ -316,7 +314,7 @@ class TestInitFromRandomFile:
         return 'neutral.mol', functional_groups, building_block
 
     def case2():
-        functional_groups = ['amine']
+        functional_groups = [stk.AmineFactory()]
         building_block = stk.BuildingBlock(
             smiles='NC[C-]CN',
             functional_groups=functional_groups,
@@ -324,7 +322,7 @@ class TestInitFromRandomFile:
         return 'negative_carbon.mol', functional_groups, building_block
 
     def case3():
-        functional_groups = ['amine']
+        functional_groups = [stk.AmineFactory()]
         building_block = stk.BuildingBlock(
             smiles='[N-]CCCN',
             functional_groups=functional_groups,
@@ -392,22 +390,20 @@ class TestInitFromSmiles:
             stk.Bond(stk.N(3), stk.H(11), 1),
         )
         expected_functional_groups = (
-            stk.FunctionalGroup(
+            stk.Amine(
                 atoms=(stk.N(0), stk.H(4), stk.H(5)),
                 bonders=(stk.N(0),),
                 deleters=(stk.H(4), stk.H(5)),
-                fg_type=stk.functional_groups.fg_types['amine'],
             ),
-            stk.FunctionalGroup(
+            stk.Amine(
                 atoms=(stk.N(3), stk.H(10), stk.H(11)),
                 bonders=(stk.N(3), ),
                 deleters=(stk.H(10), stk.H(11)),
-                fg_type=stk.functional_groups.fg_types['amine'],
             ),
         )
         return (
             'NCCN',
-            ['amine'],
+            [stk.AmineFactory()],
             expected_atoms,
             expected_bonds,
             expected_functional_groups,
@@ -435,21 +431,21 @@ class TestInitFromSmiles:
     ):
         building_block = stk.BuildingBlock(smiles, functional_groups)
         atoms = it.zip_longest(
-            building_block.atoms,
+            building_block.get_atoms(),
             expected_atoms,
         )
         for a1, a2 in atoms:
             assert is_equivalent_atom(a1, a2)
 
         bonds = it.zip_longest(
-            building_block.bonds,
+            building_block.get_bonds(),
             expected_bonds,
         )
         for b1, b2 in bonds:
             assert is_equivalent_bond(b1, b2)
 
         fgs = it.zip_longest(
-            building_block.func_groups,
+            building_block.get_functional_groups(),
             expected_functional_groups,
         )
         for fg1, fg2 in fgs:
@@ -459,12 +455,12 @@ class TestInitFromSmiles:
 def test_get_bonder_ids(building_block, get_fg_ids):
     fg_ids = get_fg_ids(building_block)
     if fg_ids is None:
-        fg_ids = range(len(building_block.func_groups))
-    fg_ids = list(fg_ids)
+        fg_ids = range(building_block.get_num_functional_groups)
+
     expected_bonder_ids = (
         bid
-        for fg_id in fg_ids
-        for bid in building_block.func_groups[fg_id].get_bonder_ids()
+        for fg in building_block.get_functional_groups(fg_ids)
+        for bid in fg.get_bonder_ids()
     )
     ids = building_block.get_bonder_ids(
         fg_ids=get_fg_ids(building_block),
