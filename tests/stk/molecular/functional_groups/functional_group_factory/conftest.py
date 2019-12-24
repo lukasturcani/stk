@@ -301,6 +301,40 @@ class GetFunctionalGroupsTestCase:
             ),
         ),
 
+        GetFunctionalGroupsTestCase(
+            molecule=stk.BuildingBlock('B(O)(O)CCB(O)O'),
+            factory=stk.BoronicAcidFactory(),
+            functional_groups=(
+                stk.BoronicAcid(
+                    atoms=(
+                        stk.B(0),
+                        stk.O(1),
+                        stk.O(2),
+                        stk.H(8),
+                        stk.H(9),
+                    ),
+                    bonders=(stk.B(0), ),
+                    deleters=(stk.O(1), stk.O(2), stk.H(8), stk.H(9)),
+                ),
+                stk.BoronicAcid(
+                    atoms=(
+                        stk.B(5),
+                        stk.O(6),
+                        stk.O(7),
+                        stk.H(14),
+                        stk.H(15)
+                    ),
+                    bonders=(stk.B(5), ),
+                    deleters=(
+                        stk.O(6),
+                        stk.O(7),
+                        stk.H(14),
+                        stk.H(15),
+                    ),
+                ),
+            ),
+        ),
+
     ],
 )
 def get_functional_groups_test_case(request):
