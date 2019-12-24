@@ -85,14 +85,14 @@ def test_with_rotation_between_vectors(valid_molecule):
     # Use to check that immutability is not violated.
     clone = valid_molecule.clone()
 
-    position1, position2 = valid_molecule.get_atom_positions((0, 1))
+    position1, position2 = valid_molecule.get_atomic_positions((0, 1))
     new = valid_molecule.with_rotation_between_vectors(
         start=position1-position2,
         target=[1, 0, 0],
         origin=valid_molecule.get_centroid(),
     )
 
-    position1, position2 = new.get_atom_positions((0, 1))
+    position1, position2 = new.get_atomic_positions((0, 1))
     assert np.allclose(
         a=stk.normalize_vector(position1-position2),
         b=[1, 0, 0],
@@ -106,7 +106,7 @@ def test_with_rotation_to_minimize_angle(valid_molecule):
     clone = valid_molecule.clone()
 
     position1, position2, position3 = (
-        valid_molecule.get_atom_positions((0, 1, 2))
+        valid_molecule.get_atomic_positions((0, 1, 2))
     )
     start = stk.normalize_vector(position2-position1)
     target = stk.normalize_vector(position3 - position1)
@@ -117,7 +117,7 @@ def test_with_rotation_to_minimize_angle(valid_molecule):
         origin=position1,
     )
 
-    new_position1, new_position2 = new.get_atom_positions((0, 1))
+    new_position1, new_position2 = new.get_atomic_positions((0, 1))
     assert np.allclose(
         a=target,
         b=stk.normalize_vector(new_position2-new_position1),
@@ -126,7 +126,7 @@ def test_with_rotation_to_minimize_angle(valid_molecule):
     _test_unchanged(valid_molecule, clone)
 
 
-def test_get_atom_positions(molecule, get_atom_ids_no_fail):
+def test_get_atomic_positions(molecule, get_atom_ids_no_fail):
     position_matrix = molecule.get_position_matrix()
     atom_ids = get_atom_ids_no_fail(molecule)
     if atom_ids is None:
@@ -134,13 +134,13 @@ def test_get_atom_positions(molecule, get_atom_ids_no_fail):
 
     positions = it.zip_longest(
         atom_ids,
-        molecule.get_atom_positions(get_atom_ids_no_fail(molecule)),
+        molecule.get_atomic_positions(get_atom_ids_no_fail(molecule)),
     )
     for atom_id, position in positions:
         assert np.all(np.equal(position, position_matrix[atom_id]))
 
 
-def test_get_atom_distance(molecule):
+def test_get_atomic_distance(molecule):
     position_matrix = molecule.get_position_matrix()
     positions_1 = np.repeat(
         a=[position_matrix],
@@ -153,7 +153,7 @@ def test_get_atom_distance(molecule):
     atom_ids = range(molecule.get_num_atoms())
     for atom1, atom2 in it.product(atom_ids, atom_ids):
         true_distance = distance_matrix[atom1, atom2]
-        distance = molecule.get_atom_distance(atom1, atom2)
+        distance = molecule.get_atomic_distance(atom1, atom2)
         assert abs(true_distance - distance) < 1e-13
 
 

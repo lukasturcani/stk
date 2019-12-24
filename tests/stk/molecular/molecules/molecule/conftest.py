@@ -6,10 +6,10 @@ import numpy as np
 valid_molecules = [
     stk.BuildingBlock('NCCN'),
     stk.BuildingBlock('N[C+][C+2]N'),
-    #stk.ConstructedMolecule(
+    # stk.ConstructedMolecule(
     #    building_blocks=[stk.BuildingBlock('BrCCBr', ['bromine'])],
     #    topology_graph=stk.polymer.Linear('A', 3),
-    #),
+    # ),
 ]
 
 
@@ -94,13 +94,13 @@ def origin(request):
 # function to fail.
 never_fail_get_atom_ids = [
     lambda molecule: None,
-    lambda molecule: range(len(molecule.atoms)),
-    lambda molecule: range(0, len(molecule.atoms), 2),
-    lambda molecule: range(0, min(1, len(molecule.atoms))),
-    lambda molecule: list(range(0, min(1, len(molecule.atoms)))),
-    lambda molecule: tuple(range(0, min(1, len(molecule.atoms)))),
+    lambda molecule: range(molecule.get_num_atoms()),
+    lambda molecule: range(0, molecule.get_num_atoms(), 2),
+    lambda molecule: range(0, min(1, molecule.get_num_atoms())),
+    lambda molecule: list(range(0, min(1, molecule.get_num_atoms()))),
+    lambda molecule: tuple(range(0, min(1, molecule.get_num_atoms()))),
     lambda molecule: (
-        i for i in range(0, min(1, len(molecule.atoms)))
+        i for i in range(0, min(1, molecule.get_num_atoms()))
     ),
 ]
 

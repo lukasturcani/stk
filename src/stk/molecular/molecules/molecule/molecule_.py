@@ -81,7 +81,11 @@ class Molecule_(Molecule):
         return self
 
     def with_rotation_about_axis(self, angle, axis, origin):
-        return self.clone()._with_displacement(angle, axis, origin)
+        return self.clone()._with_rotation_about_axis(
+            angle=angle,
+            axis=axis,
+            origin=origin
+        )
 
     def _with_rotation_between_vectors(self, start, target, origin):
         """
@@ -200,7 +204,7 @@ class Molecule_(Molecule):
         for atom_coords in coords:
             yield atom_coords
 
-    def get_atom_distance(self, atom1_id, atom2_id):
+    def get_atomic_distance(self, atom1_id, atom2_id):
         distance = euclidean(
             u=self._position_matrix[:, atom1_id],
             v=self._position_matrix[:, atom2_id]
