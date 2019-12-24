@@ -33,11 +33,11 @@ def _test_equivalent_functional_group(
 
 
 def test_get_functional_groups(get_functional_groups_test_case):
+    test_case = get_functional_groups_test_case
+
     fgs = it.zip_longest(
-        get_functional_groups_test_case.functional_groups,
-        get_functional_groups_test_case.factory.get_functional_groups(
-            molecule=get_functional_groups_test_case.molecule,
-        ),
+        test_case.functional_groups,
+        test_case.factory.get_functional_groups(test_case.molecule),
     )
     for expected_fg, fg in fgs:
         _test_equivalent_functional_group(expected_fg, fg)

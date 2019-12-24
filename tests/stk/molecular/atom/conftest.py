@@ -2,11 +2,6 @@ import pytest
 import stk
 
 
-@pytest.fixture
-def atom(atom_cls):
-    return atom_cls(3, -5).clone()
-
-
 @pytest.fixture(
     params=[
         cls for cls in stk.__dict__.values()
@@ -15,14 +10,37 @@ def atom(atom_cls):
         and cls is not stk.Atom
     ],
 )
-def atom_cls(request):
+def get_atom(request):
+    """
+    A function which returns an :class:`.Atom` instance.
+
+    The function takes two parameters, the id and charge the created
+    atom should have.
+
+    """
+
     return request.param
+
+
+@pytest.fixture
+def atom(get_atom):
+    """
+    An :class:`.Atom` instance.
+
+    """
+
+    return get_atom(3, -5).clone()
 
 
 @pytest.fixture(
     params=[0, 10],
 )
 def id(request):
+    """
+    An atom id.
+
+    """
+
     return request.param
 
 
@@ -30,4 +48,9 @@ def id(request):
     params=[0, 10, -1],
 )
 def charge(request):
+    """
+    An atomic charge.
+
+    """
+
     return request.param

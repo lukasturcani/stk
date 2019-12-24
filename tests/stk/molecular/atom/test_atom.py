@@ -1,5 +1,5 @@
-def test_init(atom_cls, id, charge):
-    atom = atom_cls(id, charge)
+def test_init(get_atom, id, charge):
+    atom = get_atom(id, charge)
     assert atom.id == id
     assert atom.charge == charge
 
