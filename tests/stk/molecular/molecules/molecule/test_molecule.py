@@ -7,8 +7,8 @@ import stk
 
 def _test_unchanged(molecule1, molecule2):
     assert np.all(np.equal(
-        a=molecule1.get_position_matrix(),
-        b=molecule2.get_position_matrix(),
+        molecule1.get_position_matrix(),
+        molecule2.get_position_matrix(),
     ))
 
 
@@ -129,8 +129,11 @@ def test_with_rotation_to_minimize_angle(valid_molecule):
 def test_get_atom_positions(molecule, get_atom_ids_no_fail):
     position_matrix = molecule.get_position_matrix()
     atom_ids = get_atom_ids_no_fail(molecule)
+    if atom_ids is None:
+        atom_ids = range(molecule.get_num_atoms())
+
     positions = it.zip_longest(
-        range(len(molecule.atoms)) if atom_ids is None else atom_ids,
+        atom_ids,
         molecule.get_atom_positions(get_atom_ids_no_fail(molecule)),
     )
     for atom_id, position in positions:
@@ -139,11 +142,15 @@ def test_get_atom_positions(molecule, get_atom_ids_no_fail):
 
 def test_get_atom_distance(molecule):
     position_matrix = molecule.get_position_matrix()
-    positions_1 = np.repeat([position_matrix], len(molecule.atoms), 0)
+    positions_1 = np.repeat(
+        a=[position_matrix],
+        repeats=molecule.get_num_atoms(),
+        axis=0,
+    )
     positions_2 = positions_1.swapaxes(0, 1)
     distance_matrix = np.linalg.norm(positions_1 - positions_2, axis=2)
 
-    atom_ids = range(len(molecule.atoms))
+    atom_ids = range(molecule.get_num_atoms())
     for atom1, atom2 in it.product(atom_ids, atom_ids):
         true_distance = distance_matrix[atom1, atom2]
         distance = molecule.get_atom_distance(atom1, atom2)
@@ -155,15 +162,11 @@ def test_get_center_of_mass(molecule, get_atom_ids):
     center_of_mass = molecule.get_center_of_mass(atom_ids),
 
     if atom_ids is None:
-        atom_ids = range(len(molecule.atoms))
+        atom_ids = range(molecule.get_num_atoms())
     else:
         atom_ids = list(get_atom_ids(molecule))
 
-    valid_atom_ids = set(atom_ids)
-    atoms = filter(
-        lambda atom: atom.id in valid_atom_ids,
-        molecule.atoms
-    )
+    atoms = molecule.get_atoms(atom_ids=atom_ids)
     masses = [[atom.mass] for atom in atoms]
     true_center_of_mass = np.divide(
         np.sum(
@@ -184,7 +187,7 @@ def test_get_centroid(molecule, get_atom_ids):
     centroid = molecule.get_centroid(atom_ids)
 
     if atom_ids is None:
-        atom_ids = range(len(molecule.atoms))
+        atom_ids = range(molecule.get_num_atoms())
     else:
         atom_ids = list(get_atom_ids(molecule))
 
@@ -334,11 +337,11 @@ class TestGetPlaneNormal:
 class TestPositionMatrix:
     def case1():
         molecule = stk.BuildingBlock('NCCN')
-        return molecule, np.zeros((len(molecule.atoms), 3))
+        return molecule, np.zeros((molecule.get_num_atoms(), 3))
 
     def case2():
         molecule = stk.BuildingBlock('NCCN')
-        return molecule, np.ones((len(molecule.atoms), 3))
+        return molecule, np.ones((molecule.get_num_atoms(), 3))
 
     @pytest.mark.parametrize(
         'molecule,position_matrix',
@@ -403,7 +406,7 @@ class TestWithStructureFromFile1:
             topology_graph=topology_graph,
         )
         conformer2.set_position_matrix(
-            position_matrix=np.zeros((len(conformer2.atoms), 3)),
+            position_matrix=np.zeros((conformer2.get_num_atoms(), 3)),
         )
         return conformer1, conformer2
 
@@ -455,7 +458,8 @@ class TestWithStructureFromFile2:
         clone = molecule.clone()
         new = molecule.with_structure_from_file(path)
         size_diff = abs(
-            molecule.get_maximum_diameter() - new.get_maximum_diamter()
+            molecule.get_maximum_diameter()
+            - new.get_maximum_diameter()
         )
         assert size_diff > 1
         _test_unchanged(clone, molecule)
@@ -502,8 +506,10 @@ def is_equivalent_bond(bond1, bond2):
 
 def test_clone(molecule):
     clone = molecule.clone()
-    for a1, a2 in it.zip_longest(clone.atoms, molecule.atoms):
+    atoms = it.zip_longest(clone.get_atoms(), molecule.get_atoms())
+    for a1, a2 in atoms:
         assert is_equivalent_atom(a1, a2)
 
-    for b1, b2 in it.zip_longest(clone.bonds, molecule.bonds):
+    bonds = it.zip_longest(clone.get_bonds(), molecule.get_bonds())
+    for b1, b2 in bonds:
         assert is_equivalent_bond(b1, b2)

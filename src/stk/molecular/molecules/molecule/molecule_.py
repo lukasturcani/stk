@@ -192,7 +192,7 @@ class Molecule_(Molecule):
 
     def get_atomic_positions(self, atom_ids=None):
         if atom_ids is None:
-            atom_ids = range(len(self.atoms))
+            atom_ids = range(len(self._atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
@@ -222,7 +222,7 @@ class Molecule_(Molecule):
         total_mass = 0.
         coords = self.get_atomic_positions(atom_ids)
         for atom_id, coord in zip(atom_ids, coords):
-            mass = self.atoms[atom_id].mass
+            mass = self._atoms[atom_id].mass
             total_mass += mass
             center += mass*coord
         return np.divide(center, total_mass)
@@ -361,7 +361,7 @@ class Molecule_(Molecule):
             a2 = bond.atom2.id
             if a1 in atoms and a2 in atoms:
                 # Keep bond ids if all bonds are getting written.
-                if num_atoms == len(self.atoms):
+                if num_atoms == len(self._atoms):
                     bond_id = bond_idx
                 else:
                     bond_id = len(bond_lines)
@@ -414,21 +414,21 @@ class Molecule_(Molecule):
         mol.AddConformer(rdkit_conf)
         return mol
 
-    def with_atomic_positions_from_file(self, path, extension=None):
+    def with_structure_from_file(self, path, extension=None):
         if extension is None:
             _, extension = os.path.splitext(path)
 
         clone = self.clone()
         update_fns = {
-            '.mol': clone._with_atomic_positions_from_mol,
-            '.sdf': clone._with_atomic_positions_from_mol,
-            '.mae': clone._with_atomic_positions_from_mae,
-            '.xyz': clone._with_atomic_positions_from_xyz,
-            '.coord': clone._with_atomic_positions_from_turbomole,
+            '.mol': clone._with_structure_from_mol,
+            '.sdf': clone._with_structure_from_mol,
+            '.mae': clone._with_structure_from_mae,
+            '.xyz': clone._with_structure_from_xyz,
+            '.coord': clone._with_structure_from_turbomole,
         }
         return update_fns[extension](path=path)
 
-    def _with_atomic_positions_from_mae(self, path):
+    def _with_structure_from_mae(self, path):
         """
         Change structure to match an ``.mae`` file.
 
@@ -450,7 +450,7 @@ class Molecule_(Molecule):
             position_matrix=molecule.GetConformer().GetPositions()
         )
 
-    def _with_atomic_positions_from_mol(self, path):
+    def _with_structure_from_mol(self, path):
         """
         Change structure to match a ``.mol`` file.
 
@@ -478,7 +478,7 @@ class Molecule_(Molecule):
             position_matrix=molecule.GetConformer().GetPositions()
         )
 
-    def _with_atomic_positions_from_xyz(self, path):
+    def _with_structure_from_xyz(self, path):
         """
         Return a clone, with its structure taken from an ``.xyz`` file.
 
@@ -541,7 +541,7 @@ class Molecule_(Molecule):
         new_coords = np.array(new_coords)
         return self._with_position_matrix(new_coords)
 
-    def _with_atomic_positions_from_turbomole(self, path):
+    def _with_structure_from_turbomole(self, path):
         """
         Return a clone, with its structure taken from a Turbomole file.
 
@@ -644,7 +644,7 @@ class Molecule_(Molecule):
             atoms.add(atom)
 
             serial = atom+1
-            element = self.atoms[atom].__class__.__name__
+            element = self._atoms[atom].__class__.__name__
             atom_counts[element] = atom_counts.get(element, 0) + 1
             name = f'{element}{atom_counts[element]}'
             # Make sure the coords are no more than 8 columns wide
@@ -656,7 +656,7 @@ class Molecule_(Molecule):
                 f'{res_seq:>4}{i_code:<1}   '
                 f'{x:>8}{y:>8}{z:>8}'
                 f'{occupancy:>6}{temp_factor:>6}          '
-                f'{element:>2}{self.atoms[atom].charge:>2}\n'
+                f'{element:>2}{self._atoms[atom].charge:>2}\n'
             )
 
         conect = 'CONECT'

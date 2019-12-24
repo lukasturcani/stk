@@ -364,12 +364,12 @@ class BuildingBlock(Molecule_):
         self._functional_groups = []
         for functional_group in functional_groups:
             if isinstance(functional_group, FunctionalGroup):
-                self.add_functional_group(functional_group)
+                self._with_functional_group(functional_group)
             # Else it is a factory.
             else:
-                self.add_functional_groups(functional_group)
+                self._with_functional_groups(functional_group)
 
-    def add_functional_group(self, functional_group):
+    def _with_functional_group(self, functional_group):
         """
         Add a functional group.
 
@@ -395,7 +395,25 @@ class BuildingBlock(Molecule_):
         }))
         return self
 
-    def add_functional_groups(self, factory):
+    def with_functional_group(self, functional_group):
+        """
+        Return a clone with an additional functional group.
+
+        Parameters
+        ----------
+        functional_group : :class:`.FunctionalGroup`
+            The functional group to add.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The clone.
+
+        """
+
+        return self.clone()._with_functional_group(functional_group)
+
+    def _with_functional_groups(self, factory):
         """
         Add functional groups produced by `factory`.
 
@@ -415,6 +433,25 @@ class BuildingBlock(Molecule_):
         for functional_group in factory.get_functional_groups(self):
             self.add_functional_group(functional_group)
         return self
+
+    def with_functional_groups(self, factory):
+        """
+        Return a clone with additional functional groups.
+
+        Parameters
+        ----------
+        factory : :class:`.FunctionalGroupFactory`
+            Produces the additional functional groups, which are
+            added to the clone.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The clone.
+
+        """
+
+        return self.clone()._with_functional_groups(factory)
 
     def get_functional_groups(self):
         """
@@ -487,13 +524,10 @@ class BuildingBlock(Molecule_):
         """
 
         clone = super().clone()
-        atom_map = {
-            original: clone
-            for original, clone in zip(self._atoms, clone._atoms)
-        }
-        clone._func_groups = tuple(
-            fg.clone(atom_map) for fg in self._func_groups
-        )
+        atom_map = {a.id: a for a in clone._atoms}
+        clone._functional_groups = [
+            fg.clone(atom_map) for fg in self._functional_groups
+        ]
         return clone
 
     def get_bonder_ids(self, fg_ids=None):
@@ -515,10 +549,10 @@ class BuildingBlock(Molecule_):
         """
 
         if fg_ids is None:
-            fg_ids = range(len(self.func_groups))
+            fg_ids = range(len(self._functional_groups))
 
         for fg_id in fg_ids:
-            yield from self.func_groups[fg_id].get_bonder_ids()
+            yield from self._functional_groups[fg_id].get_bonder_ids()
 
     def get_bonder_centroids(self, fg_ids=None):
         """
@@ -544,12 +578,11 @@ class BuildingBlock(Molecule_):
         """
 
         if fg_ids is None:
-            fg_ids = range(len(self.func_groups))
+            fg_ids = range(len(self._functional_groups))
 
         for fg_id in fg_ids:
-            yield self.get_centroid(
-                atom_ids=self.func_groups[fg_id].get_bonder_ids()
-            )
+            fg = self._functional_groups[fg_id]
+            yield self.get_centroid(fg.get_bonder_ids())
 
     def get_bonder_plane(self, fg_ids=None):
         """
@@ -595,14 +628,13 @@ class BuildingBlock(Molecule_):
         """
 
         if fg_ids is None:
-            fg_ids = range(len(self.func_groups))
+            fg_ids = range(len(self._functional_groups))
         else:
             # Iterable is used multiple times.
             fg_ids = list(fg_ids)
 
-        centroid = self.get_centroid(
-            atom_ids=self.func_groups[fg_ids[0]].get_bonder_ids()
-        )
+        fg = self._functional_groups[fg_ids[0]]
+        centroid = self.get_centroid(fg.get_bonder_ids())
         normal = self.get_bonder_plane_normal(fg_ids=fg_ids)
         d = np.sum(normal * centroid)
         return np.append(normal, d)
@@ -641,7 +673,7 @@ class BuildingBlock(Molecule_):
         """
 
         if fg_ids is None:
-            fg_ids = range(len(self.func_groups))
+            fg_ids = range(len(self._functional_groups))
         else:
             # The iterable is used mutliple times.
             fg_ids = list(fg_ids)
@@ -694,12 +726,12 @@ class BuildingBlock(Molecule_):
         """
 
         if fg_ids is None:
-            fg_ids = range(len(self.func_groups))
+            fg_ids = range(len(self._functional_groups))
 
         # Iterator yielding tuples of form (fg_id, bonder_centroid)
         centroids = ((
             i, self.get_centroid(
-                atom_ids=self.func_groups[i].get_bonder_ids()
+                atom_ids=self._functional_groups[i].get_bonder_ids()
             ))
             for i in fg_ids
         )
@@ -740,12 +772,12 @@ class BuildingBlock(Molecule_):
         """
 
         if fg_ids is None:
-            fg_ids = range(len(self.func_groups))
+            fg_ids = range(len(self._functional_groups))
 
         # Iterator yielding tuples of form (fg_id, bonder_centroid)
         centroids = ((
             i, self.get_centroid(
-                atom_ids=self.func_groups[i].get_bonder_ids()
+                atom_ids=self._functional_groups[i].get_bonder_ids()
             ))
             for i in fg_ids
         )
@@ -780,7 +812,7 @@ class BuildingBlock(Molecule_):
         """
 
         if fg_ids is None:
-            fg_ids = range(len(self.func_groups))
+            fg_ids = range(len(self._functional_groups))
         else:
             # This iterable gets used more than once.
             fg_ids = list(fg_ids)
@@ -816,7 +848,9 @@ class BuildingBlock(Molecule_):
         if include_attrs is None:
             include_attrs = []
 
-        fgs = list(dedupe(fg.fg_type.name for fg in self.func_groups))
+        fgs = list(dedupe(
+            fg.fg_type.name for fg in self._functional_groups
+        ))
 
         bonds = []
         for bond in self.bonds:
@@ -829,7 +863,7 @@ class BuildingBlock(Molecule_):
             'class': self.__class__.__name__,
             'func_groups': fgs,
             'position_matrix': self.get_position_matrix().tolist(),
-            'atoms': repr(self.atoms),
+            'atoms': repr(self._atoms),
             'bonds': repr(bonds),
             'identity_key': repr(self._identity_key)
         }
@@ -849,23 +883,23 @@ class BuildingBlock(Molecule_):
         return d
 
     @staticmethod
-    def _get_identity_key_from_rdkit_mol(mol, functional_groups):
+    def _get_identity_key_from_rdkit_mol(molecule, functional_groups):
         if functional_groups is None:
             functional_groups = ()
         functional_groups = sorted(functional_groups)
 
         # Don't modify the original molecule.
-        mol = rdkit.Mol(mol)
+        mol = rdkit.Mol(molecule)
         rdkit.SanitizeMol(mol)
         return (
             *functional_groups,
-            rdkit.MolToSmiles(mol, canonical=True)
+            rdkit.MolToSmiles(molecule, canonical=True)
         )
 
     def __str__(self):
         smiles = rdkit.MolToSmiles(rdkit.RemoveHs(self.to_rdkit_mol()))
         func_groups = list(dedupe(
-            fg.fg_type.name for fg in self.func_groups
+            fg.fg_type.name for fg in self.functional_groups
         ))
         return f'{self.__class__.__name__}({smiles!r}, {func_groups})'
 

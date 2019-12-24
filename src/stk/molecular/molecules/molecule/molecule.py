@@ -568,7 +568,7 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def with_atomic_positions_from_file(self, path, extension=None):
+    def with_structure_from_file(self, path, extension=None):
         """
         Return a clone, with its structure taken from a file.
 
