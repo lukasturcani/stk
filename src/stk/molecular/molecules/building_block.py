@@ -369,7 +369,7 @@ class BuildingBlock(Molecule_):
             else:
                 self.add_functional_groups(functional_group)
 
-    def _add_functional_group(self, functional_group):
+    def add_functional_group(self, functional_group):
         """
         Add a functional group.
 
@@ -395,7 +395,7 @@ class BuildingBlock(Molecule_):
         }))
         return self
 
-    def _add_functional_groups(self, factory):
+    def add_functional_groups(self, factory):
         """
         Add functional groups produced by `factory`.
 
@@ -412,10 +412,7 @@ class BuildingBlock(Molecule_):
 
         """
 
-        functional_groups = factory.get_functional_groups(
-            molecule=self.to_rdkit_mol,
-        )
-        for functional_group in functional_groups:
+        for functional_group in factory.get_functional_groups(self):
             self.add_functional_group(functional_group)
         return self
 
