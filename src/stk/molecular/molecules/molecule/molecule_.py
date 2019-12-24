@@ -405,7 +405,7 @@ class Molecule_(Molecule):
         mol.AddConformer(rdkit_conf)
         return mol
 
-    def _update_from_xyz(self, path):
+    def _set_atomic_positions_from_xyz(self, path):
         with open(path, 'r') as f:
             atom_count, _, *content = f.readlines()
 
@@ -445,7 +445,7 @@ class Molecule_(Molecule):
         new_coords = np.array(new_coords)
         self.set_position_matrix(new_coords)
 
-    def _update_from_turbomole(self, path):
+    def _set_atomic_positions_from_turbomole(self, path):
         bohr_to_ang = 0.5291772105638411
 
         with open(path, 'r') as f:
