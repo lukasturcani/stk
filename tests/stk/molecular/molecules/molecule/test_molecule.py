@@ -12,8 +12,8 @@ def _test_unchanged(molecule1, molecule2):
     ))
 
 
-def test_apply_displacement(molecule, displacement):
-    new = molecule.apply_displacement(displacement)
+def test_with_displacement(molecule, displacement):
+    new = molecule.with_displacement(displacement)
     assert np.allclose(
         a=molecule.get_position_matrix()+displacement,
         b=new.get_position_matrix(),
@@ -21,7 +21,7 @@ def test_apply_displacement(molecule, displacement):
     )
 
 
-class TestApplyRotationAboutAxis:
+class TestWithRotationAboutAxis:
     def _rotational_space_positions(self, molecule, axis, origin):
         """
         Get the atomic coordinates on the plane of the rotation.
@@ -62,7 +62,7 @@ class TestApplyRotationAboutAxis:
             axis=axis,
             origin=origin,
         )
-        new = valid_molecule.apply_rotation_about_axis(
+        new = valid_molecule.with_rotation_about_axis(
             angle=angle,
             axis=axis,
             origin=origin,
@@ -81,12 +81,12 @@ class TestApplyRotationAboutAxis:
             assert abs(abs(angle) - applied_rotation) < 1e-13
 
 
-def test_apply_rotation_between_vectors(valid_molecule):
+def test_with_rotation_between_vectors(valid_molecule):
     # Use to check that immutability is not violated.
     clone = valid_molecule.clone()
 
     position1, position2 = valid_molecule.get_atom_positions((0, 1))
-    new = valid_molecule.apply_rotation_between_vectors(
+    new = valid_molecule.with_rotation_between_vectors(
         start=position1-position2,
         target=[1, 0, 0],
         origin=valid_molecule.get_centroid(),
@@ -101,7 +101,7 @@ def test_apply_rotation_between_vectors(valid_molecule):
     _test_unchanged(valid_molecule, clone)
 
 
-def test_apply_rotation_to_minimize_angle(valid_molecule):
+def test_with_rotation_to_minimize_angle(valid_molecule):
     # Use to check that immutability is not violated.
     clone = valid_molecule.clone()
 
@@ -110,7 +110,7 @@ def test_apply_rotation_to_minimize_angle(valid_molecule):
     )
     start = stk.normalize_vector(position2-position1)
     target = stk.normalize_vector(position3 - position1)
-    new = valid_molecule.apply_rotation_to_minimize_angle(
+    new = valid_molecule.with_rotation_to_minimize_angle(
         start=start,
         target=target,
         axis=np.cross(start, target),
@@ -205,7 +205,7 @@ def test_get_centroid(molecule, get_atom_ids):
 class TestGetDirection1:
     def case1():
         bb = stk.BuildingBlock('NCCN')
-        bb = bb.set_position_matrix(
+        bb = bb.with_position_matrix(
             np.array([[i, 0, 0] for i in range(bb.get_num_atoms())])
         )
         return bb, [1, 0, 0]
@@ -232,7 +232,7 @@ class TestGetDirection2:
 
         coords = bb.get_position_matrix()
         coords[atom_ids] = [[1, 1, 1], [3, 3, 3]]
-        bb = bb.set_position_matrix(coords)
+        bb = bb.with_position_matrix(coords)
 
         return bb, atom_ids, [1/np.sqrt(3)]*3
 
@@ -256,7 +256,7 @@ class TestGetMaximumDiameter:
         coords = np.array([
             [i, 0, 0] for i in range(molecule.get_num_atoms())
         ])
-        molecule = molecule.set_position_matrix(coords)
+        molecule = molecule.with_position_matrix(coords)
         return molecule, None, molecule.get_num_atoms()-1
 
     def case2(atom_ids, maximum_diameter):
@@ -264,7 +264,7 @@ class TestGetMaximumDiameter:
         coords = np.zeros((molecule.get_num_atoms(), 3))
         coords[[1]] = [0, -50, 0]
         coords[[9]] = [0, 50, 0]
-        molecule = molecule.set_position_matrix(coords)
+        molecule = molecule.with_position_matrix(coords)
         return molecule, atom_ids, maximum_diameter
 
     @pytest.mark.parametrize(
@@ -294,14 +294,14 @@ class TestGetPlaneNormal:
         molecule = stk.BuildingBlock('NCCN')
         coords = molecule.get_position_matrix()
         coords[[1, 9], 2] = 0
-        molecule = molecule.set_position_matrix(coords)
+        molecule = molecule.with_position_matrix(coords)
         return molecule, atom_ids, normal
 
     def case2(atom_ids, normal):
         molecule = stk.BuildingBlock('NCCN')
         coords = molecule.get_position_matrix()
         coords[:, 2] = 0
-        molecule = molecule.set_position_matrix(coords)
+        molecule = molecule.with_position_matrix(coords)
         return molecule, atom_ids, normal
 
     @pytest.mark.parametrize(
@@ -348,26 +348,34 @@ class TestPositionMatrix:
         ],
     )
     def test(self, molecule, position_matrix):
-        molecule.set_position_matrix(position_matrix)
+        # Keep clone to test for immutability.
+        clone = molecule.clone()
+
+        new = molecule.with_position_matrix(position_matrix)
         assert np.all(np.equal(
-            molecule.get_position_matrix(),
+            new.get_position_matrix(),
             position_matrix,
         ))
+        _test_unchanged(molecule, clone)
 
 
-def test_set_centroid(molecule, get_atom_ids):
-    molecule.set_centroid(
+def test_with_centroid(molecule, get_atom_ids):
+    # Keep clone to test for immutability.
+    clone = molecule.clone()
+
+    new = molecule.with_centroid(
         position=[1, 2, 3],
         atom_ids=get_atom_ids(molecule),
     )
     assert np.allclose(
-        a=molecule.get_centroid(atom_ids=get_atom_ids(molecule)),
+        a=new.get_centroid(atom_ids=get_atom_ids(molecule)),
         b=[1, 2, 3],
         atol=1e-32,
     )
+    _test_unchanged(clone, molecule)
 
 
-class TestUpdateFromFile1:
+class TestWithStructureFromFile1:
     @pytest.fixture(params=[
         'molecule.mol',
         'molecule.xyz',
@@ -378,8 +386,8 @@ class TestUpdateFromFile1:
     def case1():
         conformer1 = stk.BuildingBlock('NCCN')
         conformer2 = stk.BuildingBlock('NCCN')
-        conformer2.set_position_matrix(
-            position_matrix=np.zeros((len(conformer2.atoms), 3)),
+        conformer2 = conformer2.with_position_matrix(
+            position_matrix=np.zeros((conformer2.get_num_atoms(), 3)),
         )
         return conformer1, conformer2
 
@@ -403,7 +411,7 @@ class TestUpdateFromFile1:
         'get_conformers',
         [
             case1,
-            case2,
+            # case2,
         ],
     )
     def test(self, get_conformers, path):
@@ -415,16 +423,19 @@ class TestUpdateFromFile1:
         )
 
         conformer2.write(path)
-        conformer1.update_from_file(path)
+        # Keep a clone for immutability testing.
+        clone = conformer1.clone()
+        new = conformer1.with_structure_from_file(path)
 
         assert np.allclose(
-            a=conformer1.get_position_matrix(),
+            a=new.get_position_matrix(),
             b=conformer2.get_position_matrix(),
             atol=1e-4,
         )
+        _test_unchanged(clone, new)
 
 
-class TestUpdateFromFile2:
+class TestWithStructureFromFile2:
     @pytest.fixture
     def path(self, datadir, request):
         return str(datadir / request.param)
@@ -440,36 +451,29 @@ class TestUpdateFromFile2:
         indirect=['path'],
     )
     def test(self, molecule, path):
-        before = molecule.get_maximum_diameter()
-        molecule.update_from_file(path)
-        after = molecule.get_maximum_diameter()
-        assert abs(before - after) > 1
-
-
-def test_update_from_rdkit_mol(molecule):
-    rdkit_molecule = molecule.to_rdkit_mol()
-    conformer = rdkit_molecule.GetConformer()
-    for atom_id, position in enumerate(conformer.GetPositions()):
-        conformer.SetAtomPosition(atom_id, 0.5*position)
-
-    molecule.update_from_rdkit_mol(rdkit_molecule)
-    after = molecule.get_position_matrix()
-    assert np.allclose(conformer.GetPositions(), after, 1e-32)
+        # Keep clone for immutability testing.
+        clone = molecule.clone()
+        new = molecule.with_structure_from_file(path)
+        size_diff = abs(
+            molecule.get_maximum_diameter() - new.get_maximum_diamter()
+        )
+        assert size_diff > 1
+        _test_unchanged(clone, molecule)
 
 
 def test_to_rdkit_mol(molecule):
     rdkit_molecule = molecule.to_rdkit_mol()
     assert rdkit_molecule.GetNumConformers() == 1
 
-    assert rdkit_molecule.GetNumAtoms() == len(molecule.atoms)
-    atoms = zip(molecule.atoms, rdkit_molecule.GetAtoms())
+    assert rdkit_molecule.GetNumAtoms() == molecule.get_num_atoms()
+    atoms = zip(molecule.get_atoms(), rdkit_molecule.GetAtoms())
     for atom, rdkit_atom in atoms:
         assert atom.charge == rdkit_atom.GetFormalCharge()
         assert atom.atomic_number == rdkit_atom.GetAtomicNum()
         assert atom.mass == rdkit_atom.GetMass()
 
-    assert len(molecule.bonds) == rdkit_molecule.GetNumBonds()
-    bonds = zip(molecule.bonds, rdkit_molecule.GetBonds())
+    assert molecule.get_num_bonds() == rdkit_molecule.GetNumBonds()
+    bonds = zip(molecule.get_bonds(), rdkit_molecule.GetBonds())
     for bond, rdkit_bond in bonds:
         assert bond.order == rdkit_bond.GetBondTypeAsDouble()
         assert bond.atom1.id == rdkit_bond.GetBeginAtomIdx()

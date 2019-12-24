@@ -241,6 +241,9 @@ class Molecule_(Molecule):
         for bond in self._bonds:
             yield bond.clone()
 
+    def get_num_bonds(self):
+        return len(self._bonds)
+
     def get_centroid(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))

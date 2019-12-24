@@ -289,6 +289,19 @@ class Molecule:
 
         raise NotImplementedError()
 
+    def get_num_bonds(self):
+        """
+        Return the number of bonds in the molecule.
+
+        Returns
+        -------
+        :class:`int`
+            The number of bonds in the molecule.
+
+        """
+
+        raise NotImplementedError()
+
     def get_centroid(self, atom_ids=None):
         """
         Return the centroid.
