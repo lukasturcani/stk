@@ -431,7 +431,7 @@ class BuildingBlock(Molecule_):
         """
 
         for functional_group in factory.get_functional_groups(self):
-            self.add_functional_group(functional_group)
+            self._with_functional_group(functional_group)
         return self
 
     def with_functional_groups(self, factory):
