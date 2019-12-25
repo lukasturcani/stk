@@ -5,29 +5,6 @@ import itertools as it
 import stk
 
 
-def test_get_centroid(molecule, get_atom_ids):
-    atom_ids = get_atom_ids(molecule)
-    centroid = molecule.get_centroid(atom_ids)
-
-    if atom_ids is None:
-        atom_ids = range(molecule.get_num_atoms())
-    else:
-        atom_ids = list(get_atom_ids(molecule))
-
-    true_centroid = np.divide(
-        np.sum(
-            a=molecule.get_position_matrix()[atom_ids, :],
-            axis=0
-        ),
-        len(atom_ids),
-    )
-    assert np.allclose(
-        a=true_centroid,
-        b=centroid,
-        atol=1e-32,
-    )
-
-
 class TestGetDirection1:
     def case1():
         bb = stk.BuildingBlock('NCCN')

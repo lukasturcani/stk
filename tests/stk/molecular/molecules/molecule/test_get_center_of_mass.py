@@ -13,8 +13,11 @@ def test_get_center_of_mass(
         center_of_mass=center_of_mass,
     )
     molecule = molecule.with_position_matrix(position_matrix)
-    result = molecule.get_center_of_mass(get_atom_ids(molecule))
-    assert abs(result - center_of_mass) < 1e-32
+    assert np.allclose(
+        a=center_of_mass,
+        b=molecule.get_center_of_mass(get_atom_ids(molecule)),
+        atol=1e-32,
+    )
 
 
 def get_position_matrix(molecule, atom_ids, center_of_mass):
@@ -24,9 +27,9 @@ def get_position_matrix(molecule, atom_ids, center_of_mass):
     Parameters
     ----------
     molecule : :class:`.Molecule`
-        The molecule for which to create a position matrix.
+        The molecule for which to create the position matrix.
 
-    atom_ids : :class:`tuple` of :class:`int`
+    atom_ids : :class:`iterable` of :class:`int`
         The ids of atoms which are to have a specific
         `center_of_mass`. If ``None``, then all atoms are used.
 
@@ -39,6 +42,11 @@ def get_position_matrix(molecule, atom_ids, center_of_mass):
         A position matrix for `molecule`.
 
     """
+
+    if atom_ids is None:
+        atom_ids = range(molecule.get_num_atoms())
+    elif not isinstance(atom_ids, (list, tuple)):
+        atom_ids = tuple(atom_ids)
 
     position_matrix = molecule.get_position_matrix()
     # First, place all atoms on the center of mass.
