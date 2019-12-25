@@ -22,7 +22,7 @@ def get_position_matrix(molecule, atom_ids, centroid):
     Parameters
     ----------
     molecule : :class:`.Molecule`
-        The molecule for which to create the position matrix.
+        The molecule for which the position matrix is created.
 
     atom_ids : :class:`iterable` of :class:`int`
         The ids of atoms which are to have a specific `centroid`.
