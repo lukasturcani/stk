@@ -42,16 +42,19 @@ def test_clone(bond, get_atom_map):
     if atom_map is None:
         atom_map = {}
 
-    is_atom_clone(atom_map.get(bond.atom1.id, bond.atom1), clone.atom1)
-    is_atom_clone(atom_map.get(bond.atom2.id, bond.atom2), clone.atom2)
+    is_atom_clone(bond.atom1, clone.atom1, atom_map)
+    is_atom_clone(bond.atom2, clone.atom2, atom_map)
     assert bond.periodicity == clone.periodicity
     assert bond.order == clone.order
     assert bond.attr == clone.attr
     assert not hasattr(clone, '_attr')
 
 
-def is_atom_clone(atom, clone):
-    assert atom is not clone
-    assert atom.id == clone.id
-    assert atom.charge == clone.charge
-    assert atom.__class__ is clone.__class__
+def is_atom_clone(atom, clone, atom_map):
+    if atom.id in atom_map:
+        assert atom_map[atom.id] is clone
+    else:
+        assert atom is not clone
+        assert atom.id == clone.id
+        assert atom.charge == clone.charge
+        assert atom.__class__ is clone.__class__
