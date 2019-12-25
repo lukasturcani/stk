@@ -5,50 +5,6 @@ import itertools as it
 import stk
 
 
-
-
-def test_get_atomic_distance(molecule):
-    position_matrix = molecule.get_position_matrix()
-    positions_1 = np.repeat(
-        a=[position_matrix],
-        repeats=molecule.get_num_atoms(),
-        axis=0,
-    )
-    positions_2 = positions_1.swapaxes(0, 1)
-    distance_matrix = np.linalg.norm(positions_1 - positions_2, axis=2)
-
-    atom_ids = range(molecule.get_num_atoms())
-    for atom1, atom2 in it.product(atom_ids, atom_ids):
-        true_distance = distance_matrix[atom1, atom2]
-        distance = molecule.get_atomic_distance(atom1, atom2)
-        assert abs(true_distance - distance) < 1e-13
-
-
-def test_get_center_of_mass(molecule, get_atom_ids):
-    atom_ids = get_atom_ids(molecule)
-    center_of_mass = molecule.get_center_of_mass(atom_ids),
-
-    if atom_ids is None:
-        atom_ids = range(molecule.get_num_atoms())
-    else:
-        atom_ids = list(get_atom_ids(molecule))
-
-    atoms = molecule.get_atoms(atom_ids=atom_ids)
-    masses = [[atom.mass] for atom in atoms]
-    true_center_of_mass = np.divide(
-        np.sum(
-            a=masses*molecule.get_position_matrix()[atom_ids, :],
-            axis=0,
-        ),
-        sum(mass for mass, in masses),
-    )
-    assert np.allclose(
-        a=true_center_of_mass,
-        b=center_of_mass,
-        atol=1e-32,
-    )
-
-
 def test_get_centroid(molecule, get_atom_ids):
     atom_ids = get_atom_ids(molecule)
     centroid = molecule.get_centroid(atom_ids)

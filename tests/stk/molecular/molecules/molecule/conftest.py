@@ -49,6 +49,27 @@ def valid_molecule(request):
 
 
 @pytest.fixture(
+    params=(
+        lambda molecule: np.zeros((molecule.get_num_atoms(), 3)),
+        lambda molecule: np.array([
+            [i, -i, 10.12*i] for i in range(molecule.get_num_atoms())
+        ]),
+        lambda molecule: molecule.get_position_matrix(),
+    ),
+)
+def get_position_matrix(request):
+    """
+    A function which returns a valid position matrix for a molecule.
+
+    The function takes 1 parameter, the :class:`.Molecule` instance
+    for which it returns a valid position matrix.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(
     params=[
         -np.pi/2,
         np.pi/2,
