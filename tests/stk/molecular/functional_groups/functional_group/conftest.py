@@ -2,70 +2,57 @@ import pytest
 import stk
 
 
-def make_atom_map_0(functional_group):
-    atoms = (stk.Li(200), )
-    return dict(zip(functional_group.get_atom_ids(), atoms))
+@pytest.fixture(
+    params=[
+            (stk.N(0), stk.H(21), stk.K(3), stk.Li(223), ),
+            (stk.H(120), ),
+            (),
+    ],
+)
+def atoms(request):
+    """
+    A :class:`tuple` of :class:`.Atom` instances.
+
+    """
+
+    return tuple(a.clone() for a in request.param)
 
 
 @pytest.fixture(
     params=[
-        lambda functional_group: None,
-        lambda functional_group: {},
-        make_atom_map_0,
+        lambda atoms: tuple(atoms),
+        lambda atoms: (),
+        lambda atoms: atoms[0:1] if atoms else (),
+        lambda atoms: tuple(atoms[i] for i in range(0, len(atoms), 2))
     ],
 )
-def make_atom_map(request):
+def get_subset(request):
+    """
+    A function which takes a tuple and returns a subset of it.
+
+    """
+
     return request.param
 
 
-class FunctionalGroupAtoms:
-    def __init__(self, atoms, bonders, deleters):
-        self.atoms = atoms
-        self.bonders = bonders
-        self.deleters = deleters
+@pytest.fixture
+def get_bonders(get_subset):
+    """
+    A function which takes atoms and returns the bonders.
 
-    def clone(self):
-        return self.__class__(
-            atoms=tuple(a.clone() for a in self.atoms),
-            bonders=tuple(a.clone() for a in self.bonders),
-            deleters=tuple(a.clone() for a in self.deleters),
-        )
+    """
+
+    return get_subset
 
 
-@pytest.fixture(
-    params=[
-        FunctionalGroupAtoms(
-            atoms=(),
-            bonders=(),
-            deleters=(),
-        ),
-        FunctionalGroupAtoms(
-            atoms=(stk.N(0), stk.H(21), stk.K(3)),
-            bonders=(stk.N(0), ),
-            deleters=(stk.K(3), ),
-        ),
-        FunctionalGroupAtoms(
-            atoms=(stk.H(120), stk.K(32), stk.H(1)),
-            bonders=(stk.K(32), ),
-            deleters=(),
-        ),
-        FunctionalGroupAtoms(
-            atoms=(stk.C(7), stk.N(12), stk.Li(2)),
-            bonders=(),
-            deleters=(stk.N(12), ),
-        ),
-    ],
-)
-def functional_group_atoms(request):
-    return request.param.clone()
+@pytest.fixture
+def get_deleters(get_subset):
+    """
+    A function which takes atoms and returns the deleters.
 
+    """
 
-class FunctionalGroupData:
-    def __init__(self, functional_group, atoms, bonders, deleters):
-        self.functional_group = functional_group
-        self.atoms = atoms
-        self.bonders = bonders
-        self.deleters = deleters
+    return get_subset
 
 
 @pytest.fixture(
@@ -89,32 +76,13 @@ class FunctionalGroupData:
         stk.RingAmine,
     ],
 )
-def make_functional_group_0(request, functional_group_atoms):
+def get_functional_group(request):
+    """
+    A function which creates a :class:`.FunctionalGroup` instance.
 
-    def inner():
-        return FunctionalGroupData(
-            functional_group=request.param(
-                atoms=functional_group_atoms.atoms,
-                bonders=functional_group_atoms.bonders,
-                deleters=functional_group_atoms.deleters,
-            ),
-            atoms=functional_group_atoms.atoms,
-            bonders=functional_group_atoms.bonders,
-            deleters=functional_group_atoms.deleters,
-        )
+    The function must take atoms, bonders and deleters parameters,
+    which are the atoms the :class:`.FunctionalGroup` should hold.
 
-    return inner
+    """
 
-
-@pytest.fixture(
-    params=[
-        pytest.lazy_fixture('make_functional_group_0'),
-    ],
-)
-def make_functional_group(request):
     return request.param
-
-
-@pytest.fixture
-def functional_group(make_functional_group):
-    return make_functional_group().functional_group
