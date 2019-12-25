@@ -52,19 +52,6 @@ def get_atom_map(request):
     return request.param
 
 
-def is_clone_sequence(atoms, clones, atom_map):
-    """
-    Test if atoms are correctly cloned.
-
-    """
-
-    if atom_map is None:
-        atom_map = {}
-
-    for atom, clone in it.zip_longest(atoms, clones):
-        is_atom_clone(atom_map.get(atom.id, atom), clone)
-
-
 def test_clone(functional_group, get_atom_map):
     functional_group.attr = 1
     functional_group._attr = 2
@@ -87,3 +74,16 @@ def test_clone(functional_group, get_atom_map):
         clone.get_deleters(),
         atom_map,
     )
+
+
+def is_clone_sequence(atoms, clones, atom_map):
+    """
+    Test if atoms are correctly cloned.
+
+    """
+
+    if atom_map is None:
+        atom_map = {}
+
+    for atom, clone in it.zip_longest(atoms, clones):
+        is_atom_clone(atom_map.get(atom.id, atom), clone)
