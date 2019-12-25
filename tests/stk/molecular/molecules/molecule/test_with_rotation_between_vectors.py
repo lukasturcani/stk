@@ -1,0 +1,93 @@
+import pytest
+import numpy as np
+import stk
+
+from .utilities import test_unchanged
+
+
+@pytest.fixture(
+    params=(
+        stk.BuildingBlock('NCCN'),
+        stk.BuildingBlock('Brc1ccc(Br)cc1Br', [stk.BromoFactory()]),
+    )
+)
+def molecule(request):
+    """
+    A :class:`.Molecule` instance which gets rotated.
+
+    The molecule must have at least 2 atoms for the test to work.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(
+    params=[
+        np.array([1., 0., 0.]),
+        np.array([0., 1., 0.]),
+        np.array([0., 0., 1.]),
+        np.array([1., 1., 1.]),
+    ],
+)
+def target(request):
+    """
+    The target vector onto which a molecule is rotated.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(
+    params=[
+        lambda molecule: molecule.get_centroid(),
+        lambda molecule: np.array([0., 0., 0.]),
+        lambda molecule: np.array([100., -50., 2.]),
+    ],
+)
+def get_origin(request):
+    """
+    A functional which returns the origin of rotation.
+
+    The functional takes 1 parameter, which is the molecule being
+    rotated, and returns the origin for the rotation.
+
+    """
+
+    return request.param
+
+
+def test_with_rotation_between_vectors(molecule, target, get_origin):
+    # Use to check that immutability is not violated.
+    clone = molecule.clone()
+    _test_with_rotation_between_vectors(molecule, target, get_origin)
+    test_unchanged(molecule, clone)
+
+
+def _test_with_rotation_between_vectors(molecule, target, get_origin):
+    start = get_displacement_vector(molecule, 0, 1)
+    new = molecule.with_rotation_between_vectors(
+        start=start,
+        target=target,
+        origin=get_origin(molecule),
+    )
+    result = get_displacement_vector(new, 0, 1)
+    assert np.allclose(
+        a=stk.normalize_vector(result),
+        b=stk.normalize_vector(target),
+        atol=1e-12,
+    )
+    assert abs(np.linalg.norm(start) - np.linalg.norm(result)) < 1e-32
+
+
+def get_displacement_vector(molecule, start_atom, end_atom):
+    """
+    Get the displacement vector between `start_atom` and `end_atom`.
+
+    """
+
+    position1, position2 = (
+        molecule.get_atomic_positions((start_atom, end_atom))
+    )
+    return position2 - position1

@@ -50,18 +50,6 @@ def valid_molecule(request):
 
 @pytest.fixture(
     params=[
-        [0, 0, 0],
-        [10, 20, 30],
-        [-10, 20, -30],
-        [0.5, 10, -0.921],
-    ],
-)
-def displacement(request):
-    return list(request.param)
-
-
-@pytest.fixture(
-    params=[
         -np.pi/2,
         np.pi/2,
     ],
