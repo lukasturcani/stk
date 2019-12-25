@@ -3,7 +3,7 @@ import pytest
 import stk
 
 
-class TestCase:
+class _TestCase:
     """
     A test case.
 
@@ -28,9 +28,9 @@ class TestCase:
 
 
 @pytest.mark.parametrize(
-    argnames=('test_case', ),
+    argnames='test_case',
     argvalues=(
-        TestCase(
+        _TestCase(
             factory=stk.AmineFactory(),
             molecule=stk.BuildingBlock('NCCN'),
             functional_groups=(
@@ -47,7 +47,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.AmineFactory(num_deleters=1),
             molecule=stk.BuildingBlock('NCCN'),
             functional_groups=(
@@ -64,7 +64,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.AmineFactory(num_deleters=0),
             molecule=stk.BuildingBlock('NCCN'),
             functional_groups=(
@@ -81,13 +81,13 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.AmineFactory(),
             molecule=stk.BuildingBlock('CCCC'),
             functional_groups=(),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.SecondaryAmineFactory(),
             molecule=stk.BuildingBlock('CNCCNCC'),
             functional_groups=(
@@ -104,7 +104,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.AldehydeFactory(),
             molecule=stk.BuildingBlock('O=CCC=O'),
             functional_groups=(
@@ -121,7 +121,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.CarboxylicAcidFactory(),
             molecule=stk.BuildingBlock('O=C(O)CCCC(O)=O'),
             functional_groups=(
@@ -138,7 +138,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.AmideFactory(),
             molecule=stk.BuildingBlock('O=C(N)CCC(=O)N'),
             functional_groups=(
@@ -167,7 +167,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.ThioacidFactory(),
             molecule=stk.BuildingBlock('O=C(S)CC(S)=O'),
             functional_groups=(
@@ -184,7 +184,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.AlcoholFactory(),
             molecule=stk.BuildingBlock('OCCCO'),
             functional_groups=(
@@ -201,7 +201,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.ThiolFactory(),
             molecule=stk.BuildingBlock('SCCCS'),
             functional_groups=(
@@ -218,7 +218,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.FluoroFactory(),
             molecule=stk.BuildingBlock('FCC(F)CCF'),
             functional_groups=(
@@ -240,7 +240,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.BromoFactory(),
             molecule=stk.BuildingBlock('BrCC(Br)CCBr'),
             functional_groups=(
@@ -262,7 +262,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.IodoFactory(),
             molecule=stk.BuildingBlock('ICC(I)CCI'),
             functional_groups=(
@@ -284,7 +284,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.TerminalAlkyneFactory(),
             molecule=stk.BuildingBlock('C#CC#CC'),
             functional_groups=(
@@ -296,7 +296,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.TerminalAlkyneFactory(delete_carbon=True),
             molecule=stk.BuildingBlock('C#CC#CC'),
             functional_groups=(
@@ -308,7 +308,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.TerminalAlkeneFactory(),
             molecule=stk.BuildingBlock('C=CC=CC'),
             functional_groups=(
@@ -320,7 +320,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.BoronicAcidFactory(),
             molecule=stk.BuildingBlock('B(O)(O)CCB(O)O'),
             functional_groups=(
@@ -354,7 +354,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.DiolFactory(),
             molecule=stk.BuildingBlock('CC(O)C(O)CC'),
             functional_groups=(
@@ -373,7 +373,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.DifluoroFactory(),
             molecule=stk.BuildingBlock('CC(F)C(F)CC'),
             functional_groups=(
@@ -385,7 +385,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.DibromoFactory(),
             molecule=stk.BuildingBlock('CC(Br)C(Br)CC'),
             functional_groups=(
@@ -397,7 +397,7 @@ class TestCase:
             ),
         ),
 
-        TestCase(
+        _TestCase(
             factory=stk.RingAmineFactory(),
             molecule=stk.BuildingBlock('NCC(Br)c1c(Br)cccc1'),
             functional_groups=(
