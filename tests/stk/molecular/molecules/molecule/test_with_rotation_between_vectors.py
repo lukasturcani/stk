@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import stk
 
-from .utilities import test_unchanged
+from .utilities import has_same_structure, get_displacement_vector
 
 
 @pytest.fixture(
@@ -19,7 +19,7 @@ def molecule(request):
 
     """
 
-    return request.param
+    return request.param.clone()
 
 
 @pytest.fixture(
@@ -62,7 +62,7 @@ def test_with_rotation_between_vectors(molecule, target, get_origin):
     # Use to check that immutability is not violated.
     clone = molecule.clone()
     _test_with_rotation_between_vectors(molecule, target, get_origin)
-    test_unchanged(molecule, clone)
+    has_same_structure(molecule, clone)
 
 
 def _test_with_rotation_between_vectors(molecule, target, get_origin):
@@ -79,15 +79,3 @@ def _test_with_rotation_between_vectors(molecule, target, get_origin):
         atol=1e-12,
     )
     assert abs(np.linalg.norm(start) - np.linalg.norm(result)) < 1e-32
-
-
-def get_displacement_vector(molecule, start_atom, end_atom):
-    """
-    Get the displacement vector between `start_atom` and `end_atom`.
-
-    """
-
-    position1, position2 = (
-        molecule.get_atomic_positions((start_atom, end_atom))
-    )
-    return position2 - position1

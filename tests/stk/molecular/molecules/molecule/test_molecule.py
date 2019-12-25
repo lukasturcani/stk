@@ -5,31 +5,6 @@ import itertools as it
 import stk
 
 
-def test_with_rotation_to_minimize_angle(valid_molecule):
-    # Use to check that immutability is not violated.
-    clone = valid_molecule.clone()
-
-    position1, position2, position3 = (
-        valid_molecule.get_atomic_positions((0, 1, 2))
-    )
-    start = stk.normalize_vector(position2-position1)
-    target = stk.normalize_vector(position3 - position1)
-    new = valid_molecule.with_rotation_to_minimize_angle(
-        start=start,
-        target=target,
-        axis=np.cross(start, target),
-        origin=position1,
-    )
-
-    new_position1, new_position2 = new.get_atomic_positions((0, 1))
-    assert np.allclose(
-        a=target,
-        b=stk.normalize_vector(new_position2-new_position1),
-        atol=1e-12,
-    )
-    _test_unchanged(valid_molecule, clone)
-
-
 def test_get_atomic_positions(molecule, get_atom_ids_no_fail):
     position_matrix = molecule.get_position_matrix()
     atom_ids = get_atom_ids_no_fail(molecule)
