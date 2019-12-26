@@ -2,6 +2,8 @@ import numpy as np
 import stk
 import pytest
 
+from .utilities import get_num_atom_ids
+
 
 @pytest.fixture(
     params=(
@@ -62,6 +64,15 @@ def direction(request):
 
 
 def test_get_direction(molecule, get_atom_ids, direction):
+    if get_num_atom_ids(molecule, get_atom_ids) == 1:
+        # Any non-0 vector is valid in this case.
+        assert not np.allclose(
+            a=[0, 0, 0],
+            b=molecule.get_plane_normal(get_atom_ids(molecule)),
+            atol=1e-13,
+        )
+        return
+
     position_matrix = get_position_matrix(
         molecule=molecule,
         atom_ids=get_atom_ids(molecule),

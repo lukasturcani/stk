@@ -65,15 +65,16 @@ def normal(request):
 def test_get_plane_normal(molecule, get_atom_ids, normal):
     num_atom_ids = get_num_atom_ids(molecule, get_atom_ids)
     if num_atom_ids == 1:
-        # Any non 0 vector in this case is valid.
+        # Any non-0 vector is valid in this case.
         assert not np.allclose(
             a=[0, 0, 0],
             b=molecule.get_plane_normal(get_atom_ids(molecule)),
             atol=1e-13,
         )
         return
+
     elif num_atom_ids == 2:
-        # Any perpendicular vector in this case is valid.
+        # Any perpendicular vector is valid in this case.
         result = molecule.get_plane_normal(get_atom_ids(molecule))
         assert result @ get_direction(molecule, 0, 1) < 1e-13
         return
