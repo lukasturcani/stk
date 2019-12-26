@@ -1,12 +1,7 @@
 import numpy as np
 
 
-def test_get_center_of_mass(
-    molecule,
-    get_atom_ids,
-    get_position_matrix,
-    center_of_mass,
-):
+def test_get_center_of_mass(molecule, get_atom_ids, center_of_mass):
     position_matrix = get_position_matrix(
         molecule=molecule,
         atom_ids=get_atom_ids(molecule),

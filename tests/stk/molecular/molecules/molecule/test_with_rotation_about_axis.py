@@ -3,9 +3,25 @@ import stk
 import pytest
 
 
-@pytest.fixture
-def molecule(valid_molecule):
-    return valid_molecule
+@pytest.fixture(
+    params=[
+        -np.pi/2,
+        np.pi/2,
+    ],
+)
+def angle(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=[
+        np.array([0, 1, 0]),
+        np.array([1, 0, 0]),
+        np.array([1/np.sqrt(3), 1/np.sqrt(3), 1/np.sqrt(3)])
+    ],
+)
+def axis(request):
+    return np.array(request.param)
 
 
 def test_with_rotation_about_axis(molecule, angle, axis, origin):
@@ -36,7 +52,7 @@ def is_rotated(original, rotated, angle):
 
     """
 
-    for atom_id in range(molecule.get_num_atoms()):
+    for atom_id in range(max(len(original), len(rotated))):
         applied_rotation = stk.vector_angle(
             vector1=original[atom_id],
             vector2=rotated[atom_id],
