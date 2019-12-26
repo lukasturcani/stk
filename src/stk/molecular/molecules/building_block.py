@@ -472,10 +472,9 @@ class BuildingBlock(Molecule_):
             bond_.atom2 = obj._atoms[bond_.atom2]
 
         obj._functional_groups = []
-        fgs = eval(
-            molecule_dict['functional_groups'],
-            vars(functional_groups),
-        )
+        globals_ = vars(functional_groups)
+        globals_.update(vars(atoms))
+        fgs = eval(molecule_dict['functional_groups'], globals_)
         for functional_group in fgs:
             obj._with_functional_group(functional_group)
 
