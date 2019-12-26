@@ -26,7 +26,18 @@ def bond(atom1, atom2, order, periodicity):
 )
 def get_atom_map(request):
     """
-    A function which returns a valid `atom_map` parameter for a bond.
+    Return a valid `atom_map` parameter for a bond.
+
+    Parameters
+    ----------
+    bond : :class:`.Bond`
+        The bond for which the `atom_map` parameter needs to be
+        created.
+
+    Returns
+    -------
+    :class:`dict`
+        A valid `atom_map` parameter for :meth:`.Bond.clone`.
 
     """
 

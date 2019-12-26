@@ -28,7 +28,17 @@ def atoms(request):
 )
 def get_subset(request):
     """
-    A function which takes a tuple and returns a subset of it.
+    Return a subset of a :class:`tuple`.
+
+    Parameters
+    ----------
+    atoms : :class:`tuple` of :class:`.Atom`
+        A collection of atoms, from which a subset is returned.
+
+    Returns
+    -------
+    :class:`tuple` of :class:`.Atom`
+        A subset of `atoms`.
 
     """
 
@@ -38,7 +48,18 @@ def get_subset(request):
 @pytest.fixture
 def get_bonders(get_subset):
     """
-    A function which takes atoms and returns the bonders.
+    Return the subset of `atoms` which are bonders.
+
+    Parameters
+    ----------
+    atoms : :class:`tuple` of :class:`.Atom`
+        A collection of atoms, from which the bonders should be
+        selected.
+
+    Returns
+    -------
+    :class:`tuple` of :class:`.Atom`
+        The bonder atoms.
 
     """
 
@@ -48,7 +69,19 @@ def get_bonders(get_subset):
 @pytest.fixture
 def get_deleters(get_subset):
     """
-    A function which takes atoms and returns the deleters.
+    Return the subset of `atoms` which are deleters.
+
+    Parameters
+    ----------
+    atoms : :class:`tuple` of :class:`.Atom`
+        A collection of atoms, from which the deleters should be
+        selected.
+
+    Returns
+    -------
+    :class:`tuple` of :class:`.Atom`
+        The deleter atoms.
+
 
     """
 
@@ -78,10 +111,23 @@ def get_deleters(get_subset):
 )
 def get_functional_group(request):
     """
-    A function which creates a :class:`.FunctionalGroup` instance.
+    Return a :class:`.FunctionalGroup` instance.
 
-    The function must take atoms, bonders and deleters parameters,
-    which are the atoms the :class:`.FunctionalGroup` should hold.
+    Parameters
+    ----------
+    atoms : :class:`tuple` of :class:`.Atom`
+        The atoms in the functional group.
+
+    bonders : :class:`tuple` of :class:.Atom`
+        The bonder atoms in the functional group.
+
+    deleters : :class:`tuple` of :class:.Atom`
+        The deleter atoms in the functional group.
+
+    Returns
+    -------
+    :class:`.FunctionalGroup`
+        A functional group.
 
     """
 

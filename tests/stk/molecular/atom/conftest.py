@@ -12,10 +12,20 @@ import stk
 )
 def get_atom(request):
     """
-    A function which returns an :class:`.Atom` instance.
+    Return an :class:`.Atom` instance.
 
-    The function takes two parameters, the id and charge the created
-    atom should have.
+    Parameters
+    ----------
+    id : :class:`int`
+        The id of the returned atom.
+
+    charge : :class:`float`
+        The charge of the returned atom.
+
+    Returns
+    -------
+    :class:`.Atom`
+        An atom.
 
     """
 

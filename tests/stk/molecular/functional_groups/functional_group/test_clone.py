@@ -42,10 +42,19 @@ def get_atom_map_0(functional_group):
 )
 def get_atom_map(request):
     """
-    A function which returns a valid `atom_map` parameter.
+    Return a valid `atom_map` parameter for a functional group.
 
-    The function takes 1 parameter, which is the functional group
-    for which it returns the atom map parameter.
+    Parameters
+    ----------
+    functional_group : :class:`.FunctionalGroup`
+        A functional group being cloned, for which a valid
+        `atom_map` parameter needs to created.
+
+    Returns
+    -------
+    :class:`dict`
+        A valid `atom_map` parameter for calling
+        :meth:`~.FunctionalGroup.clone` on `functional_group`.
 
     """
 
