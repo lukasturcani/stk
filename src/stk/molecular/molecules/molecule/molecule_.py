@@ -289,29 +289,15 @@ class Molecule_(Molecule):
     def get_plane_normal(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
-        # atom_ids needs to be sorted so that the same reference vector
-        # is always created for equivalent inputs.
-        elif not isinstance(atom_ids, range):
-            atom_ids = sorted(atom_ids)
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
 
         if len(atom_ids) == 0:
             raise ValueError('atom_ids was of length 0.')
 
         pos = self._position_matrix[:, atom_ids].T
         centroid = self.get_centroid(atom_ids)
-        # Normal must always be acute with reference vector. This
-        # ensures the normal is always the same, even if the molecule
-        # is rotated.
-        atom1, atom2 = self.get_atomic_positions(atom_ids[:2])
-        reference = atom1 - atom2
-        normal = np.linalg.svd(pos - centroid)[-1][2, :]
-        if (
-            # vector_angle is NaN if cc_vector is [0, 0, 0].
-            not np.allclose(reference, [0, 0, 0], atol=1e-5)
-            and vector_angle(normal, reference) > np.pi/2
-        ):
-            normal *= -1
-        return normal
+        return np.linalg.svd(pos - centroid)[-1][2, :]
 
     def get_position_matrix(self):
         return np.array(self._position_matrix.T)

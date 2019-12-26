@@ -54,14 +54,23 @@ def is_rotated(original, rotated, angle):
     """
 
     for atom_id in range(max(len(original), len(rotated))):
-        applied_rotation = stk.vector_angle(
-            vector1=original[atom_id],
-            vector2=rotated[atom_id],
-        )
-        assert abs(abs(angle) - applied_rotation) < 1e-13
+        # No rotation is expected if the atom was located at the
+        # origin of the rotation.
+        if np.allclose(original[atom_id], [0, 0, 0], 1e-13):
+            assert np.allclose(
+                a=original[atom_id],
+                b=rotated[atom_id],
+                atol=1e-13,
+            )
+        else:
+            applied_rotation = stk.vector_angle(
+                vector1=original[atom_id],
+                vector2=rotated[atom_id],
+            )
+            assert abs(abs(angle) - applied_rotation) < 1e-13
 
 
-def rotational_space_positions(self, molecule, axis, origin):
+def rotational_space_positions(molecule, axis, origin):
     """
     Get the atomic coordinates on the plane of the rotation.
 

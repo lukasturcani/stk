@@ -19,7 +19,7 @@ from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bond import Bond
 from .molecule import Molecule_
-from ...utilities import vector_angle, dedupe, remake
+from ...utilities import vector_angle, remake
 
 
 logger = logging.getLogger(__name__)
@@ -827,15 +827,12 @@ class BuildingBlock(Molecule_):
         return rdkit.MolToSmiles(molecule, canonical=True)
 
     def __str__(self):
-        smiles = rdkit.MolToSmiles(rdkit.RemoveHs(self.to_rdkit_mol()))
-        func_groups = list(dedupe(
-            fg.fg_type.name for fg in self._functional_groups
-        ))
-        if func_groups:
-            fg_repr = f', {func_groups}'
+        if self._functional_groups:
+            fg_repr = f', {self._functional_groups!r}'
         else:
             fg_repr = ''
 
+        smiles = rdkit.MolToSmiles(rdkit.RemoveHs(self.to_rdkit_mol()))
         return f'{self.__class__.__name__}({smiles!r}{fg_repr})'
 
     def __repr__(self):

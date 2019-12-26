@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import stk
 
 
 @pytest.fixture(
@@ -7,7 +8,6 @@ import pytest
         lambda molecule: None,
         lambda molecule: range(molecule.get_num_atoms()),
         lambda molecule: range(0, molecule.get_num_atoms(), 2),
-        lambda molecule: range(0, min(1, molecule.get_num_atoms())),
         lambda molecule: list(
             range(0, min(1, molecule.get_num_atoms()))
         ),
@@ -57,7 +57,7 @@ def normal(request):
 
     """
 
-    return np.array(request.param)
+    return stk.normalize_vector(np.array(request.param))
 
 
 def test_get_plane_normal(molecule, get_atom_ids, normal):
@@ -83,6 +83,7 @@ def get_position_matrix(molecule, atom_ids, normal):
     position_matrix = molecule.get_position_matrix()
     for atom_id in atom_ids:
         remove_component(position_matrix, atom_id, normal)
+    return position_matrix
 
 
 def remove_component(position_matrix, atom_id, normal):

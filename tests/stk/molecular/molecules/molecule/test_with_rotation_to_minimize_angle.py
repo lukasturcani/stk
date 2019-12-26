@@ -43,4 +43,4 @@ def _test_with_rotation_to_minimize_angle(molecule):
         b=stk.normalize_vector(target),
         atol=1e-12,
     )
-    assert abs(np.linalg.norm(start) - np.linalg.norm(result)) < 1e-32
+    assert abs(np.linalg.norm(start) - np.linalg.norm(result)) < 1e-15

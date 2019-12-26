@@ -59,9 +59,18 @@ def test_get_maximum_diameter(
     get_atom_ids,
     maximum_diameter,
 ):
+    num_atom_ids = get_num_atom_ids(molecule, get_atom_ids)
+    if num_atom_ids == 1:
+        result = molecule.get_maximum_diameter(
+            atom_ids=get_atom_ids(molecule),
+        )
+        assert result == 0
+        return
+
     position_matrix = get_position_matrix(
         molecule=molecule,
         atom_ids=get_atom_ids(molecule),
+        num_atom_ids=num_atom_ids,
         maximum_diameter=maximum_diameter,
     )
     molecule = molecule.with_position_matrix(position_matrix)
@@ -72,7 +81,20 @@ def test_get_maximum_diameter(
     )
 
 
-def get_position_matrix(molecule, atom_ids, maximum_diameter):
+def get_num_atom_ids(molecule, get_atom_ids):
+    atom_ids = get_atom_ids(molecule)
+    if atom_ids is None:
+        return molecule.get_num_atoms()
+    else:
+        return len(tuple(atom_ids))
+
+
+def get_position_matrix(
+    molecule,
+    atom_ids,
+    num_atom_ids,
+    maximum_diameter
+):
     """
     Create a position matrix with a specific `maximum_diameter`.
 
@@ -85,6 +107,9 @@ def get_position_matrix(molecule, atom_ids, maximum_diameter):
         The ids of atoms which are to have a specific maximum
         diameter. If ``None``, then all atoms are used.
 
+    num_atom_ids : :class:`int`
+        The number of values in `atom_ids`.
+
     maximum_diameter : :class:`float`
         The desired maximum diameter.
 
@@ -95,17 +120,22 @@ def get_position_matrix(molecule, atom_ids, maximum_diameter):
 
     """
 
+    position_matrix = molecule.get_position_matrix()
+    # In this case the maimum diameter should either raise an error
+    # or always return 0, so there is no need to change the position
+    # matrix.
+    if num_atom_ids < 2:
+        return position_matrix
+
     if atom_ids is None:
         atom_ids = range(molecule.get_num_atoms())
-    elif not isinstance(molecule, (list, tuple)):
-        atom_ids = tuple(atom_ids)
 
-    position_matrix = molecule.get_position_matrix()
+    atom_ids = tuple(atom_ids)
     position_matrix[atom_ids, :] = 0
     direction = get_direction_vector()
-    atom1_id, atom2_id = next(atom_ids), next(atom_ids)
-    position_matrix[atom1_id] += 3*direction*maximum_diameter/5
-    position_matrix[atom2_id] -= 2*direction*maximum_diameter/5
+    position_matrix[atom_ids[0]] += 3*direction*maximum_diameter/5
+    position_matrix[atom_ids[1]] -= 2*direction*maximum_diameter/5
+    return position_matrix
 
 
 def get_direction_vector():
