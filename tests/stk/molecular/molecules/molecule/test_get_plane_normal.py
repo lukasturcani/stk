@@ -2,6 +2,8 @@ import numpy as np
 import pytest
 import stk
 
+from .utilities import get_num_atom_ids
+
 
 @pytest.fixture(
     params=(
@@ -61,17 +63,30 @@ def normal(request):
 
 
 def test_get_plane_normal(molecule, get_atom_ids, normal):
+    num_atom_ids = get_num_atom_ids(molecule, get_atom_ids)
+    if num_atom_ids == 1:
+        # Any non 0 vector in this case is valid.
+        assert not np.allclose(
+            a=[0, 0, 0],
+            b=molecule.get_plane_normal(get_atom_ids(molecule)),
+            atol=1e-13,
+        )
+        return
+    elif num_atom_ids == 2:
+        # Any perpendicular vector in this case is valid.
+        result = molecule.get_plane_normal(get_atom_ids(molecule))
+        assert result @ get_direction(molecule, 0, 1) < 1e-13
+        return
+
     position_matrix = get_position_matrix(
         molecule=molecule,
         atom_ids=get_atom_ids(molecule),
         normal=normal,
     )
     molecule = molecule.with_position_matrix(position_matrix)
-    assert np.allclose(
-        a=normal,
-        b=molecule.get_plane_normal(),
-        atol=1e-32,
-    )
+    result = molecule.get_plane_normal(get_atom_ids(molecule))
+    # The normal may be parallel or anti-parallel.
+    assert abs(abs(result @ normal) - 1) < 1e-13
 
 
 def get_position_matrix(molecule, atom_ids, normal):
@@ -89,3 +104,8 @@ def get_position_matrix(molecule, atom_ids, normal):
 def remove_component(position_matrix, atom_id, normal):
     component_magnitude = position_matrix[atom_id] @ normal
     position_matrix[atom_id, :] -= component_magnitude * normal
+
+
+def get_direction(molecule, atom1, atom2):
+    position_matrix = molecule.get_position_matrix()
+    return position_matrix[atom1] - position_matrix[atom2]

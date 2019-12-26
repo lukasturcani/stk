@@ -6,6 +6,8 @@ import numpy as np
 @pytest.fixture(
     params=[
         stk.BuildingBlock('[C+4]'),
+        stk.BuildingBlock('[C+3]'),
+        stk.BuildingBlock('[C+2]'),
         stk.BuildingBlock('NCCN'),
         stk.BuildingBlock('N[C+][C+2]N'),
         stk.BuildingBlock('NCCN', [stk.AmineFactory()]),

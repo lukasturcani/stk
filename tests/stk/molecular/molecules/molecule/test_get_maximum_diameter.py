@@ -2,6 +2,8 @@ import numpy as np
 import stk
 import pytest
 
+from .utilities import get_num_atom_ids
+
 
 @pytest.fixture(
     params=(
@@ -79,14 +81,6 @@ def test_get_maximum_diameter(
         b=molecule.get_maximum_diameter(get_atom_ids(molecule)),
         atol=1e-32,
     )
-
-
-def get_num_atom_ids(molecule, get_atom_ids):
-    atom_ids = get_atom_ids(molecule)
-    if atom_ids is None:
-        return molecule.get_num_atoms()
-    else:
-        return len(tuple(atom_ids))
 
 
 def get_position_matrix(

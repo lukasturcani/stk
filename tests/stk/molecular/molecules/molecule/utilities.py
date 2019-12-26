@@ -18,3 +18,11 @@ def get_displacement_vector(molecule, start_atom, end_atom):
         molecule.get_atomic_positions((start_atom, end_atom))
     )
     return position2 - position1
+
+
+def get_num_atom_ids(molecule, get_atom_ids):
+    atom_ids = get_atom_ids(molecule)
+    if atom_ids is None:
+        return molecule.get_num_atoms()
+    else:
+        return len(tuple(atom_ids))
