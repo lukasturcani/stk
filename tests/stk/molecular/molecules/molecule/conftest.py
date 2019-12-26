@@ -61,12 +61,44 @@ def get_position_matrix(request):
 
 @pytest.fixture(
     params=[
-        np.array([0, 0, 0]),
-        np.array([-1.2, 10.12, 3]),
-    ],
+        [0, 0, 0],
+        [10, 20, 30],
+        [-10, 20, -30],
+        [0.5, 10, -0.921],
+    ]
 )
 def origin(request):
     return np.array(request.param)
+
+
+@pytest.fixture
+def get_origin_0(origin):
+    return lambda molecule: origin
+
+
+@pytest.fixture(
+    params=[
+        lambda molecule: molecule.get_centroid(),
+        pytest.lazy_fixture('get_origin_0'),
+    ],
+)
+def get_origin(request):
+    """
+    Return an origin parameter for a molecule.
+
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule which needs an origin parameter for some method.
+
+    Returns
+    -------
+    :class:`numpy.ndarray`
+        The origin parameter to use.
+
+    """
+
+    return request.param
 
 
 @pytest.fixture(

@@ -1,17 +1,10 @@
-import pytest
 import numpy as np
+import pytest
 
 
-@pytest.fixture(
-    params=[
-        [0, 0, 0],
-        [10, 20, 30],
-        [-10, 20, -30],
-        [0.5, 10, -0.921],
-    ],
-)
-def displacement(request):
-    return list(request.param)
+@pytest.fixture
+def displacement(origin):
+    return origin
 
 
 def test_with_displacement(molecule, displacement):

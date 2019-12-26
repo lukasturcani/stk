@@ -1,14 +1,29 @@
-def test_with_centroid(molecule, get_atom_ids):
-    # Keep clone to test for immutability.
-    clone = molecule.clone()
+import pytest
+import numpy as np
 
-    new = molecule.with_centroid(
-        position=[1, 2, 3],
+
+@pytest.fixture
+def centroid(origin):
+    return origin
+
+
+def test_with_centroid(molecule, get_atom_ids, centroid):
+    position_matrix = molecule.get_position_matrix()
+    _test_with_centroid(molecule, get_atom_ids, centroid)
+    # Test immutability.
+    assert np.all(np.equal(
+        position_matrix,
+        molecule.get_position_matrix(),
+    ))
+
+
+def _test_with_centroid(molecule, get_atom_ids, centroid):
+    molecule = molecule.with_centroid(
+        position=centroid,
         atom_ids=get_atom_ids(molecule),
     )
     assert np.allclose(
-        a=new.get_centroid(atom_ids=get_atom_ids(molecule)),
-        b=[1, 2, 3],
+        a=centroid,
+        b=molecule.get_centroid(atom_ids=get_atom_ids(molecule)),
         atol=1e-32,
     )
-    _test_unchanged(clone, molecule)

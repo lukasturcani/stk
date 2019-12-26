@@ -24,7 +24,8 @@ def axis(request):
     return np.array(request.param)
 
 
-def test_with_rotation_about_axis(molecule, angle, axis, origin):
+def test_with_rotation_about_axis(molecule, angle, axis, get_origin):
+    origin = get_origin(molecule)
     original = rotational_space_positions(molecule, axis, origin)
     new = molecule.with_rotation_about_axis(angle, axis, origin)
     rotated = rotational_space_positions(new, axis, origin)

@@ -39,25 +39,6 @@ def target(request):
     return request.param
 
 
-@pytest.fixture(
-    params=[
-        lambda molecule: molecule.get_centroid(),
-        lambda molecule: np.array([0., 0., 0.]),
-        lambda molecule: np.array([100., -50., 2.]),
-    ],
-)
-def get_origin(request):
-    """
-    A functional which returns the origin of rotation.
-
-    The functional takes 1 parameter, which is the molecule being
-    rotated, and returns the origin for the rotation.
-
-    """
-
-    return request.param
-
-
 def test_with_rotation_between_vectors(molecule, target, get_origin):
     # Use to check that immutability is not violated.
     clone = molecule.clone()
