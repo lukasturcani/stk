@@ -24,6 +24,7 @@ from .utilities import get_num_atom_ids
             marks=pytest.mark.xfail(strict=True, raises=ValueError),
         ),
         lambda molecule: range(min(molecule.get_num_atoms(), 1)),
+        lambda molecule: range(min(molecule.get_num_atoms(), 2)),
     ),
 )
 def get_atom_ids(request):
