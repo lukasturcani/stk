@@ -10,7 +10,7 @@ import stk
         'molecule.xyz',
     ],
 )
-def path(self, request, tmpdir):
+def path(request, tmpdir):
     return os.path.join(tmpdir, request.param)
 
 

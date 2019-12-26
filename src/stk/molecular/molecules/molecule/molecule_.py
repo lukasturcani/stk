@@ -211,26 +211,6 @@ class Molecule_(Molecule):
         )
         return float(distance)
 
-    def get_center_of_mass(self, atom_ids=None):
-        if atom_ids is None:
-            atom_ids = range(len(self._atoms))
-        elif not isinstance(atom_ids, (list, tuple)):
-            # Iterable gets used twice, once in get_atomic_positions
-            # and once in zip.
-            atom_ids = list(atom_ids)
-
-        if len(atom_ids) == 0:
-            raise ValueError('atom_ids was of length 0.')
-
-        center = 0
-        total_mass = 0.
-        coords = self.get_atomic_positions(atom_ids)
-        for atom_id, coord in zip(atom_ids, coords):
-            mass = self._atoms[atom_id].mass
-            total_mass += mass
-            center += mass*coord
-        return np.divide(center, total_mass)
-
     def get_atoms(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))

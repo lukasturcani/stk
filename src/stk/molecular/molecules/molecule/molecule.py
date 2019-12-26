@@ -216,34 +216,6 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def get_center_of_mass(self, atom_ids=None):
-        """
-        Return the centre of mass.
-
-        Parameters
-        ----------
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of atoms which should be used to calculate the
-            center of mass. If ``None``, then all atoms will be used.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            The coordinates of the center of mass.
-
-        Raises
-        ------
-        :class:`ValueError`
-            If `atom_ids` has a length of ``0``.
-
-        References
-        ----------
-        https://en.wikipedia.org/wiki/Center_of_mass
-
-        """
-
-        raise NotImplementedError()
-
     def get_atoms(self, atom_ids=None):
         """
         Yield the atoms in the molecule, ordered by id.
