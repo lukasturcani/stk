@@ -324,12 +324,9 @@ class Molecule:
 
     def get_identity_key(self):
         """
-        Return the identity key.
+        Return a unique key for the molecule.
 
-        The identity key wil be equal for two molecules which
-        ``stk`` sees as identical. The identity key does not take
-        the conformation into account but it does account for
-        isomerism.
+        Two different molecules should never have the same identity.
 
         Returns
         -------
