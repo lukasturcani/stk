@@ -1,4 +1,5 @@
 import numpy as np
+import stk
 
 
 def test_get_maximum_diameter(
@@ -48,43 +49,13 @@ def get_position_matrix(molecule, atom_ids, maximum_diameter):
         atom_ids = tuple(atom_ids)
 
     position_matrix = molecule.get_position_matrix()
+    position_matrix[atom_ids, :] = 0
+    direction = get_direction_vector()
+    atom1_id, atom2_id = next(atom_ids), next(atom_ids)
+    position_matrix[atom1_id] += 3*direction*maximum_diameter/5
+    position_matrix[atom2_id] -= 2*direction*maximum_diameter/5
 
 
-
-class TestGetMaximumDiameter:
-    def case1():
-        molecule = stk.BuildingBlock('NCCN')
-        coords = np.array([
-            [i, 0, 0] for i in range(molecule.get_num_atoms())
-        ])
-        molecule = molecule.with_position_matrix(coords)
-        return molecule, None, molecule.get_num_atoms()-1
-
-    def case2(atom_ids, maximum_diameter):
-        molecule = stk.BuildingBlock('NCCN')
-        coords = np.zeros((molecule.get_num_atoms(), 3))
-        coords[[1]] = [0, -50, 0]
-        coords[[9]] = [0, 50, 0]
-        molecule = molecule.with_position_matrix(coords)
-        return molecule, atom_ids, maximum_diameter
-
-    @pytest.mark.parametrize(
-        'molecule,atom_ids,maximum_diameter',
-        [
-            case1(),
-            case2(atom_ids=None, maximum_diameter=100),
-            case2(atom_ids=(1, 9), maximum_diameter=100),
-            case2(atom_ids=(1, 0), maximum_diameter=50),
-            case2(atom_ids=(0, 9), maximum_diameter=50),
-            case2(atom_ids=(0, 2, 3, 4), maximum_diameter=0),
-        ],
-    )
-    def test(
-        self,
-        molecule,
-        atom_ids,
-        maximum_diameter
-    ):
-        assert (
-            molecule.get_maximum_diameter(atom_ids) == maximum_diameter
-        )
+def get_direction_vector():
+    generator = np.random.RandomState(4)
+    return stk.normalize_vector(generator.rand(3))

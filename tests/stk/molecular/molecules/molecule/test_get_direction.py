@@ -25,7 +25,7 @@ def get_position_matrix(molecule, atom_ids, direction):
         The molecule for which the position matrix is created.
 
     atom_ids : :class:`iterable` of :class:`int`
-        THe ids of atoms which are to have a specific direction.
+        The ids of atoms which are to have a specific direction.
         If ``None``, then all atoms are used.
 
     direction : :class:`numpy.ndarray`
