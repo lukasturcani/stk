@@ -80,11 +80,9 @@ def test_get_direction(molecule, get_atom_ids, direction):
         direction=direction,
     )
     molecule = molecule.with_position_matrix(position_matrix)
-    assert np.allclose(
-        a=direction,
-        b=molecule.get_direction(get_atom_ids(molecule)),
-        atol=1e-32,
-    )
+    result = molecule.get_direction(get_atom_ids(molecule))
+    # The direction may be parallel or anti-parallel.
+    return abs(abs(result @ direction) - 1) < 1e-13
 
 
 def get_position_matrix(molecule, atom_ids, direction):
