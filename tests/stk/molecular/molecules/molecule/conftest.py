@@ -106,7 +106,6 @@ def get_origin(request):
         lambda molecule: None,
         lambda molecule: range(molecule.get_num_atoms()),
         lambda molecule: range(0, molecule.get_num_atoms(), 2),
-        lambda molecule: range(0, min(1, molecule.get_num_atoms())),
         lambda molecule: list(
             range(0, min(1, molecule.get_num_atoms()))
         ),
@@ -117,7 +116,9 @@ def get_origin(request):
             i for i in range(0, min(1, molecule.get_num_atoms()))
         ),
         lambda molecule: (),
-        lambda molecule: (0, ) if molecule.get_num_atoms() > 0 else (),
+        lambda molecule: range(min(molecule.get_num_atoms(), 1)),
+        lambda molecule: range(min(molecule.get_num_atoms(), 2)),
+        lambda molecule: range(min(molecule.get_num_atoms(), 3)),
     ],
 )
 def get_atom_ids(request):
