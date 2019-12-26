@@ -443,7 +443,7 @@ class BuildingBlock(Molecule_):
         yield from (fg.clone() for fg in self._functional_groups)
 
     @classmethod
-    def _init_from_dict(cls, molecule_dict):
+    def init_from_dict(cls, molecule_dict):
         """
         Initialize from a :class:`dict` representation.
 
@@ -460,22 +460,22 @@ class BuildingBlock(Molecule_):
 
         """
 
-        d = dict(molecule_dict)
-        identity_key = eval(d.pop('identity_key'))
-
-        d.pop('class')
-
         obj = cls.__new__(cls)
-        obj._identity_key = identity_key
-        obj._position_matrix = np.array(d.pop('position_matrix')).T
-        obj._atoms = eval(d.pop('atoms'), vars(atoms))
-        obj._bonds = eval(d.pop('bonds'), vars(bond))
+        obj._identity_key = molecule_dict['identity_key']
+        obj._position_matrix = np.array(
+            molecule_dict['position_matrix']
+        ).T
+        obj._atoms = eval(molecule_dict['atoms'], vars(atoms))
+        obj._bonds = eval(molecule_dict['bonds'], vars(bond))
         for bond_ in obj._bonds:
-            bond.atom1 = obj._atoms[bond_.atom1]
-            bond.atom2 = obj._atoms[bond_.atom2]
+            bond_.atom1 = obj._atoms[bond_.atom1]
+            bond_.atom2 = obj._atoms[bond_.atom2]
 
         obj._functional_groups = []
-        fgs = eval(d.pop('functional_groups'), vars(functional_groups))
+        fgs = eval(
+            molecule_dict['functional_groups'],
+            vars(functional_groups),
+        )
         for functional_group in fgs:
             obj._with_functional_group(functional_group)
 
@@ -816,7 +816,7 @@ class BuildingBlock(Molecule_):
             'position_matrix': self.get_position_matrix().tolist(),
             'atoms': repr(self._atoms),
             'bonds': repr(bonds),
-            'identity_key': repr(self._identity_key)
+            'identity_key': self._identity_key,
         }
 
     @staticmethod
