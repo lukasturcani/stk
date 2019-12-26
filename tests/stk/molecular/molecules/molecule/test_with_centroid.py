@@ -7,7 +7,6 @@ import numpy as np
         lambda molecule: None,
         lambda molecule: range(molecule.get_num_atoms()),
         lambda molecule: range(0, molecule.get_num_atoms(), 2),
-        lambda molecule: range(0, min(1, molecule.get_num_atoms())),
         lambda molecule: list(
             range(0, min(1, molecule.get_num_atoms()))
         ),
