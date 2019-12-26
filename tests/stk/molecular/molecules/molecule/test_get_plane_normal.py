@@ -1,42 +1,90 @@
+import numpy as np
+import pytest
 
 
-class TestGetPlaneNormal:
-    def case1(atom_ids, normal):
-        molecule = stk.BuildingBlock('NCCN')
-        coords = molecule.get_position_matrix()
-        coords[[1, 9], 2] = 0
-        molecule = molecule.with_position_matrix(coords)
-        return molecule, atom_ids, normal
+@pytest.fixture(
+    params=(
+        lambda molecule: None,
+        lambda molecule: range(molecule.get_num_atoms()),
+        lambda molecule: range(0, molecule.get_num_atoms(), 2),
+        lambda molecule: range(0, min(1, molecule.get_num_atoms())),
+        lambda molecule: list(
+            range(0, min(1, molecule.get_num_atoms()))
+        ),
+        lambda molecule: tuple(
+            range(0, min(1, molecule.get_num_atoms()))
+        ),
+        lambda molecule: (
+            i for i in range(0, min(1, molecule.get_num_atoms()))
+        ),
+        pytest.param(
+            lambda molecule: (),
+            marks=pytest.mark.xfail(strict=True, raises=ValueError),
+        ),
+        lambda molecule: range(min(molecule.get_num_atoms(), 1)),
+        lambda molecule: range(min(molecule.get_num_atoms(), 2)),
+        lambda molecule: range(min(molecule.get_num_atoms(), 3)),
+    ),
+)
+def get_atom_ids(request):
+    """
+    Return an atom_ids parameter for a :class:`.Molecule`.
 
-    def case2(atom_ids, normal):
-        molecule = stk.BuildingBlock('NCCN')
-        coords = molecule.get_position_matrix()
-        coords[:, 2] = 0
-        molecule = molecule.with_position_matrix(coords)
-        return molecule, atom_ids, normal
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule for which `atom_ids` are returned.
 
-    @pytest.mark.parametrize(
-        'molecule,atom_ids,normal',
-        [
-            case1(atom_ids=(1, 9), normal=[0, 0, 1]),
-            case2(atom_ids=None, normal=[0, 0, 1]),
-            case2(atom_ids=(1, 9), normal=[0, 0, 1]),
-        ],
+    Retruns
+    -------
+    :class:`iterable` of :class:`int`
+        An `atom_ids` parameter.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(
+    params=(
+        [0., 0., 1],
+        [2., -1., 1.32],
+    ),
+)
+def normal(request):
+    """
+    A plane normal.
+
+    """
+
+    return np.array(request.param)
+
+
+def test_get_plane_normal(molecule, get_atom_ids, normal):
+    position_matrix = get_position_matrix(
+        molecule=molecule,
+        atom_ids=get_atom_ids(molecule),
+        normal=normal,
     )
-    def test_1(self, molecule, atom_ids, normal):
-        assert np.all(np.equal(
-            molecule.get_plane_normal(atom_ids),
-            normal,
-        ))
-
-    @pytest.mark.parametrize(
-        'molecule,atom_ids,normal',
-        [
-            case1(atom_ids=None, normal=[0, 0, 1])
-        ],
+    molecule = molecule.with_position_matrix(position_matrix)
+    assert np.allclose(
+        a=normal,
+        b=molecule.get_plane_normal(),
+        atol=1e-32,
     )
-    def test_2(self, molecule, atom_ids, normal):
-        assert not np.all(np.equal(
-            molecule.get_plane_normal(atom_ids),
-            normal,
-        ))
+
+
+def get_position_matrix(molecule, atom_ids, normal):
+    if atom_ids is None:
+        atom_ids = range(molecule.get_num_atoms())
+    elif not isinstance(atom_ids, (list, tuple)):
+        atom_ids = tuple(atom_ids)
+
+    position_matrix = molecule.get_position_matrix()
+    for atom_id in atom_ids:
+        remove_component(position_matrix, atom_id, normal)
+
+
+def remove_component(position_matrix, atom_id, normal):
+    component_magnitude = position_matrix[atom_id] @ normal
+    position_matrix[atom_id, :] -= component_magnitude * normal

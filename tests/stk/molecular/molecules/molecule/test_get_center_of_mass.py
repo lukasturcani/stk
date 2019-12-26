@@ -21,7 +21,7 @@ import pytest
             lambda molecule: (),
             marks=pytest.mark.xfail(strict=True, raises=ValueError),
         ),
-        lambda molecule: (0, ) if molecule.get_num_atoms() > 0 else (),
+        lambda molecule: range(min(molecule.get_num_atoms(), 1)),
     ),
 )
 def get_atom_ids(request):
