@@ -1,5 +1,57 @@
 import numpy as np
 import stk
+import pytest
+
+
+@pytest.fixture(
+    params=(
+        lambda molecule: None,
+        lambda molecule: range(molecule.get_num_atoms()),
+        lambda molecule: range(0, molecule.get_num_atoms(), 2),
+        lambda molecule: range(0, min(1, molecule.get_num_atoms())),
+        lambda molecule: list(
+            range(0, min(1, molecule.get_num_atoms()))
+        ),
+        lambda molecule: tuple(
+            range(0, min(1, molecule.get_num_atoms()))
+        ),
+        lambda molecule: (
+            i for i in range(0, min(1, molecule.get_num_atoms()))
+        ),
+        pytest.param(
+            lambda molecule: (),
+            marks=pytest.mark.xfail(strict=True, raises=ValueError),
+        ),
+        lambda molecule: (0, ) if molecule.get_num_atoms() > 0 else (),
+    ),
+)
+def get_atom_ids(request):
+    """
+    Return an atom_ids parameter for a :class:`.Molecule`.
+
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule for which `atom_ids` are returned.
+
+    Retruns
+    -------
+    :class:`iterable` of :class:`int`
+        An `atom_ids` parameter.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(params=[0, 0.32, 1, 2.3, 100.12])
+def maximum_diameter(request):
+    """
+    A maximum diameter value.
+
+    """
+
+    return request.param
 
 
 def test_get_maximum_diameter(

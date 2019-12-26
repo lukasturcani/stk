@@ -5,6 +5,7 @@ import numpy as np
 
 @pytest.fixture(
     params=[
+        stk.BuildingBlock('[C+4]'),
         stk.BuildingBlock('NCCN'),
         stk.BuildingBlock('N[C+][C+2]N'),
         stk.BuildingBlock('NCCN', [stk.AmineFactory()]),
@@ -84,6 +85,7 @@ def origin(request):
             i for i in range(0, min(1, molecule.get_num_atoms()))
         ),
         lambda molecule: (),
+        lambda molecule: (0, ) if molecule.get_num_atoms() > 0 else (),
     ],
 )
 def get_atom_ids(request):
