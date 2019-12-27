@@ -1,46 +1,61 @@
-import stk
 import numpy as np
-import pytest
+import itertools as it
 
 
-class _TestGetBonderCentroids:
-    def case1():
-        building_block = stk.BuildingBlock('BrCCBr', ['bromine'])
-        position_matrix = np.zeros((len(building_block.atoms), 3))
-        bonder1 = [1.0, 0., 0.]
-        bonder2 = [10., 0., 0.]
-        position_matrix[1, :] = bonder1
-        position_matrix[2, :] = bonder2
-        building_block.set_position_matrix(position_matrix)
-        fg_ids = (0, 1)
-        return building_block, fg_ids, [bonder1, bonder2]
-
-    @pytest.mark.parametrize(
-        argnames=(
-            'building_block',
-            'fg_ids',
-            'expected_bonder_centroids',
-        ),
-        argvalues=(
-            # case1(),
-        )
+def test_get_bonder_centroids(building_block, get_fg_ids):
+    bonder_centroids = list(get_bonder_centroids(
+        building_block=building_block,
+        fg_ids=get_fg_ids(building_block),
+    ))
+    position_matrix = get_position_matrix(
+        building_block=building_block,
+        fg_ids=get_fg_ids(building_block),
+        bonder_centroids=bonder_centroids,
     )
-    def test(
-        self,
-        building_block,
-        fg_ids,
-        expected_bonder_centroids,
-    ):
-        bonder_centroids = building_block.get_bonder_centroids(
-            fg_ids=fg_ids,
+    building_block = building_block.with_position_matrix(
+        position_matrix=position_matrix,
+    )
+    result = it.zip_longest(
+        building_block.get_bonder_centroids(
+            fg_ids=get_fg_ids(building_block),
+        ),
+        bonder_centroids,
+    )
+    for centroid, expected_centroid in result:
+        assert np.allclose(
+            a=centroid,
+            b=expected_centroid,
+            atol=1e-32,
         )
-        bonder_centroids = it.zip_longest(
-            bonder_centroids,
-            expected_bonder_centroids,
-        )
-        for centroid, expected_bonder_centroid in bonder_centroids:
-            assert np.allclose(
-                a=centroid,
-                b=expected_bonder_centroid,
-                atol=1e-32,
-            )
+
+
+def get_bonder_centroids(building_block, fg_ids):
+    generator = np.random.RandomState(4)
+    for fg in building_block.get_functional_groups(fg_ids):
+        yield generator.normal(scale=50, size=3)
+
+
+def get_position_matrix(building_block, fg_ids, bonder_centroids):
+    position_matrix = building_block.get_position_matrix()
+    centroids = zip(
+        building_block.get_functional_groups(fg_ids),
+        bonder_centroids,
+    )
+    generator = np.random.RandomState(5)
+    for fg, centroid in centroids:
+        set_centroid(position_matrix, fg, centroid, generator)
+    return position_matrix
+
+
+def set_centroid(
+    position_matrix,
+    functional_group,
+    centroid,
+    generator,
+):
+    bonder_ids = tuple(functional_group.get_bonder_ids())
+    position_matrix[bonder_ids, :] = centroid
+    for i in range(0, len(bonder_ids)-1, 2):
+        displacement = generator.normal(scale=10, size=3)
+        position_matrix[bonder_ids[i]] += displacement
+        position_matrix[bonder_ids[i+1]] -= displacement

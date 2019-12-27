@@ -5,7 +5,11 @@ import pytest
 @pytest.fixture(
     params=[
         stk.BuildingBlock('NCCN'),
-        #stk.BuildingBlock('NCCN', ['amine']),
+        stk.BuildingBlock('NCCN', [stk.AmineFactory()]),
+        stk.BuildingBlock(
+            smiles='BrCC(Br)C(Br)C(Br)C(Br)C(Br)C(Br)CBr',
+            functional_groups=[stk.BromoFactory()],
+        ),
         stk.BuildingBlock('N[C+][C+2]N'),
     ],
 )
@@ -15,29 +19,26 @@ def building_block(request):
 
 @pytest.fixture(
     params=[
-        stk.BuildingBlock('NCCN'),
-        stk.BuildingBlock('N[C+][C+2]N'),
-    ],
-)
-def molecule(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=[
         lambda building_block: None,
-        lambda building_block: range(len(building_block.func_groups)),
+        lambda building_block: range(
+            building_block.get_num_functional_groups()
+        ),
         lambda building_block:
-            range(0, len(building_block.func_groups), 2),
+            range(0, building_block.get_num_functional_groups(), 2),
         lambda building_block:
-            range(0, min(1, len(building_block.func_groups))),
+            range(min(1, building_block.get_num_functional_groups())),
         lambda building_block:
-            list(range(0, min(1, len(building_block.func_groups)))),
+            list(range(min(
+                1, building_block.get_num_functional_groups()
+            ))),
         lambda building_block:
-            tuple(range(0, min(1, len(building_block.func_groups)))),
+            tuple(range(min(
+                1, building_block.get_num_functional_groups()
+            ))),
         lambda building_block: (
-            i
-            for i in range(0, min(1, len(building_block.func_groups)))
+            i for i in range(min(
+                1, building_block.get_num_functional_groups()
+            ))
         ),
     ],
 )

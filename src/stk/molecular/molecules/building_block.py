@@ -379,9 +379,28 @@ class BuildingBlock(Molecule_):
 
         return self.clone()._with_functional_groups(factory)
 
-    def get_functional_groups(self):
+    def get_num_functional_groups(self):
+        """
+        Return the number of functional groups.
+
+        Returns
+        -------
+        :class:`int`
+            The number of functional groups in the building block.
+
+        """
+
+        return len(self._functional_groups)
+
+    def get_functional_groups(self, fg_ids=None):
         """
         Yield the functional groups, ordered by id.
+
+        Parameters
+        ----------
+        fg_ids : :class:`iterable` of :class:`int`, optional
+            The ids of functional groups yielded. If ``None``, then
+            all functional groups are yielded.
 
         Yields
         ------
@@ -390,7 +409,11 @@ class BuildingBlock(Molecule_):
 
         """
 
-        yield from (fg.clone() for fg in self._functional_groups)
+        if fg_ids is None:
+            fg_ids = range(len(self._functional_groups))
+
+        for fg_id in fg_ids:
+            yield self._functional_groups[fg_id].clone()
 
     @classmethod
     def init_from_dict(cls, molecule_dict):
