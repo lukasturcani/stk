@@ -10,7 +10,6 @@ import os
 import numpy as np
 import itertools as it
 import rdkit.Chem.AllChem as rdkit
-from glob import glob
 from functools import partial
 from scipy.spatial.distance import euclidean
 
@@ -194,55 +193,6 @@ class BuildingBlock(Molecule_):
 
         return cls.init_from_rdkit_mol(
             molecule=molecule,
-            functional_groups=functional_groups,
-        )
-
-    @classmethod
-    def init_from_random_file(
-        cls,
-        file_glob,
-        functional_groups=None,
-        random_seed=None,
-    ):
-        """
-        Initialize from a random file in `file_glob`.
-
-        Parameters
-        ----------
-        file_glob : :class:`str`
-            A glob specifying files, one of which is used to initialize
-            a :class:`.BuildingBlock` at random.
-
-        functional_groups : :class:`iterable`, optional
-            An :class:`iterable` of :class:`.FunctionalGroup` or
-            :class:`.FunctionalGroupFactory` or both.
-            :class:`.FunctionalGroup` instances are added to the
-            building block and :class:`.FunctionalGroupFactory`
-            instances are used to create :class:`.FunctionalGroup`
-            instances the building block should hold.
-            :class:`.FunctionalGroup` instances are used to identify
-            which atoms are modified during
-            :class:`.ConstructedMolecule` construction.
-
-        random_seed : :class:`int`, optional
-            The random seed to use.
-
-        Returns
-        -------
-        :class:`BuildingBlock`
-            A random molecule from `file_glob`.
-
-        Raises
-        ------
-        :class:`RuntimeError`
-            If no files in `file_glob` could be initialized from.
-
-        """
-
-        files = glob(file_glob)
-        generator = np.random.RandomState(random_seed)
-        return cls.init_from_file(
-            path=generator.choice(files),
             functional_groups=functional_groups,
         )
 
