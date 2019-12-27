@@ -197,10 +197,10 @@ class Molecule_(Molecule):
     def get_atomic_positions(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
-        elif not isinstance(atom_ids, (list, tuple)):
-            atom_ids = list(atom_ids)
         elif isinstance(atom_ids, int):
             atom_ids = (atom_ids, )
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
 
         coords = self._position_matrix[:, atom_ids].T
         for atom_coords in coords:
@@ -228,10 +228,10 @@ class Molecule_(Molecule):
     def get_centroid(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
-        elif not isinstance(atom_ids, (list, tuple)):
-            atom_ids = list(atom_ids)
         elif isinstance(atom_ids, int):
             atom_ids = (atom_ids, )
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
 
         if len(atom_ids) == 0:
             raise ValueError('atom_ids was of length 0.')
@@ -244,10 +244,10 @@ class Molecule_(Molecule):
     def get_direction(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
-        elif not isinstance(atom_ids, (list, tuple)):
-            atom_ids = list(atom_ids)
         elif isinstance(atom_ids, int):
             atom_ids = (atom_ids, )
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
 
         if len(atom_ids) == 0:
             raise ValueError('atom_ids was of length 0.')
@@ -258,10 +258,10 @@ class Molecule_(Molecule):
     def get_maximum_diameter(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
-        elif not isinstance(atom_ids, (list, tuple)):
-            atom_ids = list(atom_ids)
         elif isinstance(atom_ids, int):
             atom_ids = (atom_ids, )
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
 
         if len(atom_ids) == 0:
             raise ValueError('atom_ids was of length 0.')
@@ -272,10 +272,10 @@ class Molecule_(Molecule):
     def get_plane_normal(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
-        elif not isinstance(atom_ids, (list, tuple)):
-            atom_ids = list(atom_ids)
         elif isinstance(atom_ids, int):
             atom_ids = (atom_ids, )
+        elif not isinstance(atom_ids, (list, tuple)):
+            atom_ids = list(atom_ids)
 
         if len(atom_ids) == 0:
             raise ValueError('atom_ids was of length 0.')

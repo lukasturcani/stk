@@ -2,7 +2,7 @@ import itertools as it
 import stk
 import pytest
 
-from ..utilities import is_equivalent_atom
+from ..utilities import is_equivalent_atom, sanitize_ids
 
 
 @pytest.mark.parametrize(
@@ -33,7 +33,7 @@ def test_get_atoms(molecule, atoms, get_atom_ids):
         atom_ids = range(molecule.get_num_atoms())
 
     results = it.zip_longest(
-        atom_ids,
+        sanitize_ids(molecule, atom_ids),
         molecule.get_atoms(get_atom_ids(molecule)),
     )
     for atom_id, atom in results:

@@ -134,6 +134,7 @@ def get_origin(request):
 @pytest.fixture(
     params=[
         lambda molecule: None,
+        lambda molecule: 0,
         lambda molecule: range(molecule.get_num_atoms()),
         lambda molecule: range(0, molecule.get_num_atoms(), 2),
         lambda molecule: list(
