@@ -199,21 +199,18 @@ class Molecule_(Molecule):
             atom_ids = range(len(self._atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
 
         coords = self._position_matrix[:, atom_ids].T
         for atom_coords in coords:
             yield atom_coords
 
-    def get_atomic_distance(self, atom1_id, atom2_id):
-        distance = euclidean(
-            u=self._position_matrix[:, atom1_id],
-            v=self._position_matrix[:, atom2_id]
-        )
-        return float(distance)
-
     def get_atoms(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
 
         for atom_id in atom_ids:
             yield self._atoms[atom_id].clone()
@@ -233,6 +230,8 @@ class Molecule_(Molecule):
             atom_ids = range(len(self._atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
 
         if len(atom_ids) == 0:
             raise ValueError('atom_ids was of length 0.')
@@ -247,6 +246,8 @@ class Molecule_(Molecule):
             atom_ids = range(len(self._atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
 
         if len(atom_ids) == 0:
             raise ValueError('atom_ids was of length 0.')
@@ -259,6 +260,8 @@ class Molecule_(Molecule):
             atom_ids = range(len(self._atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
 
         if len(atom_ids) == 0:
             raise ValueError('atom_ids was of length 0.')
@@ -271,6 +274,8 @@ class Molecule_(Molecule):
             atom_ids = range(len(self._atoms))
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
 
         if len(atom_ids) == 0:
             raise ValueError('atom_ids was of length 0.')
@@ -305,6 +310,8 @@ class Molecule_(Molecule):
     def _to_mdl_mol_block(self, atom_ids=None):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
 
         atom_lines = []
         # This set gets used by bonds.
@@ -580,6 +587,8 @@ class Molecule_(Molecule):
     def _write_xyz_file(self, path, atom_ids):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
 
         content = [0]
         for i, atom_id in enumerate(atom_ids, 1):
@@ -595,6 +604,8 @@ class Molecule_(Molecule):
     def _write_pdb_file(self, path, atom_ids):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
 
         lines = []
         atom_counts = {}

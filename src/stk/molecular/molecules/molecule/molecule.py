@@ -121,7 +121,7 @@ class Molecule:
         start,
         target,
         axis,
-        origin
+        origin,
     ):
         """
         Return a rotated clone.
@@ -181,36 +181,13 @@ class Molecule:
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of the atoms whose positions are desired.
             If ``None``, then the positions of all atoms will be
-            yielded.
+            yielded. Can be a single :class:`int`, if the position of
+            a single atom is desired.
 
         Yields
         ------
         :class:`numpy.ndarray`
             The x, y and z coordinates of an atom.
-
-        """
-
-        raise NotImplementedError()
-
-    def get_atomic_distance(self, atom1_id, atom2_id):
-        """
-        Return the distance between 2 atoms.
-
-        This method does not account for the van der Waals radius of
-        atoms.
-
-        Parameters
-        ----------
-        atom1_id : :class:`int`
-            The id of the first atom.
-
-        atom2_id : :class:`int`
-            The id of the second atom.
-
-        Returns
-        -------
-        :class:`float`
-            The distance between the first and second atoms.
 
         """
 
@@ -223,8 +200,9 @@ class Molecule:
         Parameters
         ----------
         atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of atoms to yield. If ``None`` then all atoms are
-            yielded.
+            The ids of atoms to yield. Can be a single
+            :class:`int` if a single atom is wanted, or ``None`` if
+            all atoms are wanted.
 
         Yields
         ------
@@ -282,7 +260,9 @@ class Molecule:
         ----------
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which are used to calculate the
-            centroid. If ``None``, then all atoms will be used.
+            centroid. Can be a single :class:`int`, if a single
+            atom is to be used, or ``None`` if all atoms are to be
+            used.
 
         Returns
         -------
@@ -306,7 +286,8 @@ class Molecule:
         ----------
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should be used to calculate the
-            vector. If ``None``, then all atoms will be used.
+            vector. Can be a single :class:`int`, if a single atom
+            is to be used, or ``None``, if all atoms are to be used.
 
         Returns
         -------
@@ -347,10 +328,11 @@ class Molecule:
 
         Parameters
         ----------
-        atom_ids : :class:`iterable` of :class:`int`
+        atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which are considered when looking for the
-            maximum diameter. If ``None`` then all atoms in the
-            molecule are considered.
+            maximum diameter. Can be a single :class:`int`, if a
+            single atom is to be used, or ``None``, if all atoms are to
+            be used.
 
         Returns
         -------
@@ -374,7 +356,9 @@ class Molecule:
         ----------
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should be used to calculate the
-            plane. If ``None``, then all atoms will be used.
+            plane. Can be a single :class:`int`, if a
+            single atom is to be used, or ``None``, if all atoms are to
+            be used.
 
         Returns
         -------
@@ -416,7 +400,9 @@ class Molecule:
 
         atom_ids : :class:`iterable` of :class:`int`, optional
             The ids of atoms which should have their centroid set to
-            `position`. If ``None`` then all atoms are used.
+            `position`. Can be a single :class:`int`, if a
+            single atom is to be used, or ``None``, if all atoms are to
+            be used.
 
         Returns
         -------
@@ -496,8 +482,9 @@ class Molecule:
         Parameters
         ----------
         atom_ids : :class:`iterable` of :class:`int`, optional
-            The atom ids of atoms to write. If ``None`` then all atoms
-            are written.
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or
+            ``None``, if all atoms are to be used.
 
         Returns
         -------
@@ -584,8 +571,9 @@ class Molecule:
             The `path` to which the molecule should be written.
 
         atom_ids : :class:`iterable` of :class:`int`, optional
-            The atom ids of atoms to write. If ``None`` then all atoms
-            are written.
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or
+            ``None``, if all atoms are to be used.
 
         Returns
         -------
@@ -619,8 +607,9 @@ class Molecule:
             The full path to the file being written.
 
         atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. If ``None`` then all atoms
-            are written.
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or ``None``,
+            if all atoms are to be used.
 
         Returns
         -------
@@ -644,8 +633,9 @@ class Molecule:
             The full path to the file being written.
 
         atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. If ``None`` then all atoms
-            are written.
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or ``None``,
+            if all atoms are to be used.
 
         Returns
         -------
@@ -668,8 +658,9 @@ class Molecule:
             The full path to the file being written.
 
         atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. If ``None`` then all atoms
-            are written.
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or ``None``,
+            if all atoms are to be used.
 
         Returns
         -------
