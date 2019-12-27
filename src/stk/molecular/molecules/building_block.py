@@ -8,17 +8,15 @@ Building Block
 import logging
 import os
 import numpy as np
-import itertools as it
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
-from scipy.spatial.distance import euclidean
 
 from .. import atoms, bond, functional_groups
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bond import Bond
 from .molecule import Molecule_
-from ...utilities import vector_angle, remake
+from ...utilities import remake
 
 
 logger = logging.getLogger(__name__)
