@@ -10,9 +10,8 @@ from .utilities import (
 
 
 class _TestCase:
-    def __init__(self, building_block, factory, functional_groups):
+    def __init__(self, building_block, functional_groups):
         self.building_block = building_block
-        self.factory = factory
         self.functional_groups = functional_groups
 
 
@@ -24,7 +23,6 @@ class _TestCase:
                 smiles='NCC(Br)CN',
                 functional_groups=[stk.BromoFactory()],
             ),
-            factory=stk.AmineFactory(),
             functional_groups=(
                 stk.Amine(
                     atoms=(stk.N(0), stk.H(6), stk.H(7)),
@@ -43,20 +41,14 @@ class _TestCase:
 def test_with_functional_groups(test_case):
     _test_with_functional_groups(
         building_block=test_case.building_block,
-        factory=test_case.factory,
         functional_groups=test_case.functional_groups,
     )
 
 
-def _test_with_functional_groups(
-    building_block,
-    factory,
-    functional_groups,
-):
+def _test_with_functional_groups(building_block, functional_groups):
     clone = building_block.clone()
     _test_with_functional_groups_0(
-        bulding_block=building_block,
-        factory=factory,
+        building_block=building_block,
         functional_groups=functional_groups,
     )
     # Test immutability.
@@ -64,18 +56,11 @@ def _test_with_functional_groups(
     has_same_structure(building_block, clone)
 
 
-def _test_with_functional_groups_0(
-    building_block,
-    factory,
-    functional_groups
-):
-    new = building_block.with_functional_groups(factory)
-    functional_groups = it.zip_longest(
+def _test_with_functional_groups_0(building_block, functional_groups):
+    new = building_block.with_functional_groups(functional_groups)
+    result = it.zip_longest(
         new.get_functional_groups(),
-        it.chain(
-            building_block.get_functional_groups(),
-            functional_groups,
-        ),
+        functional_groups,
     )
-    for fg1, fg2 in functional_groups:
+    for fg1, fg2 in result:
         is_equivalent_functional_group(fg1, fg2)

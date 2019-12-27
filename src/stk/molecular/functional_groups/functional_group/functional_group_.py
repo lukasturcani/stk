@@ -1,4 +1,7 @@
-class FunctionalGroup_:
+from .functional_group import FunctionalGroup
+
+
+class FunctionalGroup_(FunctionalGroup):
     """
     An implementation of the :class:`.FunctionalGroup` interface.
 

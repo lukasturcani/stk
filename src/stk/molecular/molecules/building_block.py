@@ -286,47 +286,63 @@ class BuildingBlock(Molecule_):
         super().__init__(atoms, bonds, position_matrix)
         self._identity_key = identity_key
         self._functional_groups = []
+        self._with_functional_groups(self._extract_functional_groups(
+            functional_groups=functional_groups,
+        ))
+
+    def _extract_functional_groups(self, functional_groups):
+        """
+        Yield functional groups.
+
+        The input can be a mixture of :class:`.FunctionalGroup` and
+        :class:`.FunctionalGroupFactory`. The output yields
+        :class:`.FunctionalGroup` instances only. Either those
+        held directly in `functional_groups` or created by the
+        factories in `functional_groups`.
+
+        Parameters
+        ----------
+        functional_groups : :class:`iterable`
+            Can be an :class:`iterable` of both
+            :class:`.FunctionalGroup` and
+            :class:`.FunctionalGroupFactory`.
+
+        Yields
+        ------
+        :class:`.FunctionalGroup`
+            A functional group from `functional_groups`, or created
+            by a factory in `functional_groups`.
+
+        """
+
         for functional_group in functional_groups:
             if isinstance(functional_group, FunctionalGroup):
-                self._with_functional_group(functional_group)
-            # Else it is a factory.
+                yield functional_group
             else:
-                self._with_functional_groups(functional_group)
+                # Else it's a factory.
+                yield from functional_group.get_functional_groups(self)
 
-    def _with_functional_group(self, functional_group):
+    def _with_functional_groups(self, functional_groups):
         """
-        Add a functional group.
-
-        Parameters
-        ----------
-        functional_group : :class:`.FunctionalGroup`
-            The functional group to add.
-
-        Returns
-        -------
-        :class:`.BuildingBlock`
-            The building block.
+        Modify the molecule.
 
         """
 
-        # Use atom_map to make sure the clone stored in the building
-        # block uses the atoms in _atoms, so that multiple Atom
-        # instances are not held by the building block, wasting
-        # space.
-        self._functional_groups.append(functional_group.clone({
-            atom.id: self._atoms[atom.id]
-            for atom in functional_group.get_atoms()
-        }))
+        atom_map = {a.id: a for a in self._atoms}
+        self._functional_groups = [
+            fg.clone(atom_map) for fg in functional_groups
+        ]
         return self
 
-    def with_functional_group(self, functional_group):
+    def with_functional_groups(self, functional_groups):
         """
-        Return a clone with an additional functional group.
+        Return a clone with specific functional groups.
 
         Parameters
         ----------
-        functional_group : :class:`.FunctionalGroup`
-            The functional group to add.
+        functional_groups : :class:`iterable`
+            :class:`.FunctionalGroup` instances which the clone
+            should have.
 
         Returns
         -------
@@ -335,47 +351,7 @@ class BuildingBlock(Molecule_):
 
         """
 
-        return self.clone()._with_functional_group(functional_group)
-
-    def _with_functional_groups(self, factory):
-        """
-        Add functional groups produced by `factory`.
-
-        Parameters
-        ----------
-        factory : :class:`.FunctionalGroupFactory`
-            Produces a set of functional groups, which are added to
-            the bulding block.
-
-        Returns
-        -------
-        :class:`.BuildingBlock`
-            The building block.
-
-        """
-
-        for functional_group in factory.get_functional_groups(self):
-            self._with_functional_group(functional_group)
-        return self
-
-    def with_functional_groups(self, factory):
-        """
-        Return a clone with additional functional groups.
-
-        Parameters
-        ----------
-        factory : :class:`.FunctionalGroupFactory`
-            Produces the additional functional groups, which are
-            added to the clone.
-
-        Returns
-        -------
-        :class:`.BuildingBlock`
-            The clone.
-
-        """
-
-        return self.clone()._with_functional_groups(factory)
+        return self.clone()._with_functional_groups(functional_groups)
 
     def get_num_functional_groups(self):
         """
@@ -445,10 +421,12 @@ class BuildingBlock(Molecule_):
         obj._functional_groups = []
         globals_ = vars(functional_groups)
         globals_.update(vars(atoms))
-        fgs = eval(molecule_dict['functional_groups'], globals_)
-        for functional_group in fgs:
-            obj._with_functional_group(functional_group)
-
+        obj._with_functional_groups(
+            functional_groups=eval(
+                molecule_dict['functional_groups'],
+                globals_
+            )
+        )
         return obj
 
     def clone(self):
