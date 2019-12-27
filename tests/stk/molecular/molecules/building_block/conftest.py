@@ -1,4 +1,5 @@
 import stk
+import itertools as it
 import pytest
 
 
@@ -18,29 +19,17 @@ def building_block(request):
 
 
 @pytest.fixture(
-    params=[
-        lambda building_block: None,
-        lambda building_block: range(
-            building_block.get_num_functional_groups()
-        ),
-        lambda building_block:
-            range(0, building_block.get_num_functional_groups(), 2),
-        lambda building_block:
-            range(min(1, building_block.get_num_functional_groups())),
-        lambda building_block:
-            list(range(min(
-                1, building_block.get_num_functional_groups()
-            ))),
-        lambda building_block:
-            tuple(range(min(
-                1, building_block.get_num_functional_groups()
-            ))),
-        lambda building_block: (
-            i for i in range(min(
-                1, building_block.get_num_functional_groups()
-            ))
-        ),
-    ],
+    params=(
+        lambda molecule:
+            stk.BromoFactory().get_functional_groups(molecule),
+        lambda molecule:
+            stk.AmineFactory().get_functional_groups(molecule),
+        lambda molecule:
+            it.chain(
+                stk.AmineFactory().get_functional_groups(molecule),
+                stk.BromoFactory().get_functional_groups(molecule),
+            )
+    )
 )
-def get_fg_ids(request):
+def get_functional_groups(request):
     return request.param

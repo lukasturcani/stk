@@ -1,7 +1,7 @@
 import itertools as it
 import numpy as np
 
-from ..utilities import sanitize_ids
+from ..utilities import normalize_ids
 
 
 def test_get_atomic_positions(
@@ -12,7 +12,7 @@ def test_get_atomic_positions(
     position_matrix = get_position_matrix(molecule)
     molecule = molecule.with_position_matrix(position_matrix)
     positions = it.zip_longest(
-        sanitize_ids(molecule, get_atom_ids(molecule)),
+        normalize_ids(molecule, get_atom_ids(molecule)),
         molecule.get_atomic_positions(get_atom_ids(molecule)),
     )
     for atom_id, position in positions:

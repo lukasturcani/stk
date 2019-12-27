@@ -18,23 +18,6 @@ def molecule(request):
     return request.param.clone()
 
 
-@pytest.fixture(
-    params=(
-        lambda molecule:
-            stk.BromoFactory().get_functional_groups(molecule),
-        lambda molecule:
-            stk.AmineFactory().get_functional_groups(molecule),
-        lambda molecule:
-            it.chain(
-                stk.AmineFactory().get_functional_groups(molecule),
-                stk.BromoFactory().get_functional_groups(molecule),
-            )
-    )
-)
-def get_functional_groups(request):
-    return request.param
-
-
 def test_init_from_molecule(molecule, get_functional_groups):
     building_block = stk.BuildingBlock.init_from_molecule(
         molecule=molecule,
