@@ -1,7 +1,8 @@
+import stk
+import pytest
 
 
-
-class TestGetBonderPlaneNormal:
+class _TestGetBonderPlaneNormal:
     def case1():
         building_block = stk.BuildingBlock(
             smiles='BrCC(CBr)(CBr)CBr',
@@ -23,7 +24,7 @@ class TestGetBonderPlaneNormal:
             'expected_bonder_plane_normal',
         ),
         argvalues=(
-            case1(),
+            # case1(),
         ),
     )
     def test(

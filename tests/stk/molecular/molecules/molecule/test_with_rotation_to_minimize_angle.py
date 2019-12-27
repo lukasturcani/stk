@@ -2,7 +2,7 @@ import stk
 import numpy as np
 import pytest
 
-from .utilities import has_same_structure, get_displacement_vector
+from ..utilities import has_same_structure, get_displacement_vector
 
 
 @pytest.fixture(

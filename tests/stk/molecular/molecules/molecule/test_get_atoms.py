@@ -2,6 +2,8 @@ import itertools as it
 import stk
 import pytest
 
+from ..utilities import is_equivalent_atom
+
 
 @pytest.mark.parametrize(
     argnames=('molecule', 'atoms'),
@@ -36,10 +38,3 @@ def test_get_atoms(molecule, atoms, get_atom_ids):
     )
     for atom_id, atom in results:
         is_equivalent_atom(atoms[atom_id], atom)
-
-
-def is_equivalent_atom(atom1, atom2):
-    assert atom1 is not atom2
-    assert atom1.id == atom2.id
-    assert atom1.charge == atom2.charge
-    assert atom1.__class__ is atom2.__class__

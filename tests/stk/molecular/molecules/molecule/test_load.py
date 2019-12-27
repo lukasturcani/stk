@@ -1,4 +1,4 @@
-from .utilities import has_same_structure, is_equivalent_molecule
+from ..utilities import has_same_structure, is_equivalent_molecule
 
 
 def test_load(molecule, tmpdir):

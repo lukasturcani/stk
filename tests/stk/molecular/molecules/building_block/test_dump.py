@@ -1,10 +1,12 @@
+import stk
+
+from .utilities import is_equivalent_building_block
+from ..utilities import has_same_structure
 
 
-def test_dump_and_load(tmpdir, building_block):
+def test_dump(building_block, tmpdir):
     path = str(tmpdir / 'building_block.json')
     building_block.dump(path)
-    new_building_block = stk.BuildingBlock.load(path)
-    assert is_equivalent_building_block(
-        building_block1=building_block,
-        building_block2=new_building_block,
-    )
+    new = stk.BuildingBlock.load(path)
+    is_equivalent_building_block(building_block, new)
+    has_same_structure(building_block, new)

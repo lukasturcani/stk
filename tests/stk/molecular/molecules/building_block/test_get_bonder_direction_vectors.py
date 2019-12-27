@@ -1,5 +1,8 @@
+import stk
+import pytest
 
-class TestGetBonderDirectionVectors:
+
+class _TestGetBonderDirectionVectors:
     def case1():
         building_block = stk.BuildingBlock(
             smiles='BrCC(CBr)(CBr)CBr',
@@ -27,7 +30,7 @@ class TestGetBonderDirectionVectors:
             'expected_vectors',
         ),
         argvalues=(
-            case1(),
+            # case1(),
         ),
     )
     def test(

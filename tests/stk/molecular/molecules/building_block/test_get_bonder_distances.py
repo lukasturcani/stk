@@ -1,6 +1,8 @@
+import stk
+import pytest
 
 
-class TestBonderDistances:
+class _TestBonderDistances:
     def case1():
         building_block = stk.BuildingBlock(
             smiles='BrCC(CBr)(CBr)CBr',
@@ -28,7 +30,7 @@ class TestBonderDistances:
             'expected_distances',
         ),
         argvalues=(
-            case1(),
+            # case1(),
         ),
     )
     def test(

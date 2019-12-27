@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import stk
 
-from .utilities import get_num_atom_ids
+from ..utilities import get_num_atom_ids
 
 
 @pytest.fixture(

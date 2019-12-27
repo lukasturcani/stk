@@ -1,4 +1,4 @@
-from .utilities import is_equivalent_molecule, has_same_structure
+from ..utilities import is_equivalent_molecule, has_same_structure
 
 
 def test_clone(molecule):

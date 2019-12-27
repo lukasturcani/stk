@@ -1,3 +1,5 @@
+import stk
+import pytest
 
 
 class _BonderPlanePoint:
@@ -39,7 +41,7 @@ class TestGetBonderPlane:
             'points',
         ),
         argvalues=(
-            case1(),
+            # case1(),
         ),
     )
     def test(self, building_block, fg_ids, points):

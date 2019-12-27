@@ -10,7 +10,7 @@ import rdkit.Chem.AllChem as rdkit
 
 
 
-class TestInitFromSmiles:
+class _TestInitFromSmiles:
     def case1():
         expected_atoms = (
             stk.N(0),
