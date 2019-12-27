@@ -456,8 +456,9 @@ class BuildingBlock(Molecule_):
         ----------
         fg_ids : :class:`iterable` of :class:`int`
             The ids of functional groups whose bonder atoms should be
-            yielded. If ``None`` then all bonder atom ids in the
-            :class:`.BuildingBlock` will be yielded.
+            yielded. Can be a single :class:`int`, if a single
+            functional group should be used, or  ``None``, if all
+            functional groups should be used.
 
         Yields
         ------
@@ -468,6 +469,8 @@ class BuildingBlock(Molecule_):
 
         if fg_ids is None:
             fg_ids = range(len(self._functional_groups))
+        elif isinstance(fg_ids, int):
+            fg_ids = (fg_ids, )
 
         for fg_id in fg_ids:
             yield from self._functional_groups[fg_id].get_bonder_ids()

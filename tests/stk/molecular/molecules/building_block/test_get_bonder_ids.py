@@ -5,6 +5,11 @@ import itertools as it
 @pytest.fixture(
     params=[
         lambda building_block: None,
+        lambda building_block: (
+            0
+            if building_block.get_num_functional_groups() > 0
+            else None
+        ),
         lambda building_block: range(
             building_block.get_num_functional_groups()
         ),
