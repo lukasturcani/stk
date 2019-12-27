@@ -17,15 +17,15 @@ def is_equivalent_functional_group(
         is_equivalent_atom(atom1, atom2)
 
     bonders = it.zip_longest(
-        functional_group1.get_bonder_ids(),
-        functional_group2.get_bonder_ids(),
+        functional_group1.get_bonders(),
+        functional_group2.get_bonders(),
     )
     for bonder1, bonder2 in bonders:
         is_equivalent_atom(bonder1, bonder2)
 
     deleters = it.zip_longest(
-        functional_group1.get_deleter_ids(),
-        functional_group2.get_deleter_ids(),
+        functional_group1.get_deleters(),
+        functional_group2.get_deleters(),
     )
     for deleter1, deleter2 in deleters:
         is_equivalent_atom(deleter1, deleter2)
