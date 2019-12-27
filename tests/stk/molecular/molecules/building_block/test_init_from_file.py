@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 import stk
 
 from .utilities import is_equivalent_building_block
@@ -23,3 +24,8 @@ def test_init_from_file(tmpdir, filename, building_block):
         functional_groups=building_block.get_functional_groups(),
     )
     is_equivalent_building_block(building_block, loaded)
+    assert np.allclose(
+        a=building_block.get_position_matrix(),
+        b=loaded.get_position_matrix(),
+        atol=1e-4,
+    )
