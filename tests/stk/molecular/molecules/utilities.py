@@ -59,3 +59,12 @@ def is_equivalent_molecule(molecule1, molecule2):
     )
     for bond1, bond2 in bonds:
         is_equivalent_bond(bond1, bond2)
+
+
+def sanitize_ids(molecule, ids):
+    if ids is None:
+        return range(molecule.get_num_atoms())
+    elif isinstance(ids, int):
+        return (ids, )
+    else:
+        return ids
