@@ -1,5 +1,3 @@
-import itertools as it
-
 from .smarts_functional_group_factory import (
     SmartsFunctionalGroupFactory,
 )
@@ -12,7 +10,42 @@ class Amine(FunctionalGroup_):
 
     """
 
-    pass
+    def __init__(
+        self,
+        nitrogen,
+        hydrogen1,
+        hydrogen2,
+        r,
+        bonders,
+        deleters,
+    ):
+        self._nitrogen = nitrogen
+        self._hydrogen1 = hydrogen1
+        self._hydrogen2 = hydrogen2
+        self._r = r
+        atoms = (nitrogen, hydrogen1, hydrogen2, r)
+        super().__init__(atoms, bonders, deleters)
+
+    def get_nitrogen(self):
+        return self._nitrogen.clone()
+
+    def get_hydrogen1(self):
+        return self._hydrogen1.clone()
+
+    def get_hydrogen2(self):
+        return self._hydrogen2.clone()
+
+    def get_r(self):
+        return self._r.clone()
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._nitrogen}, {self._hydrogen1}, {self._hydrogen2}, '
+            f'{self._r}, bonders={self._bonders}, '
+            f'deleters={self._deleters}'
+            ')'
+        )
 
 
 class AmineFactory(SmartsFunctionalGroupFactory):
@@ -21,7 +54,7 @@ class AmineFactory(SmartsFunctionalGroupFactory):
 
     """
 
-    _functional_group_smarts = '[N]([H])[H]'
+    _functional_group_smarts = '[*][N]([H])[H]'
     _bonder_smarts = ['[$([N]([H])[H])]']
     _deleter_smarts = ['[$([H][N][H])]']*2
 
@@ -44,13 +77,14 @@ class AmineFactory(SmartsFunctionalGroupFactory):
 
     def get_functional_groups(self, molecule):
         for ids in self._get_ids(molecule):
-            atoms = tuple(molecule.get_atoms(
-                atom_ids=it.chain(ids.bonder_ids, ids.deleter_ids)
-            ))
+            atoms = tuple(molecule.get_atoms(ids.atom_ids))
             yield Amine(
-                atoms=atoms,
-                bonders=(atoms[0], ),
-                deleters=atoms[1:1+self._num_deleters],
+                nitrogen=atoms[1],
+                hydrogen1=atoms[2],
+                hydrogen2=atoms[3],
+                r=atoms[0],
+                bonders=(atoms[1], ),
+                deleters=atoms[2:2+self._num_deleters],
             )
 
     def __repr__(self):
