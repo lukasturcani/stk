@@ -101,6 +101,11 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
 
         yield from deleters
 
+    @staticmethod
+    def _get_atoms(atoms, ids):
+        ids = set(ids)
+        yield from (a for a in atoms if a.id in ids)
+
     def __repr__(self):
         return f'{self.__class__.__name__}()'
 

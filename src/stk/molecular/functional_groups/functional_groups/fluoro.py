@@ -6,7 +6,7 @@ class Fluoro(FunctionalGroup_):
     Represents a fluoro functional group.
 
     The structure of the functional group is given by the pseudo-SMILES
-    ``[atom][fluorine]``.
+    ``[fluorine][atom]``.
 
     """
 

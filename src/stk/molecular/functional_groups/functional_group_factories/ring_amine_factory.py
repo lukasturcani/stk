@@ -23,7 +23,7 @@ class RingAmineFactory(SmartsFunctionalGroupFactory):
     def get_functional_groups(self, molecule):
         for ids in self._get_ids(molecule):
             atoms = tuple(molecule.get_atoms(ids.atom_ids))
-            yield RingeAmine(
+            yield RingAmine(
                 atom1=atoms[1],
                 bromine1=atoms[0],
                 atom2=atoms[2],

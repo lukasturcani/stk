@@ -6,24 +6,24 @@ class Alkyne(FunctionalGroup_):
     Represents an alkyne functional group.
 
     The structure of the functional group is given by the pseudo-SMILES
-    ``[atom1][carbon1]#[carbon2][atom2]``.
+    ``[carbon1]([atom1])#[carbon2][atom2]``.
 
     """
 
     def __init__(
         self,
-        atom1,
         carbon1,
+        atom1,
         carbon2,
         atom2,
         bonders,
         deleters,
     ):
-        self._atom1 = atom1
         self._carbon1 = carbon1
+        self._atom1 = atom1
         self._carbon2 = carbon2
         self._atom2 = atom2
-        atoms = (atom1, carbon1, carbon2, atom2)
+        atoms = (carbon1, atom1, carbon2, atom2)
         super().__init__(atoms, bonders, deleters)
 
     def get_atom1(self):

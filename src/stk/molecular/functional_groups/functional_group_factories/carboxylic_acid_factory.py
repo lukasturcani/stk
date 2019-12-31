@@ -26,6 +26,8 @@ class CarboxylicAcidFactory(SmartsFunctionalGroupFactory):
                 oxygen2=atoms[3],
                 hydrogen=atoms[4],
                 atom=atoms[0],
-                bonders=tuple(molecule.get_atoms(ids.bonder_ids)),
-                deleters=tuple(molecule.get_atoms(ids.deleter_ids)),
+                bonders=tuple(self._get_atoms(atoms, ids.bonder_ids)),
+                deleters=tuple(
+                    self._get_atoms(atoms, ids.deleter_ids)
+                ),
             )

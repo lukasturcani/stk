@@ -22,6 +22,8 @@ class SecondaryAmineFactory(SmartsFunctionalGroupFactory):
                 hydrogen=atoms[0],
                 atom1=atoms[2],
                 atom2=atoms[3],
-                bonders=tuple(molecule.get_atoms(ids.bonder_ids)),
-                deleters=tuple(molecule.get_atoms(ids.deleter_ids)),
+                bonders=tuple(self._get_atoms(atoms, ids.bonder_ids)),
+                deleters=tuple(
+                    self._get_atoms(atoms, ids.deleter_ids)
+                ),
             )

@@ -6,7 +6,7 @@ class Bromo(FunctionalGroup_):
     Represents a bromo functional group.
 
     The structure of the functional group is given by the pseudo-SMILES
-    ``[atom][bromine]``.
+    ``[bromine][atom]``.
 
     """
 

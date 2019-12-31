@@ -42,16 +42,13 @@ class TerminalAlkyneFactory(SmartsFunctionalGroupFactory):
     def get_functional_groups(self, molecule):
         for ids in self._get_ids(molecule):
             atoms = tuple(molecule.get_atoms(ids.atom_ids))
-            bonder_ids = set(ids.bonder_ids)
             deleter_ids = set(ids.deleter_ids)
             yield Alkyne(
                 atom1=atoms[0],
                 carbon1=atoms[1],
                 carbon2=atoms[2],
                 atom2=atoms[3],
-                bonders=tuple(
-                    a for a in atoms if a.id in bonder_ids
-                ),
+                bonders=tuple(self._get_atoms(atoms, ids.bonder_ids)),
                 deleters=tuple(
                     a for a in atoms
                     if a.id in deleter_ids and self._is_deleter(a)

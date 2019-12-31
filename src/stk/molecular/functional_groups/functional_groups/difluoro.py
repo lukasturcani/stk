@@ -6,16 +6,16 @@ class Difluoro(FunctionalGroup_):
     Represents a difluoro functional group.
 
     The structure of the functional group is given by the pseudo-SMILES
-    ``[fluorine1][atom1][atom2][fluorine2)``.
+    ``[fluorine1][atom1][atom2][fluorine2]``.
 
     """
 
     def __init__(
         self,
-        atom1,
         fluorine1,
-        atom2,
+        atom1,
         fluorine2,
+        atom2,
         bonders,
         deleters,
     ):

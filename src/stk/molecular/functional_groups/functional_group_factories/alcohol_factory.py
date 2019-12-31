@@ -21,6 +21,8 @@ class AlcoholFactory(SmartsFunctionalGroupFactory):
                 oxygen=atoms[1],
                 hydrogen=atoms[2],
                 atom=atoms[0],
-                bonders=tuple(molecule.get_atoms(ids.bonder_ids)),
-                deleters=tuple(molecule.get_atoms(ids.deleter_ids)),
+                bonders=tuple(self._get_atoms(atoms, ids.bonder_ids)),
+                deleters=tuple(
+                    self._get_atoms(atoms, ids.deleter_ids)
+                ),
             )
