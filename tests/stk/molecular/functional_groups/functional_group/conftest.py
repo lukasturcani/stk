@@ -1,6 +1,8 @@
 import pytest
 import stk
 
+from .fixtures import *
+
 
 @pytest.fixture(
     params=[
@@ -90,7 +92,8 @@ def get_deleters(get_subset):
 
 @pytest.fixture(
     params=[
-        stk.Amine,
+        stk.PrimaryAmine,
+        stk.SecondaryAmine,
         stk.Aldehyde,
         stk.CarboxylicAcid,
         stk.Amide,

@@ -4,9 +4,9 @@ from .smarts_functional_group_factory import (
 from .. import FunctionalGroup_
 
 
-class Amine(FunctionalGroup_):
+class PrimaryAmine(FunctionalGroup_):
     """
-    Represents an amine functional group.
+    Represents a primary amine functional group.
 
     """
 
@@ -48,9 +48,9 @@ class Amine(FunctionalGroup_):
         )
 
 
-class AmineFactory(SmartsFunctionalGroupFactory):
+class PrimaryAmineFactory(SmartsFunctionalGroupFactory):
     """
-    Creates :class:`.Amine` instances.
+    Creates :class:`.PrimaryAmine` instances.
 
     """
 
@@ -78,7 +78,7 @@ class AmineFactory(SmartsFunctionalGroupFactory):
     def get_functional_groups(self, molecule):
         for ids in self._get_ids(molecule):
             atoms = tuple(molecule.get_atoms(ids.atom_ids))
-            yield Amine(
+            yield PrimaryAmine(
                 nitrogen=atoms[1],
                 hydrogen1=atoms[2],
                 hydrogen2=atoms[3],
@@ -94,16 +94,55 @@ class AmineFactory(SmartsFunctionalGroupFactory):
         )
 
 
+class SecondaryAmine(FunctionalGroup_):
+    """
+    Represents a secondary amine functional group.
+
+    """
+
+    def __init__(self, nitrogen, hydrogen, r1, r2, bonders, deleters):
+        self._nitrogen = nitrogen
+        self._hydrogen = hydrogen
+        self._r1 = r1
+        self._r2 = r2
+        atoms = (nitrogen, hydrogen, r1, r2)
+        super().__init__(atoms, bonders, deleters)
+
+    def get_nitrogen(self):
+        return self._nitrogen.clone()
+
+    def get_hydrogen(self):
+        return self._hydrogen.clone()
+
+    def get_r1(self):
+        return self._r1.clone()
+
+    def get_r2(self):
+        return self._r2.clone()
+
+
 class SecondaryAmineFactory(SmartsFunctionalGroupFactory):
     """
-    Creates :class:`.Amine` instances.
+    Creates :class:`.SecondaryAmine` instances.
 
     """
 
-    _functional_group = Amine
+    _functional_group = SecondaryAmine
     _functional_group_smarts = '[H][N]([#6])[#6]'
     _bonder_smarts = ['[$([N]([H])([#6])[#6])]']
     _deleter_smarts = ['[$([H][N]([#6])[#6])]']
+
+    def get_functional_groups(self, molecule):
+        for ids in self._get_ids(molecule):
+            atoms = tuple(molecule.get_atoms(ids.atom_ids))
+            yield SecondaryAmine(
+                nitrogen=atoms[1],
+                hydrogen=atoms[0],
+                r1=atoms[2],
+                r2=atoms[3],
+                bonders=tuple(molecule.get_atoms(ids.bonder_ids)),
+                deleters=tuple(molecule.get_atoms(ids.deleter_ids)),
+            )
 
 
 class Aldehyde(FunctionalGroup_):
@@ -112,7 +151,25 @@ class Aldehyde(FunctionalGroup_):
 
     """
 
-    pass
+    def __init__(self, carbon, oxygen, hydrogen, r, bonders, deleters):
+        self._carbon = carbon
+        self._oxygen = oxygen
+        self._hydrogen = hydrogen
+        self._r = r
+        atoms = (carbon, oxygen, hydrogen, r)
+        super().__init__(atoms, bonders, deleters)
+
+    def get_carbon(self):
+        return self._carbon.clone()
+
+    def get_oxygen(self):
+        return self._oxygen.clone()
+
+    def get_hydrogen(self):
+        return self._hydrogen.clone()
+
+    def get_r(self):
+        return self._r.clone()
 
 
 class AldehydeFactory(SmartsFunctionalGroupFactory):
@@ -122,9 +179,21 @@ class AldehydeFactory(SmartsFunctionalGroupFactory):
     """
 
     _functional_group = Aldehyde
-    _functional_group_smarts = '[C](=[O])[H]'
+    _functional_group_smarts = '[*][C](=[O])[H]'
     _bonder_smarts = ['[$([C](=[O])[H])]']
     _deleter_smarts = ['[$([O]=[C][H])]']
+
+    def get_functional_groups(self, molecule):
+        for ids in self._get_ids(molecule):
+            atoms = tuple(molecule.get_atoms(ids.atom_ids))
+            yield Aldehyde(
+                carbon=atoms[1],
+                oxygen=atoms[2],
+                hydrogen=atoms[3],
+                r=atoms[0],
+                bonders=tuple(molecule.get_atoms(ids.bonder_ids)),
+                deleters=tuple(molecule.get_atoms(ids.deleter_ids)),
+            )
 
 
 class CarboxylicAcid(FunctionalGroup_):
@@ -133,7 +202,38 @@ class CarboxylicAcid(FunctionalGroup_):
 
     """
 
-    pass
+    def __init__(
+        self,
+        carbon,
+        oxygen1,
+        oxygen2,
+        hydrogen,
+        r,
+        bonders,
+        deleters,
+    ):
+        self._carbon = carbon
+        self._oxygen1 = oxygen1
+        self._oxygen2 = oxygen2
+        self._hydrogen = hydrogen
+        self._r = r
+        atoms = (carbon, oxygen1, oxygen2, hydrogen, r)
+        super().__init__(atoms, bonders, deleters)
+
+    def get_carbon(self):
+        return self._carbon.clone()
+
+    def get_oxygen1(self):
+        return self._oxygen1.clone()
+
+    def get_oxygen2(self):
+        return self._oxygen2.clone()
+
+    def get_hydrogen(self):
+        return self._hydrogen.clone()
+
+    def get_r(self):
+        return self._r.clone()
 
 
 class CarboxylicAcidFactory(SmartsFunctionalGroupFactory):
@@ -143,12 +243,25 @@ class CarboxylicAcidFactory(SmartsFunctionalGroupFactory):
     """
 
     _functional_group = CarboxylicAcid
-    _functional_group_smarts = '[C](=[O])[O][H]'
+    _functional_group_smarts = '[*][C](=[O])[O][H]'
     _bonder_smarts = ['[$([C](=[O])[O][H])]']
     _deleter_smarts = [
         '[$([H][O][C](=[O]))]',
         '[$([O]([H])[C](=[O]))]',
     ]
+
+    def get_functional_groups(self, molecule):
+        for ids in self._get_ids(molecule):
+            atoms = tuple(molecule.get_atoms(ids.atom_ids))
+            yield CarboxylicAcid(
+                carbon=atoms[1],
+                oxygen1=atoms[2],
+                oxygen2=atoms[3],
+                hydrogen=atoms[4],
+                r=atoms[0],
+                bonders=tuple(molecule.get_atoms(ids.bonder_ids)),
+                deleters=tuple(molecule.get_atoms(ids.deleter_ids)),
+            )
 
 
 class Amide(FunctionalGroup_):

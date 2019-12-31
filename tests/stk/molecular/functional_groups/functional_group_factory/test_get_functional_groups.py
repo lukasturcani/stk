@@ -34,13 +34,19 @@ class _TestCase:
             factory=stk.AmineFactory(),
             molecule=stk.BuildingBlock('NCCN'),
             functional_groups=(
-                stk.Amine(
-                    atoms=(stk.N(0), stk.H(4), stk.H(5)),
+                stk.PrimaryAmine(
+                    nitrogen=stk.N(0),
+                    hydrogen1=stk.H(4),
+                    hydrogen2=stk.H(5),
+                    r=stk.C(1),
                     bonders=(stk.N(0), ),
                     deleters=(stk.H(4), stk.H(5)),
                 ),
-                stk.Amine(
-                    atoms=(stk.N(3), stk.H(10), stk.H(11)),
+                stk.PrimaryAmine(
+                    nitrogen=stk.N(3),
+                    hydrogen1=stk.H(10),
+                    hydrogen2=stk.H(11),
+                    r=stk.C(2),
                     bonders=(stk.N(3), ),
                     deleters=(stk.H(10), stk.H(11)),
                 ),
@@ -51,13 +57,19 @@ class _TestCase:
             factory=stk.AmineFactory(num_deleters=1),
             molecule=stk.BuildingBlock('NCCN'),
             functional_groups=(
-                stk.Amine(
-                    atoms=(stk.N(0), stk.H(4), stk.H(5)),
+                stk.PrimaryAmine(
+                    nitrogen=stk.N(0),
+                    hydrogen1=stk.H(4),
+                    hydrogen2=stk.H(5),
+                    r=stk.C(1),
                     bonders=(stk.N(0), ),
                     deleters=(stk.H(4), ),
                 ),
-                stk.Amine(
-                    atoms=(stk.N(3), stk.H(10), stk.H(11)),
+                stk.PrimaryAmine(
+                    nitrogen=stk.N(3),
+                    hydrogen1=stk.H(10),
+                    hydrogen2=stk.H(11),
+                    r=stk.C(2),
                     bonders=(stk.N(3), ),
                     deleters=(stk.H(10), ),
                 ),
@@ -68,13 +80,19 @@ class _TestCase:
             factory=stk.AmineFactory(num_deleters=0),
             molecule=stk.BuildingBlock('NCCN'),
             functional_groups=(
-                stk.Amine(
-                    atoms=(stk.N(0), stk.H(4), stk.H(5)),
+                stk.PrimaryAmine(
+                    nitrogen=stk.N(0),
+                    hydrogen1=stk.H(4),
+                    hydrogen2=stk.H(5),
+                    r=stk.C(1),
                     bonders=(stk.N(0), ),
                     deleters=(),
                 ),
-                stk.Amine(
-                    atoms=(stk.N(3), stk.H(10), stk.H(11)),
+                stk.PrimaryAmine(
+                    nitrogen=stk.N(3),
+                    hydrogen1=stk.H(10),
+                    hydrogen2=stk.H(11),
+                    r=stk.C(2),
                     bonders=(stk.N(3), ),
                     deleters=(),
                 ),
@@ -91,12 +109,12 @@ class _TestCase:
             factory=stk.SecondaryAmineFactory(),
             molecule=stk.BuildingBlock('CNCCNCC'),
             functional_groups=(
-                stk.Amine(
+                stk.SecondaryAmine(
                     atoms=(stk.N(1), stk.C(0), stk.C(2), stk.H(10)),
                     bonders=(stk.N(1), ),
                     deleters=(stk.H(10), ),
                 ),
-                stk.Amine(
+                stk.SecondaryAmine(
                     atoms=(stk.N(4), stk.C(3), stk.C(5), stk.H(15)),
                     bonders=(stk.N(4), ),
                     deleters=(stk.H(15), ),
