@@ -889,7 +889,43 @@ class Difluoro(FunctionalGroup_):
 
     """
 
-    pass
+    def __init__(
+        self,
+        atom1,
+        fluorine1,
+        atom2,
+        fluorine2,
+        atom3,
+        atom4,
+        bonders,
+        deleters,
+    ):
+        self._atom1 = atom1
+        self._fluorine1 = fluorine1
+        self._atom2 = atom2
+        self._fluorine2 = fluorine2
+        self._atom3 = atom3
+        self._atom4 = atom4
+        atoms = (atom1, fluorine1, atom2, fluorine2, atom3, atom4)
+        super().__init__(atoms, bonders, deleters)
+
+    def get_atom1(self):
+        return self._atom1.clone()
+
+    def get_fluorine1(self):
+        return self._fluorine1.clone()
+
+    def get_atom2(self):
+        return self._atom2.clone()
+
+    def get_fluorine2(self):
+        return self._fluorine2.clone()
+
+    def get_atom3(self):
+        return self._atom3.clone()
+
+    def get_atom4(self):
+        return self._atom4.clone()
 
 
 class DifluoroFactory(SmartsFunctionalGroupFactory):
@@ -910,7 +946,43 @@ class Dibromo(FunctionalGroup_):
 
     """
 
-    pass
+    def __init__(
+        self,
+        atom1,
+        bromine1,
+        atom2,
+        bromine2,
+        atom3,
+        atom4,
+        bonders,
+        deleters,
+    ):
+        self._atom1 = atom1
+        self._bromine1 = bromine1
+        self._atom2 = atom2
+        self._bromine2 = bromine2
+        self._atom3 = atom3
+        self._atom4 = atom4
+        atoms = (atom1, bromine1, atom2, bromine2, atom3, atom4)
+        super().__init__(atoms, bonders, deleters)
+
+    def get_atom1(self):
+        return self._atom1.clone()
+
+    def get_bromine1(self):
+        return self._bromine1.clone()
+
+    def get_atom2(self):
+        return self._atom2.clone()
+
+    def get_bromine2(self):
+        return self._bromine2.clone()
+
+    def get_atom3(self):
+        return self._atom3.clone()
+
+    def get_atom4(self):
+        return self._atom4.clone()
 
 
 class DibromoFactory(SmartsFunctionalGroupFactory):
@@ -931,7 +1003,57 @@ class RingAmine(FunctionalGroup_):
 
     """
 
-    pass
+    def __init__(
+        self,
+        nitrogen,
+        hydrogen1,
+        hydrogen2,
+        carbon1,
+        carbon2,
+        hydrogen3,
+        carbon3,
+    ):
+        self._nitrogen = nitrogen
+        self._hydrogen1 = hydrogen1
+        self._hydrogen2 = hydrogen2
+        self._hydrogen3 = hydrogen3
+        self._carbon1 = carbon1
+        self._carbon2 = carbon2
+        self._carbon3 = carbon3
+        super().__init__(
+            atoms=(
+                nitrogen,
+                hydrogen1,
+                hydrogen2,
+                carbon1,
+                carbon2,
+                hydrogen3,
+                carbon3,
+            ),
+            bonders=(),
+            deleters=(),
+        )
+
+    def get_nitrogen(self):
+        return self._nitrogen.clone()
+
+    def get_hydrogen1(self):
+        return self._hydrogen1.clone()
+
+    def get_hydrogen2(self):
+        return self._hydrogen2.clone()
+
+    def get_carbon1(self):
+        return self._carbon1.clone()
+
+    def get_carbon2(self):
+        return self._carbon2.clone()
+
+    def get_hydrogen3(self):
+        return self._hydrogen3.clone()
+
+    def get_carbon3(self):
+        return self._carbon3.clone()
 
 
 class RingAmineFactory(SmartsFunctionalGroupFactory):
