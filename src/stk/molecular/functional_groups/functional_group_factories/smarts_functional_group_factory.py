@@ -17,7 +17,6 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
 
     """
 
-    _functional_group = None
     _functional_group_smarts = None
     _bonder_smarts = None
     _deleter_smarts = None
@@ -38,21 +37,6 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
             (rdkit.MolFromSmarts(smarts), count)
             for smarts, count in Counter(obj._deleter_smarts).items()
         ]
-
-    def get_functional_groups(self, molecule):
-        for ids in self._get_ids(molecule):
-            atoms = tuple(molecule.get_atoms(ids.atom_ids))
-            bonder_ids = set(ids.bonder_ids)
-            deleter_ids = set(ids.deleter_ids)
-            yield self._functional_group(
-                atoms=atoms,
-                bonders=tuple(
-                    a for a in atoms if a.id in bonder_ids
-                ),
-                deleters=tuple(
-                    a for a in atoms if a.id in deleter_ids
-                ),
-            )
 
     def _get_ids(self, molecule):
         rdkit_mol = molecule.to_rdkit_mol()
