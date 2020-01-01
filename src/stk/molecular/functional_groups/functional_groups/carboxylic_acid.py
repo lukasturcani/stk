@@ -72,6 +72,6 @@ class CarboxylicAcid(FunctionalGroup_):
         return (
             f'{self.__class__.__name__}('
             f'{self._carbon}, {self._oxygen1}, {self._oxygen2}, '
-            f'{self._hydrogen}, {self._atom}'
+            f'{self._hydrogen}, {self._atom}, '
             f'bonders={self._bonders}, deleters={self._deleters})'
         )

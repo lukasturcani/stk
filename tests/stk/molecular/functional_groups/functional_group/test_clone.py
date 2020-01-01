@@ -1,17 +1,6 @@
 import pytest
 import stk
-import itertools as it
-from .utilities import is_atom_clone
-
-
-@pytest.fixture
-def functional_group(test_case):
-    """
-    A :class:`.FunctionalGroup` instance.
-
-    """
-
-    return test_case.functional_group
+from .utilities import is_clone_functional_group
 
 
 def get_atom_map_0(functional_group):
@@ -61,31 +50,4 @@ def test_clone(functional_group, get_atom_map):
     clone = functional_group.clone(atom_map)
     assert clone.attr == functional_group.attr
     assert not hasattr(clone, '_attr')
-    is_clone_sequence(
-        functional_group.get_atoms(),
-        clone.get_atoms(),
-        atom_map,
-    )
-    is_clone_sequence(
-        functional_group.get_bonders(),
-        clone.get_bonders(),
-        atom_map,
-    )
-    is_clone_sequence(
-        functional_group.get_deleters(),
-        clone.get_deleters(),
-        atom_map,
-    )
-
-
-def is_clone_sequence(atoms, clones, atom_map):
-    """
-    Test if atoms are correctly cloned.
-
-    """
-
-    if atom_map is None:
-        atom_map = {}
-
-    for atom, clone in it.zip_longest(atoms, clones):
-        is_atom_clone(atom_map.get(atom.id, atom), clone)
+    is_clone_functional_group(functional_group, clone, atom_map)

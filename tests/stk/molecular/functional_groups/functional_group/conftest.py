@@ -36,3 +36,13 @@ def test_case(request):
 )
 def get_atom_ids(request):
     return request.param
+
+
+@pytest.fixture
+def functional_group(test_case):
+    """
+    A :class:`.FunctionalGroup` instance.
+
+    """
+
+    return test_case.functional_group
