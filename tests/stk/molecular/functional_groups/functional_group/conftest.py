@@ -1,8 +1,6 @@
 import pytest
 import stk
 
-from .fixtures import *
-
 
 @pytest.fixture(
     params=[
@@ -103,8 +101,8 @@ def get_deleters(get_subset):
         stk.Fluoro,
         stk.Bromo,
         stk.Iodo,
-        stk.TerminalAlkyne,
-        stk.TerminalAlkene,
+        stk.Alkyne,
+        stk.Alkene,
         stk.BoronicAcid,
         stk.Diol,
         stk.Difluoro,

@@ -6,7 +6,7 @@ import stk
     argnames=('building_block', 'num_functional_groups'),
     argvalues=(
         (stk.BuildingBlock('NCCN'), 0),
-        (stk.BuildingBlock('NCCN', [stk.AmineFactory()]), 2),
+        (stk.BuildingBlock('NCCN', [stk.PrimaryAmineFactory()]), 2),
         (stk.BuildingBlock('NCCN', [stk.BromoFactory()]), 0),
     )
 )

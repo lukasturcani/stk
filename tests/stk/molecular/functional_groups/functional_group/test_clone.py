@@ -5,22 +5,13 @@ from .utilities import is_atom_clone
 
 
 @pytest.fixture
-def functional_group(
-    get_functional_group,
-    atoms,
-    get_bonders,
-    get_deleters
-):
+def functional_group(test_case):
     """
     A :class:`.FunctionalGroup` instance.
 
     """
 
-    return get_functional_group(
-        atoms=atoms,
-        bonders=get_bonders(atoms),
-        deleters=get_deleters(atoms),
-    )
+    return test_case.functional_group
 
 
 def get_atom_map_0(functional_group):

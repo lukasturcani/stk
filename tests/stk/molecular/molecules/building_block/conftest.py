@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture(
     params=[
         stk.BuildingBlock('NCCN'),
-        stk.BuildingBlock('NCCN', [stk.AmineFactory()]),
+        stk.BuildingBlock('NCCN', [stk.PrimaryAmineFactory()]),
         stk.BuildingBlock(
             smiles='BrCC(Br)C(Br)C(Br)C(Br)C(Br)C(Br)CBr',
             functional_groups=[stk.BromoFactory()],
