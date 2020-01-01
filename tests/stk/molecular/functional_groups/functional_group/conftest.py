@@ -27,3 +27,12 @@ from .fixtures import *
 )
 def test_case(request):
     return request.param
+
+
+@pytest.fixture(
+    params=(
+        lambda n: range(n),
+    ),
+)
+def get_atom_ids(request):
+    return request.param

@@ -4,62 +4,20 @@ import pytest
 from ._test_case import _TestCase
 
 
-@pytest.fixture(
-    params=(
-        stk.C(0),
-    ),
-)
-def carbon(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.O(1),
-    ),
-)
-def oxygen(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.N(2),
-    ),
-)
-def nitrogen(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(3),
-    )
-)
-def hydrogen1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(4),
-    ),
-)
-def hydrogen2(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(5),
-    ),
-)
-def atom(request):
-    return request.param.clone()
-
-
 @pytest.fixture
-def amide(carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom):
+def amide(get_atom_ids):
+    a, b, c, d, e, f = get_atom_ids(6)
+    return _amide(
+        carbon=stk.C(a),
+        oxygen=stk.O(b),
+        nitrogen=stk.N(c),
+        hydrogen1=stk.H(d),
+        hydrogen2=stk.H(e),
+        atom=stk.C(f),
+    )
+
+
+def _amide(carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom):
     bonders = (carbon, )
     deleters = (nitrogen, hydrogen1, hydrogen2)
     return _TestCase(

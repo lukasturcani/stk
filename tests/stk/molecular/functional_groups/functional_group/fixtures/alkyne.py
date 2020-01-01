@@ -4,44 +4,13 @@ import pytest
 from ._test_case import _TestCase
 
 
-@pytest.fixture(
-    params=(
-        stk.C(0),
-    ),
-)
-def carbon1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(1),
-    ),
-)
-def atom1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(2),
-    ),
-)
-def carbon2(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(3),
-    ),
-)
-def atom2(request):
-    return request.param.clone()
-
-
 @pytest.fixture
-def alkyne(carbon1, atom1, carbon2, atom2):
+def alkyne(get_atom_ids):
+    a, b, c, d = get_atom_ids(4)
+    return _alkyne(stk.C(a), stk.C(b), stk.C(c), stk.C(d))
+
+
+def _alkyne(carbon1, atom1, carbon2, atom2):
     bonders = (carbon1, )
     deleters = (carbon2, atom2)
     return _TestCase(

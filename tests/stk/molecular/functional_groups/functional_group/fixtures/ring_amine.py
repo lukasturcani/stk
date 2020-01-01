@@ -4,71 +4,21 @@ import stk
 from ._test_case import _TestCase
 
 
-@pytest.fixture(
-    params=(
-        stk.N(0),
-    )
-)
-def nitrogen(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(1),
-    ),
-)
-def hydrogen1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(2),
-    ),
-)
-def hydrogen2(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(3),
-    ),
-)
-def carbon1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(4),
-    ),
-)
-def carbon2(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(5),
-    ),
-)
-def hydrogen3(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(6),
-    ),
-)
-def carbon3(request):
-    return request.param.clone()
-
-
 @pytest.fixture
-def ring_amine(
+def ring_amine(get_atom_ids):
+    a, b, c, d, e, f, g = get_atom_ids(7)
+    return _ring_amine(
+        nitrogen=stk.N(a),
+        hydrogen1=stk.H(b),
+        hydrogen2=stk.H(c),
+        carbon1=stk.C(d),
+        carbon2=stk.C(e),
+        hydrogen3=stk.H(f),
+        carbon3=stk.C(g),
+    )
+
+
+def _ring_amine(
     nitrogen,
     hydrogen1,
     hydrogen2,

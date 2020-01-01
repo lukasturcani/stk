@@ -4,26 +4,13 @@ import stk
 from ._test_case import _TestCase
 
 
-@pytest.fixture(
-    params=(
-        stk.I(0),
-    ),
-)
-def iodine(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(1),
-    ),
-)
-def atom(request):
-    return request.param.clone()
-
-
 @pytest.fixture
-def iodo(iodine, atom):
+def iodo(get_atom_ids):
+    a, b = get_atom_ids(2)
+    return _iodo(stk.I(a), stk.C(b))
+
+
+def _iodo(iodine, atom):
     bonders = (atom, )
     deleters = (iodine, )
     return _TestCase(

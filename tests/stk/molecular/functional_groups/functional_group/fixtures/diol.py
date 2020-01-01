@@ -4,62 +4,20 @@ import stk
 from ._test_case import _TestCase
 
 
-@pytest.fixture(
-    params=(
-        stk.C(0),
-    ),
-)
-def atom1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.O(1),
-    ),
-)
-def oxygen1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(2),
-    ),
-)
-def hydrogen1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(3),
-    ),
-)
-def atom2(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.O(4),
-    ),
-)
-def oxygen2(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(5),
-    ),
-)
-def hydrogen2(request):
-    return request.param.clone()
-
-
 @pytest.fixture
-def diol(atom1, oxygen1, hydrogen1, atom2, oxygen2, hydrogen2):
+def diol(get_atom_ids):
+    a, b, c, d, e, f = get_atom_ids(6)
+    return _diol(
+        atom1=stk.C(a),
+        oxygen1=stk.O(b),
+        hydrogen1=stk.H(c),
+        atom2=stk.C(d),
+        oxygen2=stk.O(e),
+        hydrogen2=stk.H(f),
+    )
+
+
+def _diol(atom1, oxygen1, hydrogen1, atom2, oxygen2, hydrogen2):
     bonders = (atom1, atom2)
     deleters = (oxygen1, hydrogen1, oxygen2, hydrogen2)
     return _TestCase(

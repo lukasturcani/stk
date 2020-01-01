@@ -4,35 +4,13 @@ import stk
 from ._test_case import _TestCase
 
 
-@pytest.fixture(
-    params=(
-        stk.S(0),
-    ),
-)
-def sulfur(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(1),
-    ),
-)
-def hydrogen(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(2),
-    ),
-)
-def atom(request):
-    return request.param.clone()
-
-
 @pytest.fixture
-def thiol(sulfur, hydrogen, atom):
+def thiol(get_atom_ids):
+    a, b, c = get_atom_ids(3)
+    return _thiol(stk.S(a), stk.H(b), stk.C(c))
+
+
+def _thiol(sulfur, hydrogen, atom):
     bonders = ()
     deleters = ()
     return _TestCase(

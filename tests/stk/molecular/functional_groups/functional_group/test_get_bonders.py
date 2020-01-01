@@ -1,5 +1,5 @@
 import itertools as it
-from ..utilities import is_atom_clone
+from .utilities import is_atom_clone
 
 
 def test_get_bonders(test_case):

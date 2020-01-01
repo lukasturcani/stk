@@ -4,53 +4,19 @@ import pytest
 from ._test_case import _TestCase
 
 
-@pytest.fixture(
-    params=(
-        stk.C(0),
-    ),
-)
-def carbon(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.O(1),
-    ),
-)
-def oxygen1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.O(2),
-    ),
-)
-def oxygen2(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.H(3),
-    ),
-)
-def hydrogen(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(4),
-    ),
-)
-def atom(request):
-    return request.param.clone()
-
-
 @pytest.fixture
-def carboxylic_acid(carbon, oxygen1, oxygen2, hydrogen, atom):
+def carboxylic_acid(get_atom_ids):
+    a, b, c, d, e = get_atom_ids(5)
+    return _carboxylic_acid(
+        carbon=stk.C(a),
+        oxygen1=stk.O(b),
+        oxygen2=stk.O(c),
+        hydrogen=stk.H(d),
+        atom=stk.C(e),
+    )
+
+
+def _carboxylic_acid(carbon, oxygen1, oxygen2, hydrogen, atom):
     bonders = (carbon, )
     deleters = (oxygen2, hydrogen)
     return _TestCase(

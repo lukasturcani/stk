@@ -4,44 +4,13 @@ import stk
 from ._test_case import _TestCase
 
 
-@pytest.fixture(
-    params=(
-        stk.F(1),
-    ),
-)
-def fluorine1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(0),
-    ),
-)
-def atom1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.F(2),
-    ),
-)
-def fluorine2(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(3),
-    ),
-)
-def atom2(request):
-    return request.param.clone()
-
-
 @pytest.fixture
-def difluoro(fluorine1, atom1, fluorine2, atom2):
+def difluoro(get_atom_ids):
+    a, b, c, d = get_atom_ids(4)
+    return _difluoro(stk.F(a), stk.C(b), stk.F(c), stk.C(d))
+
+
+def _difluoro(fluorine1, atom1, fluorine2, atom2):
     bonders = (atom1, atom2)
     deleters = (fluorine1, fluorine2)
     return _TestCase(
