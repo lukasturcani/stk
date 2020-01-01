@@ -13,8 +13,8 @@ class Diol(FunctionalGroup_):
     def __init__(
         self,
         atom1,
-        hydrogen1,
         oxygen1,
+        hydrogen1,
         atom2,
         oxygen2,
         hydrogen2,
