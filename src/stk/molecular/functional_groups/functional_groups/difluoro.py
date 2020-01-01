@@ -23,7 +23,7 @@ class Difluoro(FunctionalGroup_):
         self._fluorine1 = fluorine1
         self._atom2 = atom2
         self._fluorine2 = fluorine2
-        atoms = (atom1, fluorine1, atom2, fluorine2)
+        atoms = (fluorine1, atom1, fluorine2, atom2)
         super().__init__(atoms, bonders, deleters)
 
     def get_atom1(self):
