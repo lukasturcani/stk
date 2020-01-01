@@ -1,4 +1,4 @@
-from .smarts_functinal_group_factory import (
+from .smarts_functional_group_factory import (
     SmartsFunctionalGroupFactory,
 )
 from ..functional_groups import RingAmine

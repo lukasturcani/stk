@@ -5,7 +5,7 @@ from .carboxylic_acid import *
 from .amide import *
 from .thioacid import *
 from .alcohol import *
-from .thol import *
+from .thiol import *
 from .fluoro import *
 from .bromo import *
 from .iodo import *
