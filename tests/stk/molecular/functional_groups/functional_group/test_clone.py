@@ -20,7 +20,9 @@ def get_atom_map_0(functional_group):
 
     """
 
-    atoms = (stk.Li(200), )
+    # Make sure new_id is always valid.
+    new_id = max(functional_group.get_atom_ids()) + 1
+    atoms = (stk.Li(new_id), )
     return dict(zip(functional_group.get_atom_ids(), atoms))
 
 
