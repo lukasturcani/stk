@@ -6,17 +6,17 @@ from ._test_case import _TestCase
 
 @pytest.fixture(
     params=(
-        stk.N(0),
+        stk.O(0),
     ),
 )
-def nitrogen(request):
+def oxygen(request):
     return request.param.clone()
 
 
 @pytest.fixture(
     params=(
         stk.H(1),
-    )
+    ),
 )
 def hydrogen(request):
     return request.param.clone()
@@ -25,33 +25,25 @@ def hydrogen(request):
 @pytest.fixture(
     params=(
         stk.C(2),
-    )
+    ),
 )
-def atom1(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(3),
-    )
-)
-def atom2(request):
+def atom(request):
     return request.param.clone()
 
 
 @pytest.fixture
-def secondary_amine(nitrogen, hydrogen, atom1, atom2):
-    bonders = (nitrogen, )
+def alcohol(oxygen, hydrogen, atom):
+    bonders = (oxygen, )
     deleters = (hydrogen, )
     return _TestCase(
-        functional_group=stk.SecondaryAmine(
-            nitrogen=nitrogen,
+        functional_group=stk.Alcohol(
+            oxygen=oxygen,
             hydrogen=hydrogen,
-            atom1=atom1,
-            atom2=atom2,
+            atom=atom,
+            bonders=bonders,
+            deleters=deleters,
         ),
-        atoms=(nitrogen, hydrogen, atom1, atom2),
+        atoms=(oxygen, hydrogen, atom),
         bonders=bonders,
         deleters=deleters,
     )

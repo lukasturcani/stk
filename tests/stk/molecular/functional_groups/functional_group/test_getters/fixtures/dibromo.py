@@ -6,26 +6,17 @@ from ._test_case import _TestCase
 
 @pytest.fixture(
     params=(
-        stk.N(0),
+        stk.Br(0),
     ),
 )
-def nitrogen(request):
+def bromine1(request):
     return request.param.clone()
 
 
 @pytest.fixture(
     params=(
-        stk.H(1),
-    )
-)
-def hydrogen(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(2),
-    )
+        stk.C(9),
+    ),
 )
 def atom1(request):
     return request.param.clone()
@@ -33,25 +24,36 @@ def atom1(request):
 
 @pytest.fixture(
     params=(
-        stk.C(3),
-    )
+        stk.Br(1),
+    ),
+)
+def bromine2(request):
+    return request.param.clone()
+
+
+@pytest.fixture(
+    params=(
+        stk.C(21),
+    ),
 )
 def atom2(request):
     return request.param.clone()
 
 
 @pytest.fixture
-def secondary_amine(nitrogen, hydrogen, atom1, atom2):
-    bonders = (nitrogen, )
-    deleters = (hydrogen, )
+def dibromo(bromine1, atom1, bromine2, atom2):
+    bonders = (atom1, atom2)
+    deleters = (bromine1, bromine2)
     return _TestCase(
-        functional_group=stk.SecondaryAmine(
-            nitrogen=nitrogen,
-            hydrogen=hydrogen,
+        functional_group=stk.Dibromo(
+            bromine1=bromine1,
             atom1=atom1,
+            bromine2=bromine2,
             atom2=atom2,
+            bonders=bonders,
+            deleters=deleters,
         ),
-        atoms=(nitrogen, hydrogen, atom1, atom2),
+        atoms=(bromine1, atom1, bromine2, atom2),
         bonders=bonders,
         deleters=deleters,
     )

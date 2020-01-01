@@ -36,12 +36,12 @@ def hydrogen2(request):
         stk.C(3),
     )
 )
-def r(request):
+def atom(request):
     return request.param.clone()
 
 
 @pytest.fixture
-def primary_amine(nitrogen, hydrogen1, hydrogen2, r):
+def primary_amine(nitrogen, hydrogen1, hydrogen2, atom):
     bonders = (nitrogen, )
     deleters = (hydrogen1, hydrogen2)
     return _TestCase(
@@ -49,9 +49,9 @@ def primary_amine(nitrogen, hydrogen1, hydrogen2, r):
             nitrogen=nitrogen,
             hydrogen1=hydrogen1,
             hydrogen2=hydrogen2,
-            r=r,
+            atom=atom,
         ),
-        atoms=(nitrogen, hydrogen1, hydrogen2, r),
+        atoms=(nitrogen, hydrogen1, hydrogen2, atom),
         bonders=bonders,
         deleters=deleters,
     )

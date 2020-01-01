@@ -1,15 +1,15 @@
-import stk
 import pytest
+import stk
 
 from ._test_case import _TestCase
 
 
 @pytest.fixture(
     params=(
-        stk.C(0),
+        stk.B(0),
     ),
 )
-def carbon(request):
+def boron(request):
     return request.param.clone()
 
 
@@ -24,7 +24,16 @@ def oxygen1(request):
 
 @pytest.fixture(
     params=(
-        stk.O(2),
+        stk.H(2),
+    ),
+)
+def hydrogen1(request):
+    return request.param.clone()
+
+
+@pytest.fixture(
+    params=(
+        stk.O(3),
     ),
 )
 def oxygen2(request):
@@ -33,16 +42,16 @@ def oxygen2(request):
 
 @pytest.fixture(
     params=(
-        stk.H(3),
+        stk.H(4),
     ),
 )
-def hydrogen(request):
+def hydrogen2(request):
     return request.param.clone()
 
 
 @pytest.fixture(
     params=(
-        stk.C(4),
+        stk.C(5),
     ),
 )
 def atom(request):
@@ -50,20 +59,19 @@ def atom(request):
 
 
 @pytest.fixture
-def carboxylic_acid(carbon, oxygen1, oxygen2, hydrogen, atom):
-    bonders = (carbon, )
-    deleters = (oxygen2, hydrogen)
+def boronic_acid(boron, oxygen1, hydrogen1, oxygen2, hydrogen2, atom):
+    bonders = (oxygen1, oxygen2)
+    deleters = (hydrogen1, hydrogen2)
     return _TestCase(
-        functional_group=stk.CarboxylicAcid(
-            carbon=carbon,
+        functional_group=stk.BoronicAcid(
+            boron=boron,
             oxygen1=oxygen1,
+            hydrogen1=hydrogen1,
             oxygen2=oxygen2,
-            hydrogen=hydrogen,
+            hydrogen2=hydrogen2,
             atom=atom,
-            bonders=bonders,
-            deleters=deleters,
         ),
-        atoms=(carbon, oxygen1, oxygen2, hydrogen, atom),
+        atoms=(boron, oxygen1, hydrogen1, oxygen2, hydrogen2, atom),
         bonders=bonders,
         deleters=deleters,
     )

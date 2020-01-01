@@ -36,12 +36,12 @@ def hydrogen(request):
         stk.C(3),
     ),
 )
-def r(request):
+def atom(request):
     return request.clone()
 
 
 @pytest.fixture
-def aldehyde(carbon, oxygen, hydrogen, r):
+def aldehyde(carbon, oxygen, hydrogen, atom):
     bonders = (carbon, )
     deleters = (oxygen, )
     return _TestCase(
@@ -49,11 +49,11 @@ def aldehyde(carbon, oxygen, hydrogen, r):
             carbon=carbon,
             oxygen=oxygen,
             hydrogen=hydrogen,
-            r=r,
+            atom=atom,
             bonders=bonders,
             deleters=deleters,
         ),
-        atoms=(carbon, oxygen, hydrogen, r),
+        atoms=(carbon, oxygen, hydrogen, atom),
         bonders=bonders,
         deleters=deleters,
     )

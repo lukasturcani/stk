@@ -9,34 +9,34 @@ from ._test_case import _TestCase
         stk.C(0),
     ),
 )
-def carbon(request):
+def carbon1(request):
     return request.param.clone()
 
 
 @pytest.fixture(
     params=(
-        stk.O(1),
+        stk.H(1),
     ),
 )
-def oxygen(request):
+def atom1(request):
     return request.param.clone()
 
 
 @pytest.fixture(
     params=(
-        stk.N(2),
+        stk.C(2),
     ),
 )
-def nitrogen(request):
+def atom2(request):
     return request.param.clone()
 
 
 @pytest.fixture(
     params=(
-        stk.H(3),
-    )
+        stk.C(3),
+    ),
 )
-def hydrogen1(request):
+def carbon2(request):
     return request.param.clone()
 
 
@@ -45,7 +45,7 @@ def hydrogen1(request):
         stk.H(4),
     ),
 )
-def hydrogen2(request):
+def atom3(request):
     return request.param.clone()
 
 
@@ -54,26 +54,26 @@ def hydrogen2(request):
         stk.C(5),
     ),
 )
-def atom(request):
+def atom4(request):
     return request.param.clone()
 
 
 @pytest.fixture
-def amide(carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom):
-    bonders = (carbon, )
-    deleters = (nitrogen, hydrogen1, hydrogen2)
+def alkene(carbon1, atom1, atom2, carbon2, atom3, atom4):
+    bonders = (carbon2, )
+    deleters = (carbon1, atom1, atom2)
     return _TestCase(
-        functional_group=stk.Amide(
-            carbon=carbon,
-            oxygen=oxygen,
-            nitrogen=nitrogen,
-            hydrogen1=hydrogen1,
-            hydrogen2=hydrogen2,
-            atom=atom,
+        functional_group=stk.Alkene(
+            carbon1=carbon1,
+            atom1=atom1,
+            atom2=atom2,
+            carbon2=carbon2,
+            atom3=atom3,
+            atom4=atom4,
             bonders=bonders,
             deleters=deleters,
         ),
-        atoms=(carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom),
+        atoms=(carbon1, atom1, atom2, carbon2, atom3, atom4),
         bonders=bonders,
         deleters=deleters,
     )

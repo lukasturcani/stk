@@ -1,31 +1,22 @@
-import pytest
 import stk
+import pytest
 
 from ._test_case import _TestCase
 
 
 @pytest.fixture(
     params=(
-        stk.N(0),
+        stk.C(0),
     ),
 )
-def nitrogen(request):
+def carbon1(request):
     return request.param.clone()
 
 
 @pytest.fixture(
     params=(
-        stk.H(1),
-    )
-)
-def hydrogen(request):
-    return request.param.clone()
-
-
-@pytest.fixture(
-    params=(
-        stk.C(2),
-    )
+        stk.C(1),
+    ),
 )
 def atom1(request):
     return request.param.clone()
@@ -33,25 +24,34 @@ def atom1(request):
 
 @pytest.fixture(
     params=(
-        stk.C(3),
-    )
+        stk.C(2),
+    ),
+)
+def carbon2(request):
+    return request.param.clone()
+
+
+@pytest.fixture(
+    params=(
+        stk.H(3),
+    ),
 )
 def atom2(request):
     return request.param.clone()
 
 
 @pytest.fixture
-def secondary_amine(nitrogen, hydrogen, atom1, atom2):
-    bonders = (nitrogen, )
-    deleters = (hydrogen, )
+def alkyne(carbon1, atom1, carbon2, atom2):
+    bonders = (carbon1, )
+    deleters = (carbon2, atom2)
     return _TestCase(
-        functional_group=stk.SecondaryAmine(
-            nitrogen=nitrogen,
-            hydrogen=hydrogen,
+        functional_group=stk.Alkyne(
+            carbon1=carbon1,
             atom1=atom1,
+            carbon2=carbon2,
             atom2=atom2,
         ),
-        atoms=(nitrogen, hydrogen, atom1, atom2),
+        atoms=(carbon1, atom1, carbon2, atom2),
         bonders=bonders,
         deleters=deleters,
     )
