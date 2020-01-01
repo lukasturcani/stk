@@ -74,3 +74,11 @@ class Amide(FunctionalGroup_):
         clone._hydrogen2 = atom_map[self._hydrogen2.id]
         clone._atom = atom_map[self._atom.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._carbon}, {self._oxygen}, {self._nitrogen}, '
+            f'{self._hydrogen1}, {self._hydrogen2}, {self._atom}, '
+            f'bonders={self._bonders}, deleters={self._deleters})'
+        )

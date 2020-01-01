@@ -81,3 +81,11 @@ class Diol(FunctionalGroup_):
         clone._oxygen2 = atom_map[self._oxygen2.id]
         clone._hydrogen2 = atom_map[self._hydrogen2.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._atom1}, {self._oxygen1}, {self._hydrogen1}, '
+            f'{self._atom2}, {self._oxygen2}, {self._hydrogen2}, '
+            f'bonders={self._bonders}, deleters={self._deleters})'
+        )

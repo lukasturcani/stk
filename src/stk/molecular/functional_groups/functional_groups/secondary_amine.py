@@ -57,3 +57,11 @@ class SecondaryAmine(FunctionalGroup_):
         clone._atom1 = atom_map[self._atom1.id]
         clone._atom2 = atom_map[self._atom2.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._nitrogen}, {self._hydrogen}, {self._atom1}, '
+            f'{self._atom2}, '
+            f'bonders={self._bonders}, deleters={self._deleters})'
+        )

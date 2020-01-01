@@ -36,3 +36,10 @@ class Fluoro(FunctionalGroup_):
         clone._fluorine = atom_map[self._fluorine.id]
         clone._atom = atom_map[self._atom.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._fluorine}, {self._atom}, '
+            f'bonders={self._bonders}, deleters={self._deleters})'
+        )

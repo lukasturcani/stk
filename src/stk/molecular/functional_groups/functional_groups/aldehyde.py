@@ -57,3 +57,11 @@ class Aldehyde(FunctionalGroup_):
         clone._hydrogen = atom_map[self._hydrogen.id]
         clone._atom = atom_map[self._atom.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._carbon}, {self._oxygen}, {self._hydrogen}, '
+            f'{self._atom}, bonders={self._bonders}, '
+            f'deleters={self._deleters})'
+        )

@@ -74,3 +74,11 @@ class Alkene(FunctionalGroup_):
         clone._atom3 = atom_map[self._atom3.id]
         clone._atom4 = atom_map[self._atom4.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._carbon1}, {self._atom1}, {self._atom2}, '
+            f'{self._carbon2}, {self._atom3}, {self._atom4}, '
+            f'bonders={self._bonders}, deleters={self._deleters})'
+        )

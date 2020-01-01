@@ -57,3 +57,11 @@ class Difluoro(FunctionalGroup_):
         clone._atom2 = atom_map[self._atom2.id]
         clone._fluorine2 = atom_map[self._fluorine2.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._fluorine1}, {self._atom1}, {self._fluorine2}, '
+            f'{self._atom2}, '
+            f'bonders={self._bonders}, deleters={self._deleters})'
+        )

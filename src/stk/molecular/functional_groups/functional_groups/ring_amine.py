@@ -91,3 +91,11 @@ class RingAmine(FunctionalGroup_):
         clone._carbon2 = atom_map[self._carbon2.id]
         clone._carbon3 = atom_map[self._carbon3.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._nitrogen}, {self._hydrogen1}, {self._hydrogen2}, '
+            f'{self._carbon1}, {self._carbon2}, {self._hydrogen3}, '
+            f'{self._carbon3})'
+        )

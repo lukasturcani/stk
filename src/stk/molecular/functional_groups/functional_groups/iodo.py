@@ -36,3 +36,10 @@ class Iodo(FunctionalGroup_):
         clone._iodine = atom_map[self._iodine.id]
         clone._atom = atom_map[self._atom.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._iodine}, {self._atom}, '
+            f'bonders={self._bonders}, deleters={self._deleters})'
+        )

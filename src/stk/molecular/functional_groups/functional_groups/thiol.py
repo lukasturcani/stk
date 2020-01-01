@@ -43,3 +43,10 @@ class Thiol(FunctionalGroup_):
         clone._hydrogen = atom_map[self._hydrogen.id]
         clone._atom = atom_map[self._atom.id]
         return clone
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._sulfur}, {self._hydrogen}, {self._atom}, '
+            f'bonders={self._bonders}, deleters={self._deleters})'
+        )
