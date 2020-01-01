@@ -9,7 +9,7 @@ from ._test_case import _TestCase
         stk.S(0),
     ),
 )
-def sulfulr(request):
+def sulfur(request):
     return request.param.clone()
 
 

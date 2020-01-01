@@ -70,6 +70,8 @@ def boronic_acid(boron, oxygen1, hydrogen1, oxygen2, hydrogen2, atom):
             oxygen2=oxygen2,
             hydrogen2=hydrogen2,
             atom=atom,
+            bonders=bonders,
+            deleters=deleters,
         ),
         atoms=(boron, oxygen1, hydrogen1, oxygen2, hydrogen2, atom),
         bonders=bonders,

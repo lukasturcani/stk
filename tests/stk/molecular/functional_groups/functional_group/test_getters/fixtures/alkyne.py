@@ -50,6 +50,8 @@ def alkyne(carbon1, atom1, carbon2, atom2):
             atom1=atom1,
             carbon2=carbon2,
             atom2=atom2,
+            bonders=bonders,
+            deleters=deleters,
         ),
         atoms=(carbon1, atom1, carbon2, atom2),
         bonders=bonders,

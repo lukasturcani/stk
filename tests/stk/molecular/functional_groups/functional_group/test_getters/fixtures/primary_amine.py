@@ -50,6 +50,8 @@ def primary_amine(nitrogen, hydrogen1, hydrogen2, atom):
             hydrogen1=hydrogen1,
             hydrogen2=hydrogen2,
             atom=atom,
+            bonders=bonders,
+            deleters=deleters,
         ),
         atoms=(nitrogen, hydrogen1, hydrogen2, atom),
         bonders=bonders,

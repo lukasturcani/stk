@@ -37,7 +37,7 @@ def hydrogen2(request):
     ),
 )
 def carbon1(request):
-    return request.parm.clone()
+    return request.param.clone()
 
 
 @pytest.fixture(
@@ -56,7 +56,6 @@ def carbon2(request):
 )
 def hydrogen3(request):
     return request.param.clone()
-
 
 
 @pytest.fixture(

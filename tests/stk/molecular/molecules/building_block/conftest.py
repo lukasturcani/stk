@@ -23,12 +23,10 @@ def building_block(request):
         lambda molecule:
             stk.BromoFactory().get_functional_groups(molecule),
         lambda molecule:
-            stk.AmineFactory().get_functional_groups(molecule),
-        lambda molecule:
-            it.chain(
-                stk.AmineFactory().get_functional_groups(molecule),
-                stk.BromoFactory().get_functional_groups(molecule),
-            )
+            stk.PrimaryAmineFactory().get_functional_groups(molecule),
+        lambda molecule: it.chain(
+            stk.PrimaryAmineFactory().get_functional_groups(molecule),
+            stk.BromoFactory().get_functional_groups(molecule)),
     )
 )
 def get_functional_groups(request):

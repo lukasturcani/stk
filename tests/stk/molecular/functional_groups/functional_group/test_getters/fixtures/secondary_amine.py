@@ -50,6 +50,8 @@ def secondary_amine(nitrogen, hydrogen, atom1, atom2):
             hydrogen=hydrogen,
             atom1=atom1,
             atom2=atom2,
+            bonders=bonders,
+            deleters=deleters,
         ),
         atoms=(nitrogen, hydrogen, atom1, atom2),
         bonders=bonders,
