@@ -10,41 +10,22 @@ class PrimaryAmineFactory(SmartsFunctionalGroupFactory):
 
     """
 
-    _functional_group_smarts = '[*][N]([H])[H]'
-    _bonder_smarts = ['[$([N]([H])[H])]']
-    _deleter_smarts = ['[$([H][N][H])]']*2
-
-    def __init__(self, num_deleters=2):
+    def __init__(self, bonders=(1, ), deleters=(2, 3)):
         """
         Initialize an :class:`.AmineFactory`.
 
-        Parameters
-        ----------
-        num_deleters : :class:`int`, optional
-            The number of deleter atoms the created :class:`.Amine`
-            instances will have, maximum is ``2``. If ``0`` or ``1``
-            is used, the :class:`.Amine` instances created by the
-            factory will lose ``0`` or ``1`` hydrogen atoms during
-            construction, respectively.
-
         """
 
-        self._num_deleters = num_deleters
+        super().__init__('[*][N]([H])[H]', bonders, deleters)
 
     def get_functional_groups(self, molecule):
-        for ids in self._get_ids(molecule):
-            atoms = tuple(molecule.get_atoms(ids.atom_ids))
+        for atom_ids in self._get_atom_ids(molecule):
+            atoms = tuple(molecule.get_atoms(atom_ids))
             yield PrimaryAmine(
                 nitrogen=atoms[1],
                 hydrogen1=atoms[2],
                 hydrogen2=atoms[3],
                 atom=atoms[0],
-                bonders=(atoms[1], ),
-                deleters=atoms[2:2+self._num_deleters],
+                bonders=tuple(atoms[i] for i in self._bonders),
+                deleters=tuple(atoms[i] for i in self._deleters),
             )
-
-    def __repr__(self):
-        return (
-            f'{self.__class__.__name__}'
-            f'(num_deleters={self._num_deleters})'
-        )

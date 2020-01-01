@@ -10,20 +10,17 @@ class DifluoroFactory(SmartsFunctionalGroupFactory):
 
     """
 
-    _functional_group_smarts = '[F][#6]~[#6][F]'
-    _bonder_smarts = ['[$([#6]([F])~[#6][F])]']*2
-    _deleter_smarts = ['[$([F][#6]~[#6][F])]']*2
+    def __init__(self, bonders=(1, 2), deleters=(0, 3)):
+        super().__init__('[F][#6]~[#6][F]', bonders, deleters)
 
     def get_functional_groups(self, molecule):
-        for ids in self._get_ids(molecule):
-            atoms = tuple(molecule.get_atoms(ids.atom_ids))
+        for atom_ids in self._get_atom_ids(molecule):
+            atoms = tuple(molecule.get_atoms(atom_ids))
             yield Difluoro(
                 atom1=atoms[1],
                 fluorine1=atoms[0],
                 atom2=atoms[2],
                 fluorine2=atoms[3],
-                bonders=tuple(self._get_atoms(atoms, ids.bonder_ids)),
-                deleters=tuple(
-                    self._get_atoms(atoms, ids.deleter_ids)
-                ),
+                bonders=tuple(atoms[i] for i in self._bonders),
+                deleters=tuple(atoms[i] for i in self._deleters),
             )

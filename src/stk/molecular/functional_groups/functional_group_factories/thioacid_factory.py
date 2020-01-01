@@ -10,22 +10,18 @@ class ThioacidFactory(SmartsFunctionalGroupFactory):
 
     """
 
-    _functional_group_smarts = '[*][C](=[O])[S][H]'
-    _bonder_smarts = ['[$([C](=[O])[S][H])]']
-    _deleter_smarts = [
-        '[$([H][S][C](=[O]))]',
-        '[$([S]([H])[C](=[O]))]',
-    ]
+    def __init__(self, bonders=(1, ), deleters=(3, 4)):
+        super().__init__('[*][C](=[O])[S][H]', bonders, deleters)
 
     def get_functional_groups(self, molecule):
-        for ids in self._get_ids(molecule):
-            atoms = tuple(molecule.get_atoms(ids.atom_ids))
+        for atom_ids in self._get_atom_ids(molecule):
+            atoms = tuple(molecule.get_atoms(atom_ids))
             yield Thioacid(
                 carbon=atoms[1],
                 oxygen=atoms[2],
                 sulfur=atoms[3],
                 hydrogen=atoms[4],
                 atom=atoms[0],
-                bonders=tuple(molecule.get_atoms(ids.bonder_ids)),
-                deleters=tuple(molecule.get_atoms(ids.deleter_ids)),
+                bonders=tuple(atoms[i] for i in self._bonders),
+                deleters=tuple(atoms[i] for i in self._deleters),
             )

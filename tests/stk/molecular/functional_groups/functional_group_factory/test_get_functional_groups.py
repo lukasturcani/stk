@@ -54,52 +54,6 @@ class _TestCase:
         ),
 
         _TestCase(
-            factory=stk.PrimaryAmineFactory(num_deleters=1),
-            molecule=stk.BuildingBlock('NCCN'),
-            functional_groups=(
-                stk.PrimaryAmine(
-                    nitrogen=stk.N(0),
-                    hydrogen1=stk.H(4),
-                    hydrogen2=stk.H(5),
-                    atom=stk.C(1),
-                    bonders=(stk.N(0), ),
-                    deleters=(stk.H(4), ),
-                ),
-                stk.PrimaryAmine(
-                    nitrogen=stk.N(3),
-                    hydrogen1=stk.H(10),
-                    hydrogen2=stk.H(11),
-                    atom=stk.C(2),
-                    bonders=(stk.N(3), ),
-                    deleters=(stk.H(10), ),
-                ),
-            ),
-        ),
-
-        _TestCase(
-            factory=stk.PrimaryAmineFactory(num_deleters=0),
-            molecule=stk.BuildingBlock('NCCN'),
-            functional_groups=(
-                stk.PrimaryAmine(
-                    nitrogen=stk.N(0),
-                    hydrogen1=stk.H(4),
-                    hydrogen2=stk.H(5),
-                    atom=stk.C(1),
-                    bonders=(stk.N(0), ),
-                    deleters=(),
-                ),
-                stk.PrimaryAmine(
-                    nitrogen=stk.N(3),
-                    hydrogen1=stk.H(10),
-                    hydrogen2=stk.H(11),
-                    atom=stk.C(2),
-                    bonders=(stk.N(3), ),
-                    deleters=(),
-                ),
-            ),
-        ),
-
-        _TestCase(
             factory=stk.PrimaryAmineFactory(),
             molecule=stk.BuildingBlock('CCCC'),
             functional_groups=(),
@@ -356,21 +310,6 @@ class _TestCase:
                     atom2=stk.C(2),
                     bonders=(stk.C(0), ),
                     deleters=(stk.H(5), ),
-                ),
-            ),
-        ),
-
-        _TestCase(
-            factory=stk.TerminalAlkyneFactory(delete_carbon=True),
-            molecule=stk.BuildingBlock('C#CC#CC'),
-            functional_groups=(
-                stk.Alkyne(
-                    carbon1=stk.C(0),
-                    carbon2=stk.C(1),
-                    atom1=stk.H(5),
-                    atom2=stk.C(2),
-                    bonders=(stk.C(1), ),
-                    deleters=(stk.H(5), stk.C(0)),
                 ),
             ),
         ),

@@ -10,19 +10,18 @@ class RingAmineFactory(SmartsFunctionalGroupFactory):
 
     """
 
-    _functional_group_smarts = '[N]([H])([H])[#6]~[#6]([H])~[#6R1]'
-    _bonder_smarts = [
-        '[$([N]([H])([H])[#6]~[#6]([H])~[#6R1])]',
-        '[$([#6]([H])(~[#6R1])~[#6][N]([H])[H])]',
-    ]
-    _deleter_smarts = (
-            ['[$([H][N]([H])[#6]~[#6]([H])~[#6R1])]']*2 +
-            ['[$([H][#6](~[#6R1])~[#6][N]([H])[H])]']
-    )
+    def __init__(self):
+        super().__init__(
+            functional_group_smarts=(
+                '[N]([H])([H])[#6]~[#6]([H])~[#6R1]'
+            ),
+            bonders=(),
+            deleters=(),
+        )
 
     def get_functional_groups(self, molecule):
-        for ids in self._get_ids(molecule):
-            atoms = tuple(molecule.get_atoms(ids.atom_ids))
+        for atom_ids in self._get_atom_ids(molecule):
+            atoms = tuple(molecule.get_atoms(atom_ids))
             yield RingAmine(
                 nitrogen=atoms[0],
                 hydrogen1=atoms[1],
