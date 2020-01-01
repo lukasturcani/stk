@@ -62,3 +62,32 @@ class RingAmine(FunctionalGroup_):
 
     def get_carbon3(self):
         return self._carbon3.clone()
+
+    def clone(self, atom_map=None):
+        if atom_map is None:
+            atom_map = {}
+        else:
+            atom_map = dict(atom_map)
+
+        atoms = (
+            self._nitrogen,
+            self._hydrogen1,
+            self._hydrogen2,
+            self._hydrogen3,
+            self._carbon1,
+            self._carbon2,
+            self._carbon3,
+        )
+        for atom in atoms:
+            if atom.id not in atom_map:
+                atom_map[atom.id] = atom.clone()
+
+        clone = super().clone(atom_map)
+        clone._nitrogen = atom_map[self._nitrogen.id]
+        clone._hydrogen1 = atom_map[self._hydrogen1.id]
+        clone._hydrogen2 = atom_map[self._hydrogen2.id]
+        clone._hydrogen3 = atom_map[self._hydrogen3.id]
+        clone._carbon1 = atom_map[self._carbon1.id]
+        clone._carbon2 = atom_map[self._carbon2.id]
+        clone._carbon3 = atom_map[self._carbon3.id]
+        return clone

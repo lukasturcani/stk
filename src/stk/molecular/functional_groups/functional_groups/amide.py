@@ -47,3 +47,30 @@ class Amide(FunctionalGroup_):
 
     def get_atom(self):
         return self._atom.clone()
+
+    def clone(self, atom_map=None):
+        if atom_map is None:
+            atom_map = {}
+        else:
+            atom_map = dict(atom_map)
+
+        atoms = (
+            self._carbon,
+            self._oxygen,
+            self._nitrogen,
+            self._hydrogen1,
+            self._hydrogen2,
+            self._atom,
+        )
+        for atom in atoms:
+            if atom.id not in atom_map:
+                atom_map[atom.id] = atom.clone()
+
+        clone = super().clone(atom_map)
+        clone._carbon = atom_map[self._carbon.id]
+        clone._oxygen = atom_map[self._oxygen.id]
+        clone._nitrogen = atom_map[self._nitrogen.id]
+        clone._hydrogen1 = atom_map[self._hydrogen1.id]
+        clone._hydrogen2 = atom_map[self._hydrogen2.id]
+        clone._atom = atom_map[self._atom.id]
+        return clone

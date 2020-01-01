@@ -54,3 +54,30 @@ class Diol(FunctionalGroup_):
 
     def get_hydrogen2(self):
         return self._hydrogen2.clone()
+
+    def clone(self, atom_map=None):
+        if atom_map is None:
+            atom_map = {}
+        else:
+            atom_map = dict(atom_map)
+
+        atoms = (
+            self._atom1,
+            self._oxygen1,
+            self._hydrogen1,
+            self._atom2,
+            self._oxygen2,
+            self._hydrogen2,
+        )
+        for atom in atoms:
+            if atom.id not in atom_map:
+                atom_map[atom.id] = atom.clone()
+
+        clone = super().clone(atom_map)
+        clone._atom1 = atom_map[self._atom1.id]
+        clone._oxygen1 = atom_map[self._oxygen1.id]
+        clone._hydrogen1 = atom_map[self._hydrogen1.id]
+        clone._atom2 = atom_map[self._atom2.id]
+        clone._oxygen2 = atom_map[self._oxygen2.id]
+        clone._hydrogen2 = atom_map[self._hydrogen2.id]
+        return clone

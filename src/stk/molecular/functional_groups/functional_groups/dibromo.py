@@ -37,3 +37,23 @@ class Dibromo(FunctionalGroup_):
 
     def get_bromine2(self):
         return self._bromine2.clone()
+
+    def clone(self, atom_map=None):
+        if atom_map is None:
+            atom_map = {}
+        else:
+            atom_map = dict(atom_map)
+
+        atoms = (
+            self._atom1, self._bromine1, self._atom2, self._bromine2
+        )
+        for atom in atoms:
+            if atom.id not in atom_map:
+                atom_map[atom.id] = atom.clone()
+
+        clone = super().clone(atom_map)
+        clone._atom1 = atom_map[self._atom1.id]
+        clone._bromine1 = atom_map[self._bromine1.id]
+        clone._atom2 = atom_map[self._atom2.id]
+        clone._bromine2 = atom_map[self._bromine2.id]
+        return clone

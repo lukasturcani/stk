@@ -46,3 +46,26 @@ class PrimaryAmine(FunctionalGroup_):
             f'deleters={self._deleters}'
             ')'
         )
+
+    def clone(self, atom_map=None):
+        if atom_map is None:
+            atom_map = {}
+        else:
+            atom_map = dict(atom_map)
+
+        atoms = (
+            self._nitrogen,
+            self._hydrogen1,
+            self._hydrogen2,
+            self._atom,
+        )
+        for atom in atoms:
+            if atom.id not in atom_map:
+                atom_map[atom.id] = atom.clone()
+
+        clone = super().clone(atom_map)
+        clone._nitrogen = atom_map[self._nitrogen.id]
+        clone._hydrogen1 = atom_map[self._hydrogen1.id]
+        clone._hydrogen2 = atom_map[self._hydrogen2.id]
+        clone._atom = atom_map[self._atom.id]
+        return clone

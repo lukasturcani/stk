@@ -37,3 +37,23 @@ class Difluoro(FunctionalGroup_):
 
     def get_fluorine2(self):
         return self._fluorine2.clone()
+
+    def clone(self, atom_map=None):
+        if atom_map is None:
+            atom_map = {}
+        else:
+            atom_map = dict(atom_map)
+
+        atoms = (
+            self._atom1, self._fluorine1, self._atom2, self._fluorine2
+        )
+        for atom in atoms:
+            if atom.id not in atom_map:
+                atom_map[atom.id] = atom.clone()
+
+        clone = super().clone(atom_map)
+        clone._atom1 = atom_map[self._atom1.id]
+        clone._fluorine1 = atom_map[self._fluorine1.id]
+        clone._atom2 = atom_map[self._atom2.id]
+        clone._fluorine2 = atom_map[self._fluorine2.id]
+        return clone
