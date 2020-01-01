@@ -10,7 +10,7 @@ class TerminalAlkyneFactory(SmartsFunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(1), deleters=(2, 3)):
+    def __init__(self, bonders=(1, ), deleters=(2, 3)):
         super().__init__('[*][C]#[C][H]', bonders, deleters)
 
     def get_functional_groups(self, molecule):

@@ -308,8 +308,8 @@ class _TestCase:
                     carbon2=stk.C(1),
                     atom1=stk.H(5),
                     atom2=stk.C(2),
-                    bonders=(stk.C(0), ),
-                    deleters=(stk.H(5), ),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.C(0), stk.H(5), ),
                 ),
             ),
         ),
@@ -374,8 +374,10 @@ class _TestCase:
                     oxygen2=stk.O(4),
                     hydrogen1=stk.H(11),
                     hydrogen2=stk.H(13),
-                    bonders=(stk.O(2), stk.O(4)),
-                    deleters=(stk.H(11), stk.H(13)),
+                    bonders=(stk.C(1), stk.C(3)),
+                    deleters=(
+                        stk.O(2), stk.O(4), stk.H(11), stk.H(13)
+                    ),
                 ),
             ),
         ),
