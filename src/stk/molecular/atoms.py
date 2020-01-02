@@ -110,6 +110,28 @@ class Atom:
 
         return self._id
 
+    def _with_id(self, id):
+        """
+        Modify the atom.
+
+        """
+
+        self._id = id
+        return self
+
+    def with_id(self, id):
+        """
+        Get a clone but with a different id.
+
+        Returns
+        -------
+        :class:`.Atom`
+            A clone with a new id.
+
+        """
+
+        return self.clone()._with_id(id)
+
     def get_atomic_number(self):
         """
         Get the atomic number of the atom.

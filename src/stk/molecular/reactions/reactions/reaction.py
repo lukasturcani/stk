@@ -10,8 +10,11 @@ class Reaction:
 
         Yields
         ------
-        :class:`.Atom`
-            An atom added by the reaction.
+        :class:`tuple`
+            A :class:`tuple` of the form ``(atom, position)``, holding
+            an :class:`.Atom` added
+            by the reaction and its position as a
+            :class:`numpy.ndarray`.
 
         """
 
