@@ -1,9 +1,9 @@
 from .. import FunctionalGroup_
 
 
-class PrimaryAmine(FunctionalGroup_):
+class PrimaryAmino(FunctionalGroup_):
     """
-    Represents a primary amine functional group.
+    Represents a primary amino functional group.
 
     The structure of the functional group is given by the pseudo-SMILES
     ``[atom][nitrogen]([hydrogen1])[hydrogen2]``.

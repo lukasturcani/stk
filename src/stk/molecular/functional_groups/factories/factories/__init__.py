@@ -10,9 +10,9 @@ from .difluoro_factory import *
 from .diol_factory import *
 from .fluoro_factory import *
 from .iodo_factory import *
-from .primary_amine_factory import *
+from .primary_amino_factory import *
 from .ring_amine_factory import *
-from .secondary_amine_factory import *
+from .secondary_amino_factory import *
 from .terminal_alkene_factory import *
 from .terminal_alkyne_factory import *
 from .thioacid_factory import *

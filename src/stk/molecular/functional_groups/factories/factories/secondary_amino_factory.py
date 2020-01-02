@@ -1,12 +1,12 @@
 from .smarts_functional_group_factory import (
     SmartsFunctionalGroupFactory,
 )
-from ...functional_groups import SecondaryAmine
+from ...functional_groups import SecondaryAmino
 
 
-class SecondaryAmineFactory(SmartsFunctionalGroupFactory):
+class SecondaryAminoFactory(SmartsFunctionalGroupFactory):
     """
-    Creates :class:`.SecondaryAmine` instances.
+    Creates :class:`.SecondaryAmino` instances.
 
     """
 
@@ -16,7 +16,7 @@ class SecondaryAmineFactory(SmartsFunctionalGroupFactory):
     def get_functional_groups(self, molecule):
         for atom_ids in self._get_atom_ids(molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield SecondaryAmine(
+            yield SecondaryAmino(
                 nitrogen=atoms[1],
                 hydrogen=atoms[0],
                 atom1=atoms[2],

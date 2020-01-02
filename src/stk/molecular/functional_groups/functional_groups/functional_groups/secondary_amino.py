@@ -1,9 +1,9 @@
 from .. import FunctionalGroup_
 
 
-class SecondaryAmine(FunctionalGroup_):
+class SecondaryAmino(FunctionalGroup_):
     """
-    Represents a secondary amine functional group.
+    Represents a secondary amino functional group.
 
     The structure of the functional group is given by the pseudo-SMILES
     ``[atom1][nitrogen]([hydrogen])[atom2]``.
