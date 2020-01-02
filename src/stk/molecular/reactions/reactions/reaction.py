@@ -14,7 +14,9 @@ class Reaction:
             A :class:`tuple` of the form ``(atom, position)``, holding
             an :class:`.Atom` added
             by the reaction and its position as a
-            :class:`numpy.ndarray`.
+            :class:`numpy.ndarray`. New atoms have a negative id, and
+            will need to be assigned a new one when added to the
+            :class:`.ConstructedMolecule`.
 
         """
 
