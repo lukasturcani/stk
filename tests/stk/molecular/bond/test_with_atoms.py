@@ -4,7 +4,6 @@ import stk
 
 @pytest.fixture(
     params=[
-        lambda bond: None,
         lambda bond: {},
         lambda bond: {bond.get_atom1().get_id(): stk.Be(33)},
         lambda bond: {bond.get_atom2().get_id(): stk.Bi(122)},
@@ -37,12 +36,9 @@ def get_atom_map(request):
 def test_with_atoms(bond, get_atom_map):
     bond.attr = 1
     bond._attr = 2
-    clone = bond.with_atoms(get_atom_map(bond))
-    assert clone is not bond
-
     atom_map = get_atom_map(bond)
-    if atom_map is None:
-        atom_map = {}
+    clone = bond.with_atoms(atom_map)
+    assert clone is not bond
 
     expected_atom1 = atom_map.get(
         bond.get_atom1().get_id(),

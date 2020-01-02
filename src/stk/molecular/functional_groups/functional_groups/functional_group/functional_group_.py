@@ -58,6 +58,7 @@ class FunctionalGroup_(FunctionalGroup):
         self._deleters = tuple(
             atom_map.get(a.get_id(), a) for a in self._deleters
         )
+        return self
 
     def with_atoms(self, atom_map):
         """

@@ -26,7 +26,7 @@ class CarboxylicAcid(FunctionalGroup_):
         self._hydrogen = hydrogen
         self._atom = atom
         atoms = (carbon, oxygen1, oxygen2, hydrogen, atom)
-        super().__init__(atoms, bonders, atoms)
+        super().__init__(atoms, bonders, deleters)
 
     def get_carbon(self):
         return self._carbon

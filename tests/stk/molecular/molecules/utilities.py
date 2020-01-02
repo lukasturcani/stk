@@ -2,6 +2,17 @@ import numpy as np
 import itertools as it
 
 
+def is_clone_molecule(molecule1, molecule2):
+    assert molecule1 is not molecule2
+    are_same_objects(molecule1.get_atoms(), molecule2.get_atoms())
+    are_same_objects(molecule1.get_bonds(), molecule2.get_bonds())
+
+
+def are_same_objects(objects1, objects2):
+    for object1, object2 in it.zip_longest(objects1, objects2):
+        assert object1 is object2
+
+
 def has_same_structure(molecule1, molecule2):
     assert np.all(np.equal(
         molecule1.get_position_matrix(),
@@ -30,14 +41,14 @@ def get_num_atom_ids(molecule, get_atom_ids):
 
 
 def is_equivalent_atom(atom1, atom2):
-    assert atom1 is not atom2
     assert atom1.get_id() == atom2.get_id()
     assert atom1.get_charge() == atom2.get_charge()
+    assert atom1.get_mass() == atom2.get_mass()
+    assert atom1.get_atomic_number() == atom2.get_atomic_number()
     assert atom1.__class__ is atom2.__class__
 
 
 def is_equivalent_bond(bond1, bond2):
-    assert bond1 is not bond2
     assert bond1.__class__ is bond2.__class__
     assert bond1.get_order() == bond2.get_order()
     assert bond1.get_periodicity() == bond2.get_periodicity()

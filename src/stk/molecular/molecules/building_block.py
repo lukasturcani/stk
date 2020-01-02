@@ -327,7 +327,10 @@ class BuildingBlock(Molecule_):
 
         """
 
-        self._functional_groups = tuple(functional_groups)
+        atom_map = {a.get_id(): a for a in self._atoms}
+        self._functional_groups = tuple(
+            fg.with_atoms(atom_map) for fg in functional_groups
+        )
         return self
 
     def with_functional_groups(self, functional_groups):

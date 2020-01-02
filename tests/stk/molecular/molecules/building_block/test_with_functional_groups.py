@@ -1,11 +1,10 @@
-import itertools as it
 import stk
 import pytest
 
-from ..utilities import has_same_structure
+from ..utilities import has_same_structure, are_same_objects
 from .utilities import (
-    is_equivalent_building_block,
-    is_equivalent_functional_group,
+    is_clone_building_block,
+    are_equivalent_functional_groups,
 )
 
 
@@ -58,15 +57,16 @@ def _test_with_functional_groups(building_block, functional_groups):
         functional_groups=functional_groups,
     )
     # Test immutability.
-    is_equivalent_building_block(building_block, clone)
+    is_clone_building_block(building_block, clone)
     has_same_structure(building_block, clone)
 
 
 def _test_with_functional_groups_0(building_block, functional_groups):
     new = building_block.with_functional_groups(functional_groups)
-    result = it.zip_longest(
+    are_equivalent_functional_groups(
         new.get_functional_groups(),
         functional_groups,
     )
-    for fg1, fg2 in result:
-        is_equivalent_functional_group(fg1, fg2)
+    are_same_objects(new.get_atoms(), building_block.get_atoms())
+    are_same_objects(new.get_bonds(), building_block.get_bonds())
+    has_same_structure(building_block, new)

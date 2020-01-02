@@ -19,7 +19,6 @@ def get_atom_map_0(functional_group):
 
 @pytest.fixture(
     params=[
-        lambda functional_group: None,
         lambda functional_group: {},
         get_atom_map_0,
     ],
@@ -79,5 +78,4 @@ def _test_with_atoms(functional_group, get_atom_map):
 
 def is_modified_sequence(atoms1, atoms2, atom_map):
     for atom1, atom2 in it.zip_longest(atoms1, atoms2):
-        atom2 = atom_map.get(atom1.get_id(), atom2)
-        assert atom1 is atom2
+        assert atom2 is atom_map.get(atom1.get_id(), atom1)

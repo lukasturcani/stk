@@ -3,8 +3,8 @@ def test_clone(bond):
     bond._attr = 2
     clone = bond.clone()
 
-    assert clone.atom1 is bond.atom1
-    assert clone.atom2 is bond.atom2
+    assert clone.get_atom1() is bond.get_atom1()
+    assert clone.get_atom2() is bond.get_atom2()
     assert bond.get_periodicity() == clone.get_periodicity()
     assert bond.get_order() == clone.get_order()
     assert bond.attr == clone.attr
