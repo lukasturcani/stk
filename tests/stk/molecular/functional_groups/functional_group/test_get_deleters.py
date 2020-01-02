@@ -1,7 +1,5 @@
 import itertools as it
 
-from .utilities import is_atom_clone
-
 
 def test_get_deleters(test_case):
     _test_get_deleters(
@@ -16,4 +14,4 @@ def _test_get_deleters(functional_group, deleters):
         deleters,
     )
     for atom1, atom2 in fg_atoms:
-        is_atom_clone(atom1, atom2)
+        atom1 is atom2
