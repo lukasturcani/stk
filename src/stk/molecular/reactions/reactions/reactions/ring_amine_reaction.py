@@ -56,7 +56,7 @@ class RingAmineReaction(Reaction):
     def get_new_bonds(self):
         n1 = self._ring_amine1.get_nitrogen()
         n2 = self._ring_amine2.get_nitrogen()
-        c1 = self._ring_amine1.get_carbon1()
+        c1 = self._ring_amine1.get_carbon2()
         c2 = self._ring_amine2.get_carbon2()
         n_joiner = atoms.C(-1)
         nh1 = atoms.H(-2)
@@ -82,4 +82,9 @@ class RingAmineReaction(Reaction):
         yield Bond(nc_joiner2, nc2h2, 1)
 
     def get_deleted_atoms(self):
-        pass
+        yield self._ring_amine1.get_hydrogen3()
+        yield self._ring_amine2.get_hydrogen3()
+        yield self._ring_amine1.get_hydrogen1()
+        yield self._ring_amine2.get_hydrogen1()
+        yield self._ring_amine1.get_hydrogen2()
+        yield self._ring_amine2.get_hydrogen2()
