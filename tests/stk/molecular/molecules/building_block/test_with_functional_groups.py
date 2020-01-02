@@ -1,9 +1,9 @@
 import stk
 import pytest
 
-from ..utilities import has_same_structure, are_same_objects
+from ..utilities import has_same_structure, is_equivalent_molecule
 from .utilities import (
-    is_clone_building_block,
+    is_equivalent_building_block,
     are_equivalent_functional_groups,
 )
 
@@ -57,7 +57,7 @@ def _test_with_functional_groups(building_block, functional_groups):
         functional_groups=functional_groups,
     )
     # Test immutability.
-    is_clone_building_block(building_block, clone)
+    is_equivalent_building_block(building_block, clone)
     has_same_structure(building_block, clone)
 
 
@@ -67,6 +67,5 @@ def _test_with_functional_groups_0(building_block, functional_groups):
         new.get_functional_groups(),
         functional_groups,
     )
-    are_same_objects(new.get_atoms(), building_block.get_atoms())
-    are_same_objects(new.get_bonds(), building_block.get_bonds())
+    is_equivalent_molecule(building_block, new)
     has_same_structure(building_block, new)

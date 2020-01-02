@@ -1,7 +1,8 @@
-from ..utilities import is_clone_molecule, has_same_structure
+from ..utilities import has_same_structure, is_equivalent_molecule
 
 
 def test_clone(molecule):
     clone = molecule.clone()
     has_same_structure(molecule, clone)
-    is_clone_molecule(molecule, clone)
+    assert molecule is not clone
+    is_equivalent_molecule(molecule, clone)

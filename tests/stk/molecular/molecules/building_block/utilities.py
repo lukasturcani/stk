@@ -3,8 +3,6 @@ import itertools as it
 from ..utilities import (
     is_equivalent_atom,
     is_equivalent_molecule,
-    are_same_objects,
-    is_clone_molecule,
 )
 
 
@@ -50,20 +48,7 @@ def is_equivalent_functional_group(
 
 def is_equivalent_building_block(building_block1, building_block2):
     is_equivalent_molecule(building_block1, building_block2)
-    functional_groups = it.zip_longest(
-        building_block1.get_functional_groups(),
-        building_block2.get_functional_groups(),
-    )
-    for functional_group1, functional_group2 in functional_groups:
-        is_equivalent_functional_group(
-            functional_group1=functional_group1,
-            functional_group2=functional_group2,
-        )
-
-
-def is_clone_building_block(building_block1, building_block2):
-    is_clone_molecule(building_block1, building_block2)
-    are_same_objects(
-        objects1=building_block1.get_functional_groups(),
-        objects2=building_block2.get_functional_groups(),
+    are_equivalent_functional_groups(
+        functional_groups1=building_block1.get_functional_groups(),
+        functional_groups2=building_block2.get_functional_groups(),
     )

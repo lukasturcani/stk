@@ -2,17 +2,6 @@ import numpy as np
 import itertools as it
 
 
-def is_clone_molecule(molecule1, molecule2):
-    assert molecule1 is not molecule2
-    are_same_objects(molecule1.get_atoms(), molecule2.get_atoms())
-    are_same_objects(molecule1.get_bonds(), molecule2.get_bonds())
-
-
-def are_same_objects(objects1, objects2):
-    for object1, object2 in it.zip_longest(objects1, objects2):
-        assert object1 is object2
-
-
 def has_same_structure(molecule1, molecule2):
     assert np.all(np.equal(
         molecule1.get_position_matrix(),
