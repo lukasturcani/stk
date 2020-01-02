@@ -11,44 +11,42 @@ class Alcohol(FunctionalGroup_):
     """
 
     def __init__(self, oxygen, hydrogen, atom, bonders, deleters):
-        atom_map = {
-            oxygen.get_id(): oxygen.clone(),
-            hydrogen.get_id(): hydrogen.clone(),
-            atom.get_id(): atom.clone(),
-        }
-        self._oxygen = atom_map[oxygen.get_id()]
-        self._hydrogen = atom_map[hydrogen.get_id()]
-        self._atom = atom_map[atom.get_id()]
-        super()._init(
-            atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.get_id()] for a in bonders),
-            deleters=tuple(atom_map[a.get_id()] for a in deleters),
-        )
+        self._oxygen = oxygen
+        self._hydrogen = hydrogen
+        self._atom = atom
+        atoms = (oxygen, hydrogen, atom)
+        super().__init__(atoms, bonders, deleters)
 
     def get_oxygen(self):
-        return self._oxygen.clone()
+        return self._oxygen
 
     def get_hydrogen(self):
-        return self._hydrogen.clone()
+        return self._hydrogen
 
     def get_atom(self):
-        return self._atom.clone()
+        return self._atom
 
-    def clone(self, atom_map=None):
-        if atom_map is None:
-            atom_map = {}
-        else:
-            atom_map = dict(atom_map)
+    def clone(self):
+        clone = super().clone()
+        clone._oxygen = self._oxygen
+        clone._hydrogen = self._hydrogen
+        clone._atom = self._atom
+        return clone
 
-        atoms = (self._oxygen, self._hydrogen, self._atom)
-        for atom in atoms:
-            if atom.get_id() not in atom_map:
-                atom_map[atom.get_id()] = atom.clone()
-
-        clone = super().clone(atom_map)
-        clone._oxygen = atom_map[self._oxygen.get_id()]
-        clone._hydrogen = atom_map[self._hydrogen.get_id()]
-        clone._atom = atom_map[self._atom.get_id()]
+    def with_atoms(self, atom_map):
+        clone = super().with_atoms(atom_map)
+        clone._oxygen = atom_map.get(
+            self._oxygen.get_id(),
+            self._oxygen,
+        )
+        clone._hydrogen = atom_map.get(
+            self._hydrogen.get_id(),
+            self._hydrogen,
+        )
+        clone._atom = atom_map.get(
+            self._atom.get_id(),
+            self._atom,
+        )
         return clone
 
     def __repr__(self):

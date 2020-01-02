@@ -24,46 +24,11 @@ class FunctionalGroup_(FunctionalGroup):
 
         """
 
-        # Make sure all attributes use use the same clone,
-        # to save memory.
-        atom_map = {a.get_id(): a.clone() for a in atoms}
-        self._atoms = tuple(atom_map[a.get_id()] for a in atoms)
-        self._bonders = tuple(atom_map[a.get_id()] for a in bonders)
-        self._deleters = tuple(atom_map[a.get_id()] for a in deleters)
-
-    def _init(self, atoms, bonders, deleters):
-        """
-        Initialize a :class:`.FunctionalGroup`.
-
-        Like :meth:`__init__`, but does not clone the atoms passed
-        as parameters. Use to prevent duplicate atom clones, when
-        subclasses need to initialize the base class.
-
-        Parameters
-        ----------
-        atoms : :class:`tuple` of :class:`.Atom`
-            The atoms in the functional group.
-
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms in the functional group.
-
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms in the functional group.
-
-        """
-
         self._atoms = atoms
         self._bonders = bonders
         self._deleters = deleters
 
-    def clone(self, atom_map=None):
-        if atom_map is None:
-            atom_map = {}
-
-        atom_map.update(
-            (a.get_id(), a.clone()) for a in self._atoms
-            if a.get_id() not in atom_map
-        )
+    def clone(self):
 
         clone = self.__class__.__new__(self.__class__)
         for attr, value in vars(self).items():
@@ -72,26 +37,63 @@ class FunctionalGroup_(FunctionalGroup):
 
         FunctionalGroup_.__init__(
             self=clone,
-            atoms=tuple(atom_map[a.get_id()] for a in self._atoms),
-            bonders=tuple(atom_map[a.get_id()] for a in self._bonders),
-            deleters=tuple(atom_map[a.get_id()] for a in self._deleters),
+            atoms=self._atoms,
+            bonders=self._bonders,
+            deleters=self._deleters,
         )
         return clone
 
+    def _with_atoms(self, atom_map):
+        """
+        Modify the functional group.
+
+        """
+
+        self._atoms = tuple(
+            atom_map.get(a.get_id(), a) for a in self._atoms
+        )
+        self._bonders = tuple(
+            atom_map.get(a.get_id(), a) for a in self._bonders
+        )
+        self._deleters = tuple(
+            atom_map.get(a.get_id(), a) for a in self._deleters
+        )
+
+    def with_atoms(self, atom_map):
+        """
+        Return a clone holding different atoms.
+
+        Parameters
+        ----------
+        atom_map : :class:`dict`
+            Maps the id of an atom in the functional group to the new
+            atom the clone should hold. If the id of an atom in the
+            functional group is not found in `atom_map`, the atom will
+            not be replaced in the clone.
+
+        Returns
+        -------
+        :class:`.FunctionalGroup`
+            The clone.
+
+        """
+
+        return self.clone()._with_atoms(atom_map)
+
     def get_atoms(self):
-        yield from (a.clone() for a in self._atoms)
+        yield from self._atoms
 
     def get_atom_ids(self):
         yield from (a.get_id() for a in self._atoms)
 
     def get_bonders(self):
-        yield from (a.clone() for a in self._bonders)
+        yield from self._bonders
 
     def get_bonder_ids(self):
         yield from (a.get_id() for a in self._bonders)
 
     def get_deleters(self):
-        yield from (a.clone() for a in self._deleters)
+        yield from self._deleters
 
     def get_deleter_ids(self):
         yield from (a.get_id() for a in self._deleters)

@@ -21,69 +21,69 @@ class Alkene(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        atom_map = {
-            carbon1.get_id(): carbon1.clone(),
-            atom1.get_id(): atom1.clone(),
-            atom2.get_id(): atom2.clone(),
-            carbon2.get_id(): carbon2.clone(),
-            atom3.get_id(): atom3.clone(),
-            atom4.get_id(): atom4.clone(),
-        }
-        self._carbon1 = atom_map[carbon1.get_id()]
-        self._atom1 = atom_map[atom1.get_id()]
-        self._atom2 = atom_map[atom2.get_id()]
-        self._carbon2 = atom_map[carbon2.get_id()]
-        self._atom3 = atom_map[atom3.get_id()]
-        self._atom4 = atom_map[atom4.get_id()]
-        super()._init(
-            atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.get_id()] for a in bonders),
-            deleters=tuple(atom_map[a.get_id()] for a in deleters),
-        )
+        self._carbon1 = carbon1
+        self._atom1 = atom1
+        self._atom2 = atom2
+        self._carbon2 = carbon2
+        self._atom3 = atom3
+        self._atom4 = atom4
+        atoms = (carbon1, atom1, atom2, carbon2, atom3, atom4)
+        super().__init__(atoms, bonders, deleters)
 
     def get_carbon1(self):
-        return self._carbon1.clone()
+        return self._carbon1
 
     def get_atom1(self):
-        return self.atom1.clone()
+        return self.atom1
 
     def get_atom2(self):
-        return self.atom2.clone()
+        return self.atom2
 
     def get_carbon2(self):
-        return self._carbon2.clone()
+        return self._carbon2
 
     def get_atom3(self):
-        return self._atom3.clone()
+        return self._atom3
 
     def get_atom4(self):
-        return self._atom4.clone()
+        return self._atom4
 
-    def clone(self, atom_map=None):
-        if atom_map is None:
-            atom_map = {}
-        else:
-            atom_map = dict(atom_map)
+    def clone(self):
+        clone = super().clone()
+        clone._carbon1 = self._carbon1
+        clone._atom1 = self._atom1
+        clone._atom2 = self._atom2
+        clone._carbon2 = self._carbon2
+        clone._atom3 = self._atom3
+        clone._atom4 = self._atom4
+        return clone
 
-        atoms = (
+    def with_atoms(self, atom_map):
+        clone = super().with_atoms(atom_map)
+        clone._carbon1 = atom_map.get(
+            self._carbon1.get_id(),
             self._carbon1,
+        )
+        clone._atom1 = atom_map.get(
+            self._atom1.get_id(),
             self._atom1,
+        )
+        clone._atom2 = atom_map.get(
+            self._atom2.get_id(),
             self._atom2,
+        )
+        clone._carbon2 = atom_map.get(
+            self._carbon2.get_id(),
             self._carbon2,
+        )
+        clone._atom3 = atom_map.get(
+            self._atom3.get_id(),
             self._atom3,
+        )
+        clone._atom4 = atom_map.get(
+            self._atom4.get_id(),
             self._atom4,
         )
-        for atom in atoms:
-            if atom.get_id() not in atom_map:
-                atom_map[atom.get_id()] = atom.clone()
-
-        clone = super().clone(atom_map)
-        clone._carbon1 = atom_map[self._carbon1.get_id()]
-        clone._atom1 = atom_map[self._atom1.get_id()]
-        clone._atom2 = atom_map[self._atom2.get_id()]
-        clone._carbon2 = atom_map[self._carbon2.get_id()]
-        clone._atom3 = atom_map[self._atom3.get_id()]
-        clone._atom4 = atom_map[self._atom4.get_id()]
         return clone
 
     def __repr__(self):

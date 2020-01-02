@@ -11,38 +11,32 @@ class Bromo(FunctionalGroup_):
     """
 
     def __init__(self, bromine, atom, bonders, deleters):
-        atom_map = {
-            bromine.get_id(): bromine.clone(),
-            atom.get_id(): atom.clone()
-        }
-        self._bromine = atom_map[bromine.get_id()]
-        self._atom = atom_map[atom.get_id()]
-        super()._init(
-            atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.get_id()] for a in bonders),
-            deleters=tuple(atom_map[a.get_id()] for a in deleters),
-        )
+        self._bromine = bromine
+        self._atom = atom
+        super().__init__((bromine, atom), bonders, deleters)
 
     def get_bromine(self):
-        return self._bromine.clone()
+        return self._bromine
 
     def get_atom(self):
-        return self._atom.clone()
+        return self._atom
 
-    def clone(self, atom_map=None):
-        if atom_map is None:
-            atom_map = {}
-        else:
-            atom_map = dict(atom_map)
+    def clone(self):
+        clone = super().clone()
+        clone._bromine = self._bromine
+        clone._atom = self._atom
+        return clone
 
-        atoms = (self._bromine, self._atom)
-        for atom in atoms:
-            if atom.get_id() not in atom_map:
-                atom_map[atom.get_id()] = atom.clone()
-
-        clone = super().clone(atom_map)
-        clone._bromine = atom_map[self._bromine.get_id()]
-        clone._atom = atom_map[self._atom.get_id()]
+    def with_atoms(self, atom_map):
+        clone = super().with_atoms(atom_map)
+        clone._bromine = atom_map.get(
+            self._bromine.get_id(),
+            self._bromine,
+        )
+        clone._atom = atom_map.get(
+            self._atom.get_id(),
+            self._atom,
+        )
         return clone
 
     def __repr__(self):

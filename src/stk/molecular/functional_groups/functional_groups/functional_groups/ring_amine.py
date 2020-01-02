@@ -21,76 +21,86 @@ class RingAmine(FunctionalGroup_):
         hydrogen3,
         carbon3,
     ):
-        atom_map = {
-            nitrogen.get_id(): nitrogen.clone(),
-            hydrogen1.get_id(): hydrogen1.clone(),
-            hydrogen2.get_id(): hydrogen2.clone(),
-            carbon1.get_id(): carbon1.clone(),
-            carbon2.get_id(): carbon2.clone(),
-            hydrogen3.get_id(): hydrogen3.clone(),
-            carbon3.get_id(): carbon3.clone(),
-        }
-        self._nitrogen = atom_map[nitrogen.get_id()]
-        self._hydrogen1 = atom_map[hydrogen1.get_id()]
-        self._hydrogen2 = atom_map[hydrogen2.get_id()]
-        self._hydrogen3 = atom_map[hydrogen3.get_id()]
-        self._carbon1 = atom_map[carbon1.get_id()]
-        self._carbon2 = atom_map[carbon2.get_id()]
-        self._carbon3 = atom_map[carbon3.get_id()]
-        super()._init(
-            atoms=tuple(atom_map.values()),
-            bonders=(),
-            deleters=(),
+        self._nitrogen = nitrogen
+        self._hydrogen1 = hydrogen1
+        self._hydrogen2 = hydrogen2
+        self._hydrogen3 = hydrogen3
+        self._carbon1 = carbon1
+        self._carbon2 = carbon2
+        self._carbon3 = carbon3
+        atoms = (
+            nitrogen,
+            hydrogen1,
+            hydrogen2,
+            carbon1,
+            carbon2,
+            hydrogen3,
+            carbon3,
         )
+        super().__init__(atoms, (), ())
 
     def get_nitrogen(self):
-        return self._nitrogen.clone()
+        return self._nitrogen
 
     def get_hydrogen1(self):
-        return self._hydrogen1.clone()
+        return self._hydrogen1
 
     def get_hydrogen2(self):
-        return self._hydrogen2.clone()
+        return self._hydrogen2
 
     def get_carbon1(self):
-        return self._carbon1.clone()
+        return self._carbon1
 
     def get_carbon2(self):
-        return self._carbon2.clone()
+        return self._carbon2
 
     def get_hydrogen3(self):
-        return self._hydrogen3.clone()
+        return self._hydrogen3
 
     def get_carbon3(self):
-        return self._carbon3.clone()
+        return self._carbon3
 
-    def clone(self, atom_map=None):
-        if atom_map is None:
-            atom_map = {}
-        else:
-            atom_map = dict(atom_map)
+    def clone(self):
+        clone = super().clone()
+        clone._nitrogen = self._nitrogen
+        clone._hydrogen1 = self._hydrogen1
+        clone._hydrogen2 = self._hydrogen2
+        clone._hydrogen3 = self._hydrogen3
+        clone._carbon1 = self._carbon1
+        clone._carbon2 = self._carbon2
+        clone._carbon3 = self._carbon3
+        return clone
 
-        atoms = (
+    def with_atoms(self, atom_map):
+        clone = super().with_atoms(atom_map)
+        clone._nitrogen = atom_map.get(
+            self._nitrogen.get_id(),
             self._nitrogen,
+        )
+        clone._hydrogen1 = atom_map.get(
+            self._hydrogen1.get_id(),
             self._hydrogen1,
+        )
+        clone._hydrogen2 = atom_map.get(
+            self._hydrogen2.get_id(),
             self._hydrogen2,
+        )
+        clone._hydrogen3 = atom_map.get(
+            self._hydrogen3.get_id(),
             self._hydrogen3,
+        )
+        clone._carbon1 = atom_map.get(
+            self._carbon1.get_id(),
             self._carbon1,
+        )
+        clone._carbon2 = atom_map.get(
+            self._carbon2.get_id(),
             self._carbon2,
+        )
+        clone._carbon3 = atom_map.get(
+            self._carbon3.get_id(),
             self._carbon3,
         )
-        for atom in atoms:
-            if atom.get_id() not in atom_map:
-                atom_map[atom.get_id()] = atom.clone()
-
-        clone = super().clone(atom_map)
-        clone._nitrogen = atom_map[self._nitrogen.get_id()]
-        clone._hydrogen1 = atom_map[self._hydrogen1.get_id()]
-        clone._hydrogen2 = atom_map[self._hydrogen2.get_id()]
-        clone._hydrogen3 = atom_map[self._hydrogen3.get_id()]
-        clone._carbon1 = atom_map[self._carbon1.get_id()]
-        clone._carbon2 = atom_map[self._carbon2.get_id()]
-        clone._carbon3 = atom_map[self._carbon3.get_id()]
         return clone
 
     def __repr__(self):

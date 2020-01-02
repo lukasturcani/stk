@@ -274,10 +274,10 @@ class BuildingBlock(Molecule_):
             for a in molecule.GetAtoms()
         )
         bonds = tuple(
-            Bond.dangerous_init(
-                atoms[b.GetBeginAtomIdx()],
-                atoms[b.GetEndAtomIdx()],
-                b.GetBondTypeAsDouble()
+            Bond(
+                atom1=atoms[b.GetBeginAtomIdx()],
+                atom2=atoms[b.GetEndAtomIdx()],
+                order=b.GetBondTypeAsDouble(),
             )
             for b in molecule.GetBonds()
         )
@@ -285,7 +285,6 @@ class BuildingBlock(Molecule_):
 
         super().__init__(atoms, bonds, position_matrix)
         self._identity_key = identity_key
-        self._functional_groups = []
         self._with_functional_groups(self._extract_functional_groups(
             functional_groups=functional_groups,
         ))
@@ -328,10 +327,7 @@ class BuildingBlock(Molecule_):
 
         """
 
-        atom_map = {a.get_id(): a for a in self._atoms}
-        self._functional_groups = [
-            fg.clone(atom_map) for fg in functional_groups
-        ]
+        self._functional_groups = tuple(functional_groups)
         return self
 
     def with_functional_groups(self, functional_groups):
@@ -374,7 +370,9 @@ class BuildingBlock(Molecule_):
         ----------
         fg_ids : :class:`iterable` of :class:`int`, optional
             The ids of functional groups yielded. If ``None``, then
-            all functional groups are yielded.
+            all functional groups are yielded. Can be a single
+            :class:`int`, if a single functional group is
+            desired.
 
         Yields
         ------
@@ -385,9 +383,11 @@ class BuildingBlock(Molecule_):
 
         if fg_ids is None:
             fg_ids = range(len(self._functional_groups))
+        elif isinstance(fg_ids, int):
+            fg_ids = (fg_ids, )
 
         for fg_id in fg_ids:
-            yield self._functional_groups[fg_id].clone()
+            yield self._functional_groups[fg_id]
 
     @classmethod
     def init_from_dict(cls, molecule_dict):
@@ -414,7 +414,7 @@ class BuildingBlock(Molecule_):
         ).T
         obj._atoms = eval(molecule_dict['atoms'], vars(atoms))
         obj._bonds = [
-            Bond.dangerous_init(
+            Bond(
                 atom1=obj._atoms[bond_dict['atom1_id']],
                 atom2=obj._atoms[bond_dict['atom2_id']],
                 order=bond_dict['order'],
@@ -446,11 +446,8 @@ class BuildingBlock(Molecule_):
         """
 
         clone = super().clone()
-        atom_map = {a.get_id(): a for a in clone._atoms}
         clone._identity_key = self._identity_key
-        clone._functional_groups = [
-            fg.clone(atom_map) for fg in self._functional_groups
-        ]
+        clone._functional_groups = self._functional_groups
         return clone
 
     def get_bonder_ids(self, fg_ids=None):

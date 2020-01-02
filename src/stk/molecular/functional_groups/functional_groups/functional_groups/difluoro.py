@@ -19,52 +19,51 @@ class Difluoro(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        atom_map = {
-            fluorine1.get_id(): fluorine1.clone(),
-            atom1.get_id(): atom1.clone(),
-            fluorine2.get_id(): fluorine2.clone(),
-            atom2.get_id(): atom2.clone(),
-        }
-        self._atom1 = atom_map[atom1.get_id()]
-        self._fluorine1 = atom_map[fluorine1.get_id()]
-        self._atom2 = atom_map[atom2.get_id()]
-        self._fluorine2 = atom_map[fluorine2.get_id()]
-        super()._init(
-            atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.get_id()] for a in bonders),
-            deleters=tuple(atom_map[a.get_id()] for a in deleters),
-        )
+        self._fluorine1 = fluorine1
+        self._atom1 = atom1
+        self._fluorine2 = fluorine2
+        self._atom2 = atom2
+        atoms = (fluorine1, atom1, fluorine2, atom2)
+        super().__init__(atoms, bonders, deleters)
 
     def get_atom1(self):
-        return self._atom1.clone()
+        return self._atom1
 
     def get_fluorine1(self):
-        return self._fluorine1.clone()
+        return self._fluorine1
 
     def get_atom2(self):
-        return self._atom2.clone()
+        return self._atom2
 
     def get_fluorine2(self):
-        return self._fluorine2.clone()
+        return self._fluorine2
 
-    def clone(self, atom_map=None):
-        if atom_map is None:
-            atom_map = {}
-        else:
-            atom_map = dict(atom_map)
-
-        atoms = (
-            self._atom1, self._fluorine1, self._atom2, self._fluorine2
+    def with_atoms(self, atom_map):
+        clone = super().with_atoms(atom_map)
+        clone._atom1 = atom_map.get(
+            self._atom1.get_id(),
+            self._atom1,
         )
-        for atom in atoms:
-            if atom.get_id() not in atom_map:
-                atom_map[atom.get_id()] = atom.clone()
+        clone._fluorine1 = atom_map.get(
+            self._fluorine1.get_id(),
+            self._fluorine1,
+        )
+        clone._atom2 = atom_map.get(
+            self._atom2.get_id(),
+            self._atom2,
+        )
+        clone._fluorine2 = atom_map.get(
+            self._fluorine2.get_id(),
+            self._fluorine2,
+        )
+        return clone
 
-        clone = super().clone(atom_map)
-        clone._atom1 = atom_map[self._atom1.get_id()]
-        clone._fluorine1 = atom_map[self._fluorine1.get_id()]
-        clone._atom2 = atom_map[self._atom2.get_id()]
-        clone._fluorine2 = atom_map[self._fluorine2.get_id()]
+    def clone(self):
+        clone = super().clone()
+        clone._atom1 = self._atom1
+        clone._fluorine1 = self._fluorine1
+        clone._atom2 = self._atom2
+        clone._fluorine2 = self._fluorine2
         return clone
 
     def __repr__(self):

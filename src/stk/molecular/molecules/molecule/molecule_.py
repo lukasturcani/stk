@@ -44,7 +44,7 @@ class Molecule_(Molecule):
 
         self._atoms = atoms
         self._bonds = bonds
-        # Take the transpose because it will make some martix
+        # Take the transpose because it will make some matrix
         # multiplications faster.
         self._position_matrix = position_matrix.T
 
@@ -178,14 +178,11 @@ class Molecule_(Molecule):
         )
 
     def clone(self):
-        atom_map = {atom.get_id(): atom.clone() for atom in self._atoms}
-        atoms = tuple(atom_map.values())
-        bonds = tuple(bond.clone(atom_map) for bond in self._bonds)
         clone = self.__class__.__new__(self.__class__)
         Molecule_.__init__(
             self=clone,
-            atoms=atoms,
-            bonds=bonds,
+            atoms=self._atoms,
+            bonds=self._bonds,
             position_matrix=self.get_position_matrix(),
         )
         for name, value in self.__dict__.items():
@@ -213,14 +210,14 @@ class Molecule_(Molecule):
             atom_ids = (atom_ids, )
 
         for atom_id in atom_ids:
-            yield self._atoms[atom_id].clone()
+            yield self._atoms[atom_id]
 
     def get_num_atoms(self):
         return len(self._atoms)
 
     def get_bonds(self):
         for bond in self._bonds:
-            yield bond.clone()
+            yield bond
 
     def get_num_bonds(self):
         return len(self._bonds)
@@ -582,7 +579,7 @@ class Molecule_(Molecule):
             )
 
         # Update the structure.
-        return self._with_position_matrix(np.array(new_coords))
+        return self._with_position_matrix(new_coords)
 
     def _write_xyz_file(self, path, atom_ids):
         if atom_ids is None:

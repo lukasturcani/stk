@@ -132,10 +132,14 @@ class Bond:
         for attr, val in vars(self).items():
             if not attr.startswith('_'):
                 setattr(clone, attr, val)
-        clone._atom1 = self._atom1
-        clone._atom2 = self._atom2
-        clone._order = self._order
-        clone._periodicity = self._periodicity
+
+        Bond.__init__(
+            self=clone,
+            atom1=self._atom1,
+            atom2=self._atom2,
+            order=self._order,
+            periodicity=self._periodicity,
+        )
         return clone
 
     def _with_atoms(self, atom_map):
