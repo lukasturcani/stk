@@ -20,13 +20,23 @@ class CarboxylicAcid(FunctionalGroup_):
         bonders,
         deleters,
     ):
+        atom_map = {
+            carbon.id: carbon.clone(),
+            oxygen1.id: oxygen1.clone(),
+            oxygen2.id: oxygen2.clone(),
+            hydrogen.id: hydrogen.clone(),
+            atom.id: atom.clone(),
+        }
         self._carbon = carbon
         self._oxygen1 = oxygen1
         self._oxygen2 = oxygen2
         self._hydrogen = hydrogen
         self._atom = atom
-        atoms = (carbon, oxygen1, oxygen2, hydrogen, atom)
-        super().__init__(atoms, bonders, deleters)
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_carbon(self):
         return self._carbon.clone()

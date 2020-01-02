@@ -24,6 +24,34 @@ class FunctionalGroup_(FunctionalGroup):
 
         """
 
+        # Make sure all attributes use use the same clone,
+        # to save memory.
+        atom_map = {a.id: a.clone() for a in atoms}
+        self._atoms = tuple(atom_map[a.id] for a in atoms)
+        self._bonders = tuple(atom_map[a.id] for a in bonders)
+        self._deleters = tuple(atom_map[a.id] for a in deleters)
+
+    def _init(self, atoms, bonders, deleters):
+        """
+        Initialize a :class:`.FunctionalGroup`.
+
+        Like :meth:`__init__`, but does not clone the atoms passed
+        as parameters. Use to prevent duplicate atom clones, when
+        subclasses need to initialize the base class.
+
+        Parameters
+        ----------
+        atoms : :class:`tuple` of :class:`.Atom`
+            The atoms in the functional group.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms in the functional group.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms in the functional group.
+
+        """
+
         self._atoms = atoms
         self._bonders = bonders
         self._deleters = deleters

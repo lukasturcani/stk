@@ -11,9 +11,15 @@ class Bromo(FunctionalGroup_):
     """
 
     def __init__(self, bromine, atom, bonders, deleters):
-        self._bromine = bromine
-        self._atom = atom
-        super().__init__((bromine, atom), bonders, deleters)
+        atom_map = {
+            bromine.id: bromine.clone(),
+            atom.id: atom.clone()
+        }
+        self._bromine = atom_map[bromine.id]
+        self._atom = atom_map[atom.id]
+        bonders = tuple(atom_map[a.id] for a in bonders)
+        deleters = tuple(atom_map[a.id] for a in deleters)
+        super()._init(tuple(atom_map.values()), bonders, deleters)
 
     def get_bromine(self):
         return self._bromine.clone()

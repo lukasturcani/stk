@@ -11,9 +11,17 @@ class Fluoro(FunctionalGroup_):
     """
 
     def __init__(self, fluorine, atom, bonders, deleters):
-        self._fluorine = fluorine
-        self._atom = atom
-        super().__init__((fluorine, atom), bonders, deleters)
+        atom_map = {
+            fluorine.id: fluorine.clone(),
+            atom.id: atom.clone(),
+        }
+        self._fluorine = atom_map[fluorine.id]
+        self._atom = atom_map[atom.id]
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_fluorine(self):
         return self._fluorine.clone()

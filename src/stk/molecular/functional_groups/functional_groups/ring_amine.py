@@ -21,6 +21,15 @@ class RingAmine(FunctionalGroup_):
         hydrogen3,
         carbon3,
     ):
+        atom_map = {
+            nitrogen.id: nitrogen.clone(),
+            hydrogen1.id: hydrogen1.clone(),
+            hydrogen2.id: hydrogen2.clone(),
+            carbon1.id: carbon1.clone(),
+            carbon2.id: carbon2.clone(),
+            hydrogen3.id: hydrogen3.clone(),
+            carbon3.id: carbon3.clone(),
+        }
         self._nitrogen = nitrogen
         self._hydrogen1 = hydrogen1
         self._hydrogen2 = hydrogen2
@@ -28,16 +37,8 @@ class RingAmine(FunctionalGroup_):
         self._carbon1 = carbon1
         self._carbon2 = carbon2
         self._carbon3 = carbon3
-        super().__init__(
-            atoms=(
-                nitrogen,
-                hydrogen1,
-                hydrogen2,
-                carbon1,
-                carbon2,
-                hydrogen3,
-                carbon3,
-            ),
+        super()._init(
+            atoms=tuple(atom_map.values()),
             bonders=(),
             deleters=(),
         )

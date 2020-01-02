@@ -21,14 +21,24 @@ class Amide(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        self._carbon = carbon
-        self._oxygen = oxygen
-        self._nitrogen = nitrogen
-        self._hydrogen1 = hydrogen1
-        self._hydrogen2 = hydrogen2
-        self._atom = atom
+        atom_map = {
+            carbon.id: carbon.clone(),
+            oxygen.id: oxygen.clone(),
+            nitrogen.id: nitrogen.clone(),
+            hydrogen1.id: hydrogen1.clone(),
+            hydrogen2.id: hydrogen2.clone(),
+            atom.id: atom.clone(),
+        }
+        self._carbon = atom_map[carbon.id]
+        self._oxygen = atom_map[oxygen.id]
+        self._nitrogen = atom_map[nitrogen.id]
+        self._hydrogen1 = atom_map[hydrogen1.id]
+        self._hydrogen2 = atom_map[hydrogen2.id]
+        self._atom = atom_map[atom.id]
         atoms = (carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom)
-        super().__init__(atoms, bonders, deleters)
+        bonders = tuple(atom_map[a.id] for a in bonders)
+        deleters = tuple(atom_map[a.id] for a in deleters)
+        super()._init(atoms, bonders, deleters)
 
     def get_carbon(self):
         return self._carbon.clone()

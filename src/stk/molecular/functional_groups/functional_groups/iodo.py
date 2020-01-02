@@ -11,9 +11,17 @@ class Iodo(FunctionalGroup_):
     """
 
     def __init__(self, iodine, atom, bonders, deleters):
+        atom_map = {
+            iodine.id: iodine.clone(),
+            atom.id: atom.clone(),
+        }
         self._iodine = iodine
         self._atom = atom
-        super().__init__((iodine, atom), bonders, deleters)
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_iodine(self):
         return self._iodine.clone()

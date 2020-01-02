@@ -19,12 +19,21 @@ class Dibromo(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        self._atom1 = atom1
-        self._bromine1 = bromine1
-        self._atom2 = atom2
-        self._bromine2 = bromine2
-        atoms = (bromine1, atom1, bromine2, atom2)
-        super().__init__(atoms, bonders, deleters)
+        atom_map = {
+            atom1.id: atom1.clone(),
+            bromine1.id: bromine1.clone(),
+            atom2.id: atom2.clone(),
+            bromine2.id: bromine2.clone(),
+        }
+        self._atom1 = atom_map[atom1.id]
+        self._bromine1 = atom_map[bromine1.id]
+        self._atom2 = atom_map[atom2.id]
+        self._bromine2 = atom_map[bromine2.id]
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_atom1(self):
         return self._atom1.clone()

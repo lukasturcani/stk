@@ -19,12 +19,20 @@ class Alkyne(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        self._carbon1 = carbon1
-        self._atom1 = atom1
-        self._carbon2 = carbon2
-        self._atom2 = atom2
+        atom_map = {
+            carbon1.id: carbon1.clone(),
+            atom1.id: atom1.clone(),
+            carbon2.id: carbon2.clone(),
+            atom2.id: atom2.clone(),
+        }
+        self._carbon1 = atom_map[carbon1.id]
+        self._atom1 = atom_map[atom1.id]
+        self._carbon2 = atom_map[carbon2.id]
+        self._atom2 = atom_map[atom2.id]
         atoms = (carbon1, atom1, carbon2, atom2)
-        super().__init__(atoms, bonders, deleters)
+        bonders = tuple(atom_map[a.id] for a in bonders)
+        deleters = tuple(atom_map[a.id] for a in deleters)
+        super()._init(atoms, bonders, deleters)
 
     def get_atom1(self):
         return self._atom1.clone()

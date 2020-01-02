@@ -19,12 +19,21 @@ class SecondaryAmine(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        self._nitrogen = nitrogen
-        self._hydrogen = hydrogen
-        self._atom1 = atom1
-        self._atom2 = atom2
-        atoms = (nitrogen, hydrogen, atom1, atom2)
-        super().__init__(atoms, bonders, deleters)
+        atom_map = {
+            nitrogen.id: nitrogen.clone(),
+            hydrogen.id: hydrogen.clone(),
+            atom1.id: atom1.clone(),
+            atom2.id: atom2.clone(),
+        }
+        self._nitrogen = atom_map[nitrogen]
+        self._hydrogen = atom_map[hydrogen]
+        self._atom1 = atom_map[atom1]
+        self._atom2 = atom_map[atom2]
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_nitrogen(self):
         return self._nitrogen.clone()

@@ -21,21 +21,25 @@ class Diol(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        self._atom1 = atom1
-        self._oxygen1 = oxygen1
-        self._hydrogen1 = hydrogen1
-        self._atom2 = atom2
-        self._oxygen2 = oxygen2
-        self._hydrogen2 = hydrogen2
-        atoms = (
-            atom1,
-            oxygen1,
-            hydrogen1,
-            atom2,
-            oxygen2,
-            hydrogen2,
+        atom_map = {
+            atom1.id: atom1.clone(),
+            oxygen1.id: oxygen1.clone(),
+            hydrogen1.id: hydrogen1.clone(),
+            atom2.id: atom2.clone(),
+            oxygen2.id: oxygen2.clone(),
+            hydrogen2.id: hydrogen2.clone(),
+        }
+        self._atom1 = atom_map[atom1.id]
+        self._oxygen1 = atom_map[oxygen1.id]
+        self._hydrogen1 = atom_map[hydrogen1.id]
+        self._atom2 = atom_map[atom2.id]
+        self._oxygen2 = atom_map[oxygen2.id]
+        self._hydrogen2 = atom_map[hydrogen2.id]
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
         )
-        super().__init__(atoms, bonders, deleters)
 
     def get_atom1(self):
         return self._atom1.clone()

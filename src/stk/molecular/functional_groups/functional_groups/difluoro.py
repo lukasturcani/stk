@@ -19,12 +19,21 @@ class Difluoro(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        self._atom1 = atom1
-        self._fluorine1 = fluorine1
-        self._atom2 = atom2
-        self._fluorine2 = fluorine2
-        atoms = (fluorine1, atom1, fluorine2, atom2)
-        super().__init__(atoms, bonders, deleters)
+        atom_map = {
+            atom1.id: atom1.clone(),
+            fluorine1.id: fluorine1.clone(),
+            atom2.id: atom2.clone(),
+            fluorine2.id: fluorine2.clone(),
+        }
+        self._atom1 = atom_map[atom1.id]
+        self._fluorine1 = atom_map[fluorine1.id]
+        self._atom2 = atom_map[atom2.id]
+        self._fluorine2 = atom_map[fluorine2.id]
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_atom1(self):
         return self._atom1.clone()

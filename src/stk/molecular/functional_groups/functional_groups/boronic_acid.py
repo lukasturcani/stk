@@ -21,14 +21,24 @@ class BoronicAcid(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        self._boron = boron
-        self._oxygen1 = oxygen1
-        self._hydrogen1 = hydrogen1
-        self._oxygen2 = oxygen2
-        self._hydrogen2 = hydrogen2
-        self._atom = atom
+        atom_map = {
+            boron.id: boron.clone(),
+            oxygen1.id: oxygen1.clone(),
+            hydrogen1.id: hydrogen1.clone(),
+            oxygen2.id: oxygen2.clone(),
+            hydrogen2.id: hydrogen2.clone(),
+            atom.id: atom.clone(),
+        }
+        self._boron = atom_map[boron.id]
+        self._oxygen1 = atom_map[oxygen1.id]
+        self._hydrogen1 = atom_map[hydrogen1.id]
+        self._oxygen2 = atom_map[oxygen2.id]
+        self._hydrogen2 = atom_map[hydrogen2.id]
+        self._atom = atom_map[atom.id]
         atoms = (boron, oxygen1, hydrogen1, oxygen2, hydrogen2, atom)
-        super().__init__(atoms, bonders, deleters)
+        bonders = tuple(atom_map[a.id] for a in bonders)
+        deleters = tuple(atom_map[a.id] for a in deleters)
+        super()._init(atoms, bonders, deleters)
 
     def get_boron(self):
         return self._boron.clone()

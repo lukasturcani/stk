@@ -20,13 +20,23 @@ class Thioacid(FunctionalGroup_):
         bonders,
         deleters
     ):
-        self._carbon = carbon
-        self._oxygen = oxygen
-        self._sulfur = sulfur
-        self._hydrogen = hydrogen
-        self._atom = atom
-        atoms = (carbon, oxygen, sulfur, hydrogen, atom)
-        super().__init__(atoms, bonders, deleters)
+        atom_map = {
+            carbon.id: carbon.clone(),
+            oxygen.id: oxygen.clone(),
+            sulfur.id: sulfur.clone(),
+            hydrogen.id: hydrogen.clone(),
+            atom.id: atom.clone(),
+        }
+        self._carbon = atom_map[carbon]
+        self._oxygen = atom_map[oxygen]
+        self._sulfur = atom_map[sulfur]
+        self._hydrogen = atom_map[hydrogen]
+        self._atom = atom_map[atom]
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_carbon(self):
         return self._carbon.clone()

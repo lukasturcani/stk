@@ -12,11 +12,19 @@ class Thiol(FunctionalGroup_):
     """
 
     def __init__(self, sulfur, hydrogen, atom, bonders, deleters):
-        self._sulfur = sulfur
-        self._hydrogen = hydrogen
-        self._atom = atom
-        atoms = (sulfur, hydrogen, atom)
-        super().__init__(atoms, bonders, deleters)
+        atom_map = {
+            sulfur.id: sulfur.clone(),
+            hydrogen.id: hydrogen.clone(),
+            atom.id: atom.clone(),
+        }
+        self._sulfur = atom_map[sulfur]
+        self._hydrogen = atom_map[hydrogen]
+        self._atom = atom_map[atom]
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_sulfur(self):
         return self._sulfur.clone()

@@ -21,14 +21,24 @@ class Alkene(FunctionalGroup_):
         bonders,
         deleters,
     ):
-        self._carbon1 = carbon1
-        self._atom1 = atom1
-        self._atom2 = atom2
-        self._carbon2 = carbon2
-        self._atom3 = atom3
-        self._atom4 = atom4
+        atom_map = {
+            carbon1.id: carbon1.clone(),
+            atom1.id: atom1.clone(),
+            atom2.id: atom2.clone(),
+            carbon2.id: carbon2.clone(),
+            atom3.id: atom3.clone(),
+            atom4.id: atom4.clone(),
+        }
+        self._carbon1 = atom_map[carbon1.id]
+        self._atom1 = atom_map[atom1.di]
+        self._atom2 = atom_map[atom2.id]
+        self._carbon2 = atom_map[carbon2.id]
+        self._atom3 = atom_map[atom3.id]
+        self._atom4 = atom_map[atom4.id]
         atoms = (carbon1, atom1, atom2, carbon2, atom3, atom4)
-        super().__init__(atoms, bonders, deleters)
+        bonders = tuple(atom_map[a.id] for a in bonders)
+        deleters = tuple(atom_map[a.id] for a in deleters)
+        super()._init(atoms, bonders, deleters)
 
     def get_carbon1(self):
         return self._carbon1.clone()
