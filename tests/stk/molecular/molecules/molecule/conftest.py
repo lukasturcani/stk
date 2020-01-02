@@ -47,6 +47,12 @@ import numpy as np
                     'order': 1,
                     'periodicity': [0, 0, 0],
                 },
+                {
+                    'atom1_id': 0,
+                    'atom2_id': 2,
+                    'order': 1,
+                    'periodicity': [0, 0, 0],
+                },
             ],
             'identity_key': '[H][C+2][H]'
         }),
