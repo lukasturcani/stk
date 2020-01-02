@@ -29,7 +29,7 @@ class Atom:
         import stk
 
         # h0 is an instance of the H class.
-        h0 = stk.Atom(id=0,_atomic_number=1)
+        h0 = stk.Atom(id=0, atomic_number=1)
 
         # h1 is also an instance of the H class.
         h1 = stk.H(id=1)
@@ -40,12 +40,12 @@ class Atom:
     .. code-block:: python
 
         # Both he0 and he1 are instances of the He class.
-        he0 = stk.Atom(id=2,_atomic_number=2)
+        he0 = stk.Atom(id=2, atomic_number=2)
         he1 = stk.He(id=3)
 
         # Both c0 and c1 are instances of the
         # C class.
-        c0 = stk.Atom(id=4,_atomic_number=6)
+        c0 = stk.Atom(id=4, atomic_number=6)
         c1 = stk.C(id=5)
 
     """
@@ -85,7 +85,7 @@ class Atom:
         id : :class:`int`
             The id of the atom.
 
-        _atomic_number : :class:`int`
+        atomic_number : :class:`int`
             The atomic number.
 
         charge : :class:`int`
@@ -160,12 +160,12 @@ class Atom:
 
     def get_mass(self):
         """
-        Get the _mass of the atom.
+        Get the mass of the atom.
 
         Returns
         -------
         :class:`float`
-            The _mass.
+            The mass.
 
         """
 

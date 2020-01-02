@@ -90,3 +90,13 @@ def periodicity(x_periodicity, y_periodicity, z_periodicity):
     """
 
     return x_periodicity, y_periodicity, z_periodicity
+
+
+@pytest.fixture
+def bond(atom1, atom2, order, periodicity):
+    """
+    A :class:`.Bond` instance.
+
+    """
+
+    return stk.Bond(atom1, atom2, order, periodicity)
