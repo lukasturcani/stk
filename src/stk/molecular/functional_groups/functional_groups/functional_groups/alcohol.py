@@ -19,10 +19,11 @@ class Alcohol(FunctionalGroup_):
         self._oxygen = atom_map[oxygen.id]
         self._hydrogen = atom_map[hydrogen.id]
         self._atom = atom_map[atom.id]
-        atoms = (self._oxygen, self._hydrogen, self._atom)
-        bonders = tuple(atom_map[a.id] for a in bonders)
-        deleters = tuple(atom_map[a.id] for a in deleters)
-        super()._init(atoms, bonders, deleters)
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_oxygen(self):
         return self._oxygen.clone()

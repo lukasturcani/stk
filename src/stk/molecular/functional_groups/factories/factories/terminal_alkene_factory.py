@@ -1,7 +1,7 @@
 from .smarts_functional_group_factory import (
     SmartsFunctionalGroupFactory,
 )
-from ..functional_groups import Alkene
+from ...functional_groups import Alkene
 
 
 class TerminalAlkeneFactory(SmartsFunctionalGroupFactory):

@@ -27,11 +27,11 @@ class Thioacid(FunctionalGroup_):
             hydrogen.id: hydrogen.clone(),
             atom.id: atom.clone(),
         }
-        self._carbon = atom_map[carbon]
-        self._oxygen = atom_map[oxygen]
-        self._sulfur = atom_map[sulfur]
-        self._hydrogen = atom_map[hydrogen]
-        self._atom = atom_map[atom]
+        self._carbon = atom_map[carbon.id]
+        self._oxygen = atom_map[oxygen.id]
+        self._sulfur = atom_map[sulfur.id]
+        self._hydrogen = atom_map[hydrogen.id]
+        self._atom = atom_map[atom.id]
         super()._init(
             atoms=tuple(atom_map.values()),
             bonders=tuple(atom_map[a.id] for a in bonders),

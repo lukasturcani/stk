@@ -17,9 +17,9 @@ class Thiol(FunctionalGroup_):
             hydrogen.id: hydrogen.clone(),
             atom.id: atom.clone(),
         }
-        self._sulfur = atom_map[sulfur]
-        self._hydrogen = atom_map[hydrogen]
-        self._atom = atom_map[atom]
+        self._sulfur = atom_map[sulfur.id]
+        self._hydrogen = atom_map[hydrogen.id]
+        self._atom = atom_map[atom.id]
         super()._init(
             atoms=tuple(atom_map.values()),
             bonders=tuple(atom_map[a.id] for a in bonders),

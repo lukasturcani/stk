@@ -29,10 +29,11 @@ class Aldehyde(FunctionalGroup_):
         self._oxygen = atom_map[oxygen.id]
         self._hydrogen = atom_map[hydrogen.id]
         self._atom = atom_map[atom.id]
-        atoms = (carbon, oxygen, hydrogen, atom)
-        bonders = tuple(atom_map[a.id] for a in bonders)
-        deleters = tuple(atom_map[a.id] for a in deleters)
-        super()._init(atoms, bonders, deleters)
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_carbon(self):
         return self._carbon.clone()

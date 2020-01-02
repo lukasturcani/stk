@@ -25,10 +25,10 @@ class PrimaryAmine(FunctionalGroup_):
             hydrogen2.id: hydrogen2.clone(),
             atom.id: atom.clone(),
         }
-        self._nitrogen = atom_map[nitrogen]
-        self._hydrogen1 = atom_map[hydrogen1]
-        self._hydrogen2 = atom_map[hydrogen2]
-        self._atom = atom_map[atom]
+        self._nitrogen = atom_map[nitrogen.id]
+        self._hydrogen1 = atom_map[hydrogen1.id]
+        self._hydrogen2 = atom_map[hydrogen2.id]
+        self._atom = atom_map[atom.id]
         super()._init(
             atoms=tuple(atom_map.values()),
             bonders=tuple(atom_map[a.id] for a in bonders),

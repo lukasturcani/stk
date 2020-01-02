@@ -15,8 +15,8 @@ class Iodo(FunctionalGroup_):
             iodine.id: iodine.clone(),
             atom.id: atom.clone(),
         }
-        self._iodine = iodine
-        self._atom = atom
+        self._iodine = atom_map[iodine.id]
+        self._atom = atom_map[atom.id]
         super()._init(
             atoms=tuple(atom_map.values()),
             bonders=tuple(atom_map[a.id] for a in bonders),

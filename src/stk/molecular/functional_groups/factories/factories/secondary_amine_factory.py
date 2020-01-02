@@ -1,7 +1,7 @@
 from .smarts_functional_group_factory import (
     SmartsFunctionalGroupFactory,
 )
-from ..functional_groups import SecondaryAmine
+from ...functional_groups import SecondaryAmine
 
 
 class SecondaryAmineFactory(SmartsFunctionalGroupFactory):

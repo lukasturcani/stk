@@ -27,11 +27,11 @@ class CarboxylicAcid(FunctionalGroup_):
             hydrogen.id: hydrogen.clone(),
             atom.id: atom.clone(),
         }
-        self._carbon = carbon
-        self._oxygen1 = oxygen1
-        self._oxygen2 = oxygen2
-        self._hydrogen = hydrogen
-        self._atom = atom
+        self._carbon = atom_map[carbon.id]
+        self._oxygen1 = atom_map[oxygen1.id]
+        self._oxygen2 = atom_map[oxygen2.id]
+        self._hydrogen = atom_map[hydrogen.id]
+        self._atom = atom_map[atom.id]
         super()._init(
             atoms=tuple(atom_map.values()),
             bonders=tuple(atom_map[a.id] for a in bonders),

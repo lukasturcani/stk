@@ -30,15 +30,16 @@ class Alkene(FunctionalGroup_):
             atom4.id: atom4.clone(),
         }
         self._carbon1 = atom_map[carbon1.id]
-        self._atom1 = atom_map[atom1.di]
+        self._atom1 = atom_map[atom1.id]
         self._atom2 = atom_map[atom2.id]
         self._carbon2 = atom_map[carbon2.id]
         self._atom3 = atom_map[atom3.id]
         self._atom4 = atom_map[atom4.id]
-        atoms = (carbon1, atom1, atom2, carbon2, atom3, atom4)
-        bonders = tuple(atom_map[a.id] for a in bonders)
-        deleters = tuple(atom_map[a.id] for a in deleters)
-        super()._init(atoms, bonders, deleters)
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_carbon1(self):
         return self._carbon1.clone()

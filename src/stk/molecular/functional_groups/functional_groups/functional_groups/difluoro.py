@@ -20,10 +20,10 @@ class Difluoro(FunctionalGroup_):
         deleters,
     ):
         atom_map = {
-            atom1.id: atom1.clone(),
             fluorine1.id: fluorine1.clone(),
-            atom2.id: atom2.clone(),
+            atom1.id: atom1.clone(),
             fluorine2.id: fluorine2.clone(),
+            atom2.id: atom2.clone(),
         }
         self._atom1 = atom_map[atom1.id]
         self._fluorine1 = atom_map[fluorine1.id]

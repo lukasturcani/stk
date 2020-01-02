@@ -29,10 +29,11 @@ class Alkyne(FunctionalGroup_):
         self._atom1 = atom_map[atom1.id]
         self._carbon2 = atom_map[carbon2.id]
         self._atom2 = atom_map[atom2.id]
-        atoms = (carbon1, atom1, carbon2, atom2)
-        bonders = tuple(atom_map[a.id] for a in bonders)
-        deleters = tuple(atom_map[a.id] for a in deleters)
-        super()._init(atoms, bonders, deleters)
+        super()._init(
+            atoms=tuple(atom_map.values()),
+            bonders=tuple(atom_map[a.id] for a in bonders),
+            deleters=tuple(atom_map[a.id] for a in deleters),
+        )
 
     def get_atom1(self):
         return self._atom1.clone()

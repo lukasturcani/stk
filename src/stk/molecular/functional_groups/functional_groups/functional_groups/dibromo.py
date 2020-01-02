@@ -20,10 +20,10 @@ class Dibromo(FunctionalGroup_):
         deleters,
     ):
         atom_map = {
-            atom1.id: atom1.clone(),
             bromine1.id: bromine1.clone(),
-            atom2.id: atom2.clone(),
+            atom1.id: atom1.clone(),
             bromine2.id: bromine2.clone(),
+            atom2.id: atom2.clone(),
         }
         self._atom1 = atom_map[atom1.id]
         self._bromine1 = atom_map[bromine1.id]

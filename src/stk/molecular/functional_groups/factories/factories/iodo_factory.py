@@ -1,7 +1,7 @@
 from .smarts_functional_group_factory import (
     SmartsFunctionalGroupFactory,
 )
-from ..functional_groups import Iodo
+from ...functional_groups import Iodo
 
 
 class IodoFactory(SmartsFunctionalGroupFactory):

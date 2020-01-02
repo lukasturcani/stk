@@ -1,6 +1,6 @@
 import rdkit.Chem.AllChem as rdkit
 
-from .functional_group_factory import FunctionalGroupFactory
+from ..functional_group_factory import FunctionalGroupFactory
 
 
 class SmartsFunctionalGroupFactory(FunctionalGroupFactory):

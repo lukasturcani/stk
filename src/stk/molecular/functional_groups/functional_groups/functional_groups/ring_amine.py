@@ -30,13 +30,13 @@ class RingAmine(FunctionalGroup_):
             hydrogen3.id: hydrogen3.clone(),
             carbon3.id: carbon3.clone(),
         }
-        self._nitrogen = nitrogen
-        self._hydrogen1 = hydrogen1
-        self._hydrogen2 = hydrogen2
-        self._hydrogen3 = hydrogen3
-        self._carbon1 = carbon1
-        self._carbon2 = carbon2
-        self._carbon3 = carbon3
+        self._nitrogen = atom_map[nitrogen.id]
+        self._hydrogen1 = atom_map[hydrogen1.id]
+        self._hydrogen2 = atom_map[hydrogen2.id]
+        self._hydrogen3 = atom_map[hydrogen3.id]
+        self._carbon1 = atom_map[carbon1.id]
+        self._carbon2 = atom_map[carbon2.id]
+        self._carbon3 = atom_map[carbon3.id]
         super()._init(
             atoms=tuple(atom_map.values()),
             bonders=(),
