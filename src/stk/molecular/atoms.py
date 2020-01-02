@@ -172,6 +172,8 @@ class Atom:
         """
 
         clone = self.__class__.__new__(self.__class__)
+        clone._id = self._id
+        clone._charge = self._charge
         for attr, val in vars(self).items():
             if not attr.startswith('_'):
                 setattr(clone, attr, val)

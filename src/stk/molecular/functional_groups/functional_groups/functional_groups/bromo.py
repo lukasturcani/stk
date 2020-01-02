@@ -12,15 +12,15 @@ class Bromo(FunctionalGroup_):
 
     def __init__(self, bromine, atom, bonders, deleters):
         atom_map = {
-            bromine.id: bromine.clone(),
-            atom.id: atom.clone()
+            bromine.get_id(): bromine.clone(),
+            atom.get_id(): atom.clone()
         }
-        self._bromine = atom_map[bromine.id]
-        self._atom = atom_map[atom.id]
+        self._bromine = atom_map[bromine.get_id()]
+        self._atom = atom_map[atom.get_id()]
         super()._init(
             atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.id] for a in bonders),
-            deleters=tuple(atom_map[a.id] for a in deleters),
+            bonders=tuple(atom_map[a.get_id()] for a in bonders),
+            deleters=tuple(atom_map[a.get_id()] for a in deleters),
         )
 
     def get_bromine(self):
@@ -37,12 +37,12 @@ class Bromo(FunctionalGroup_):
 
         atoms = (self._bromine, self._atom)
         for atom in atoms:
-            if atom.id not in atom_map:
-                atom_map[atom.id] = atom.clone()
+            if atom.get_id() not in atom_map:
+                atom_map[atom.get_id()] = atom.clone()
 
         clone = super().clone(atom_map)
-        clone._bromine = atom_map[self._bromine.id]
-        clone._atom = atom_map[self._atom.id]
+        clone._bromine = atom_map[self._bromine.get_id()]
+        clone._atom = atom_map[self._atom.get_id()]
         return clone
 
     def __repr__(self):

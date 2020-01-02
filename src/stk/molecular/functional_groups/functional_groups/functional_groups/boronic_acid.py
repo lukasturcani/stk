@@ -22,23 +22,23 @@ class BoronicAcid(FunctionalGroup_):
         deleters,
     ):
         atom_map = {
-            boron.id: boron.clone(),
-            oxygen1.id: oxygen1.clone(),
-            hydrogen1.id: hydrogen1.clone(),
-            oxygen2.id: oxygen2.clone(),
-            hydrogen2.id: hydrogen2.clone(),
-            atom.id: atom.clone(),
+            boron.get_id(): boron.clone(),
+            oxygen1.get_id(): oxygen1.clone(),
+            hydrogen1.get_id(): hydrogen1.clone(),
+            oxygen2.get_id(): oxygen2.clone(),
+            hydrogen2.get_id(): hydrogen2.clone(),
+            atom.get_id(): atom.clone(),
         }
-        self._boron = atom_map[boron.id]
-        self._oxygen1 = atom_map[oxygen1.id]
-        self._hydrogen1 = atom_map[hydrogen1.id]
-        self._oxygen2 = atom_map[oxygen2.id]
-        self._hydrogen2 = atom_map[hydrogen2.id]
-        self._atom = atom_map[atom.id]
+        self._boron = atom_map[boron.get_id()]
+        self._oxygen1 = atom_map[oxygen1.get_id()]
+        self._hydrogen1 = atom_map[hydrogen1.get_id()]
+        self._oxygen2 = atom_map[oxygen2.get_id()]
+        self._hydrogen2 = atom_map[hydrogen2.get_id()]
+        self._atom = atom_map[atom.get_id()]
         super()._init(
             atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.id] for a in bonders),
-            deleters=tuple(atom_map[a.id] for a in deleters),
+            bonders=tuple(atom_map[a.get_id()] for a in bonders),
+            deleters=tuple(atom_map[a.get_id()] for a in deleters),
         )
 
     def get_boron(self):
@@ -74,16 +74,16 @@ class BoronicAcid(FunctionalGroup_):
             self._atom,
         )
         for atom in atoms:
-            if atom.id not in atom_map:
-                atom_map[atom.id] = atom.clone()
+            if atom.get_id() not in atom_map:
+                atom_map[atom.get_id()] = atom.clone()
 
         clone = super().clone(atom_map)
-        clone._boron = atom_map[self._boron.id]
-        clone._oxygen1 = atom_map[self._oxygen1.id]
-        clone._hydrogen1 = atom_map[self._hydrogen1.id]
-        clone._oxygen2 = atom_map[self._oxygen2.id]
-        clone._hydrogen2 = atom_map[self._hydrogen2.id]
-        clone._atom = atom_map[self._atom.id]
+        clone._boron = atom_map[self._boron.get_id()]
+        clone._oxygen1 = atom_map[self._oxygen1.get_id()]
+        clone._hydrogen1 = atom_map[self._hydrogen1.get_id()]
+        clone._oxygen2 = atom_map[self._oxygen2.get_id()]
+        clone._hydrogen2 = atom_map[self._hydrogen2.get_id()]
+        clone._atom = atom_map[self._atom.get_id()]
         return clone
 
     def __repr__(self):

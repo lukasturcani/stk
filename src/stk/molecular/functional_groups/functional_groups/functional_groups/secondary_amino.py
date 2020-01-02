@@ -20,19 +20,19 @@ class SecondaryAmino(FunctionalGroup_):
         deleters,
     ):
         atom_map = {
-            nitrogen.id: nitrogen.clone(),
-            hydrogen.id: hydrogen.clone(),
-            atom1.id: atom1.clone(),
-            atom2.id: atom2.clone(),
+            nitrogen.get_id(): nitrogen.clone(),
+            hydrogen.get_id(): hydrogen.clone(),
+            atom1.get_id(): atom1.clone(),
+            atom2.get_id(): atom2.clone(),
         }
-        self._nitrogen = atom_map[nitrogen.id]
-        self._hydrogen = atom_map[hydrogen.id]
-        self._atom1 = atom_map[atom1.id]
-        self._atom2 = atom_map[atom2.id]
+        self._nitrogen = atom_map[nitrogen.get_id()]
+        self._hydrogen = atom_map[hydrogen.get_id()]
+        self._atom1 = atom_map[atom1.get_id()]
+        self._atom2 = atom_map[atom2.get_id()]
         super()._init(
             atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.id] for a in bonders),
-            deleters=tuple(atom_map[a.id] for a in deleters),
+            bonders=tuple(atom_map[a.get_id()] for a in bonders),
+            deleters=tuple(atom_map[a.get_id()] for a in deleters),
         )
 
     def get_nitrogen(self):
@@ -57,14 +57,14 @@ class SecondaryAmino(FunctionalGroup_):
             self._nitrogen, self._hydrogen, self._atom1, self._atom2
         )
         for atom in atoms:
-            if atom.id not in atom_map:
-                atom_map[atom.id] = atom.clone()
+            if atom.get_id() not in atom_map:
+                atom_map[atom.get_id()] = atom.clone()
 
         clone = super().clone(atom_map)
-        clone._nitrogen = atom_map[self._nitrogen.id]
-        clone._hydrogen = atom_map[self._hydrogen.id]
-        clone._atom1 = atom_map[self._atom1.id]
-        clone._atom2 = atom_map[self._atom2.id]
+        clone._nitrogen = atom_map[self._nitrogen.get_id()]
+        clone._hydrogen = atom_map[self._hydrogen.get_id()]
+        clone._atom1 = atom_map[self._atom1.get_id()]
+        clone._atom2 = atom_map[self._atom2.get_id()]
         return clone
 
     def __repr__(self):

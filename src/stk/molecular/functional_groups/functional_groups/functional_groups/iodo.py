@@ -12,15 +12,15 @@ class Iodo(FunctionalGroup_):
 
     def __init__(self, iodine, atom, bonders, deleters):
         atom_map = {
-            iodine.id: iodine.clone(),
-            atom.id: atom.clone(),
+            iodine.get_id(): iodine.clone(),
+            atom.get_id(): atom.clone(),
         }
-        self._iodine = atom_map[iodine.id]
-        self._atom = atom_map[atom.id]
+        self._iodine = atom_map[iodine.get_id()]
+        self._atom = atom_map[atom.get_id()]
         super()._init(
             atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.id] for a in bonders),
-            deleters=tuple(atom_map[a.id] for a in deleters),
+            bonders=tuple(atom_map[a.get_id()] for a in bonders),
+            deleters=tuple(atom_map[a.get_id()] for a in deleters),
         )
 
     def get_iodine(self):
@@ -37,12 +37,12 @@ class Iodo(FunctionalGroup_):
 
         atoms = (self._iodine, self._atom)
         for atom in atoms:
-            if atom.id not in atom_map:
-                atom_map[atom.id] = atom.clone()
+            if atom.get_id() not in atom_map:
+                atom_map[atom.get_id()] = atom.clone()
 
         clone = super().clone(atom_map)
-        clone._iodine = atom_map[self._iodine.id]
-        clone._atom = atom_map[self._atom.id]
+        clone._iodine = atom_map[self._iodine.get_id()]
+        clone._atom = atom_map[self._atom.get_id()]
         return clone
 
     def __repr__(self):

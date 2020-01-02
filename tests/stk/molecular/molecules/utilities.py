@@ -31,18 +31,18 @@ def get_num_atom_ids(molecule, get_atom_ids):
 
 def is_equivalent_atom(atom1, atom2):
     assert atom1 is not atom2
-    assert atom1.id == atom2.id
-    assert atom1.charge == atom2.charge
+    assert atom1.get_id() == atom2.get_id()
+    assert atom1.get_charge() == atom2.get_charge()
     assert atom1.__class__ is atom2.__class__
 
 
 def is_equivalent_bond(bond1, bond2):
     assert bond1 is not bond2
     assert bond1.__class__ is bond2.__class__
-    assert bond1.order == bond2.order
-    assert bond1.periodicity == bond2.periodicity
-    is_equivalent_atom(bond1.atom1, bond2.atom1)
-    is_equivalent_atom(bond1.atom2, bond2.atom2)
+    assert bond1.get_order() == bond2.get_order()
+    assert bond1.get_periodicity() == bond2.get_periodicity()
+    is_equivalent_atom(bond1.get_atom1(), bond2.get_atom1())
+    is_equivalent_atom(bond1.get_atom2(), bond2.get_atom2())
 
 
 def is_equivalent_molecule(molecule1, molecule2):

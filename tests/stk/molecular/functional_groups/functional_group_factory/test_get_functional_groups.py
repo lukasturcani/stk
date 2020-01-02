@@ -469,7 +469,7 @@ def are_clone_functional_groups(functional_group1, functional_group2):
 
 
 def atom_id(atom):
-    return atom.id
+    return atom.get_id()
 
 
 def are_clone_sequences(atoms1, atoms2):
@@ -480,6 +480,6 @@ def are_clone_sequences(atoms1, atoms2):
 
     for a1, a2 in it.zip_longest(atoms1, atoms2):
         assert a1 is not a2
-        assert a1.id == a2.id
-        assert a1.charge == a2.charge
+        assert a1.get_id() == a2.get_id()
+        assert a1.get_charge() == a2.get_charge()
         assert a1.__class__ is a2.__class__

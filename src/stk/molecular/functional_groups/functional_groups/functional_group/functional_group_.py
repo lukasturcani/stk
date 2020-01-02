@@ -26,10 +26,10 @@ class FunctionalGroup_(FunctionalGroup):
 
         # Make sure all attributes use use the same clone,
         # to save memory.
-        atom_map = {a.id: a.clone() for a in atoms}
-        self._atoms = tuple(atom_map[a.id] for a in atoms)
-        self._bonders = tuple(atom_map[a.id] for a in bonders)
-        self._deleters = tuple(atom_map[a.id] for a in deleters)
+        atom_map = {a.get_id(): a.clone() for a in atoms}
+        self._atoms = tuple(atom_map[a.get_id()] for a in atoms)
+        self._bonders = tuple(atom_map[a.get_id()] for a in bonders)
+        self._deleters = tuple(atom_map[a.get_id()] for a in deleters)
 
     def _init(self, atoms, bonders, deleters):
         """
@@ -61,8 +61,8 @@ class FunctionalGroup_(FunctionalGroup):
             atom_map = {}
 
         atom_map.update(
-            (a.id, a.clone()) for a in self._atoms
-            if a.id not in atom_map
+            (a.get_id(), a.clone()) for a in self._atoms
+            if a.get_id() not in atom_map
         )
 
         clone = self.__class__.__new__(self.__class__)
@@ -72,9 +72,9 @@ class FunctionalGroup_(FunctionalGroup):
 
         FunctionalGroup_.__init__(
             self=clone,
-            atoms=tuple(atom_map[a.id] for a in self._atoms),
-            bonders=tuple(atom_map[a.id] for a in self._bonders),
-            deleters=tuple(atom_map[a.id] for a in self._deleters),
+            atoms=tuple(atom_map[a.get_id()] for a in self._atoms),
+            bonders=tuple(atom_map[a.get_id()] for a in self._bonders),
+            deleters=tuple(atom_map[a.get_id()] for a in self._deleters),
         )
         return clone
 
@@ -82,19 +82,19 @@ class FunctionalGroup_(FunctionalGroup):
         yield from (a.clone() for a in self._atoms)
 
     def get_atom_ids(self):
-        yield from (a.id for a in self._atoms)
+        yield from (a.get_id() for a in self._atoms)
 
     def get_bonders(self):
         yield from (a.clone() for a in self._bonders)
 
     def get_bonder_ids(self):
-        yield from (a.id for a in self._bonders)
+        yield from (a.get_id() for a in self._bonders)
 
     def get_deleters(self):
         yield from (a.clone() for a in self._deleters)
 
     def get_deleter_ids(self):
-        yield from (a.id for a in self._deleters)
+        yield from (a.get_id() for a in self._deleters)
 
     def __repr__(self):
         return (

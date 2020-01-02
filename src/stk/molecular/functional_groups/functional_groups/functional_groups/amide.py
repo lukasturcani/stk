@@ -22,23 +22,23 @@ class Amide(FunctionalGroup_):
         deleters,
     ):
         atom_map = {
-            carbon.id: carbon.clone(),
-            oxygen.id: oxygen.clone(),
-            nitrogen.id: nitrogen.clone(),
-            hydrogen1.id: hydrogen1.clone(),
-            hydrogen2.id: hydrogen2.clone(),
-            atom.id: atom.clone(),
+            carbon.get_id(): carbon.clone(),
+            oxygen.get_id(): oxygen.clone(),
+            nitrogen.get_id(): nitrogen.clone(),
+            hydrogen1.get_id(): hydrogen1.clone(),
+            hydrogen2.get_id(): hydrogen2.clone(),
+            atom.get_id(): atom.clone(),
         }
-        self._carbon = atom_map[carbon.id]
-        self._oxygen = atom_map[oxygen.id]
-        self._nitrogen = atom_map[nitrogen.id]
-        self._hydrogen1 = atom_map[hydrogen1.id]
-        self._hydrogen2 = atom_map[hydrogen2.id]
-        self._atom = atom_map[atom.id]
+        self._carbon = atom_map[carbon.get_id()]
+        self._oxygen = atom_map[oxygen.get_id()]
+        self._nitrogen = atom_map[nitrogen.get_id()]
+        self._hydrogen1 = atom_map[hydrogen1.get_id()]
+        self._hydrogen2 = atom_map[hydrogen2.get_id()]
+        self._atom = atom_map[atom.get_id()]
         super()._init(
             atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.id] for a in bonders),
-            deleters=tuple(atom_map[a.id] for a in deleters),
+            bonders=tuple(atom_map[a.get_id()] for a in bonders),
+            deleters=tuple(atom_map[a.get_id()] for a in deleters),
         )
 
     def get_carbon(self):
@@ -74,16 +74,16 @@ class Amide(FunctionalGroup_):
             self._atom,
         )
         for atom in atoms:
-            if atom.id not in atom_map:
-                atom_map[atom.id] = atom.clone()
+            if atom.get_id() not in atom_map:
+                atom_map[atom.get_id()] = atom.clone()
 
         clone = super().clone(atom_map)
-        clone._carbon = atom_map[self._carbon.id]
-        clone._oxygen = atom_map[self._oxygen.id]
-        clone._nitrogen = atom_map[self._nitrogen.id]
-        clone._hydrogen1 = atom_map[self._hydrogen1.id]
-        clone._hydrogen2 = atom_map[self._hydrogen2.id]
-        clone._atom = atom_map[self._atom.id]
+        clone._carbon = atom_map[self._carbon.get_id()]
+        clone._oxygen = atom_map[self._oxygen.get_id()]
+        clone._nitrogen = atom_map[self._nitrogen.get_id()]
+        clone._hydrogen1 = atom_map[self._hydrogen1.get_id()]
+        clone._hydrogen2 = atom_map[self._hydrogen2.get_id()]
+        clone._atom = atom_map[self._atom.get_id()]
         return clone
 
     def __repr__(self):

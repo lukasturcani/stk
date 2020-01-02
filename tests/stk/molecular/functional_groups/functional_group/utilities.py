@@ -8,8 +8,8 @@ def is_atom_clone(atom, clone):
     """
 
     assert atom is not clone
-    assert atom.id == clone.id
-    assert atom.charge == clone.charge
+    assert atom.get_id() == clone.get_id()
+    assert atom.get_charge() == clone.get_charge()
     assert atom.__class__ is clone.__class__
 
 
@@ -23,7 +23,7 @@ def is_clone_sequence(atoms, clones, atom_map):
         atom_map = {}
 
     for atom, clone in it.zip_longest(atoms, clones):
-        is_atom_clone(atom_map.get(atom.id, atom), clone)
+        is_atom_clone(atom_map.get(atom.get_id(), atom), clone)
 
 
 def is_clone_functional_group(

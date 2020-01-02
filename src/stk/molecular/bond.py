@@ -35,16 +35,14 @@ class Bond:
 
         """
 
-        self.dangerous_init(
-            atom1=atom1.clone(),
-            atom2=atom2.clone(),
-            order=order,
-            periodicity=periodicity,
-        )
+        self._atom1 = atom1.clone()
+        self._atom2 = atom2.clone()
+        self._order = order
+        self._periodicity = periodicity
 
     @classmethod
     def dangerous_init(
-        self,
+        cls,
         atom1,
         atom2,
         order,
@@ -84,10 +82,12 @@ class Bond:
 
         """
 
-        self._atom1 = atom1
-        self._atom2 = atom2
-        self._order = order
-        self._periodicity = periodicity
+        obj = cls.__new__(cls)
+        obj._atom1 = atom1
+        obj._atom2 = atom2
+        obj._order = order
+        obj._periodicity = periodicity
+        return obj
 
     def get_atom1(self):
         """
@@ -145,6 +145,24 @@ class Bond:
         """
 
         return self._periodicity
+
+    def to_dict(self):
+        """
+        Get :class:`dict` representation of the bond.
+
+        Returns
+        -------
+        :class:`dict`
+            A :class:`dict` representation.
+
+        """
+
+        return {
+            'atom1_id': self._atom1.get_id(),
+            'atom2_id': self._atom2.get_id(),
+            'order': self._order,
+            'periodicity': self._periodicity,
+        }
 
     def clone(self, atom_map=None):
         """
@@ -208,14 +226,16 @@ class Bond:
         for attr, val in vars(self).items():
             if not attr.startswith('_'):
                 setattr(clone, attr, val)
-        clone.atom1 = atom_map.get(
+        clone._atom1 = atom_map.get(
             self._atom1.get_id(),
             self._atom1.clone(),
         )
-        clone.atom2 = atom_map.get(
+        clone._atom2 = atom_map.get(
             self._atom2.get_id(),
             self._atom2.clone(),
         )
+        clone._order = self._order
+        clone._periodicity = self._periodicity
         return clone
 
     def is_periodic(self):

@@ -11,7 +11,7 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 
-from .. import atoms, bond, functional_groups
+from .. import atoms, functional_groups
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bond import Bond
@@ -274,7 +274,7 @@ class BuildingBlock(Molecule_):
             for a in molecule.GetAtoms()
         )
         bonds = tuple(
-            Bond(
+            Bond.dangerous_init(
                 atoms[b.GetBeginAtomIdx()],
                 atoms[b.GetEndAtomIdx()],
                 b.GetBondTypeAsDouble()
@@ -328,7 +328,7 @@ class BuildingBlock(Molecule_):
 
         """
 
-        atom_map = {a.id: a for a in self._atoms}
+        atom_map = {a.get_id(): a for a in self._atoms}
         self._functional_groups = [
             fg.clone(atom_map) for fg in functional_groups
         ]
@@ -413,10 +413,15 @@ class BuildingBlock(Molecule_):
             molecule_dict['position_matrix']
         ).T
         obj._atoms = eval(molecule_dict['atoms'], vars(atoms))
-        obj._bonds = eval(molecule_dict['bonds'], vars(bond))
-        for bond_ in obj._bonds:
-            bond_.atom1 = obj._atoms[bond_.atom1]
-            bond_.atom2 = obj._atoms[bond_.atom2]
+        obj._bonds = [
+            Bond.dangerous_init(
+                atom1=obj._atoms[bond_dict['atom1_id']],
+                atom2=obj._atoms[bond_dict['atom2_id']],
+                order=bond_dict['order'],
+                periodicity=tuple(bond_dict['periodicity']),
+            )
+            for bond_dict in molecule_dict['bonds']
+        ]
 
         obj._functional_groups = []
         globals_ = vars(functional_groups)
@@ -441,7 +446,7 @@ class BuildingBlock(Molecule_):
         """
 
         clone = super().clone()
-        atom_map = {a.id: a for a in clone._atoms}
+        atom_map = {a.get_id(): a for a in clone._atoms}
         clone._identity_key = self._identity_key
         clone._functional_groups = [
             fg.clone(atom_map) for fg in self._functional_groups
@@ -486,19 +491,12 @@ class BuildingBlock(Molecule_):
 
         """
 
-        bonds = []
-        for bond_ in self._bonds:
-            clone = bond_.clone()
-            clone.atom1 = clone.atom1.id
-            clone.atom2 = clone.atom2.id
-            bonds.append(clone)
-
         return {
             'class': self.__class__.__name__,
             'functional_groups': repr(self._functional_groups),
             'position_matrix': self.get_position_matrix().tolist(),
             'atoms': repr(self._atoms),
-            'bonds': repr(bonds),
+            'bonds': [b.to_dict() for b in self._bonds],
             'identity_key': self._identity_key,
         }
 

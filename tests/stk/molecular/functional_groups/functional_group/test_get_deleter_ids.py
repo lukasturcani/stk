@@ -14,4 +14,4 @@ def _test_get_deleter_ids(functional_group, deleters):
         deleters,
     )
     for id_, atom in fg_atoms:
-        assert id_ == atom.id
+        assert id_ == atom.get_id()

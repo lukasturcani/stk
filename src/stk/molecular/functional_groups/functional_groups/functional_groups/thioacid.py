@@ -21,21 +21,21 @@ class Thioacid(FunctionalGroup_):
         deleters
     ):
         atom_map = {
-            carbon.id: carbon.clone(),
-            oxygen.id: oxygen.clone(),
-            sulfur.id: sulfur.clone(),
-            hydrogen.id: hydrogen.clone(),
-            atom.id: atom.clone(),
+            carbon.get_id(): carbon.clone(),
+            oxygen.get_id(): oxygen.clone(),
+            sulfur.get_id(): sulfur.clone(),
+            hydrogen.get_id(): hydrogen.clone(),
+            atom.get_id(): atom.clone(),
         }
-        self._carbon = atom_map[carbon.id]
-        self._oxygen = atom_map[oxygen.id]
-        self._sulfur = atom_map[sulfur.id]
-        self._hydrogen = atom_map[hydrogen.id]
-        self._atom = atom_map[atom.id]
+        self._carbon = atom_map[carbon.get_id()]
+        self._oxygen = atom_map[oxygen.get_id()]
+        self._sulfur = atom_map[sulfur.get_id()]
+        self._hydrogen = atom_map[hydrogen.get_id()]
+        self._atom = atom_map[atom.get_id()]
         super()._init(
             atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.id] for a in bonders),
-            deleters=tuple(atom_map[a.id] for a in deleters),
+            bonders=tuple(atom_map[a.get_id()] for a in bonders),
+            deleters=tuple(atom_map[a.get_id()] for a in deleters),
         )
 
     def get_carbon(self):
@@ -67,15 +67,15 @@ class Thioacid(FunctionalGroup_):
             self._atom,
         )
         for atom in atoms:
-            if atom.id not in atom_map:
-                atom_map[atom.id] = atom.clone()
+            if atom.get_id() not in atom_map:
+                atom_map[atom.get_id()] = atom.clone()
 
         clone = super().clone(atom_map)
-        clone._carbon = atom_map[self._carbon.id]
-        clone._oxygen = atom_map[self._oxygen.id]
-        clone._sulfur = atom_map[self._sulfur.id]
-        clone._hydrogen = atom_map[self._hydrogen.id]
-        clone._atom = atom_map[self._atom.id]
+        clone._carbon = atom_map[self._carbon.get_id()]
+        clone._oxygen = atom_map[self._oxygen.get_id()]
+        clone._sulfur = atom_map[self._sulfur.get_id()]
+        clone._hydrogen = atom_map[self._hydrogen.get_id()]
+        clone._atom = atom_map[self._atom.get_id()]
         return clone
 
     def __repr__(self):

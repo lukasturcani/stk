@@ -178,7 +178,7 @@ class Molecule_(Molecule):
         )
 
     def clone(self):
-        atom_map = {atom.id: atom.clone() for atom in self._atoms}
+        atom_map = {atom.get_id(): atom.clone() for atom in self._atoms}
         atoms = tuple(atom_map.values())
         bonds = tuple(bond.clone(atom_map) for bond in self._bonds)
         clone = self.__class__.__new__(self.__class__)
@@ -322,7 +322,7 @@ class Molecule_(Molecule):
             x, y, z = self._position_matrix[:, atom_id]
             atom = self._atoms[atom_id]
             symbol = atom.__class__.__name__
-            charge = atom.charge
+            charge = atom.get_charge()
             charge = f' CHG={charge}' if charge else ''
             atom_lines.append(
                 'M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n'.format(
@@ -334,8 +334,8 @@ class Molecule_(Molecule):
 
         bond_lines = []
         for bond_idx, bond in enumerate(self._bonds):
-            a1 = bond.atom1.id
-            a2 = bond.atom2.id
+            a1 = bond.get_atom1().get_id()
+            a2 = bond.get_atom2().get_id()
             if a1 in atoms and a2 in atoms:
                 # Keep bond ids if all bonds are getting written.
                 if num_atoms == len(self._atoms):
@@ -345,7 +345,7 @@ class Molecule_(Molecule):
 
                 bond_lines.append(
                     f'M  V30 {bond_id+1} '
-                    f'{int(bond.order)} {a1+1} {a2+1}\n'
+                    f'{int(bond.get_order())} {a1+1} {a2+1}\n'
                 )
 
         num_bonds = len(bond_lines)
@@ -372,15 +372,15 @@ class Molecule_(Molecule):
     def to_rdkit_mol(self):
         mol = rdkit.EditableMol(rdkit.Mol())
         for atom in self._atoms:
-            rdkit_atom = rdkit.Atom(atom.atomic_number)
-            rdkit_atom.SetFormalCharge(atom.charge)
+            rdkit_atom = rdkit.Atom(atom.get_atomic_number())
+            rdkit_atom.SetFormalCharge(atom.get_charge())
             mol.AddAtom(rdkit_atom)
 
         for bond in self._bonds:
             mol.AddBond(
-                beginAtomIdx=bond.atom1.id,
-                endAtomIdx=bond.atom2.id,
-                order=rdkit.BondType(bond.order)
+                beginAtomIdx=bond.get_atom1().get_id(),
+                endAtomIdx=bond.get_atom2().get_id(),
+                order=rdkit.BondType(bond.get_order())
             )
 
         mol = mol.GetMol()
@@ -637,13 +637,13 @@ class Molecule_(Molecule):
                 f'{res_seq:>4}{i_code:<1}   '
                 f'{x:>8}{y:>8}{z:>8}'
                 f'{occupancy:>6}{temp_factor:>6}          '
-                f'{element:>2}{self._atoms[atom].charge:>2}\n'
+                f'{element:>2}{self._atoms[atom].get_charge():>2}\n'
             )
 
         conect = 'CONECT'
         for bond in self._bonds:
-            a1 = bond.atom1.id
-            a2 = bond.atom2.id
+            a1 = bond.get_atom1().get_id()
+            a2 = bond.get_atom2().get_id()
             if a1 in atoms and a2 in atoms:
                 lines.append(
                     f'{conect:<6}{a1+1:>5}{a2+1:>5}               \n'

@@ -11,4 +11,4 @@ def test_get_atom_ids(test_case):
 def _test_get_atom_ids(functional_group, atoms):
     fg_atoms = it.zip_longest(functional_group.get_atom_ids(), atoms)
     for id_, atom in fg_atoms:
-        assert id_ == atom.id
+        assert id_ == atom.get_id()

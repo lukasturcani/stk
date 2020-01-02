@@ -12,15 +12,15 @@ class Fluoro(FunctionalGroup_):
 
     def __init__(self, fluorine, atom, bonders, deleters):
         atom_map = {
-            fluorine.id: fluorine.clone(),
-            atom.id: atom.clone(),
+            fluorine.get_id(): fluorine.clone(),
+            atom.get_id(): atom.clone(),
         }
-        self._fluorine = atom_map[fluorine.id]
-        self._atom = atom_map[atom.id]
+        self._fluorine = atom_map[fluorine.get_id()]
+        self._atom = atom_map[atom.get_id()]
         super()._init(
             atoms=tuple(atom_map.values()),
-            bonders=tuple(atom_map[a.id] for a in bonders),
-            deleters=tuple(atom_map[a.id] for a in deleters),
+            bonders=tuple(atom_map[a.get_id()] for a in bonders),
+            deleters=tuple(atom_map[a.get_id()] for a in deleters),
         )
 
     def get_fluorine(self):
@@ -37,12 +37,12 @@ class Fluoro(FunctionalGroup_):
 
         atoms = (self._fluorine, self._atom)
         for atom in atoms:
-            if atom.id not in atom_map:
-                atom_map[atom.id] = atom.clone()
+            if atom.get_id() not in atom_map:
+                atom_map[atom.get_id()] = atom.clone()
 
         clone = super().clone(atom_map)
-        clone._fluorine = atom_map[self._fluorine.id]
-        clone._atom = atom_map[self._atom.id]
+        clone._fluorine = atom_map[self._fluorine.get_id()]
+        clone._atom = atom_map[self._atom.get_id()]
         return clone
 
     def __repr__(self):

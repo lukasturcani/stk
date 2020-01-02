@@ -10,7 +10,7 @@ import numpy as np
             'functional_groups': '[]',
             'position_matrix': [[0.0, 0.0, 0.0]],
             'atoms': '(C(0, charge=4),)',
-            'bonds': '[]',
+            'bonds': [],
             'identity_key': '[C+4]',
         }),
         stk.BuildingBlock.init_from_dict({
@@ -21,7 +21,14 @@ import numpy as np
                 [-0.39382080513175644, 0.0, 0.0],
             ],
             'atoms': '(C(0, charge=3), H(1))',
-            'bonds': '[Bond(0, 1, 1)]',
+            'bonds': [
+                {
+                    'atom1_id': 0,
+                    'atom2_id': 1,
+                    'order': 1,
+                    'periodicity': [0, 0, 0],
+                },
+            ],
             'identity_key': '[H][C+3]'
         }),
         stk.BuildingBlock.init_from_dict({
@@ -33,7 +40,14 @@ import numpy as np
                 [1.0517309326343591, -0.016963507306017023, 0.0],
             ],
             'atoms': '(C(0, charge=2), H(1), H(2))',
-            'bonds': '[Bond(0, 1, 1), Bond(0, 2, 1)]',
+            'bonds': [
+                {
+                    'atom1_id': 0,
+                    'atom2_id': 1,
+                    'order': 1,
+                    'periodicity': [0, 0, 0],
+                },
+            ],
             'identity_key': '[H][C+2][H]'
         }),
         stk.BuildingBlock('NCCN'),

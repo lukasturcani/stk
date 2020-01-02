@@ -14,4 +14,4 @@ def _test_get_bonder_ids(functional_group, bonders):
         bonders,
     )
     for id_, atom in fg_atoms:
-        assert id_ == atom.id
+        assert id_ == atom.get_id()
