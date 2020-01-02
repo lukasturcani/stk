@@ -5,8 +5,8 @@ from .fixtures import *
 
 @pytest.fixture(
     params=(
-        pytest.lazy_fixture('primary_amine'),
-        pytest.lazy_fixture('secondary_amine'),
+        pytest.lazy_fixture('primary_amino'),
+        pytest.lazy_fixture('secondary_amino'),
         pytest.lazy_fixture('aldehyde'),
         pytest.lazy_fixture('carboxylic_acid'),
         pytest.lazy_fixture('amide'),

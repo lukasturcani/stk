@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture(
     params=[
         stk.BuildingBlock('NCCN'),
-        stk.BuildingBlock('NCCN', [stk.PrimaryAmineFactory()]),
+        stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
         stk.BuildingBlock(
             smiles='BrCC(Br)C(Br)C(Br)C(Br)C(Br)C(Br)CBr',
             functional_groups=[stk.BromoFactory()],
@@ -23,9 +23,9 @@ def building_block(request):
         lambda molecule:
             stk.BromoFactory().get_functional_groups(molecule),
         lambda molecule:
-            stk.PrimaryAmineFactory().get_functional_groups(molecule),
+            stk.PrimaryAminoFactory().get_functional_groups(molecule),
         lambda molecule: it.chain(
-            stk.PrimaryAmineFactory().get_functional_groups(molecule),
+            stk.PrimaryAminoFactory().get_functional_groups(molecule),
             stk.BromoFactory().get_functional_groups(molecule)),
     )
 )

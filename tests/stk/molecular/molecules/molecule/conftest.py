@@ -38,7 +38,7 @@ import numpy as np
         }),
         stk.BuildingBlock('NCCN'),
         stk.BuildingBlock('N[C+][C+2]N'),
-        stk.BuildingBlock('NCCN', [stk.PrimaryAmineFactory()]),
+        stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
     ],
     scope='function',
 )

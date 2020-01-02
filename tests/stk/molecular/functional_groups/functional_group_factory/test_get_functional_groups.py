@@ -31,10 +31,10 @@ class _TestCase:
     argnames='test_case',
     argvalues=(
         _TestCase(
-            factory=stk.PrimaryAmineFactory(),
+            factory=stk.PrimaryAminoFactory(),
             molecule=stk.BuildingBlock('NCCN'),
             functional_groups=(
-                stk.PrimaryAmine(
+                stk.PrimaryAmino(
                     nitrogen=stk.N(0),
                     hydrogen1=stk.H(4),
                     hydrogen2=stk.H(5),
@@ -42,7 +42,7 @@ class _TestCase:
                     bonders=(stk.N(0), ),
                     deleters=(stk.H(4), stk.H(5)),
                 ),
-                stk.PrimaryAmine(
+                stk.PrimaryAmino(
                     nitrogen=stk.N(3),
                     hydrogen1=stk.H(10),
                     hydrogen2=stk.H(11),
@@ -54,16 +54,16 @@ class _TestCase:
         ),
 
         _TestCase(
-            factory=stk.PrimaryAmineFactory(),
+            factory=stk.PrimaryAminoFactory(),
             molecule=stk.BuildingBlock('CCCC'),
             functional_groups=(),
         ),
 
         _TestCase(
-            factory=stk.SecondaryAmineFactory(),
+            factory=stk.SecondaryAminoFactory(),
             molecule=stk.BuildingBlock('CNCCNCC'),
             functional_groups=(
-                stk.SecondaryAmine(
+                stk.SecondaryAmino(
                     nitrogen=stk.N(1),
                     hydrogen=stk.H(10),
                     atom1=stk.C(0),
@@ -71,7 +71,7 @@ class _TestCase:
                     bonders=(stk.N(1), ),
                     deleters=(stk.H(10), ),
                 ),
-                stk.SecondaryAmine(
+                stk.SecondaryAmino(
                     nitrogen=stk.N(4),
                     hydrogen=stk.H(15),
                     atom1=stk.C(3),

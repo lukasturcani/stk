@@ -24,7 +24,7 @@ class _TestCase:
                 functional_groups=[stk.BromoFactory()],
             ),
             functional_groups=(
-                stk.PrimaryAmine(
+                stk.PrimaryAmino(
                     nitrogen=stk.N(0),
                     hydrogen1=stk.H(6),
                     hydrogen2=stk.H(7),
@@ -32,7 +32,7 @@ class _TestCase:
                     bonders=(stk.N(0), ),
                     deleters=(stk.H(6), stk.H(7)),
                 ),
-                stk.PrimaryAmine(
+                stk.PrimaryAmino(
                     nitrogen=stk.N(5),
                     hydrogen1=stk.H(13),
                     hydrogen2=stk.H(14),
