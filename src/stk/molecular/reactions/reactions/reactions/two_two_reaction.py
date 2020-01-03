@@ -3,7 +3,7 @@ import itertools as it
 from scipy.spatial.distance import euclidean
 
 from ..reaction import Reaction
-from ...bond import Bond
+from ....bond import Bond
 
 
 class TwoTwoReaction(Reaction):
@@ -55,7 +55,8 @@ class TwoTwoReaction(Reaction):
                 bonded.add(bonder2.get_id())
                 yield bonder1, bonder2
 
-    def _pair_distance(self, bonder1, bonder2):
+    def _pair_distance(self, bonders):
+        bonder1, bonder2 = bonders
         return euclidean(
             self._position_matrix[bonder1.get_id()],
             self._position_matrix[bonder2.get_id()],

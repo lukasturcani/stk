@@ -7,24 +7,24 @@ from ._test_case import _TestCase
 
 
 @pytest.fixture
-def functional_group1(functional_group2):
+def functional_group2_2(functional_group2):
     return functional_group2
 
 
 @pytest.fixture
 def two_two_reaction(
-    functional_group1,
     functional_group2,
+    functional_group2_2,
     bond_order,
     periodicity,
 ):
     return _TestCase(
         reaction=stk.TwoTwoReaction(
             position_matrix=get_position_matrix(
-                functional_group1=functional_group1,
+                functional_group1=functional_group2_2,
                 functional_group2=functional_group2,
             ),
-            functional_group1=functional_group1,
+            functional_group1=functional_group2_2,
             functional_group2=functional_group2,
             bond_order=bond_order,
             periodicity=periodicity,
@@ -32,14 +32,14 @@ def two_two_reaction(
         new_atoms=(),
         new_bonds=tuple(
             get_bonds(
-                functional_group1=functional_group1,
+                functional_group1=functional_group2_2,
                 functional_group2=functional_group2,
                 bond_order=bond_order,
                 periodicity=periodicity,
             ),
         ),
         deleted_atoms=tuple(it.chain(
-            functional_group1.get_deleters(),
+            functional_group2_2.get_deleters(),
             functional_group2.get_deleters(),
         )),
     )
@@ -73,7 +73,7 @@ def get_position_matrix(functional_group1, functional_group2):
         functional_group1.get_bonder_ids(),
         functional_group2.get_bonder_ids(),
     ))
-    position_matrix = np.array((size, 3))
+    position_matrix = np.zeros((size+1, 3))
     b1, b2 = functional_group1.get_bonder_ids()
     b3, b4 = functional_group2.get_bonder_ids()
     position_matrix[b1] = [100, 100, 100]

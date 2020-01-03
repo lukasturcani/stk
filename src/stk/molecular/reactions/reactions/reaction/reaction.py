@@ -15,7 +15,7 @@ class Reaction:
         return ReactionResult(
             new_atoms=self._get_new_atoms(),
             new_bonds=self._get_new_bonds(),
-            deleted_atoms=self._deleted_atoms(),
+            deleted_atoms=self._get_deleted_atoms(),
         )
 
     def _get_new_atoms(self):

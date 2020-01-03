@@ -43,7 +43,7 @@ class ReactionResult:
         yield from self._new_atoms
 
     def get_new_bonds(self):
-        yield from self._bonds
+        yield from self._new_bonds
 
     def get_deleted_atoms(self):
         yield from self._deleted_atoms

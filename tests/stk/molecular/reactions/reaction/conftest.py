@@ -199,7 +199,7 @@ def test_case(request):
 
 
 @pytest.fixture(
-    params=(1, 2, 3),
+    params=(1, 3),
 )
 def bond_order(request):
     return request.param
@@ -208,7 +208,6 @@ def bond_order(request):
 @pytest.fixture(
     params=(
         (0, 0, 0),
-        (1, 0, 0),
         (0, -1, 0),
     ),
 )

@@ -49,6 +49,6 @@ def get_bond(
     return stk.Bond(
         atom1=next(functional_group1.get_bonders()),
         atom2=next(functional_group2.get_bonders()),
-        bond_order=bond_order,
+        order=bond_order,
         periodicity=periodicity,
     )

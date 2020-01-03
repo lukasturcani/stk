@@ -3,14 +3,14 @@ import itertools as it
 
 
 @pytest.fixture(
-    params=(5, 10, 15),
+    params=(10,),
 )
 def id(request):
-    return request.parma
+    return request.param
 
 
 def test_with_new_ids_from(test_case, id):
-    _test_with_new_ids_from(test_case.get_result(), id)
+    _test_with_new_ids_from(test_case.reaction.get_result(), id)
 
 
 def _test_with_new_ids_from(reaction_result, id):
