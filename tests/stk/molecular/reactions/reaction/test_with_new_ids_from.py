@@ -16,4 +16,4 @@ def test_with_new_ids_from(test_case, id):
 def _test_with_new_ids_from(reaction_result, id):
     new = reaction_result.with_new_ids_from(id)
     for expected_id, atom in zip(new.get_new_atoms(), it.count(id)):
-        assert atom.get_id() == expected_id
+        assert expected_id == atom.get_id()

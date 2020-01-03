@@ -6,27 +6,22 @@ from ._test_case import _TestCase
 
 
 @pytest.fixture
-def functional_group2(functional_group1):
-    return functional_group1
-
-
-@pytest.fixture
-def one_one_reaction(
+def one_two_reaction(
     functional_group1,
     functional_group2,
     bond_order,
     periodicity,
 ):
     return _TestCase(
-        reaction=stk.OneOneReaction(
+        reaction=stk.OneTwoReaction(
             functional_group1=functional_group1,
             functinoal_group2=functional_group2,
             bond_order=bond_order,
             periodicity=periodicity,
         ),
         new_atoms=(),
-        new_bonds=(
-            get_bond(
+        new_bonds=tuple(
+            get_bonds(
                 functional_group1=functional_group1,
                 functional_group2=functional_group2,
                 bond_order=bond_order,
@@ -40,15 +35,18 @@ def one_one_reaction(
     )
 
 
-def get_bond(
+def get_bonds(
     functional_group1,
     functional_group2,
     bond_order,
     periodicity,
 ):
-    return stk.Bond(
-        atom1=next(functional_group1.get_bonders()),
-        atom2=next(functional_group2.get_bonders()),
-        bond_order=bond_order,
-        periodicity=periodicity,
-    )
+    bonders1 = functional_group1.get_bonders()
+    bonders2 = functional_group2.get_bonders()
+    for bonder1, bonder2 in it.product(bonders1, bonders2):
+        yield stk.Bond(
+            atom1=bonder1,
+            atom2=bonder2,
+            order=bond_order,
+            periodicity=periodicity,
+        )
