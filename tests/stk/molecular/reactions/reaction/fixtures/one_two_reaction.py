@@ -15,7 +15,7 @@ def one_two_reaction(
     return _TestCase(
         reaction=stk.OneTwoReaction(
             functional_group1=functional_group1,
-            functinoal_group2=functional_group2,
+            functional_group2=functional_group2,
             bond_order=bond_order,
             periodicity=periodicity,
         ),
