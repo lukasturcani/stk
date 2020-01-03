@@ -63,7 +63,6 @@ import numpy as np
 import pathos
 from collections import namedtuple
 
-from ..reactor import Reactor
 from ...utilities import vector_angle
 
 

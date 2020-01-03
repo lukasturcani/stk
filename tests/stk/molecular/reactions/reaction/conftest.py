@@ -120,6 +120,8 @@ from .fixtures import *
             sulfur=stk.S(21),
             hydrogen=stk.H(2),
             atom=stk.C(1),
+            bonders=(stk.C(0), ),
+            deleters=(stk.S(21), stk.H(2)),
         ),
 
         stk.Thiol(
