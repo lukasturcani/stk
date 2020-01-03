@@ -26,11 +26,11 @@ class TwoTwoReaction(Reaction):
         self._bond_order = bond_order
         self._periodicity = periodicity
 
-    def get_new_atoms(self):
+    def _get_new_atoms(self):
         return
         yield
 
-    def get_new_bonds(self):
+    def _get_new_bonds(self):
         for bonder1, bonder2 in self._get_bonder_pairs():
             yield Bond(
                 atom1=bonder1,
@@ -61,6 +61,6 @@ class TwoTwoReaction(Reaction):
             self._position_matrix[bonder2.get_id()],
         )
 
-    def get_deleted_atoms(self):
+    def _get_deleted_atoms(self):
         yield from self._functional_group1.get_deleters()
         yield from self._functional_group2.get_deleters()

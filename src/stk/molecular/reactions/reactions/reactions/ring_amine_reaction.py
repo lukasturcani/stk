@@ -11,7 +11,7 @@ class RingAmineReaction(Reaction):
         self._ring_amine1 = ring_amine1.clone()
         self._ring_amine2 = ring_amine2.clone()
 
-    def get_new_atoms(self):
+    def _get_new_atoms(self):
         n1_coord = self._get_position(self._ring_amine1.get_nitrogen())
         n2_coord = self._get_position(self._ring_amine2.get_nitrogen())
         c1_coord = self._get_position(self._ring_amine1.get_carbon1())
@@ -53,7 +53,7 @@ class RingAmineReaction(Reaction):
         nc2h2_coord = nc_joiner2_coord + [0, 0, -1]
         yield nc2h2, nc2h2_coord
 
-    def get_new_bonds(self):
+    def _get_new_bonds(self):
         n1 = self._ring_amine1.get_nitrogen()
         n2 = self._ring_amine2.get_nitrogen()
         c1 = self._ring_amine1.get_carbon2()
@@ -81,7 +81,7 @@ class RingAmineReaction(Reaction):
         yield Bond(nc_joiner2, nc2h1, 1),
         yield Bond(nc_joiner2, nc2h2, 1)
 
-    def get_deleted_atoms(self):
+    def _get_deleted_atoms(self):
         yield self._ring_amine1.get_hydrogen3()
         yield self._ring_amine2.get_hydrogen3()
         yield self._ring_amine1.get_hydrogen1()

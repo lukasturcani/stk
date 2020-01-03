@@ -1,10 +1,24 @@
+from .reaction_result import ReactionResult
+
+
 class Reaction:
     """
     An abstract base class for reactions.
 
     """
 
-    def get_new_atoms(self):
+    def get_result(self):
+        """
+
+        """
+
+        return ReactionResult(
+            new_atoms=self._get_new_atoms(),
+            new_bonds=self._get_new_bonds(),
+            deleted_atoms=self._deleted_atoms(),
+        )
+
+    def _get_new_atoms(self):
         """
         Yield the atoms added by the reaction.
 
@@ -22,7 +36,7 @@ class Reaction:
 
         raise NotImplementedError()
 
-    def get_new_bonds(self):
+    def _get_new_bonds(self):
         """
         Yield the bonds added by the reaction.
 
@@ -35,7 +49,7 @@ class Reaction:
 
         raise NotImplementedError()
 
-    def get_deleted_atoms(self):
+    def _get_deleted_atoms(self):
         """
         Yield the atoms removed by the reaction.
 

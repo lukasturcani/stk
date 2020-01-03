@@ -90,6 +90,9 @@ class FunctionalGroup_(FunctionalGroup):
     def get_bonders(self):
         yield from self._bonders
 
+    def get_num_bonders(self):
+        return len(self._bonders)
+
     def get_bonder_ids(self):
         yield from (a.get_id() for a in self._bonders)
 

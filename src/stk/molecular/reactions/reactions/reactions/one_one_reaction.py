@@ -20,11 +20,11 @@ class OneOneReaction(Reaction):
         self._bond_order = bond_order
         self._periodicity = periodicity
 
-    def get_new_atoms(self):
+    def _get_new_atoms(self):
         return
         yield
 
-    def get_new_bonds(self):
+    def _get_new_bonds(self):
         bonder1 = next(self._functional_group1.get_bonders())
         bonder2 = next(self._functional_group2.get_bonders())
         yield Bond(
@@ -34,6 +34,6 @@ class OneOneReaction(Reaction):
             periodicity=self._periodicity,
         )
 
-    def get_deleted_atoms(self):
+    def _get_deleted_atoms(self):
         yield from self._functional_group1.get_deleters()
         yield from self._functional_group2.get_deleters()
