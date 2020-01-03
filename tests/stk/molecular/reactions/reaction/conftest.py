@@ -190,7 +190,6 @@ def functional_group2(request):
         pytest.lazy_fixture('one_one_reaction'),
         pytest.lazy_fixture('one_two_reaction'),
         pytest.lazy_fixture('two_two_reaction'),
-        pytest.lazy_fixture('ring_amine_reaction'),
     ),
 )
 def test_case(request):
