@@ -1,3 +1,6 @@
+class Parallel:
+    pass
+
 """
 Adding Topology Graphs
 ======================
@@ -63,11 +66,8 @@ import numpy as np
 import pathos
 from collections import namedtuple
 
+from .implementations import Parallel, Serial
 from ...utilities import vector_angle
-
-
-
-
 
 
 PlacementResult = namedtuple(
@@ -559,6 +559,9 @@ class TopologyGraph:
         mol._position_matrix = np.array(mol._position_matrix).T
         for i, atom in enumerate(mol.atoms):
             atom.id = i
+
+    def get_adjacency_list(self):
+        raise NotImplementedError()
 
     def __str__(self):
         return repr(self)

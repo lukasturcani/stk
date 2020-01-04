@@ -1,0 +1,2 @@
+class Serial:
+    pass
