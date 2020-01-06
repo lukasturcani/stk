@@ -544,7 +544,7 @@ class ConstructedMolecule(Molecule):
         for i, bb in enumerate(bbs):
             obj.building_block_counter[bb] = counter[i]
             obj.building_block_vertices[bb] = [
-                topology_graph.vertices[i] for i in vertices[str(i)]
+                topology_graph.vertices[i] for i in vertices[i]
             ]
 
         obj.topology_graph = topology_graph
