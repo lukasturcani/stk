@@ -2,46 +2,13 @@ import numpy as np
 import pathos
 from collections import namedtuple
 
-from .implementations import Parallel, Serial
+from .implementations import _Parallel, _Serial
 from ...utilities import vector_angle
 
 
-class TopologyGraph:
+class TopologyGraph_:
     """
-    Represents topology graphs of :class:`.ConstructedMolecule`.
-
-    The topology graph is an abstract representation of a constructed
-    molecule. The vertices indicate where building blocks are placed
-    and the edges indicate which building blocks have bonds formed
-    between them by the construction process.
-
-    Vertices are responsible for placing the building block molecules.
-    By initializing the vertices with different settings, they can
-    position the building block molecules differently and therefore
-    allow the user to easily specify a different structural isomer.
-
-    Once a building block is placed on a vertex, the functional groups
-    on the building block must be assigned to the different edges
-    connected to the vertex. The number of functional groups in the
-    building block must match the number of edges connected to the
-    vertex.
-
-    Once the functional groups are assigned to edges, each edge
-    represents a reaction between the functional groups assigned to it.
-    Note that an edge can be assigned more than two functional groups,
-    in case you are dealing with something really exotic. The
-    functional groups are then matched to an appropriate reaction,
-    which generally creates bonds between the atoms of the functional
-    groups. After this you will end up with a
-    :class:`.ConstructedMolecule`.
-
-    Attributes
-    ----------
-    vertices : :class:`tuple` of :class:`.Vertex`
-        The vertices which make up the topology graph.
-
-    edges : :class:`tuple` of :class:`.Edge`
-        The edges which make up the topology graph.
+    A partial implementation of :class:`.TopologyGraph`.
 
     """
 
@@ -50,17 +17,17 @@ class TopologyGraph:
         vertex_data,
         edge_data,
         construction_stages,
-        num_processes
+        num_processes,
     ):
         """
         Initialize an instance of :class:`.TopologyGraph`.
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`.VertexData`
+        vertex_data : :class:`tuple` of :class:`.VertexData`
             The vertices which make up the graph.
 
-        edges : :class:`tuple` of :class:`.EdgeData`
+        edge_data : :class:`tuple` of :class:`.EdgeData`
             The edges which make up the graph.
 
         construction_stages : :class:`tuple` of :class:`callable`
@@ -89,36 +56,47 @@ class TopologyGraph:
 
         """
 
-        self._set_data_ids(vertex_data)
-        self._set_data_ids(edge_data)
-        self.vertices = tuple(
+        vertex_data = tuple(self._with_ids(vertex_data))
+        edge_data = tuple(self._with_ids(edge_data))
+        self._vertices = tuple(
             data.get_vertex() for data in vertex_data
         )
-        self.edges = tuple(
+        self._edges = tuple(
             data.get_edge() for data in edge_data
         )
         self._construction_stages = construction_stages
-        self._set_stages()
-        self._num_processes = num_processes
 
-    def _set_data_ids(self, data):
-        for i, data in enumerate(data):
-            data.id = i
+        if num_processes == 1:
+            self._implementation = _Serial(
+                stages=self._get_stages(),
+                after_placement_stage=self._after_placement_stage,
+            )
+        else:
+            self._implementation = _Parallel(
+                stages=self._get_stages(),
+                num_processes=num_processes,
+                after_placement_stage=self._after_placement_stage,
+            )
 
-    def _set_stages(self):
-        self._stages = tuple(
+    @staticmethod
+    def _with_ids(objects):
+        for id, object in enumerate(objects):
+            yield object.with_id(id)
+
+    def _get_stages(self):
+        stages = tuple(
             [] for i in range(len(self._construction_stages)+1)
         )
-        for vertex in self.vertices:
+        for vertex in self._vertices:
             placed = False
             for i, stage in enumerate(self._construction_stages):
                 if stage(vertex):
-                    self._stages[i].append(vertex)
+                    self._stages[i].append(vertex.get_id())
                     placed = True
                     break
             if not placed:
-                self._stages[-1].append(vertex)
-
+                self._stages[-1].append(vertex.get_id())
+        return stages
 
     def _get_vertex_clones(self, mol, scale):
         for vertex in self.vertices:
@@ -139,8 +117,8 @@ class TopologyGraph:
     def _prepare(self, mol):
         return
 
-    def _place_building_blocks(self, mol, vertices, edges):
-        self._implementation._place_building_blocks(molecule,)
+    def _place_building_blocks(self, state):
+        return self._implementation._place_building_blocks(state)
 
     def _get_atom_map(self, mol, bb, bb_id):
         atom_map = {}

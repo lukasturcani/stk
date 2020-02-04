@@ -28,7 +28,7 @@ Why is both :class:`.VertexData` and :class:`.Vertex` needed?
 -------------------------------------------------------------
 
 At first, it may appear that having both :class:`.VertexData` and
-:class:`.Vertex` is an unnecssary inconvenience, as when you create
+:class:`.Vertex` is an unnecessary inconvenience, as when you create
 a new :class:`.TopologyGraph` subclass you have to subclass both of
 these classes rather than just :class:`.Vertex`. The answer is
 related to how these two classes reference other objects in the
@@ -39,8 +39,8 @@ to each other in the :attr:`~.VertexData.edges` and
 :attr:`~.EdgeData.vertices`. This is extremely convenient for
 defining a :class:`.TopologyGraph` because its components can directly
 reference each other. However, it poses a significant issue for
-serialization. Topology graphs are usually highly-cyclic structures
-and are therefore often not possible to serialize with off-the-shelf
+serialization. Topology graphs may be highly-cyclic structures
+and are therefore they may not possible to serialize with off-the-shelf
 serialization tools like :mod:`pickle` or :mod:`dill`. However,
 serialization is necessary and fundamental for allowing
 parallelization of :class:`.TopologyGraph` construction. The
@@ -60,6 +60,7 @@ into its :class:`.Vertex` counterpart.
 """
 
 from .construction_result import ConstructionResult
+from ._construction_state import _ConstructionState
 
 
 class TopologyGraph:
@@ -72,24 +73,24 @@ class TopologyGraph:
     between them by the construction process.
 
     Vertices are responsible for placing the building block molecules.
-    By initializing the vertices with different settings, they can
-    position the building block molecules differently and therefore
+    By initializing the vertices with different parameters, you can
+    alter how they position the building block molecules and therefore
     allow the user to easily specify a different structural isomer.
 
     Once a building block is placed on a vertex, the functional groups
-    on the building block must be assigned to the different edges
+    on the building block must be mapped to the different edges
     connected to the vertex. The number of functional groups in the
     building block must match the number of edges connected to the
     vertex.
 
-    Once the functional groups are assigned to edges, each edge
-    represents a reaction between the functional groups assigned to it.
-    Note that an edge can be assigned more than two functional groups,
-    in case you are dealing with something really exotic. The
-    functional groups are then matched to an appropriate reaction,
-    which generally creates bonds between the atoms of the functional
-    groups. After this you will end up with a
-    :class:`.ConstructedMolecule`.
+    Once the functional groups are mapped to edges, each edge
+    represents a reaction between the functional groups mapped to it.
+    Note that more than two functional groups can map to the same edge,
+    for cases where you are dealing with something really exotic.
+    A :class:`.Reaction` between functional groups is selected based
+    on the edges mapped to the edge. A :class:`.Reaction` will
+    generally create bonds between the atoms of the functional groups.
+    After this you will end up with a :class:`.ConstructedMolecule`.
 
     """
 
@@ -106,6 +107,7 @@ class TopologyGraph:
         Returns
         -------
         :class:`.ConstructionResult`
+            The data describing the :class:`.ConstructedMolecule`.
 
         """
 
@@ -116,6 +118,9 @@ class TopologyGraph:
         state = self._run_reactions(state)
         state = self._clean_up(state)
         return ConstructionResult(state)
+
+    def _get_construction_state(self, vertex_assignments):
+        return _ConstructionState()
 
     def _before_reactions(self, state):
         return state
@@ -143,18 +148,14 @@ class TopologyGraph:
 
         Parameters
         ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        vertices : :class:`tuple` of :class:`.Vertex`
-            The vertex clones used for construction.
-
-        edges : :class:`tuple` of :class:`.Edge`
-            The edge clones used for construction.
+        state : :class:`._ConstructionState`
+            Holds data necessary to construct the molecule.
 
         Returns
         -------
-        None : :class:`NoneType`
+        :class:`._ConstructionState`
+            The :class:`._ConstructionState` updated to account for
+            the placed building blocks.
 
         """
 
