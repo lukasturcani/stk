@@ -133,8 +133,8 @@ class FunctionalGroup:
             # a clone of h1 fg_clone holds h100. fg_clone does hold a
             # clone of h2.
             fg_clone = fg.clone({
-                n.id: n20,
-                h1.id: h100,
+                n.get_id(): n20,
+                h1.get_id(): h100,
             })
 
         """

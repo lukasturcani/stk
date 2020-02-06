@@ -60,7 +60,6 @@ into its :class:`.Vertex` counterpart.
 """
 
 from .construction_result import ConstructionResult
-from ._construction_state import _ConstructionState
 
 
 class TopologyGraph:
@@ -120,31 +119,17 @@ class TopologyGraph:
         return ConstructionResult(state)
 
     def _get_construction_state(self, vertex_assignments):
-        return _ConstructionState()
+        raise NotImplementedError()
 
     def _before_reactions(self, state):
         return state
 
     def _before_placement(self, state):
-        """
-        Do preprocessing on `mol` before construction.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
         return state
 
     def _place_building_blocks(self, state):
         """
-        Place building blocks in `mol` on :attr:`vertices`.
+        Place the building blocks onto the vertices.
 
         Parameters
         ----------
@@ -166,9 +151,6 @@ class TopologyGraph:
 
     def _clean_up(self, state):
         return state
-
-    def get_adjacency_list(self):
-        raise NotImplementedError()
 
     def __str__(self):
         return repr(self)

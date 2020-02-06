@@ -16,6 +16,7 @@ class TopologyGraph_:
         self,
         vertex_data,
         edge_data,
+        reaction_factory,
         construction_stages,
         num_processes,
     ):
@@ -25,10 +26,14 @@ class TopologyGraph_:
         Parameters
         ----------
         vertex_data : :class:`tuple` of :class:`.VertexData`
-            The vertices which make up the graph.
+            The data for vertices which make up the graph.
 
         edge_data : :class:`tuple` of :class:`.EdgeData`
-            The edges which make up the graph.
+            The date for edges which make up the graph.
+
+        reaction_factory : :class:`.ReactionFactory`
+            Used to pick which :class:`.Reaction` is used, given
+            the functional groups on a topology graph edge.
 
         construction_stages : :class:`tuple` of :class:`callable`
             A collection of callables, each of which takes a
@@ -64,102 +69,100 @@ class TopologyGraph_:
         self._edges = tuple(
             data.get_edge() for data in edge_data
         )
-        self._construction_stages = construction_stages
-
+        self._reaction_factory = reaction_factory
         if num_processes == 1:
             self._implementation = _Serial(
-                stages=self._get_stages(),
+                stages=self._get_stages(construction_stages),
                 after_placement_stage=self._after_placement_stage,
             )
         else:
             self._implementation = _Parallel(
-                stages=self._get_stages(),
+                stages=self._get_stages(construction_stages),
                 num_processes=num_processes,
                 after_placement_stage=self._after_placement_stage,
             )
+
+    def _after_placement_stage(
+        self,
+        state,
+        vertices,
+        edges,
+        building_blocks,
+        position_matrices,
+        functional_group_to_edge_maps,
+    ):
+        """
+        Perform `state` changes after a placement stage is done.
+
+        This method should be overridden if the `state` needs to be
+        modified after a placement stage of construction is complete.
+
+        Parameters
+        ----------
+        state : :class:`._ConstructionState`
+            The state of the construction process.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            The vertices which were used in the last construction
+            stage.
+
+        edges : :class:`tuple`
+            For each vertex in `vertices` a :class:`tuple` holding
+            all connected edges. Has the form
+            ``((e1, e2, e3), (e1, e4))``.
+
+        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
+            The building blocks which were placed in the last
+            construction stage. They are ordered to have the same
+            index as the vertex in `vertices` which placed them.
+
+        position_matrices : :class:`tuple` of :class:`numpy.ndarray`
+            For each building block in `building_blocks`, the position
+            matrix after it has been placed by its vertex.
+
+        functional_group_to_edge_maps : :class:`tuple` of :class:`dict`
+            For each building block in `building_blocks`, the
+            mapping of functional group to the edge id it is mapped to.
+
+        Returns
+        -------
+        :class:`.ConstructionState`
+            The new construction state.
+
+        """
+
+        return state
 
     @staticmethod
     def _with_ids(objects):
         for id, object in enumerate(objects):
             yield object.with_id(id)
 
-    def _get_stages(self):
+    def _get_stages(self, construction_stages):
         stages = tuple(
-            [] for i in range(len(self._construction_stages)+1)
+            [] for i in range(len(construction_stages)+1)
         )
         for vertex in self._vertices:
             placed = False
-            for i, stage in enumerate(self._construction_stages):
+            for i, stage in enumerate(construction_stages):
                 if stage(vertex):
-                    self._stages[i].append(vertex.get_id())
+                    stages[i].append(vertex.get_id())
                     placed = True
                     break
             if not placed:
-                self._stages[-1].append(vertex.get_id())
+                stages[-1].append(vertex.get_id())
         return stages
-
-    def _get_vertex_clones(self, mol, scale):
-        for vertex in self.vertices:
-            yield (
-                vertex
-                .clone()
-                .set_constructed_molecule(mol)
-                .apply_scale(scale)
-            )
-
-    def _get_edge_clones(self, scale):
-        for edge in self.edges:
-            yield edge.clone().apply_scale(scale)
-
-    def _before_react(self, mol, vertices, edges):
-        return vertices, edges
-
-    def _prepare(self, mol):
-        return
 
     def _place_building_blocks(self, state):
         return self._implementation._place_building_blocks(state)
 
-    def _get_atom_map(self, mol, bb, bb_id):
-        atom_map = {}
-        for atom in bb.atoms:
-            atom_clone = atom.clone()
-            atom_clone.id = len(mol.atoms)
-            atom_clone.building_block = bb
-            atom_clone.building_block_id = bb_id
-            atom_map[atom] = atom_clone
-            mol.atoms.append(atom_clone)
-        return atom_map
-
-    def _assign_func_groups_to_edges(
-        self,
-        mol,
-        bb,
-        bb_id,
-        edges,
-        assignments
-    ):
-        atom_map = self._get_atom_map(mol, bb, bb_id)
-        mol.func_groups.extend(
-            fg.clone(atom_map) for fg in bb.func_groups
+    def _run_reactions(self, state):
+        reactions = map(
+            self._reaction_factory.get_reaction,
+            state.get_edge_functional_groups.values(),
         )
-        num_fgs = len(bb.func_groups)
-        for fg_id, edge_id in assignments.items():
-            edges[edge_id].assign_func_group(
-                func_group=mol.func_groups[-num_fgs+fg_id]
-            )
-        return atom_map
-
-    def _clean_up(self, mol):
-        mol._position_matrix = np.array(mol._position_matrix).T
-        for i, atom in enumerate(mol.atoms):
-            atom.id = i
-
-    def get_adjacency_list(self):
-        raise NotImplementedError()
-
-    def __str__(self):
-        return repr(self)
-
-    def __repr__(self):
-        raise NotImplementedError()
+        results = map(
+            lambda reaction: reaction.get_result(),
+            reactions,
+        )
+        return state.with_reaction_results(results)

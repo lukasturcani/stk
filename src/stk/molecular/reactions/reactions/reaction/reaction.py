@@ -1,4 +1,26 @@
-from .reaction_result import ReactionResult
+from typing import NamedTuple
+
+
+class _ReactionResult(NamedTuple):
+    """
+    The result of a reaction.
+
+    Attributes
+    ----------
+    new_atoms : :class:`tuple` of :class:`.Atom`
+        The atoms added by the reaction.
+
+    new_bonds : :class:`tuple` of :class:`.Bond`
+        The bonds added by the reaction.
+
+    deleted_atoms : :class:`tuple` of :class:`.Atom`
+        The atoms deleted by the reaction.
+
+    """
+
+    new_atoms: object
+    new_bonds: object
+    deleted_atoms: object
 
 
 class Reaction:
@@ -12,10 +34,10 @@ class Reaction:
 
         """
 
-        return ReactionResult(
-            new_atoms=self._get_new_atoms(),
-            new_bonds=self._get_new_bonds(),
-            deleted_atoms=self._get_deleted_atoms(),
+        return _ReactionResult(
+            new_atoms=tuple(self._get_new_atoms()),
+            new_bonds=tuple(self._get_new_bonds()),
+            deleted_atoms=tuple(self._get_deleted_atoms()),
         )
 
     def _get_new_atoms(self):

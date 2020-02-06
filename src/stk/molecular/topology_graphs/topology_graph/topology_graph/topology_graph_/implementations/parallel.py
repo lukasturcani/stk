@@ -1,41 +1,6 @@
 import pathos
 
-
-def _place_and_map(vertex, edges, building_block):
-    """
-    Place a `building_block` and map its functional groups to `edges`.
-
-    Parameters
-    ----------
-    vertex : :class:`.Vertex`
-        The vertex used to place the `building_block`.
-
-    edges : :class:`tuple` of :class:`.Edge`
-        The edges connected to the `vertex`.
-
-    building_block : :class:`.BuildingBlock`
-        The building block which is to be placed on the `vertex` and
-        have its functional groups mapped to `edges`.
-
-    Returns
-    -------
-    :class:`tuple`
-        The position matrix of the `building_block` after it has
-        been placed on the vertex is the first element of the
-        :class:`tuple` and the mapping of functional groups to edge
-        ids is the second element of the :class:`tuple`.
-
-    """
-
-    position_matrix = vertex.place_building_block(building_block)
-    building_block = building_block.with_position_matrix(
-        position_matrix=position_matrix,
-    )
-    functional_group_edges = vertex.map_functional_groups_to_edges(
-        building_block=building_block,
-        edges=edges,
-    )
-    return position_matrix, functional_group_edges
+from .utilities import _Placement
 
 
 class _Parallel:
@@ -80,23 +45,25 @@ class _Parallel:
                     map(vertex_assignments.get, stage)
                 )
                 edges = tuple(state.get_vertex_edges(stage))
-                position_matrices, maps = zip(*pool.map(
-                    _place_and_map,
+                placements = map(
+                    _Placement,
                     vertices,
                     edges,
                     building_blocks,
-                ))
-                state = state.with_building_blocks(
+                )
+                placement_results = pool.map(
+                    lambda placement: placement.get_result(),
+                    placements,
+                )
+                state = state.with_placement_results(
                     building_blocks=building_blocks,
-                    position_matrices=position_matrices,
-                    functional_group_to_edge_maps=maps,
+                    placement_results=placement_results,
                 )
                 state = self._after_placement_stage(
                     state=state,
                     vertices=vertices,
                     edges=edges,
                     building_blocks=building_blocks,
-                    position_matrices=position_matrices,
-                    maps=maps,
+                    placement_results=placement_results,
                 )
         return state
