@@ -3,6 +3,7 @@ import pathos
 from collections import namedtuple
 
 from .implementations import _Parallel, _Serial
+from ._construction_state import _ConstructionState
 from ...utilities import vector_angle
 
 
@@ -81,6 +82,10 @@ class TopologyGraph_:
                 num_processes=num_processes,
                 after_placement_stage=self._after_placement_stage,
             )
+
+    def _get_construction_state(self, vertex_assignments):
+        return _ConstructionState(
+
 
     def _after_placement_stage(
         self,
