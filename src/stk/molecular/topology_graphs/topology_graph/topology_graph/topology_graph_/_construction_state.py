@@ -12,6 +12,7 @@ class _ConstructionState:
         }
         self._vertex_edges = dict(vertex_edges)
 
+
     def with_placement_results(self, results):
         pass
 
@@ -31,7 +32,8 @@ class _ConstructionState:
             yield self._vertices[vertex_id]
 
     def get_vertex_edges(self, vertex_ids):
-        pass
+        for vertex_id in vertex_ids:
+            yield self._vertex_edges[vertex_id]
 
     def get_edge_functional_groups(self):
         # Returns a dictionary.

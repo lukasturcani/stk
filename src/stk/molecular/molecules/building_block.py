@@ -402,6 +402,7 @@ class BuildingBlock(Molecule_):
 
         """
 
+        obj = super().init_from_dict(molecule_dict)
         obj = cls.__new__(cls)
         obj._position_matrix = np.array(
             molecule_dict['position_matrix']

@@ -257,7 +257,6 @@ class ConstructedMolecule(Molecule):
         building_blocks,
         topology_graph,
         building_block_vertices,
-        identity_key
     ):
         """
         Initialize a :class:`ConstructedMolecule`.
@@ -287,10 +286,6 @@ class ConstructedMolecule(Molecule):
             is used. If ``None``, building block molecules will be
             assigned to vertices at random.
 
-        identity_key : :class:`tuple`
-            The identity key of the molecule. The identity key wil be
-            equal for two molecules which ``stk`` sees as identical.
-
         Returns
         -------
         :class:`.ConstructedMolecule`
@@ -299,7 +294,6 @@ class ConstructedMolecule(Molecule):
         """
 
         obj = cls.__new__(cls)
-        obj._identity_key = identity_key
         obj.building_block_vertices = building_block_vertices
         obj.topology_graph = topology_graph
         obj.atoms = []
@@ -480,7 +474,6 @@ class ConstructedMolecule(Molecule):
             'func_groups': repr(tuple(func_groups)),
             'atoms': repr(tuple(atoms)),
             'bonds': repr(tuple(bonds)),
-            'identity_key': repr(self._identity_key),
         }
 
         if ignore_missing_attrs:
@@ -497,23 +490,15 @@ class ConstructedMolecule(Molecule):
 
         return d
 
-    @classmethod
-    def _init_from_dict(cls, mol_dict, use_cache):
+    def init_from_dict(cls, molecule_dict):
         """
         Intialize from a :class:`dict` representation.
 
         Parameters
         ----------
-        mol_dict : :class:`dict`
+        molecule_dict : :class:`dict`
             A :class:`dict` representation of a molecule generated
             by :meth:`to_dict`.
-
-        use_cache : :class:`bool`
-            If ``True``, a new instance will not be made if a cached
-            and identical one already exists, the one which already
-            exists will be returned. If ``True`` and a cached,
-            identical instance does not yet exist the created one will
-            be added to the cache.
 
         Returns
         -------
@@ -523,7 +508,6 @@ class ConstructedMolecule(Molecule):
         """
 
         d = dict(mol_dict)
-        identity_key = eval(d.pop('identity_key'))
         if use_cache and identity_key in cls._cache:
             return cls._cache[identity_key]
 

@@ -84,8 +84,7 @@ class TopologyGraph_:
             )
 
     def _get_construction_state(self, vertex_assignments):
-        return _ConstructionState(
-
+        return _ConstructionState(vertex_assignments)
 
     def _after_placement_stage(
         self,
