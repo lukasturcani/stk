@@ -101,9 +101,8 @@ class BuildingBlock(Molecule_):
             raise RuntimeError(
                 f'Embedding with seed value of {random_seed} failed.'
             )
-        key = self._get_identity_key_from_rdkit_mol(molecule)
         rdkit.Kekulize(molecule)
-        self._init_from_rdkit_mol(molecule, functional_groups, key)
+        self._init_from_rdkit_mol(molecule, functional_groups)
 
     @classmethod
     def init_from_molecule(cls, molecule, functional_groups=None):
@@ -222,12 +221,10 @@ class BuildingBlock(Molecule_):
 
         """
 
-        key = cls._get_identity_key_from_rdkit_mol(molecule)
         bb = cls.__new__(cls)
         bb._init_from_rdkit_mol(
             molecule=molecule,
             functional_groups=functional_groups,
-            identity_key=key,
         )
 
         return bb
@@ -236,7 +233,6 @@ class BuildingBlock(Molecule_):
         self,
         molecule,
         functional_groups,
-        identity_key,
     ):
         """
         Initialize from an :mod:`rdkit` molecule.
@@ -256,9 +252,6 @@ class BuildingBlock(Molecule_):
             :class:`.FunctionalGroup` instances are used to identify
             which atoms are modified during
             :class:`.ConstructedMolecule` construction.
-
-        identity_key : :class:`tuple`
-            The identity key of the molecule.
 
         Returns
         -------
@@ -284,7 +277,6 @@ class BuildingBlock(Molecule_):
         position_matrix = molecule.GetConformer().GetPositions()
 
         super().__init__(atoms, bonds, position_matrix)
-        self._identity_key = identity_key
         self._with_functional_groups(self._extract_functional_groups(
             functional_groups=functional_groups,
         ))
@@ -411,7 +403,6 @@ class BuildingBlock(Molecule_):
         """
 
         obj = cls.__new__(cls)
-        obj._identity_key = molecule_dict['identity_key']
         obj._position_matrix = np.array(
             molecule_dict['position_matrix']
         ).T
@@ -449,7 +440,6 @@ class BuildingBlock(Molecule_):
         """
 
         clone = super().clone()
-        clone._identity_key = self._identity_key
         clone._functional_groups = self._functional_groups
         return clone
 
@@ -497,15 +487,7 @@ class BuildingBlock(Molecule_):
             'position_matrix': self.get_position_matrix().tolist(),
             'atoms': repr(self._atoms),
             'bonds': [b.to_dict() for b in self._bonds],
-            'identity_key': self._identity_key,
         }
-
-    @staticmethod
-    def _get_identity_key_from_rdkit_mol(molecule):
-        # Don't modify the original molecule.
-        mol = rdkit.Mol(molecule)
-        rdkit.SanitizeMol(mol)
-        return rdkit.MolToSmiles(molecule, canonical=True)
 
     def __str__(self):
         if self._functional_groups:

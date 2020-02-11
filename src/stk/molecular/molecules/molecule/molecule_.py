@@ -46,7 +46,7 @@ class Molecule_(Molecule):
         self._bonds = bonds
         # Take the transpose because it will make some matrix
         # multiplications faster.
-        self._position_matrix = position_matrix.T
+        self._position_matrix = np.array(position_matrix.T)
 
     def _with_displacement(self, displacement):
         """
@@ -183,7 +183,7 @@ class Molecule_(Molecule):
             self=clone,
             atoms=self._atoms,
             bonds=self._bonds,
-            position_matrix=self.get_position_matrix(),
+            position_matrix=self._position_matrix.T,
         )
         for name, value in self.__dict__.items():
             if not name.startswith('_'):

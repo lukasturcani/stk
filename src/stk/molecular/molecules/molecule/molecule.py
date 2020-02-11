@@ -303,22 +303,6 @@ class Molecule:
 
         raise NotImplementedError()
 
-    def get_identity_key(self):
-        """
-        Return a unique key for the molecule.
-
-        Two different molecules should never have the same identity.
-
-        Returns
-        -------
-        :class:`object`
-            A hashable object which represents the identity of the
-            molecule.
-
-        """
-
-        raise NotImplementedError()
-
     def get_maximum_diameter(self, atom_ids=None):
         """
         Return the maximum diameter.
