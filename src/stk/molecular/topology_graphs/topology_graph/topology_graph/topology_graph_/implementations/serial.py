@@ -1,7 +1,7 @@
 from .utilities import _Placement
 
 
-class Serial:
+class _Serial:
     """
     Holds serial implementations of topology graph methods.
 

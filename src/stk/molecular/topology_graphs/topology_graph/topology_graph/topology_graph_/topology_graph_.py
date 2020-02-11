@@ -1,10 +1,5 @@
-import numpy as np
-import pathos
-from collections import namedtuple
-
 from .implementations import _Parallel, _Serial
 from ._construction_state import _ConstructionState
-from ...utilities import vector_angle
 
 
 class TopologyGraph_:
