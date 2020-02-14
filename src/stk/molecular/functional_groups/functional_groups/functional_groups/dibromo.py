@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
 
-class Dibromo(FunctionalGroup_):
+class Dibromo(GenericFunctionalGroup):
     """
     Represents a dibromo functional group.
 
@@ -19,6 +19,31 @@ class Dibromo(FunctionalGroup_):
         bonders,
         deleters,
     ):
+        """
+        Initialize a :class:`.Dibromo` instance.
+
+        Parameters
+        ----------
+        bromine1 : :class:`.Br`
+            The ``[bromine1]`` atom.
+
+        atom1 : :class:`.Atom`
+            The ``[atom1]`` atom.
+
+        bromine2 : :class:`.Br`
+            The ``[bromine2]`` atom.
+
+        atom2 : :class:`.Atom`
+            The ``[atom]`` atom.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
         self._bromine1 = bromine1
         self._atom1 = atom1
         self._bromine2 = bromine2
@@ -27,15 +52,55 @@ class Dibromo(FunctionalGroup_):
         super().__init__(atoms, bonders, deleters)
 
     def get_atom1(self):
+        """
+        Get the ``[atom1]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom1]`` atom.
+
+        """
+
         return self._atom1
 
     def get_bromine1(self):
+        """
+        Get the ``[bromine1]`` atom.
+
+        Returns
+        -------
+        :class:`.Br`
+            The ``[bromine1]`` atom.
+
+        """
+
         return self._bromine1
 
     def get_atom2(self):
+        """
+        Get the ``[atom2]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom2]`` atom.
+
+        """
+
         return self._atom2
 
     def get_bromine2(self):
+        """
+        Get the ``[bromine2]`` atom.
+
+        Returns
+        -------
+        :class:`.Br`
+            The ``[bromine2]`` atom.
+
+        """
+
         return self._bromine2
 
     def clone(self):

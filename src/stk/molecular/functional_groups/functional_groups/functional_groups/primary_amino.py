@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
 
-class PrimaryAmino(FunctionalGroup_):
+class PrimaryAmino(GenericFunctionalGroup):
     """
     Represents a primary amino functional group.
 
@@ -19,6 +19,32 @@ class PrimaryAmino(FunctionalGroup_):
         bonders,
         deleters,
     ):
+        """
+        Initializes a :class:`.PrimaryAmino` instance.
+
+        Parameters
+        ----------
+        nitrogen : :class:`.N`
+            The ``[nitrogen]`` atom.
+
+        hydrogen1 : :class:`.H`
+            The ``[hydrogen1]`` atom.
+
+        hydrogen2 : :class:`.H`
+            The ``[hydrogen2]`` atom.
+
+        atom : :class:`.Atom`
+            The ``[atom]`` atom.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
+
         self._nitrogen = nitrogen
         self._hydrogen1 = hydrogen1
         self._hydrogen2 = hydrogen2
@@ -27,15 +53,55 @@ class PrimaryAmino(FunctionalGroup_):
         super().__init__(atoms, bonders, deleters)
 
     def get_nitrogen(self):
+        """
+        Get the ``[nitrogen]`` atom.
+
+        Returns
+        -------
+        :class:`.N`
+            The ``[nitrogen]`` atom.
+
+        """
+
         return self._nitrogen
 
     def get_hydrogen1(self):
+        """
+        Get the ``[hydrogen1]`` atom.
+
+        Returns
+        -------
+        :class:`.H`
+            The ``[hydrogen1]`` atom.
+
+        """
+
         return self._hydrogen1
 
     def get_hydrogen2(self):
+        """
+        Get the ``[hydrogen2]`` atom.
+
+        Returns
+        -------
+        :class:`.H`
+            The ``[hydrogen2]`` atom.
+
+        """
+
         return self._hydrogen2
 
     def get_atom(self):
+        """
+        Get the ``[atom]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom]`` atom.
+
+        """
+
         return self._atom
 
     def __repr__(self):

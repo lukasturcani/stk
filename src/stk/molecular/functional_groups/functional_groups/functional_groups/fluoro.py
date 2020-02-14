@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
 
-class Fluoro(FunctionalGroup_):
+class Fluoro(GenericFunctionalGroup):
     """
     Represents a fluoro functional group.
 
@@ -11,14 +11,53 @@ class Fluoro(FunctionalGroup_):
     """
 
     def __init__(self, fluorine, atom, bonders, deleters):
+        """
+        Initialize a :class:`.Fluoro` instance.
+
+        Parameters
+        ----------
+        fluorine : :class:`.F`
+            The ``[fluorine]`` atom.
+
+        atom : :class:`.Atom`
+            The ``[atom]`` atom.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
         self._fluorine = fluorine
         self._atom = atom
         super().__init__((fluorine, atom), bonders, deleters)
 
     def get_fluorine(self):
+        """
+        Get the ``[fluorine]`` atom.
+
+        Returns
+        -------
+        :class:`.F`
+            The ``[fluorine]`` atom.
+
+        """
+
         return self._fluorine
 
     def get_atom(self):
+        """
+        Get the ``[atom]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom]`` atom.
+
+        """
+
         return self._atom
 
     def clone(self):

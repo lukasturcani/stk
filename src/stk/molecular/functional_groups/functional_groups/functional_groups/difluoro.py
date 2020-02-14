@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
 
-class Difluoro(FunctionalGroup_):
+class Difluoro(GenericFunctionalGroup):
     """
     Represents a difluoro functional group.
 
@@ -19,6 +19,25 @@ class Difluoro(FunctionalGroup_):
         bonders,
         deleters,
     ):
+        """
+        Initialize a :class:`.Difluoro` instance.
+
+        Parameters
+        ----------
+        fluorine1 : :class:`.F`
+            The ``[fluorine1]`` atom.
+
+        atom1 : :class:`.Atom`
+            The ``[atom1]`` atom.
+
+        fluorine2 : :class:`.F`
+            The ``[fluorine2]`` atom.
+
+        atom2 : :class:`.Atom`
+            The ``[atom2]`` atom.
+
+        """
+
         self._fluorine1 = fluorine1
         self._atom1 = atom1
         self._fluorine2 = fluorine2
@@ -27,15 +46,55 @@ class Difluoro(FunctionalGroup_):
         super().__init__(atoms, bonders, deleters)
 
     def get_atom1(self):
+        """
+        Get the ``[atom1]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom1]`` atom.
+
+        """
+
         return self._atom1
 
     def get_fluorine1(self):
+        """
+        Get the ``[fluorine1]`` atom.
+
+        Returns
+        -------
+        :class:`.F`
+            The ``[fluorine1]`` atom.
+
+        """
+
         return self._fluorine1
 
     def get_atom2(self):
+        """
+        Get the ``[atom2]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom2]`` atom.
+
+        """
+
         return self._atom2
 
     def get_fluorine2(self):
+        """
+        Get the ``[fluorine2]`` atom.
+
+        Returns
+        -------
+        :class:`.F`
+            The ``[fluorine2]`` atom.
+
+        """
+
         return self._fluorine2
 
     def with_atoms(self, atom_map):

@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
 
-class SecondaryAmino(FunctionalGroup_):
+class SecondaryAmino(GenericFunctionalGroup):
     """
     Represents a secondary amino functional group.
 
@@ -19,6 +19,31 @@ class SecondaryAmino(FunctionalGroup_):
         bonders,
         deleters,
     ):
+        """
+        Initialize a :class:`.SecondaryAmine` instance.
+
+        Parameters
+        ----------
+        nitrogen : :class:`.N`
+            The ``[nitrogen]`` atom
+
+        hydrogen : :class:`.H`
+            The ``[hydrogen]`` atom.
+
+        atom1 : :class:`.Atom`
+            The ``[atom]`` atom.
+
+        atom2 : :class:`.Atom`
+            The ``[atom]``atom.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
         self._nitrogen = nitrogen
         self._hydrogen = hydrogen
         self._atom1 = atom1
@@ -27,15 +52,55 @@ class SecondaryAmino(FunctionalGroup_):
         super().__init__(atoms, bonders, deleters)
 
     def get_nitrogen(self):
+        """
+        Get the ``[nitrogen]`` atom.
+
+        Returns
+        -------
+        :class:`.N`
+            The ``[nitrogen]`` atom.
+
+        """
+
         return self._nitrogen
 
     def get_hydrogen(self):
+        """
+        Get the ``[hydrogen]`` atom.
+
+        Returns
+        -------
+        :class:`.H`
+            The ``[hydrogen]`` atom.
+
+        """
+
         return self._hydrogen
 
     def get_atom1(self):
+        """
+        Get the ``[atom1]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom1]`` atom.
+
+        """
+
         return self._atom1
 
     def get_atom2(self):
+        """
+        Get the ``[atom2]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom2]`` atom.
+
+        """
+
         return self._atom2
 
     def clone(self):

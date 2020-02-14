@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
 
-class Iodo(FunctionalGroup_):
+class Iodo(GenericFunctionalGroup):
     """
     Represents an iodo functional group.
 
@@ -11,14 +11,53 @@ class Iodo(FunctionalGroup_):
     """
 
     def __init__(self, iodine, atom, bonders, deleters):
+        """
+        Initialize a :class:`.Iodo` instance.
+
+        Parameters
+        ----------
+        iodine : :class:`.I`
+            The ``[iodine]`` atom.
+
+        atom : :class:`.Atom`
+            The ``[atom]`` atom.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
         self._iodine = iodine
         self._atom = atom
         super().__init__((iodine, atom), bonders, deleters)
 
     def get_iodine(self):
+        """
+        Get the ``[iodine]`` atom.
+
+        Returns
+        -------
+        :class:`.I`
+            The ``[iodine]`` atom.
+
+        """
+
         return self._iodine
 
     def get_atom(self):
+        """
+        Get the ``[atom]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom]`` atom.
+
+        """
+
         return self._atom
 
     def clone(self):

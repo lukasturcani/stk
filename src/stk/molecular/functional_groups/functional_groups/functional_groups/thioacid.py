@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_function_group import GenericFunctionalGroup
 
 
-class Thioacid(FunctionalGroup_):
+class Thioacid(GenericFunctionalGroup):
     """
     Represents a thioacid functional group.
 
@@ -20,6 +20,34 @@ class Thioacid(FunctionalGroup_):
         bonders,
         deleters
     ):
+        """
+        Initialize a :class:`.Thioacid` functional group.
+
+        Parameters
+        ----------
+        carbon : :class:`.C`
+            The ``[carbon]`` atom.
+
+        oxygen : :class:`.O`
+            The ``[oxygen]`` atom.
+
+        sulfur : :class:`.S`
+            The ``[sulfur]`` atom.
+
+        hydrogen : :class:`.H`
+            The ``[hydrogen]`` atom.
+
+        atom : :class:`.Atom`
+            The ``[atom]`` atom.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
         self._carbon = carbon
         self._oxygen = oxygen
         self._sulfur = sulfur
@@ -29,18 +57,68 @@ class Thioacid(FunctionalGroup_):
         super().__init__(atoms, bonders, deleters)
 
     def get_carbon(self):
+        """
+        Get the ``[carbon]`` atom.
+
+        Returns
+        -------
+        :class:`.C`
+            The ``[carbon]`` atom.
+
+        """
+
         return self._carbon
 
-    def get_oxygen(self):
+    def get_oxygen(self):_
+        """
+        Get the ``[oxygen]`` atom.
+
+        Returns
+        -------
+        :class:`.O`
+            The ``[oxygen]`` atom.
+
+        """
+
         return self._oxygen
 
     def get_sulfur(self):
+        """
+        Get the ``[sulfur]`` atom.
+
+        Returns
+        -------
+        :class:`.S`
+            The ``[sulfur]`` atom.
+
+        """
+
         return self._sulfur
 
     def get_hydrogen(self):
+        """
+        Get the ``[hydrogen]`` atom.
+
+        Returns
+        -------
+        :class:`.H`
+            Get the ``[hydrogen]`` atom.
+
+        """
+
         return self._hydrogen
 
     def get_atom(self):
+        """
+        Get the ``[atom]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom]`` atom.
+
+        """
+
         return self._atom
 
     def clone(self):

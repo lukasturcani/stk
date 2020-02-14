@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
 
-class Thiol(FunctionalGroup_):
+class Thiol(GenericFunctionalGroup):
     """
     Represents a thiol functional group.
 
@@ -12,6 +12,28 @@ class Thiol(FunctionalGroup_):
     """
 
     def __init__(self, sulfur, hydrogen, atom, bonders, deleters):
+        """
+        Initialize a :class:`.Thiol` instance.
+
+        Parameters
+        ----------
+        sulfur : :class:`.S`
+            The ``[sulfur]`` atom.
+
+        hydrogen : :class:`.H`
+            The ``[hydrogen]`` atom.
+
+        atom : :class:`.Atom`
+            The ``[atom]`` atom.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
         self._sulfur = sulfur
         self._hydrogen = hydrogen
         self._atom = atom
@@ -19,12 +41,42 @@ class Thiol(FunctionalGroup_):
         super().__init__(atoms, bonders, deleters)
 
     def get_sulfur(self):
+        """
+        Get the ``[sulfur]`` atom.
+
+        Returns
+        -------
+        :class:`.S`
+            The ``[sulfur]`` atom.
+
+        """
+
         return self._sulfur
 
     def get_hydrogen(self):
+        """
+        Get the ``[hydrogen]`` atom.
+
+        Returns
+        -------
+        :class:`.H`
+            The ``[hydrogen]`` atom.
+
+        """
+
         return self._hydrogen
 
     def get_atom(self):
+        """
+        Get the ``[atom]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom]`` atom.
+
+        """
+
         return self._atom
 
     def clone(self):

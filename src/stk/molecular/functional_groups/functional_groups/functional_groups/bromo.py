@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
 
-class Bromo(FunctionalGroup_):
+class Bromo(GenericFunctionalGroup):
     """
     Represents a bromo functional group.
 
@@ -11,14 +11,53 @@ class Bromo(FunctionalGroup_):
     """
 
     def __init__(self, bromine, atom, bonders, deleters):
+        """
+        Initialize a :class:`.Bromo` instance.
+
+        Parameters
+        ----------
+        bromine : :class:`.Br`
+            The ``[bromine]`` atom.
+
+        atom : :class:`.Atom`
+            The ``[atom]`` atom.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
         self._bromine = bromine
         self._atom = atom
         super().__init__((bromine, atom), bonders, deleters)
 
     def get_bromine(self):
+        """
+        Get the ``[bromine]`` atom.
+
+        Returns
+        -------
+        :class:`.Br`
+            The ``[bromine]`` atom.
+
+        """
+
         return self._bromine
 
     def get_atom(self):
+        """
+        Get the ``[atom]`` atom.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The ``[atom]`` atom.
+
+        """
+
         return self._atom
 
     def clone(self):

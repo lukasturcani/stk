@@ -21,6 +21,34 @@ class RingAmine(FunctionalGroup_):
         hydrogen3,
         carbon3,
     ):
+        """
+        Initializes a :class:`.RingAmine` instance.
+
+        Parameters
+        ----------
+        nitrogen : :class:`.N`
+            The ``[nitrogen]`` atom.
+
+        hydrogen1 : :class:`.H`
+            The ``[hydrogen1]`` atom.
+
+        hydrogen2 : :class:`.H`
+            The ``[hydrogen2]`` atom.
+
+        carbon1 : :class:`.C`
+            The ``[carbon1]`` atom.
+
+        carbon2 : :class:`.C`
+            The ``[carbon2]`` atom.
+
+        hydrogen3 : :class:`.H`
+            The ``[hydrogen3]`` atom.
+
+        carbon3 : :class:`.C`
+            The ``[carbon3]``atom.
+
+        """
+
         self._nitrogen = nitrogen
         self._hydrogen1 = hydrogen1
         self._hydrogen2 = hydrogen2
@@ -37,28 +65,101 @@ class RingAmine(FunctionalGroup_):
             hydrogen3,
             carbon3,
         )
-        super().__init__(atoms, (), ())
+        super().__init__(atoms)
 
     def get_nitrogen(self):
+        """
+        Get the ``[nitrogen]`` atom.
+
+        Returns
+        -------
+        :class:`.N`
+            The ``[nitrogen]`` atom.
+
+        """
+
         return self._nitrogen
 
     def get_hydrogen1(self):
+        """
+        Get the ``[hydrogen1]`` atom.
+
+        Returns
+        -------
+        :class:`.H`
+            The ``[hydrogen1]`` atom.
+
+        """
+
         return self._hydrogen1
 
     def get_hydrogen2(self):
+        """
+        Get the ``[hydrogen2]`` atom.
+
+        Returns
+        -------
+        :class:`.H`
+            The ``[hydrogen2]`` atom.
+
+        """
+
         return self._hydrogen2
 
     def get_carbon1(self):
+        """
+        Get the ``[carbon1]`` atom.
+
+        Returns
+        -------
+        :class:`.C`
+            The ``[carbon1]`` atom.
+
+        """
+
         return self._carbon1
 
     def get_carbon2(self):
+        """
+        Get the ``[carbon2]`` atom.
+
+        Returns
+        -------
+        :class:`.C`
+            The ``[carbon2]`` atom.
+
+        """
+
         return self._carbon2
 
     def get_hydrogen3(self):
+        """
+        Get the ``[hydrogen3]`` atom.
+
+        Returns
+        -------
+        :class:`.H`
+            The ``[hydrogen3]`` atom.
+
+        """
+
         return self._hydrogen3
 
     def get_carbon3(self):
+        """
+        Get the ``[carbon3]`` atom.
+
+        Returns
+        -------
+        :class:`.C`
+            The ``[carbon3]`` atom.
+
+        """
+
         return self._carbon3
+
+    def get_placer_ids(self):
+        yield self._nitrogen.get_id()
 
     def clone(self):
         clone = super().clone()
