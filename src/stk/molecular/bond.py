@@ -169,8 +169,8 @@ class Bond:
 
             import stk
             bond = stk.Bond(stk.C(0), stk.C(12), 2)
-            # Replace C(0) with H(12) but keep C(12).
-            clone = bond.with_atoms({0: stk.H(12)})
+            # Replace C(0) with H(13) but keep C(12).
+            clone = bond.with_atoms({0: stk.H(13)})
 
         """
 

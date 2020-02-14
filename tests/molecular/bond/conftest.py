@@ -75,7 +75,7 @@ def y_periodicity(periodicity_value):
 @pytest.fixture
 def z_periodicity(periodicity_value):
     """
-    THe periodicity of a bond along the z axis.
+    The periodicity of a bond along the z axis.
 
     """
 
