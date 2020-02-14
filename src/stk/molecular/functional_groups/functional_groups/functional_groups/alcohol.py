@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
 
-class Alcohol(FunctionalGroup_):
+class Alcohol(GenericFunctionalGroup):
     """
     Represents an alcohol functional group.
 
@@ -11,6 +11,28 @@ class Alcohol(FunctionalGroup_):
     """
 
     def __init__(self, oxygen, hydrogen, atom, bonders, deleters):
+        """
+        Initialize a :class:`.Alcohol` instance.
+
+        Parameters
+        ----------
+        oxygen : :class:`.O`
+            The oxygen atom.
+
+        hydrogen : :class:`.H`
+            The hydrogen atom.
+
+        atom : :class:`.Atom`
+            The atom to which the alcohol is attached.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
         self._oxygen = oxygen
         self._hydrogen = hydrogen
         self._atom = atom
@@ -18,12 +40,42 @@ class Alcohol(FunctionalGroup_):
         super().__init__(atoms, bonders, deleters)
 
     def get_oxygen(self):
+        """
+        Get the oxygen atom.
+
+        Returns
+        -------
+        :class:`.O`
+            The oxygen atom.
+
+        """
+
         return self._oxygen
 
     def get_hydrogen(self):
+        """
+        Get the hydrogen atom.
+
+        Returns
+        -------
+        :class:`.H`
+            The hydrogen atom.
+
+        """
+
         return self._hydrogen
 
     def get_atom(self):
+        """
+        Get the atom to which the functional group is attached.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The atom to which the functional group is attached.
+
+        """
+
         return self._atom
 
     def clone(self):

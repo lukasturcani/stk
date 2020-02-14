@@ -1,3 +1,39 @@
+"""
+Functional Group
+================
+
+#. :class:`.Alcohol`
+#. :class:`.Aldehyde`
+#. :class:`.Alkene`
+#. :class:`.Alkyne`
+#. :class:`.Amide`
+#. :class:`.BoronicAcid`
+#. :class:`.Bromo`
+#. :class:`.CarboxylicAcid`
+#. :class:`.Dibromo`
+#. :class:`.Difluoro`
+#. :class:`.Diol`
+#. :class:`.Fluoro`
+#. :class:`.GenericFunctionalGroup`
+#. :class:`.Iodo`
+#. :class:`.PrimaryAmino`
+#. :class:`.RingAmine`
+#. :class:`.SecondaryAmino`
+#. :class:`.Thioacid`
+#. :class:`.Thiol`
+
+Functional groups define which atoms of a :class:`.BuildingBlock` are
+modified by during :class:`.ConstructedMolecule` construction. They
+also define which atoms are used to position the
+:class:`.BuildingBlock` molecules
+during construction. The class of a :class:`.FunctionalGroup`
+affects which :class:`.Reaction` can be used with it.
+See the abstract base class :class:`.FunctionalGroup` for more
+information.
+
+"""
+
+
 class FunctionalGroup:
     """
     An abstract base class for functional groups.
@@ -34,83 +70,38 @@ class FunctionalGroup:
 
         raise NotImplementedError()
 
-    def get_bonders(self):
+    def get_positional_atom_ids(self):
         """
-        Yield bonder atoms in the functional group.
+        Yield the ids of atoms used for position calculation.
 
-        These are atoms which have bonds added during
-        :class:`.ConstructedMolecule` construction.
-
-        Yields
-        ------
-        :class:`.Atom`
-            A bonder atom.
-
-        """
-
-        raise NotImplementedError()
-
-    def get_bonder_ids(self):
-        """
-        Yield the ids of bonder atoms.
+        The ids of atoms yielded by this method should be used to
+        calculate the position of the functional group.
 
         Yields
         ------
         :class:`int`
-            The id of a bonder :class:`.Atom`.
+            The id of an :class:`.Atom`.
 
         """
 
         raise NotImplementedError()
 
-    def get_deleters(self):
+    def with_atoms(self, atom_map):
         """
-        Yield the deleter atoms in the functional group.
-
-        These are atoms which are removed during
-        :class:`.ConstructedMolecule` construction.
-
-        Yields
-        ------
-        :class:`.Atom`
-            A deleter atom.
-
-        """
-
-        raise NotImplementedError()
-
-    def get_deleter_ids(self):
-        """
-        Yield the ids of deleter atoms.
-
-        Yields
-        -------
-        :class:`int`
-            The id of a deleter :class:`.Atom`.
-
-        """
-
-        raise NotImplementedError()
-
-    def clone(self, atom_map=None):
-        """
-        Return a clone.
-
-        Public attributes are inherited by the clone but private
-        ones are not.
+        Return a clone holding different atoms.
 
         Parameters
         ----------
-        atom_map : :class:`dict`, optional
-            If the clone should hold specific :class:`.Atom`
-            instances, then a :class:`dict` should be provided, which
-            maps atom ids in the current :class:`.FunctionalGroup` to
-            the atoms which should be used in the clone.
+        atom_map : :class:`dict`
+            Maps the id of an atom in the functional group to the new
+            atom the clone should hold. If the id of an atom in the
+            functional group is not found in `atom_map`, the atom
+            will not be replaced in the clone.
 
         Returns
         -------
-        :class:`FunctionalGroup`
-            A clone.
+        :class:`.FunctionalGroup`
+            The clone.
 
         Examples
         --------
@@ -129,13 +120,26 @@ class FunctionalGroup:
             h100 = stk.H(100)
 
             # fg_clone is a clone of fg, except that instead of holding
-            # a clone of n, fg_clone holds n20, and instead of holding
-            # a clone of h1 fg_clone holds h100. fg_clone does hold a
-            # clone of h2.
-            fg_clone = fg.clone({
+            # n, fg_clone holds n20, and instead of holding h1
+            # fg_clone holds h100. fg_clone continues to hold h2.
+            fg_clone = fg.with_atoms({
                 n.get_id(): n20,
                 h1.get_id(): h100,
             })
+
+
+        """
+
+        raise NotImplementedError()
+
+    def clone(self):
+        """
+        Return a clone.
+
+        Returns
+        -------
+        :class:`.FunctionalGroup`
+            A clone.
 
         """
 
