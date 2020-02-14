@@ -146,7 +146,7 @@ class TopologyGraph:
 
         raise NotImplementedError()
 
-    def run_reactions(self, state):
+    def _run_reactions(self, state):
         raise NotImplementedError()
 
     def _clean_up(self, state):

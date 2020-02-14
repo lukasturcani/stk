@@ -1,7 +1,8 @@
 """
 Defines a class for each type of element.
 
-Read the docstring of :class:`.Atom`.
+An abstract base class for all atoms is provided, :class:`.Atom`,
+read it's docstring for more information.
 
 """
 
@@ -184,8 +185,6 @@ class Atom:
         """
         Return a clone.
 
-        Private attributes are not passed to the clone.
-
         Returns
         -------
         :class:`.Atom`
@@ -196,9 +195,6 @@ class Atom:
         clone = self.__class__.__new__(self.__class__)
         clone._id = self._id
         clone._charge = self._charge
-        for attr, val in vars(self).items():
-            if not attr.startswith('_'):
-                setattr(clone, attr, val)
         return clone
 
 
