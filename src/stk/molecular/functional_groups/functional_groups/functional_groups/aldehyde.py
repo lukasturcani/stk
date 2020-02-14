@@ -1,7 +1,6 @@
-from .. import FunctionalGroup_
+from .generic_functional_group import GenericFunctionalGroup
 
-
-class Aldehyde(FunctionalGroup_):
+class Aldehyde(GenericFunctionalGroup):
     """
     Represents an aldehyde functional group.
 
@@ -19,6 +18,31 @@ class Aldehyde(FunctionalGroup_):
         bonders,
         deleters,
     ):
+        """
+        Initialize a :class:`.Aldehyde` instance.
+
+        Parameters
+        ----------
+        carbon : :class:`.C`
+            The carbon atom.
+
+        oxygen : :class:`.O`
+            The oxygen atom.
+
+        hydrogen : :class:`.H`
+            The hydrogen atom.
+
+        atom : :class:`.Atom`
+            The atom to which the functional group is attached.
+
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
+
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
+
+        """
+
         self._carbon = carbon
         self._oxygen = oxygen
         self._hydrogen = hydrogen
@@ -27,15 +51,54 @@ class Aldehyde(FunctionalGroup_):
         super().__init__(atoms, bonders, deleters)
 
     def get_carbon(self):
+        """
+        Get the carbon atom.
+
+        Returns
+        -------
+        :class:`.C`
+            The carbon atom.
+
+        """
+
         return self._carbon
 
     def get_oxygen(self):
+        """
+        Get the oxygen atom.
+
+        Returns
+        -------
+        :class:`.O`
+            The oxygen atom.
+
+        """
         return self._oxygen
 
     def get_hydrogen(self):
+        """
+        Get the hydrogen atom.
+
+        Returns
+        -------
+        :class:`.H`
+            The hydrogen atom.
+
+        """
+
         return self._hydrogen
 
     def get_atom(self):
+        """
+        Get the atom to which the functional group is attached.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The atom to which the functional group is attached.
+
+        """
+
         return self._atom
 
     def with_atoms(self, atom_map):

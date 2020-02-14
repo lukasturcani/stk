@@ -123,7 +123,7 @@ class GenericFunctionalGroup(FunctionalGroup_):
 
         yield from (a.get_id() for a in self._deleters)
 
-    def get_positional_atom_ids(self):
+    def get_placer_ids(self):
         yield from (a.get_id() for a in self._bonders)
 
     def __repr__(self):

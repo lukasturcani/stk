@@ -70,7 +70,7 @@ class FunctionalGroup:
 
         raise NotImplementedError()
 
-    def get_positional_atom_ids(self):
+    def get_placer_ids(self):
         """
         Yield the ids of atoms used for position calculation.
 
