@@ -73,7 +73,7 @@ class Bond:
         Returns
         -------
         :class:`int`
-            THe bond order.
+            The bond order.
 
         """
 
@@ -119,8 +119,6 @@ class Bond:
         """
         Return a clone.
 
-        Private attributes are not passed to the clone.
-
         Returns
         -------
         :class:`.Bond`
@@ -129,10 +127,6 @@ class Bond:
         """
 
         clone = self.__class__.__new__(self.__class__)
-        for attr, val in vars(self).items():
-            if not attr.startswith('_'):
-                setattr(clone, attr, val)
-
         Bond.__init__(
             self=clone,
             atom1=self._atom1,
@@ -168,6 +162,15 @@ class Bond:
         -------
         :class:`.Bond`
             The clone.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            import stk
+            bond = stk.Bond(stk.C(0), stk.C(12), 2)
+            # Replace C(0) with H(12) but keep C(12).
+            clone = bond.with_atoms({0: stk.H(12)})
 
         """
 

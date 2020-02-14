@@ -34,8 +34,6 @@ def get_atom_map(request):
 
 
 def test_with_atoms(bond, get_atom_map):
-    bond.attr = 1
-    bond._attr = 2
     atom_map = get_atom_map(bond)
     clone = bond.with_atoms(atom_map)
     assert clone is not bond
@@ -54,5 +52,3 @@ def test_with_atoms(bond, get_atom_map):
 
     assert bond.get_periodicity() == clone.get_periodicity()
     assert bond.get_order() == clone.get_order()
-    assert bond.attr == clone.attr
-    assert not hasattr(clone, '_attr')
