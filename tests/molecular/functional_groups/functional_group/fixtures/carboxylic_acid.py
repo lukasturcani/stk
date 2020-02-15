@@ -1,7 +1,7 @@
 import stk
 import pytest
 
-from ._test_case import _TestCase
+from ._test_case import _GenericTestCase
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def carboxylic_acid(get_atom_ids):
 def _carboxylic_acid(carbon, oxygen1, oxygen2, hydrogen, atom):
     bonders = (carbon, )
     deleters = (oxygen2, hydrogen)
-    return _TestCase(
+    return _GenericTestCase(
         functional_group=stk.CarboxylicAcid(
             carbon=carbon,
             oxygen1=oxygen1,

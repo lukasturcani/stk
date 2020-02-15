@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _TestCase
+from ._test_case import _GenericTestCase
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def diol(get_atom_ids):
 def _diol(atom1, oxygen1, hydrogen1, atom2, oxygen2, hydrogen2):
     bonders = (atom1, atom2)
     deleters = (oxygen1, hydrogen1, oxygen2, hydrogen2)
-    return _TestCase(
+    return _GenericTestCase(
         functional_group=stk.Diol(
             atom1=atom1,
             oxygen1=oxygen1,

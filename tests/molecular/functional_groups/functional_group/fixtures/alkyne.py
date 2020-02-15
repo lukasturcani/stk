@@ -1,7 +1,7 @@
 import stk
 import pytest
 
-from ._test_case import _TestCase
+from ._test_case import _GenericTestCase
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def alkyne(get_atom_ids):
 def _alkyne(carbon1, atom1, carbon2, atom2):
     bonders = (carbon1, )
     deleters = (carbon2, atom2)
-    return _TestCase(
+    return _GenericTestCase(
         functional_group=stk.Alkyne(
             carbon1=carbon1,
             atom1=atom1,

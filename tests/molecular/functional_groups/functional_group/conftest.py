@@ -22,10 +22,29 @@ from .fixtures import *
         pytest.lazy_fixture('fluoro'),
         pytest.lazy_fixture('iodo'),
         pytest.lazy_fixture('thiol'),
+    ),
+)
+def generic_test_case(request):
+    """
+    A :class:`._GenericTestCase` instance.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(
+    params=(
+        pytest.lazy_fixture('generic_test_case'),
         pytest.lazy_fixture('ring_amine'),
     ),
 )
 def test_case(request):
+    """
+    A :class:`._TestCase` instance.
+
+    """
+
     return request.param
 
 
@@ -35,6 +54,21 @@ def test_case(request):
     ),
 )
 def get_atom_ids(request):
+    """
+    Yield `n` atom ids.
+
+    Parameters
+    ----------
+    n : :class:`int`
+        The number of atom ids to yield.
+
+    Yields
+    ------
+    :class:`int`
+        An atom id.
+
+    """
+
     return request.param
 
 

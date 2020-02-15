@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _TestCase
+from ._test_case import _GenericTestCase
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def difluoro(get_atom_ids):
 def _difluoro(fluorine1, atom1, fluorine2, atom2):
     bonders = (atom1, atom2)
     deleters = (fluorine1, fluorine2)
-    return _TestCase(
+    return _GenericTestCase(
         functional_group=stk.Difluoro(
             fluorine1=fluorine1,
             atom1=atom1,

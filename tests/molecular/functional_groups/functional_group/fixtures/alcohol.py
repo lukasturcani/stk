@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _TestCase
+from ._test_case import _GenericTestCase
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def alcohol(get_atom_ids):
 def _alcohol(oxygen, hydrogen, atom):
     bonders = (oxygen, )
     deleters = (hydrogen, )
-    return _TestCase(
+    return _GenericTestCase(
         functional_group=stk.Alcohol(
             oxygen=oxygen,
             hydrogen=hydrogen,

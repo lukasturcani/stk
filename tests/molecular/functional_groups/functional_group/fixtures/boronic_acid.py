@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _TestCase
+from ._test_case import _GenericTestCase
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def boronic_acid(get_atom_ids):
 def _boronic_acid(boron, oxygen1, hydrogen1, oxygen2, hydrogen2, atom):
     bonders = (oxygen1, oxygen2)
     deleters = (hydrogen1, hydrogen2)
-    return _TestCase(
+    return _GenericTestCase(
         functional_group=stk.BoronicAcid(
             boron=boron,
             oxygen1=oxygen1,
