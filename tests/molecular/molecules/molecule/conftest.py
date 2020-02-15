@@ -1,4 +1,5 @@
 import pytest
+from pytest_lazyfixture import lazy_fixture
 import stk
 import numpy as np
 
@@ -129,7 +130,7 @@ def get_origin_0(origin):
 @pytest.fixture(
     params=[
         lambda molecule: molecule.get_centroid(),
-        pytest.lazy_fixture('get_origin_0'),
+        lazy_fixture('get_origin_0'),
     ],
 )
 def get_origin(request):
