@@ -1,10 +1,10 @@
 import itertools as it
 
 
-def test_get_bonders(test_case):
+def test_get_bonders(generic_test_case):
     _test_get_bonders(
-        functional_group=test_case.functional_group,
-        bonders=test_case.bonders,
+        functional_group=generic_test_case.functional_group,
+        bonders=generic_test_case.bonders,
     )
 
 

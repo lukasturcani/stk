@@ -1,27 +1,29 @@
 import pytest
+from pytest_lazyfixture import lazy_fixture
 
-from .fixtures import *
+# Fixtures need to be visible for lazy_fixture() calls.
+from .fixtures import * # noqa
 
 
 @pytest.fixture(
     params=(
-        pytest.lazy_fixture('primary_amino'),
-        pytest.lazy_fixture('secondary_amino'),
-        pytest.lazy_fixture('aldehyde'),
-        pytest.lazy_fixture('carboxylic_acid'),
-        pytest.lazy_fixture('amide'),
-        pytest.lazy_fixture('thioacid'),
-        pytest.lazy_fixture('alcohol'),
-        pytest.lazy_fixture('alkene'),
-        pytest.lazy_fixture('alkyne'),
-        pytest.lazy_fixture('boronic_acid'),
-        pytest.lazy_fixture('bromo'),
-        pytest.lazy_fixture('dibromo'),
-        pytest.lazy_fixture('difluoro'),
-        pytest.lazy_fixture('diol'),
-        pytest.lazy_fixture('fluoro'),
-        pytest.lazy_fixture('iodo'),
-        pytest.lazy_fixture('thiol'),
+        lazy_fixture('primary_amino'),
+        lazy_fixture('secondary_amino'),
+        lazy_fixture('aldehyde'),
+        lazy_fixture('carboxylic_acid'),
+        lazy_fixture('amide'),
+        lazy_fixture('thioacid'),
+        lazy_fixture('alcohol'),
+        lazy_fixture('alkene'),
+        lazy_fixture('alkyne'),
+        lazy_fixture('boronic_acid'),
+        lazy_fixture('bromo'),
+        lazy_fixture('dibromo'),
+        lazy_fixture('difluoro'),
+        lazy_fixture('diol'),
+        lazy_fixture('fluoro'),
+        lazy_fixture('iodo'),
+        lazy_fixture('thiol'),
     ),
 )
 def generic_test_case(request):
@@ -35,8 +37,8 @@ def generic_test_case(request):
 
 @pytest.fixture(
     params=(
-        pytest.lazy_fixture('generic_test_case'),
-        pytest.lazy_fixture('ring_amine'),
+        lazy_fixture('generic_test_case'),
+        lazy_fixture('ring_amine'),
     ),
 )
 def test_case(request):
@@ -80,3 +82,13 @@ def functional_group(test_case):
     """
 
     return test_case.functional_group
+
+
+@pytest.fixture
+def generic_functional_group(generic_test_case):
+    """
+    A :class:`.GenericFunctionalGroup` instance.
+
+    """
+
+    return generic_test_case.functional_group

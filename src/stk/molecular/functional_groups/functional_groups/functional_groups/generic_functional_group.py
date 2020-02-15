@@ -51,7 +51,6 @@ class GenericFunctionalGroup(FunctionalGroup_):
         )
         return self
 
-
     def get_bonders(self):
         """
         Yield bonder atoms in the functional group.

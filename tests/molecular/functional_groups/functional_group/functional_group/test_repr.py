@@ -1,6 +1,6 @@
 import stk
 
-from .utilities import is_equivalent_functional_group
+from ..utilities import is_equivalent_functional_group
 
 
 def test_repr(functional_group):

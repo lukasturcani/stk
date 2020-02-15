@@ -27,8 +27,6 @@ def _ring_amine(
     hydrogen3,
     carbon3,
 ):
-    bonders = ()
-    deleters = ()
     return _TestCase(
         functional_group=stk.RingAmine(
             nitrogen=nitrogen,
@@ -48,6 +46,5 @@ def _ring_amine(
             hydrogen3,
             carbon3,
         ),
-        bonders=bonders,
-        deleters=deleters,
+        placers=(nitrogen, ),
     )

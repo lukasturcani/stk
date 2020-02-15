@@ -2,7 +2,7 @@ import pytest
 import itertools as it
 import stk
 
-from ..utilities import is_clone_functional_group
+from ..utilities import is_clone_generic_functional_group
 
 
 def get_atom_map_0(functional_group):
@@ -44,11 +44,11 @@ def get_atom_map(request):
     return request.param
 
 
-def test_with_atoms(functional_group, get_atom_map):
-    before = functional_group.clone()
-    _test_with_atoms(functional_group, get_atom_map)
+def test_with_atoms(generic_functional_group, get_atom_map):
+    before = generic_functional_group.clone()
+    _test_with_atoms(generic_functional_group, get_atom_map)
     # Test immutability.
-    is_clone_functional_group(before, functional_group)
+    is_clone_generic_functional_group(before, generic_functional_group)
 
 
 def _test_with_atoms(functional_group, get_atom_map):
@@ -65,11 +65,39 @@ def _test_with_atoms(functional_group, get_atom_map):
         ids2=clone.get_atom_ids(),
         atom_map=atom_map,
     )
+
+    is_modified_sequence(
+        atoms1=functional_group.get_bonders(),
+        atoms2=clone.get_bonders(),
+        atom_map=atom_map,
+    )
+    is_modified_id_sequence(
+        ids1=functional_group.get_bonder_ids(),
+        ids2=clone.get_bonder_ids(),
+        atom_map=atom_map,
+    )
+
+    is_modified_sequence(
+        atoms1=functional_group.get_deleters(),
+        atoms2=clone.get_deleters(),
+        atom_map=atom_map,
+    )
+    is_modified_id_sequence(
+        ids1=functional_group.get_deleter_ids(),
+        ids2=clone.get_deleter_ids(),
+        atom_map=atom_map,
+    )
+
     is_modified_id_sequence(
         ids1=functional_group.get_placer_ids(),
         ids2=clone.get_placer_ids(),
         atom_map=atom_map,
     )
+
+
+def is_modified_sequence(atoms1, atoms2, atom_map):
+    for atom1, atom2 in it.zip_longest(atoms1, atoms2):
+        assert atom2 is atom_map.get(atom1.get_id(), atom1)
 
 
 def is_modified_id_sequence(ids1, ids2, atom_map):
@@ -78,8 +106,3 @@ def is_modified_id_sequence(ids1, ids2, atom_map):
             assert id2 == atom_map[id1].get_id()
         else:
             assert id2 == id1
-
-
-def is_modified_sequence(atoms1, atoms2, atom_map):
-    for atom1, atom2 in it.zip_longest(atoms1, atoms2):
-        assert atom2 is atom_map.get(atom1.get_id(), atom1)

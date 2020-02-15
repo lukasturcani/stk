@@ -1,4 +1,4 @@
-from .utilities import is_clone_functional_group
+from ..utilities import is_clone_functional_group
 
 
 def test_clone(functional_group):
