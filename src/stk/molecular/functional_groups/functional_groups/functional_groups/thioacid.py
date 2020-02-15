@@ -1,4 +1,4 @@
-from .generic_function_group import GenericFunctionalGroup
+from .generic_functional_group import GenericFunctionalGroup
 
 
 class Thioacid(GenericFunctionalGroup):
@@ -69,7 +69,7 @@ class Thioacid(GenericFunctionalGroup):
 
         return self._carbon
 
-    def get_oxygen(self):_
+    def get_oxygen(self):
         """
         Get the ``[oxygen]`` atom.
 
