@@ -15,6 +15,11 @@ import pytest
     ],
 )
 def building_block(request):
+    """
+    A :class:`.BuildingBlock` instance.
+
+    """
+
     return request.param.clone()
 
 
@@ -30,4 +35,19 @@ def building_block(request):
     )
 )
 def get_functional_groups(request):
+    """
+    Yield the functional groups of a `molecule`.
+
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule whose functional groups should be gotten.
+
+    Yields
+    ------
+    :class:`.FunctionalGroup`
+        A functional group of `molecule`.
+
+    """
+
     return request.param

@@ -36,7 +36,7 @@ def get_fg_ids(request):
     return request.param
 
 
-def test_get_bonder_ids(
+def test_get_placer_ids(
     building_block,
     get_functional_groups,
     get_fg_ids,
@@ -44,9 +44,9 @@ def test_get_bonder_ids(
     building_block = building_block.with_functional_groups(
         functional_groups=get_functional_groups(building_block),
     )
-    bonder_ids = it.zip_longest(
-        building_block.get_bonder_ids(get_fg_ids(building_block)),
-        get_bonder_ids(
+    placer_ids = it.zip_longest(
+        building_block.get_placer_ids(get_fg_ids(building_block)),
+        get_placer_ids(
             functional_groups=get_functional_groups(building_block),
             fg_ids=normalize_ids(
                 building_block=building_block,
@@ -54,15 +54,15 @@ def test_get_bonder_ids(
             ),
         ),
     )
-    for bonder1, bonder2 in bonder_ids:
-        assert bonder1 == bonder2
+    for placer1, placer2 in placer_ids:
+        assert placer1 == placer2
 
 
-def get_bonder_ids(functional_groups, fg_ids):
+def get_placer_ids(functional_groups, fg_ids):
     fg_ids = set(fg_ids)
     for fg_id, fg in enumerate(functional_groups):
         if fg_id in fg_ids:
-            yield from fg.get_bonder_ids()
+            yield from fg.get_placer_ids()
 
 
 def normalize_ids(building_block, ids):

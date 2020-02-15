@@ -429,14 +429,14 @@ class BuildingBlock(Molecule):
         clone._functional_groups = self._functional_groups
         return clone
 
-    def get_bonder_ids(self, fg_ids=None):
+    def get_placer_ids(self, fg_ids=None):
         """
-        Yield ids of bonder atoms.
+        Yield ids of atoms used for placing the building block.
 
         Parameters
         ----------
         fg_ids : :class:`iterable` of :class:`int`
-            The ids of functional groups whose bonder atoms should be
+            The ids of functional groups whose placer atoms should be
             yielded. Can be a single :class:`int`, if a single
             functional group should be used, or  ``None``, if all
             functional groups should be used.
@@ -444,7 +444,7 @@ class BuildingBlock(Molecule):
         Yields
         ------
         :class:`int`
-            The id of a bonder atom.
+            The id of a placer atom.
 
         """
 
@@ -454,7 +454,7 @@ class BuildingBlock(Molecule):
             fg_ids = (fg_ids, )
 
         for fg_id in fg_ids:
-            yield from self._functional_groups[fg_id].get_bonder_ids()
+            yield from self._functional_groups[fg_id].get_placer_ids()
 
     def to_dict(self):
         """
