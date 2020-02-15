@@ -52,7 +52,8 @@ class BuildingBlock(Molecule):
         '.pdb': partial(
             rdkit.MolFromPDBFile,
             sanitize=False,
-            removeHs=False
+            removeHs=False,
+            proximityBonding=False,
         ),
     }
 
