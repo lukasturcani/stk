@@ -403,21 +403,6 @@ class BuildingBlock(Molecule_):
         """
 
         obj = super().init_from_dict(molecule_dict)
-        obj = cls.__new__(cls)
-        obj._position_matrix = np.array(
-            molecule_dict['position_matrix']
-        ).T
-        obj._atoms = eval(molecule_dict['atoms'], vars(atoms))
-        obj._bonds = [
-            Bond(
-                atom1=obj._atoms[bond_dict['atom1_id']],
-                atom2=obj._atoms[bond_dict['atom2_id']],
-                order=bond_dict['order'],
-                periodicity=tuple(bond_dict['periodicity']),
-            )
-            for bond_dict in molecule_dict['bonds']
-        ]
-
         obj._functional_groups = []
         globals_ = vars(functional_groups)
         globals_.update(vars(atoms))
@@ -482,13 +467,11 @@ class BuildingBlock(Molecule_):
 
         """
 
-        return {
-            'class': self.__class__.__name__,
+        d = super().to_dict()
+        d.update({
             'functional_groups': repr(self._functional_groups),
-            'position_matrix': self.get_position_matrix().tolist(),
-            'atoms': repr(self._atoms),
-            'bonds': [b.to_dict() for b in self._bonds],
-        }
+        })
+        return d
 
     def __str__(self):
         if self._functional_groups:
