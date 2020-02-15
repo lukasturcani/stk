@@ -1,7 +1,7 @@
 from .smarts_functional_group_factory import (
     SmartsFunctionalGroupFactory,
 )
-from ...functional_groups import Amide
+from ..functional_groups import Amide
 
 
 class AmideFactory(SmartsFunctionalGroupFactory):

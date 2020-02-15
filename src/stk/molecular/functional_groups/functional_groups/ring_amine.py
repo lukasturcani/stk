@@ -1,4 +1,4 @@
-from .. import FunctionalGroup
+from . import FunctionalGroup
 
 
 class RingAmine(FunctionalGroup):

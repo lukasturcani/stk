@@ -1,4 +1,4 @@
-from ..functional_group import FunctionalGroup
+from .functional_group import FunctionalGroup
 
 
 class GenericFunctionalGroup(FunctionalGroup):

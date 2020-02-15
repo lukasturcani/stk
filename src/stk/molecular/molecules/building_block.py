@@ -15,14 +15,14 @@ from .. import atoms, functional_groups
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bond import Bond
-from .molecule import Molecule_
+from .molecule import Molecule
 from ...utilities import remake
 
 
 logger = logging.getLogger(__name__)
 
 
-class BuildingBlock(Molecule_):
+class BuildingBlock(Molecule):
     """
     Represents a building block of a :class:`.ConstructedMolecule`.
 
