@@ -1,7 +1,7 @@
-from ..functional_group import FunctionalGroup_
+from ..functional_group import FunctionalGroup
 
 
-class GenericFunctionalGroup(FunctionalGroup_):
+class GenericFunctionalGroup(FunctionalGroup):
     """
     A functional group which defines general atom classes.
 
@@ -31,7 +31,7 @@ class GenericFunctionalGroup(FunctionalGroup_):
 
         """
 
-        super().__init__(atoms)
+        super().__init__(atoms, bonders)
         self._bonders = bonders
         self._deleters = deleters
 
@@ -121,9 +121,6 @@ class GenericFunctionalGroup(FunctionalGroup_):
         """
 
         yield from (a.get_id() for a in self._deleters)
-
-    def get_placer_ids(self):
-        yield from (a.get_id() for a in self._bonders)
 
     def __repr__(self):
         return (

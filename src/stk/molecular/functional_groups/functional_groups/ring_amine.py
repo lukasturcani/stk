@@ -1,7 +1,7 @@
-from .. import FunctionalGroup_
+from .. import FunctionalGroup
 
 
-class RingAmine(FunctionalGroup_):
+class RingAmine(FunctionalGroup):
     """
     Represents an amine bonded to a ring.
 
@@ -65,7 +65,7 @@ class RingAmine(FunctionalGroup_):
             hydrogen3,
             carbon3,
         )
-        super().__init__(atoms)
+        super().__init__(atoms, (nitrogen, ))
 
     def get_nitrogen(self):
         """
@@ -157,9 +157,6 @@ class RingAmine(FunctionalGroup_):
         """
 
         return self._carbon3
-
-    def get_placer_ids(self):
-        yield self._nitrogen.get_id()
 
     def clone(self):
         clone = super().clone()
