@@ -23,9 +23,8 @@ Functional Group
 #. :class:`.Thiol`
 
 Functional groups define which atoms of a :class:`.BuildingBlock` are
-modified by during :class:`.ConstructedMolecule` construction. They
-are also used to position the :class:`.BuildingBlock` molecules during
-construction. The class of a :class:`.FunctionalGroup`
+modified by during :class:`.ConstructedMolecule` construction.
+The class of a :class:`.FunctionalGroup`
 affects which :class:`.Reaction` can be used with it.
 See the abstract base class :class:`.FunctionalGroup` for more
 information.
