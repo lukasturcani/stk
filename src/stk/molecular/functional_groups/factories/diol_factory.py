@@ -8,9 +8,27 @@ class DiolFactory(SmartsFunctionalGroupFactory):
     """
     Creates :class:`.Diol` instances.
 
+    Creates functional groups from substructures, which match the
+    ``[H][O][#6]~[#6][O][H]`` functional group string.
+
     """
 
     def __init__(self, bonders=(2, 3), deleters=(0, 1, 4, 5)):
+        """
+        Initialize a :class:`.DiolFactory` instance.
+
+        Parameters
+        ----------
+        bonders : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are bonder atoms.
+
+        deleters : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are deleter atoms.
+
+        """
+
         super().__init__('[H][O][#6]~[#6][O][H]', bonders, deleters)
 
     def get_functional_groups(self, molecule):

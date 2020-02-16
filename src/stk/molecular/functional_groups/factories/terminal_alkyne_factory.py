@@ -8,9 +8,27 @@ class TerminalAlkyneFactory(SmartsFunctionalGroupFactory):
     """
     Creates :class:`.Alkyne` instances.
 
+    Creates functional groups from substructures, which match the
+    ``[*][C]#[C][H]`` functional group string.
+
     """
 
     def __init__(self, bonders=(1, ), deleters=(2, 3)):
+        """
+        Initialize a :class:`.TerminalAlkyneFactory` instance.
+
+        Parameters
+        ----------
+        bonders : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are bonder atoms.
+
+        deleters : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are deleter atoms.
+
+        """
+
         super().__init__('[*][C]#[C][H]', bonders, deleters)
 
     def get_functional_groups(self, molecule):

@@ -8,9 +8,27 @@ class DifluoroFactory(SmartsFunctionalGroupFactory):
     """
     Creates :class:`.Difluoro` instances.
 
+    Creates functional groups from substructures, which match the
+    ``[F][#6]~[#6][F]`` functional group string.
+
     """
 
     def __init__(self, bonders=(1, 2), deleters=(0, 3)):
+        """
+        Initialize a :class:`.DifluoroFactory` instance.
+
+        Parameters
+        ----------
+        bonders : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are bonder atoms.
+
+        deleters : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are deleter atoms.
+
+        """
+
         super().__init__('[F][#6]~[#6][F]', bonders, deleters)
 
     def get_functional_groups(self, molecule):

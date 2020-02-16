@@ -8,9 +8,27 @@ class BromoFactory(SmartsFunctionalGroupFactory):
     """
     Creates :class:`.Bromo` instances.
 
+    Creates functional groups from substructures, which match the
+    ``[*][Br]`` functional group string.
+
     """
 
     def __init__(self, bonders=(0, ), deleters=(1, )):
+        """
+        Initialize a :class:`.BromoFactory` instance.
+
+        Parameters
+        ----------
+        bonders : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are bonder atoms.
+
+        deleters : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are deleter atoms.
+
+        """
+
         super().__init__('[*][Br]', bonders, deleters)
 
     def get_functional_groups(self, molecule):

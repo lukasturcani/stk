@@ -8,9 +8,27 @@ class PrimaryAminoFactory(SmartsFunctionalGroupFactory):
     """
     Creates :class:`.PrimaryAmino` instances.
 
+    Creates functional groups from substructures, which match the
+    ``[*][N]([H])[H]`` functional group string.
+
     """
 
     def __init__(self, bonders=(1, ), deleters=(2, 3)):
+        """
+        Initialize a :class:`.PrimaryAminoFactory` instance.
+
+        Parameters
+        ----------
+        bonders : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are bonder atoms.
+
+        deleters : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are deleter atoms.
+
+        """
+
         """
         Initialize an :class:`.AmineFactory`.
 
