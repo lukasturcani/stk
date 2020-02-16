@@ -2,6 +2,9 @@ import itertools as it
 import numpy as np
 import pytest
 import stk
+from stk.molecular.topology_graphs.topology_graph import (
+    ConstructionState,
+)
 
 from ._test_case import _TestCase
 
@@ -20,7 +23,7 @@ def two_two_reaction(
 ):
     return _TestCase(
         reaction=stk.TwoTwoReaction(
-            position_matrix=get_position_matrix(
+            construction_state=get_construction_state(
                 functional_group1=functional_group2_2,
                 functional_group2=functional_group2,
             ),
@@ -68,7 +71,20 @@ def get_bonds(
     )
 
 
-def get_position_matrix(functional_group1, functional_group2):
+class _TestConstructionState(ConstructionState):
+    """
+    A mock implementation for the tests here.
+
+    """
+
+    def __init__(self, position_matrix):
+        self.position_matrix = position_matrix
+
+    def get_position_matrix(self):
+        return self.position_matrix
+
+
+def get_construction_state(functional_group1, functional_group2):
     size = max(it.chain(
         functional_group1.get_bonder_ids(),
         functional_group2.get_bonder_ids(),
@@ -80,4 +96,4 @@ def get_position_matrix(functional_group1, functional_group2):
     position_matrix[b3] = [99, 99, 99]
     position_matrix[b2] = [10, 10, 10]
     position_matrix[b4] = [8, 8, 8]
-    return position_matrix
+    return _TestConstructionState(position_matrix)

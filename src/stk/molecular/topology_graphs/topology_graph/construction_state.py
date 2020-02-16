@@ -1,4 +1,4 @@
-class _ConstructionState:
+class ConstructionState:
     """
 
     """
@@ -53,7 +53,7 @@ class _ConstructionState:
 
     def clone(self):
         clone = self.__class__.__new__(self.__class__)
-        _ConstructionState.__init__(
+        ConstructionState.__init__(
             self=clone,
             vertex_assignments={
                 vertex: self._vertex_assignments[id_]
@@ -61,3 +61,10 @@ class _ConstructionState:
             },
         )
         return clone
+
+    def get_position_matrix(self):
+        """
+
+        """
+
+        pass

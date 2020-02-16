@@ -1,7 +1,7 @@
 from typing import NamedTuple
 
 
-class _ReactionResult(NamedTuple):
+class ReactionResult(NamedTuple):
     """
     The result of a reaction.
 
@@ -45,7 +45,7 @@ class Reaction:
 
         """
 
-        return _ReactionResult(
+        return ReactionResult(
             new_atoms=tuple(self._get_new_atoms()),
             new_bonds=tuple(self._get_new_bonds()),
             deleted_atoms=tuple(self._get_deleted_atoms()),

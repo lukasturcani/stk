@@ -59,7 +59,9 @@ into its :class:`.Vertex` counterpart.
 
 """
 
-from .construction_result import ConstructionResult
+from ..construction_result import ConstructionResult
+from ..construction_state import ConstructionState
+from .implementations import _Parallel, _Serial
 
 
 class TopologyGraph:
