@@ -10,6 +10,6 @@ def test_get_deleted_atoms(test_case):
 
 def _test_get_deleted_atoms(reaction_result, deleted_atoms):
     are_equivalent_atoms(
-        atoms1=reaction_result.get_deleted_atoms(),
+        atoms1=reaction_result.deleted_atoms,
         atoms2=deleted_atoms,
     )

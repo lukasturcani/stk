@@ -1,7 +1,9 @@
 import pytest
+from pytest_lazyfixture import lazy_fixture
 import stk
 
-from .fixtures import *
+# Fixtures need to visible for lazy_fixture() calls.
+from .fixtures import *  # noqa
 
 
 @pytest.fixture(
@@ -189,9 +191,9 @@ def functional_group2(request):
 
 @pytest.fixture(
     params=(
-        pytest.lazy_fixture('one_one_reaction'),
-        pytest.lazy_fixture('one_two_reaction'),
-        pytest.lazy_fixture('two_two_reaction'),
+        lazy_fixture('one_one_reaction'),
+        lazy_fixture('one_two_reaction'),
+        lazy_fixture('two_two_reaction'),
     ),
 )
 def test_case(request):

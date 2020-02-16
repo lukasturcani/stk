@@ -9,4 +9,4 @@ def test_get_new_bonds(test_case):
 
 
 def _test_get_new_bonds(reaction_result, new_bonds):
-    are_equivalent_bonds(reaction_result.get_new_bonds(), new_bonds)
+    are_equivalent_bonds(reaction_result.new_bonds, new_bonds)
