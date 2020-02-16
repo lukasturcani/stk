@@ -14,13 +14,13 @@ class TwoTwoReaction(Reaction):
 
     def __init__(
         self,
-        position_matrix,
+        construction_state,
         functional_group1,
         functional_group2,
         bond_order,
         periodicity,
     ):
-        self._position_matrix = np.array(position_matrix)
+        self._construction_state = construction_state
         self._functional_group1 = functional_group1
         self._functional_group2 = functional_group2
         self._bond_order = bond_order
