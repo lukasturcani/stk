@@ -7,8 +7,13 @@ class _ReactionResult(NamedTuple):
 
     Attributes
     ----------
-    new_atoms : :class:`tuple` of :class:`.Atom`
-        The atoms added by the reaction.
+    new_atoms : :class:`tuple`
+        A :class:`tuple` of the form ``(atom, position)``, holding
+        an :class:`.Atom` added
+        by the reaction and its position as a
+        :class:`numpy.ndarray`. New atoms have a negative id, and
+        will need to be assigned a new one when added to the
+        :class:`.ConstructedMolecule`.
 
     new_bonds : :class:`tuple` of :class:`.Bond`
         The bonds added by the reaction.
@@ -31,6 +36,12 @@ class Reaction:
 
     def get_result(self):
         """
+        Get the result of carrying out the reaction.
+
+        Returns
+        -------
+        :class:`._ReactionResult`
+            Holds the results of the reaction.
 
         """
 
