@@ -1,8 +1,8 @@
 import numpy as np
 
-from ..reaction import Reaction
-from .... import atoms
-from ....bond import Bond
+from .reaction import Reaction
+from ... import atoms
+from ...bond import Bond
 
 
 class RingAmineReaction(Reaction):

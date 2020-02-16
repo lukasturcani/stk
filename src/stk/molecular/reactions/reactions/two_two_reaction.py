@@ -2,8 +2,8 @@ import numpy as np
 import itertools as it
 from scipy.spatial.distance import euclidean
 
-from ..reaction import Reaction
-from ....bond import Bond
+from .reaction import Reaction
+from ...bond import Bond
 
 
 class TwoTwoReaction(Reaction):

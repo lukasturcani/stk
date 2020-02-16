@@ -1,7 +1,7 @@
 import itertools as it
 
-from ..reaction import Reaction
-from ....bond import Bond
+from .reaction import Reaction
+from ...bond import Bond
 
 
 class OneTwoReaction(Reaction):
