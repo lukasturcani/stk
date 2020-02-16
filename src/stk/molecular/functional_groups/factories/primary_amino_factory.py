@@ -1,10 +1,9 @@
-from .smarts_functional_group_factory import (
-    SmartsFunctionalGroupFactory,
-)
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import _get_atom_ids
 from ..functional_groups import PrimaryAmino
 
 
-class PrimaryAminoFactory(SmartsFunctionalGroupFactory):
+class PrimaryAminoFactory(FunctionalGroupFactory):
     """
     Creates :class:`.PrimaryAmino` instances.
 
@@ -34,10 +33,11 @@ class PrimaryAminoFactory(SmartsFunctionalGroupFactory):
 
         """
 
-        super().__init__('[*][N]([H])[H]', bonders, deleters)
+        self._bonders = bonders
+        self._deleters = deleters
 
     def get_functional_groups(self, molecule):
-        for atom_ids in self._get_atom_ids(molecule):
+        for atom_ids in _get_atom_ids('[*][N]([H])[H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield PrimaryAmino(
                 nitrogen=atoms[1],

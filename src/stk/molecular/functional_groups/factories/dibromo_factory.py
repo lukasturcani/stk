@@ -1,10 +1,9 @@
-from .smarts_functional_group_factory import (
-    SmartsFunctionalGroupFactory,
-)
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import _get_atom_ids
 from ..functional_groups import Dibromo
 
 
-class DibromoFactory(SmartsFunctionalGroupFactory):
+class DibromoFactory(FunctionalGroupFactory):
     """
     Creates :class:`.Dibromo` instances.
 
@@ -29,10 +28,11 @@ class DibromoFactory(SmartsFunctionalGroupFactory):
 
         """
 
-        super().__init__('[Br][#6]~[#6][Br]', bonders, deleters)
+        self._bonders = bonders
+        self._deleters = deleters
 
     def get_functional_groups(self, molecule):
-        for atom_ids in self._get_atom_ids(molecule):
+        for atom_ids in _get_atom_ids('[Br][#6]~[#6][Br]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Dibromo(
                 atom1=atoms[1],

@@ -1,10 +1,9 @@
-from .smarts_functional_group_factory import (
-    SmartsFunctionalGroupFactory,
-)
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import _get_atom_ids
 from ..functional_groups import RingAmine
 
 
-class RingAmineFactory(SmartsFunctionalGroupFactory):
+class RingAmineFactory(FunctionalGroupFactory):
     """
     Creates :class:`.RingAmine` functional groups.
 
@@ -13,32 +12,12 @@ class RingAmineFactory(SmartsFunctionalGroupFactory):
 
     """
 
-    def __init__(self):
-        """
-        Initialize a :class:`.RingAmineFactory` instance.
-
-        Parameters
-        ----------
-        bonders : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are bonder atoms.
-
-        deleters : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are deleter atoms.
-
-        """
-
-        super().__init__(
-            functional_group_smarts=(
-                '[N]([H])([H])[#6]~[#6]([H])~[#6R1]'
-            ),
-            bonders=(),
-            deleters=(),
-        )
-
     def get_functional_groups(self, molecule):
-        for atom_ids in self._get_atom_ids(molecule):
+        ids = _get_atom_ids(
+            query='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
+            molecule=molecule,
+        )
+        for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield RingAmine(
                 nitrogen=atoms[0],

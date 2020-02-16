@@ -1,10 +1,9 @@
-from .smarts_functional_group_factory import (
-    SmartsFunctionalGroupFactory,
-)
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import _get_atom_ids
 from ..functional_groups import Alkene
 
 
-class TerminalAlkeneFactory(SmartsFunctionalGroupFactory):
+class TerminalAlkeneFactory(FunctionalGroupFactory):
     """
     Creates :class:`.TerminalAlkene` instances.
 
@@ -29,10 +28,12 @@ class TerminalAlkeneFactory(SmartsFunctionalGroupFactory):
 
         """
 
-        super().__init__('[*][C]([*])=[C]([H])[H]', bonders, deleters)
+        self._bonders = bonders
+        self._deleters = deleters
 
     def get_functional_groups(self, molecule):
-        for atom_ids in self._get_atom_ids(molecule):
+        ids = _get_atom_ids('[*][C]([*])=[C]([H])[H]', molecule)
+        for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Alkene(
                 carbon1=atoms[1],

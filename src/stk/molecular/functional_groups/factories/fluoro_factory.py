@@ -1,10 +1,9 @@
-from .smarts_functional_group_factory import (
-    SmartsFunctionalGroupFactory,
-)
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import _get_atom_ids
 from ..functional_groups import Fluoro
 
 
-class FluoroFactory(SmartsFunctionalGroupFactory):
+class FluoroFactory(FunctionalGroupFactory):
     """
     Creates :class:`.Fluoro` instances.
 
@@ -29,10 +28,11 @@ class FluoroFactory(SmartsFunctionalGroupFactory):
 
         """
 
-        super().__init__('[*][F]', bonders, deleters)
+        self._bonders = bonders
+        self._deleters = deleters
 
     def get_functional_groups(self, molecule):
-        for atom_ids in self._get_atom_ids(molecule):
+        for atom_ids in _get_atom_ids('[*][F]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Fluoro(
                 fluorine=atoms[1],

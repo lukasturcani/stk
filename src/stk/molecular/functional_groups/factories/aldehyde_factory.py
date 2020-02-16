@@ -1,10 +1,9 @@
-from .smarts_functional_group_factory import (
-    SmartsFunctionalGroupFactory,
-)
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import _get_atom_ids
 from ..functional_groups import Aldehyde
 
 
-class AldehydeFactory(SmartsFunctionalGroupFactory):
+class AldehydeFactory(FunctionalGroupFactory):
     """
     Creates :class:`.Aldehyde` instances.
 
@@ -29,10 +28,11 @@ class AldehydeFactory(SmartsFunctionalGroupFactory):
 
         """
 
-        super().__init__('[*][C](=[O])[H]', bonders, deleters)
+        self._bonders = bonders
+        self._deleters = deleters
 
     def get_functional_groups(self, molecule):
-        for atom_ids in self._get_atom_ids(molecule):
+        for atom_ids in _get_atom_ids('[*][C](=[O])[H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Aldehyde(
                 carbon=atoms[1],

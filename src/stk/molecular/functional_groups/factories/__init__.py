@@ -1,5 +1,4 @@
 from .functional_group_factory import *
-from .smarts_functional_group_factory import *
 from .alcohol_factory import *
 from .aldehyde_factory import *
 from .amide_factory import *
