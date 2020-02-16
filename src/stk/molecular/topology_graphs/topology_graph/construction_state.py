@@ -12,7 +12,6 @@ class ConstructionState:
         }
         self._vertex_edges = dict(vertex_edges)
 
-
     def with_placement_results(self, results):
         pass
 

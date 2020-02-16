@@ -1,4 +1,3 @@
-import numpy as np
 import itertools as it
 from scipy.spatial.distance import euclidean
 
