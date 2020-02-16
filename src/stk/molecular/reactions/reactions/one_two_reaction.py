@@ -19,8 +19,8 @@ class OneTwoReaction(Reaction):
         bond_order,
         periodicity,
     ):
-        self._functional_group1 = functional_group1.clone()
-        self._functional_group2 = functional_group2.clone()
+        self._functional_group1 = functional_group1
+        self._functional_group2 = functional_group2
         self._bond_order = bond_order
         self._periodicity = periodicity
 
