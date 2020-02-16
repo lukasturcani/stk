@@ -7,7 +7,7 @@ from ..reactions import (
 from ...functional_groups import (
     Alkene,
     Alkyne,
-    Amine,
+    PrimaryAmino,
     Aldehyde,
     Amide,
 )
@@ -129,9 +129,9 @@ class GenericReactionFactory(ReactionFactory):
 
         if bond_orders is None:
             bond_orders = {
-                frozenset({Amine, Aldehyde}): 2,
+                frozenset({PrimaryAmino, Aldehyde}): 2,
                 frozenset({Amide, Aldehyde}): 2,
-                frozenset({Amide, Amine}): 2,
+                frozenset({Amide, PrimaryAmino}): 2,
                 frozenset({Alkene}): 2,
                 frozenset({Alkyne}): 2,
             }
