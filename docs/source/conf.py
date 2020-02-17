@@ -37,6 +37,7 @@ MOCK_MODULES = [
     'pywindowx',
     'scipy',
     'scipy.spatial',
+    'scipy.spatial.distance',
     'matplotlib',
     'psutil',
     'pandas',
