@@ -36,6 +36,7 @@ MOCK_MODULES = [
     'numpy',
     'pywindowx',
     'scipy',
+    'scipy.spatial',
     'matplotlib',
     'psutil',
     'pandas',
