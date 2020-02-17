@@ -35,7 +35,7 @@ MOCK_MODULES = [
     'rdkit.Geometry',
     'numpy',
     'numpy.linalg',
-    'pywindowx',
+    'pywindow',
     'scipy',
     'scipy.spatial',
     'scipy.spatial.distance',
