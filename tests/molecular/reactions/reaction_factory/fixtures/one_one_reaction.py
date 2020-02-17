@@ -1,8 +1,9 @@
 import pytest
+import itertools as it
 import stk
 
 from ._test_case import _TestCase
-from .utilities import MockEdge, get_deleted_atoms
+from .utilities import MockEdge
 
 
 @pytest.fixture(
@@ -57,10 +58,10 @@ def one_one_reaction(
                 functional_group2=functional_group2,
                 periodicity=periodicity,
             ),
-            deleted_atoms=get_deleted_atoms(
-                functional_group1=functional_group1,
-                functional_group2=functional_group2,
-            )
+            deleted_atoms=it.chain(
+                functional_group1.get_deleters(),
+                functional_group2.get_deleters(),
+            ),
         ),
     )
 
