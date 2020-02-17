@@ -18,6 +18,27 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 
+import sys
+from unittest.mock import MagicMock
+
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+MOCK_MODULES = [
+    'rdkit',
+    'numpy',
+    'pywindowx',
+    'scipy',
+    'matplotlib',
+    'psutil',
+    'pandas',
+    'pathos',
+    'seaborn',
+]
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
