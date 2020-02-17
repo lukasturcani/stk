@@ -32,6 +32,7 @@ MOCK_MODULES = [
     'rdkit',
     'rdkit.Chem',
     'rdkit.Chem.AllChem',
+    'rdkit.Geometry',
     'numpy',
     'pywindowx',
     'scipy',
