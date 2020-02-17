@@ -40,6 +40,7 @@ MOCK_MODULES = [
     'scipy.spatial',
     'scipy.spatial.distance',
     'scipy.optimize',
+    'scipy.sparse',
     'matplotlib',
     'matplotlib.pyplot',
     'psutil',
