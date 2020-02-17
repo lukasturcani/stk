@@ -30,6 +30,8 @@ class Mock(MagicMock):
 
 MOCK_MODULES = [
     'rdkit',
+    'rdkit.Chem',
+    'rdkit.Chem.AllChem',
     'numpy',
     'pywindowx',
     'scipy',
