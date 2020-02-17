@@ -59,3 +59,5 @@ def is_same_bond(bond1, bond2):
             key=lambda atom: atom.get_id(),
         )
     )
+    assert bond1.get_periodicity() == bond2.get_periodicity()
+    assert bond1.get_order() == bond2.get_order()

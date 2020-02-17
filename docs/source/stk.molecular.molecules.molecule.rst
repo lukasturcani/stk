@@ -1,16 +1,5 @@
-stk.molecular.molecules.molecule package
-========================================
-
-Submodules
-----------
-
-.. toctree::
-
-   stk.molecular.molecules.molecule.molecule
-   stk.molecular.molecules.molecule.molecule_
-
-Module contents
----------------
+stk.molecular.molecules.molecule module
+=======================================
 
 .. automodule:: stk.molecular.molecules.molecule
    :members:
