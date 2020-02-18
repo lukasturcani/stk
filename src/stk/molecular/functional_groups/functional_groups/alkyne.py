@@ -53,12 +53,12 @@ class Alkyne(GenericFunctionalGroup):
 
     def get_atom1(self):
         """
-        Get the ``[atom1]``atom.
+        Get the ``[atom1]`` atom.
 
         Returns
         -------
         :class:`.Atom`
-            The ``[atom1]``atom.
+            The ``[atom1]`` atom.
 
         """
 

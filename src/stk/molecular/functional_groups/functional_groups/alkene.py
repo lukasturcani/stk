@@ -39,10 +39,10 @@ class Alkene(GenericFunctionalGroup):
             The ``[carbon2]`` atom.
 
         atom3 : :class:`.Atom`
-            The ``[atom3]``atom.
+            The ``[atom3]`` atom.
 
         atom4 : :class:`.Atom`
-            The ``[atom4]``atom.
+            The ``[atom4]`` atom.
 
         bonders : :class:`tuple` of :class:`.Atom`
             The bonder atoms.
@@ -81,7 +81,7 @@ class Alkene(GenericFunctionalGroup):
         Returns
         -------
         :class:`.Atom`
-            The ``[atom1]``atom.
+            The ``[atom1]`` atom.
 
         """
 
@@ -89,12 +89,12 @@ class Alkene(GenericFunctionalGroup):
 
     def get_atom2(self):
         """
-        Get the ``[atom2]``atom.
+        Get the ``[atom2]`` atom.
 
         Returns
         -------
         :class:`.Atom`
-            The ``[atom2]``atom.
+            The ``[atom2]`` atom.
 
         """
 
@@ -120,7 +120,7 @@ class Alkene(GenericFunctionalGroup):
         Returns
         -------
         :class:`.Atom`
-            The ``[atom3]``atom.
+            The ``[atom3]`` atom.
 
         """
 
@@ -128,7 +128,7 @@ class Alkene(GenericFunctionalGroup):
 
     def get_atom4(self):
         """
-        Get the ``[atom4]``atom.
+        Get the ``[atom4]`` atom.
 
         Returns
         -------

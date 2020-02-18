@@ -21,7 +21,7 @@ def _test_get_reaction(
     reaction = factory.get_reaction(
         construction_state=construction_state,
         edge=edge,
-        functional_gorups=functional_groups,
+        functional_groups=functional_groups,
     )
     is_same_result(reaction.get_result(), reaction_result)
 

@@ -76,7 +76,7 @@ class Amide(GenericFunctionalGroup):
 
     def get_oxygen(self):
         """
-        Get the ``[oxygen]``atom.
+        Get the ``[oxygen]`` atom.
 
         Returns
         -------
@@ -89,7 +89,7 @@ class Amide(GenericFunctionalGroup):
 
     def get_nitrogen(self):
         """
-        Get the ``[nitrogen]``atom.
+        Get the ``[nitrogen]`` atom.
 
         Returns
         -------
@@ -128,7 +128,7 @@ class Amide(GenericFunctionalGroup):
 
     def get_atom(self):
         """
-        Get the ``[atom]``atom.
+        Get the ``[atom]`` atom.
 
         Returns
         -------

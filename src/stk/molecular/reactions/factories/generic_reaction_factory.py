@@ -151,7 +151,7 @@ class GenericReactionFactory(ReactionFactory):
             construction_state=construction_state,
             functional_group1=functional_group1,
             functional_group2=functional_group2,
-            bonder_order=self._bonder_orders.get(
+            bond_order=self._bond_orders.get(
                 self._get_bond_order_key(functional_groups),
                 1,
             ),
