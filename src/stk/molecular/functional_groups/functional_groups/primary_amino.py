@@ -44,7 +44,6 @@ class PrimaryAmino(GenericFunctionalGroup):
 
         """
 
-
         self._nitrogen = nitrogen
         self._hydrogen1 = hydrogen1
         self._hydrogen2 = hydrogen2

@@ -81,7 +81,7 @@ class Amide(GenericFunctionalGroup):
         Returns
         -------
         :class:`.O`
-            The ``[oxygen]``atom.
+            The ``[oxygen]`` atom.
 
         """
 
@@ -94,7 +94,7 @@ class Amide(GenericFunctionalGroup):
         Returns
         -------
         :class:`.N`
-            The ``[nitrogen]``atom.
+            The ``[nitrogen]`` atom.
 
         """
 
@@ -133,7 +133,7 @@ class Amide(GenericFunctionalGroup):
         Returns
         -------
         :class:`.Atom`
-            The ``[atom]``atom.
+            The ``[atom]`` atom.
 
         """
 

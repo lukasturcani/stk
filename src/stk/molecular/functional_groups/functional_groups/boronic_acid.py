@@ -27,16 +27,16 @@ class BoronicAcid(GenericFunctionalGroup):
         Parameters
         ----------
         boron : :class:`.B`
-            The ``[boron]``atom.
+            The ``[boron]`` atom.
 
         oxygen1 : :class:`.O`
-            The ``[oxygen1]``atom.
+            The ``[oxygen1]`` atom.
 
         hydrogen1 : :class:`.H`
-            The ``[hydrogen]``atom.
+            The ``[hydrogen]`` atom.
 
         oxygen2 : :class:`.O`
-            The ``[oyxgen2]``atom.
+            The ``[oyxgen2]`` atom.
 
         hydrogen2 : :class:`.H`
             The ``[hydrogen2]`` atom.

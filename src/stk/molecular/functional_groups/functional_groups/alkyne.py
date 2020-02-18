@@ -25,10 +25,10 @@ class Alkyne(GenericFunctionalGroup):
         Parameters
         ----------
         carbon1 : :class:`.C`
-            The ``[carbon1]``atom.
+            The ``[carbon1]`` atom.
 
         atom1 : :class:`.Atom`
-            The ``[atom1]``atom.
+            The ``[atom1]`` atom.
 
         carbon2 : :class:`.C`
             The ``[carbon2]`` atom.

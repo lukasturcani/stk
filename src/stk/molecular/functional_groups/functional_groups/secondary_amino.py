@@ -34,7 +34,7 @@ class SecondaryAmino(GenericFunctionalGroup):
             The ``[atom]`` atom.
 
         atom2 : :class:`.Atom`
-            The ``[atom]``atom.
+            The ``[atom]`` atom.
 
         bonders : :class:`tuple` of :class:`.Atom`
             The bonder atoms.

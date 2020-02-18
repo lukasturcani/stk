@@ -33,7 +33,7 @@ class Alkene(GenericFunctionalGroup):
             The ``[atom1]`` atom.
 
         atom2 : :class:`.Atom`
-            The ``[atom2]``atom.
+            The ``[atom2]`` atom.
 
         carbon2 : :class:`.C`
             The ``[carbon2]`` atom.

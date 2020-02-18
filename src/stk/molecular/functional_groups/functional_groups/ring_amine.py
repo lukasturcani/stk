@@ -45,7 +45,7 @@ class RingAmine(FunctionalGroup):
             The ``[hydrogen3]`` atom.
 
         carbon3 : :class:`.C`
-            The ``[carbon3]``atom.
+            The ``[carbon3]`` atom.
 
         """
 
