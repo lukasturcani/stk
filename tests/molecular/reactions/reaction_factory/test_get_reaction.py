@@ -44,8 +44,14 @@ def is_same_atom(atom1, atom2):
 
 
 def are_same_bonds(bonds1, bonds2):
+    bonds1 = sorted(bonds1, key=atom_ids)
+    bonds2 = sorted(bonds2, key=atom_ids)
     for bond1, bond2 in it.zip_longest(bonds1, bonds2):
         is_same_bond(bond1, bond2)
+
+
+def atom_ids(bond):
+    return bond.get_atom1().get_id(), bond.get_atom2().get_id()
 
 
 def is_same_bond(bond1, bond2):
@@ -60,4 +66,3 @@ def is_same_bond(bond1, bond2):
         )
     )
     assert bond1.get_periodicity() == bond2.get_periodicity()
-    assert bond1.get_order() == bond2.get_order()
