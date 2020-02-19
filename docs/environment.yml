@@ -3,4 +3,4 @@ channels:
 dependencies:
     - pip:
         - numpydoc
-        - -r file:requirements.txt
+        - --no-deps -e ..
