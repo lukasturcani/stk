@@ -190,6 +190,31 @@ class TopologyGraph:
         state = self._clean_up(state)
         return ConstructionResult(state)
 
+    def get_vertices(self, vertex_ids=None):
+        """
+        Yield the vertices of the graph.
+
+        Parameters
+        ----------
+        vertex_ids : :class:`iterable` of :class:`int`, optional
+            The ids of vertices to yield. If ``None``, then all
+            vertices are yielded.
+
+        Yields
+        ------
+        :class:`.Vertex`
+            A vertex of the graph.
+
+        """
+
+        if vertex_ids is None:
+            vertex_ids = range(len(self._vertices))
+        elif isinstance(vertex_ids, int):
+            vertex_ids = (vertex_ids, )
+
+        for id_ in vertex_ids:
+            yield self._vertices[id_]
+
     def _get_construction_state(self, vertex_assignments):
         return ConstructionState(vertex_assignments)
 
@@ -298,12 +323,10 @@ class TopologyGraph:
 
         return state
 
-
     @staticmethod
     def _with_ids(objects):
         for id, object in enumerate(objects):
             yield object.with_id(id)
-
 
     def __str__(self):
         return repr(self)

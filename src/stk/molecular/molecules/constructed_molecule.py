@@ -31,72 +31,6 @@ class ConstructedMolecule(Molecule):
     method does not have to be called explicitly by the user, it will
     be called automatically during initialization.
 
-    The building block molecules used for construction can be either
-    :class:`.BuildingBlock` instances or other
-    :class:`.ConstructedMolecule` instances, or a combination both.
-
-    Each :class:`.TopologyGraph` subclass may add additional attributes
-    to the :class:`ConstructedMolecule`, which will be described within
-    its documentation.
-
-    Attributes
-    ----------
-    atoms : :class:`tuple` of :class:`.Atom`
-        The atoms of the molecule. Each :class:`.Atom`
-        instance is guaranteed to have two attributes. The
-        first is :attr:`building_block`, which holds the building
-        block :class:`.Molecule` from which that
-        :class:`.Atom` came. If the :class:`.Atom` did not come from a
-        building block, but was added by a reaction, the value
-        of this attribute will be ``None``.
-
-        The second attribute is :attr:`building_block_id`.
-        This will be the same value on all atoms that came from the
-        building block. Note that if a building block is used multiple
-        times during construction, the :attr:`building_block_id` will
-        be different for each time it is used.
-
-    bonds : :class:`tuple` of :class:`.Bond`
-        The bonds of the molecule.
-
-    building_block_vertices : :class:`dict`
-        Maps the :class:`.Molecule` instances used for construction,
-        which can be either :class:`.BuildingBlock` or
-        :class:`.ConstructedMolecule`, to the
-        :class:`~.topologies.base.Vertex` objects they are placed on
-        during construction. The :class:`dict` has the form
-
-        .. code-block:: python
-
-            building_block_vertices = {
-                BuildingBlock(...): [Vertex(...), Vertex(...)],
-                BuildingBlock(...): [
-                    Vertex(...),
-                    Vertex(...),
-                    Vertex(...),
-                ]
-                ConstructedMolecule(...): [Vertex(...)]
-            }
-
-    building_block_counter : :class:`collections.Counter`
-        A counter keeping track of how many times each building block
-        molecule appears in the :class:`ConstructedMolecule`.
-
-    topology_graph : :class:`.TopologyGraph`
-        Defines the topology graph of :class:`ConstructedMolecule` and
-        is responsible for constructing it.
-
-    construction_bonds : :class:`tuple` of :class:`.Bond`
-        Holds the bonds in :attr:`bonds`, which were added by the
-        construction process.
-
-    func_groups : :class:`tuple` of :class:`.FunctionalGroup`
-        The remnants of building block functional groups present in the
-        molecule. They track which atoms belonged to functional groups
-        in the building block molecules. The id of each
-        :class:`.FunctionalGroup` should match its index in
-        :attr:`func_groups`.
-
     Examples
     --------
     *Initialization*
@@ -108,152 +42,166 @@ class ConstructedMolecule(Molecule):
 
         import stk
 
-        bb1 = stk.BuildingBlock('NCCCN', ['amine'])
-        bb2 = stk.BuildingBlock('O=CC(C=O)CC=O', ['aldehyde'])
+        bb1 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)CC=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
         tetrahedron = stk.cage.FourPlusSix()
         cage1 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2],
-            topology_graph=tetrahedron
+            topology_graph=tetrahedron,
         )
 
     A :class:`ConstructedMolecule` can be used to construct other
-    :class:`ConstructedMolecule` instances
+    :class:`ConstructedMolecule` instances, but you have to convert
+    them into a :class:`.BuildingBlock` first
 
     .. code-block:: python
 
         benzene = stk.BuildingBlock('c1ccccc1')
         cage_complex = stk.ConstructedMolecule(
-            building_blocks=[cage1, benzene],
-            topology_graph=stk.host_guest.Complex()
+            building_blocks=[
+                stk.BuildingBlock.init_from_molecule(cage1),
+                benzene,
+            ],
+            topology_graph=stk.host_guest.Complex(),
         )
 
-    During initialization it is possible to force building blocks to
-    be placed on specific :attr:`~.TopologyGraph.vertices` of the
-    :class:`.TopologyGraph`
+    During initialization, it is possible to force building blocks to
+    be placed on a specific :class:`.Vertex` of the
+    :class:`.TopologyGraph` by specifying the vertex
 
     .. code-block:: python
 
-        bb3 = stk.BuildingBlock('NCOCN', ['amine'])
-        bb4 = stk.BuildingBlock('NCOCCCOCN', ['amine'])
+        bb3 = stk.BuildingBlock('NCOCN', [stk.PrimaryAminoFactory()])
+        bb4 = stk.BuildingBlock(
+            smiles='NCOCCCOCN',
+            functional_groups=[stk.PrimaryAminoFactory()],
+        )
         cage2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3, bb4],
-            topology_graph=tetrahedron
+            topology_graph=tetrahedron,
             building_block_vertices={
-                bb1: tetrahedron.vertices[4:6]
-                bb3: tetrahedron.vertices[6:7]
-                bb4: tetrahedron.vertices[7:8]
-            }
-        )
-
-    *Building blocks with the wrong number of functional groups.*
-
-    If the building block has too many functional groups, you can
-    remove some in order to use it
-
-    .. code-block:: python
-
-        chain = stk.polymer.Linear('AB', [0, 0],  3)
-
-        # This won't work, bb2 has 3 functional groups but 2 are needed
-        # for monomers in a linear polymer chain.
-        failed = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
-            topology_graph=chain
-        )
-
-        # Remove one of the functional groups and you will be able to
-        # construct the chain.
-        bb2.func_groups = (bb2.func_groups[0], bb2.func_groups[2])
-        failed = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
-            topology_graph=chain
+                bb1: tetrahedron.get_vertices(vertex_ids=(4, 5)),
+                bb2: tetrahedron.get_vertices(vertex_ids=range(4)),
+                bb3: tetrahedron.get_vertices(vertex_ids=6),
+                bb4: tetrahedron.get_vertices(vertex_ids=range(7, 10)),
+            },
         )
 
     """
-
-    @classmethod
-    def _construct(
-        cls,
-        building_blocks,
-        topology_graph,
-        building_block_vertices=None,
-        use_cache=False
-    ):
-        if building_block_vertices is None:
-            building_block_vertices = (
-                topology_graph.assign_building_blocks_to_vertices(
-                    building_blocks=building_blocks
-                )
-            )
-        identity_key = cls._get_identity_key_from_components(
-            building_blocks=building_blocks,
-            topology_graph=topology_graph,
-            building_block_vertices=building_block_vertices
-        )
-        if use_cache and identity_key in cls._cache:
-            return cls._cache[identity_key]
-
-        obj = cls._init_from_components(
-            building_blocks=building_blocks,
-            topology_graph=topology_graph,
-            building_block_vertices=building_block_vertices,
-            identity_key=identity_key
-        )
-        if use_cache:
-            cls._cache[identity_key] = obj
-        return obj
 
     def __init__(
         self,
         building_blocks,
         topology_graph,
         building_block_vertices=None,
-        use_cache=False
     ):
         """
-        Initialize a :class:`ConstructedMolecule`.
+        Initialize a :class:`.ConstructedMolecule`.
 
         Parameters
         ----------
-        building_blocks : :class:`list` of :class:`.Molecule`
-            The :class:`.BuildingBlock` and
-            :class:`ConstructedMolecule` instances which
+        building_blocks : :class:`list` of :class:`.BuildingBlock`
+            The :class:`.BuildingBlock` instances which
             represent the building block molecules used for
             construction. Only one instance is present per building
             block molecule, even if multiples of that building block
-            join up to form the :class:`ConstructedMolecule`.
+            join up to form the :class:`.ConstructedMolecule`.
 
         topology_graph : :class:`.TopologyGraph`
             Defines the topology graph of the
-            :class:`ConstructedMolecule` and constructs it.
+            :class:`.ConstructedMolecule` and constructs it.
 
         building_block_vertices : :class:`dict`, optional
-            Maps the :class:`.Molecule` in  `building_blocks` to the
-            :class:`~.topologies.base.Vertex` instances in
+            Maps the :class:`.BuildingBlock` in  `building_blocks` to
+            the :class:`~.topologies.base.Vertex` instances in
             `topology_graph` it is placed on. Each
-            :class:`.BuildingBlock` and :class:`ConstructedMolecule`
-            can be mapped to multiple :class:`~.topologies.base.Vertex`
+            :class:`.BuildingBlock` can be mapped to multiple
+            :class:`~.topologies.base.Vertex`
             objects. See the examples section in the
             :class:`.ConstructedMolecule` class docstring to help
             understand how this parameter is used. If ``None``,
-            building block molecules will be assigned to vertices at
-            random.
+            a building block will be placed on an vertex with a
+            degree equal to its number of functional groups.
+            If multiple building blocks with the same number of
+            functional groups are present in `building_blocks`, this
+            parameter is required, as otherwise placement would be
+            ambiguous.
 
-        use_cache : :class:`bool`, optional
-            If ``True``, a new :class:`.ConstructedMolecule` will
-            not be made if a cached and identical one already exists,
-            the one which already exists will be returned. If ``True``
-            and a cached, identical :class:`ConstructedMolecule` does
-            not yet exist the created one will be added to the cache.
+        Raises
+        ------
+        :class:`.ConstructionError`
+            If multiple building blocks with the same number of
+            functional groups are present, and
+            `building_block_vertices` is not provided.
 
         """
 
-        # This method does not get called, See _construct().
-        raise RuntimeError('This method should not be getting called.')
+        if building_block_vertices is None:
+            if self._is_placement_ambiguous(building_blocks):
+                raise ConstructionError(
+                    'Multiple building blocks have the same number '
+                    'of functional groups and building_block_vertices '
+                    'is None. Desired placement of building '
+                    'blocks on vertices is therefore unclear. '
+                    'Please use the building_block_vertices parameter '
+                    'to fix this error.'
+                )
 
-    @classmethod
+            building_block_vertices = (
+                topology_graph.assign_building_blocks_to_vertices(
+                    building_blocks=building_blocks
+                )
+            )
+
+        construction_result = topology_graph.construct(
+            building_block_vertices=building_block_vertices,
+        )
+        super().__init__(
+            atoms=construction_result.atoms,
+            bonds=construction_result.bonds,
+            position_matrix=construction_result.position_matrix,
+        )
+
+        cls._init_from_components(
+            building_blocks=building_blocks,
+            topology_graph=topology_graph,
+            building_block_vertices=building_block_vertices,
+        )
+
+    @staticmethod
+    def _is_placement_ambiguous(building_blocks):
+        """
+        Return ``True``, if desired placement is unclear.
+
+        The desired placement of `building_blocks` is unclear if
+        multiple building blocks have the same number of functional
+        groups. In cases like this, it is not clear which of these
+        building blocks the user wants to place on a given vertex,
+        since they are both valid candidates.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if placmenet is ambiguous and ``False``
+            otherwise.
+
+        """
+
+        seen = set()
+        for building_block in building_blocks:
+            num_functional_groups = (
+                building_block.get_num_functional_groups()
+            )
+            if num_functional_groups in seen:
+                return True
+            seen.add(num_functional_groups)
+        return False
+
     def _init_from_components(
-        cls,
+        self,
         building_blocks,
         topology_graph,
         building_block_vertices,
@@ -293,17 +241,16 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        obj = cls.__new__(cls)
-        obj.building_block_vertices = building_block_vertices
-        obj.topology_graph = topology_graph
-        obj.atoms = []
-        obj.bonds = []
-        obj.construction_bonds = []
-        obj.func_groups = []
-        obj.building_block_counter = Counter()
+        self.building_block_vertices = building_block_vertices
+        self.topology_graph = topology_graph
+        self.atoms = []
+        self.bonds = []
+        self.construction_bonds = []
+        self.func_groups = []
+        self.building_block_counter = Counter()
         # A (3, n) numpy.ndarray holding the position of every atom in
         # the molecule.
-        obj._position_matrix = []
+        self._position_matrix = []
 
         try:
             topology_graph.construct(obj)
