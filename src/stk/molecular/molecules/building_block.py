@@ -7,7 +7,6 @@ Building Block
 
 import logging
 import os
-import numpy as np
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 
@@ -458,16 +457,6 @@ class BuildingBlock(Molecule):
             yield from self._functional_groups[fg_id].get_placer_ids()
 
     def to_dict(self):
-        """
-        Return a :class:`dict` representation.
-
-        Returns
-        -------
-        :class:`dict`
-            A :class:`dict` which represents the molecule.
-
-        """
-
         d = super().to_dict()
         d.update({
             'functional_groups': repr(self._functional_groups),

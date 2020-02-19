@@ -49,7 +49,7 @@ class ConstructedMolecule(Molecule):
         )
         tetrahedron = stk.cage.FourPlusSix()
         cage1 = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
+            building_blocks=(bb1, bb2),
             topology_graph=tetrahedron,
         )
 
@@ -61,10 +61,10 @@ class ConstructedMolecule(Molecule):
 
         benzene = stk.BuildingBlock('c1ccccc1')
         cage_complex = stk.ConstructedMolecule(
-            building_blocks=[
+            building_blocks=(
                 stk.BuildingBlock.init_from_molecule(cage1),
                 benzene,
-            ],
+            ),
             topology_graph=stk.host_guest.Complex(),
         )
 
@@ -80,7 +80,7 @@ class ConstructedMolecule(Molecule):
             functional_groups=[stk.PrimaryAminoFactory()],
         )
         cage2 = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2, bb3, bb4],
+            building_blocks=(bb1, bb2, bb3, bb4),
             topology_graph=tetrahedron,
             building_block_vertices={
                 bb1: tetrahedron.get_vertices(vertex_ids=(4, 5)),
@@ -103,7 +103,7 @@ class ConstructedMolecule(Molecule):
 
         Parameters
         ----------
-        building_blocks : :class:`list` of :class:`.BuildingBlock`
+        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
             The :class:`.BuildingBlock` instances which
             represent the building block molecules used for
             construction. Only one instance is present per building
@@ -155,106 +155,13 @@ class ConstructedMolecule(Molecule):
                     building_blocks=building_blocks
                 )
             )
-
-        construction_result = topology_graph.construct(
-            building_block_vertices=building_block_vertices,
-        )
-        super().__init__(
-            atoms=construction_result.atoms,
-            bonds=construction_result.bonds,
-            position_matrix=construction_result.position_matrix,
-        )
-
-        cls._init_from_components(
-            building_blocks=building_blocks,
-            topology_graph=topology_graph,
-            building_block_vertices=building_block_vertices,
-        )
-
-    @staticmethod
-    def _is_placement_ambiguous(building_blocks):
-        """
-        Return ``True``, if desired placement is unclear.
-
-        The desired placement of `building_blocks` is unclear if
-        multiple building blocks have the same number of functional
-        groups. In cases like this, it is not clear which of these
-        building blocks the user wants to place on a given vertex,
-        since they are both valid candidates.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if placmenet is ambiguous and ``False``
-            otherwise.
-
-        """
-
-        seen = set()
-        for building_block in building_blocks:
-            num_functional_groups = (
-                building_block.get_num_functional_groups()
-            )
-            if num_functional_groups in seen:
-                return True
-            seen.add(num_functional_groups)
-        return False
-
-    def _init_from_components(
-        self,
-        building_blocks,
-        topology_graph,
-        building_block_vertices,
-    ):
-        """
-        Initialize a :class:`ConstructedMolecule`.
-
-        Parameters
-        ----------
-        building_blocks : :class:`list` of :class:`.Molecule`
-            The :class:`.BuildingBlock` and
-            :class:`ConstructedMolecule` instances which
-            represent the building block molecules used for
-            construction. Only one instance is present per building
-            block molecule, even if multiples of that building block
-            join up to form the :class:`ConstructedMolecule`.
-
-        topology_graph : :class:`.TopologyGraph`
-            Defines the topology graph of the
-            :class:`ConstructedMolecule` and constructs it.
-
-        building_block_vertices : :class:`dict`
-            Maps the :class:`.Molecule` in  `building_blocks` to the
-            :class:`~.topologies.base.Vertex` in `topology_graph`.
-            Each :class:`.BuildingBlock` and
-            :class:`ConstructedMolecule` can be mapped to multiple
-            :class:`~.topologies.base.Vertex` objects. See the
-            examples section in the :class:`.ConstructedMolecule`
-            class docstring to help understand how this parameter
-            is used. If ``None``, building block molecules will be
-            assigned to vertices at random.
-
-        Returns
-        -------
-        :class:`.ConstructedMolecule`
-            The molecule.
-
-        """
-
-        self.building_block_vertices = building_block_vertices
-        self.topology_graph = topology_graph
-        self.atoms = []
-        self.bonds = []
-        self.construction_bonds = []
-        self.func_groups = []
-        self.building_block_counter = Counter()
-        # A (3, n) numpy.ndarray holding the position of every atom in
-        # the molecule.
-        self._position_matrix = []
+        else:
+            building_block_vertices = dict(building_block_vertices)
 
         try:
-            topology_graph.construct(obj)
-
+            construction_result = topology_graph.construct(
+                building_block=building_block_vertices,
+            )
         except Exception as ex:
             errormsg = (
                 'Construction failure.\n'
@@ -279,16 +186,44 @@ class ConstructedMolecule(Molecule):
             errormsg += '\n'.join(bb_blocks)
             raise ConstructionError(errormsg) from ex
 
-        obj.atoms = tuple(obj.atoms)
-        obj.bonds = tuple(obj.bonds)
-        obj.construction_bonds = tuple(obj.construction_bonds)
-        obj.func_groups = tuple(obj.func_groups)
+        super().__init__(
+            atoms=construction_result.atoms,
+            bonds=construction_result.bonds,
+            position_matrix=construction_result.position_matrix,
+        )
+        self._topology_graph = topology_graph
+        self._building_block_vertices = building_block_vertices
+        self._atom_infos = construction_result.atom_infos
+        self._reaction_infos = construction_result.reaction_infos
 
-        # Ensure that functional group ids are set correctly.
-        for id_, func_group in enumerate(obj.func_groups):
-            func_group.id = id_
+    @staticmethod
+    def _is_placement_ambiguous(building_blocks):
+        """
+        Return ``True``, if desired placement is unclear.
 
-        return obj
+        The desired placement of `building_blocks` is unclear if
+        multiple building blocks have the same number of functional
+        groups. In cases like this, it is not clear which of these
+        building blocks the user wants to place on a given vertex,
+        since they are both valid candidates.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if placement is ambiguous and ``False``
+            otherwise.
+
+        """
+
+        seen = set()
+        for building_block in building_blocks:
+            num_functional_groups = (
+                building_block.get_num_functional_groups()
+            )
+            if num_functional_groups in seen:
+                return True
+            seen.add(num_functional_groups)
+        return False
 
     def clone(self):
         """
@@ -329,40 +264,79 @@ class ConstructedMolecule(Molecule):
 
         Yields
         ------
-        :class:`.Molecule`
+        :class:`.BuildingBlock`
             A building block of the :class:`ConstructedMolecule`.
 
         """
 
-        yield from self.building_block_vertices.keys()
+        yield from self._building_block_vertices.keys()
 
-    def to_dict(self, include_attrs=None, ignore_missing_attrs=False):
+    def get_topology_graph(self):
         """
-        Return a :class:`dict` representation.
+        Get the :class:`.TopologyGraph` used for construction.
+
+        Returns
+        -------
+        :class:`.TopologyGraph`
+            The topology graph used for construction.
+
+        """
+
+        return self._topology_graph
+
+    def get_atom_infos(self, atom_ids=None):
+        """
+        Yield data about atoms in the molecule.
 
         Parameters
         ----------
-        include_attrs : :class:`list` of :class:`str`, optional
-            The names of additional attributes of the molecule to be
-            added to the :class:`dict`. Each attribute is saved as a
-            string using :func:`repr`. These attributes are also
-            passed down recursively to the building block molecules.
+        atom_ids : :class:`iterable` of :class:`int`, optional
+            The ids of atoms whose data is desired. If ``None``,
+            data on all atoms will be yielded. Can be a single
+            :class:`int`, if data on a single atom is desired.
 
-        ignore_missing_attrs : :class:`bool`, optional
-            If ``False`` and an attribute in `include_attrs` is not
-            held by the :class:`ConstructedMolecule`, an error will be
-            raised.
+        Yields
+        ------
+        :class:`.AtomInfo`
+            Data about an atom.
+
+        """
+
+        if atom_ids is None:
+            atom_ids = range(len(self._atoms))
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
+
+        for atom_id in atom_ids:
+            yield self._atom_infos[atom_id]
+
+    def get_reaction_infos(self):
+        """
+        Yield data about reactions performed during construction.
+
+        Yields
+        ------
+        :class:`.ReactionInfo`
+            Data about a :class:`.Reaction` performed during
+            construction.
+
+        """
+
+        yield from self._reaction_infos
+
+    def get_building_block_vertices(self):
+        """
+        Get the
 
         Returns
         -------
         :class:`dict`
-            A :class:`dict` which represents the molecule.
 
         """
 
-        if include_attrs is None:
-            include_attrs = []
+        return dict(self._building_block_vertices)
 
+    def to_dict(self):
         bb_counter = []
         building_blocks = []
         building_block_vertices = {}
@@ -455,8 +429,6 @@ class ConstructedMolecule(Molecule):
         """
 
         d = dict(mol_dict)
-        if use_cache and identity_key in cls._cache:
-            return cls._cache[identity_key]
 
         tops = vars(topology_graphs)
         topology_graph = eval(d.pop('topology_graph'), tops)
@@ -515,63 +487,6 @@ class ConstructedMolecule(Molecule):
         if use_cache:
             cls._cache[identity_key] = obj
         return obj
-
-    @classmethod
-    def _get_identity_key_from_components(
-        cls,
-        building_blocks,
-        topology_graph,
-        building_block_vertices,
-    ):
-        """
-        Return the identity key.
-
-        Parameters
-        ----------
-        building_blocks : :class:`list` of :class:`.Molecule`
-            The :class:`.BuildingBlock` and
-            :class:`ConstructedMolecule` instances which
-            represent the building block molecules used for
-            construction. Only one instance is present per building
-            block molecule, even if multiples of that building block
-            join up to form the :class:`ConstructedMolecule`.
-
-        topology_graph : :class:`.TopologyGraph`
-            Defines the topology graph of the
-            :class:`ConstructedMolecule` and constructs it.
-
-        building_block_vertices : :class:`dict`
-            Maps the :class:`.Molecule` in  `building_blocks` to the
-            :class:`~.topologies.base.Vertex` in `topology_graph`.
-            Each :class:`.BuildingBlock` and
-            :class:`ConstructedMolecule` can be mapped to multiple
-            :class:`~.topologies.base.Vertex` objects. See the
-            examples section in the :class:`.ConstructedMolecule`
-            class docstring to help understand how this parameter
-            is used. If ``None``, building block molecules will be
-            assigned to vertices at random.
-
-        Returns
-        -------
-        :class:`tuple`
-            The identity key.
-
-        """
-
-        building_block_types = sorted(
-            {bb.__class__ for bb in building_blocks},
-            key=lambda cls: cls.__name__
-        )
-        bb_keys = cls._get_sorted_building_block_keys(
-            building_blocks=building_blocks,
-            building_block_types=building_block_types
-        )
-        vertices = cls._get_sorted_building_block_vertices(
-            building_blocks=building_blocks,
-            building_block_vertices=building_block_vertices,
-            building_block_types=building_block_types
-        )
-        return tuple(bb_keys), repr(topology_graph), tuple(vertices)
 
     @classmethod
     def _get_sorted_building_block_keys(
