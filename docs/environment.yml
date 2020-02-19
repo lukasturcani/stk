@@ -1,6 +1,6 @@
-name: base
+name: stk_docs
 channels:
-  - rdkit
-  - defaults
+    - defaults
 dependencies:
-  - rdkit
+    - pip:
+        - numpydoc
