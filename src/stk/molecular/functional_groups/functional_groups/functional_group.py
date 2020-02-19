@@ -140,8 +140,10 @@ class FunctionalGroup:
             import stk
 
             n, h1, h2 = stk.N(0), stk.H(1), stk.H(2)
-            amine = stk.Amine(
-                atoms=(n, h1, h2),
+            amine = stk.PrimaryAmino(
+                nitrogen=n,
+                hydrogen1=h1,
+                hydrogen2=h2,
                 bonders=(n, ),
                 deleters=(h1, h2),
             )
