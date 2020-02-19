@@ -1,4 +1,3 @@
-name: stk_docs
 channels:
     - defaults
 dependencies:
