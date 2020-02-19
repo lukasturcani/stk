@@ -4,5 +4,5 @@ dependencies:
     - pip
     - pip:
         - numpydoc
-        - --no-deps
         - -e ..
+        - --install-option="--no-deps"
