@@ -165,13 +165,13 @@ class TopologyGraph:
                 after_placement_stage=self._after_placement_stage,
             )
 
-    def construct(self, vertex_assignments):
+    def construct(self, building_block_vertices):
         """
         Construct a :class:`.ConstructedMolecule`.
 
         Parameters
         ----------
-        vertex_assignments : :class:`.ConstructedMolecule`
+        vertex_assignments : :class:`dict`
             The :class:`.ConstructedMolecule` instance which needs to
             be constructed.
 
