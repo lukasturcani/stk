@@ -1,6 +1,8 @@
 channels:
     - defaults
 dependencies:
+    - pip
     - pip:
         - numpydoc
-        - --no-deps -e ..
+        - --no-deps
+        - -e ..
