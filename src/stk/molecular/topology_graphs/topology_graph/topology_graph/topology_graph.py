@@ -171,9 +171,11 @@ class TopologyGraph:
 
         Parameters
         ----------
-        vertex_assignments : :class:`dict`
-            The :class:`.ConstructedMolecule` instance which needs to
-            be constructed.
+        building_block_vertices : :class:`dict`
+            Maps :class:`.BuildingBlock` instances to a
+            :class:`tuple` holding :class:`.Vertex` instances.
+            The mapping specifies which building block gets placed
+            on which vertices of the graph.
 
         Returns
         -------
@@ -182,7 +184,7 @@ class TopologyGraph:
 
         """
 
-        state = self._get_construction_state(vertex_assignments)
+        state = ConstructionState(building_block_vertices)
         state = self._before_placement(state)
         state = self._place_building_blocks(state)
         state = self._before_reactions(state)
@@ -214,9 +216,6 @@ class TopologyGraph:
 
         for id_ in vertex_ids:
             yield self._vertices[id_]
-
-    def _get_construction_state(self, vertex_assignments):
-        return ConstructionState(vertex_assignments)
 
     def _before_reactions(self, state):
         return state

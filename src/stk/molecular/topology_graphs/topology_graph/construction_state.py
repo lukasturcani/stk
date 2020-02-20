@@ -3,24 +3,33 @@ class ConstructionState:
 
     """
 
-    def __init__(self, vertex_assignments, vertex_edges):
-        self._vertex_assignments = {
-            v.get_id(): bb for v, bb in vertex_assignments.items()
+    def __init__(self, building_block_vertices, vertex_edges):
+        """
+
+        """
+
+        self._vertex_building_blocks = {
+            vertex.get_id(): building_block
+            for building_block, vertices
+            in building_block_vertices.items()
+            for vertex in vertices
         }
         self._vertices = {
-            v.get_id(): v for v in vertex_assignments
+                vertex.get_id(): vertex
+                for vertices in building_block_vertices.values()
+                for vertex in vertices
         }
         self._vertex_edges = dict(vertex_edges)
 
     def with_placement_results(self, results):
         pass
 
-    def get_vertex_assignments(self):
+    def get_vertex_building_block(self, vertex_id):
         """
 
         """
 
-        return dict(self._vertex_assignments)
+        return self._vertex_building_blocks[vertex_id]
 
     def get_vertices(self, vertex_ids):
         """
