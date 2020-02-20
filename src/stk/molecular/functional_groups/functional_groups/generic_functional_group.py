@@ -41,6 +41,21 @@ class GenericFunctionalGroup(FunctionalGroup):
         clone._deleters = self._deleters
         return clone
 
+    def to_dict(self):
+        d = super().to_dict()
+        indices = {atom.get_id(): index for index, atom in self._atoms}
+        d.update({
+            'bonders': indices[self._bonders.get_id()],
+            'deleters': indices[self._deleters.get_id()],
+        })
+        return d
+
+    def _init_from_dict(self, functional_group):
+        obj = super()._init_from_dict(functional_group)
+        obj._bonders = self._atoms[functional_group['bonders']]
+        obj._deleters = self._atoms[functional_group['deleters']]
+        return obj
+
     def _with_atoms(self, atom_map):
         super()._with_atoms(atom_map)
         self._bonders = tuple(

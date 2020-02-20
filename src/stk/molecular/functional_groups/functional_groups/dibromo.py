@@ -111,6 +111,25 @@ class Dibromo(GenericFunctionalGroup):
         clone._bromine2 = self._bromine2
         return clone
 
+    def to_dict(self):
+        d = super().to_dict()
+        indices = {atom.get_id(): index for index, atom in self._atoms}
+        d.update({
+            'atom1': indices[self._atom1.get_id()],
+            'bromine1': indices[self._bromine1.get_id()],
+            'atom2': indices[self._atom2.get_id()],
+            'bromine2': indices[self._bromine2.get_id()],
+        })
+        return d
+
+    def _init_from_dict(self, functional_group):
+        obj = super()._init_from_dict(functional_group)
+        obj._atom1 = self._atoms[functional_group['atom1']]
+        obj._bromine1 = self._atoms[functional_group['bromine1']]
+        obj._atom2 = self._atoms[functional_group['atom2']]
+        obj._bromine2 = self._atoms[functional_group['bromine2']]
+        return obj
+
     def with_atoms(self, atom_map):
         clone = super().with_atoms(atom_map)
         clone._atom1 = atom_map.get(

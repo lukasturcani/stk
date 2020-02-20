@@ -149,6 +149,29 @@ class BoronicAcid(GenericFunctionalGroup):
         clone._atom = self._atom
         return clone
 
+    def to_dict(self):
+        d = super().to_dict()
+        indices = {atom.get_id(): index for index, atom in self._atoms}
+        d.update({
+            'boron': indices[self._boron.get_id()],
+            'oxygen1': indices[self._oxygen1.get_id()],
+            'hydrogen1': indices[self._hydrogen1.get_id()],
+            'oxygen2': indices[self._oxygen2.get_id()],
+            'hydrogen2': indices[self._hydrogen2.get_id()],
+            'atom': indices[self._atom.get_id()],
+        })
+        return d
+
+    def _init_from_dict(self, functional_group):
+        obj = super()._init_from_dict(functional_group)
+        obj._boron = self._atoms[functional_group['boron']]
+        obj._oxygen1 = self._atoms[functional_group['oxygen1']]
+        obj._hydrogen1 = self._atoms[functional_group['hydrogen1']]
+        obj._oxygen2 = self._atoms[functional_group['oxygen2']]
+        obj._hydrogen2 = self._atoms[functional_group['hydrogen2']]
+        obj._atom = self._atoms[functional_group['atom']]
+        return obj
+
     def with_atoms(self, atom_map):
         clone = super().with_atoms(atom_map)
         clone._boron = atom_map.get(

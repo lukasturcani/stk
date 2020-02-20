@@ -68,14 +68,14 @@ class Molecule:
 
     @classmethod
     def _init_from_dict(cls, molecule):
-        molecule = cls.__new__(cls)
-        molecule._position_matrix = np.array(
+        obj = cls.__new__(cls)
+        obj._position_matrix = np.array(
             molecule['position_matrix']
         ).T
-        molecule._atoms = [
+        obj._atoms = tuple(
             Atom.init_from_dict(atom) for atom in molecule['atoms']
-        ]
-        molecule._bonds = [
+        )
+        obj._bonds = tuple(
             Bond(
                 atom1=molecule._atoms[bond['atom1_id']],
                 atom2=molecule._atoms[bond['atom2_id']],
@@ -83,8 +83,8 @@ class Molecule:
                 periodicity=tuple(bond['periodicity']),
             )
             for bond in molecule['bonds']
-        ]
-        return molecule
+        )
+        return obj
 
     def _with_displacement(self, displacement):
         """

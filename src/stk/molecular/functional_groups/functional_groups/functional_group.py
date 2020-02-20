@@ -31,6 +31,8 @@ information.
 
 """
 
+from ...atoms import Atom
+
 
 class FunctionalGroup:
     """
@@ -41,6 +43,15 @@ class FunctionalGroup:
     :class:`.ConstructedMolecule` construction.
 
     """
+
+    _subclasses = {}
+
+    def __init_subclass__(cls):
+        cls._subclasses[cls._get_class_name(cls)] = cls
+
+    @staticmethod
+    def _get_class_name(cls):
+        return f'{cls.__module__}.{cls.__qualname__}'
 
     def __init__(self, atoms, placers):
         """
@@ -178,6 +189,58 @@ class FunctionalGroup:
         clone = self.__class__.__new__(self.__class__)
         FunctionalGroup.__init__(clone, self._atoms, self._placers)
         return clone
+
+    def to_dict(self):
+        """
+        Return a :class:`dict` representation.
+
+        Returns
+        -------
+        :class:`dict`
+            A :class:`dict` representation.
+
+        """
+
+        atoms = {atom.get_id(): index for index, atom in self._atoms}
+        return {
+            'class': self._get_class_name(self.__class__),
+            'atoms': [atom.to_dict() for atom in self._atoms],
+            'placers': [
+                atoms[placer.get_id()] for placer in self._placers
+            ],
+        }
+
+    def init_from_dict(cls, functional_group):
+        """
+        Initialize from a :class:`dict` representation.
+
+        Parameters
+        ----------
+        functional_group : :class:`.dict`
+            The :class:`dict` representation of the fucntional group.
+
+        Returns
+        -------
+        :class:`.FunctionalGroup`
+            The functional group. The returned instance will be the
+            correct subclass.
+
+        """
+
+        subclass = cls._subclasses[functional_group['class']]
+        return subclass._init_from_dict(functional_group)
+
+    def _init_from_dict(cls, functional_group):
+        obj = cls.__new__(cls)
+        obj._atoms = tuple(
+            Atom.init_from_dict(atom)
+            for atom in functional_group['atoms']
+        )
+        obj._placers = tuple(
+            obj._atoms[placer]
+            for placer in functional_group['placers']
+        )
+        return obj
 
     def __str__(self):
         return repr(self)
