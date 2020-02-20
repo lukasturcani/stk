@@ -125,29 +125,6 @@ class Difluoro(GenericFunctionalGroup):
         clone._fluorine2 = self._fluorine2
         return clone
 
-    def to_dict(self):
-        d = super().to_dict()
-        indices = {
-            atom.get_id(): index
-            for index, atom in enumerate(self._atoms)
-        }
-        d.update({
-            'atom1': indices[self._atom1.get_id()],
-            'fluorine1': indices[self._fluorine1.get_id()],
-            'atom2': indices[self._atom2.get_id()],
-            'fluorine2': indices[self._fluorine2.get_id()],
-        })
-        return d
-
-    @classmethod
-    def _init_from_dict(cls, functional_group):
-        obj = super()._init_from_dict(functional_group)
-        obj._atom1 = obj._atoms[functional_group['atom1']]
-        obj._fluorine1 = obj._atoms[functional_group['fluorine1']]
-        obj._atom2 = obj._atoms[functional_group['atom2']]
-        obj._fluorine2 = obj._atoms[functional_group['fluorine2']]
-        return obj
-
     def __repr__(self):
         return (
             f'{self.__class__.__name__}('

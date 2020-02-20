@@ -149,33 +149,6 @@ class Alkene(GenericFunctionalGroup):
         clone._atom4 = self._atom4
         return clone
 
-    def to_dict(self):
-        d = super().to_dict()
-        indices = {
-            atom.get_id(): index
-            for index, atom in enumerate(self._atoms)
-        }
-        d.update({
-            'carbon1': indices[self._carbon1.get_id()],
-            'atom1': indices[self._atom1.get_id()],
-            'atom2': indices[self._atom2.get_id()],
-            'carbon2': indices[self._carbon2.get_id()],
-            'atom3': indices[self._atom3.get_id()],
-            'atom4': indices[self._atom4.get_id()],
-        })
-        return d
-
-    @classmethod
-    def _init_from_dict(cls, functional_group):
-        obj = super()._init_from_dict(functional_group)
-        obj._carbon1 = obj._atoms[functional_group['carbon1']]
-        obj._atom1 = obj._atoms[functional_group['atom1']]
-        obj._atom2 = obj._atoms[functional_group['atom2']]
-        obj._carbon2 = obj._atoms[functional_group['carbon2']]
-        obj._atom3 = obj._atoms[functional_group['atom3']]
-        obj._atom4 = obj._atoms[functional_group['atom4']]
-        return obj
-
     def with_atoms(self, atom_map):
         clone = super().with_atoms(atom_map)
         clone._carbon1 = atom_map.get(

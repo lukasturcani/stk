@@ -66,25 +66,6 @@ class Iodo(GenericFunctionalGroup):
         clone._atom = self._atom
         return clone
 
-    def to_dict(self):
-        d = super().to_dict()
-        indices = {
-            atom.get_id(): index
-            for index, atom in enumerate(self._atoms)
-        }
-        d.update({
-            'iodine': indices[self._iodine.get_id()],
-            'atom': indices[self._atom.get_id()],
-        })
-        return d
-
-    @classmethod
-    def _init_from_dict(cls, functional_group):
-        obj = super()._init_from_dict(functional_group)
-        obj._iodine = obj._atoms[functional_group['iodine']]
-        obj._atom = obj._atoms[functional_group['atom']]
-        return obj
-
     def with_atoms(self, atom_map):
         clone = super().with_atoms(atom_map)
         clone._iodine = atom_map.get(

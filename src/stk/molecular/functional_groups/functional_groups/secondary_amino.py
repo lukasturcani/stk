@@ -111,29 +111,6 @@ class SecondaryAmino(GenericFunctionalGroup):
         clone._atom2 = self._atom2
         return clone
 
-    def to_dict(self):
-        d = super().to_dict()
-        indices = {
-            atom.get_id(): index
-            for index, atom in enumerate(self._atoms)
-        }
-        d.update({
-            'nitrogen': indices[self._nitrogen.get_id()],
-            'hydrogen': indices[self._hydrogen.get_id()],
-            'atom1': indices[self._atom1.get_id()],
-            'atom2': indices[self._atom2.get_id()],
-        })
-        return d
-
-    @classmethod
-    def _init_from_dict(cls, functional_group):
-        obj = super()._init_from_dict(functional_group)
-        obj._nitrogen = obj._atoms[functional_group['nitrogen']]
-        obj._hydrogen = obj._atoms[functional_group['hydrogen']]
-        obj._atom1 = obj._atoms[functional_group['atom1']]
-        obj._atom2 = obj._atoms[functional_group['atom2']]
-        return obj
-
     def with_atoms(self, atom_map):
         clone = super().with_atoms(atom_map)
         clone._nitrogen = atom_map.get(

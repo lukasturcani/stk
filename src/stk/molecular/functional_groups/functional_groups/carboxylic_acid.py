@@ -130,31 +130,6 @@ class CarboxylicAcid(GenericFunctionalGroup):
         clone._atom = self._atom
         return clone
 
-    def to_dict(self):
-        d = super().to_dict()
-        indices = {
-            atom.get_id(): index
-            for index, atom in enumerate(self._atoms)
-        }
-        d.update({
-            'carbon': indices[self._carbon.get_id()],
-            'oxygen1': indices[self._oxygen1.get_id()],
-            'oxygen2': indices[self._oxygen2.get_id()],
-            'hydrogen': indices[self._hydrogen.get_id()],
-            'atom': indices[self._atom.get_id()],
-        })
-        return d
-
-    @classmethod
-    def _init_from_dict(cls, functional_group):
-        obj = super()._init_from_dict(functional_group)
-        obj._carbon = obj._atoms[functional_group['carbon']]
-        obj._oxygen1 = obj._atoms[functional_group['oxygen1']]
-        obj._oxygen2 = obj._atoms[functional_group['oxygen2']]
-        obj._hydrogen = obj._atoms[functional_group['hydrogen']]
-        obj._atom = obj._atoms[functional_group['atom']]
-        return obj
-
     def with_atoms(self, atom_map):
         clone = super().with_atoms(atom_map)
         clone._carbon = atom_map.get(

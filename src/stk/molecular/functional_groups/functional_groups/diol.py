@@ -149,33 +149,6 @@ class Diol(GenericFunctionalGroup):
         clone._hydrogen2 = self._hydrogen2
         return clone
 
-    def to_dict(self):
-        d = super().to_dict()
-        indices = {
-            atom.get_id(): index
-            for index, atom in enumerate(self._atoms)
-        }
-        d.update({
-            'atom1': indices[self._atom1.get_id()],
-            'oxygen1': indices[self._oxygen1.get_id()],
-            'hydrogen1': indices[self._hydrogen1.get_id()],
-            'atom2': indices[self._atom2.get_id()],
-            'oxygen2': indices[self._oxygen2.get_id()],
-            'hydrogen2': indices[self._hydrogen2.get_id()],
-        })
-        return d
-
-    @classmethod
-    def _init_from_dict(cls, functional_group):
-        obj = super()._init_from_dict(functional_group)
-        obj._atom1 = obj._atoms[functional_group['atom1']]
-        obj._oxygen1 = obj._atoms[functional_group['oxygen1']]
-        obj._hydrogen1 = obj._atoms[functional_group['hydrogen1']]
-        obj._atom2 = obj._atoms[functional_group['atom2']]
-        obj._oxygen2 = obj._atoms[functional_group['oxygen2']]
-        obj._hydrogen2 = obj._atoms[functional_group['hydrogen2']]
-        return obj
-
     def with_atoms(self, atom_map):
         clone = super().with_atoms(atom_map)
         clone._atom1 = atom_map.get(
