@@ -36,15 +36,13 @@ class _Parallel:
         self._after_placement_stage = after_placement_stage
 
     def _place_building_blocks(self, state):
-        vertex_assignments = state.get_vertex_assignments()
-
         with pathos.pools.ProcessPool(self._num_processes) as pool:
             for stage in self._stages:
-                vertices = tuple(state.get_vertices(stage))
+                vertices = tuple(map(state.get_vertex, stage))
                 building_blocks = tuple(
-                    map(vertex_assignments.get, stage)
+                    map(state.get_building_block, stage)
                 )
-                edges = tuple(state.get_vertex_edges(stage))
+                edges = tuple(map(state.get_edges, stage))
                 placements = map(
                     _Placement,
                     vertices,

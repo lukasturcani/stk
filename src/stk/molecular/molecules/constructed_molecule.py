@@ -5,11 +5,8 @@ Constructed Molecule
 """
 
 import logging
-import numpy as np
-from collections import Counter
 
 from .molecule import Molecule
-from .building_block import BuildingBlock
 
 logger = logging.getLogger(__name__)
 

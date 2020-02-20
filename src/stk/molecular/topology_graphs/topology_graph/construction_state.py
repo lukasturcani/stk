@@ -24,24 +24,22 @@ class ConstructionState:
     def with_placement_results(self, results):
         pass
 
-    def get_vertex_building_block(self, vertex_id):
+    def get_building_block(self, vertex_id):
         """
 
         """
 
         return self._vertex_building_blocks[vertex_id]
 
-    def get_vertices(self, vertex_ids):
+    def get_vertex(self, vertex_id):
         """
 
         """
 
-        for vertex_id in vertex_ids:
-            yield self._vertices[vertex_id]
+        return self._vertex[vertex_id]
 
-    def get_vertex_edges(self, vertex_ids):
-        for vertex_id in vertex_ids:
-            yield self._vertex_edges[vertex_id]
+    def get_edges(self, vertex_id):
+        return self._vertex_edges[vertex_id]
 
     def get_edge_functional_groups(self):
         # Returns a dictionary.
