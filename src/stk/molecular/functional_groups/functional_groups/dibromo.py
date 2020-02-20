@@ -113,7 +113,10 @@ class Dibromo(GenericFunctionalGroup):
 
     def to_dict(self):
         d = super().to_dict()
-        indices = {atom.get_id(): index for index, atom in self._atoms}
+        indices = {
+            atom.get_id(): index
+            for index, atom in enumerate(self._atoms)
+        }
         d.update({
             'atom1': indices[self._atom1.get_id()],
             'bromine1': indices[self._bromine1.get_id()],
@@ -122,12 +125,13 @@ class Dibromo(GenericFunctionalGroup):
         })
         return d
 
-    def _init_from_dict(self, functional_group):
+    @classmethod
+    def _init_from_dict(cls, functional_group):
         obj = super()._init_from_dict(functional_group)
-        obj._atom1 = self._atoms[functional_group['atom1']]
-        obj._bromine1 = self._atoms[functional_group['bromine1']]
-        obj._atom2 = self._atoms[functional_group['atom2']]
-        obj._bromine2 = self._atoms[functional_group['bromine2']]
+        obj._atom1 = obj._atoms[functional_group['atom1']]
+        obj._bromine1 = obj._atoms[functional_group['bromine1']]
+        obj._atom2 = obj._atoms[functional_group['atom2']]
+        obj._bromine2 = obj._atoms[functional_group['bromine2']]
         return obj
 
     def with_atoms(self, atom_map):

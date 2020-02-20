@@ -151,7 +151,10 @@ class Diol(GenericFunctionalGroup):
 
     def to_dict(self):
         d = super().to_dict()
-        indices = {atom.get_id(): index for index, atom in self._atoms}
+        indices = {
+            atom.get_id(): index
+            for index, atom in enumerate(self._atoms)
+        }
         d.update({
             'atom1': indices[self._atom1.get_id()],
             'oxygen1': indices[self._oxygen1.get_id()],
@@ -162,14 +165,15 @@ class Diol(GenericFunctionalGroup):
         })
         return d
 
-    def _init_from_dict(self, functional_group):
+    @classmethod
+    def _init_from_dict(cls, functional_group):
         obj = super()._init_from_dict(functional_group)
-        obj._atom1 = self._atoms[functional_group['atom1']]
-        obj._oxygen1 = self._atoms[functional_group['oxygen1']]
-        obj._hydrogen1 = self._atoms[functional_group['hydrogen1']]
-        obj._atom2 = self._atoms[functional_group['atom2']]
-        obj._oxygen2 = self._atoms[functional_group['oxygen2']]
-        obj._hydrogen2 = self._atoms[functional_group['hydrogen2']]
+        obj._atom1 = obj._atoms[functional_group['atom1']]
+        obj._oxygen1 = obj._atoms[functional_group['oxygen1']]
+        obj._hydrogen1 = obj._atoms[functional_group['hydrogen1']]
+        obj._atom2 = obj._atoms[functional_group['atom2']]
+        obj._oxygen2 = obj._atoms[functional_group['oxygen2']]
+        obj._hydrogen2 = obj._atoms[functional_group['hydrogen2']]
         return obj
 
     def with_atoms(self, atom_map):

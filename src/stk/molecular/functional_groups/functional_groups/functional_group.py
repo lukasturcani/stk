@@ -201,7 +201,10 @@ class FunctionalGroup:
 
         """
 
-        atoms = {atom.get_id(): index for index, atom in self._atoms}
+        atoms = {
+            atom.get_id(): index
+            for index, atom in enumerate(self._atoms)
+        }
         return {
             'class': self._get_class_name(self.__class__),
             'atoms': [atom.to_dict() for atom in self._atoms],
@@ -210,6 +213,7 @@ class FunctionalGroup:
             ],
         }
 
+    @classmethod
     def init_from_dict(cls, functional_group):
         """
         Initialize from a :class:`dict` representation.
@@ -230,6 +234,7 @@ class FunctionalGroup:
         subclass = cls._subclasses[functional_group['class']]
         return subclass._init_from_dict(functional_group)
 
+    @classmethod
     def _init_from_dict(cls, functional_group):
         obj = cls.__new__(cls)
         obj._atoms = tuple(

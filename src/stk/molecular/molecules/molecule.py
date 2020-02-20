@@ -77,8 +77,8 @@ class Molecule:
         )
         obj._bonds = tuple(
             Bond(
-                atom1=molecule._atoms[bond['atom1_id']],
-                atom2=molecule._atoms[bond['atom2_id']],
+                atom1=obj._atoms[bond['atom1_id']],
+                atom2=obj._atoms[bond['atom2_id']],
                 order=bond['order'],
                 periodicity=tuple(bond['periodicity']),
             )

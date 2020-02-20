@@ -113,7 +113,10 @@ class Alkyne(GenericFunctionalGroup):
 
     def to_dict(self):
         d = super().to_dict()
-        indices = {atom.get_id(): index for index, atom in self._atoms}
+        indices = {
+            atom.get_id(): index
+            for index, atom in enumerate(self._atoms)
+        }
         d.update({
             'carbon1': indices[self._carbon1.get_id()],
             'atom1': indices[self._atom1.get_id()],
@@ -122,12 +125,13 @@ class Alkyne(GenericFunctionalGroup):
         })
         return d
 
-    def _init_from_dict(self, functional_group):
+    @classmethod
+    def _init_from_dict(cls, functional_group):
         obj = super()._init_from_dict(functional_group)
-        obj._carbon1 = self._atoms[functional_group['carbon1']]
-        obj._atom1 = self._atoms[functional_group['atom1']]
-        obj._carbon2 = self._atoms[functional_group['carbon2']]
-        obj._atom2 = self._atoms[functional_group['atom2']]
+        obj._carbon1 = obj._atoms[functional_group['carbon1']]
+        obj._atom1 = obj._atoms[functional_group['atom1']]
+        obj._carbon2 = obj._atoms[functional_group['carbon2']]
+        obj._atom2 = obj._atoms[functional_group['atom2']]
         return obj
 
     def with_atoms(self, atom_map):

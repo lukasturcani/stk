@@ -132,7 +132,10 @@ class CarboxylicAcid(GenericFunctionalGroup):
 
     def to_dict(self):
         d = super().to_dict()
-        indices = {atom.get_id(): index for index, atom in self._atoms}
+        indices = {
+            atom.get_id(): index
+            for index, atom in enumerate(self._atoms)
+        }
         d.update({
             'carbon': indices[self._carbon.get_id()],
             'oxygen1': indices[self._oxygen1.get_id()],
@@ -142,13 +145,14 @@ class CarboxylicAcid(GenericFunctionalGroup):
         })
         return d
 
-    def _init_from_dict(self, functional_group):
+    @classmethod
+    def _init_from_dict(cls, functional_group):
         obj = super()._init_from_dict(functional_group)
-        obj._carbon = self._atoms[functional_group['carbon']]
-        obj._oxygen1 = self._atoms[functional_group['oxygen1']]
-        obj._oxygen2 = self._atoms[functional_group['oxygen2']]
-        obj._hydrogen = self._atoms[functional_group['hydrogen']]
-        obj._atom = self._atoms[functional_group['atom']]
+        obj._carbon = obj._atoms[functional_group['carbon']]
+        obj._oxygen1 = obj._atoms[functional_group['oxygen1']]
+        obj._oxygen2 = obj._atoms[functional_group['oxygen2']]
+        obj._hydrogen = obj._atoms[functional_group['hydrogen']]
+        obj._atom = obj._atoms[functional_group['atom']]
         return obj
 
     def with_atoms(self, atom_map):

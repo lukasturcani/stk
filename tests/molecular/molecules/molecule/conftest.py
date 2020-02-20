@@ -8,20 +8,24 @@ import numpy as np
     params=[
         stk.BuildingBlock.init_from_dict({
             'class': 'BuildingBlock',
-            'functional_groups': '[]',
+            'functional_groups': [],
             'position_matrix': [[0.0, 0.0, 0.0]],
-            'atoms': '(C(0, charge=4),)',
+            'atoms': [
+                {'id': 0, 'atomic_number': 6, 'charge': 4},
+            ],
             'bonds': [],
-            'identity_key': '[C+4]',
         }),
         stk.BuildingBlock.init_from_dict({
             'class': 'BuildingBlock',
-            'functional_groups': '[]',
+            'functional_groups': [],
             'position_matrix': [
                 [0.39382080513175644, 0.0, 0.0],
                 [-0.39382080513175644, 0.0, 0.0],
             ],
-            'atoms': '(C(0, charge=3), H(1))',
+            'atoms':[
+                {'id': 0, 'atomic_number': 6, 'charge': 3},
+                {'id': 1, 'atomic_number': 1, 'charge': 0},
+            ],
             'bonds': [
                 {
                     'atom1_id': 0,
@@ -30,17 +34,20 @@ import numpy as np
                     'periodicity': [0, 0, 0],
                 },
             ],
-            'identity_key': '[H][C+3]'
         }),
         stk.BuildingBlock.init_from_dict({
             'class': 'BuildingBlock',
-            'functional_groups': '[]',
+            'functional_groups': [],
             'position_matrix': [
                 [-0.002271396061231665, 0.034037398527897535, -0.0],
                 [-1.0494595365731274, -0.017073891221884126, -0.0],
                 [1.0517309326343591, -0.016963507306017023, 0.0],
             ],
-            'atoms': '(C(0, charge=2), H(1), H(2))',
+            'atoms': [
+                {'id': 0, 'atomic_number': 6, 'charge': 2},
+                {'id': 1, 'atomic_number': 1, 'charge': 0},
+                {'id': 2, 'atomic_number': 1, 'charge': 0},
+            ],
             'bonds': [
                 {
                     'atom1_id': 0,
@@ -55,7 +62,6 @@ import numpy as np
                     'periodicity': [0, 0, 0],
                 },
             ],
-            'identity_key': '[H][C+2][H]'
         }),
         stk.BuildingBlock('NCCN'),
         stk.BuildingBlock('N[C+][C+2]N'),

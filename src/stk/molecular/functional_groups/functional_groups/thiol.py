@@ -88,7 +88,10 @@ class Thiol(GenericFunctionalGroup):
 
     def to_dict(self):
         d = super().to_dict()
-        indices = {atom.get_id(): index for index, atom in self._atoms}
+        indices = {
+            atom.get_id(): index
+            for index, atom in enumerate(self._atoms)
+        }
         d.update({
             'sulfur': indices[self._sulfur.get_id()],
             'hydrogen': indices[self._hydrogen.get_id()],
@@ -96,11 +99,12 @@ class Thiol(GenericFunctionalGroup):
         })
         return d
 
-    def _init_from_dict(self, functional_group):
+    @classmethod
+    def _init_from_dict(cls, functional_group):
         obj = super()._init_from_dict(functional_group)
-        obj._sulfur = self._atoms[functional_group['sulfur']]
-        obj._hydrogen = self._atoms[functional_group['hydrogen']]
-        obj._atom = self._atoms[functional_group['atom']]
+        obj._sulfur = obj._atoms[functional_group['sulfur']]
+        obj._hydrogen = obj._atoms[functional_group['hydrogen']]
+        obj._atom = obj._atoms[functional_group['atom']]
         return obj
 
     def with_atoms(self, atom_map):

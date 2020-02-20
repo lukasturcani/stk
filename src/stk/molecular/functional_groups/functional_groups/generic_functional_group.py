@@ -43,17 +43,31 @@ class GenericFunctionalGroup(FunctionalGroup):
 
     def to_dict(self):
         d = super().to_dict()
-        indices = {atom.get_id(): index for index, atom in self._atoms}
+        indices = {
+            atom.get_id(): index
+            for index, atom in enumerate(self._atoms)
+        }
         d.update({
-            'bonders': indices[self._bonders.get_id()],
-            'deleters': indices[self._deleters.get_id()],
+            'bonders': [
+                indices[bonder.get_id()] for bonder in self._bonders
+            ],
+            'deleters': [
+                indices[deleter.get_id()] for deleter in self._deleters
+            ],
         })
         return d
 
+    @classmethod
     def _init_from_dict(self, functional_group):
         obj = super()._init_from_dict(functional_group)
-        obj._bonders = self._atoms[functional_group['bonders']]
-        obj._deleters = self._atoms[functional_group['deleters']]
+        obj._bonders = tuple(
+            obj._atoms[bonder]
+            for bonder in functional_group['bonders']
+        )
+        obj._deleters = tuple(
+            obj._atoms[deleter]
+            for deleter in functional_group['deleters']
+        )
         return obj
 
     def _with_atoms(self, atom_map):
