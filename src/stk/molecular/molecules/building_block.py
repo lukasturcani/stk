@@ -132,10 +132,30 @@ class BuildingBlock(Molecule):
 
         """
 
-        return cls.init_from_rdkit_mol(
-            molecule=molecule.to_rdkit_mol(),
+        return cls.init(
+            atoms=tuple(molecule.get_atoms()),
+            bonds=tuple(molecule.get_bonds()),
+            position_matrix=molecule.get_position_matrix(),
             functional_groups=functional_groups,
         )
+
+    @classmethod
+    def init(
+        cls,
+        atoms,
+        bonds,
+        position_matrix,
+        functional_groups,
+    ):
+        building_block = cls.__new__(cls)
+        Molecule.__init__(
+            self=building_block,
+            atoms=atoms,
+            bonds=bonds,
+            position_matrix=position_matrix,
+        )
+        building_block._with_functional_groups(functional_groups)
+        return building_block
 
     @classmethod
     def init_from_file(cls, path, functional_groups=None):
@@ -383,38 +403,6 @@ class BuildingBlock(Molecule):
         for fg_id in fg_ids:
             yield self._functional_groups[fg_id]
 
-    @classmethod
-    def _init_from_dict(cls, molecule):
-        building_block = super()._init_from_dict(molecule)
-        building_block._functional_groups = []
-        building_block._with_functional_groups(
-            functional_groups=(
-                FunctionalGroup.init_from_dict(functional_group)
-                for functional_group in molecule['functional_groups']
-            )
-        )
-        return building_block
-
-    @classmethod
-    def init_from_dict(cls, molecule):
-        """
-        Initialize from a :class:`dict` representation.
-
-        Parameters
-        ----------
-        molecule : :class:`dict`
-            A :class:`dict` representation of a molecule generated
-            by :meth:`to_dict`.
-
-        Returns
-        -------
-        :class:`.BuildingBlock`
-            The molecule described by `molecule`.
-
-        """
-
-        return super().init_from_dict(molecule)
-
     def clone(self):
         """
         Return a clone.
@@ -430,17 +418,9 @@ class BuildingBlock(Molecule):
         clone._functional_groups = self._functional_groups
         return clone
 
-    def get_placer_ids(self, fg_ids=None):
+    def get_placer_ids(self):
         """
         Yield ids of atoms used for placing the building block.
-
-        Parameters
-        ----------
-        fg_ids : :class:`iterable` of :class:`int`
-            The ids of functional groups whose placer atoms should be
-            yielded. Can be a single :class:`int`, if a single
-            functional group should be used, or  ``None``, if all
-            functional groups should be used.
 
         Yields
         ------
@@ -449,23 +429,8 @@ class BuildingBlock(Molecule):
 
         """
 
-        if fg_ids is None:
-            fg_ids = range(len(self._functional_groups))
-        elif isinstance(fg_ids, int):
-            fg_ids = (fg_ids, )
-
-        for fg_id in fg_ids:
-            yield from self._functional_groups[fg_id].get_placer_ids()
-
-    def to_dict(self):
-        d = super().to_dict()
-        d.update({
-            'functional_groups': [
-                functional_group.to_dict()
-                for functional_group in self._functional_groups
-            ],
-        })
-        return d
+        for functional_group in self._functional_groups:
+            yield from functional_group.get_placer_ids()
 
     def __str__(self):
         if self._functional_groups:

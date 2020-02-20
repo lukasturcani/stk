@@ -6,63 +6,34 @@ import numpy as np
 
 @pytest.fixture(
     params=[
-        stk.BuildingBlock.init_from_dict({
-            'class': 'BuildingBlock',
-            'functional_groups': [],
-            'position_matrix': [[0.0, 0.0, 0.0]],
-            'atoms': [
-                {'id': 0, 'atomic_number': 6, 'charge': 4},
-            ],
-            'bonds': [],
-        }),
-        stk.BuildingBlock.init_from_dict({
-            'class': 'BuildingBlock',
-            'functional_groups': [],
-            'position_matrix': [
+        stk.BuildingBlock.init(
+            atoms=(stk.C(0, 4), ),
+            bonds=(),
+            position_matrix=np.array([[0.0, 0.0, 0.0]]),
+            functional_groups=(),
+        ),
+        stk.BuildingBlock.init(
+            atoms=(stk.C(0, 3), stk.H(1)),
+            bonds=(stk.Bond(stk.C(0, 3), stk.H(1), 1), ),
+            position_matrix=np.array([
                 [0.39382080513175644, 0.0, 0.0],
                 [-0.39382080513175644, 0.0, 0.0],
-            ],
-            'atoms':[
-                {'id': 0, 'atomic_number': 6, 'charge': 3},
-                {'id': 1, 'atomic_number': 1, 'charge': 0},
-            ],
-            'bonds': [
-                {
-                    'atom1_id': 0,
-                    'atom2_id': 1,
-                    'order': 1,
-                    'periodicity': [0, 0, 0],
-                },
-            ],
-        }),
-        stk.BuildingBlock.init_from_dict({
-            'class': 'BuildingBlock',
-            'functional_groups': [],
-            'position_matrix': [
+            ]),
+            functional_groups=(),
+        ),
+        stk.BuildingBlock.init(
+            atoms=(stk.C(0, 2), stk.H(1), stk.H(2)),
+            bonds=(
+                stk.Bond(stk.C(0, 2), stk.H(1), 1),
+                stk.Bond(stk.C(0, 2), stk.H(2), 1),
+            ),
+            position_matrix=np.array([
                 [-0.002271396061231665, 0.034037398527897535, -0.0],
                 [-1.0494595365731274, -0.017073891221884126, -0.0],
                 [1.0517309326343591, -0.016963507306017023, 0.0],
-            ],
-            'atoms': [
-                {'id': 0, 'atomic_number': 6, 'charge': 2},
-                {'id': 1, 'atomic_number': 1, 'charge': 0},
-                {'id': 2, 'atomic_number': 1, 'charge': 0},
-            ],
-            'bonds': [
-                {
-                    'atom1_id': 0,
-                    'atom2_id': 1,
-                    'order': 1,
-                    'periodicity': [0, 0, 0],
-                },
-                {
-                    'atom1_id': 0,
-                    'atom2_id': 2,
-                    'order': 1,
-                    'periodicity': [0, 0, 0],
-                },
-            ],
-        }),
+            ]),
+            functional_groups=(),
+        ),
         stk.BuildingBlock('NCCN'),
         stk.BuildingBlock('N[C+][C+2]N'),
         stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),

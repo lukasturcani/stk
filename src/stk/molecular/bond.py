@@ -97,24 +97,6 @@ class Bond:
 
         return self._periodicity
 
-    def to_dict(self):
-        """
-        Get :class:`dict` representation of the bond.
-
-        Returns
-        -------
-        :class:`dict`
-            A :class:`dict` representation.
-
-        """
-
-        return {
-            'atom1_id': self._atom1.get_id(),
-            'atom2_id': self._atom2.get_id(),
-            'order': self._order,
-            'periodicity': self._periodicity,
-        }
-
     def clone(self):
         """
         Return a clone.

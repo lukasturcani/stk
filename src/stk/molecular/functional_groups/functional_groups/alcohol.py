@@ -101,27 +101,6 @@ class Alcohol(GenericFunctionalGroup):
         )
         return clone
 
-    def to_dict(self):
-        d = super().to_dict()
-        indices = {
-            atom.get_id(): index
-            for index, atom in enumerate(self._atoms)
-        }
-        d.update({
-            'oxygen': indices[self._oxygen.get_id()],
-            'hydrogen': indices[self._hydrogen.to_dict()],
-            'atom': indices[self._atom.to_dict()],
-        })
-        return d
-
-    @classmethod
-    def _init_from_dict(cls, functional_group):
-        obj = super()._init_from_dict(functional_group)
-        obj._oxygen = obj._atoms[functional_group['oxygen']]
-        obj._hydrogen = obj._atoms[functional_group['hydrogen']]
-        obj._atom = obj._atoms[functional_group['atom']]
-        return obj
-
     def __repr__(self):
         return (
             f'{self.__class__.__name__}('
