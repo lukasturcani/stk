@@ -9,8 +9,6 @@ import numpy as np
 from collections import Counter
 
 from .molecule import Molecule
-from ..functional_groups import FunctionalGroup
-from .. import atoms, topology_graphs
 
 logger = logging.getLogger(__name__)
 
@@ -178,9 +176,9 @@ class ConstructedMolecule(Molecule):
             for i, bb in enumerate(building_blocks):
                 bb_blocks.append(
                     f'{bb}\n\n'
-                    'MDL MOL BLOCK\n'
-                    '-------------\n'
-                    f'{bb._to_mdl_mol_block()}'
+                    'position matrix\n'
+                    '---------------\n'
+                    f'{bb.get_position_matrix()}'
                 )
 
             errormsg += '\n'.join(bb_blocks)
@@ -195,6 +193,9 @@ class ConstructedMolecule(Molecule):
         self._building_block_vertices = building_block_vertices
         self._atom_infos = construction_result.atom_infos
         self._reaction_infos = construction_result.reaction_infos
+        self._building_block_counts = (
+            construction_result.building_block_counts
+        )
 
     @staticmethod
     def _is_placement_ambiguous(building_blocks):
@@ -237,25 +238,15 @@ class ConstructedMolecule(Molecule):
         """
 
         clone = super().clone()
-        clone.building_block_vertices = dict(
-            self.building_block_vertices
+        clone._building_block_vertices = dict(
+            self._building_block_vertices
         )
-        clone.building_block_counter = Counter(
-            self.building_block_counter
+        clone._building_block_counts = dict(
+            self._building_block_counts
         )
-        clone.topology_graph = self.topology_graph
-        construction_bonds = set(self.construction_bonds)
-        clone.construction_bonds = tuple(
-            clone.bonds[i] for i, bond in enumerate(self.bonds)
-            if bond in construction_bonds
-        )
-        atom_map = {
-            original: clone
-            for original, clone in zip(self.atoms, clone.atoms)
-        }
-        clone.func_groups = tuple(
-            fg.clone(atom_map) for fg in self.func_groups
-        )
+        clone._topology_graph = self._topology_graph
+        clone._atom_infos = self._atom_infos
+        clone._reaction_infos = self._reaction_infos
         return clone
 
     def get_building_blocks(self):
@@ -270,6 +261,21 @@ class ConstructedMolecule(Molecule):
         """
 
         yield from self._building_block_vertices.keys()
+
+    def get_building_block_counts(self):
+        """
+        Get the count of each building block.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps each :class:`.BuildingBlock` used during construction,
+            to the number of times it is present in the
+            :class:`.ConstructedMolecule`.
+
+        """
+
+        return dict(self._building_block_counts)
 
     def get_topology_graph(self):
         """
@@ -326,94 +332,53 @@ class ConstructedMolecule(Molecule):
 
     def get_building_block_vertices(self):
         """
-        Get the
+        Get vertices on which each building block was placed.
 
         Returns
         -------
         :class:`dict`
+            Maps each :class:`.BuildingBlock` used during construction,
+            to a :class:`tuple` of the :class:`.Vertex` instances on
+            which it was placed.
 
         """
 
         return dict(self._building_block_vertices)
 
     def to_dict(self):
-        bb_counter = []
+        d = super().to_dict()
+
         building_blocks = []
-        building_block_vertices = {}
-        bb_index = {}
-        for i, bb in enumerate(self.building_block_vertices):
-            bb_index[bb] = i
-            bb_counter.append(self.building_block_counter[bb])
-            building_blocks.append(bb.to_dict(include_attrs, True))
-            building_block_vertices[i] = [
-                self.topology_graph.vertices.index(v)
-                for v in self.building_block_vertices[bb]
-            ]
+        building_block_counts = []
+        building_block_vertices = []
+        for i, bb in enumerate(self._building_block_vertices):
+            building_blocks.append(bb.to_dict())
+            building_block_counts.append(
+                self._building_block_counts[bb]
+            )
+            building_block_vertices.append([
+                vertex.get_id()
+                for vertex in self._building_block_vertices[bb]
+            ])
 
-        # For atoms, bond sand func groups, need to change all atom
-        # references with the id of the atom. This is because when
-        # these objects a reconstructed you want to create pointers
-        # back to the atoms found in the atoms attribute.
-        atoms = []
-        for atom in self.atoms:
-            clone = atom.clone()
-            # This attribute is a pointer that will need to get
-            # re-created by load().
-            clone.building_block = bb_index[clone.building_block]
-            atoms.append(clone)
-
-        bonds = []
-        bond_indices = {}
-        for i, bond in enumerate(self.bonds):
-            clone = bond.clone()
-            clone.atom1 = clone.atom1.id
-            clone.atom2 = clone.atom2.id
-            bonds.append(clone)
-            bond_indices[bond] = i
-
-        construction_bonds = [
-            bond_indices[bond] for bond in self.construction_bonds
-        ]
-
-        func_groups = []
-        for fg in self.func_groups:
-            clone = fg.clone()
-            clone.atoms = tuple(clone.get_atom_ids())
-            clone.bonders = tuple(clone.get_bonder_ids())
-            clone.deleters = tuple(clone.get_deleter_ids())
-            clone.fg_type = f'{clone.fg_type.name!r}'
-            func_groups.append(clone)
-
-        d = {
+        d.update({
             'building_blocks': building_blocks,
             'building_block_vertices': building_block_vertices,
-            'building_block_counter': bb_counter,
-            'construction_bonds': construction_bonds,
-            'class': self.__class__.__name__,
-            'position_matrix': self.get_position_matrix().tolist(),
-            'topology_graph': repr(self.topology_graph),
-            'func_groups': repr(tuple(func_groups)),
-            'atoms': repr(tuple(atoms)),
-            'bonds': repr(tuple(bonds)),
-        }
-
-        if ignore_missing_attrs:
-            d.update({
-                attr: repr(getattr(self, attr))
-                for attr in include_attrs
-                if hasattr(self, attr)
-            })
-        else:
-            d.update({
-                attr: repr(getattr(self, attr))
-                for attr in include_attrs
-            })
-
+            'building_block_counts': building_block_counts,
+            'topology_graph': self._topology_graph.to_dict(),
+            'atom_infos': [
+                atom_info.to_dict() for atom_info in self._atoms_infos
+            ],
+            'reaction_infos': [
+                reaction_info.to_dict()
+                for reaction_info in self._reaction_infos
+            ],
+        })
         return d
 
     def init_from_dict(cls, molecule_dict):
         """
-        Intialize from a :class:`dict` representation.
+        Initialize from a :class:`dict` representation.
 
         Parameters
         ----------
@@ -423,10 +388,15 @@ class ConstructedMolecule(Molecule):
 
         Returns
         -------
-        :class:`ConstructedMolecule`
-            The molecule described by `mol_dict`.
+        :class:`.ConstructedMolecule`
+            The molecule described by `molecule_dict`.
 
         """
+
+        molecule = super().init_from_dict(molecule_dict)
+
+        return molecule
+
 
         d = dict(mol_dict)
 

@@ -1,7 +1,4 @@
-from typing import NamedTuple
-
-
-class ConstructionResult(NamedTuple):
+class ConstructionResult:
     """
     The result of a :class:`.ConstructedMolecule` construction.
 
@@ -25,10 +22,37 @@ class ConstructionResult(NamedTuple):
         Holds data on the reactions which were performed during
         construction.
 
+    building_block_counts : :class:`dict`
+        Maps each :class:`.BuildingBlock` used during construction to
+        the number of times it was used.
+
     """
 
-    atoms: object
-    bonds: object
-    position_matrix: object
-    atom_infos: object
-    reaction_infos: object
+    __slots__ = [
+        'atoms',
+        'bonds',
+        'position_matrix',
+        'atom_infos',
+        'reaction_infos',
+        'building_block_counts',
+    ]
+
+    def __init__(self, construction_state):
+        """
+        Initialize a :class:`.ConstructionResult` instance.
+
+        Parameters
+        ----------
+        construction_state : :class:`.ConstructionState`
+            The construction state from which to create the result.
+
+        """
+
+        self.atoms = construction_state.get_atoms()
+        self.bonds = construction_state.get_bonds()
+        self.position_matrix = construction_state.get_position_matrix()
+        self.atom_infos = construction_state.get_atom_infos()
+        self.reaction_infos = construction_state.get_reaction_infos()
+        self.building_block_counts = (
+            construction_state.get_building_block_counts()
+        )

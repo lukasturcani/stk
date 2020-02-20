@@ -98,6 +98,43 @@ class Atom:
         self._id = id
         self._charge = charge
 
+    def to_dict(self):
+        """
+        Return a :class:`dict` representation.
+
+        Returns
+        -------
+        :class:`dict`
+            A :class:`dict` representation of the atom.
+
+        """
+
+        return {
+            'id': self._id,
+            'atomic_number': self._atomic_number,
+            'charge': self._charge,
+        }
+
+    @classmethod
+    def init_from_dict(cls, atom):
+        """
+        Initialize an atom from its :class:`dict` representation.
+
+        Parameters
+        ----------
+        atom : :class:`dict`
+            The atom in its :class:`dict` representation.
+
+        Returns
+        -------
+        :class:`.Atom`
+            The atom. It will have the correct subclass, corresponding
+            to its element.
+
+        """
+
+        return Atom(atom['id'], atom['atomic_number'], atom['charge'])
+
     def get_id(self):
         """
         Get the id of the atom.

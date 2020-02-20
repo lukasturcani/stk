@@ -10,7 +10,6 @@ import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 
-from .. import atoms, functional_groups
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bond import Bond
@@ -385,34 +384,36 @@ class BuildingBlock(Molecule):
             yield self._functional_groups[fg_id]
 
     @classmethod
-    def init_from_dict(cls, molecule_dict):
+    def _init_from_dict(cls, molecule):
+        building_block = super()._init_from_dict(molecule)
+        building_block._functional_groups = []
+        building_block._with_functional_groups(
+            functional_groups=(
+                FunctionalGroup.init_from_dict(functional_group)
+                for functional_group in molecule['functional_groups']
+            )
+        )
+        return building_block
+
+    @classmethod
+    def init_from_dict(cls, molecule):
         """
         Initialize from a :class:`dict` representation.
 
         Parameters
         ----------
-        molecule_dict : :class:`dict`
+        molecule : :class:`dict`
             A :class:`dict` representation of a molecule generated
             by :meth:`to_dict`.
 
         Returns
         -------
-        :class:`BuildingBlock`
-            The molecule described by `molecule_dict`.
+        :class:`.BuildingBlock`
+            The molecule described by `molecule`.
 
         """
 
-        obj = super().init_from_dict(molecule_dict)
-        obj._functional_groups = []
-        globals_ = vars(functional_groups)
-        globals_.update(vars(atoms))
-        obj._with_functional_groups(
-            functional_groups=eval(
-                molecule_dict['functional_groups'],
-                globals_
-            )
-        )
-        return obj
+        return super().init_from_dict(molecule)
 
     def clone(self):
         """
@@ -459,7 +460,10 @@ class BuildingBlock(Molecule):
     def to_dict(self):
         d = super().to_dict()
         d.update({
-            'functional_groups': repr(self._functional_groups),
+            'functional_groups': [
+                functional_group.to_dict()
+                for functional_group in self._functional_groups
+            ],
         })
         return d
 

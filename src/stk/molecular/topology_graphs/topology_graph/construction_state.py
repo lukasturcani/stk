@@ -67,3 +67,18 @@ class ConstructionState:
         """
 
         pass
+
+    def get_atoms(self):
+        pass
+
+    def get_bonds(self):
+        pass
+
+    def get_atom_infos(self):
+        pass
+
+    def get_reaction_infos(self):
+        pass
+
+    def get_building_block_counts(self):
+        pass
