@@ -25,7 +25,8 @@ def one_two_reaction(
             },
         ),
         construction_state=None,
-        edge=MockEdge(periodicity),
+        edges=(MockEdge(periodicity), ),
+        edge_group=None,
         functional_groups=(
             functional_group1,
             functional_group2,

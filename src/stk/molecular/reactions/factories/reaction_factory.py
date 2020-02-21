@@ -7,7 +7,8 @@ class ReactionFactory:
     def get_reaction(
         self,
         construction_state,
-        edge,
+        edges,
+        edge_group,
         functional_groups,
     ):
         """
@@ -18,8 +19,11 @@ class ReactionFactory:
         construction_state : :class:`.ConstructionState`
             The state of the current construction.
 
-        edge : :class:`.Edge`
-            The edge on which the `functional_groups` are found.
+        edges : :class:`iterable` of :class:`.Edge`
+            The edges on which the `functional_groups` are found.
+
+        edge_group : :class:`.EdgeGroup`
+            The edge group on which the `functional_groups` are found.
 
         functional_groups : :class:`iterable`
             An :class:`iterable` holding :class:`.FunctionalGroup`

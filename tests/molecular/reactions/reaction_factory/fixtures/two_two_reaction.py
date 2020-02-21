@@ -35,7 +35,8 @@ def two_two_reaction(
             },
         ),
         construction_state=MockConstructionState(position_matrix),
-        edge=MockEdge(periodicity),
+        edges=(MockEdge(periodicity), ),
+        edge_group=None,
         functional_groups=(
             functional_group2,
             functional_group2_2,

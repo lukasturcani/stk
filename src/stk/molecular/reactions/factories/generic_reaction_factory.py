@@ -141,12 +141,13 @@ class GenericReactionFactory(ReactionFactory):
     def get_reaction(
         self,
         construction_state,
-        edge,
+        edges,
+        edge_group,
         functional_groups,
     ):
         functional_groups = tuple(functional_groups)
         functional_group1, functional_group2 = functional_groups
-
+        edge, = edges
         return _reactions[_get_reaction_key(functional_groups)](
             construction_state=construction_state,
             functional_group1=functional_group1,

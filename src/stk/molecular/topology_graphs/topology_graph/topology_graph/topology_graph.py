@@ -59,8 +59,11 @@ into its :class:`.Vertex` counterpart.
 
 """
 
+from collections import defaultdict
+
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
+from ..edge_group import EdgeGroup
 from .implementations import _Parallel, _Serial
 
 
@@ -97,22 +100,23 @@ class TopologyGraph:
 
     def __init__(
         self,
-        vertex_data,
-        edge_data,
+        vertices,
+        edges,
         reaction_factory,
         construction_stages,
         num_processes,
+        edge_groups=None,
     ):
         """
         Initialize an instance of :class:`.TopologyGraph`.
 
         Parameters
         ----------
-        vertex_data : :class:`tuple` of :class:`.VertexData`
-            The data for vertices which make up the graph.
+        vertices : :class:`tuple` of :class:`.VertexData`
+            The vertices which make up the graph.
 
-        edge_data : :class:`tuple` of :class:`.EdgeData`
-            The date for edges which make up the graph.
+        edges : :class:`tuple` of :class:`.EdgeData`
+            The edges which make up the graph.
 
         reaction_factory : :class:`.ReactionFactory`
             Used to pick which :class:`.Reaction` is used, given
@@ -142,16 +146,15 @@ class TopologyGraph:
             The number of parallel processes to create during
             :meth:`construct`.
 
+        edge_groups : :class:`tuple` of :class:`.EdgeGroup`, optional
+            The edge groups of the topology graph, if ``None`` every
+            :class:`.Edge` is in its own edge group.
+
         """
 
-        vertex_data = tuple(self._with_ids(vertex_data))
-        edge_data = tuple(self._with_ids(edge_data))
-        self._vertices = tuple(
-            data.get_vertex() for data in vertex_data
-        )
-        self._edges = tuple(
-            data.get_edge() for data in edge_data
-        )
+        self._vertices = vertices
+        self._edges = edges
+        self._vertex_edges = self._get_vertex_egdes(self._edges)
         self._reaction_factory = reaction_factory
         if num_processes == 1:
             self._implementation = _Serial(
@@ -164,6 +167,53 @@ class TopologyGraph:
                 num_processes=num_processes,
                 after_placement_stage=self._after_placement_stage,
             )
+
+        if edge_groups is None:
+            edge_groups = tuple(
+                EdgeGroup((edge, )) for edge in self._edges
+            )
+        self._edge_groups = edge_groups
+
+    def _get_vertex_edges(self, edges):
+        vertex_edges = defaultdict(list)
+        for edge in edges:
+            for vertex_id in edge.get_vertex_ids():
+                if edge.is_periodic():
+                    periodic_edge = self._get_periodic_edge(
+                        edge=edge,
+                        reference=vertex_id,
+                    )
+                    vertex_edges[vertex_id].append(periodic_edge)
+                else:
+                    vertex_edges[vertex_id].append(edge)
+
+    def _get_periodic_edge(self, edge, reference):
+        vertex1 = self._vertices[reference]
+        vertex2 = self._vertices[
+            edge.get_vertex1_id()
+            if reference == edge.get_vertex2_id()
+            else edge.get_vertex2_id()
+        ]
+
+        direction = 1 if reference == edge.get_vertex1_id() else -1
+        end_cell = (
+            vertex1.get_cell() + direction*edge.get_periodicity()
+        )
+
+        cell_shift = end_cell - vertex2.get_cell()
+
+        shift = 0
+        lattice_constants = self._get_lattice_constants()
+        for axis_shift, constant in zip(cell_shift, lattice_constants):
+            shift += axis_shift*constant
+
+        position = (
+            (vertex2.get_position()+shift+vertex1.get_position()) / 2
+        )
+        return edge.with_position(position)
+
+    def _get_lattice_constants(self):
+        raise NotImplementedError()
 
     def construct(self, building_block_vertices):
         """
@@ -184,7 +234,10 @@ class TopologyGraph:
 
         """
 
-        state = ConstructionState(building_block_vertices)
+        state = ConstructionState(
+            building_block_vertices=building_block_vertices,
+            vertex_edges=self._vertex_edges,
+        )
         state = self._before_placement(state)
         state = self._place_building_blocks(state)
         state = self._before_reactions(state)
@@ -277,8 +330,7 @@ class TopologyGraph:
         vertices,
         edges,
         building_blocks,
-        position_matrices,
-        functional_group_to_edge_maps,
+        placement_results,
     ):
         """
         Perform `state` changes after a placement stage is done.
@@ -305,13 +357,8 @@ class TopologyGraph:
             construction stage. They are ordered to have the same
             index as the vertex in `vertices` which placed them.
 
-        position_matrices : :class:`tuple` of :class:`numpy.ndarray`
-            For each building block in `building_blocks`, the position
-            matrix after it has been placed by its vertex.
-
-        functional_group_to_edge_maps : :class:`tuple` of :class:`dict`
-            For each building block in `building_blocks`, the
-            mapping of functional group to the edge id it is mapped to.
+        placement_results : :class:`.PlacementResult`
+            The placement results of the previous placement stage.
 
         Returns
         -------
@@ -321,11 +368,6 @@ class TopologyGraph:
         """
 
         return state
-
-    @staticmethod
-    def _with_ids(objects):
-        for id, object in enumerate(objects):
-            yield object.with_id(id)
 
     def __str__(self):
         return repr(self)

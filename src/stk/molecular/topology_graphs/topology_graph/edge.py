@@ -1,8 +1,54 @@
+import numpy as np
+
+
 class Edge:
     """
     Represents an edge in a topology graph.
 
     """
+
+    def __init__(
+        self,
+        id,
+        vertex1,
+        vertex2,
+        periodicity=(0, 0, 0),
+        position=None,
+    ):
+        """
+        Initialize a :class:`.Edge` instance.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the edge.
+
+        vertex1 : :class:`.Vertex`
+            The first vertex the edge is connected to.
+
+        vertex2 : :class:`.Vertex`
+            The second vertex the edge is connected to.
+
+        periodicity : :class:`tuple` of :class:`int`, optional
+            The periodicity of the edge, when going from `vertex1` to
+            `vertex2`.
+
+        position : :class:`numpy.ndarray`, optional
+            The position of the edge, if ``None``, the midpoint of the
+            the vertices is used.
+
+        """
+
+        if position is None:
+            position = (
+                vertex1.get_position() + vertex2.get_position()
+            ) / 2
+
+        self._id = id
+        self._vertex1_id = vertex1.get_id()
+        self._vertex2_id = vertex2.get_id()
+        self._position = position
+        self._periodicity = periodicity
 
     def get_periodicity(self):
         """
@@ -19,7 +65,7 @@ class Edge:
 
         """
 
-        raise NotImplementedError()
+        return np.array(self._periodicity)
 
     def is_periodic(self):
         """
@@ -32,7 +78,7 @@ class Edge:
 
         """
 
-        return any(i != 0 for i in self.get_periodicity())
+        return any(i != 0 for i in self._periodicity)
 
     def with_scale(self, scale):
         """
@@ -67,36 +113,43 @@ class Edge:
 
         """
 
-        raise NotImplementedError()
+        clone = self.__class__.__new__(self.__class__)
+        clone._id = self._id
+        clone._vertex1_id = self._vertex1_id
+        clone._vertex2_id = self._vertex2_id
+        clone._position = np.array(self._position)
+        clone._periodicity = self._periodicity
+        return clone
 
-    def get_vertex_ids(self):
+    def get_vertex1_id(self):
         """
-        Get the ids of connected vertices.
+        Get the id of the first vertex.
 
-        Yields
-        ------
+        Returns
+        -------
         :class:`int`
-            The id of a connected vertex.
+            The id of the first vertex.
 
         """
 
-        raise NotImplementedError()
+        return self._vertex1_id
 
-    def get_position(self, reference=None, vertices=None):
+    def get_vertex2_id(self):
+        """
+        Get the id of the second vertex.
+
+        Returns
+        -------
+        :class:`int`
+            The id of the second vertex.
+
+        """
+
+        return self._vertex2_id
+
+    def get_position(self):
         """
         Return the position.
-
-        Parameters
-        ----------
-        reference : :class:`.Vertex`, optional
-            If the edge is periodic, the position returned will
-            depend on which vertex the edge position is calculated
-            relative to.
-
-        vertices : :class:`tuple` of :class:`.Vertex`, optional
-            All the vertices in the topology graph. Index of each
-            vertex must be equal to its :class:`~.Vertex.id`. Only
-            needs to be supplied if `reference` is supplied.
 
         Returns
         -------
@@ -105,4 +158,4 @@ class Edge:
 
         """
 
-        raise NotImplementedError()
+        return np.array(self._position)

@@ -30,11 +30,12 @@ def one_one_reaction(
             },
         ),
         construction_state=None,
-        edge=MockEdge(periodicity),
+        edges=(MockEdge(periodicity), ),
         functional_groups=(
             functional_group1,
             functional_group1_2,
         ),
+        edge_group=None,
         reaction_result=ReactionResult(
             new_atoms=(),
             new_bonds=get_new_bonds(
