@@ -48,11 +48,13 @@ class ConstructionResult:
 
         """
 
-        self.atoms = construction_state.get_atoms()
-        self.bonds = construction_state.get_bonds()
+        self.atoms = tuple(construction_state.get_atoms())
+        self.bonds = tuple(construction_state.get_bonds())
         self.position_matrix = construction_state.get_position_matrix()
-        self.atom_infos = construction_state.get_atom_infos()
-        self.reaction_infos = construction_state.get_reaction_infos()
+        self.atom_infos = tuple(construction_state.get_atom_infos())
+        self.reaction_infos = tuple(
+            construction_state.get_reaction_infos()
+        )
         self.building_block_counts = (
             construction_state.get_building_block_counts()
         )
