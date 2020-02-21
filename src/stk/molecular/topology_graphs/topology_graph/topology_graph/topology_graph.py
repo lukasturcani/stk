@@ -60,6 +60,7 @@ into its :class:`.Vertex` counterpart.
 """
 
 from collections import defaultdict
+from functools import partial
 
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
@@ -177,14 +178,17 @@ class TopologyGraph:
     def _get_vertex_edges(self, edges):
         vertex_edges = defaultdict(list)
         for edge in edges:
-            for vertex_id in edge.get_vertex_ids():
-                if edge.is_periodic():
+            vertex_ids = (edge.get_vertex1_id(), edge.get_vertex2_id())
+
+            if edge.is_periodic():
+                for vertex_id in vertex_ids:
                     periodic_edge = self._get_periodic_edge(
                         edge=edge,
                         reference=vertex_id,
                     )
                     vertex_edges[vertex_id].append(periodic_edge)
-                else:
+            else:
+                for vertex_id in vertex_ids:
                     vertex_edges[vertex_id].append(edge)
 
     def _get_periodic_edge(self, edge, reference):
@@ -236,6 +240,7 @@ class TopologyGraph:
 
         state = ConstructionState(
             building_block_vertices=building_block_vertices,
+            edges=self._edges,
             vertex_edges=self._vertex_edges,
         )
         state = self._before_placement(state)
@@ -296,10 +301,11 @@ class TopologyGraph:
         return self._implementation._place_building_blocks(state)
 
     def _run_reactions(self, state):
-        reactions = map(
+        get_reaction = partial(
             self._reaction_factory.get_reaction,
-            state.get_edge_functional_groups.values(),
+            state,
         )
+        reactions = map(get_reaction, self._edge_groups)
         results = map(
             lambda reaction: reaction.get_result(),
             reactions,

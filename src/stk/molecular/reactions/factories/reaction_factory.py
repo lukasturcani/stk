@@ -4,13 +4,7 @@ class ReactionFactory:
 
     """
 
-    def get_reaction(
-        self,
-        construction_state,
-        edges,
-        edge_group,
-        functional_groups,
-    ):
+    def get_reaction(self, construction_state, edge_group):
         """
         Get a reaction to use on the `functional_groups`.
 
@@ -19,21 +13,13 @@ class ReactionFactory:
         construction_state : :class:`.ConstructionState`
             The state of the current construction.
 
-        edges : :class:`iterable` of :class:`.Edge`
-            The edges on which the `functional_groups` are found.
-
         edge_group : :class:`.EdgeGroup`
-            The edge group on which the `functional_groups` are found.
-
-        functional_groups : :class:`iterable`
-            An :class:`iterable` holding :class:`.FunctionalGroup`
-            instances, for which a :class:`.Reaction` should be
-            returned.
+            The edge group for which a reaction should be found.
 
         Returns
         -------
         :class:`.Reaction`
-            The reaction to use on the `functional_groups`.
+            The reaction to use on the `edge_group`.
 
         """
 
