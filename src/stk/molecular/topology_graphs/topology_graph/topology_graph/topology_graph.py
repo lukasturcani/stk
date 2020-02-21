@@ -61,6 +61,7 @@ into its :class:`.Vertex` counterpart.
 
 from collections import defaultdict
 from functools import partial
+import numpy as np
 
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
@@ -200,8 +201,9 @@ class TopologyGraph:
         ]
 
         direction = 1 if reference == edge.get_vertex1_id() else -1
+        periodicity = np.array(edge.get_periodicity())
         end_cell = (
-            vertex1.get_cell() + direction*edge.get_periodicity()
+            vertex1.get_cell() + direction*periodicity
         )
 
         cell_shift = end_cell - vertex2.get_cell()
@@ -248,7 +250,7 @@ class TopologyGraph:
         state = self._before_reactions(state)
         state = self._run_reactions(state)
         state = self._clean_up(state)
-        return ConstructionResult(state)
+        return ConstructionResult.init_from_construction_state(state)
 
     def get_vertices(self, vertex_ids=None):
         """

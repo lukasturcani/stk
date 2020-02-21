@@ -5,9 +5,7 @@ def test_get_reaction(test_case):
     _test_get_reaction(
         factory=test_case.factory,
         construction_state=test_case.construction_state,
-        edges=test_case.edges,
         edge_group=test_case.edge_group,
-        functional_groups=test_case.functional_groups,
         reaction_result=test_case.reaction_result,
     )
 
@@ -15,16 +13,12 @@ def test_get_reaction(test_case):
 def _test_get_reaction(
     factory,
     construction_state,
-    edges,
     edge_group,
-    functional_groups,
     reaction_result,
 ):
     reaction = factory.get_reaction(
         construction_state=construction_state,
-        edges=edges,
         edge_group=edge_group,
-        functional_groups=functional_groups,
     )
     is_same_result(reaction.get_result(), reaction_result)
 

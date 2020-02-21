@@ -2,16 +2,18 @@ import stk
 
 
 class MockConstructionState(stk.ConstructionState):
-    def __init__(self, position_matrix=None):
-        self.position_matrix = position_matrix
-
-    def get_position_matrix(self):
-        return self.position_matrix
+    def __init__(
+        self,
+        edges,
+        edge_functional_groups,
+        position_matrix=None,
+    ):
+        self._edges = edges
+        self._edge_functional_groups = edge_functional_groups
+        self._position_matrix = position_matrix
 
 
 class MockEdge(stk.Edge):
-    def __init__(self, periodicity):
-        self.periodicity = periodicity
-
-    def get_periodicity(self):
-        return self.periodicity
+    def __init__(self, id, periodicity):
+        self._id = id
+        self._periodicity = periodicity

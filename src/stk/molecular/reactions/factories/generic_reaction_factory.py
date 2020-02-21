@@ -139,11 +139,12 @@ class GenericReactionFactory(ReactionFactory):
         self._bond_orders = bond_orders
 
     def get_reaction(self, construction_state, edge_group):
-        functional_groups = functional_group1, functional_group2 = (
+        functional_groups = tuple(
             construction_state.get_edge_group_functional_groups(
                 edge_group=edge_group,
             )
         )
+        functional_group1, functional_group2 = functional_groups
         edge = construction_state.get_edge(
             edge_id=next(edge_group.get_edge_ids()),
         )

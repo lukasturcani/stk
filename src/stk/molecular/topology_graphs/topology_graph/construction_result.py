@@ -1,4 +1,7 @@
-class ConstructionResult:
+from typing import NamedTuple
+
+
+class ConstructionResult(NamedTuple):
     """
     The result of a :class:`.ConstructedMolecule` construction.
 
@@ -28,16 +31,15 @@ class ConstructionResult:
 
     """
 
-    __slots__ = [
-        'atoms',
-        'bonds',
-        'position_matrix',
-        'atom_infos',
-        'reaction_infos',
-        'building_block_counts',
-    ]
+    atoms: object
+    bonds: object
+    position_matrix: object
+    atom_infos: object
+    reaction_infos: object
+    building_block_counts: object
 
-    def __init__(self, construction_state):
+    @classmethod
+    def init_from_construction_state(cls, construction_state):
         """
         Initialize a :class:`.ConstructionResult` instance.
 
@@ -48,13 +50,17 @@ class ConstructionResult:
 
         """
 
-        self.atoms = tuple(construction_state.get_atoms())
-        self.bonds = tuple(construction_state.get_bonds())
-        self.position_matrix = construction_state.get_position_matrix()
-        self.atom_infos = tuple(construction_state.get_atom_infos())
-        self.reaction_infos = tuple(
-            construction_state.get_reaction_infos()
-        )
-        self.building_block_counts = (
-            construction_state.get_building_block_counts()
+        position_matrix = construction_state.get_position_matrix()
+        position_matrix.setflags(write=False)
+        return cls(
+            atoms=tuple(construction_state.get_atoms()),
+            bonds=tuple(construction_state.get_bonds()),
+            position_matrix=position_matrix,
+            atom_infos=tuple(construction_state.get_atom_infos()),
+            reaction_infos=tuple(
+                construction_state.get_reaction_infos()
+            ),
+            building_block_counts=(
+                construction_state.get_building_block_counts()
+            ),
         )

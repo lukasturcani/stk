@@ -28,18 +28,25 @@ def two_two_reaction(
         functional_group1=functional_group2,
         functional_group2=functional_group2_2,
     )
+    edge = MockEdge(0, periodicity)
     return _TestCase(
         factory=stk.GenericReactionFactory(
             bond_orders={
                 bond_order_key: bond_order,
             },
         ),
-        construction_state=MockConstructionState(position_matrix),
-        edges=(MockEdge(periodicity), ),
-        edge_group=None,
-        functional_groups=(
-            functional_group2,
-            functional_group2_2,
+        construction_state=MockConstructionState(
+            edges=(edge, ),
+            edge_functional_groups={
+                0: (
+                    functional_group2,
+                    functional_group2_2,
+                ),
+            },
+            position_matrix=position_matrix,
+        ),
+        edge_group=stk.EdgeGroup(
+            edges=(edge, ),
         ),
         reaction_result=ReactionResult(
             new_atoms=(),

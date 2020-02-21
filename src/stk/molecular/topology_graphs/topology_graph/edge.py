@@ -50,6 +50,19 @@ class Edge:
         self._position = position
         self._periodicity = periodicity
 
+    def get_id(self):
+        """
+        Get the id of the edge.
+
+        Returns
+        -------
+        :class:`int`
+            The id.
+
+        """
+
+        return self._id
+
     def get_periodicity(self):
         """
         Get the periodicity of the edge.
@@ -65,7 +78,7 @@ class Edge:
 
         """
 
-        return np.array(self._periodicity)
+        return self._periodicity
 
     def is_periodic(self):
         """
