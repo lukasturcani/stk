@@ -69,9 +69,9 @@ class Edge:
 
         Returns
         -------
-        :class:`numpy.ndarray`
-            The periodicity of the edge. If ``[0, 0, 0]`` the edge is
-            not periodic, if ``[1, 0, -1]`` the edge is periodic going
+        :class:`tuple` of :class:`int`
+            The periodicity of the edge. If ``(0, 0, 0)`` the edge is
+            not periodic, if ``(1, 0, -1)`` the edge is periodic going
             in the positive direction along the x axis, is not periodic
             across the y axis and is periodic in the negative direction
             along the z axis.
