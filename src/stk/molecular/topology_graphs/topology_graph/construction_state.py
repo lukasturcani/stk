@@ -89,7 +89,7 @@ class ConstructionState:
                 new_atom = atom.with_id(len(self._atoms))
                 atom_map[atom.get_id()] = new_atom
 
-                self._atoms.append(atom)
+                self._atoms.append(new_atom)
                 self._atom_infos.append(
                     AtomInfo(
                         atom=new_atom,
