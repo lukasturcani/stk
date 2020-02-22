@@ -24,29 +24,6 @@ class Vertex:
         self._id = id
         self._position = np.array(position)
 
-    @classmethod
-    def init_at_center(cls, id, vertices):
-        """
-        Initialize at the center of other vertices.
-
-        Parameters
-        ----------
-        vertices : :class:`tuple` of :class:`.Vertex`
-            Vertices at whose center this vertex should be initialized.
-
-        Returns
-        -------
-        :class:`.Vertex`
-            The vertex.
-
-        """
-
-        center = (
-            sum(vertex.get_position() for vertex in vertices)
-            / len(vertices)
-        )
-        return cls(id, center)
-
     def _with_scale(self, scale):
         self._position *= scale
         return self
