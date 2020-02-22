@@ -130,8 +130,44 @@ class ConstructionState:
         for edge_id in edge_group.get_edge_ids():
             yield from self._edge_functional_groups[edge_id]
 
-    def with_reaction_results(self, results):
-        pass
+    def _with_reaction_results(self, reactions, results):
+        deleted_atoms = set()
+        for reaction, result in zip(reactions, results):
+            deleted_atoms.update(
+                atom.get_id() for atom in result.deleted_atoms
+            )
+
+            atom_map = {}
+            for atom in result.new_atoms:
+                new_atom = atom.with_id(len(self._atoms))
+                atom_map[atom.get_id()] = new_atom
+                self._atoms.append(new_atom)
+
+            for bond in result.new_bonds:
+                new_bond = bond.with_atoms(atom_map)
+                self._bonds.append(new_bond)
+
+        atom_map = {}
+        atoms = []
+        for atom in self._atoms:
+            if atom.get_id() not in deleted_atoms:
+                new_atom = atom.with_id(len(atoms))
+                atom_map[atom.get_id()] = new_atom
+                atoms.append(new_atom)
+        self._atoms = atoms
+
+        bonds = []
+        for bond in self._bonds:
+            bond_deleted = (
+                bond.get_atom1().get_id() in deleted_atoms
+                or bond.get_atom2().get_id() in deleted_atoms
+            )
+            if not bond_deleted:
+                bonds.append(bond.with_atoms(atom_map))
+        self._bonds = bonds
+
+    def with_reaction_results(self, reactions, results):
+        return self.clone()._with_reaction_results(reactions, results)
 
     def _with_vertices(self, vertices):
         self._vertices = {
