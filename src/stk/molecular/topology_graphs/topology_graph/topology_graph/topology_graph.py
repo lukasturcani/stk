@@ -156,7 +156,7 @@ class TopologyGraph:
 
         self._vertices = vertices
         self._edges = edges
-        self._vertex_edges = self._get_vertex_egdes(self._edges)
+        self._vertex_edges = self._get_vertex_edges(self._edges)
         self._reaction_factory = reaction_factory
         if num_processes == 1:
             self._implementation = _Serial(
@@ -191,6 +191,7 @@ class TopologyGraph:
             else:
                 for vertex_id in vertex_ids:
                     vertex_edges[vertex_id].append(edge)
+        return vertex_edges
 
     def _get_periodic_edge(self, edge, reference):
         vertex1 = self._vertices[reference]
@@ -219,6 +220,13 @@ class TopologyGraph:
         return edge.with_position(position)
 
     def _get_lattice_constants(self):
+        raise NotImplementedError()
+
+    def get_building_block_vertices(self, building_blocks):
+        """
+
+        """
+
         raise NotImplementedError()
 
     def construct(self, building_block_vertices):
@@ -342,7 +350,7 @@ class TopologyGraph:
         vertices,
         edges,
         building_blocks,
-        placement_results,
+        results,
     ):
         """
         Perform `state` changes after a placement stage is done.
@@ -369,7 +377,7 @@ class TopologyGraph:
             construction stage. They are ordered to have the same
             index as the vertex in `vertices` which placed them.
 
-        placement_results : :class:`.PlacementResult`
+        results : :class:`._PlacementResult`
             The placement results of the previous placement stage.
 
         Returns

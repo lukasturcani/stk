@@ -48,13 +48,13 @@ class _Serial:
             )
             state = state.with_placement_results(
                 building_blocks=building_blocks,
-                placement_results=placement_results,
+                results=placement_results,
             )
             state = self._after_placement_stage(
                 state=state,
                 vertices=vertices,
                 edges=edges,
                 building_blocks=building_blocks,
-                placement_results=placement_results,
+                results=placement_results,
             )
         return state

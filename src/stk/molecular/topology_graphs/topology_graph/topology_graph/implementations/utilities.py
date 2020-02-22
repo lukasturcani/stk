@@ -17,7 +17,7 @@ class _PlacementResult(NamedTuple):
 
     """
 
-    postion_matrix: object
+    position_matrix: object
     functional_group_edges: object
 
 

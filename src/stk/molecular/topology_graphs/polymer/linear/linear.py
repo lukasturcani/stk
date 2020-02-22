@@ -8,20 +8,14 @@ Polymer
 
 import numpy as np
 
-from ...topology_graph import TopologyGraph
+from .vertices import _HeadVertex, _TailVertex, _LinearVertex
+from ...topology_graph import TopologyGraph, Edge
+from ....reactions import GenericReactionFactory
 
 
 class Linear(TopologyGraph):
     """
     Represents a linear polymer topology graph.
-
-    Attributes
-    ----------
-    vertices : :class:`tuple` of :class:`.Vertex`
-        The vertices which make up the topology graph.
-
-    edges : :class:`tuple` of :class:`.Edge`
-        The edges which make up the topology graph.
 
     Examples
     --------
@@ -31,11 +25,11 @@ class Linear(TopologyGraph):
 
         import stk
 
-        bb1 = stk.BuildingBlock('NCCN', ['amine'])
-        bb2 = stk.BuildingBlock('O=CCC=O', ['aldehyde'])
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
         polymer = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2],
-            topology_graph=stk.polymer.Linear('AB', 12)
+            topology_graph=stk.polymer.Linear('AB', 12),
         )
 
     However building blocks with a single functional group can
@@ -43,10 +37,10 @@ class Linear(TopologyGraph):
 
     .. code-block: python
 
-        bb3 = stk.BuildingBlock('CCN', ['amine'])
+        bb3 = stk.BuildingBlock('CCN', [stk.PrimaryAminoFactory()])
         polymer = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear('ABABC', 1)
+            topology_graph=stk.polymer.Linear('ABABC', 1),
         )
 
     The repeating unit can also be specified through the indices of
@@ -57,11 +51,11 @@ class Linear(TopologyGraph):
         # p1 and p2 are different ways to write the same thing.
         p1 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear('ACB', 1)
+            topology_graph=stk.polymer.Linear('ACB', 1),
         )
         p2 = stk.ConstructedMolecule(
             building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear((0, 2, 1), 1)
+            topology_graph=stk.polymer.Linear((0, 2, 1), 1),
         )
 
     The `orientations` parameter allows the direction of each building
@@ -76,8 +70,8 @@ class Linear(TopologyGraph):
             topology_graph=stk.polymer.Linear(
                 repeating_unit='AB',
                 num_repeating_units=5,
-                orientations=(1, 0.5)
-            )
+                orientations=(1, 0.5),
+            ),
         )
 
     In the above example, ``bb1`` is guaranteed to be flipped,
@@ -92,8 +86,8 @@ class Linear(TopologyGraph):
         # chain will always construct the same polymer.
         chain = stk.polymer.Linear(
             repeating_unit='AB',
-            num_repeating_untis=5,
-            orientations=(0.65, 0.45)
+            num_repeating_units=5,
+            orientations=(0.65, 0.45),
         )
         # p4 and p5 are guaranteed to be the same as they used the same
         # topology graph.
@@ -125,7 +119,7 @@ class Linear(TopologyGraph):
             repeating_unit='AB',
             num_repeating_untis=5,
             orientations=(0.65, 0.45),
-            random_seed=4
+            random_seed=4,
         )
         p8 = stk.ConstructedMolecule([bb2, bb4], chain3)
 
@@ -133,7 +127,7 @@ class Linear(TopologyGraph):
             repeating_unit='AB',
             num_repeating_untis=5,
             orientations=(0.65, 0.45),
-            random_seed=4
+            random_seed=4,
         )
         p9 = stk.ConstructedMolecule([bb2, bb4], chain4)
 
@@ -146,7 +140,8 @@ class Linear(TopologyGraph):
         num_repeating_units,
         orientations=None,
         random_seed=None,
-        num_processes=1
+        reaction_factory=GenericReactionFactory(),
+        num_processes=1,
     ):
         """
         Initialize a :class:`Linear` instance.
@@ -186,6 +181,10 @@ class Linear(TopologyGraph):
         random_seed : :class:`int`, optional
             The random seed to use when choosing random orientations.
 
+        reaction_factory : :class:`.ReactionFactory`, optional
+            The factory to use for creating reactions between
+            functional groups of building blocks.
+
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
@@ -224,41 +223,39 @@ class Linear(TopologyGraph):
 
         head, *body, tail = orientations
         choices = [True, False]
-        vertex_data = [
-            _HeadVertexData(
-                x=0,
-                y=0,
-                z=0,
+        vertices = [
+            _HeadVertex(
+                id=0,
+                position=np.array([0, 0, 0]),
                 flip=generator.choice(choices, p=[head, 1-head])
-            )
+            ),
         ]
-        edge_data = []
+        edges = []
         for i, p in enumerate(body, 1):
             flip = generator.choice(choices, p=[p, 1-p])
-            v = _LinearVertexData(i, 0, 0, flip)
-            vertex_data.append(v)
-            edge_data.append(
-                EdgeData(vertex_data[i-1], vertex_data[i])
+            vertices.append(
+                _LinearVertex(i, np.array([i, 0, 0]), flip)
             )
+            edges.append(Edge(len(edges), vertices[i-1], vertices[i]))
 
-        vertex_data.append(
-            _TailVertexData(
-                x=len(vertex_data),
-                y=0,
-                z=0,
-                flip=generator.choice(choices, p=[tail, 1-tail]))
+        vertices.append(
+            _TailVertex(
+                id=len(vertices),
+                position=np.array([len(vertices), 0, 0]),
+                flip=generator.choice(choices, p=[tail, 1-tail])),
         )
 
         # Save the chosen orientations for __repr__.
-        self._orientations = tuple(int(v.flip) for v in vertex_data)
+        self._orientations = tuple(int(v.get_flip()) for v in vertices)
 
-        edge_data.append(EdgeData(vertex_data[-2], vertex_data[-1]))
+        edges.append(Edge(len(edges), vertices[-2], vertices[-1]))
 
         super().__init__(
-            vertex_data=tuple(vertex_data),
-            edge_data=tuple(edge_data),
+            vertices=tuple(vertices),
+            edges=tuple(edges),
+            reaction_factory=reaction_factory,
             construction_stages=(),
-            num_processes=num_processes
+            num_processes=num_processes,
         )
 
     @staticmethod
@@ -269,45 +266,10 @@ class Linear(TopologyGraph):
         base = ord('A')
         return tuple(ord(letter)-base for letter in repeating_unit)
 
-    def assign_building_blocks_to_vertices(self, building_blocks):
-        """
-        Assign `building_blocks` to :attr:`vertices`.
-
-        Parameters
-        ----------
-        building_blocks : :class:`list` of :class:`.Molecule`
-            The :class:`.BuildingBlock` and
-            :class:`ConstructedMolecule` instances which
-            represent the building block molecules used for
-            construction. Only one instance is present per building
-            block molecule, even if multiples of that building block
-            join up to form the :class:`ConstructedMolecule`.
-
-        Returns
-        -------
-        :class:`dict`
-            Maps the `building_blocks`, to the
-            :class:`~.topologies.base.Vertex` objects in
-            :attr:`vertices` they are placed on during construction.
-            The :class:`dict` has the form
-
-            .. code-block:: python
-
-                building_block_vertices = {
-                    BuildingBlock(...): [Vertex(...), Vertex(...)],
-                    BuildingBlock(...): [
-                        Vertex(...),
-                        Vertex(...),
-                        Vertex(...),
-                    ]
-                    ConstructedMolecule(...): [Vertex(...)]
-                }
-
-        """
-
+    def get_building_block_vertices(self, building_blocks):
         polymer = self._repeating_unit*self._num_repeating_units
         building_block_vertices = {}
-        for bb_index, vertex in zip(polymer, self.vertices):
+        for bb_index, vertex in zip(polymer, self._vertices):
             bb = building_blocks[bb_index]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
@@ -315,28 +277,10 @@ class Linear(TopologyGraph):
             building_block_vertices[bb].append(vertex)
         return building_block_vertices
 
-    def _get_scale(self, mol):
-        """
-        Get the scale used for the positions of :attr:`vertices`.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Returns
-        -------
-        :class:`float` or :class:`list` of :class:`float`
-            The value by which the position of each :class:`Vertex` is
-            scaled. Can be a single number if all axes are scaled by
-            the same amount or a :class:`list` of three numbers if
-            each axis is scaled by a different value.
-
-        """
-
+    def _get_scale(self, building_block_vertices):
         return max(
             bb.get_maximum_diameter()
-            for bb in mol.building_block_vertices
+            for bb in building_block_vertices
         )
 
     def __repr__(self):

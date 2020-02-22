@@ -147,8 +147,8 @@ class ConstructedMolecule(Molecule):
                 )
 
             building_block_vertices = (
-                topology_graph.assign_building_blocks_to_vertices(
-                    building_blocks=building_blocks
+                topology_graph.get_building_block_vertices(
+                    building_blocks=building_blocks,
                 )
             )
         else:
@@ -156,7 +156,7 @@ class ConstructedMolecule(Molecule):
 
         try:
             construction_result = topology_graph.construct(
-                building_block=building_block_vertices,
+                building_block_vertices=building_block_vertices,
             )
         except Exception as ex:
             errormsg = (
@@ -346,7 +346,7 @@ class ConstructedMolecule(Molecule):
         return (
             f'{self.__class__.__name__}'
             f'(building_blocks={list(self.get_building_blocks())}, '
-            f'topology_graph={self.topology_graph!r})'
+            f'topology_graph={self._topology_graph!r})'
         )
 
     def __repr__(self):

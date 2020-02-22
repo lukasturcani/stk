@@ -146,7 +146,7 @@ class Molecule:
         """
         Return a rotated clone.
 
-        The rotatin is equal to a rotation from `start` to `target`.
+        The rotation is equal to a rotation from `start` to `target`.
 
         Given two direction vectors, `start` and `target`, this method
         applies the rotation required transform `start` to `target`

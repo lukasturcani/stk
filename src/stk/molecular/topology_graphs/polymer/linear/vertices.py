@@ -33,6 +33,9 @@ class _LinearVertex(Vertex):
         super().__init__(id, position)
         self._flip = flip
 
+    def get_flip(self):
+        return self._flip
+
     def clone(self):
         clone = super().clone()
         clone._flip = self._flip
@@ -75,7 +78,7 @@ class _LinearVertex(Vertex):
         x2, y2, z2 = building_block.get_centroid(
             atom_ids=fg2.get_placer_ids(),
         )
-        return 0, 1 if x1 < x2 else 1, 0
+        return (0, 1) if x1 < x2 else (1, 0)
 
     @staticmethod
     def _sort_edges(edges):
@@ -89,7 +92,7 @@ class _LinearVertex(Vertex):
 
     def __str__(self):
         return (
-            f'Vertex(id={self.id}, '
+            f'Vertex(id={self._id}, '
             f'position={self._position.tolist()}, '
             f'flip={self._flip})'
         )
@@ -99,129 +102,42 @@ class _TerminalVertex(_LinearVertex):
     """
     Represents a vertex at the end of a polymer chain.
 
-    Do not instantiate this class directly, use :class:`.HeadVertex` or
-    :class:`.TailVertex` instead.
-
-    Attributes
-    ----------
-    id : :class:`int`
-        The id of the vertex. This should be its index in
-        :attr:`TopologyGraph.vertices`.
+    Do not instantiate this class directly, use :class:`._HeadVertex`
+    or :class:`._TailVertex` instead.
 
     """
 
-    def place_building_block(self, building_block, vertices, edges):
-        """
-        Place `building_block` on the :class:`.Vertex`.
-
-        `building_block` is placed such that the centroid-centroid
-        direction vector is always pointing away from the center of the
-        chain, when `building_block` has only one
-        :class:`.FunctionalGroup`.
-
-        If the `building_block` has more than one
-        :class:`.FunctionalGroup` then this method behaves in the same
-        was as for :class:`.LinearVertex`.
-
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block molecule which is to be placed on the
-            vertex.
-
-        vertices : :class:`tuple` of :class:`.Vertex`
-            All vertices in the topology graph. The index of each
-            vertex must match its :class:`~.Vertex.id`.
-
-        edges : :class:`tuple` of :class:`.Edge`
-            All edges in the topology graph. The index of each
-            edge must match its :class:`~.Edge.id`.
-
-        Returns
-        -------
-        :class:`numpy.nadarray`
-            The position matrix of `building_block` after being
-            placed on the :class:`.Vertex`.
-
-        """
-
-        if len(building_block.func_groups) != 1:
-            return super().place_building_block(
-                building_block=building_block,
-                vertices=vertices,
-                edges=edges
-            )
-
-        building_block.set_centroid(
+    def place_building_block(self, building_block):
+        if building_block.get_num_functional_groups() != 1:
+            return super().place_building_block(building_block)
+        building_block = building_block.with_centroid(
             position=self._position,
-            atom_ids=building_block.get_bonder_ids(fg_ids=(0, )),
+            atom_ids=building_block.get_placer_ids(),
         )
-        centroid_vector = (
-            building_block.get_centroid_centroid_direction_vector()
+        fg = next(building_block.get_functional_groups())
+        fg_centroid = building_block.get_centroid(
+            atom_ids=fg.get_placer_ids(),
         )
+        centroid = building_block.get_centroid()
+        centroid_displacement = fg_centroid - centroid
         building_block.apply_rotation_between_vectors(
-            start=centroid_vector,
+            start=centroid_displacement,
             # _cap_direction is defined by a subclass.
             target=[self._cap_direction, 0, 0],
-            origin=self._position
+            origin=self._position,
         )
         return building_block.get_position_matrix()
 
-    def assign_func_groups_to_edges(
-        self,
-        building_block,
-        vertices,
-        edges
-    ):
-        """
-        Assign functional groups to edges.
-
-        Each :class:`.FunctionalGroup` of the `building_block` needs
-        to be associated with one of the :class:`.Edge` instances in
-        :attr:`edges`.
-
-        Parameters
-        ----------
-        building_block : :class:`.Molecule`
-            The building block molecule which is needs to have
-            functional groups assigned to edges.
-
-        vertices : :class:`tuple` of :class:`.Vertex`
-            All vertices in the topology graph. The index of each
-            vertex must match its :class:`~.Vertex.id`.
-
-        edges : :class:`tuple` of :class:`.Edge`
-            All edges in the topology graph. The index of each
-            edge must match its :class:`~.Edge.id`.
-
-        Returns
-        -------
-        :class:`dict`
-            A mapping from the id of a functional group in
-            `building_block` to the id of the edge in :attr:`edges` it
-            is assigned to.
-
-        Raises
-        ------
-        :class:`ValueError`
-            If `building_block` does not have one or two functional
-            groups.
-
-        """
-
-        if len(building_block.func_groups) == 2:
-            func_groups = building_block.func_groups
-            fgs = sorted(
-                range(len(func_groups)),
-                key=lambda fg_id: building_block.get_centroid(
-                    atom_ids=func_groups[fg_id].get_bonder_ids()
-                )[0]
+    def map_functional_groups_to_edges(self, building_block, edges):
+        if building_block.get_num_functional_groups() == 2:
+            functional_groups = self._sort_functional_groups(
+                building_block=building_block,
             )
-            fg_index = 0 if self._cap_direction == 1 else -1
-            return {fgs[fg_index]: self._edge_ids[0]}
+            index = 0 if self._cap_direction == 1 else -1
+            return {functional_groups[index]: edges[0].get_id()}
 
         elif len(building_block.func_groups) == 1:
-            return {0: self._edge_ids[0]}
+            return {0: edges[0].get_id()}
 
         else:
             raise ValueError(
@@ -234,12 +150,6 @@ class _HeadVertex(_TerminalVertex):
     """
     Represents a vertex at the head of a polymer chain.
 
-    Attributes
-    ----------
-    id : :class:`int`
-        The id of the vertex. This should be its index in
-        :attr:`TopologyGraph.vertices`.
-
     """
 
     # The direction to use if the building block placed on the
@@ -251,16 +161,8 @@ class _TailVertex(_TerminalVertex):
     """
     Represents a vertex at the tail of a polymer chain.
 
-    Attributes
-    ----------
-    id : :class:`int`
-        The id of the vertex. This should be its index in
-        :attr:`TopologyGraph.vertices`.
-
     """
 
     # The direction to use if the building block placed on the
     # vertex only has 1 FunctionalGroup.
     _cap_direction = 1
-
-

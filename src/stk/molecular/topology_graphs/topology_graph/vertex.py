@@ -22,7 +22,20 @@ class Vertex:
             """
 
         self._id = id
-        self._position = np.array(position)
+        self._position = np.array(position, dtype=np.float64)
+
+    def get_id(self):
+        """
+        Get the id.
+
+        Returns
+        -------
+        :class:`int`
+            The id.
+
+        """
+
+        return self._id
 
     def _with_scale(self, scale):
         self._position *= scale
@@ -140,7 +153,7 @@ class Vertex:
 
     def __str__(self):
         position = self._position.tolist()
-        return f'Vertex(id={self.id}, position={position})'
+        return f'Vertex(id={self._id}, position={position})'
 
     def __repr__(self):
         return str(self)

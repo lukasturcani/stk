@@ -40,14 +40,15 @@ class Edge:
         """
 
         if position is None:
-            position = (
+            self._position = (
                 vertex1.get_position() + vertex2.get_position()
             ) / 2
+        else:
+            self._position = np.array(position, dtype=np.float64)
 
         self._id = id
         self._vertex1_id = vertex1.get_id()
         self._vertex2_id = vertex2.get_id()
-        self._position = position
         self._periodicity = periodicity
 
     def get_id(self):

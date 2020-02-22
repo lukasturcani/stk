@@ -33,11 +33,13 @@ class ConstructionState:
                 for vertex in vertices
         }
         self._vertex_edges = {
-            vertex_id: tuple(edge.with_scale(scale))
-            for vertex_id, edge in vertex_edges.items()
+            vertex_id: tuple(
+                edge.with_scale(scale) for edge in edges
+            )
+            for vertex_id, edges in vertex_edges.items()
         }
         self._edges = tuple(edge.with_scale(scale) for edge in edges)
-        self._position_matrx = []
+        self._position_matrix = []
         self._atoms = []
         self._atom_infos = []
         self._bonds = []
@@ -64,6 +66,7 @@ class ConstructionState:
         clone._edge_functional_groups = defaultdict.copy(
             self._edge_functional_groups
         )
+        return clone
 
     def _with_placement_results(self, building_blocks, results):
         """
@@ -138,7 +141,7 @@ class ConstructionState:
 
         """
 
-        return self._vertex[vertex_id]
+        return self._vertices[vertex_id]
 
     def get_edge(self, edge_id):
         return self._edges[edge_id]
@@ -226,7 +229,8 @@ class ConstructionState:
                 not in deleted_atoms
                 and bond_info.bond.get_atom2().get_id()
                 not in deleted_atoms
-            )
+            ),
+            self._bond_infos,
         )
         self._bond_infos = [
             BondInfo(

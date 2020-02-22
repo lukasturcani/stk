@@ -8,4 +8,4 @@ class AtomInfo(NamedTuple):
 
     atom: object
     building_block: object
-    buiding_block_index: object
+    building_block_index: object
