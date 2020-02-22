@@ -190,7 +190,7 @@ class ConstructedMolecule(Molecule):
         self._topology_graph = topology_graph
         self._building_block_vertices = building_block_vertices
         self._atom_infos = construction_result.atom_infos
-        self._reaction_infos = construction_result.reaction_infos
+        self._bond_infos = construction_result.bond_infos
         self._building_block_counts = (
             construction_result.building_block_counts
         )
@@ -244,7 +244,7 @@ class ConstructedMolecule(Molecule):
         )
         clone._topology_graph = self._topology_graph
         clone._atom_infos = self._atom_infos
-        clone._reaction_infos = self._reaction_infos
+        clone._bond_infos = self._bond_infos
         return clone
 
     def get_building_blocks(self):
@@ -314,19 +314,18 @@ class ConstructedMolecule(Molecule):
         for atom_id in atom_ids:
             yield self._atom_infos[atom_id]
 
-    def get_reaction_infos(self):
+    def get_bond_infos(self):
         """
-        Yield data about reactions performed during construction.
+        Yield data about bonds in the molecule.
 
         Yields
         ------
-        :class:`.ReactionInfo`
-            Data about a :class:`.Reaction` performed during
-            construction.
+        :class:`.BondInfo`
+            Data about a bond.
 
         """
 
-        yield from self._reaction_infos
+        yield from self._bond_infos
 
     def get_building_block_vertices(self):
         """

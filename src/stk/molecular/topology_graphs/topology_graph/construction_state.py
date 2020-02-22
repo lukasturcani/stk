@@ -31,8 +31,8 @@ class ConstructionState:
         self._atoms = []
         self._atom_infos = []
         self._bonds = []
+        self._bond_infos = []
         self._building_block_counts = defaultdict(int)
-        self._reaction_infos = []
         self._edge_functional_groups = defaultdict(list)
 
     def clone(self):
@@ -47,10 +47,10 @@ class ConstructionState:
         clone._atoms = list(self._atoms)
         clone._atom_infos = list(self._atom_infos)
         clone._bonds = list(self._bonds)
+        clone._bond_infos = list(self._bond_infos)
         clone._building_block_counts = defaultdict.copy(
             self._building_block_counts
         )
-        clone._reaction_infos = list(self._reaction_infos)
         clone._edge_functional_groups = defaultdict.copy(
             self._edge_functional_groups
         )
@@ -142,6 +142,13 @@ class ConstructionState:
                 new_atom = atom.with_id(len(self._atoms))
                 atom_map[atom.get_id()] = new_atom
                 self._atoms.append(new_atom)
+                self._atom_infos.append(
+                    AtomInfo(
+                        atom=new_atom,
+                        building_block=None,
+                        building_block_index=None,
+                    )
+                )
 
             for bond in result.new_bonds:
                 new_bond = bond.with_atoms(atom_map)
@@ -155,6 +162,20 @@ class ConstructionState:
                 atom_map[atom.get_id()] = new_atom
                 atoms.append(new_atom)
         self._atoms = atoms
+
+        atom_infos = []
+        for atom_info in self._atom_infos:
+            if atom_info.atom.get_id() in atom_map:
+                atom_infos.append(
+                    AtomInfo(
+                        atom=atom_map[atom_info.atom.get_id()],
+                        building_block=atom_info.building_block,
+                        building_block_index=(
+                            atom_info.building_block_index
+                        ),
+                    )
+                )
+        self._atom_infos = atom_infos
 
         bonds = []
         for bond in self._bonds:
@@ -194,8 +215,8 @@ class ConstructionState:
     def get_atom_infos(self):
         yield from self._atom_infos
 
-    def get_reaction_infos(self):
-        yield from self._reaction_infos
+    def get_bond_infos(self):
+        yield from self._bond_infos
 
     def get_building_block_counts(self):
         return dict(self._building_block_counts)

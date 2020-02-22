@@ -21,9 +21,9 @@ class ConstructionResult(NamedTuple):
         molecule, for example, which building block it originated
         from.
 
-    reaction_infos : :class:`tuple` of :class:`.ReactionInfo`
-        Holds data on the reactions which were performed during
-        construction.
+    bond_infos : :class:`tuple` of :class:`.BondInfo`
+        Holds additional data for each bond in the constructed
+        molecule, for example, which building block it originated from.
 
     building_block_counts : :class:`dict`
         Maps each :class:`.BuildingBlock` used during construction to
@@ -35,7 +35,7 @@ class ConstructionResult(NamedTuple):
     bonds: object
     position_matrix: object
     atom_infos: object
-    reaction_infos: object
+    bond_infos: object
     building_block_counts: object
 
     @classmethod
@@ -57,8 +57,8 @@ class ConstructionResult(NamedTuple):
             bonds=tuple(construction_state.get_bonds()),
             position_matrix=position_matrix,
             atom_infos=tuple(construction_state.get_atom_infos()),
-            reaction_infos=tuple(
-                construction_state.get_reaction_infos()
+            bond_infos=tuple(
+                construction_state.get_bond_infos()
             ),
             building_block_counts=(
                 construction_state.get_building_block_counts()
