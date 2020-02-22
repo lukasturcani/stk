@@ -244,6 +244,7 @@ class TopologyGraph:
             building_block_vertices=building_block_vertices,
             edges=self._edges,
             vertex_edges=self._vertex_edges,
+            scale=self._get_scale(building_block_vertices),
         )
         state = self._before_placement(state)
         state = self._place_building_blocks(state)
@@ -277,6 +278,9 @@ class TopologyGraph:
         for id_ in vertex_ids:
             yield self._vertices[id_]
 
+    def _get_scale(self, building_block_vertices):
+        raise NotImplementedError()
+
     def _before_reactions(self, state):
         return state
 
@@ -307,12 +311,12 @@ class TopologyGraph:
             self._reaction_factory.get_reaction,
             state,
         )
-        reactions = map(get_reaction, self._edge_groups)
+        reactions = tuple(map(get_reaction, self._edge_groups))
         results = map(
             lambda reaction: reaction.get_result(),
             reactions,
         )
-        return state.with_reaction_results(results)
+        return state.with_reaction_results(reactions, results)
 
     def _get_stages(self, construction_stages):
         stages = tuple(

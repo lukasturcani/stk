@@ -10,7 +10,13 @@ class ConstructionState:
 
     """
 
-    def __init__(self, building_block_vertices, edges, vertex_edges):
+    def __init__(
+        self,
+        building_block_vertices,
+        edges,
+        vertex_edges,
+        scale,
+    ):
         """
 
         """
@@ -109,6 +115,8 @@ class ConstructionState:
                     functional_group.with_atoms(atom_map)
                 )
 
+        return self
+
     def with_placement_results(self, building_blocks, results):
         return self.clone()._with_placement_results(
             building_blocks=building_blocks,
@@ -139,7 +147,7 @@ class ConstructionState:
         for edge_id in edge_group.get_edge_ids():
             yield from self._edge_functional_groups[edge_id]
 
-    def _with_reaction_results(self, reactions, results):
+    def _add_new_atoms_and_bonds(self, reactions, results):
         deleted_atoms = set()
         for reaction, result in zip(reactions, results):
             deleted_atoms.update(
@@ -169,7 +177,9 @@ class ConstructionState:
                         building_block_index=None,
                     )
                 )
+        return deleted_atoms
 
+    def _remove_deleted_atoms(self, deleted_atoms):
         atom_map = {}
         valid_atoms = filter(
             lambda atom: atom.get_id() not in deleted_atoms,
@@ -193,7 +203,9 @@ class ConstructionState:
             )
             for atom_info in valid_atom_infos
         ]
+        return atom_map
 
+    def _update_bonds(self, deleted_atoms, atom_map):
         valid_bonds = filter(
             lambda bond: (
                 bond.get_atom1().get_id() not in deleted_atoms
@@ -221,6 +233,15 @@ class ConstructionState:
             )
             for index, bond_info in enumerate(valid_bond_infos)
         ]
+
+    def _with_reaction_results(self, reactions, results):
+        deleted_atoms = self._add_new_atoms_and_bonds(
+            reactions=reactions,
+            results=results,
+        )
+        atom_map = self._remove_deleted_atoms(deleted_atoms)
+        self._update_bonds(deleted_atoms, atom_map)
+        return self
 
     def with_reaction_results(self, reactions, results):
         return self.clone()._with_reaction_results(reactions, results)
