@@ -2,6 +2,7 @@ import numpy as np
 from collections import defaultdict
 
 from ...atom_info import AtomInfo
+from ...bond_info import BondInfo
 
 
 class ConstructionState:
@@ -87,7 +88,15 @@ class ConstructionState:
 
             # Add bonds holding the new atoms.
             for bond in building_block.get_bonds():
-                self._bonds.append(bond.with_atoms(atom_map))
+                new_bond = bond.with_atoms(atom_map)
+                self._bonds.append(new_bond)
+                self._bond_infos.append(
+                    BondInfo(
+                        bond=new_bond,
+                        building_block=building_block,
+                        building_block_index=index,
+                    )
+                )
 
             # Add edge to functional group mappings.
             functional_groups = building_block.get_functional_groups(
@@ -153,39 +162,65 @@ class ConstructionState:
             for bond in result.new_bonds:
                 new_bond = bond.with_atoms(atom_map)
                 self._bonds.append(new_bond)
-
-        atom_map = {}
-        atoms = []
-        for atom in self._atoms:
-            if atom.get_id() not in deleted_atoms:
-                new_atom = atom.with_id(len(atoms))
-                atom_map[atom.get_id()] = new_atom
-                atoms.append(new_atom)
-        self._atoms = atoms
-
-        atom_infos = []
-        for atom_info in self._atom_infos:
-            if atom_info.atom.get_id() in atom_map:
-                atom_infos.append(
-                    AtomInfo(
-                        atom=atom_map[atom_info.atom.get_id()],
-                        building_block=atom_info.building_block,
-                        building_block_index=(
-                            atom_info.building_block_index
-                        ),
+                self._bond_infos.append(
+                    BondInfo(
+                        bond=new_bond,
+                        building_block=None,
+                        building_block_index=None,
                     )
                 )
-        self._atom_infos = atom_infos
 
-        bonds = []
-        for bond in self._bonds:
-            bond_deleted = (
-                bond.get_atom1().get_id() in deleted_atoms
-                or bond.get_atom2().get_id() in deleted_atoms
+        atom_map = {}
+        valid_atoms = filter(
+            lambda atom: atom.get_id() not in deleted_atoms,
+            self._atoms,
+        )
+        self._atoms = []
+        for atom in valid_atoms:
+            new_atom = atom.with_id(len(self._atoms))
+            atom_map[atom.get_id()] = new_atom
+            self._atoms.append(new_atom)
+
+        valid_atom_infos = filter(
+            lambda atom_info: atom_info.atom.get_id() in atom_map,
+            self._atom_infos
+        )
+        self._atom_infos = [
+            AtomInfo(
+                atom=atom_map[atom_info.atom.get_id()],
+                building_block=atom_info.building_block,
+                building_block_index=atom_info.building_block_index,
             )
-            if not bond_deleted:
-                bonds.append(bond.with_atoms(atom_map))
-        self._bonds = bonds
+            for atom_info in valid_atom_infos
+        ]
+
+        valid_bonds = filter(
+            lambda bond: (
+                bond.get_atom1().get_id() not in deleted_atoms
+                and bond.get_atom2().get_id() not in deleted_atoms
+            ),
+            self._bonds,
+        )
+        self._bonds = [
+            bond.with_atoms(atom_map) for bond in valid_bonds
+        ]
+
+        valid_bond_infos = filter(
+            lambda bond_info: (
+                bond_info.bond.get_atom1().get_id()
+                not in deleted_atoms
+                and bond_info.bond.get_atom2().get_id()
+                not in deleted_atoms
+            )
+        )
+        self._bond_infos = [
+            BondInfo(
+                bond=self._bonds[index],
+                building_block=bond_info.building_block,
+                building_block_index=bond_info.building_block_index,
+            )
+            for index, bond_info in enumerate(valid_bond_infos)
+        ]
 
     def with_reaction_results(self, reactions, results):
         return self.clone()._with_reaction_results(reactions, results)
