@@ -28,12 +28,15 @@ class ConstructionState:
             for vertex in vertices
         }
         self._vertices = {
-                vertex.get_id(): vertex
+                vertex.get_id(): vertex.with_scale(scale)
                 for vertices in building_block_vertices.values()
                 for vertex in vertices
         }
-        self._vertex_edges = dict(vertex_edges)
-        self._edges = edges
+        self._vertex_edges = {
+            vertex_id: tuple(edge.with_scale(scale))
+            for vertex_id, edge in vertex_edges.items()
+        }
+        self._edges = tuple(edge.with_scale(scale) for edge in edges)
         self._position_matrx = []
         self._atoms = []
         self._atom_infos = []

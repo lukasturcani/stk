@@ -93,6 +93,10 @@ class Edge:
 
         return any(i != 0 for i in self._periodicity)
 
+    def _with_scale(self, scale):
+        self._position *= scale
+        return self
+
     def with_scale(self, scale):
         """
         Return a clone with a scaled position.
@@ -113,7 +117,7 @@ class Edge:
 
         """
 
-        raise NotImplementedError()
+        return self.clone()._with_scale(scale)
 
     def clone(self):
         """
