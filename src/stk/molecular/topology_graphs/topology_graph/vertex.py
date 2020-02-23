@@ -91,6 +91,28 @@ class Vertex:
 
         return np.array(self._position)
 
+    def _with_position(self, position):
+        self._position = np.array(position, dtype=np.float64)
+        return self
+
+    def with_position(self, position):
+        """
+        Return a clone at a certain position.
+
+        Parameters
+        ----------
+        position : :class:`numpy.ndarray`
+            The desired position of the clone.
+
+        Returns
+        -------
+        :class:`.Vertex`
+            The clone.
+
+        """
+
+        return self.clone()._with_position(position)
+
     def get_cell(self):
         """
         Get the cell of the lattice in which the vertex is found.
@@ -102,7 +124,7 @@ class Vertex:
 
         """
 
-        raise NotImplementedError()
+        return np.array([0, 0, 0])
 
     def place_building_block(self, building_block):
         """

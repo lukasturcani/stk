@@ -1,70 +1,50 @@
+import pytest
 import numpy as np
-from scipy.spatial.distance import euclidean
+from pytest_lazyfixture import lazy_fixture
+
+# Fixtures must be visible for lazy_fixture() calls.
+from .fixtures import *  # noqa
 
 
-def _test_placement(graph, building_block, position):
-    graph.placement_vertex.place_building_block(
+@pytest.fixture(
+    params=(
+        lazy_fixture('linear_placement'),
+    ),
+)
+def placement_test_case(request):
+    return request.param
+
+
+def test_placement(placement_test_case):
+    _test_placement(
+        vertex=placement_test_case.vertex,
+        edges=placement_test_case.edges,
+        building_block=placement_test_case.building_block,
+        position=placement_test_case.position,
+        functional_group_edges=(
+            placement_test_case.functional_group_edges
+        ),
+    )
+
+
+def _test_placement(
+    vertex,
+    edges,
+    building_block,
+    position,
+    functional_group_edges,
+):
+    position_matrix = vertex.place_building_block(building_block)
+    building_block = building_block.with_position_matrix(
+        position_matrix=position_matrix,
+    )
+    assert np.allclose(
+        a=building_block.get_centroid(building_block.get_placer_ids()),
+        b=position,
+        atol=1e-14,
+    )
+    result = vertex.map_functional_groups_to_edges(
         building_block=building_block,
-        vertices=graph.vertices,
-        edges=graph.edges,
+        edges=edges,
     )
-    assert (
-        np.all(np.equal(building_block.get_centroid(), position))
-    )
-
-
-def _test_alignment(graph, building_block):
-    bonder_centroids = enumerate(
-        building_block.get_bonder_centroids()
-    )
-    for i, bonder_centroid in bonder_centroids:
-        closest_edge = min(
-            graph.placement_vertex.get_edge_ids(),
-            key=lambda edge_id: euclidean(
-                position1=bonder_centroid,
-                position2=graph.edges[edge_id].get_position(),
-            ),
-        )
-        assert closest_edge == graph.alignments[i]
-
-
-def _test_assignment(graph, building_block):
-    vertex = graph.placement_vertex
-    functional_group_edges = vertex.assign_func_groups_to_edges(
-        building_block=building_block,
-        vertices=graph.vertices,
-        edges=graph.edges,
-    )
-    assert (
-        functional_group_edges == graph.functional_group_edges
-    )
-
-
-def _test_place_building_block(graph, building_block):
-    _test_placement(graph, building_block)
-    _test_alignment(graph, building_block)
-    _test_assignment(graph, building_block)
-
-
-def test_place_building_block_0(graph_0, building_block_0):
-    _test_place_building_block(graph_0, building_block_0)
-
-
-def test_place_building_block_1(graph_1, building_block_1):
-    _test_place_building_block(graph_1, building_block_1)
-
-
-def test_place_building_block_2(graph_2, building_block_2):
-    _test_place_building_block(graph_2, building_block_2)
-
-
-def test_place_building_block_3(graph_3, building_block_3):
-    _test_place_building_block(graph_3, building_block_3)
-
-
-def test_place_building_block_4(graph_4, building_block_4):
-    _test_place_building_block(graph_4, building_block_4)
-
-
-def test_place_building_block_5(graph_5, building_block_5):
-    _test_place_building_block(graph_5, building_block_5)
+    assert result == functional_group_edges
