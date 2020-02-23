@@ -39,7 +39,7 @@ class ConstructionState:
             for vertex_id, edges in vertex_edges.items()
         }
         self._edges = tuple(edge.with_scale(scale) for edge in edges)
-        self._position_matrix = []
+        self._position_matrix = np.empty((0, 3), dtype=np.float64)
         self._atoms = []
         self._atom_infos = []
         self._bonds = []
@@ -55,7 +55,7 @@ class ConstructionState:
         clone._vertices = dict(self._vertices)
         clone._vertex_edges = dict(self._vertex_edges)
         clone._edges = self._edges
-        clone._position_matrix = list(self._position_matrix)
+        clone._position_matrix = np.array(self._position_matrix)
         clone._atoms = list(self._atoms)
         clone._atom_infos = list(self._atom_infos)
         clone._bonds = list(self._bonds)
@@ -74,9 +74,12 @@ class ConstructionState:
 
         """
 
+        # Doing a vstack after the loop should be faster than doing one
+        # within the loop.
+        position_matrices = [self._position_matrix]
         results_ = zip(building_blocks, results)
         for index, (building_block, result) in enumerate(results_):
-            self._position_matrix.extend(result.position_matrix)
+            position_matrices.append(result.position_matrix)
             self._building_block_counts[building_block] += 1
 
             # atom_map maps atoms in the original building block to
@@ -121,6 +124,7 @@ class ConstructionState:
                     functional_group.with_atoms(atom_map)
                 )
 
+        self._position_matrix = np.vstack(position_matrices)
         return self
 
     def with_placement_results(self, building_blocks, results):
@@ -154,6 +158,7 @@ class ConstructionState:
             yield from self._edge_functional_groups[edge_id]
 
     def _add_new_atoms_and_bonds(self, reactions, results):
+        new_atom_positions = []
         deleted_atoms = set()
         for reaction, result in zip(reactions, results):
             deleted_atoms.update(
@@ -161,7 +166,7 @@ class ConstructionState:
             )
 
             atom_map = {}
-            for atom in result.new_atoms:
+            for atom, position in result.new_atoms:
                 new_atom = atom.with_id(len(self._atoms))
                 atom_map[atom.get_id()] = new_atom
                 self._atoms.append(new_atom)
@@ -172,6 +177,7 @@ class ConstructionState:
                         building_block_index=None,
                     )
                 )
+                new_atom_positions.append(position)
 
             for bond in result.new_bonds:
                 new_bond = bond.with_atoms(atom_map)
@@ -183,6 +189,11 @@ class ConstructionState:
                         building_block_index=None,
                     )
                 )
+        if new_atom_positions:
+            self._position_matrix = np.vstack([
+                self._position_matrix,
+                new_atom_positions,
+            ])
         return deleted_atoms
 
     def _remove_deleted_atoms(self, deleted_atoms):
@@ -192,10 +203,15 @@ class ConstructionState:
             self._atoms,
         )
         self._atoms = []
+        position_matrix = []
         for atom in valid_atoms:
             new_atom = atom.with_id(len(self._atoms))
             atom_map[atom.get_id()] = new_atom
             self._atoms.append(new_atom)
+            position_matrix.append(
+                self._position_matrix[atom.get_id()]
+            )
+        self._position_matrix = np.array(position_matrix)
 
         valid_atom_infos = filter(
             lambda atom_info: atom_info.atom.get_id() in atom_map,
