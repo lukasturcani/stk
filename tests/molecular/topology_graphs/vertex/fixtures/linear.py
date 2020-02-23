@@ -6,7 +6,7 @@ from pytest_lazyfixture import lazy_fixture
 from ._test_case import _TestCase
 
 
-vertices = stk.molecular.topology_graphs.polymer.linear.vertices
+vertices = stk.molecular.topology_graphs.polymer.linear
 
 
 @pytest.fixture(
@@ -48,3 +48,23 @@ def tail(id, position, flip):
         position=position,
         cell=np.array([0, 0, 0]),
     )
+
+
+@pytest.fixture(params=(0, 20))
+def id(request):
+    return request.param
+
+
+@pytest.fixture(params=(True, False))
+def flip(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=(
+        [0, 0, 0],
+        [1, 2, -20],
+    ),
+)
+def position(request):
+    return np.array(request.param, dtype=np.float64)

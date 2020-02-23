@@ -3,3 +3,4 @@ class _TestCase:
         self.vertex = vertex
         self.id = id
         self.position = position
+        self.cell = cell
