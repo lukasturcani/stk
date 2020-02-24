@@ -32,7 +32,7 @@ def _test_placement(
         b=position,
         atol=1e-14,
     )
-    assert correct_points(
+    correct_points(
         points1=get_nearest_points(building_block, points),
         points2=nearest_points,
     )

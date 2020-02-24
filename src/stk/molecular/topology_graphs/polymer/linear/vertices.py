@@ -135,7 +135,7 @@ class _TerminalVertex(_LinearVertex):
             functional_groups = self._sort_functional_groups(
                 building_block=building_block,
             )
-            index = 0 if self._cap_direction == 1 else -1
+            index = 1 if self._cap_direction == 1 else 0
             return {functional_groups[index]: edges[0].get_id()}
 
         elif building_block.get_num_functional_groups() == 1:
