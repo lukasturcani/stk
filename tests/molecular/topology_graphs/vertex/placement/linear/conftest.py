@@ -2,6 +2,8 @@ import pytest
 import stk
 import numpy as np
 from pytest_lazyfixture import lazy_fixture
+from scipy.spatial.distance import euclidean
+from functools import partial
 
 from .._test_case import _TestCase
 
@@ -12,93 +14,245 @@ vertices = stk.molecular.topology_graphs.polymer.linear
 @pytest.fixture(
     params=(
         lazy_fixture('center'),
-        lazy_fixture('head'),
-        lazy_fixture('tail'),
+        lazy_fixture('head_1'),
+        lazy_fixture('head_2'),
+        lazy_fixture('head_3'),
+        lazy_fixture('tail_1'),
+        lazy_fixture('tail_2'),
+        lazy_fixture('tail_3'),
     ),
 )
 def test_case(request):
     return request.param
 
 
+def get_fg_position(id, building_block):
+    functional_group = next(building_block.get_functional_groups(id))
+    return building_block.get_centroid(
+        atom_ids=functional_group.get_placer_ids(),
+    )
+
+
+def get_centroid(building_block):
+    return building_block.get_centroid()
+
+
+def get_closest_point(points, point):
+    return min(points, key=partial(euclidean, point))
+
+
 @pytest.fixture
-def center(position, flip, center_building_block):
-    point1 = position + [-10, 0, 0]
-    point2 = position + [10, 0, 0]
+def center(position, flip, building_block_2):
+
+    point1, point2 = points = (
+        position + [-10, 0, 0],
+        position + [10, 0, 0],
+    )
+
+    def get_fg0_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(0, building_block),
+        )
+
+    def get_fg1_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(1, building_block),
+        )
+
     vertex = vertices._LinearVertex(0, position, flip)
     return _TestCase(
         vertex=vertex,
         edges=tuple(get_edges(vertex)),
-        building_block=center_building_block,
+        building_block=building_block_2,
         position=position,
-        points=(point1, point2),
-        nearest_points=get_nearest_points(flip, point1, point2),
-        functional_group_edges=get_functional_group_edges(flip),
+        points={
+            get_fg0_point: point2 if flip else point1,
+            get_fg1_point: point1 if flip else point2,
+        },
+        functional_group_edges={0: 1, 1: 0} if flip else {0: 0, 1: 1},
     )
 
 
 @pytest.fixture
-def head(position, flip, end_building_block):
-    point1 = position + [-10, 0, 0]
-    point2 = position + [10, 0, 0]
+def head_1(position, flip, building_block_1):
+    point1, point2 = points = (
+        position + [-10, 0, 0],
+        position + [10, 0, 0],
+    )
 
-    if end_building_block.get_num_functional_groups() == 2:
-        nearest_points = get_nearest_points(flip, point1, point2)
-        if flip:
-            functional_group_edges = {0: 1}
-        else:
-            functional_group_edges = {1: 1}
-    else:
-        nearest_points = {0: point2}
-        functional_group_edges = {0: 1}
+    def get_centroid_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_centroid(building_block),
+        )
 
     vertex = vertices._HeadVertex(0, position, flip)
     return _TestCase(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[1], ),
-        building_block=end_building_block,
+        building_block=building_block_1,
         position=position,
-        points=(point1, point2),
-        nearest_points=nearest_points,
-        functional_group_edges=functional_group_edges,
+        points={get_centroid_point: point1},
+        functional_group_edges={0: 1},
     )
 
 
 @pytest.fixture
-def tail(position, flip, end_building_block):
-    point1 = position + [-10, 0, 0]
-    point2 = position + [10, 0, 0]
+def head_2(position, building_block_2):
+    point1, point2 = points = (
+        position + [-10, 0, 0],
+        position + [10, 0, 0],
+    )
 
-    if end_building_block.get_num_functional_groups() == 2:
-        nearest_points = get_nearest_points(flip, point1, point2)
-        if flip:
-            functional_group_edges = {1: 0}
-        else:
-            functional_group_edges = {0: 0}
-    else:
-        nearest_points = {0: point1}
-        functional_group_edges = {0: 0}
+    def get_fg0_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(0, building_block),
+        )
+
+    def get_fg1_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(1, building_block),
+        )
+
+    vertex = vertices._HeadVertex(0, position, False)
+    return _TestCase(
+        vertex=vertex,
+        edges=(tuple(get_edges(vertex))[1], ),
+        building_block=building_block_2,
+        position=position,
+        points={
+            get_fg0_point: point1,
+            get_fg1_point: point2,
+        },
+        functional_group_edges={1: 1},
+    )
+
+
+@pytest.fixture
+def head_3(position, building_block_2):
+    point1, point2 = points = (
+        position + [-10, 0, 0],
+        position + [10, 0, 0],
+    )
+
+    def get_fg0_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(0, building_block),
+        )
+
+    def get_fg1_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(1, building_block),
+        )
+
+    vertex = vertices._HeadVertex(0, position, True)
+    return _TestCase(
+        vertex=vertex,
+        edges=(tuple(get_edges(vertex))[1], ),
+        building_block=building_block_2,
+        position=position,
+        points={
+            get_fg0_point: point2,
+            get_fg1_point: point1,
+        },
+        functional_group_edges={0: 1},
+    )
+
+
+@pytest.fixture
+def tail_1(position, flip, building_block_1):
+    point1, point2 = points = (
+        position + [-10, 0, 0],
+        position + [10, 0, 0],
+    )
+
+    def get_centroid_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_centroid(building_block),
+        )
 
     vertex = vertices._TailVertex(0, position, flip)
     return _TestCase(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[0], ),
-        building_block=end_building_block,
+        building_block=building_block_1,
         position=position,
-        points=(point1, point2),
-        nearest_points=nearest_points,
-        functional_group_edges=functional_group_edges,
+        points={get_centroid_point: point2},
+        functional_group_edges={0: 0},
     )
 
 
-def get_nearest_points(flip, point1, point2):
-    if flip:
-        return {0: point2, 1: point1}
-    else:
-        return {0: point1, 1: point2}
+@pytest.fixture
+def tail_2(position, building_block_2):
+    point1, point2 = points = (
+        position + [-10, 0, 0],
+        position + [10, 0, 0],
+    )
+
+    def get_fg0_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(0, building_block),
+        )
+
+    def get_fg1_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(1, building_block),
+        )
+
+    vertex = vertices._TailVertex(0, position, False)
+    return _TestCase(
+        vertex=vertex,
+        edges=(tuple(get_edges(vertex))[0], ),
+        building_block=building_block_2,
+        position=position,
+        points={
+            get_fg0_point: point1,
+            get_fg1_point: point2,
+        },
+        functional_group_edges={0: 0},
+    )
 
 
-def get_functional_group_edges(flip):
-    return {0: 1, 1: 0} if flip else {0: 0, 1: 1}
+@pytest.fixture
+def tail_3(position, building_block_2):
+    point1, point2 = points = (
+        position + [-10, 0, 0],
+        position + [10, 0, 0],
+    )
+
+    def get_fg0_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(0, building_block),
+        )
+
+    def get_fg1_point(building_block):
+        return get_closest_point(
+            points=points,
+            point=get_fg_position(1, building_block),
+        )
+
+    vertex = vertices._HeadVertex(0, position, True)
+    return _TestCase(
+        vertex=vertex,
+        edges=(tuple(get_edges(vertex))[0], ),
+        building_block=building_block_2,
+        position=position,
+        points={
+            get_fg0_point: point2,
+            get_fg1_point: point1,
+        },
+        functional_group_edges={1: 0},
+    )
 
 
 @pytest.fixture(
@@ -109,7 +263,7 @@ def get_functional_group_edges(flip):
         ),
     ),
 )
-def center_building_block(request):
+def building_block_2(request):
     return request.param
 
 
@@ -121,17 +275,7 @@ def center_building_block(request):
         ),
     ),
 )
-def _end_building_block(request):
-    return request.param
-
-
-@pytest.fixture(
-    params=(
-        lazy_fixture('center_building_block'),
-        lazy_fixture('_end_building_block'),
-    ),
-)
-def end_building_block(request):
+def building_block_1(request):
     return request.param
 
 
