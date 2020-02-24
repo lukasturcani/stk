@@ -241,7 +241,7 @@ def tail_3(position, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices._HeadVertex(0, position, True)
+    vertex = vertices._TailVertex(0, position, True)
     return _TestCase(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[0], ),
