@@ -53,7 +53,7 @@ class _LinearVertex(Vertex):
         fg2_position = building_block.get_centroid(
             atom_ids=fg2.get_placer_ids(),
         )
-        fg_displacement = fg1_position - fg2_position
+        fg_displacement = fg2_position - fg1_position
         building_block = building_block.with_rotation_between_vectors(
             start=fg_displacement,
             target=[-1 if self._flip else 1, 0, 0],
