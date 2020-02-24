@@ -110,6 +110,7 @@ class _TerminalVertex(_LinearVertex):
     def place_building_block(self, building_block):
         if building_block.get_num_functional_groups() != 1:
             return super().place_building_block(building_block)
+
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
@@ -118,9 +119,10 @@ class _TerminalVertex(_LinearVertex):
         fg_centroid = building_block.get_centroid(
             atom_ids=fg.get_placer_ids(),
         )
-        centroid = building_block.get_centroid()
-        centroid_displacement = fg_centroid - centroid
-        building_block.apply_rotation_between_vectors(
+        centroid_displacement = (
+            fg_centroid - building_block.get_centroid()
+        )
+        building_block = building_block.with_rotation_between_vectors(
             start=centroid_displacement,
             # _cap_direction is defined by a subclass.
             target=[self._cap_direction, 0, 0],
@@ -136,7 +138,7 @@ class _TerminalVertex(_LinearVertex):
             index = 0 if self._cap_direction == 1 else -1
             return {functional_groups[index]: edges[0].get_id()}
 
-        elif len(building_block.func_groups) == 1:
+        elif building_block.get_num_functional_groups() == 1:
             return {0: edges[0].get_id()}
 
         else:
@@ -154,7 +156,7 @@ class _HeadVertex(_TerminalVertex):
 
     # The direction to use if the building block placed on the
     # vertex only has 1 FunctionalGroup.
-    _cap_direction = -1
+    _cap_direction = 1
 
 
 class _TailVertex(_TerminalVertex):
@@ -165,4 +167,4 @@ class _TailVertex(_TerminalVertex):
 
     # The direction to use if the building block placed on the
     # vertex only has 1 FunctionalGroup.
-    _cap_direction = 1
+    _cap_direction = -1

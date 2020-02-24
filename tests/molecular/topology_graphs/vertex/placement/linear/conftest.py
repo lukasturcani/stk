@@ -12,8 +12,8 @@ vertices = stk.molecular.topology_graphs.polymer.linear
 @pytest.fixture(
     params=(
         lazy_fixture('center'),
-        # lazy_fixture('head'),
-        # lazy_fixture('tail'),
+        lazy_fixture('head'),
+        lazy_fixture('tail'),
     ),
 )
 def test_case(request):
@@ -22,52 +22,77 @@ def test_case(request):
 
 @pytest.fixture
 def center(position, flip, center_building_block):
-    point1 = position + [10, 0, 0]
-    point2 = position + [-10, 0, 0]
-    if flip:
-        nearest_points = {0: point1, 1: point2}
-    else:
-        nearest_points = {0: point2, 1: point1}
-
+    point1 = position + [-10, 0, 0]
+    point2 = position + [10, 0, 0]
     vertex = vertices._LinearVertex(0, position, flip)
     return _TestCase(
         vertex=vertex,
         edges=tuple(get_edges(vertex)),
         building_block=center_building_block,
         position=position,
-        nearest_points=nearest_points,
-        functional_group_edges={0: 1, 1: 0} if flip else {0: 0, 1: 1},
+        points=(point1, point2),
+        nearest_points=get_nearest_points(flip, point1, point2),
+        functional_group_edges=get_functional_group_edges(flip),
     )
 
 
 @pytest.fixture
 def head(position, flip, end_building_block):
+    point1 = position + [-10, 0, 0]
+    point2 = position + [10, 0, 0]
+
+    if end_building_block.get_num_functional_groups() == 2:
+        nearest_points = get_nearest_points(flip, point1, point2)
+        functional_group_edges = get_functional_group_edges(flip)
+    else:
+        nearest_points = {0: point2}
+        functional_group_edges = {0: 1}
+
     vertex = vertices._HeadVertex(0, position, flip)
     return _TestCase(
         vertex=vertex,
-        edges=tuple(get_edges(vertex))[0],
+        edges=(tuple(get_edges(vertex))[1], ),
         building_block=end_building_block,
         position=position,
-        nearest_points={
-        },
-        functional_groups_edges={
-        },
+        points=(point1, point2),
+        nearest_points=nearest_points,
+        functional_group_edges=functional_group_edges,
     )
 
 
 @pytest.fixture
 def tail(position, flip, end_building_block):
+    point1 = position + [-10, 0, 0]
+    point2 = position + [10, 0, 0]
+
+    if end_building_block.get_num_functional_groups() == 2:
+        nearest_points = get_nearest_points(flip, point1, point2)
+        functional_group_edges = get_functional_group_edges(flip)
+    else:
+        nearest_points = {0: point1}
+        functional_group_edges = {0: 0}
+
     vertex = vertices._TailVertex(0, position, flip)
     return _TestCase(
         vertex=vertex,
-        edges=tuple(get_edges(vertex))[1],
+        edges=(tuple(get_edges(vertex))[0], ),
         building_block=end_building_block,
         position=position,
-        nearest_points={
-        },
-        functional_groups_edges={
-        },
+        points=(point1, point2),
+        nearest_points=nearest_points,
+        functional_group_edges=functional_group_edges,
     )
+
+
+def get_nearest_points(flip, point1, point2):
+    if flip:
+        return {0: point2, 1: point1}
+    else:
+        return {0: point1, 1: point2}
+
+
+def get_functional_group_edges(flip):
+    return {0: 1, 1: 0} if flip else {0: 0, 1: 1}
 
 
 @pytest.fixture(
@@ -84,11 +109,20 @@ def center_building_block(request):
 
 @pytest.fixture(
     params=(
-        lazy_fixture('center_building_block'),
         stk.BuildingBlock(
             smiles='BrCC',
             functional_groups=[stk.BromoFactory()],
         ),
+    ),
+)
+def _end_building_block(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=(
+        lazy_fixture('center_building_block'),
+        lazy_fixture('_end_building_block'),
     ),
 )
 def end_building_block(request):
