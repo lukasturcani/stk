@@ -51,7 +51,6 @@ def get_nearest_points(building_block, points):
             distances.append(
                 (euclidean(fg_position, point), i, point)
             )
-
     nearest_points = {}
     for _, fg, point in sorted(distances, key=lambda x: x[0]):
         if fg not in nearest_points:

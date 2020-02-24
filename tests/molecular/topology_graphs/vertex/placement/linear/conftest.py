@@ -43,7 +43,10 @@ def head(position, flip, end_building_block):
 
     if end_building_block.get_num_functional_groups() == 2:
         nearest_points = get_nearest_points(flip, point1, point2)
-        functional_group_edges = get_functional_group_edges(flip)
+        if flip:
+            functional_group_edges = {0: 1}
+        else:
+            functional_group_edges = {1: 1}
     else:
         nearest_points = {0: point2}
         functional_group_edges = {0: 1}
@@ -67,7 +70,10 @@ def tail(position, flip, end_building_block):
 
     if end_building_block.get_num_functional_groups() == 2:
         nearest_points = get_nearest_points(flip, point1, point2)
-        functional_group_edges = get_functional_group_edges(flip)
+        if flip:
+            functional_group_edges = {1: 0}
+        else:
+            functional_group_edges = {0: 0}
     else:
         nearest_points = {0: point1}
         functional_group_edges = {0: 0}
