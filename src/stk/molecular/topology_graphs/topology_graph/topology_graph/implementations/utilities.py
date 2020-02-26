@@ -31,6 +31,7 @@ class _Placement:
         position_matrix = self._vertex.place_building_block(
             building_block=self._building_block,
         )
+        position_matrix.setflags(write=False)
         building_block = self._building_block.with_position_matrix(
             position_matrix=position_matrix,
         )

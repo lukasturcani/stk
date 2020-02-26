@@ -147,8 +147,14 @@ class ConstructionState:
 
         return self._vertices[vertex_id]
 
+    def get_num_vertices(self):
+        return len(self._vertices)
+
     def get_edge(self, edge_id):
         return self._edges[edge_id]
+
+    def get_num_edges(self):
+        return len(self._edges)
 
     def get_edges(self, vertex_id):
         return self._vertex_edges[vertex_id]
