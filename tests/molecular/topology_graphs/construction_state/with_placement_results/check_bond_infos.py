@@ -1,5 +1,7 @@
 import stk
 
+BondInfo = stk.molecular.bond_info.BondInfo
+
 
 def check_bond_infos(old_state, new_state, building_blocks):
     old_infos = tuple(old_state.get_bond_infos())
@@ -42,7 +44,7 @@ def get_infos(old_state, new_state, building_blocks):
         start_atom_index += building_block.get_num_atoms()
 
         for bond in building_block.get_bonds():
-            yield stk.BondInfo(
+            yield BondInfo(
                 bond=bond.with_atoms(atom_map),
                 building_block=building_block,
                 building_block_index=building_block_index,
@@ -57,4 +59,4 @@ def is_equivalent_bond(bond1, bond2):
 def is_equivalent_atom(atom1, atom2):
     assert atom1.__class__ is atom2.__class__
     assert atom1.get_id() == atom2.get_id()
-    assert atom1.charge() == atom2.get_charge()
+    assert atom1.get_charge() == atom2.get_charge()

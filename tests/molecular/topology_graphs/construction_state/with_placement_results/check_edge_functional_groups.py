@@ -16,9 +16,9 @@ def check_edge_functional_groups(
 
     for edge_id in range(old_state.get_num_edges()):
         edge_group = stk.EdgeGroup((old_state.get_edge(edge_id), ))
-        expected_fgs = {fg_key(fg): fg for fg in expected[edge_id]}
+        expected_fgs = {get_fg_key(fg): fg for fg in expected[edge_id]}
         new_state_fgs = {
-            fg_key(fg): fg
+            get_fg_key(fg): fg
             for fg
             in new_state.get_edge_group_functional_groups(edge_group)
         }
@@ -44,7 +44,7 @@ def get_expected_edge_functional_groups(
     for edge_id, fg in added_functional_groups(
         old_state=old_state,
         building_blocks=building_blocks,
-        placment_results=placement_results,
+        placement_results=placement_results,
     ):
         expected[edge_id].append(fg)
     return expected
@@ -56,7 +56,7 @@ def is_equivalent_fg(fg1, fg2):
     assert tuple(fg1.get_placer_ids()) == tuple(fg2.get_placer_ids())
 
 
-def fg_key(fg):
+def get_fg_key(fg):
     return tuple(fg.get_atom_ids())
 
 

@@ -37,7 +37,8 @@ def test_with_placement_results(construction_state):
     # Clone for testing immutability.
     clone = construction_state.clone()
     new_state = construction_state.with_placement_results(
-        placement_results=placement_results,
+        building_blocks=building_blocks,
+        results=placement_results,
     )
     old_state = construction_state
     check_atoms(old_state, new_state, building_blocks)

@@ -9,7 +9,7 @@ def check_atoms(old_state, new_state, building_blocks):
         num_added == sum(bb.get_num_atoms() for bb in building_blocks)
     )
     expected_atoms = enumerate(
-        it.chain(bb.get_atoms() for bb in building_blocks),
+        it.chain(*(bb.get_atoms() for bb in building_blocks)),
         len(old_atoms),
     )
     for atom1, (id_, atom2) in zip(

@@ -1,5 +1,7 @@
 import stk
 
+AtomInfo = stk.molecular.atom_info.AtomInfo
+
 
 def check_atom_infos(old_state, new_state, building_blocks):
     old_infos = tuple(old_state.get_atom_infos())
@@ -29,7 +31,7 @@ def check_atom_infos(old_state, new_state, building_blocks):
 def get_infos(building_blocks, building_block_index, atom_id):
     for building_block in building_blocks:
         for atom in building_block.get_atoms():
-            yield stk.AtomInfo(
+            yield AtomInfo(
                 atom=atom.with_id(atom_id),
                 building_block=building_block,
                 building_block_index=building_block_index,
@@ -41,4 +43,4 @@ def get_infos(building_blocks, building_block_index, atom_id):
 def is_equivalent_atom(atom1, atom2):
     assert atom1.__class__ is atom2.__class__
     assert atom1.get_id() == atom2.get_id()
-    assert atom1.charge() == atom2.get_charge()
+    assert atom1.get_charge() == atom2.get_charge()
