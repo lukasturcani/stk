@@ -14,12 +14,18 @@ class ConstructionState:
         self,
         building_block_vertices,
         edges,
-        vertex_edges,
         scale,
+        lattice_constants=None,
     ):
         """
 
         """
+
+        if lattice_constants is not None:
+            lattice_constants = tuple(
+                np.array(constant, dtype=np.float64)
+                for constant in lattice_constants
+            )
 
         self._vertex_building_blocks = {
             vertex.get_id(): building_block
@@ -32,13 +38,9 @@ class ConstructionState:
                 for vertices in building_block_vertices.values()
                 for vertex in vertices
         }
-        self._vertex_edges = {
-            vertex_id: tuple(
-                edge.with_scale(scale) for edge in edges
-            )
-            for vertex_id, edges in vertex_edges.items()
-        }
         self._edges = tuple(edge.with_scale(scale) for edge in edges)
+        self._lattice_constants = lattice_constants
+        self._vertex_edges = self._get_vertex_edges()
         self._position_matrix = np.empty((0, 3), dtype=np.float64)
         self._atoms = []
         self._atom_infos = []
@@ -46,6 +48,51 @@ class ConstructionState:
         self._bond_infos = []
         self._building_block_counts = defaultdict(int)
         self._edge_functional_groups = defaultdict(list)
+
+    def _get_vertex_edges(self):
+        vertex_edges = defaultdict(list)
+        for edge in self._edges:
+            vertex_ids = (edge.get_vertex1_id(), edge.get_vertex2_id())
+
+            if edge.is_periodic():
+                for vertex_id in vertex_ids:
+                    periodic_edge = self._get_periodic_edge(
+                        edge=edge,
+                        reference=vertex_id,
+                    )
+                    vertex_edges[vertex_id].append(periodic_edge)
+            else:
+                for vertex_id in vertex_ids:
+                    vertex_edges[vertex_id].append(edge)
+        return vertex_edges
+
+    def _get_periodic_edge(self, edge, reference):
+        vertex1 = self._vertices[reference]
+        vertex2 = self._vertices[
+            edge.get_vertex1_id()
+            if reference == edge.get_vertex2_id()
+            else edge.get_vertex2_id()
+        ]
+
+        direction = 1 if reference == edge.get_vertex1_id() else -1
+        periodicity = np.array(edge.get_periodicity())
+        end_cell = (
+            vertex1.get_cell() + direction*periodicity
+        )
+
+        cell_shift = end_cell - vertex2.get_cell()
+
+        shift = sum(
+            axis_shift*constant
+            for axis_shift, constant in zip(
+                cell_shift,
+                self._lattice_constants,
+            )
+        )
+        position = (
+            (vertex2.get_position()+shift+vertex1.get_position()) / 2
+        )
+        return edge.with_position(position)
 
     def clone(self):
         clone = self.__class__.__new__(self.__class__)

@@ -156,7 +156,6 @@ class TopologyGraph:
 
         self._vertices = vertices
         self._edges = edges
-        self._vertex_edges = self._get_vertex_edges(self._edges)
         self._reaction_factory = reaction_factory
         if num_processes == 1:
             self._implementation = _Serial(
@@ -176,51 +175,9 @@ class TopologyGraph:
             )
         self._edge_groups = edge_groups
 
-    def _get_vertex_edges(self, edges):
-        vertex_edges = defaultdict(list)
-        for edge in edges:
-            vertex_ids = (edge.get_vertex1_id(), edge.get_vertex2_id())
-
-            if edge.is_periodic():
-                for vertex_id in vertex_ids:
-                    periodic_edge = self._get_periodic_edge(
-                        edge=edge,
-                        reference=vertex_id,
-                    )
-                    vertex_edges[vertex_id].append(periodic_edge)
-            else:
-                for vertex_id in vertex_ids:
-                    vertex_edges[vertex_id].append(edge)
-        return vertex_edges
-
-    def _get_periodic_edge(self, edge, reference):
-        vertex1 = self._vertices[reference]
-        vertex2 = self._vertices[
-            edge.get_vertex1_id()
-            if reference == edge.get_vertex2_id()
-            else edge.get_vertex2_id()
-        ]
-
-        direction = 1 if reference == edge.get_vertex1_id() else -1
-        periodicity = np.array(edge.get_periodicity())
-        end_cell = (
-            vertex1.get_cell() + direction*periodicity
-        )
-
-        cell_shift = end_cell - vertex2.get_cell()
-
-        shift = 0
-        lattice_constants = self._get_lattice_constants()
-        for axis_shift, constant in zip(cell_shift, lattice_constants):
-            shift += axis_shift*constant
-
-        position = (
-            (vertex2.get_position()+shift+vertex1.get_position()) / 2
-        )
-        return edge.with_position(position)
-
     def _get_lattice_constants(self):
-        raise NotImplementedError()
+        return
+        yield
 
     def get_building_block_vertices(self, building_blocks):
         """
@@ -248,18 +205,21 @@ class TopologyGraph:
 
         """
 
-        state = ConstructionState(
-            building_block_vertices=building_block_vertices,
-            edges=self._edges,
-            vertex_edges=self._vertex_edges,
-            scale=self._get_scale(building_block_vertices),
-        )
+        state = self._get_construction_state(building_block_vertices)
         state = self._before_placement(state)
         state = self._place_building_blocks(state)
         state = self._before_reactions(state)
         state = self._run_reactions(state)
         state = self._clean_up(state)
         return ConstructionResult.init_from_construction_state(state)
+
+    def _get_construction_state(self, building_block_vertices):
+        return ConstructionState(
+            building_block_vertices=building_block_vertices,
+            edges=self._edges,
+            scale=self._get_scale(building_block_vertices),
+            lattice_constants=self._get_lattice_constants(),
+        )
 
     def get_vertices(self, vertex_ids=None):
         """
