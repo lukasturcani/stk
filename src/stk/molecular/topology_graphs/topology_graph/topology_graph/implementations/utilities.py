@@ -30,6 +30,7 @@ class _Placement:
     def get_result(self):
         position_matrix = self._vertex.place_building_block(
             building_block=self._building_block,
+            edges=self._edges,
         )
         position_matrix.setflags(write=False)
         building_block = self._building_block.with_position_matrix(

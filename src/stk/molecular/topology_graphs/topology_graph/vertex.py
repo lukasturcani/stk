@@ -126,7 +126,7 @@ class Vertex:
 
         return np.array([0, 0, 0])
 
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, edges):
         """
         Place `building_block` on the :class:`.Vertex`.
 
@@ -135,6 +135,9 @@ class Vertex:
         building_block : :class:`.Molecule`
             The building block molecule which is to be placed on the
             vertex.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            The edges to which the vertex is attached.
 
         Returns
         -------

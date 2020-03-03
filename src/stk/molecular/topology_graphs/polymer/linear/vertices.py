@@ -41,7 +41,7 @@ class _LinearVertex(Vertex):
         clone._flip = self._flip
         return clone
 
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, edges):
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
@@ -107,9 +107,9 @@ class _TerminalVertex(_LinearVertex):
 
     """
 
-    def place_building_block(self, building_block):
+    def place_building_block(self, building_block, edges):
         if building_block.get_num_functional_groups() != 1:
-            return super().place_building_block(building_block)
+            return super().place_building_block(building_block, edges)
 
         building_block = building_block.with_centroid(
             position=self._position,

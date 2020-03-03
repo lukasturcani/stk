@@ -20,7 +20,10 @@ def _test_placement(
     points,
     functional_group_edges,
 ):
-    position_matrix = vertex.place_building_block(building_block)
+    position_matrix = vertex.place_building_block(
+        building_block=building_block,
+        edges=edges,
+    )
     building_block = building_block.with_position_matrix(
         position_matrix=position_matrix,
     )
