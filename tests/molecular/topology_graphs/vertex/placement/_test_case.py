@@ -5,12 +5,12 @@ class _TestCase:
         edges,
         building_block,
         position,
-        points,
+        alignment_tests,
         functional_group_edges,
     ):
         self.vertex = vertex
         self.edges = edges
         self.building_block = building_block
         self.position = position
-        self.points = points
+        self.alignment_tests = alignment_tests
         self.functional_group_edges = functional_group_edges

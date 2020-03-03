@@ -67,7 +67,7 @@ def center(position, flip, building_block_2):
         edges=tuple(get_edges(vertex)),
         building_block=building_block_2,
         position=position,
-        points={
+        alignment_tests={
             get_fg0_point: point2 if flip else point1,
             get_fg1_point: point1 if flip else point2,
         },
@@ -94,7 +94,7 @@ def head_1(position, flip, building_block_1):
         edges=(tuple(get_edges(vertex))[1], ),
         building_block=building_block_1,
         position=position,
-        points={get_centroid_point: point1},
+        alignment_tests={get_centroid_point: point1},
         functional_group_edges={0: 1},
     )
 
@@ -124,7 +124,7 @@ def head_2(position, building_block_2):
         edges=(tuple(get_edges(vertex))[1], ),
         building_block=building_block_2,
         position=position,
-        points={
+        alignment_tests={
             get_fg0_point: point1,
             get_fg1_point: point2,
         },
@@ -157,7 +157,7 @@ def head_3(position, building_block_2):
         edges=(tuple(get_edges(vertex))[1], ),
         building_block=building_block_2,
         position=position,
-        points={
+        alignment_tests={
             get_fg0_point: point2,
             get_fg1_point: point1,
         },
@@ -184,7 +184,7 @@ def tail_1(position, flip, building_block_1):
         edges=(tuple(get_edges(vertex))[0], ),
         building_block=building_block_1,
         position=position,
-        points={get_centroid_point: point2},
+        alignment_tests={get_centroid_point: point2},
         functional_group_edges={0: 0},
     )
 
@@ -214,7 +214,7 @@ def tail_2(position, building_block_2):
         edges=(tuple(get_edges(vertex))[0], ),
         building_block=building_block_2,
         position=position,
-        points={
+        alignment_tests={
             get_fg0_point: point1,
             get_fg1_point: point2,
         },
@@ -247,7 +247,7 @@ def tail_3(position, building_block_2):
         edges=(tuple(get_edges(vertex))[0], ),
         building_block=building_block_2,
         position=position,
-        points={
+        alignment_tests={
             get_fg0_point: point2,
             get_fg1_point: point1,
         },

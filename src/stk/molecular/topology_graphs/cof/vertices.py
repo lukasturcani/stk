@@ -1,5 +1,4 @@
 import numpy as np
-from functools import partial
 from scipy.spatial.distance import euclidean
 from stk.utilities import vector_angle, get_acute_vector
 
@@ -106,7 +105,10 @@ class _LinearCofVertex(_CofVertex):
         return {
             fg_id: edge.get_id() for fg_id, edge in enumerate(sorted(
                 edges,
-                key=partial(euclidean, fg0_position),
+                key=lambda edge: euclidean(
+                    edge.get_position(),
+                    fg0_position,
+                ),
             ))
         }
 

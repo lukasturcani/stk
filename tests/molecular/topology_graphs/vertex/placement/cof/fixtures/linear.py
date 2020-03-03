@@ -41,12 +41,12 @@ def linear(position, linear_aligner_edge, building_block_2):
         edges=tuple(get_linear_edges(vertex)),
         building_block=building_block_2,
         position=position,
-        points={
+        alignment_tests={
             get_fg0_point: (
                 point1 if linear_aligner_edge == 0 else point2
             ),
             get_fg1_point: (
-                point2 if linear_aligner_edge == 1 else point1
+                point2 if linear_aligner_edge == 0 else point1
             ),
         },
         functional_group_edges=(
