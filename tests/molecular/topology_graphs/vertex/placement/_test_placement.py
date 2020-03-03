@@ -32,6 +32,9 @@ def _test_placement(
         b=position,
         atol=1e-14,
     )
+    if hasattr(vertex, '_aligner_edge'):
+        print(vertex._aligner_edge)
+
     for test, result in alignment_tests.items():
         print(
             np.array(test(building_block), dtype=np.int64),
@@ -43,4 +46,5 @@ def _test_placement(
         building_block=building_block,
         edges=edges,
     )
+    print(functional_group_edges_, functional_group_edges)
     assert functional_group_edges_ == functional_group_edges

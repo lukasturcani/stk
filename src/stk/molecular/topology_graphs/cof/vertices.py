@@ -172,9 +172,11 @@ class _NonLinearCofVertex(_CofVertex):
                 axis=axis,
             ),
         )
+        print('fgs', functional_groups)
         edges = sorted(edges, key=self._get_edge_angle(axis, edges))
+        print('edges', edges)
         return {
-            edge.get_id(): fg_id
+            fg_id: edge.get_id()
             for fg_id, edge in zip(functional_groups, edges)
         }
 

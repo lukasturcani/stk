@@ -124,21 +124,11 @@ def _nonlinear(position, aligner_edge, building_block):
 
     building_block = order_functional_groups(building_block)
     n = building_block.get_num_functional_groups()
-    points = tuple(get_points(n))
-    # Make an alignment test for each functional group. Each test
-    # should find the point in "points", closest to that functional
-    # group. The fg_ids of "building_block" are assumed to be assigned,
-    # such that when the aligner_edge is 0, the closest point to a
-    # functional group, is the one at the index equal to the fg_id.
-    # When the aligner_edge is incremented, the index of the expected
-    # point is also incremented, because the building block should have
-    # been rotated.
+    points = tuple(get_points(position, n))
     alignment_tests = {
-        partial(get_fg_point, points, fg_id):
-            points[(fg_id+aligner_edge) % n]
-        for fg_id in range(n)
+        partial(get_fg_point, points, 0): points[aligner_edge],
+        get_normal: np.array([0, 0, 1]),
     }
-    alignment_tests[get_normal] = np.array([0, 0, 1])
 
     vertex = vertices._NonLinearCofVertex(
         id=0,
@@ -154,18 +144,21 @@ def _nonlinear(position, aligner_edge, building_block):
         position=position,
         alignment_tests=alignment_tests,
         functional_group_edges={
-            fg_id: (fg_id+aligner_edge)//n
+            fg_id: (fg_id+aligner_edge) % n
             for fg_id in range(n)
         },
     )
 
 
-def get_points(num_points):
+def get_points(center, num_points):
     """
     Yield equally spaced points on a circle of radius 10.
 
     Parameters
     ----------
+    center : :class:`numpy.ndarray`
+        The center of circle.
+
     num_points : :class:`int`
         The number of points to make.
 
@@ -180,7 +173,7 @@ def get_points(num_points):
     # extra theta.
     thetas = np.arange(0, 2*np.pi, 2*np.pi/num_points)[:num_points]
     for theta in thetas:
-        yield 10*np.array([np.sin(theta), np.cos(theta), 0.])
+        yield center + 10*np.array([np.sin(theta), np.cos(theta), 0.])
 
 
 def get_fg_point(points, fg_id, building_block):
@@ -267,7 +260,10 @@ def get_nonlinear_edges(num_edges, vertex):
 
     """
 
-    for id_, point in enumerate(get_points(num_edges)):
+    for id_, point in enumerate(get_points(
+        center=vertex.get_position(),
+        num_points=num_edges
+    )):
         yield stk.Edge(id_, vertex, stk.Vertex(id_+1, point))
 
 
@@ -324,21 +320,16 @@ def order_functional_groups(building_block):
     building_block = building_block.with_functional_groups(
         functional_groups=sorted(
             building_block.get_functional_groups(),
-            key=functional_group_angle(
-                building_block=building_block,
-                fg0_position=fg0_position,
-                normal=normal,
-            ),
+            key=functional_group_angle(building_block, fg0_position),
         ),
     )
     return building_block.with_position_matrix(position_matrix)
 
 
-def functional_group_angle(building_block, fg0_position, normal):
+def functional_group_angle(building_block, fg0_position):
     centroid = building_block.get_centroid(
         atom_ids=building_block.get_placer_ids(),
     )
-    axis = np.cross(fg0_position, normal)
 
     def inner(functional_group):
         position = building_block.get_centroid(
@@ -347,7 +338,7 @@ def functional_group_angle(building_block, fg0_position, normal):
         fg_direction = position - centroid
         theta = stk.vector_angle(fg0_position, fg_direction)
 
-        projection = fg_direction @ axis
+        projection = fg_direction @ [1, 0, 0]
         if theta > 0 and projection < 0:
             return 2*np.pi - theta
         return theta
