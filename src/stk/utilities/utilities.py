@@ -1554,3 +1554,13 @@ class XTBExtractor:
                     frequencies.append(freq)
 
         self.frequencies = [float(i) for i in frequencies]
+
+
+def get_acute_vector(reference, vector):
+    if (
+        # vector_angle is NaN if reference is [0, 0, 0].
+        not np.allclose(reference, [0, 0, 0], atol=1e-5)
+        and vector_angle(vector, reference) > np.pi/2
+    ):
+        return vector * -1
+    return vector

@@ -1,18 +1,29 @@
 import numpy as np
 from functools import partial
 from scipy.spatial.distance import euclidean
-from stk.utilities import vector_angle
+from stk.utilities import vector_angle, get_acute_vector
 
-from ...topology_graph import Vertex
+from ..topology_graph import Vertex
 
 
 class _CofVertex(Vertex):
-    def __init__(self, id, position, aligner_edge):
+    def __init__(self, id, position, aligner_edge, cell):
         super().__init__(id, position)
         self._aligner_edge = aligner_edge
+        self._cell = np.array(cell)
+
+    def get_cell(self):
+        return np.array(self._cell)
+
+    def _with_cell(self, cell):
+        self._cell = np.array(cell)
+        return self
+
+    def with_cell(self, cell):
+        return self.clone()._with_cell(cell)
 
     @classmethod
-    def init_at_center(cls, id, vertices, aligner_edge):
+    def init_at_center(cls, id, vertices, aligner_edge, cell):
         obj = cls.__new__(cls)
         obj._id = id
         obj._position = np.array([0, 0, 0], dtype=np.float64)
@@ -20,15 +31,18 @@ class _CofVertex(Vertex):
             obj._position += vertex.get_position()
         obj._position /= count
         obj._aligner_edge = aligner_edge
+        obj._cell = cell
         return obj
 
     @classmethod
     def init_at_shifted_center(
         cls,
+        id,
         vertices,
         cell_shifts,
         lattice_constants,
         aligner_edge,
+        cell,
     ):
         positions = []
         for vertex, cell_shift in zip(vertices, cell_shifts):
@@ -43,18 +57,19 @@ class _CofVertex(Vertex):
             np.sum(positions, axis=0),
             len(positions),
         )
-        return cls(id, position, aligner_edge)
+        return cls(id, position, aligner_edge, cell)
 
     def clone(self):
         clone = super().clone()
         clone._aligner_edge = self._aligner_edge
+        clone._cell = np.array(self._cell)
         return clone
 
     def __str__(self):
         return (
-            'Vertex(id={self._id}, '
-            'position={self._position.tolist()}, '
-            'aligner_edge={self._aligner_edge})'
+            f'Vertex(id={self._id}, '
+            f'position={self._position.tolist()}, '
+            f'aligner_edge={self._aligner_edge})'
         )
 
 
@@ -68,7 +83,7 @@ class _LinearCofVertex(_CofVertex):
         fg_centroid = building_block.get_centroid(fg.get_placer_ids())
         start = fg_centroid - self._position
         target = edges[0].get_position() - edges[1].get_position()
-        target *= 1 if self._aigner_edge == 0 else -1
+        target *= 1 if self._aligner_edge == 0 else -1
 
         building_block = building_block.with_rotation_between_vectors(
             start=start,
@@ -105,8 +120,8 @@ class _NonLinearCofVertex(_CofVertex):
         normal = building_block.get_plane_normal(
             atom_ids=building_block.get_placer_ids(),
         )
-        normal = _get_acute_vector(
-            reference=self._position - building_block.get_centroid(),
+        normal = get_acute_vector(
+            reference=building_block.get_centroid() - self._position,
             vector=normal,
         )
         building_block = building_block.with_rotation_between_vectors(
@@ -140,8 +155,8 @@ class _NonLinearCofVertex(_CofVertex):
         normal = building_block.get_plane_normal(
             atom_ids=building_block.get_placer_ids(),
         )
-        normal = _get_acute_vector(
-            reference=self._position - building_block.get_centroid(),
+        normal = get_acute_vector(
+            reference=building_block.get_centroid() - self._position,
             vector=normal,
         )
 
@@ -158,7 +173,7 @@ class _NonLinearCofVertex(_CofVertex):
         edges = sorted(edges, key=self._get_edge_angle(axis, edges))
         return {
             edge.get_id(): fg_id
-            for edge, fg_id in zip(functional_groups, edges)
+            for fg_id, edge in zip(functional_groups, edges)
         }
 
     def _get_functional_group_angle(
@@ -179,7 +194,7 @@ class _NonLinearCofVertex(_CofVertex):
 
             projection = fg_direction @ axis
             if theta > 0 and projection < 0:
-                return 2*np.pu - theta
+                return 2*np.pi - theta
             return theta
 
         return angle
@@ -206,13 +221,3 @@ class _NonLinearCofVertex(_CofVertex):
             return theta
 
         return angle
-
-
-def _get_acute_vector(reference, vector):
-    if (
-        # vector_angle is NaN if reference is [0, 0, 0].
-        not np.allclose(reference, [0, 0, 0], atol=1e-5)
-        and vector_angle(vector, reference) > np.pi/2
-    ):
-        return vector * -1
-    return vector

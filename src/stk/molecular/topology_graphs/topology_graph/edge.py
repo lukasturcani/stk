@@ -177,3 +177,11 @@ class Edge:
         """
 
         return np.array(self._position)
+
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return (
+            f'Edge({self._id}, {self._vertex1_id}, {self._vertex2_id})'
+        )
