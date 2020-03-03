@@ -271,9 +271,6 @@ def order_functional_groups(building_block):
     """
     Get a building block with ordered functional groups.
 
-    The functional groups are ordered, such that when the building
-    block is placed
-
     Parameters
     ----------
     building_block : :class:`.BuildingBlock`
@@ -287,58 +284,42 @@ def order_functional_groups(building_block):
 
     """
 
-    # The original position matrix will be restored at the end.
-    position_matrix = building_block.get_position_matrix()
-
-    building_block = building_block.with_centroid(
-        position=[0, 0, 0],
-        atom_ids=building_block.get_placer_ids(),
-    )
-    normal = building_block.get_plane_normal(
-        atom_ids=building_block.get_placer_ids(),
-    )
-    normal = stk.get_acute_vector(
-        reference=building_block.get_centroid(),
-        vector=normal,
-    )
-    building_block = building_block.with_rotation_between_vectors(
-        start=normal,
-        target=[0, 0, 1],
-        origin=np.array([0, 0, 0]),
-    )
-    fg0 = next(building_block.get_functional_groups(0))
-    fg0_position = building_block.get_centroid(
-        atom_ids=fg0.get_placer_ids())
-    building_block = (
-        building_block.with_rotation_to_minimize_angle(
-            start=fg0_position,
-            target=[0, 1, 0],
-            axis=[0, 0, 1],
-            origin=np.array([0, 0, 0]),
-        )
-    )
-    building_block = building_block.with_functional_groups(
+    return building_block.with_functional_groups(
         functional_groups=sorted(
             building_block.get_functional_groups(),
-            key=functional_group_angle(building_block, fg0_position),
+            key=functional_group_angle(building_block),
         ),
     )
-    return building_block.with_position_matrix(position_matrix)
 
 
-def functional_group_angle(building_block, fg0_position):
+def functional_group_angle(building_block):
+    fg0 = next(building_block.get_functional_groups(0))
+    fg0_position = building_block.get_centroid(
+        atom_ids=fg0.get_placer_ids(),
+    )
+    placer_centroid = building_block.get_centroid(
+        atom_ids=building_block.get_placer_ids(),
+    )
+    fg0_direction = fg0_position - placer_centroid
     centroid = building_block.get_centroid(
         atom_ids=building_block.get_placer_ids(),
     )
+    normal = stk.get_acute_vector(
+        reference=building_block.get_centroid() - placer_centroid,
+        vector=building_block.get_plane_normal(
+            atom_ids=building_block.get_placer_ids(),
+        ),
+    )
+    axis = -np.cross(normal, fg0_direction)
 
     def inner(functional_group):
         position = building_block.get_centroid(
             atom_ids=functional_group.get_placer_ids(),
         )
         fg_direction = position - centroid
-        theta = stk.vector_angle(fg0_position, fg_direction)
+        theta = stk.vector_angle(fg0_direction, fg_direction)
 
-        projection = fg_direction @ [1, 0, 0]
+        projection = fg_direction @ axis
         if theta > 0 and projection < 0:
             return 2*np.pi - theta
         return theta
