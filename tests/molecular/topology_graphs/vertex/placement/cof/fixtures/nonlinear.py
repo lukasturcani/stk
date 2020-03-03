@@ -135,7 +135,7 @@ def _nonlinear(position, aligner_edge, building_block):
     # been rotated.
     alignment_tests = {
         partial(get_fg_point, points, fg_id):
-            points[(fg_id+aligner_edge) // n]
+            points[(fg_id+aligner_edge) % n]
         for fg_id in range(n)
     }
     alignment_tests[get_normal] = np.array([0, 0, 1])

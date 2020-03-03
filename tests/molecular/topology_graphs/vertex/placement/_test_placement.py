@@ -33,6 +33,10 @@ def _test_placement(
         atol=1e-14,
     )
     for test, result in alignment_tests.items():
+        print(
+            np.array(test(building_block), dtype=np.int64),
+            np.array(result, dtype=np.int64),
+        )
         assert np.all(np.equal(test(building_block), result))
 
     functional_group_edges_ = vertex.map_functional_groups_to_edges(
