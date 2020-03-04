@@ -69,7 +69,7 @@ class ShiftParams:
         ShiftParams(
             vertices=(
                 stk.Vertex(1, [-1, 1, 2]),
-                stk.Vertex(2, [1, -1, -2]),
+                stk.Vertex(2, [1, -1, 0.]),
             ),
             cell_shifts=(
                 np.array([10, -10, 10]),
@@ -80,7 +80,7 @@ class ShiftParams:
                 np.array([0, 1, 0]),
                 np.array([0, 0, 1]),
             ),
-            position=np.array([0., 0., 0.]),
+            position=np.array([0., 0., 1.]),
         ),
     ),
 )
