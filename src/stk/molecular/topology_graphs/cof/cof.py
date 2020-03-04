@@ -18,19 +18,33 @@ class Cof(TopologyGraph):
         if vertex_alignments is None:
             vertex_alignments = {}
 
+        self._vertex_alignments = vertex_alignments
         self._lattice_size = lattice_size
         self._periodic = periodic
-        vertices = self._get_vertices(vertex_alignments)
+        lattice = self._get_lattice(vertex_alignments)
         super().__init__(
-            vertices=vertices,
-            edges=self._get_edges(vertices),
+            vertices=self._get_vertices(lattice),
+            edges=self._get_edges(lattice),
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
             edge_groups=None,
         )
 
-    def _get_vertices(self, vertex_alignments):
+    def _get_vertices(self, lattice):
+        xdim, ydim, zdim = self._lattice_size
+        num_vertices = xdim*ydim*zdim*len(self._vertex_prototypes)
+        vertices = [None for i in range(num_vertices)]
+        for x, y, z in it.product(
+            range(xdim),
+            range(ydim),
+            range(zdim),
+        ):
+            for vertex in lattice[x][y][z].values():
+                vertices[vertex.get_id()] = vertex
+        return tuple(vertices)
+
+    def _get_lattice(self, vertex_alignments):
         """
         Get the vertices of the topology graph instance.
 
@@ -63,7 +77,7 @@ class Cof(TopologyGraph):
 
         xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
         # vertex_clones is indexed as vertex_clones[x][y][z]
-        vertex_clones = [
+        lattice = [
             [
                 [
                     {} for k in zdim
@@ -81,21 +95,21 @@ class Cof(TopologyGraph):
                 axis * dim
                 for axis, dim in zip(cell, self._lattice_constants)
             )
-            vertex_clones[x][y][z][vertex.get_id()] = vertex.__class__(
+            lattice[x][y][z][vertex.get_id()] = vertex.__class__(
                 id=id_,
                 position=vertex.get_position() + shift,
                 aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
                 cell=cell,
             )
-        return vertex_clones
+        return lattice
 
-    def _get_edges(self, vertices):
+    def _get_edges(self, lattice):
         """
         Create the edges of the topology graph instance.
 
         Parameters
         ----------
-        vertices : :class:`list`
+        lattice : :class:`list`
             A nested :class:`list` which can be indexed as
             ``vertices[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
@@ -134,8 +148,8 @@ class Cof(TopologyGraph):
             )
             edge_clones.append(Edge(
                 id=id_,
-                vertex1=vertices[x][y][z][edge.get_vertex1_id()],
-                vertex2=vertices[x2][y2][z2][edge.get_vertex2_id()],
+                vertex1=lattice[x][y][z][edge.get_vertex1_id()],
+                vertex2=lattice[x2][y2][z2][edge.get_vertex2_id()],
                 periodicity=(
                     (0, 0, 0)
                     if edge_is_not_periodic
@@ -177,24 +191,23 @@ class Cof(TopologyGraph):
     def _get_lattice_constants(self):
         return self._lattice_constants
 
-    def get_scale(self, building_block_vertices):
+    def _get_scale(self, building_block_vertices):
         return 5*max(
             bb.get_maximum_diameter()
             for bb in building_block_vertices
         )
 
     def __repr__(self):
-        vertex_alignments = ', '.join(
-            f'{v.get_id()}: {v.get_aligner_edge()}'
-            # Only get the vertices in the first unit cell.
-            for v in self.vertices[:len(self.vertex_data)]
-        )
-
         x, y, z = self._lattice_size
         periodic = ', periodic=True' if self._periodic else ''
+        vertex_alignments = (
+            ', vertex_alignments={self._vertex_alignments}'
+            if self._vertex_alignments
+            else ''
+        )
         return (
             f'cof.{self.__class__.__name__}('
-            f'lattice_size=({x}, {y}, {z}), '
-            f'vertex_alignments={{{vertex_alignments}}}'
+            f'({x}, {y}, {z})'
+            f'{vertex_alignments}'
             f'{periodic})'
         )

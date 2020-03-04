@@ -158,6 +158,7 @@ class ConstructedMolecule(Molecule):
             construction_result = topology_graph.construct(
                 building_block_vertices=building_block_vertices,
             )
+
         except Exception as ex:
             errormsg = (
                 'Construction failure.\n'
@@ -174,12 +175,10 @@ class ConstructedMolecule(Molecule):
             for i, bb in enumerate(building_blocks):
                 bb_blocks.append(
                     f'{bb}\n\n'
-                    'position matrix\n'
-                    '---------------\n'
                     f'{bb.get_position_matrix()}'
                 )
 
-            errormsg += '\n'.join(bb_blocks)
+            errormsg += '\n\n'.join(bb_blocks)
             raise ConstructionError(errormsg) from ex
 
         super().__init__(

@@ -178,6 +178,28 @@ class Edge:
 
         return np.array(self._position)
 
+    def _with_position(self, position):
+        self._position = np.array(position, dtype=np.float64)
+        return self
+
+    def with_position(self, position):
+        """
+        Return a clone at `position`.
+
+        Parameters
+        ----------
+        position : :class:`numpy.ndarray`
+            The desired position of the clone.
+
+        Returns
+        -------
+        :class:`.Edge`
+            The clone.
+
+        """
+
+        return self.clone()._with_position(position)
+
     def __repr__(self):
         return str(self)
 
