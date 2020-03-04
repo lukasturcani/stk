@@ -2,7 +2,7 @@ import itertools as it
 from collections import Counter
 import numpy as np
 
-from ..topology_graph import TopologyGraph, Edge
+from ..topology_graph import TopologyGraph, Edge, EdgeGroup
 from ...reactions import GenericReactionFactory
 
 
@@ -22,13 +22,23 @@ class Cof(TopologyGraph):
         self._lattice_size = lattice_size
         self._periodic = periodic
         lattice = self._get_lattice(vertex_alignments)
+        edges = self._get_edges(lattice)
         super().__init__(
             vertices=self._get_vertices(lattice),
-            edges=self._get_edges(lattice),
+            edges=edges,
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
-            edge_groups=None,
+            edge_groups=self._get_edge_groups(edges),
+        )
+
+    def _get_edge_groups(self, edges):
+        if self._periodic:
+            return None
+
+        return tuple(
+            EdgeGroup((edge,)) for edge in edges
+            if not edge.is_periodic()
         )
 
     def _get_vertices(self, lattice):
