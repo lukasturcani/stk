@@ -14,6 +14,9 @@ class _CofVertex(Vertex):
     def get_cell(self):
         return np.array(self._cell)
 
+    def get_aligner_edge(self):
+        return self._aligner_edge
+
     @classmethod
     def init_at_center(cls, id, vertices, aligner_edge, cell):
         obj = cls.__new__(cls)

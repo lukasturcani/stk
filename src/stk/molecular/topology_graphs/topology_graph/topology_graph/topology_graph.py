@@ -59,9 +59,7 @@ into its :class:`.Vertex` counterpart.
 
 """
 
-from collections import defaultdict
 from functools import partial
-import numpy as np
 
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
