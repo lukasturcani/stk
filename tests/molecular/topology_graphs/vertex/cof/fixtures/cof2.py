@@ -3,7 +3,7 @@ import stk
 
 from ..._test_case import _TestCase
 
-vertices = stk.molecular.topology_graphs.cof.vertices
+vertices = stk.molecular.topology_graphs.cof.honeycomb
 
 
 @pytest.fixture

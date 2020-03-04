@@ -84,7 +84,7 @@ class Cof(TopologyGraph):
             vertex_clones[x][y][z][vertex.get_id()] = vertex.__class__(
                 id=id_,
                 position=vertex.get_position() + shift,
-                aligner_edge=vertex.get_aligner_edge(),
+                aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
                 cell=cell,
             )
         return vertex_clones
@@ -197,3 +197,4 @@ class Cof(TopologyGraph):
             f'lattice_size=({x}, {y}, {z}), '
             f'vertex_alignments={{{vertex_alignments}}}'
             f'{periodic})'
+        )

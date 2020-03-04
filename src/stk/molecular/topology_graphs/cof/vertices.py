@@ -6,7 +6,7 @@ from ..topology_graph import Vertex
 
 
 class _CofVertex(Vertex):
-    def __init__(self, id, position, aligner_edge, cell):
+    def __init__(self, id, position, aligner_edge=0, cell=(0, 0, 0)):
         super().__init__(id, position)
         self._aligner_edge = aligner_edge
         self._cell = np.array(cell)
@@ -14,11 +14,14 @@ class _CofVertex(Vertex):
     def get_cell(self):
         return np.array(self._cell)
 
-    def get_aligner_edge(self):
-        return self._aligner_edge
-
     @classmethod
-    def init_at_center(cls, id, vertices, aligner_edge, cell):
+    def init_at_center(
+        cls,
+        id,
+        vertices,
+        aligner_edge=0,
+        cell=(0, 0, 0),
+    ):
         obj = cls.__new__(cls)
         obj._id = id
         obj._position = np.array([0, 0, 0], dtype=np.float64)
@@ -36,8 +39,8 @@ class _CofVertex(Vertex):
         vertices,
         cell_shifts,
         lattice_constants,
-        aligner_edge,
-        cell,
+        aligner_edge=0,
+        cell=(0, 0, 0),
     ):
         positions = []
         for vertex, cell_shift in zip(vertices, cell_shifts):
