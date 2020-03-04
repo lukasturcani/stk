@@ -14,13 +14,6 @@ class _CofVertex(Vertex):
     def get_cell(self):
         return np.array(self._cell)
 
-    def _with_cell(self, cell):
-        self._cell = np.array(cell)
-        return self
-
-    def with_cell(self, cell):
-        return self.clone()._with_cell(cell)
-
     @classmethod
     def init_at_center(cls, id, vertices, aligner_edge, cell):
         obj = cls.__new__(cls)

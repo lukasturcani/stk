@@ -3,7 +3,7 @@ import stk
 import numpy as np
 from pytest_lazyfixture import lazy_fixture
 
-from ._test_case import _TestCase
+from .._test_case import _TestCase
 
 
 vertices = stk.molecular.topology_graphs.polymer.linear
@@ -16,7 +16,7 @@ vertices = stk.molecular.topology_graphs.polymer.linear
         lazy_fixture('tail'),
     ),
 )
-def linear(request):
+def test_case(request):
     return request.param
 
 
