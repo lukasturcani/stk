@@ -48,7 +48,7 @@ class Honeycomb(Cof):
         )
     )
 
-    edge_data = (
+    _edge_prototypes = (
         Edge(0, _vertex_prototypes[2], _vertex_prototypes[0]),
         Edge(1, _vertex_prototypes[2], _vertex_prototypes[1]),
 
@@ -57,7 +57,7 @@ class Honeycomb(Cof):
             id=3,
             vertex1=_vertex_prototypes[3],
             vertex2=_vertex_prototypes[1],
-            periodicity=(0, -1, 0)
+            periodicity=(0, -1, 0),
         ),
 
         Edge(4, _vertex_prototypes[4], _vertex_prototypes[0]),
@@ -65,6 +65,6 @@ class Honeycomb(Cof):
             id=5,
             vertex1=_vertex_prototypes[4],
             vertex2=_vertex_prototypes[1],
-            periodicity=(-1, 0, 0)
+            periodicity=(-1, 0, 0),
         )
     )

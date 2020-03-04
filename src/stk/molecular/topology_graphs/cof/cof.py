@@ -95,9 +95,9 @@ class Cof(TopologyGraph):
 
         Parameters
         ----------
-        vertex_data : :class:`list`
+        vertices : :class:`list`
             A nested :class:`list` which can be indexed as
-            ``vertex_data[x][y][z]``, which will return a :class:`dict`
+            ``vertices[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
             the vertices in :attr:`_vertex_prototypes` to the clones
             for that unit cell.
@@ -125,7 +125,7 @@ class Cof(TopologyGraph):
                 (dim+max_dim) % max_dim
                 for dim, max_dim in dims
             ])
-            # If the edge is not periodic if periodic_cell is did not
+            # The edge is not periodic if periodic_cell did not
             # have to wrap around.
             dims = zip(periodic_cell, self._lattice_size)
             edge_is_not_periodic = all(
