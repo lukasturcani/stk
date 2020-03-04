@@ -50,7 +50,7 @@ def tail(id, position, flip):
     )
 
 
-@pytest.fixture(params=(0, 20))
+@pytest.fixture(params=(0, ))
 def id(request):
     return request.param
 

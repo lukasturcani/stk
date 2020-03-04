@@ -1,13 +1,9 @@
-import stk
 import numpy as np
 import pytest
 from pytest_lazyfixture import lazy_fixture
 
 # Fixtures must be visible for lazy_fixture() calls.
 from .fixtures import *  # noqa
-
-
-vertices = stk.molecular.topology_graphs.cof.vertices
 
 
 @pytest.fixture(
@@ -21,12 +17,12 @@ def test_case(request):
     return request.param
 
 
-@pytest.fixture(params=(0, 1))
+@pytest.fixture(params=(0, ))
 def aligner_edge(request):
     return request.param
 
 
-@pytest.fixture(params=(0, 20))
+@pytest.fixture(params=(0, ))
 def id(request):
     return request.param
 

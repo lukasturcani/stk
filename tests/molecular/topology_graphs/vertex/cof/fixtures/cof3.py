@@ -56,13 +56,29 @@ class ShiftParams:
                 stk.Vertex(2, [1, -1, -2]),
             ),
             cell_shifts=(
-                [0, 0, 0],
-                [0, 0, 0],
+                np.array([0, 0, 0]),
+                np.array([0, 0, 0]),
             ),
             lattice_constants=(
-                [1, 0, 0],
-                [0, 1, 0],
-                [0, 0, 1],
+                np.array([1, 0, 0]),
+                np.array([0, 1, 0]),
+                np.array([0, 0, 1]),
+            ),
+            position=np.array([0., 0., 0.]),
+        ),
+        ShiftParams(
+            vertices=(
+                stk.Vertex(1, [-1, 1, 2]),
+                stk.Vertex(2, [1, -1, -2]),
+            ),
+            cell_shifts=(
+                np.array([10, -10, 10]),
+                np.array([-10, 10, -10]),
+            ),
+            lattice_constants=(
+                np.array([1, 0, 0]),
+                np.array([0, 1, 0]),
+                np.array([0, 0, 1]),
             ),
             position=np.array([0., 0., 0.]),
         ),
