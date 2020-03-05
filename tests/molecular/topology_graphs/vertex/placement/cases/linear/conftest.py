@@ -5,7 +5,7 @@ from pytest_lazyfixture import lazy_fixture
 from scipy.spatial.distance import euclidean
 from functools import partial
 
-from ..case_data import CaseData
+from ...case_data import CaseData
 
 
 vertices = stk.molecular.topology_graphs.polymer.linear

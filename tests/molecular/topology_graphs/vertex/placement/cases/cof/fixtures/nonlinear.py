@@ -6,7 +6,7 @@ from functools import partial
 from scipy.spatial.distance import euclidean
 
 
-from ...case_data import CaseData
+from ....case_data import CaseData
 
 vertices = stk.molecular.topology_graphs.cof.vertices
 
