@@ -438,7 +438,11 @@ class BuildingBlock(Molecule):
         else:
             fg_repr = ''
 
-        smiles = rdkit.MolToSmiles(rdkit.RemoveHs(self.to_rdkit_mol()))
+        smiles = rdkit.MolToSmiles(
+            mol=rdkit.RemoveHs(self.to_rdkit_mol()),
+            # Canonical smiles generation can be slow.
+            canonical=False,
+        )
         return f'{self.__class__.__name__}({smiles!r}{fg_repr})'
 
     def __repr__(self):
