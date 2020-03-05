@@ -1,11 +1,8 @@
-import json
 import os
 import numpy as np
 from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
 
-from ..atoms import Atom
-from ..bond import Bond
 from stk.utilities import (
     vector_angle,
     rotation_matrix,
