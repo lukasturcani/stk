@@ -1,7 +1,7 @@
 import itertools as it
 
 
-class _TestCase:
+class CaseData:
     """
     A test case.
 

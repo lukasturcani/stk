@@ -3,7 +3,7 @@ import pytest
 import stk
 
 from .utilities import (
-    _TestCase,
+    CaseData,
     are_clone_sequences,
     atom_id,
     are_same_id_sequences,
@@ -11,9 +11,9 @@ from .utilities import (
 
 
 @pytest.mark.parametrize(
-    argnames='test_case',
+    argnames='case_data',
     argvalues=(
-        _TestCase(
+        CaseData(
             factory=stk.RingAmineFactory(),
             molecule=stk.BuildingBlock('NCC(Br)c1c(Br)cccc1'),
             functional_groups=(
@@ -30,11 +30,11 @@ from .utilities import (
         ),
     )
 )
-def test_get_functional_groups(test_case):
+def test_get_functional_groups(case_data):
     _test_get_functional_groups(
-        factory=test_case.factory,
-        molecule=test_case.molecule,
-        functional_groups=test_case.functional_groups,
+        factory=case_data.factory,
+        molecule=case_data.molecule,
+        functional_groups=case_data.functional_groups,
     )
 
 

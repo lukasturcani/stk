@@ -2,7 +2,7 @@ import itertools as it
 import pytest
 import stk
 
-from ._test_case import _TestCase
+from .case_data import CaseData
 
 
 @pytest.fixture
@@ -12,7 +12,7 @@ def one_two_reaction(
     bond_order,
     periodicity,
 ):
-    return _TestCase(
+    return CaseData(
         reaction=stk.OneTwoReaction(
             functional_group1=functional_group1,
             functional_group2=functional_group2,

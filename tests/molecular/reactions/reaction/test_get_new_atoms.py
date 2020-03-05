@@ -4,10 +4,10 @@ import itertools as it
 from .utilities import is_equivalent_atom
 
 
-def test_get_new_atoms(test_case):
+def test_get_new_atoms(case_data):
     _test_get_new_atoms(
-        reaction_result=test_case.reaction.get_result(),
-        new_atoms=test_case.new_atoms,
+        reaction_result=case_data.reaction.get_result(),
+        new_atoms=case_data.new_atoms,
     )
 
 

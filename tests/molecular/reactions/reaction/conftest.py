@@ -196,7 +196,7 @@ def functional_group2(request):
         lazy_fixture('two_two_reaction'),
     ),
 )
-def test_case(request):
+def case_data(request):
     return request.param
 
 

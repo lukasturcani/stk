@@ -6,7 +6,7 @@ from stk.molecular.topology_graphs.topology_graph import (
     ConstructionState,
 )
 
-from ._test_case import _TestCase
+from .case_data import CaseData
 
 
 @pytest.fixture
@@ -21,7 +21,7 @@ def two_two_reaction(
     bond_order,
     periodicity,
 ):
-    return _TestCase(
+    return CaseData(
         reaction=stk.TwoTwoReaction(
             construction_state=get_construction_state(
                 functional_group1=functional_group2_2,
@@ -71,7 +71,7 @@ def get_bonds(
     )
 
 
-class _TestConstructionState(ConstructionState):
+class MockConstructionState(ConstructionState):
     """
     A mock implementation for the tests here.
 
@@ -96,4 +96,4 @@ def get_construction_state(functional_group1, functional_group2):
     position_matrix[b3] = [99, 99, 99]
     position_matrix[b2] = [10, 10, 10]
     position_matrix[b4] = [8, 8, 8]
-    return _TestConstructionState(position_matrix)
+    return MockConstructionState(position_matrix)

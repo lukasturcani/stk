@@ -1,10 +1,10 @@
 from .utilities import are_equivalent_atoms
 
 
-def test_get_deleted_atoms(test_case):
+def test_get_deleted_atoms(case_data):
     _test_get_deleted_atoms(
-        reaction_result=test_case.reaction.get_result(),
-        deleted_atoms=test_case.deleted_atoms,
+        reaction_result=case_data.reaction.get_result(),
+        deleted_atoms=case_data.deleted_atoms,
     )
 
 
