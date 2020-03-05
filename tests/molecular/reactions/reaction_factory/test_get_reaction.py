@@ -1,12 +1,12 @@
 import itertools as it
 
 
-def test_get_reaction(test_case):
+def test_get_reaction(case_data):
     _test_get_reaction(
-        factory=test_case.factory,
-        construction_state=test_case.construction_state,
-        edge_group=test_case.edge_group,
-        reaction_result=test_case.reaction_result,
+        factory=case_data.factory,
+        construction_state=case_data.construction_state,
+        edge_group=case_data.edge_group,
+        reaction_result=case_data.reaction_result,
     )
 
 

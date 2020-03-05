@@ -4,7 +4,7 @@ import itertools as it
 import stk
 from stk.molecular.reactions.reactions.reaction import ReactionResult
 
-from ._test_case import _TestCase
+from .case_data import CaseData
 from .utilities import MockEdge, MockConstructionState
 
 
@@ -29,7 +29,7 @@ def two_two_reaction(
         functional_group2=functional_group2_2,
     )
     edge = MockEdge(0, periodicity)
-    return _TestCase(
+    return CaseData(
         factory=stk.GenericReactionFactory(
             bond_orders={
                 bond_order_key: bond_order,

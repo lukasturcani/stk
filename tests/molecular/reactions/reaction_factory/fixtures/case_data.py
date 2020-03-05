@@ -1,4 +1,4 @@
-class _TestCase:
+class CaseData:
     def __init__(
         self,
         factory,
