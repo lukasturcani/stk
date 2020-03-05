@@ -3,6 +3,8 @@ from pytest_lazyfixture import lazy_fixture
 import stk
 import numpy as np
 
+from .case_data import CaseData
+
 
 @pytest.fixture(
     params=[
@@ -173,4 +175,37 @@ def get_atom_ids(request):
 
     """
 
+    return request.param
+
+
+@pytest.fixture(
+    params=(
+        CaseData(
+            molecule=stk.BuildingBlock('NCCN'),
+            smiles='NCCN',
+        ),
+        CaseData(
+            molecule=stk.BuildingBlock('[H]NCCN'),
+            smiles='NCCN',
+        ),
+        CaseData(
+            molecule=stk.BuildingBlock('C(N)CN'),
+            smiles='NCCN',
+        ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock(
+                        smiles='BrCNCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.polymer.Linear('AB', 2),
+            ),
+            smiles='N(CCBr)CCCCCNCCCBr',
+        ),
+    ),
+)
+def case_data(request):
     return request.param
