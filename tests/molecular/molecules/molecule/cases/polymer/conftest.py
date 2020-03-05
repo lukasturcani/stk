@@ -18,11 +18,7 @@ from ...case_data import CaseData
                 ),
                 topology_graph=stk.polymer.Linear('AB', 2),
             ),
-            smiles=(
-                '[H]N(C([H])([H])C([H])([H])Br)C([H])([H])C([H])([H])'
-                'C([H])([H])C([H])([H])C([H])([H])N([H])C([H])([H])C'
-                '([H])([H])C([H])([H])Br'
-            ),
+            smiles='N(CCBr)CCCCCNCCCBr',
         ),
     ),
 )

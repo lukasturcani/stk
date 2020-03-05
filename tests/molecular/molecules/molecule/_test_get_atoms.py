@@ -17,9 +17,6 @@ def _test_get_atoms(molecule, smiles):
     # correctly - see get_rdkit_mol(). Finally, you compare that atoms
     # of the canonically ordered molecule to an rdkit molecule which
     # also has canonical ordering, and all the atoms should match.
-
-    print(rdkit.MolToSmiles(molecule.to_rdkit_mol()))
-
     molecule = with_canonical_atom_ordering(molecule)
     expected = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
     for atom1, atom2 in it.zip_longest(
@@ -30,9 +27,11 @@ def _test_get_atoms(molecule, smiles):
 
 
 def with_canonical_atom_ordering(molecule):
-    return stk.BuildingBlock(
-        smiles=rdkit.MolToSmiles(get_rdkit_mol(molecule))
-    )
+    smiles = rdkit.MolToSmiles(get_rdkit_mol(molecule))
+    # This print statement is useful for checking what went wrong
+    # if the actual and expected smiles don't match.
+    print(smiles)
+    return stk.BuildingBlock(smiles)
 
 
 def get_rdkit_mol(molecule):
