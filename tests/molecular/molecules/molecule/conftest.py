@@ -37,6 +37,13 @@ import numpy as np
         stk.BuildingBlock('NCCN'),
         stk.BuildingBlock('N[C+][C+2]N'),
         stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
+        stk.ConstructedMolecule(
+            building_blocks=(
+                stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                stk.BuildingBlock('BrCNCCBr', [stk.BromoFactory()]),
+            ),
+            topology_graph=stk.polymer.Linear('AB', 2),
+        ),
     ],
     scope='function',
 )

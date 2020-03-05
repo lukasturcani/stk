@@ -65,5 +65,5 @@ def _test_with_centroid(molecule, get_atom_ids, centroid):
     assert np.allclose(
         a=centroid,
         b=molecule.get_centroid(atom_ids=get_atom_ids(molecule)),
-        atol=1e-15,
+        atol=1e-14,
     )

@@ -136,16 +136,6 @@ class ConstructedMolecule(Molecule):
         """
 
         if building_block_vertices is None:
-            if self._is_placement_ambiguous(building_blocks):
-                raise ConstructionError(
-                    'Multiple building blocks have the same number '
-                    'of functional groups and building_block_vertices '
-                    'is None. Desired placement of building '
-                    'blocks on vertices is therefore unclear. '
-                    'Please use the building_block_vertices parameter '
-                    'to fix this error.'
-                )
-
             building_block_vertices = (
                 topology_graph.get_building_block_vertices(
                     building_blocks=building_blocks,
@@ -193,35 +183,6 @@ class ConstructedMolecule(Molecule):
         self._building_block_counts = (
             construction_result.building_block_counts
         )
-
-    @staticmethod
-    def _is_placement_ambiguous(building_blocks):
-        """
-        Return ``True``, if desired placement is unclear.
-
-        The desired placement of `building_blocks` is unclear if
-        multiple building blocks have the same number of functional
-        groups. In cases like this, it is not clear which of these
-        building blocks the user wants to place on a given vertex,
-        since they are both valid candidates.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if placement is ambiguous and ``False``
-            otherwise.
-
-        """
-
-        seen = set()
-        for building_block in building_blocks:
-            num_functional_groups = (
-                building_block.get_num_functional_groups()
-            )
-            if num_functional_groups in seen:
-                return True
-            seen.add(num_functional_groups)
-        return False
 
     def clone(self):
         """
