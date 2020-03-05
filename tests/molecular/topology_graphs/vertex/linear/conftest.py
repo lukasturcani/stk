@@ -3,7 +3,7 @@ import stk
 import numpy as np
 from pytest_lazyfixture import lazy_fixture
 
-from .._test_case import _TestCase
+from ..case_data import CaseData
 
 
 vertices = stk.molecular.topology_graphs.polymer.linear
@@ -16,13 +16,13 @@ vertices = stk.molecular.topology_graphs.polymer.linear
         lazy_fixture('tail'),
     ),
 )
-def test_case(request):
+def case_data(request):
     return request.param
 
 
 @pytest.fixture
 def center(id, position, flip):
-    return _TestCase(
+    return CaseData(
         vertex=vertices._LinearVertex(id, position, flip),
         id=id,
         position=position,
@@ -32,7 +32,7 @@ def center(id, position, flip):
 
 @pytest.fixture
 def head(id, position, flip):
-    return _TestCase(
+    return CaseData(
         vertex=vertices._HeadVertex(id, position, flip),
         id=id,
         position=position,
@@ -42,7 +42,7 @@ def head(id, position, flip):
 
 @pytest.fixture
 def tail(id, position, flip):
-    return _TestCase(
+    return CaseData(
         vertex=vertices._TailVertex(id, position, flip),
         id=id,
         position=position,

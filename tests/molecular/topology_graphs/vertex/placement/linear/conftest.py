@@ -5,7 +5,7 @@ from pytest_lazyfixture import lazy_fixture
 from scipy.spatial.distance import euclidean
 from functools import partial
 
-from .._test_case import _TestCase
+from ..case_data import CaseData
 
 
 vertices = stk.molecular.topology_graphs.polymer.linear
@@ -22,7 +22,7 @@ vertices = stk.molecular.topology_graphs.polymer.linear
         lazy_fixture('tail_3'),
     ),
 )
-def test_case(request):
+def case_data(request):
     return request.param
 
 
@@ -62,7 +62,7 @@ def center(position, flip, building_block_2):
         )
 
     vertex = vertices._LinearVertex(0, position, flip)
-    return _TestCase(
+    return CaseData(
         vertex=vertex,
         edges=tuple(get_edges(vertex)),
         building_block=building_block_2,
@@ -89,7 +89,7 @@ def head_1(position, flip, building_block_1):
         )
 
     vertex = vertices._HeadVertex(0, position, flip)
-    return _TestCase(
+    return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[1], ),
         building_block=building_block_1,
@@ -119,7 +119,7 @@ def head_2(position, building_block_2):
         )
 
     vertex = vertices._HeadVertex(0, position, False)
-    return _TestCase(
+    return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[1], ),
         building_block=building_block_2,
@@ -152,7 +152,7 @@ def head_3(position, building_block_2):
         )
 
     vertex = vertices._HeadVertex(0, position, True)
-    return _TestCase(
+    return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[1], ),
         building_block=building_block_2,
@@ -179,7 +179,7 @@ def tail_1(position, flip, building_block_1):
         )
 
     vertex = vertices._TailVertex(0, position, flip)
-    return _TestCase(
+    return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[0], ),
         building_block=building_block_1,
@@ -209,7 +209,7 @@ def tail_2(position, building_block_2):
         )
 
     vertex = vertices._TailVertex(0, position, False)
-    return _TestCase(
+    return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[0], ),
         building_block=building_block_2,
@@ -242,7 +242,7 @@ def tail_3(position, building_block_2):
         )
 
     vertex = vertices._TailVertex(0, position, True)
-    return _TestCase(
+    return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[0], ),
         building_block=building_block_2,

@@ -11,5 +11,5 @@ from .fixtures import *  # noqa
         lazy_fixture('nonlinear'),
     ),
 )
-def test_case(request):
+def case_data(request):
     return request.param

@@ -4,7 +4,7 @@ from functools import partial
 from scipy.spatial.distance import euclidean
 
 
-from ..._test_case import _TestCase
+from ...case_data import CaseData
 
 vertices = stk.molecular.topology_graphs.cof.vertices
 
@@ -36,7 +36,7 @@ def linear(position, linear_aligner_edge, building_block_2):
         cell=[0, 0, 0],
     )
 
-    return _TestCase(
+    return CaseData(
         vertex=vertex,
         edges=tuple(get_linear_edges(vertex)),
         building_block=building_block_2,

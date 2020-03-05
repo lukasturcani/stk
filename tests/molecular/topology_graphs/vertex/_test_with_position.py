@@ -3,8 +3,8 @@ import numpy as np
 from .utilities import is_clone
 
 
-def test_with_position(test_case, position):
-    _test_with_position(test_case.vertex, position)
+def test_with_position(case_data, position):
+    _test_with_position(case_data.vertex, position)
 
 
 def _test_with_position(vertex, position):

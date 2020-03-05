@@ -2,7 +2,7 @@ import pytest
 import stk
 
 
-class _TestCase:
+class CaseData:
     def __init__(
         self,
         edge,
@@ -21,8 +21,8 @@ class _TestCase:
 
 
 @pytest.fixture
-def test_case(id, vertex1, vertex2, periodicity):
-    return _TestCase(
+def case_data(id, vertex1, vertex2, periodicity):
+    return CaseData(
         edge=stk.Edge(
             id=id,
             vertex1=vertex1,

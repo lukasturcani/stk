@@ -1,4 +1,4 @@
-class _TestCase:
+class CaseData:
     def __init__(
         self,
         vertex,
@@ -17,7 +17,7 @@ class _TestCase:
 
     def __str__(self):
         return (
-            f'TestCase({self.vertex}, {self.edges}, '
+            f'CaseData({self.vertex}, {self.edges}, '
             f'{self.building_block}, {self.position}, '
             f'{self.alignment_tests}, {self.functional_group_edges})'
         )

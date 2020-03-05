@@ -6,7 +6,7 @@ from functools import partial
 from scipy.spatial.distance import euclidean
 
 
-from ..._test_case import _TestCase
+from ...case_data import CaseData
 
 vertices = stk.molecular.topology_graphs.cof.vertices
 
@@ -117,7 +117,7 @@ def _nonlinear(position, aligner_edge, building_block):
 
     Returns
     -------
-    :class:`._TestCase`
+    :class:`.CaseData`
         The test case.
 
     """
@@ -137,7 +137,7 @@ def _nonlinear(position, aligner_edge, building_block):
         cell=[0, 0, 0],
     )
 
-    return _TestCase(
+    return CaseData(
         vertex=vertex,
         edges=tuple(get_nonlinear_edges(n, vertex)),
         building_block=building_block,

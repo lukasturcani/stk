@@ -1,5 +1,5 @@
-def test_get_id(test_case):
-    _test_get_id(test_case.vertex, test_case.id)
+def test_get_id(case_data):
+    _test_get_id(case_data.vertex, case_data.id)
 
 
 def _test_get_id(vertex, id):

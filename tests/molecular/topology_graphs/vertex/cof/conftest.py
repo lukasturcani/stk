@@ -13,7 +13,7 @@ from .fixtures import *  # noqa
         lazy_fixture('cof3'),
     ),
 )
-def test_case(request):
+def case_data(request):
     return request.param
 
 

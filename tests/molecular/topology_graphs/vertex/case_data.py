@@ -1,4 +1,4 @@
-class _TestCase:
+class CaseData:
     def __init__(self, vertex, id, position, cell):
         self.vertex = vertex
         self.id = id

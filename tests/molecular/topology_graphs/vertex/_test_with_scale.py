@@ -19,9 +19,9 @@ from .utilities import is_clone
         ),
     ),
 )
-def test_with_scale(test_case, start, scale, target):
+def test_with_scale(case_data, start, scale, target):
     _test_with_scale(
-        vertex=test_case.vertex,
+        vertex=case_data.vertex,
         start=start,
         scale=scale,
         target=target,

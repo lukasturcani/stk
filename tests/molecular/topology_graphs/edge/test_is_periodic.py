@@ -1,5 +1,5 @@
-def test_is_periodic(test_case):
-    _test_is_periodic(test_case.edge, test_case.is_periodic)
+def test_is_periodic(case_data):
+    _test_is_periodic(case_data.edge, case_data.is_periodic)
 
 
 def _test_is_periodic(edge, is_periodic):

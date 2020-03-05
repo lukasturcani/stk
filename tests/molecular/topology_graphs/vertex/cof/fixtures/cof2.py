@@ -1,14 +1,14 @@
 import pytest
 import stk
 
-from ..._test_case import _TestCase
+from ...case_data import CaseData
 
 vertices = stk.molecular.topology_graphs.cof.honeycomb
 
 
 @pytest.fixture
 def cof2(init_at_center, id, vertices_, aligner_edge, cell):
-    return _TestCase(
+    return CaseData(
         vertex=init_at_center(id, vertices_, aligner_edge, cell),
         id=id,
         position=(

@@ -1,5 +1,5 @@
-def test_get_periodicity(test_case):
-    _test_get_periodicity(test_case.edge, test_case.periodicity)
+def test_get_periodicity(case_data):
+    _test_get_periodicity(case_data.edge, case_data.periodicity)
 
 
 def _test_get_periodicity(edge, periodicity):

@@ -1,14 +1,14 @@
 import numpy as np
 
 
-def test_placement(test_case):
+def test_placement(case_data):
     _test_placement(
-        vertex=test_case.vertex,
-        edges=test_case.edges,
-        building_block=test_case.building_block,
-        position=test_case.position,
-        alignment_tests=test_case.alignment_tests,
-        functional_group_edges=test_case.functional_group_edges,
+        vertex=case_data.vertex,
+        edges=case_data.edges,
+        building_block=case_data.building_block,
+        position=case_data.position,
+        alignment_tests=case_data.alignment_tests,
+        functional_group_edges=case_data.functional_group_edges,
     )
 
 

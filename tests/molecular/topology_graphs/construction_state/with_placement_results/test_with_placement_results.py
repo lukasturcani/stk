@@ -1,4 +1,3 @@
-import pytest
 import itertools as it
 from functools import partial
 import stk
