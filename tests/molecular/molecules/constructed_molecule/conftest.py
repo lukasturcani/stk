@@ -34,15 +34,13 @@ def linear(request):
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles=(
-                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
-                    ),
+                    smiles='Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
             topology_graph=stk.cof.Honeycomb((2, 2, 1)),
-            num_new_atoms=...,
-            num_new_bonds=...
+            num_new_atoms=0,
+            num_new_bonds=24,
         ),
         CaseData(
             building_blocks=(
@@ -51,9 +49,7 @@ def linear(request):
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles=(
-                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
-                    ),
+                    smiles='Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -61,8 +57,8 @@ def linear(request):
                 lattice_size=(2, 2, 1),
                 vertex_alignments={0: 1, 1: 1, 2: 1, 3: 1, 4: 1},
             ),
-            num_new_atoms=...,
-            num_new_bonds=...,
+            num_new_atoms=0,
+            num_new_bonds=24,
         ),
         CaseData(
             building_blocks=(
@@ -71,9 +67,7 @@ def linear(request):
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles=(
-                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
-                    ),
+                    smiles='Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -81,21 +75,19 @@ def linear(request):
                 lattice_size=(2, 2, 1),
                 vertex_alignments={0: 2, 1: 2},
             ),
-            num_new_atoms=...,
-            num_new_bonds=...,
+            num_new_atoms=0,
+            num_new_bonds=24,
         ),
         CaseData(
             building_blocks=(
                 stk.BuildingBlock(
-                    smiles=(
-                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
-                    ),
+                    smiles='Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
             topology_graph=stk.cof.LinkerlessHoneycomb((2, 2, 1)),
-            num_new_atoms=...,
-            num_new_bonds=...,
+            num_new_atoms=0,
+            num_new_bonds=8,
         ),
         CaseData(
             building_blocks=(
@@ -104,10 +96,7 @@ def linear(request):
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles=(
-                        'Br[C+]1[C+](F)[C+](I)[C+](I)[C+](Br)'
-                        'C1Br'
-                    ),
+                    smiles='Br[C+]1[C+](F)[C+](I)[C+](I)[C+](Br)C1Br',
                     functional_groups=[
                         stk.BromoFactory(),
                         stk.IodoFactory(),
@@ -119,8 +108,8 @@ def linear(request):
                 lattice_size=(2, 2, 1),
                 vertex_alignments={0: 5},
             ),
-            num_new_atoms=...,
-            num_new_bonds=...,
+            num_new_atoms=0,
+            num_new_bonds=78,
         ),
         CaseData(
             building_blocks=(
@@ -137,8 +126,8 @@ def linear(request):
                 ),
             ),
             topology_graph=stk.cof.Kagome((2, 2, 1)),
-            num_new_atoms=...,
-            num_new_bonds=...,
+            num_new_atoms=0,
+            num_new_bonds=42,
         ),
         CaseData(
             building_blocks=(
@@ -152,8 +141,8 @@ def linear(request):
                 ),
             ),
             topology_graph=stk.cof.Square((2, 2, 1)),
-            num_new_atoms=...,
-            num_new_bonds=...,
+            num_new_atoms=0,
+            num_new_bonds=12,
         ),
     ),
 )

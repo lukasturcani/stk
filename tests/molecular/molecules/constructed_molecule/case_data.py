@@ -21,10 +21,10 @@ class CaseData:
         )
         self.num_new_atoms = num_new_atoms
         self.num_new_bonds = num_new_bonds
-        self.building_blocks_counts = {
+        self.building_block_counts = {
             building_block: len(vertices)
             for building_block, vertices
             in self.building_block_vertices.items()
         }
-        self.building_blocks = building_blocks
+        self.building_blocks = tuple(self.building_block_vertices)
         self.topology_graph = topology_graph
