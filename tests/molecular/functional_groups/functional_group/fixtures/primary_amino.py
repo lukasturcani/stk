@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _GenericTestCase
+from .case_data import GenericCaseData
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def primary_amino(get_atom_ids):
 def _primary_amino(nitrogen, hydrogen1, hydrogen2, atom):
     bonders = (nitrogen, )
     deleters = (hydrogen1, hydrogen2)
-    return _GenericTestCase(
+    return GenericCaseData(
         functional_group=stk.PrimaryAmino(
             nitrogen=nitrogen,
             hydrogen1=hydrogen1,

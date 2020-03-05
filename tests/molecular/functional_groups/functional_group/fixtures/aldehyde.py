@@ -1,7 +1,7 @@
 import stk
 import pytest
 
-from ._test_case import _GenericTestCase
+from .case_data import GenericCaseData
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def aldehyde(get_atom_ids):
 def _aldehyde(carbon, oxygen, hydrogen, atom):
     bonders = (carbon, )
     deleters = (oxygen, )
-    return _GenericTestCase(
+    return GenericCaseData(
         functional_group=stk.Aldehyde(
             carbon=carbon,
             oxygen=oxygen,

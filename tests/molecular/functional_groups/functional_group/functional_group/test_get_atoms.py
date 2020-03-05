@@ -1,10 +1,10 @@
 import itertools as it
 
 
-def test_get_atoms(test_case):
+def test_get_atoms(case_data):
     _test_get_atoms(
-        functional_group=test_case.functional_group,
-        atoms=test_case.atoms,
+        functional_group=case_data.functional_group,
+        atoms=case_data.atoms,
     )
 
 

@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _GenericTestCase
+from .case_data import GenericCaseData
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def dibromo(get_atom_ids):
 def _dibromo(bromine1, atom1, bromine2, atom2):
     bonders = (atom1, atom2)
     deleters = (bromine1, bromine2)
-    return _GenericTestCase(
+    return GenericCaseData(
         functional_group=stk.Dibromo(
             bromine1=bromine1,
             atom1=atom1,

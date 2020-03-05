@@ -1,4 +1,4 @@
-class _TestCase:
+class CaseData:
     """
     A test case for :class:`.FunctionalGroup` instances.
 
@@ -10,7 +10,7 @@ class _TestCase:
         self.placers = placers
 
 
-class _GenericTestCase(_TestCase):
+class GenericCaseData(CaseData):
     """
     A test case for :class:`.GenericFunctionalGroup` instances.
 

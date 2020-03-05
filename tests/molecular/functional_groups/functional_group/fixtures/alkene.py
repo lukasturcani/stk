@@ -1,7 +1,7 @@
 import stk
 import pytest
 
-from ._test_case import _GenericTestCase
+from .case_data import GenericCaseData
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def alkene(get_atom_ids):
 def _alkene(carbon1, atom1, atom2, carbon2, atom3, atom4):
     bonders = (carbon2, )
     deleters = (carbon1, atom1, atom2)
-    return _GenericTestCase(
+    return GenericCaseData(
         functional_group=stk.Alkene(
             carbon1=carbon1,
             atom1=atom1,

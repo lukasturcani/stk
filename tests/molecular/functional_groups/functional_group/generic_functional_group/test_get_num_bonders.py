@@ -1,7 +1,7 @@
-def test_get_num_bonders(generic_test_case):
+def test_get_num_bonders(generic_case_data):
     _test_get_num_bonders(
-        functional_group=generic_test_case.functional_group,
-        num_bonders=len(generic_test_case.bonders),
+        functional_group=generic_case_data.functional_group,
+        num_bonders=len(generic_case_data.bonders),
     )
 
 

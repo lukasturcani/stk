@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _TestCase
+from .case_data import CaseData
 
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def _ring_amine(
     hydrogen3,
     carbon3,
 ):
-    return _TestCase(
+    return CaseData(
         functional_group=stk.RingAmine(
             nitrogen=nitrogen,
             hydrogen1=hydrogen1,

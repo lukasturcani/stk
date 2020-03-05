@@ -1,10 +1,10 @@
 import itertools as it
 
 
-def test_get_deleters(generic_test_case):
+def test_get_deleters(generic_case_data):
     _test_get_deleters(
-        functional_group=generic_test_case.functional_group,
-        deleters=generic_test_case.deleters,
+        functional_group=generic_case_data.functional_group,
+        deleters=generic_case_data.deleters,
     )
 
 

@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _GenericTestCase
+from .case_data import GenericCaseData
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def thiol(get_atom_ids):
 def _thiol(sulfur, hydrogen, atom):
     bonders = ()
     deleters = ()
-    return _GenericTestCase(
+    return GenericCaseData(
         functional_group=stk.Thiol(
             sulfur=sulfur,
             hydrogen=hydrogen,

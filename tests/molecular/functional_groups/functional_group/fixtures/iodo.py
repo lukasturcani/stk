@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _GenericTestCase
+from .case_data import GenericCaseData
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def iodo(get_atom_ids):
 def _iodo(iodine, atom):
     bonders = (atom, )
     deleters = (iodine, )
-    return _GenericTestCase(
+    return GenericCaseData(
         functional_group=stk.Iodo(
             iodine=iodine,
             atom=atom,

@@ -26,9 +26,9 @@ from .fixtures import * # noqa
         lazy_fixture('thiol'),
     ),
 )
-def generic_test_case(request):
+def generic_case_data(request):
     """
-    A :class:`._GenericTestCase` instance.
+    A :class:`.GenericCaseData` instance.
 
     """
 
@@ -37,13 +37,13 @@ def generic_test_case(request):
 
 @pytest.fixture(
     params=(
-        lazy_fixture('generic_test_case'),
+        lazy_fixture('generic_case_data'),
         lazy_fixture('ring_amine'),
     ),
 )
-def test_case(request):
+def case_data(request):
     """
-    A :class:`._TestCase` instance.
+    A :class:`.CaseData` instance.
 
     """
 
@@ -75,20 +75,20 @@ def get_atom_ids(request):
 
 
 @pytest.fixture
-def functional_group(test_case):
+def functional_group(case_data):
     """
     A :class:`.FunctionalGroup` instance.
 
     """
 
-    return test_case.functional_group
+    return case_data.functional_group
 
 
 @pytest.fixture
-def generic_functional_group(generic_test_case):
+def generic_functional_group(generic_case_data):
     """
     A :class:`.GenericFunctionalGroup` instance.
 
     """
 
-    return generic_test_case.functional_group
+    return generic_case_data.functional_group

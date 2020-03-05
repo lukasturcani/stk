@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _GenericTestCase
+from .case_data import GenericCaseData
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def thioacid(get_atom_ids):
 def _thioacid(carbon, oxygen, sulfur, hydrogen, atom):
     bonders = ()
     deleters = ()
-    return _GenericTestCase(
+    return GenericCaseData(
         functional_group=stk.Thioacid(
             carbon=carbon,
             oxygen=oxygen,

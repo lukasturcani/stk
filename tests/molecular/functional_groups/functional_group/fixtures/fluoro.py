@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ._test_case import _GenericTestCase
+from .case_data import GenericCaseData
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def fluoro(get_atom_ids):
 def _fluoro(fluorine, atom):
     bonders = (atom, )
     deleters = (fluorine, )
-    return _GenericTestCase(
+    return GenericCaseData(
         functional_group=stk.Fluoro(
             fluorine=fluorine,
             atom=atom,

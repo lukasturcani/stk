@@ -1,10 +1,10 @@
 import itertools as it
 
 
-def test_get_placer_ids(test_case):
+def test_get_placer_ids(case_data):
     _test_get_placer_ids(
-        functional_group=test_case.functional_group,
-        placers=test_case.placers,
+        functional_group=case_data.functional_group,
+        placers=case_data.placers,
     )
 
 

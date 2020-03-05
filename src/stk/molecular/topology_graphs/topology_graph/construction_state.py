@@ -23,7 +23,7 @@ class ConstructionState:
 
         if lattice_constants is not None:
             lattice_constants = tuple(
-                np.array(constant, dtype=np.float64)
+                np.array(constant, dtype=np.float64)*scale
                 for constant in lattice_constants
             )
 
@@ -39,10 +39,7 @@ class ConstructionState:
                 for vertex in vertices
         }
         self._edges = tuple(edge.with_scale(scale) for edge in edges)
-        self._lattice_constants = tuple(
-            scale*lattice_constant
-            for lattice_constant in lattice_constants
-        )
+        self._lattice_constants = lattice_constants
         self._vertex_edges = self._get_vertex_edges()
         self._position_matrix = np.empty((0, 3), dtype=np.float64)
         self._atoms = []
