@@ -9,6 +9,13 @@ from ..utilities import has_same_structure, get_displacement_vector
     params=(
         stk.BuildingBlock('NCCN'),
         stk.BuildingBlock('Brc1ccc(Br)cc1Br', [stk.BromoFactory()]),
+        stk.ConstructedMolecule(
+            building_blocks=(
+                stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                stk.BuildingBlock('BrCNCCBr', [stk.BromoFactory()]),
+            ),
+            topology_graph=stk.polymer.Linear('AB', 2),
+        ),
     ),
 )
 def molecule(request):
