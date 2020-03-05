@@ -109,7 +109,7 @@ class Cof(TopologyGraph):
             lattice[x][y][z][vertex.get_id()] = vertex.__class__(
                 id=id_,
                 position=vertex.get_position() + shift,
-                aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
+                aligner_edge=vertex_alignments.get(id_, 0),
                 cell=cell,
             )
         return lattice

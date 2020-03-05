@@ -220,10 +220,10 @@ def get_atom_ids(request):
                 topology_graph=stk.cof.Honeycomb((2, 2, 1)),
             ),
             smiles=(
-                'C1=C(Br)C=C(Br)C(F)=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
-                '(F)C(=CC(Br)=C1)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C'
-                '(F)C(=CC(CCNCC3=CC(CNCCBr)=C(F)C(CNCCBr)=C3)=C1)CCNC'
-                'C1=CC(=CC(CNCCBr)=C1F)CNCCC1=C(F)C(=CC(Br)=C1)CCNC2'
+                'C1=C(Br)C(F)=C(Br)C=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=CC'
+                '(=CC(Br)=C1F)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C(F)'
+                'C(=CC(CCNCC3=CC(CNCCBr)=C(F)C(CNCCBr)=C3)=C1)CCNCC1=C'
+                'C(=CC(CNCCBr)=C1F)CNCCC1=CC(=C(F)C(Br)=C1)CCNC2'
             ),
         ),
         CaseData(
@@ -240,14 +240,14 @@ def get_atom_ids(request):
                 ),
                 topology_graph=stk.cof.Honeycomb(
                     lattice_size=(2, 2, 1),
-                    vertex_alignments={0: 1, 1: 1},
+                    vertex_alignments={0: 1, 1: 1, 2: 1, 3: 1, 4: 1},
                 ),
             ),
             smiles=(
-                'C1=C(Br)C=C(Br)C(F)=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
-                '(F)C(=CC(Br)=C1)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C'
-                '(F)C(=CC(CCNCC3=CC(CNCCBr)=C(F)C(CNCCBr)=C3)=C1)CCNC'
-                'C1=CC(=CC(CNCCBr)=C1F)CNCCC1=C(F)C(=CC(Br)=C1)CCNC2'
+                'C1=C(Br)C(F)=C(Br)C=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
+                'C(=CC(Br)=C1F)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=CC'
+                '(=C(F)C(CNCCC3=CC(CCNCBr)=CC(CCNCBr)=C3F)=C1)CCNCC1='
+                'CC(=CC(CNCCBr)=C1F)CNCCC1=CC(=C(F)C(Br)=C1)CCNC2'
             ),
         ),
     ),

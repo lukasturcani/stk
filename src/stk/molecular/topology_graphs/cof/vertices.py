@@ -114,6 +114,9 @@ class _LinearCofVertex(_CofVertex):
 
 class _NonLinearCofVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
+        # Sort to ensure that for two vertices, which are periodically
+        # equivalent, "edges" has identical ordering. This means that
+        # the aligner_edge is chosen consistently in both cases.
         edges = sorted(edges, key=lambda edge: edge.get_parent_id())
 
         building_block = building_block.with_centroid(
@@ -146,6 +149,9 @@ class _NonLinearCofVertex(_CofVertex):
         return building_block.get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
+        # Sort to ensure that for two vertices, which are periodically
+        # equivalent, "edges" has identical ordering. This means that
+        # the aligner_edge is chosen consistently in both cases.
         edges = sorted(edges, key=lambda edge: edge.get_parent_id())
 
         fg0 = next(building_block.get_functional_groups(0))
