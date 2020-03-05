@@ -203,7 +203,7 @@ def get_atom_ids(request):
                 ),
                 topology_graph=stk.polymer.Linear('AB', 2),
             ),
-            smiles='N(CCBr)CCCCCNCCCBr',
+            smiles='BrC#C[C+]=NC#CC#C[C+]=NC#CBr',
         ),
         CaseData(
             molecule=stk.ConstructedMolecule(
@@ -222,10 +222,14 @@ def get_atom_ids(request):
                 topology_graph=stk.cof.Honeycomb((2, 2, 1)),
             ),
             smiles=(
-                'C1=C(Br)C(F)=C(Br)C=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=CC'
-                '(=CC(Br)=C1F)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C(F)'
-                'C(=CC(CCNCC3=CC(CNCCBr)=C(F)C(CNCCBr)=C3)=C1)CCNCC1=C'
-                'C(=CC(CNCCBr)=C1F)CNCCC1=CC(=C(F)C(Br)=C1)CCNC2'
+                'F[C+]1[C+](Br)[C+2][C+](C#CN=[C+][C+]2[C+2][C+]3[C+]'
+                '=NC#C[C+]4[C+2][C+](C#CN=[C+][C+]5[C+2][C+]([C+]=NC#C'
+                'Br)[C+](F)[C+]([C+]=NC#C[C+]6[C+2][C+](C#CN=[C+][C+]7'
+                '[C+2][C+]([C+]=NC#CBr)[C+](F)[C+]([C+]=NC#CBr)[C+2]7)'
+                '[C+2][C+](C#CN=[C+][C+]7[C+2][C+]([C+]=NC#C[C+]8[C+2]'
+                '[C+](Br)[C+](F)[C+](C#CN=[C+][C+]([C+2]2)[C+]3F)[C+2]'
+                '8)[C+2][C+]([C+]=NC#CBr)[C+]7F)[C+]6F)[C+2]5)[C+2][C+'
+                '](Br)[C+]4F)[C+2][C+]1Br'
             ),
         ),
         CaseData(
@@ -248,10 +252,14 @@ def get_atom_ids(request):
                 ),
             ),
             smiles=(
-                'C1=C(Br)C(F)=C(Br)C=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
-                'C(=CC(Br)=C1F)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=CC'
-                '(=C(F)C(CNCCC3=CC(CCNCBr)=CC(CCNCBr)=C3F)=C1)CCNCC1='
-                'CC(=CC(CNCCBr)=C1F)CNCCC1=CC(=C(F)C(Br)=C1)CCNC2'
+                'F[C+]1[C+](Br)[C+2][C+](C#CN=[C+][C+]2[C+2][C+]3[C+]'
+                '=NC#C[C+]4[C+2][C+](C#CN=[C+][C+]5[C+2][C+]([C+]=NC#C'
+                'Br)[C+](F)[C+]([C+]=NC#C[C+]6[C+2][C+](C#CN=[C+][C+]7'
+                '[C+2][C+]([C+]=NC#C[C+]8[C+2][C+](Br)[C+](F)[C+](C#CN'
+                '=[C+][C+]([C+2]2)[C+]3F)[C+2]8)[C+2][C+]([C+]=NC#CBr)'
+                '[C+]7F)[C+](F)[C+]([C+]=NC#C[C+]2[C+2][C+](C#CN=[C+]'
+                'Br)[C+2][C+](C#CN=[C+]Br)[C+]2F)[C+2]6)[C+2]5)[C+2][C'
+                '+](Br)[C+]4F)[C+2][C+]1Br'
             ),
         ),
         CaseData(
@@ -274,10 +282,14 @@ def get_atom_ids(request):
                 ),
             ),
             smiles=(
-                'C1=C(Br)C(F)=C(Br)C=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
-                'C(=CC(Br)=C1F)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C'
-                'C(=CC(CCNCC3=C(F)C(CNCCBr)=CC(CNCCBr)=C3)=C1F)CCNC'
-                'C1=CC(=CC(CNCCBr)=C1F)CNCCC1=CC(=C(F)C(Br)=C1)CCNC2'
+                'F[C+]1[C+](Br)[C+2][C+](C#CN=[C+][C+]2[C+2][C+]3[C+]'
+                '=NC#C[C+]4[C+2][C+](C#CN=[C+][C+]5[C+2][C+]([C+]=NC#'
+                'CBr)[C+](F)[C+]([C+]=NC#C[C+]6[C+2][C+](C#CN=[C+][C+'
+                ']7[C+2][C+]([C+]=NC#CBr)[C+2][C+]([C+]=NC#CBr)[C+]7F)'
+                '[C+](F)[C+](C#CN=[C+][C+]7[C+2][C+]([C+]=NC#C[C+]8[C'
+                '+2][C+](Br)[C+](F)[C+](C#CN=[C+][C+]([C+2]2)[C+]3F)['
+                'C+2]8)[C+2][C+]([C+]=NC#CBr)[C+]7F)[C+2]6)[C+2]5)[C+'
+                '2][C+](Br)[C+]4F)[C+2][C+]1Br'
             ),
         ),
         CaseData(
@@ -293,51 +305,12 @@ def get_atom_ids(request):
                 topology_graph=stk.cof.LinkerlessHoneycomb((2, 2, 1)),
             ),
             smiles=(
-                'C1=C(Br)C(F)=C(Br)C=C1C1=CC2=C(F)C(=C1)C1=CC(=CC(Br)'
-                '=C1F)C1=CC(=C(F)C(Br)=C1)C1=C(F)C(=CC(C3=CC(Br)=C(F)'
-                'C(Br)=C3)=C1)C1=CC(=CC(Br)=C1F)C1=CC2=C(F)C(Br)=C1'
-            ),
-        ),
-        CaseData(
-            molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
-                        ),
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                ),
-                topology_graph=stk.cof.LinkerlessHoneycomb(
-                    lattice_size=(2, 2, 1),
-                    vertex_alignments={0: 1, 1: 1},
-                ),
-            ),
-            smiles=(
-                'C1=C(Br)C=C(Br)C(F)=C1C1=C(F)C2=CC(=C1)C1=CC(=CC(Br)'
-                '=C1F)C1=CC(=C(F)C(Br)=C1)C1=C(F)C(=CC(C3=CC(Br)=C(F)'
-                'C(Br)=C3)=C1)C1=CC(=CC(Br)=C1F)C1=CC2=C(F)C(Br)=C1'
-            ),
-        ),
-        CaseData(
-            molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
-                        ),
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                ),
-                topology_graph=stk.cof.LinkerlessHoneycomb(
-                    lattice_size=(2, 2, 1),
-                    vertex_alignments={0: 2, 1: 2},
-                ),
-            ),
-            smiles=(
-                'C1=C(Br)C=C(C2=CC3=CC(=C2F)C2=CC(=CC(Br)=C2F)C2=CC'
-                '(=C(F)C(Br)=C2)C2=C(F)C(=CC(C4=CC(Br)=C(F)C(Br)=C4)='
-                'C2)C2=CC(=CC(Br)=C2F)C2=CC3=C(F)C(Br)=C2)C(F)=C1Br'
+                'F[C+]1[C+](Br)[C+2][C+]([C+]2[C+2][C+]3[C+](F)[C+]([C'
+                '+2]2)[C+]2[C+2][C+]([C+2][C+](Br)[C+]2F)[C+]2[C+2][C'
+                '+](Br)[C+](F)[C+]([C+2]2)[C+]2[C+2][C+]([C+]4[C+2][C+'
+                '](Br)[C+](F)[C+](Br)[C+2]4)[C+2][C+]([C+]2F)[C+]2[C+2'
+                '][C+]([C+2][C+](Br)[C+]2F)[C+]2[C+2][C+](Br)[C+](F)['
+                'C+]3[C+2]2)[C+2][C+]1Br'
             ),
         ),
         CaseData(
@@ -348,7 +321,10 @@ def get_atom_ids(request):
                         functional_groups=[stk.BromoFactory()],
                     ),
                     stk.BuildingBlock(
-                        smiles='Brc1c(F)c(I)c(I)c(Br)c1Br',
+                        smiles=(
+                            'Br[C+]1[C+](F)[C+](I)[C+](I)[C+](Br)'
+                            'C1Br'
+                        ),
                         functional_groups=[
                             stk.BromoFactory(),
                             stk.IodoFactory(),
@@ -356,13 +332,31 @@ def get_atom_ids(request):
                         ],
                     ),
                 ),
-                topology_graph=stk.cof.Hexagonal((2, 2, 1)),
+                topology_graph=stk.cof.Hexagonal(
+                    lattice_size=(2, 2, 1),
+                    vertex_alignments={0: 5},
+                ),
             ),
             smiles=(
-                'C1=C(Br)C(F)=C(Br)C=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
-                'C(=CC(Br)=C1F)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C'
-                'C(=CC(CCNCC3=C(F)C(CNCCBr)=CC(CNCCBr)=C3)=C1F)CCNC'
-                'C1=CC(=CC(CNCCBr)=C1F)CNCCC1=CC(=C(F)C(Br)=C1)CCNC2'
+                'C1(Br)[C+]([C+]=NC#CBr)[C+]2[C+]=NC#C[C+]3[C+](I)[C+]'
+                '([C+]=NC#CBr)[C+]4C#CN=[C+][C+]5[C+]([C+]=NC#C[C+]6[C'
+                '+]7C#CN=[C+]C4[C+]3[C+]=NC#C[C+]3[C+]4C#CN=[C+][C+]2['
+                'C+]2[C+]=NC#C[C+]8[C+]9C#CN=[C+]C%10[C+](C#CN=[C+][C+'
+                ']21)[C+]([C+]=NC#CBr)[C+](I)[C+](I)[C+]%10[C+]=NC#C[C'
+                '+]1[C+](F)[C+](I)[C+]2C#CN=[C+][C+]%10[C+](I)[C+](I)['
+                'C+]%11[C+]=NC#C[C+]%12[C+](F)[C+](I)[C+](I)[C+]([C+]='
+                'NC#CBr)C%12C#CN=[C+][C+]%12[C+](I)[C+]([C+]=NC#CBr)C%'
+                '13[C+]=NC#C[C+]%14[C+](I)[C+]([C+]=NC#CBr)C%15C#CN=[C'
+                '+][C+]%16[C+](I)[C+]([C+]=NC#CBr)C([C+]=NC#CBr)[C+]%1'
+                '7C#CN=[C+][C+]%18[C+]([C+]=NC#CBr)[C+]([C+]=NC#CBr)[C'
+                '+]%19[C+]=NC#C[C+]([C+]7[C+]=NC#CC3[C+]3[C+]=NC#CC%19'
+                '[C+]%18[C+]=NC#C[C+]7[C+]%18[C+]=NC#C[C+]3[C+]4C#CN=['
+                'C+]C8[C+]3[C+]=NC#C[C+]%18[C+]4C#CN=[C+][C+]8[C+]([C+'
+                ']=NC#C[C+]%14[C+]%15C#CN=[C+][C+]4C7[C+]=NC#C[C+]%16%'
+                '17)[C+]4[C+]=NC#C[C+]%13[C+]%12C#CN=[C+]C%11[C+]%10C#'
+                'CN=[C+][C+]4C4C#CN=[C+][C+]2C1C#CN=[C+][C+]9[C+]3C#CN'
+                '=[C+][C+]84)[C+]([C+]=NC#CBr)C6[C+]=NC#CBr)[C+]([C+]='
+                'NC#CBr)[C+]([C+]=NC#CBr)C([C+]=NC#CBr)[C+]5Br'
             ),
         ),
     ),
