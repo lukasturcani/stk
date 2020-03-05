@@ -250,6 +250,84 @@ def get_atom_ids(request):
                 'CC(=CC(CNCCBr)=C1F)CNCCC1=CC(=C(F)C(Br)=C1)CCNC2'
             ),
         ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrCNCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.cof.Honeycomb(
+                    lattice_size=(2, 2, 1),
+                    vertex_alignments={0: 2, 1: 2},
+                ),
+            ),
+            smiles=(
+                'C1=C(Br)C(F)=C(Br)C=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
+                'C(=CC(Br)=C1F)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C'
+                'C(=CC(CCNCC3=C(F)C(CNCCBr)=CC(CNCCBr)=C3)=C1F)CCNC'
+                'C1=CC(=CC(CNCCBr)=C1F)CNCCC1=CC(=C(F)C(Br)=C1)CCNC2'
+            ),
+        ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.cof.LinkerlessHoneycomb((2, 2, 1)),
+            ),
+            smiles=(
+                'C1=C(Br)C(F)=C(Br)C=C1C1=CC2=C(F)C(=C1)C1=CC(=CC(Br)'
+                '=C1F)C1=CC(=C(F)C(Br)=C1)C1=C(F)C(=CC(C3=CC(Br)=C(F)'
+                'C(Br)=C3)=C1)C1=CC(=CC(Br)=C1F)C1=CC2=C(F)C(Br)=C1'
+            ),
+        ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.cof.LinkerlessHoneycomb(
+                    lattice_size=(2, 2, 1),
+                    vertex_alignments={0: 1, 1: 1},
+                ),
+            ),
+            smiles=(
+                'C1=C(Br)C=C(Br)C(F)=C1C1=C(F)C2=CC(=C1)C1=CC(=CC(Br)'
+                '=C1F)C1=CC(=C(F)C(Br)=C1)C1=C(F)C(=CC(C3=CC(Br)=C(F)'
+                'C(Br)=C3)=C1)C1=CC(=CC(Br)=C1F)C1=CC2=C(F)C(Br)=C1'
+            ),
+        ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.cof.LinkerlessHoneycomb(
+                    lattice_size=(2, 2, 1),
+                    vertex_alignments={0: 2, 1: 2},
+                ),
+            ),
+            smiles=(
+                'C1=C(Br)C=C(C2=CC3=CC(=C2F)C2=CC(=CC(Br)=C2F)C2=CC'
+                '(=C(F)C(Br)=C2)C2=C(F)C(=CC(C4=CC(Br)=C(F)C(Br)=C4)='
+                'C2)C2=CC(=CC(Br)=C2F)C2=CC3=C(F)C(Br)=C2)C(F)=C1Br'
+            ),
+        ),
     ),
 )
 def case_data(request):
