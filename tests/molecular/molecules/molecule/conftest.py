@@ -205,6 +205,51 @@ def get_atom_ids(request):
             ),
             smiles='N(CCBr)CCCCCNCCCBr',
         ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrCNCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.cof.Honeycomb((2, 2, 1)),
+            ),
+            smiles=(
+                'C1=C(Br)C=C(Br)C(F)=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
+                '(F)C(=CC(Br)=C1)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C'
+                '(F)C(=CC(CCNCC3=CC(CNCCBr)=C(F)C(CNCCBr)=C3)=C1)CCNC'
+                'C1=CC(=CC(CNCCBr)=C1F)CNCCC1=C(F)C(=CC(Br)=C1)CCNC2'
+            ),
+        ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrCNCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.cof.Honeycomb(
+                    lattice_size=(2, 2, 1),
+                    vertex_alignments={0: 1, 1: 1},
+                ),
+            ),
+            smiles=(
+                'C1=C(Br)C=C(Br)C(F)=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
+                '(F)C(=CC(Br)=C1)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C'
+                '(F)C(=CC(CCNCC3=CC(CNCCBr)=C(F)C(CNCCBr)=C3)=C1)CCNC'
+                'C1=CC(=CC(CNCCBr)=C1F)CNCCC1=C(F)C(=CC(Br)=C1)CCNC2'
+            ),
+        ),
     ),
 )
 def case_data(request):

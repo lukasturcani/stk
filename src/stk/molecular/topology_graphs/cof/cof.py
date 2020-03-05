@@ -2,7 +2,8 @@ import itertools as it
 from collections import Counter
 import numpy as np
 
-from ..topology_graph import TopologyGraph, Edge, EdgeGroup
+from ..topology_graph import TopologyGraph, EdgeGroup
+from .edge import _CofEdge
 from ...reactions import GenericReactionFactory
 
 
@@ -156,7 +157,8 @@ class Cof(TopologyGraph):
                 dim >= 0 and dim < max_dim
                 for dim, max_dim in dims
             )
-            edge_clones.append(Edge(
+            edge_clones.append(_CofEdge(
+                parent_id=edge.get_id(),
                 id=id_,
                 vertex1=lattice[x][y][z][edge.get_vertex1_id()],
                 vertex2=lattice[x2][y2][z2][edge.get_vertex2_id()],

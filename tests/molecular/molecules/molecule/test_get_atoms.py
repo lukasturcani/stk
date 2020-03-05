@@ -68,7 +68,7 @@ def with_canonical_atom_ordering(molecule):
     smiles = rdkit.MolToSmiles(get_rdkit_mol(molecule))
     # This print statement is useful for checking what went wrong
     # if the actual and expected smiles don't match.
-    print(smiles)
+    print(smiles.replace('([H])', '').replace('[H]', ''))
     return stk.BuildingBlock(smiles)
 
 

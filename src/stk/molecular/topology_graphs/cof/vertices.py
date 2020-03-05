@@ -114,6 +114,8 @@ class _LinearCofVertex(_CofVertex):
 
 class _NonLinearCofVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
+        edges = sorted(edges, key=lambda edge: edge.get_parent_id())
+
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
@@ -144,6 +146,8 @@ class _NonLinearCofVertex(_CofVertex):
         return building_block.get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
+        edges = sorted(edges, key=lambda edge: edge.get_parent_id())
+
         fg0 = next(building_block.get_functional_groups(0))
         fg0_position = building_block.get_centroid(
             atom_ids=fg0.get_placer_ids(),

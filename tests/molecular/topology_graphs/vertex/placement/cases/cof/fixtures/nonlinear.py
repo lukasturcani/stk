@@ -2,6 +2,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 import numpy as np
 import stk
+from stk.molecular.topology_graphs.cof.edge import _CofEdge as Edge
 from functools import partial
 from scipy.spatial.distance import euclidean
 
@@ -264,7 +265,7 @@ def get_nonlinear_edges(num_edges, vertex):
         center=vertex.get_position(),
         num_points=num_edges
     )):
-        yield stk.Edge(id_, vertex, stk.Vertex(id_+1, point))
+        yield Edge(id_, id_, vertex, stk.Vertex(id_+1, point))
 
 
 def order_functional_groups(building_block):

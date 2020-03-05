@@ -1,5 +1,6 @@
 import pytest
 import stk
+from stk.molecular.topology_graphs.cof.edge import _CofEdge as Edge
 from functools import partial
 from scipy.spatial.distance import euclidean
 
@@ -69,8 +70,8 @@ def get_fg_position(id, building_block):
 def get_linear_edges(vertex):
     vertex2 = stk.Vertex(1, vertex.get_position() + [-10, 0, 0])
     vertex3 = stk.Vertex(2, vertex.get_position() + [10, 0, 0])
-    yield stk.Edge(0, vertex, vertex2)
-    yield stk.Edge(1, vertex, vertex3)
+    yield Edge(0, 0, vertex, vertex2)
+    yield Edge(1, 1, vertex, vertex3)
 
 
 @pytest.fixture(params=(0, 1))
