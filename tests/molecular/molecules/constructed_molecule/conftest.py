@@ -40,7 +40,7 @@ def linear(request):
             ),
             topology_graph=stk.cof.Honeycomb((2, 2, 1)),
             num_new_atoms=0,
-            num_new_bonds=24,
+            num_new_bonds=20,
         ),
         CaseData(
             building_blocks=(
@@ -58,7 +58,7 @@ def linear(request):
                 vertex_alignments={0: 1, 1: 1, 2: 1, 3: 1, 4: 1},
             ),
             num_new_atoms=0,
-            num_new_bonds=24,
+            num_new_bonds=20,
         ),
         CaseData(
             building_blocks=(
@@ -76,7 +76,7 @@ def linear(request):
                 vertex_alignments={0: 2, 1: 2},
             ),
             num_new_atoms=0,
-            num_new_bonds=24,
+            num_new_bonds=20,
         ),
         CaseData(
             building_blocks=(
@@ -109,7 +109,7 @@ def linear(request):
                 vertex_alignments={0: 5},
             ),
             num_new_atoms=0,
-            num_new_bonds=78,
+            num_new_bonds=81,
         ),
         CaseData(
             building_blocks=(
@@ -127,7 +127,7 @@ def linear(request):
             ),
             topology_graph=stk.cof.Kagome((2, 2, 1)),
             num_new_atoms=0,
-            num_new_bonds=42,
+            num_new_bonds=41,
         ),
         CaseData(
             building_blocks=(
