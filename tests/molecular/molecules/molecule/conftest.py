@@ -359,6 +359,59 @@ def get_atom_ids(request):
                 'NC#CBr)[C+]([C+]=NC#CBr)C([C+]=NC#CBr)[C+]5Br'
             ),
         ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles=(
+                            'Br[C+]1[C+](Br)[C+](F)[C+](Br)[C+](Br)'
+                            '[C+2]1'
+                        ),
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.cof.Kagome((2, 2, 1)),
+            ),
+            smiles=(
+                'F[C+]1[C+](Br)[C+](Br)[C+2][C+]2C#CN=[C+][C+]3[C+]4[C'
+                '+]=NC#C[C+]5[C+2][C+]([C+]=NC#C[C+]21)[C+](Br)[C+](F)'
+                '[C+]5[C+]=NC#C[C+]1[C+2][C+]2C#CN=[C+][C+]5[C+]([C+]='
+                'NC#C[C+]6[C+2][C+]([C+]=NC#C[C+]2[C+](F)[C+]1Br)[C+]('
+                'Br)[C+](F)[C+]6[C+]=NC#CBr)[C+2][C+]([C+]=NC#CBr)[C+]'
+                '([C+]=NC#C[C+]1[C+]2[C+]=NC#C[C+]6[C+](C#CN=[C+][C+]7'
+                '[C+]([C+]=NC#C[C+]([C+2]2)[C+]([C+]=NC#CBr)[C+]1F)[C+'
+                '2][C+]([C+]=NC#CBr)[C+]([C+]=NC#CBr)[C+]7F)[C+2][C+]1'
+                'C#CN=[C+][C+]2[C+]7C#CN=[C+][C+]8[C+2][C+]([C+]=NC#CB'
+                'r)[C+]([C+]=NC#CBr)[C+](F)[C+]8[C+]=NC#C[C+]8[C+2][C+'
+                '](Br)[C+](Br)[C+](F)[C+]8C#CN=[C+][C+]([C+2]7)[C+](C#'
+                'CN=[C+][C+]([C+]([C+]=NC#C[C+]1[C+]6F)[C+2]4)[C+]3F)['
+                'C+]2F)[C+]5F'
+            ),
+        ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='BrC1=C(Br)C(F)(Br)[C+]1Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.cof.Square((2, 2, 1)),
+            ),
+            smiles=(
+                'FC1(Br)C(Br)=C2[C+]=NC#CC3(F)C(Br)=C([C+]=NC#CBr)[C+]'
+                '3[C+]=NC#CC3=C([C+]=NC#CBr)[C+]([C+]=NC#CBr)C3(F)C#CN'
+                '=[C+]C3=C(C#CN=[C+][C+]21)C(F)(Br)[C+]3[C+]=NC#CBr'
+            ),
+        ),
     ),
 )
 def case_data(request):
