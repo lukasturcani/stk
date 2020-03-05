@@ -195,9 +195,9 @@ def get_atom_ids(request):
         CaseData(
             molecule=stk.ConstructedMolecule(
                 building_blocks=(
-                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock('BrC#CBr', [stk.BromoFactory()]),
                     stk.BuildingBlock(
-                        smiles='BrCNCCBr',
+                        smiles='Br[C+]=NC#CBr',
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
@@ -209,11 +209,13 @@ def get_atom_ids(request):
             molecule=stk.ConstructedMolecule(
                 building_blocks=(
                     stk.BuildingBlock(
-                        smiles='BrCNCCBr',
+                        smiles='Br[C+]=NC#CBr',
                         functional_groups=[stk.BromoFactory()],
                     ),
                     stk.BuildingBlock(
-                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
@@ -230,11 +232,13 @@ def get_atom_ids(request):
             molecule=stk.ConstructedMolecule(
                 building_blocks=(
                     stk.BuildingBlock(
-                        smiles='BrCNCCBr',
+                        smiles='Br[C+]=NC#CBr',
                         functional_groups=[stk.BromoFactory()],
                     ),
                     stk.BuildingBlock(
-                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
@@ -254,11 +258,13 @@ def get_atom_ids(request):
             molecule=stk.ConstructedMolecule(
                 building_blocks=(
                     stk.BuildingBlock(
-                        smiles='BrCNCCBr',
+                        smiles='Br[C+]=NC#CBr',
                         functional_groups=[stk.BromoFactory()],
                     ),
                     stk.BuildingBlock(
-                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
@@ -278,7 +284,9 @@ def get_atom_ids(request):
             molecule=stk.ConstructedMolecule(
                 building_blocks=(
                     stk.BuildingBlock(
-                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
@@ -294,7 +302,9 @@ def get_atom_ids(request):
             molecule=stk.ConstructedMolecule(
                 building_blocks=(
                     stk.BuildingBlock(
-                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
@@ -313,7 +323,9 @@ def get_atom_ids(request):
             molecule=stk.ConstructedMolecule(
                 building_blocks=(
                     stk.BuildingBlock(
-                        smiles='Brc1cc(Br)c(F)c(Br)c1',
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
@@ -326,6 +338,31 @@ def get_atom_ids(request):
                 'C1=C(Br)C=C(C2=CC3=CC(=C2F)C2=CC(=CC(Br)=C2F)C2=CC'
                 '(=C(F)C(Br)=C2)C2=C(F)C(=CC(C4=CC(Br)=C(F)C(Br)=C4)='
                 'C2)C2=CC(=CC(Br)=C2F)C2=CC3=C(F)C(Br)=C2)C(F)=C1Br'
+            ),
+        ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='Brc1c(F)c(I)c(I)c(Br)c1Br',
+                        functional_groups=[
+                            stk.BromoFactory(),
+                            stk.IodoFactory(),
+                            stk.FluoroFactory(),
+                        ],
+                    ),
+                ),
+                topology_graph=stk.cof.Hexagonal((2, 2, 1)),
+            ),
+            smiles=(
+                'C1=C(Br)C(F)=C(Br)C=C1CCNCC1=CC2=C(F)C(=C1)CNCCC1=C'
+                'C(=CC(Br)=C1F)CCNCC1=CC(=C(F)C(CNCCBr)=C1)CNCCC1=C'
+                'C(=CC(CCNCC3=C(F)C(CNCCBr)=CC(CNCCBr)=C3)=C1F)CCNC'
+                'C1=CC(=CC(CNCCBr)=C1F)CNCCC1=CC(=C(F)C(Br)=C1)CCNC2'
             ),
         ),
     ),
