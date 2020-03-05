@@ -305,7 +305,7 @@ class ConstructedMolecule(Molecule):
     def __str__(self):
         return (
             f'{self.__class__.__name__}'
-            f'(building_blocks={list(self.get_building_blocks())}, '
+            f'(building_blocks={tuple(self.get_building_blocks())}, '
             f'topology_graph={self._topology_graph!r})'
         )
 
