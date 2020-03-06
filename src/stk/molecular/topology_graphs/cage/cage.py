@@ -1,3 +1,6 @@
+from collections import Counter, defaultdict
+from functools import partial
+
 from ..topology_graph import TopologyGraph
 from ...reactions import GenericReactionFactory
 
@@ -78,6 +81,19 @@ class Cage(TopologyGraph):
 
     """
 
+    def __init_subclass__(cls, **kwargs):
+        cls._vertex_degrees = Counter(
+            vertex_id
+            for edge in cls._edge_prototypes
+            for vertex_id in (
+                edge.get_vertex1_id(),
+                edge.get_vertex2_id(),
+            )
+        )
+        cls._vertices_of_degree = defaultdict(set)
+        for vertex_id, degree in cls._vertex_degrees.items():
+            cls._vertices_of_degree[degree].add(vertex_id)
+
     def __init__(
         self,
         vertex_alignments=None,
@@ -118,10 +134,7 @@ class Cage(TopologyGraph):
             if vertex_alignments is not None
             else {}
         )
-        vertex_types = sorted(
-            {len(v.edges) for v in vertex_data},
-            reverse=True
-        )
+
         super().__init__(
             vertices=tuple(
                 vertex.with_aligner_edge(
@@ -135,29 +148,31 @@ class Cage(TopologyGraph):
             edges=self._edge_prototypes,
             reaction_factory=reaction_factory,
             construction_stages=tuple(
-                lambda vertex, vertex_type=vt:
-                    vertex.get_num_edges() == vertex_type
-                for vt in vertex_types
+                partial(self._has_degree, degree)
+                for degree
+                in sorted(self._vertices_by_degree, reverse=True)
             ),
             num_processes=num_processes,
             edge_groups=None,
         )
 
+    def _has_degree(self, degree, vertex):
+        return vertex.get_id() in self._vertices_of_degree[degree]
+
     def get_building_block_vertices(self, building_blocks):
         bb_by_degree = {}
         for bb in building_blocks:
-            num_fgs = len(bb.func_groups)
-            if num_fgs in bb_by_degree:
+            if bb.get_num_functional_groups() in bb_by_degree:
                 raise ValueError(
                     'If there are multiple building blocks with the '
                     'same number of functional groups, '
                     'building_block_vertices must be set explicitly.'
                 )
-            bb_by_degree[num_fgs] = bb
+            bb_by_degree[bb.get_num_functional_groups()] = bb
 
         building_block_vertices = {}
-        for vertex in self.vertices:
-            bb = bb_by_degree[vertex.get_num_edges()]
+        for vertex in self._vertices:
+            bb = bb_by_degree[self._vertex_degrees[vertex.get_id()]]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
             )
