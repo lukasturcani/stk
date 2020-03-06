@@ -103,7 +103,8 @@ class Molecule:
             The size of the rotation in radians.
 
         axis : :class:`numpy.ndarray`
-            The axis about which the rotation happens.
+            The axis about which the rotation happens. Must have unit
+            magnitude.
 
         origin : :class:`numpy.ndarray`
             The origin about which the rotation happens.
@@ -209,16 +210,14 @@ class Molecule:
         # the axis. This puts them both on the same plane.
         # 2. Calculate the angle between them.
         # 3. Apply the rotation.
-
-        axis_dot = np.dot(axis, axis)
-        tstart = start - np.dot(start, axis)*axis/axis_dot
+        tstart = start - np.dot(start, axis)*axis
 
         # If `tstart` is 0, it is parallel to the rotation axis, stop.
         if np.allclose(tstart, [0, 0, 0], 1e-8):
             self._with_displacement(origin)
             return self
 
-        tend = target - np.dot(target, axis)*axis/axis_dot
+        tend = target - np.dot(target, axis)*axis
         # If `tend` is 0, it is parallel to the rotation axis, stop.
         if np.allclose(tstart, [0, 0, 0], 1e-8):
             self._with_displacement(origin)
@@ -268,7 +267,8 @@ class Molecule:
             The vector which is stationary.
 
         axis : :class:`numpy.ndarray`
-            The vector about which the rotation happens.
+            The vector about which the rotation happens. Must have
+            unit magnitude.
 
         origin : :class:`numpy.ndarray`
             The origin about which the rotation happens.

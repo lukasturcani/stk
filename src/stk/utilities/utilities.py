@@ -871,7 +871,8 @@ def rotation_matrix_arbitrary_axis(angle, axis):
 
     axis : :class:`numpy.ndarray`
         A 3 element aray which represents a vector. The vector is the
-        axis about which the rotation is carried out.
+        axis about which the rotation is carried out. Must be of
+        unit magnitude.
 
     Returns
     -------
@@ -879,8 +880,6 @@ def rotation_matrix_arbitrary_axis(angle, axis):
         A ``3x3`` array representing a rotation matrix.
 
     """
-
-    axis = normalize_vector(axis)
 
     a = np.cos(angle/2)
     b, c, d = axis * np.sin(angle/2)

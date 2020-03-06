@@ -1,6 +1,10 @@
 import numpy as np
 from scipy.spatial.distance import euclidean
-from stk.utilities import vector_angle, get_acute_vector
+from stk.utilities import (
+    vector_angle,
+    get_acute_vector,
+    normalize_vector,
+)
 
 from ..topology_graph import Vertex
 
@@ -92,7 +96,7 @@ class _LinearCofVertex(_CofVertex):
             building_block.with_rotation_to_minimize_angle(
                 start=building_block.get_centroid() - self._position,
                 target=[0, 0, 1],
-                axis=target,
+                axis=normalize_vector(target),
                 origin=self._position,
             )
         )

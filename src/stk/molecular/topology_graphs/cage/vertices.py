@@ -5,6 +5,7 @@ from stk.utilities import (
     get_acute_vector,
     get_plane_normal,
     vector_angle,
+    normalize_vector,
 )
 from ..topology_graph import Vertex
 
@@ -93,7 +94,9 @@ class _LinearCageVertex(_CageVertex):
             building_block.with_rotation_to_minimize_angle(
                 start=building_block.get_centroid() - self._position,
                 target=self._position,
-                axis=edges[0].get_position() - edges[1].get_position(),
+                axis=normalize_vector(
+                    edges[0].get_position() - edges[1].get_position()
+                ),
                 origin=self._position,
             )
         )

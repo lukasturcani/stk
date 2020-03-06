@@ -40,7 +40,7 @@ def _test_with_rotation_to_minimize_angle(molecule):
     new = molecule.with_rotation_to_minimize_angle(
         start=start,
         target=target,
-        axis=np.cross(start, target),
+        axis=stk.normalize_vector(np.cross(start, target)),
         origin=next(molecule.get_atomic_positions((0, ))),
     )
 
