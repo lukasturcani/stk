@@ -16,13 +16,14 @@ class Cof(TopologyGraph):
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
     ):
-        if vertex_alignments is None:
-            vertex_alignments = {}
-
-        self._vertex_alignments = vertex_alignments
+        self._vertex_alignments = (
+            dict(vertex_alignments)
+            if vertex_alignments is not None
+            else {}
+        )
         self._lattice_size = lattice_size
         self._periodic = periodic
-        lattice = self._get_lattice(vertex_alignments)
+        lattice = self._get_lattice(self._vertex_alignments)
         edges = self._get_edges(lattice)
         super().__init__(
             vertices=self._get_vertices(lattice),

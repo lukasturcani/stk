@@ -43,6 +43,13 @@ class _CageVertex(Vertex):
         )
         return clone
 
+    def _with_aligner_edge(self, aligner_edge):
+        self._aligner_edge = aligner_edge
+        return self
+
+    def with_aligner_edge(self, aligner_edge):
+        return self.clone()._with_aligner_edge(aligner_edge)
+
     @classmethod
     def init_at_center(cls, id, vertices):
         return cls(

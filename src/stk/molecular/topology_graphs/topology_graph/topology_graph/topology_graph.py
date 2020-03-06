@@ -180,6 +180,11 @@ class TopologyGraph:
     def get_building_block_vertices(self, building_blocks):
         """
 
+        Raises
+        ------
+        :class:`ValueError`
+            If `building_blocks` cannot be assigned to the vertices.
+
         """
 
         raise NotImplementedError()
