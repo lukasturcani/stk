@@ -412,42 +412,29 @@ def get_atom_ids(request):
                 '=[C+]C3=C(C#CN=[C+][C+]21)C(F)(Br)[C+]3[C+]=NC#CBr'
             ),
         ),
-        CaseData(
-            molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC1=C(Br)[C+]=[C+]1',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1[C+2][C+](Br)C([C+2]F)[C+](Br)'
-                            '[C+2]1'
-                        ),
-                        functional_groups=[stk.BromoFactory()],
-                    ),
+        CaseData.init_constructed_molecule(
+            building_blocks=(
+                stk.BuildingBlock(
+                    smiles='BrC1=C(Br)[C+]=[C+]1',
+                    functional_groups=[stk.BromoFactory()],
                 ),
-                topology_graph=stk.cage.FourPlusSix(),
-            ),
-            smiles='',
-        ),
-        CaseData(
-            molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC1=C(Br)[C+]=N1',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1[C+2][C+](Br)C([C+2]F)[C+](Br)'
-                            '[C+2]1'
-                        ),
-                        functional_groups=[stk.BromoFactory()],
-                    ),
+                stk.BuildingBlock(
+                    smiles='BrC1=C(Br)[C+]=N1',
+                    functional_groups=[stk.BromoFactory()],
                 ),
-                topology_graph=stk.cage.FourPlusSix(),
+                stk.BuildingBlock(
+                    smiles=(
+                        'Br[C+]1[C+2][C+](Br)C([C+2]F)[C+](Br)[C+2]1'
+                    ),
+                    functional_groups=[stk.BromoFactory()],
+                ),
             ),
+            topology_graph=stk.cage.FourPlusSix(),
+            building_block_vertices={
+                0: 4,
+                1: (5, 6, 7, 8, 9),
+                2: (0, 1, 2, 3)
+            },
             smiles='',
         ),
     ),
