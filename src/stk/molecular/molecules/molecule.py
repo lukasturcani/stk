@@ -10,6 +10,7 @@ from stk.utilities import (
     periodic_table,
     mol_from_mae_file,
     remake,
+    normalize_vector,
 )
 
 
@@ -225,19 +226,12 @@ class Molecule:
 
         angle = vector_angle(tstart, tend)
 
-        # Check in which direction the rotation should go.
-        # This is done by applying the rotation in each direction and
-        # seeing which one leads to a smaller angle.
-        r1 = rotation_matrix_arbitrary_axis(angle, axis)
-        t1 = vector_angle(np.dot(r1, tstart), tend)
-        r2 = rotation_matrix_arbitrary_axis(-angle, axis)
-        t2 = vector_angle(np.dot(r2, tstart), tend)
+        projection = tstart @ np.cross(axis, tend)
+        if projection > 0:
+            angle = 2*np.pi - angle
 
-        if t1 < t2:
-            self._position_matrix = r1 @ self._position_matrix
-        else:
-            self._position_matrix = r2 @ self._position_matrix
-
+        rotation_matrix = rotation_matrix_arbitrary_axis(angle, axis)
+        self._position_matrix = rotation_matrix @ self._position_matrix
         self._with_displacement(origin)
         return self
 
