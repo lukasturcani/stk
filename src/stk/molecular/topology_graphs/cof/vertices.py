@@ -142,7 +142,7 @@ class _NonLinearCofVertex(_CofVertex):
             building_block.with_rotation_to_minimize_angle(
                 start=fg_centroid - self._position,
                 target=edge_coord - self._position,
-                axis=[0, 0, 1],
+                axis=np.array([0, 0, 1], dtype=np.float64),
                 origin=self._position,
             )
         )
