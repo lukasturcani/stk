@@ -416,7 +416,7 @@ def get_atom_ids(request):
             molecule=stk.ConstructedMolecule(
                 building_blocks=(
                     stk.BuildingBlock(
-                        smiles='Br[C+]=NC#CBr',
+                        smiles='BrC1=C(Br)[C+]=[C+]1',
                         functional_groups=[stk.BromoFactory()],
                     ),
                     stk.BuildingBlock(

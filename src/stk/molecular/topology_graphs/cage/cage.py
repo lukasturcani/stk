@@ -47,7 +47,7 @@ class _CageConstructionState(ConstructionState):
         )
 
     def get_neighbor_positions(self, vertex_id):
-        for position in self._neighbor_positions[vertex_id]:
+        for position in self._neighbor_positions.get(vertex_id, []):
             yield np.array(position, dtype=np.float64)
 
 
@@ -196,7 +196,7 @@ class Cage(TopologyGraph):
             construction_stages=tuple(
                 partial(self._has_degree, degree)
                 for degree
-                in sorted(self._vertices_by_degree, reverse=True)
+                in sorted(self._vertices_of_degree, reverse=True)
             ),
             num_processes=num_processes,
             edge_groups=None,
@@ -250,6 +250,7 @@ class Cage(TopologyGraph):
         state = self._update_neighbor_positions(
             state=state,
             vertices=vertices,
+            edges=edges,
             building_blocks=building_blocks,
             results=results,
         )
