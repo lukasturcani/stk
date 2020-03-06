@@ -10,7 +10,6 @@ from stk.utilities import (
     periodic_table,
     mol_from_mae_file,
     remake,
-    normalize_vector,
 )
 
 
