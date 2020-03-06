@@ -205,40 +205,40 @@ class Molecule:
 
         self._with_displacement(-origin)
 
-        # 1. First transform the problem.
-        # 2. The rotation axis is set equal to the z-axis.
-        # 3. Apply this transformation to all vectors in the problem.
-        # 4. Take only the x and y components of `start` and `target`.
-        # 5. Work out the angle between them.
-        # 6. Apply that rotation along the original rotation axis.
+        # 1. Remove any component of the start and target vectors long
+        # the axis. This puts them both on the same plane.
+        # 2. Calculate the angle between them.
+        # 3. Apply the rotation.
 
-        rotmat = rotation_matrix(axis, [0, 0, 1])
-        tstart = np.dot(rotmat, start)
-        tstart = np.array([tstart[0], tstart[1], 0])
+        axis_dot = np.dot(axis, axis)
+        tstart = start - np.dot(start, axis)*axis/axis_dot
 
-        # If the `tstart` vector is 0 after these transformations it
-        # means that it is parallel to the rotation axis, stop.
+        # If `tstart` is 0, it is parallel to the rotation axis, stop.
         if np.allclose(tstart, [0, 0, 0], 1e-8):
             self._with_displacement(origin)
             return self
 
-        tend = np.dot(rotmat, target)
-        tend = np.array([tend[0], tend[1], 0])
+        tend = target - np.dot(target, axis)*axis/axis_dot
+        # If `tend` is 0, it is parallel to the rotation axis, stop.
+        if np.allclose(tstart, [0, 0, 0], 1e-8):
+            self._with_displacement(origin)
+            return self
+
         angle = vector_angle(tstart, tend)
 
         # Check in which direction the rotation should go.
         # This is done by applying the rotation in each direction and
         # seeing which one leads to a smaller angle.
-        r1 = rotation_matrix_arbitrary_axis(angle, [0, 0, 1])
+        r1 = rotation_matrix_arbitrary_axis(angle, axis)
         t1 = vector_angle(np.dot(r1, tstart), tend)
-        r2 = rotation_matrix_arbitrary_axis(-angle, [0, 0, 1])
+        r2 = rotation_matrix_arbitrary_axis(-angle, axis)
         t2 = vector_angle(np.dot(r2, tstart), tend)
 
-        if t2 < t1:
-            angle *= -1
+        if t1 < t2:
+            self._position_matrix = r1 @ self._position_matrix
+        else:
+            self._position_matrix = r2 @ self._position_matrix
 
-        rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
-        self._position_matrix = rot_mat @ self._position_matrix
         self._with_displacement(origin)
         return self
 
