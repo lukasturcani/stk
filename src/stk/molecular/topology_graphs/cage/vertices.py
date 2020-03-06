@@ -77,10 +77,9 @@ class _LinearCageVertex(_CageVertex):
         edge_centroid = (
             sum(edge.get_position() for edge in edges) / len(edges)
         )
-        target = edge_coord - edge_centroid
         building_block = building_block.with_rotation_between_vectors(
             start=start,
-            target=target,
+            target=edge_coord - edge_centroid,
             origin=self._position,
         )
         building_block = (

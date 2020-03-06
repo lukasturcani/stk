@@ -33,10 +33,16 @@ def _test_placement(
         atol=1e-14,
     )
     for test, result in alignment_tests.items():
-        assert np.all(np.equal(test(building_block), result))
+        # Do the assert via a function call here so that pytest prints
+        # the values being compared when an error occurs.
+        assert_equal_vectors(test(building_block), result)
 
     functional_group_edges_ = vertex.map_functional_groups_to_edges(
         building_block=building_block,
         edges=edges,
     )
     assert functional_group_edges_ == functional_group_edges
+
+
+def assert_equal_vectors(vector1, vector2):
+    assert np.all(np.equal(vector2, vector1))

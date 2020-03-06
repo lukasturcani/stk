@@ -237,7 +237,7 @@ def get_normal(building_block):
             atom_ids=building_block.get_placer_ids(),
         ),
     )
-    if np.allclose(normal, [0, 0, 1], atol=1e-5):
+    if np.allclose(normal, [0, 0, 1], atol=1e-13):
         return np.array([0, 0, 1])
     return normal
 

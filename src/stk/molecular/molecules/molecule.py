@@ -197,6 +197,11 @@ class Molecule:
         # probably due to a planar molecule.
         if not all(np.isfinite(x) for x in start):
             return self
+        if np.allclose(target, [0, 0, 0], atol=1e-15):
+            raise ValueError(
+                'target has a magnitude of 0. It is therefore not '
+                'possible to calculate an angle.'
+            )
 
         self._with_displacement(-origin)
 
@@ -272,6 +277,13 @@ class Molecule:
         -------
         :class:`.Molecule`
             A rotated clone.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If `target` has a magnitude of 0. In this case it is
+            not possible to calculate an angle between `start` and
+            `target`.
 
         """
 
