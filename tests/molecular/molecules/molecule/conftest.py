@@ -424,16 +424,25 @@ def get_atom_ids(request):
                 ),
                 stk.BuildingBlock(
                     smiles=(
-                        'Br[C+]1[C+2][C+](Br)C([C+2]F)[C+](Br)[C+2]1'
+                        'Br[C+]1[C+2][C+](Br)C2[C+][C+2][C+]2(Br)'
+                        '[C+2]1'
+                    ),
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles=(
+                        'Br[C+]1[C+2][C+](Br)C2[C+](F)[C+2][C+]2(Br)'
+                        '[C+2]1'
                     ),
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
             topology_graph=stk.cage.FourPlusSix(),
             building_block_vertices={
-                0: 4,
-                1: (5, 6, 7, 8, 9),
-                2: (0, 1, 2, 3)
+                0: (4, 5, 6, 7, 8),
+                1: 9,
+                2: (0, 1, 2),
+                3: 3,
             },
             smiles='',
         ),
