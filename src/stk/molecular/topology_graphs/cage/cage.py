@@ -1,8 +1,54 @@
 from collections import Counter, defaultdict
+import numpy as np
 from functools import partial
 
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, ConstructionState
 from ...reactions import GenericReactionFactory
+
+
+class _CageConstructionState(ConstructionState):
+    def __init__(
+        self,
+        building_block_vertices,
+        edges,
+        scale,
+        lattice_constants=None,
+    ):
+        super().__init__(
+            building_block_vertices=building_block_vertices,
+            edges=edges,
+            scale=scale,
+            lattice_constants=lattice_constants,
+        )
+        self._neighbor_positions = {}
+
+    def clone(self):
+        clone = super().clone()
+        clone._neighbor_positions = {
+            key: list(value)
+            for key, value in self._neighbor_positions.items()
+        }
+        return clone
+
+    def _with_neighbor_positions(self, neighbor_positions):
+        for vertex_id, positions in neighbor_positions.items():
+            self._neighbor_positions[vertex_id] = (
+                self._neighbor_positions.get(vertex_id, [])
+            )
+            self._neighbor_positions[vertex_id].extend(
+                np.array(position, dtype=np.float64)
+                for position in positions
+            )
+        return self
+
+    def with_neighbor_positions(self, neighbor_positions):
+        return self.clone()._with_neighbor_positions(
+            neighbor_positions=neighbor_positions,
+        )
+
+    def get_neighbor_positions(self, vertex_id):
+        for position in self._neighbor_positions[vertex_id]:
+            yield np.array(position, dtype=np.float64)
 
 
 class Cage(TopologyGraph):
@@ -179,46 +225,98 @@ class Cage(TopologyGraph):
             building_block_vertices[bb].append(vertex)
         return building_block_vertices
 
-    def _prepare(self, mol):
-        """
-        Do preprocessing on `mol` before construction.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule being constructed.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # Order the building blocks by number of functional groups
-        # so that building blocks with more functional groups are
-        # always placed first.
-
-        bb_verts = dict()
-        bbs = sorted(
-            mol.building_block_vertices,
-            key=lambda bb: len(bb.func_groups),
-            reverse=True
-        )
-        for bb in bbs:
-            bb_verts[bb] = mol.building_block_vertices[bb]
-        mol.building_block_vertices = bb_verts
-        return super()._prepare(mol)
-
-    def _clean_up(self, mol):
-        mol.num_windows = self.num_windows
-        mol.num_window_types = self.num_window_types
-        return super()._clean_up(mol)
-
     def _get_scale(self, building_block_vertices):
         return max(
             bb.get_maximum_diameter()
             for bb in building_block_vertices
         )
+
+    def _get_construction_state(self, building_block_vertices):
+        return _CageConstructionState(
+            building_block_vertices=building_block_vertices,
+            edges=self._edges,
+            scale=self._get_scale(building_block_vertices),
+            lattice_constants=self._get_lattice_constants(),
+        )
+
+    def _after_placement_stage(
+        self,
+        state,
+        vertices,
+        edges,
+        building_blocks,
+        results,
+    ):
+        state = self._update_neighbor_positions(
+            state=state,
+            vertices=vertices,
+            building_blocks=building_blocks,
+            results=results,
+        )
+        return state.with_vertices(self._get_updated_vertices(state))
+
+    def _update_neighbor_positions(
+        self,
+        state,
+        vertices,
+        edges,
+        building_blocks,
+        results,
+    ):
+        neighbor_positions = defaultdict(list)
+        for vertex, vertex_edges, building_block, result in zip(
+            vertices,
+            edges,
+            building_blocks,
+            results,
+        ):
+            building_block = building_block.with_position_matrix(
+                position_matrix=result.position_matrix,
+            )
+            edge_functional_groups = dict(zip(
+                result.functional_group_edges.values(),
+                result.functional_group_edges.keys(),
+            ))
+            for neighbor_id, edge_id in zip(
+                self._get_neighbors(vertex, vertex_edges),
+                (edge.get_id() for edge in vertex_edges),
+            ):
+                fg_id = edge_functional_groups[edge_id]
+                functional_group = next(
+                    building_block.get_functional_groups(fg_id)
+                )
+                neighbor_positions[neighbor_id].append(
+                    building_block.get_centroid(
+                        atom_ids=functional_group.get_placer_ids(),
+                    )
+                )
+
+        return state.with_neighbor_positions(neighbor_positions)
+
+    def _get_neighbors(self, vertex, vertex_edges):
+        for edge in vertex_edges:
+            yield (
+                edge.get_vertex1_id()
+                if vertex.get_id() != edge.get_vertex1_id()
+                else edge.get_vertex2_id()
+            )
+
+    def _get_updated_vertices(self, state):
+        for vertex_id in range(state.get_num_vertices()):
+            neighbor_positions = tuple(state.get_neighbor_positions(
+                vertex_id=vertex_id,
+            ))
+            if (
+                len(neighbor_positions)
+                == self._vertex_degrees[vertex_id]
+            ):
+                yield state.get_vertex(vertex_id).with_position(
+                    position=(
+                        sum(neighbor_positions)/len(neighbor_positions)
+                    ),
+                )
+            else:
+                yield state.get_vertex(vertex_id)
 
     def __repr__(self):
         vertex_alignments = (
