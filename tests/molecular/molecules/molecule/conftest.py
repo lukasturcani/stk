@@ -431,6 +431,25 @@ def get_atom_ids(request):
             ),
             smiles='',
         ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrC1=C(Br)[C+]=N1',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)C([C+2]F)[C+](Br)'
+                            '[C+2]1'
+                        ),
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                topology_graph=stk.cage.FourPlusSix(),
+            ),
+            smiles='',
+        ),
     ),
 )
 def case_data(request):
