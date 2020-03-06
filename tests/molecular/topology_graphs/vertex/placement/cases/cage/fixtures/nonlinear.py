@@ -38,7 +38,7 @@ def aligner_3(request):
 @pytest.fixture(
     params=(
         stk.BuildingBlock(
-            smiles='BrCC(Br)CNCBr',
+            smiles='BrCC(Br)C(CCCC)NCBr',
             functional_groups=[stk.BromoFactory()],
         ),
     ),
@@ -87,6 +87,7 @@ def building_block_4(request):
 @pytest.fixture(
     params=(
         [1, 2, -20],
+        [1, 2, 20],
     ),
 )
 def position(request):
@@ -170,9 +171,18 @@ def get_points(center, num_points):
 
     """
 
+    # Generate points in counter clockwise order if the building block
+    # is to be placed upside down. This keeps the relative ordering
+    # of points the same from the perspective of the building block.
+    direction = 1 if center[2] > 0 else -1
+
     # Take slice to account for case where rounding errors cause
     # extra theta.
-    thetas = np.arange(0, 2*np.pi, 2*np.pi/num_points)[:num_points]
+    thetas = np.arange(
+        start=0,
+        stop=direction*2*np.pi,
+        step=direction*2*np.pi/num_points
+    )[:num_points]
     for theta in thetas:
         yield center + 10*np.array([np.sin(theta), np.cos(theta), 0.])
 
@@ -313,7 +323,7 @@ def functional_group_angle(building_block):
             atom_ids=building_block.get_placer_ids(),
         ),
     )
-    axis = np.cross(normal, fg0_direction)
+    axis = -np.cross(normal, fg0_direction)
 
     def inner(functional_group):
         position = building_block.get_centroid(
