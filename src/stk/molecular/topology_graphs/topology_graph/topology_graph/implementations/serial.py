@@ -42,10 +42,10 @@ class _Serial:
                 edges,
                 building_blocks,
             )
-            placement_results = map(
+            placement_results = tuple(map(
                 lambda placement: placement.get_result(),
                 placements,
-            )
+            ))
             state = state.with_placement_results(
                 building_blocks=building_blocks,
                 results=placement_results,
