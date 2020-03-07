@@ -20,13 +20,10 @@ class _CageVertex(Vertex):
         self,
         id,
         position,
+        use_neighbor_placement=True,
         aligner_edge=0,
-        use_bonder_placement=True,
     ):
-        # _neighbor_positions holds the bonder centroids of functional
-        # groups on neighbor vertices connected to this vertex.
-        self._neighbor_positions = ()
-        self._use_bonder_placement = use_bonder_placement
+        self._use_neighbor_placement = use_neighbor_placement
         # The edge which is used to align the :class:`.BuildingBlock`
         # placed on the vertex. The first :class:`.FunctionalGroup`
         # is rotated such that it lies exactly on this :class:`.Edge`.
@@ -38,10 +35,7 @@ class _CageVertex(Vertex):
     def clone(self):
         clone = super().clone()
         clone._aligner_edge = self._aligner_edge
-        clone._use_bonder_placement = self._use_bonder_placement
-        clone._neighbor_positions = tuple(
-            np.array(position) for position in self._neighbor_positions
-        )
+        clone._use_neighbor_placement = self._use_neighbor_placement
         return clone
 
     def _with_aligner_edge(self, aligner_edge):
@@ -50,6 +44,9 @@ class _CageVertex(Vertex):
 
     def with_aligner_edge(self, aligner_edge):
         return self.clone()._with_aligner_edge(aligner_edge)
+
+    def use_neighbor_placement(self):
+        return self._use_neighbor_placement
 
     @classmethod
     def init_at_center(cls, id, vertices):

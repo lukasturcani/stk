@@ -279,7 +279,7 @@ class Cage(TopologyGraph):
                 result.functional_group_edges.keys(),
             ))
             for neighbor_id, edge_id in zip(
-                self._get_neighbors(vertex, vertex_edges),
+                self._get_neighbors(state, vertex, vertex_edges),
                 (edge.get_id() for edge in vertex_edges),
             ):
                 fg_id = edge_functional_groups[edge_id]
@@ -294,13 +294,16 @@ class Cage(TopologyGraph):
 
         return state.with_neighbor_positions(neighbor_positions)
 
-    def _get_neighbors(self, vertex, vertex_edges):
+    def _get_neighbors(self, state, vertex, vertex_edges):
         for edge in vertex_edges:
-            yield (
+            neighbor_id = (
                 edge.get_vertex1_id()
                 if vertex.get_id() != edge.get_vertex1_id()
                 else edge.get_vertex2_id()
             )
+            neighbor = state.get_vertex(neighbor_id)
+            if neighbor.use_neighbor_placement():
+                yield neighbor_id
 
     def _get_updated_vertices(self, state):
         for vertex_id in range(state.get_num_vertices()):
