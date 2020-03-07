@@ -22,7 +22,7 @@ class _CageConstructionState(ConstructionState):
             lattice_constants=lattice_constants,
         )
         self._num_placement_stages = num_placement_stages
-        self._next_placement_stage = 1
+        self._num_placement_stages_done = 0
         self._vertex_degrees = dict(vertex_degrees)
         self._neighbor_positions = {}
 
@@ -40,10 +40,12 @@ class _CageConstructionState(ConstructionState):
             results=results,
         )
 
-        # No need to update vertex positions before last stage, or if
-        # there is only 1 stage. The ">=" accounts for the latter case.
-        self._next_placement_stage += 1
-        if self._next_placement_stage >= self._num_placement_stages:
+        # No need to update vertex positions after the last stage.
+        self._num_placement_stages_done += 1
+        if (
+            self._num_placement_stages_done
+            >= self._num_placement_stages
+        ):
             return self
 
         self._update_neighbor_positions(
@@ -108,7 +110,7 @@ class _CageConstructionState(ConstructionState):
             (vertex_id, vertex)
             for vertex_id, vertex in self._vertices.items()
             if (
-                len(self._neighbor_positions[vertex_id])
+                len(self._neighbor_positions.get(vertex_id, []))
                 == self._vertex_degrees[vertex_id]
             )
         )
@@ -126,7 +128,9 @@ class _CageConstructionState(ConstructionState):
             key: list(value)
             for key, value in self._neighbor_positions.items()
         }
-        clone._next_placement_stage = self._next_placement_stage
+        clone._num_placement_stages_done = (
+            self._num_placement_stages_done
+        )
         clone._num_placement_stages = self._num_placement_stages
         clone._vertex_degrees = dict(self._vertex_degrees)
         return clone
