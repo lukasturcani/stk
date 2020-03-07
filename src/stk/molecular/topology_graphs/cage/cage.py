@@ -76,9 +76,9 @@ class _CageConstructionState(ConstructionState):
                 result.functional_group_edges.values(),
                 result.functional_group_edges.keys(),
             ))
-            for neighbor_id, edge_id in zip(
-                self._get_neighbors(vertex, vertex_edges),
-                (edge.get_id() for edge in vertex_edges),
+            for neighbor_id, edge_id in self._get_neighbors(
+                vertex=vertex,
+                vertex_edges=vertex_edges,
             ):
                 fg_id = edge_functional_groups[edge_id]
                 functional_group = next(
@@ -103,7 +103,7 @@ class _CageConstructionState(ConstructionState):
                 else edge.get_vertex2_id()
             )
             if self._vertices[neighbor_id].use_neighbor_placement():
-                yield neighbor_id
+                yield neighbor_id, edge.get_id()
 
     def _update_vertices(self):
         updateable = (
