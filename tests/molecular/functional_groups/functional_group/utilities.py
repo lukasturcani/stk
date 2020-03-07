@@ -34,6 +34,10 @@ def is_clone_functional_group(functional_group1, functional_group2):
         ids1=functional_group1.get_placer_ids(),
         ids2=functional_group2.get_placer_ids(),
     )
+    same_ids(
+        ids1=functional_group1.get_core_atom_ids(),
+        ids2=functional_group2.get_core_atom_ids(),
+    )
 
 
 def is_clone_generic_functional_group(
