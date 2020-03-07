@@ -313,50 +313,68 @@ def get_atom_ids(request):
                 'C+]3[C+2]2)[C+2][C+]1Br'
             ),
         ),
-        CaseData(
-            molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='Br[C+]=NC#CBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1[C+](F)[C+](I)[C+](I)[C+](Br)'
-                            'C1Br'
-                        ),
-                        functional_groups=[
-                            stk.BromoFactory(),
-                            stk.IodoFactory(),
-                            stk.FluoroFactory(),
-                        ],
-                    ),
+        CaseData.init_constructed_molecule(
+            building_blocks=(
+                stk.BuildingBlock(
+                    smiles='BrC1=C(Br)[C+]=N1',
+                    functional_groups=[stk.BromoFactory()],
                 ),
-                topology_graph=stk.cof.Hexagonal(
-                    lattice_size=(2, 2, 1),
-                    vertex_alignments={0: 5},
+                stk.BuildingBlock(
+                    smiles='BrN1N(Br)[C+]=N1',
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles=(
+                        'Br[C+]1[C+]2[N+][C+2]C2(Br)[C+](I)[C+](I)[C+](Br)'
+                        '[C+]1Br'
+                    ),
+                    functional_groups=[
+                        stk.BromoFactory(),
+                        stk.IodoFactory(),
+                        stk.FluoroFactory(),
+                    ],
+                ),
+                stk.BuildingBlock(
+                    smiles=(
+                        'Br[C+]1[C+]2[S][C+2]C2(Br)[C+](I)[C+](I)[C+](Br)'
+                        '[C+]1Br'
+                    ),
+                    functional_groups=[
+                        stk.BromoFactory(),
+                        stk.IodoFactory(),
+                        stk.FluoroFactory(),
+                    ],
+                ),
+                stk.BuildingBlock(
+                    smiles=(
+                        'Br[C+]1[C+]2[S][O]C2(Br)[C+](I)[C+](I)[C+](Br)'
+                        '[C+]1Br'
+                    ),
+                    functional_groups=[
+                        stk.BromoFactory(),
+                        stk.IodoFactory(),
+                        stk.FluoroFactory(),
+                    ],
                 ),
             ),
+            topology_graph=stk.cof.Hexagonal(
+                lattice_size=(2, 2, 1),
+                vertex_alignments={0: 5},
+            ),
+            building_block_vertices={
+                0: (
+                    4, 5, 6, 7, 8, 9, 20, 21, 23, 24, 30, 36, 38,
+                    40, 41, 42, 43, 46, 47, 52, 53, 60, 61
+                ),
+                1: (
+                    10, 11, 12, 13, 14, 15, 22, 25, 26, 27, 28, 29,
+                    37, 39, 44, 45, 54, 55, 56, 57, 58, 59, 31, 62, 63,
+                ),
+                2: (0, 1, 18, 50, 51),
+                3: (2, 16, 34, 49),
+                4: (3, 17, 19, 32, 33, 35, 48),
+            },
             smiles=(
-                'C1(Br)[C+]([C+]=NC#CBr)[C+]2[C+]=NC#C[C+]3[C+](I)[C+]'
-                '([C+]=NC#CBr)[C+]4C#CN=[C+][C+]5[C+]([C+]=NC#C[C+]6[C'
-                '+]7C#CN=[C+]C4[C+]3[C+]=NC#C[C+]3[C+]4C#CN=[C+][C+]2['
-                'C+]2[C+]=NC#C[C+]8[C+]9C#CN=[C+]C%10[C+](C#CN=[C+][C+'
-                ']21)[C+]([C+]=NC#CBr)[C+](I)[C+](I)[C+]%10[C+]=NC#C[C'
-                '+]1[C+](F)[C+](I)[C+]2C#CN=[C+][C+]%10[C+](I)[C+](I)['
-                'C+]%11[C+]=NC#C[C+]%12[C+](F)[C+](I)[C+](I)[C+]([C+]='
-                'NC#CBr)C%12C#CN=[C+][C+]%12[C+](I)[C+]([C+]=NC#CBr)C%'
-                '13[C+]=NC#C[C+]%14[C+](I)[C+]([C+]=NC#CBr)C%15C#CN=[C'
-                '+][C+]%16[C+](I)[C+]([C+]=NC#CBr)C([C+]=NC#CBr)[C+]%1'
-                '7C#CN=[C+][C+]%18[C+]([C+]=NC#CBr)[C+]([C+]=NC#CBr)[C'
-                '+]%19[C+]=NC#C[C+]([C+]7[C+]=NC#CC3[C+]3[C+]=NC#CC%19'
-                '[C+]%18[C+]=NC#C[C+]7[C+]%18[C+]=NC#C[C+]3[C+]4C#CN=['
-                'C+]C8[C+]3[C+]=NC#C[C+]%18[C+]4C#CN=[C+][C+]8[C+]([C+'
-                ']=NC#C[C+]%14[C+]%15C#CN=[C+][C+]4C7[C+]=NC#C[C+]%16%'
-                '17)[C+]4[C+]=NC#C[C+]%13[C+]%12C#CN=[C+]C%11[C+]%10C#'
-                'CN=[C+][C+]4C4C#CN=[C+][C+]2C1C#CN=[C+][C+]9[C+]3C#CN'
-                '=[C+][C+]84)[C+]([C+]=NC#CBr)C6[C+]=NC#CBr)[C+]([C+]='
-                'NC#CBr)[C+]([C+]=NC#CBr)C([C+]=NC#CBr)[C+]5Br'
             ),
         ),
         CaseData(
