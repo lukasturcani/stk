@@ -119,9 +119,10 @@ class _TerminalVertex(_LinearVertex):
         fg_centroid = building_block.get_centroid(
             atom_ids=fg.get_placer_ids(),
         )
-        centroid_displacement = (
-            fg_centroid - building_block.get_centroid()
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
         )
+        centroid_displacement = fg_centroid - core_centroid
         building_block = building_block.with_rotation_between_vectors(
             start=centroid_displacement,
             # _cap_direction is defined by a subclass.

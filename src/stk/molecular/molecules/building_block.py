@@ -432,7 +432,7 @@ class BuildingBlock(Molecule):
         for functional_group in self._functional_groups:
             yield from functional_group.get_placer_ids()
 
-    def get_core_ids(self):
+    def get_core_atom_ids(self):
         """
         Yield ids of atoms which form the core of the building block.
 
@@ -458,7 +458,7 @@ class BuildingBlock(Molecule):
                 yield atom_id
 
         for functional_group in self._functional_groups:
-            for atom_id in functional_group.get_core_ids():
+            for atom_id in functional_group.get_core_atom_ids():
                 yield atom_id
 
     def __str__(self):

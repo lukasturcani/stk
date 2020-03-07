@@ -92,9 +92,12 @@ class _LinearCofVertex(_CofVertex):
             target=target,
             origin=self._position,
         )
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
         building_block = (
             building_block.with_rotation_to_minimize_angle(
-                start=building_block.get_centroid() - self._position,
+                start=core_centroid - self._position,
                 target=[0, 0, 1],
                 axis=normalize_vector(target),
                 origin=self._position,
@@ -130,8 +133,11 @@ class _NonLinearCofVertex(_CofVertex):
         normal = building_block.get_plane_normal(
             atom_ids=building_block.get_placer_ids(),
         )
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
         normal = get_acute_vector(
-            reference=building_block.get_centroid() - self._position,
+            reference=core_centroid - self._position,
             vector=normal,
         )
         building_block = building_block.with_rotation_between_vectors(
@@ -170,8 +176,11 @@ class _NonLinearCofVertex(_CofVertex):
         normal = building_block.get_plane_normal(
             atom_ids=building_block.get_placer_ids(),
         )
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
         normal = get_acute_vector(
-            reference=building_block.get_centroid() - self._position,
+            reference=core_centroid - self._position,
             vector=normal,
         )
 

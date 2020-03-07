@@ -34,7 +34,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         deleter_set = set(deleters)
         super().__init__(
             atoms=atoms,
-            bonds=bonders,
+            placers=bonders,
             core_atoms=tuple(
                 atom for atom in atoms if atom not in deleter_set
             ),

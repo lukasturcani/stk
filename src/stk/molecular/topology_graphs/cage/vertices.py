@@ -90,9 +90,12 @@ class _LinearCageVertex(_CageVertex):
             target=edge_coord - edge_centroid,
             origin=self._position,
         )
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
         building_block = (
             building_block.with_rotation_to_minimize_angle(
-                start=building_block.get_centroid() - self._position,
+                start=core_centroid - self._position,
                 target=self._position,
                 axis=normalize_vector(
                     edges[0].get_position() - edges[1].get_position()
@@ -133,13 +136,15 @@ class _NonLinearCageVertex(_CageVertex):
                 ]),
             ),
         )
-        centroid = building_block.get_centroid()
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
         placer_centroid = building_block.get_centroid(
             atom_ids=building_block.get_placer_ids(),
         )
         building_block = building_block.with_rotation_between_vectors(
             start=get_acute_vector(
-                reference=centroid - placer_centroid,
+                reference=core_centroid - placer_centroid,
                 vector=building_block.get_plane_normal(
                     atom_ids=building_block.get_placer_ids(),
                 ),
@@ -183,12 +188,13 @@ class _NonLinearCageVertex(_CageVertex):
             atom_ids=building_block.get_placer_ids(),
         )
         fg0_direction = fg0_position - placer_centroid
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
         axis = np.cross(
             fg0_direction,
             get_acute_vector(
-                reference=(
-                    building_block.get_centroid() - placer_centroid
-                ),
+                reference=core_centroid - placer_centroid,
                 vector=building_block.get_plane_normal(),
             ),
         )

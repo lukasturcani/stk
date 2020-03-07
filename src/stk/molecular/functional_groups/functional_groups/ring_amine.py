@@ -65,7 +65,11 @@ class RingAmine(FunctionalGroup):
             hydrogen3,
             carbon3,
         )
-        super().__init__(atoms, (nitrogen, ))
+        super().__init__(
+            atoms=atoms,
+            placers=(nitrogen, ),
+            core_atoms=(nitrogen, ),
+        )
 
     def get_nitrogen(self):
         """

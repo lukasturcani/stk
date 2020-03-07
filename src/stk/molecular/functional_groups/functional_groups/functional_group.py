@@ -107,7 +107,7 @@ class FunctionalGroup:
 
         yield from (a.get_id() for a in self._placers)
 
-    def get_core_ids(self):
+    def get_core_atom_ids(self):
         """
         Yield the ids of core atoms.
 
@@ -194,7 +194,12 @@ class FunctionalGroup:
         """
 
         clone = self.__class__.__new__(self.__class__)
-        FunctionalGroup.__init__(clone, self._atoms, self._placers)
+        FunctionalGroup.__init__(
+            self=clone,
+            atoms=self._atoms,
+            placers=self._placers,
+            core_atoms=self._core_atoms,
+        )
         return clone
 
     def __str__(self):
