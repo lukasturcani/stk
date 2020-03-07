@@ -115,7 +115,13 @@ class ConstructionState:
         )
         return clone
 
-    def _with_placement_results(self, building_blocks, results):
+    def _with_placement_results(
+        self,
+        vertices,
+        edges,
+        building_blocks,
+        results,
+    ):
         """
         Modify the state.
 
@@ -174,8 +180,16 @@ class ConstructionState:
         self._position_matrix = np.vstack(position_matrices)
         return self
 
-    def with_placement_results(self, building_blocks, results):
+    def with_placement_results(
+        self,
+        vertices,
+        edges,
+        building_blocks,
+        results,
+    ):
         return self.clone()._with_placement_results(
+            vertices=vertices,
+            edges=edges,
             building_blocks=building_blocks,
             results=results,
         )

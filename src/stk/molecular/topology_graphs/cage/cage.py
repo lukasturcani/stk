@@ -43,10 +43,7 @@ class _CageConstructionState(ConstructionState):
         # No need to update vertex positions before last stage, or if
         # there is only 1 stage. The ">=" accounts for the latter case.
         self._next_placement_stage += 1
-        if (
-            self._next_placement_stage
-            >= len(self._num_placement_stages)
-        ):
+        if self._next_placement_stage >= self._num_placement_stages:
             return self
 
         self._update_neighbor_positions(
@@ -85,7 +82,9 @@ class _CageConstructionState(ConstructionState):
                 functional_group = next(
                     building_block.get_functional_groups(fg_id)
                 )
-                # TODO
+                self._neighbor_positions[neighbor_id] = (
+                    self._neighbor_positions.get(neighbor_id, [])
+                )
                 self._neighbor_positions[neighbor_id].append(
                     building_block.get_centroid(
                         atom_ids=functional_group.get_placer_ids(),
@@ -127,7 +126,7 @@ class _CageConstructionState(ConstructionState):
             key: list(value)
             for key, value in self._neighbor_positions.items()
         }
-        clone._next_placement_stage = self._new_placement_stage
+        clone._next_placement_stage = self._next_placement_stage
         clone._num_placement_stages = self._num_placement_stages
         clone._vertex_degrees = dict(self._vertex_degrees)
         return clone

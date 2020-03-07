@@ -41,6 +41,8 @@ class _Serial:
                 placements,
             ))
             state = state.with_placement_results(
+                vertices=vertices,
+                edges=edges,
                 building_blocks=building_blocks,
                 results=placement_results,
             )
