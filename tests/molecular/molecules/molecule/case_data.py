@@ -11,7 +11,7 @@ class CaseData:
         The molecule to be tested.
 
     smiles : :class:`str`
-        The canonical smiles for the molecule.
+        The smiles for the molecule.
 
     """
 

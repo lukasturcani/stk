@@ -41,7 +41,6 @@ def test_get_atoms_1(molecule, atoms, get_atom_ids):
         is_equivalent_atom(atoms[atom_id], atom)
 
 
-@pytest.mark.slow
 def test_get_atoms_2(tmp_path, case_data):
     # Visual inspection of the molecule can be useful.
     case_data.molecule.write(tmp_path / 'molecule.mol')
@@ -49,28 +48,13 @@ def test_get_atoms_2(tmp_path, case_data):
 
 
 def _test_get_atoms_2(molecule, smiles):
-    # The basic idea is that you get a molecule and the canonical
-    # smiles for that molecule. You then create a clone "molecule"
-    # making sure that atoms have canonical ordering. This conversion
-    # will only work correctly when get_atoms() and get_bonds() work
-    # correctly - see get_rdkit_mol(). Finally, you compare that atoms
-    # of the canonically ordered molecule to an rdkit molecule which
-    # also has canonical ordering, and all the atoms should match.
-    molecule = with_canonical_atom_ordering(molecule)
-    expected = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
-    for atom1, atom2 in it.zip_longest(
-        molecule.get_atoms(),
-        expected.GetAtoms(),
-    ):
-        is_equivalent_rdkit_atom(atom1, atom2)
-
-
-def with_canonical_atom_ordering(molecule):
-    smiles = rdkit.MolToSmiles(get_rdkit_mol(molecule))
-    # This print statement is useful for checking what went wrong
-    # if the actual and expected smiles don't match.
-    print(smiles.replace('([H])', '').replace('[H]', ''))
-    return stk.BuildingBlock(smiles)
+    # get_rdkit_mol() tests get_atoms() and get_bonds(), if those are
+    # broken, the produced rdkit molecule will not have the expected
+    # smiles.
+    result = rdkit.MolToSmiles(get_rdkit_mol(molecule))
+    # Printing is useful for debugging.
+    print(result)
+    assert result == smiles
 
 
 def get_rdkit_mol(molecule):
@@ -87,9 +71,3 @@ def get_rdkit_mol(molecule):
             order=rdkit.BondType(bond.get_order())
         )
     return rdkit_mol.GetMol()
-
-
-def is_equivalent_rdkit_atom(atom, rdkit_atom):
-    assert atom.get_atomic_number() == rdkit_atom.GetAtomicNum()
-    assert atom.get_id() == rdkit_atom.GetIdx()
-    assert atom.get_charge() == rdkit_atom.GetFormalCharge()
