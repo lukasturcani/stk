@@ -31,7 +31,14 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         """
 
-        super().__init__(atoms, bonders)
+        deleter_set = set(deleters)
+        super().__init__(
+            atoms=atoms,
+            bonds=bonders,
+            core_atoms=tuple(
+                atom for atom in atoms if atom not in deleter_set
+            ),
+        )
         self._bonders = bonders
         self._deleters = deleters
 

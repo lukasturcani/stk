@@ -432,6 +432,35 @@ class BuildingBlock(Molecule):
         for functional_group in self._functional_groups:
             yield from functional_group.get_placer_ids()
 
+    def get_core_ids(self):
+        """
+        Yield ids of atoms which form the core of the building block.
+
+        This includes all atoms in the building block not part of a
+        functional group, as well as any atoms in a functional group,
+        specifically labelled as core atoms.
+
+        Yields
+        ------
+        :class:`int`
+            The id of a core atom.
+
+        """
+
+        functional_group_atom_ids = {
+            atom_id
+            for functional_group in self._functional_groups
+            for atom_id in functional_group.get_atom_ids()
+        }
+        for atom in self._atoms:
+            atom_id = atom.get_id()
+            if atom_id not in functional_group_atom_ids:
+                yield atom_id
+
+        for functional_group in self._functional_groups:
+            for atom_id in functional_group.get_core_ids():
+                yield atom_id
+
     def __str__(self):
         if self._functional_groups:
             fg_repr = f', {self._functional_groups!r}'

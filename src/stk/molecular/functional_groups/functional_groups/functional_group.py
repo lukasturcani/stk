@@ -31,8 +31,6 @@ information.
 
 """
 
-from ...atoms import Atom
-
 
 class FunctionalGroup:
     """
@@ -44,7 +42,7 @@ class FunctionalGroup:
 
     """
 
-    def __init__(self, atoms, placers):
+    def __init__(self, atoms, placers, core_atoms):
         """
         Initialize a :class:`.FunctionalGroup`.
 
@@ -57,10 +55,15 @@ class FunctionalGroup:
             The atoms used to calculate the position of the functional
             group.
 
+        core_atoms : :class:`tuple` of :class:`.Atom`
+            The atoms of the functional group which also form the core
+            of the :class:`.BuildingBlock`.
+
         """
 
         self._atoms = atoms
         self._placers = placers
+        self._core_atoms = core_atoms
 
     def get_atoms(self):
         """
@@ -103,6 +106,19 @@ class FunctionalGroup:
         """
 
         yield from (a.get_id() for a in self._placers)
+
+    def get_core_ids(self):
+        """
+        Yield the ids of core atoms.
+
+        Yields
+        ------
+        :class:`int`
+            The id of an :class:`.Atom`.
+
+        """
+
+        yield from (a.get_id() for a in self._core_atoms)
 
     def _with_atoms(self, atom_map):
         """
