@@ -18,5 +18,5 @@ def test_get_num_atoms_2(case_data):
 
 
 def _test_get_num_atoms_2(molecule, smiles):
-    expected = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+    expected = rdkit.MolFromSmiles(smiles, sanitize=False)
     assert molecule.get_num_atoms() == expected.GetNumAtoms()

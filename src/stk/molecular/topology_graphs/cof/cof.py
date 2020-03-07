@@ -214,7 +214,7 @@ class Cof(TopologyGraph):
         x, y, z = self._lattice_size
         periodic = ', periodic=True' if self._periodic else ''
         vertex_alignments = (
-            ', vertex_alignments={self._vertex_alignments}'
+            f', vertex_alignments={self._vertex_alignments}'
             if self._vertex_alignments
             else ''
         )
