@@ -1,4 +1,5 @@
 import itertools as it
+import pytest
 from functools import partial
 import stk
 import numpy as np
@@ -23,6 +24,7 @@ PlacementResult = (
 )
 
 
+@pytest.mark.skip
 def test_with_placement_results(construction_state):
     building_blocks = tuple(map(
         construction_state.get_building_block,
