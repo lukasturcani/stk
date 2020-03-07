@@ -157,12 +157,12 @@ class TopologyGraph:
         self._reaction_factory = reaction_factory
         if num_processes == 1:
             self._implementation = _Serial(
-                stages=self._get_stages(construction_stages),
+                stages=tuple(self._get_stages(construction_stages)),
                 after_placement_stage=self._after_placement_stage,
             )
         else:
             self._implementation = _Parallel(
-                stages=self._get_stages(construction_stages),
+                stages=tuple(self._get_stages(construction_stages)),
                 num_processes=num_processes,
                 after_placement_stage=self._after_placement_stage,
             )
@@ -302,7 +302,7 @@ class TopologyGraph:
                     break
             if not placed:
                 stages[-1].append(vertex.get_id())
-        return stages
+        yield from (stage for stage in stages if stage)
 
     def _clean_up(self, state):
         return state
