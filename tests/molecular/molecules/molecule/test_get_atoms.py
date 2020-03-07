@@ -41,6 +41,7 @@ def test_get_atoms_1(molecule, atoms, get_atom_ids):
         is_equivalent_atom(atoms[atom_id], atom)
 
 
+@pytest.mark.slow
 def test_get_atoms_2(tmp_path, case_data):
     # Visual inspection of the molecule can be useful.
     case_data.molecule.write(tmp_path / 'molecule.mol')
