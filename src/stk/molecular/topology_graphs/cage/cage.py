@@ -1,5 +1,4 @@
 from collections import Counter, defaultdict
-import numpy as np
 from functools import partial
 
 from ..topology_graph import TopologyGraph, ConstructionState
@@ -12,6 +11,8 @@ class _CageConstructionState(ConstructionState):
         building_block_vertices,
         edges,
         scale,
+        num_placement_stages,
+        vertex_degrees,
         lattice_constants=None,
     ):
         super().__init__(
@@ -20,7 +21,105 @@ class _CageConstructionState(ConstructionState):
             scale=scale,
             lattice_constants=lattice_constants,
         )
+        self._num_placement_stages = num_placement_stages
+        self._next_placement_stage = 1
+        self._vertex_degrees = dict(vertex_degrees)
         self._neighbor_positions = {}
+
+    def _with_placement_results(
+        self,
+        vertices,
+        edges,
+        building_blocks,
+        results,
+    ):
+        super()._with_placement_results(
+            vertices=vertices,
+            edges=edges,
+            building_blocks=building_blocks,
+            results=results,
+        )
+
+        # No need to update vertex positions before last stage, or if
+        # there is only 1 stage. The ">=" accounts for the latter case.
+        self._next_placement_stage += 1
+        if (
+            self._next_placement_stage
+            >= len(self._num_placement_stages)
+        ):
+            return self
+
+        self._update_neighbor_positions(
+            vertices=vertices,
+            edges=edges,
+            building_blocks=building_blocks,
+            results=results,
+        )
+        return self
+
+    def _update_neighbor_positions(
+        self,
+        vertices,
+        edges,
+        building_blocks,
+        results,
+    ):
+        for vertex, vertex_edges, building_block, result in zip(
+            vertices,
+            edges,
+            building_blocks,
+            results,
+        ):
+            building_block = building_block.with_position_matrix(
+                position_matrix=result.position_matrix,
+            )
+            edge_functional_groups = dict(zip(
+                result.functional_group_edges.values(),
+                result.functional_group_edges.keys(),
+            ))
+            for neighbor_id, edge_id in zip(
+                self._get_neighbors(vertex, vertex_edges),
+                (edge.get_id() for edge in vertex_edges),
+            ):
+                fg_id = edge_functional_groups[edge_id]
+                functional_group = next(
+                    building_block.get_functional_groups(fg_id)
+                )
+                # TODO
+                self._neighbor_positions[neighbor_id].append(
+                    building_block.get_centroid(
+                        atom_ids=functional_group.get_placer_ids(),
+                    )
+                )
+
+        self._update_vertices()
+
+    def _get_neighbors(self, vertex, vertex_edges):
+        for edge in vertex_edges:
+            neighbor_id = (
+                edge.get_vertex1_id()
+                if vertex.get_id() != edge.get_vertex1_id()
+                else edge.get_vertex2_id()
+            )
+            if self._vertices[neighbor_id].use_neighbor_placement():
+                yield neighbor_id
+
+    def _update_vertices(self):
+        updateable = (
+            (vertex_id, vertex)
+            for vertex_id, vertex in self._vertices.items()
+            if (
+                len(self._neighbor_positions[vertex_id])
+                == self._vertex_degrees[vertex_id]
+            )
+        )
+        for vertex_id, vertex in updateable:
+            self._vertices[vertex_id] = vertex.with_position(
+                position=(
+                    sum(self._neighbor_positions[vertex_id])
+                    / len(self._neighbor_positions[vertex_id])
+                ),
+            )
 
     def clone(self):
         clone = super().clone()
@@ -28,27 +127,10 @@ class _CageConstructionState(ConstructionState):
             key: list(value)
             for key, value in self._neighbor_positions.items()
         }
+        clone._next_placement_stage = self._new_placement_stage
+        clone._num_placement_stages = self._num_placement_stages
+        clone._vertex_degrees = dict(self._vertex_degrees)
         return clone
-
-    def _with_neighbor_positions(self, neighbor_positions):
-        for vertex_id, positions in neighbor_positions.items():
-            self._neighbor_positions[vertex_id] = (
-                self._neighbor_positions.get(vertex_id, [])
-            )
-            self._neighbor_positions[vertex_id].extend(
-                np.array(position, dtype=np.float64)
-                for position in positions
-            )
-        return self
-
-    def with_neighbor_positions(self, neighbor_positions):
-        return self.clone()._with_neighbor_positions(
-            neighbor_positions=neighbor_positions,
-        )
-
-    def get_neighbor_positions(self, vertex_id):
-        for position in self._neighbor_positions.get(vertex_id, []):
-            yield np.array(position, dtype=np.float64)
 
 
 class Cage(TopologyGraph):
@@ -236,91 +318,10 @@ class Cage(TopologyGraph):
             building_block_vertices=building_block_vertices,
             edges=self._edges,
             scale=self._get_scale(building_block_vertices),
+            num_placement_stages=len(self._implementation._stages),
+            vertex_degrees=self._vertex_degrees,
             lattice_constants=self._get_lattice_constants(),
         )
-
-    def _after_placement_stage(
-        self,
-        state,
-        vertices,
-        edges,
-        building_blocks,
-        results,
-    ):
-        state = self._update_neighbor_positions(
-            state=state,
-            vertices=vertices,
-            edges=edges,
-            building_blocks=building_blocks,
-            results=results,
-        )
-        return state.with_vertices(self._get_updated_vertices(state))
-
-    def _update_neighbor_positions(
-        self,
-        state,
-        vertices,
-        edges,
-        building_blocks,
-        results,
-    ):
-        neighbor_positions = defaultdict(list)
-        for vertex, vertex_edges, building_block, result in zip(
-            vertices,
-            edges,
-            building_blocks,
-            results,
-        ):
-            building_block = building_block.with_position_matrix(
-                position_matrix=result.position_matrix,
-            )
-            edge_functional_groups = dict(zip(
-                result.functional_group_edges.values(),
-                result.functional_group_edges.keys(),
-            ))
-            for neighbor_id, edge_id in zip(
-                self._get_neighbors(state, vertex, vertex_edges),
-                (edge.get_id() for edge in vertex_edges),
-            ):
-                fg_id = edge_functional_groups[edge_id]
-                functional_group = next(
-                    building_block.get_functional_groups(fg_id)
-                )
-                neighbor_positions[neighbor_id].append(
-                    building_block.get_centroid(
-                        atom_ids=functional_group.get_placer_ids(),
-                    )
-                )
-
-        return state.with_neighbor_positions(neighbor_positions)
-
-    def _get_neighbors(self, state, vertex, vertex_edges):
-        for edge in vertex_edges:
-            neighbor_id = (
-                edge.get_vertex1_id()
-                if vertex.get_id() != edge.get_vertex1_id()
-                else edge.get_vertex2_id()
-            )
-            neighbor = state.get_vertex(neighbor_id)
-            if neighbor.use_neighbor_placement():
-                yield neighbor_id
-
-    def _get_updated_vertices(self, state):
-        for vertex_id in range(state.get_num_vertices()):
-            neighbor_positions = tuple(state.get_neighbor_positions(
-                vertex_id=vertex_id,
-            ))
-            if (
-                len(neighbor_positions)
-                == self._vertex_degrees[vertex_id]
-            ):
-                yield state.get_vertex(vertex_id).with_position(
-                    position=(
-                        sum(neighbor_positions)/len(neighbor_positions)
-                    ),
-                )
-            else:
-                yield state.get_vertex(vertex_id)
 
     def __repr__(self):
         vertex_alignments = (

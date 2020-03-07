@@ -158,13 +158,11 @@ class TopologyGraph:
         if num_processes == 1:
             self._implementation = _Serial(
                 stages=tuple(self._get_stages(construction_stages)),
-                after_placement_stage=self._after_placement_stage,
             )
         else:
             self._implementation = _Parallel(
                 stages=tuple(self._get_stages(construction_stages)),
                 num_processes=num_processes,
-                after_placement_stage=self._after_placement_stage,
             )
 
         if edge_groups is None:
@@ -305,51 +303,6 @@ class TopologyGraph:
         yield from (stage for stage in stages if stage)
 
     def _clean_up(self, state):
-        return state
-
-    def _after_placement_stage(
-        self,
-        state,
-        vertices,
-        edges,
-        building_blocks,
-        results,
-    ):
-        """
-        Perform `state` changes after a placement stage is done.
-
-        This method should be overridden if the `state` needs to be
-        modified after a placement stage of construction is complete.
-
-        Parameters
-        ----------
-        state : :class:`._ConstructionState`
-            The state of the construction process.
-
-        vertices : :class:`tuple` of :class:`.Vertex`
-            The vertices which were used in the last construction
-            stage.
-
-        edges : :class:`tuple`
-            For each vertex in `vertices` a :class:`tuple` holding
-            all connected edges. Has the form
-            ``((e1, e2, e3), (e1, e4))``.
-
-        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
-            The building blocks which were placed in the last
-            construction stage. They are ordered to have the same
-            index as the vertex in `vertices` which placed them.
-
-        results : :class:`._PlacementResult`
-            The placement results of the previous placement stage.
-
-        Returns
-        -------
-        :class:`.ConstructionState`
-            The new construction state.
-
-        """
-
         return state
 
     def __str__(self):

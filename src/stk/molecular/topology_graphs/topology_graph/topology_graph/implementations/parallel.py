@@ -9,7 +9,7 @@ class _Parallel:
 
     """
 
-    def __init__(self, stages, num_processes, after_placement_stage):
+    def __init__(self, stages, num_processes):
         """
         Initialize a :class:`._Parallel`.
 
@@ -24,16 +24,10 @@ class _Parallel:
         num_processes : :class:`int`
             The number of parallel processes to spawn.
 
-        after_placement_stage : :class:`callable`
-            The function to run on the :class:`._ConstructionState`
-            after a placement stage has been completed. See
-            :meth:`.TopologyGraph._after_placement_stage`.
-
         """
 
         self._stages = stages
         self._num_processes = num_processes
-        self._after_placement_stage = after_placement_stage
 
     def _place_building_blocks(self, state):
         with pathos.pools.ProcessPool(self._num_processes) as pool:
@@ -54,13 +48,6 @@ class _Parallel:
                     placements,
                 )
                 state = state.with_placement_results(
-                    building_blocks=building_blocks,
-                    results=placement_results,
-                )
-                state = self._after_placement_stage(
-                    state=state,
-                    vertices=vertices,
-                    edges=edges,
                     building_blocks=building_blocks,
                     results=placement_results,
                 )
