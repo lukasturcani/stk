@@ -31,19 +31,17 @@ def is_equivalent_functional_group(
     for atom1, atom2 in atoms:
         is_equivalent_atom(atom1, atom2)
 
-    bonders = it.zip_longest(
-        functional_group1.get_bonders(),
-        functional_group2.get_bonders(),
-    )
-    for bonder1, bonder2 in bonders:
-        is_equivalent_atom(bonder1, bonder2)
+    for placer_id1, placer_id2 in it.zip_longest(
+        functional_group1.get_placer_ids(),
+        functional_group2.get_placer_ids(),
+    ):
+        assert placer_id1 == placer_id2
 
-    deleters = it.zip_longest(
-        functional_group1.get_deleters(),
-        functional_group2.get_deleters(),
-    )
-    for deleter1, deleter2 in deleters:
-        is_equivalent_atom(deleter1, deleter2)
+    for core_atom_id1, core_atom_id2 in it.zip_longest(
+        functional_group1.get_core_atom_ids(),
+        functional_group2.get_core_atom_ids(),
+    ):
+        assert core_atom_id1 == core_atom_id2
 
 
 def is_equivalent_building_block(building_block1, building_block2):
@@ -52,3 +50,14 @@ def is_equivalent_building_block(building_block1, building_block2):
         functional_groups1=building_block1.get_functional_groups(),
         functional_groups2=building_block2.get_functional_groups(),
     )
+    for placer_id1, placer_id2 in it.zip_longest(
+        building_block1.get_placer_ids(),
+        building_block2.get_placer_ids(),
+    ):
+        assert placer_id1 == placer_id2
+
+    for core_atom_id1, core_atom_id2 in it.zip_longest(
+        building_block1.get_core_atom_ids(),
+        building_block2.get_core_atom_ids(),
+    ):
+        assert core_atom_id1 == core_atom_id2
