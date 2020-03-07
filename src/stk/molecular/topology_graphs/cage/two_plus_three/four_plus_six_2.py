@@ -11,7 +11,7 @@ class FourPlusSix2(Cage):
 
     """
 
-    __vertex_prototypes = (
+    _vertex_prototypes = (
         _NonLinearCageVertex(0, [1, 0, 1]),
         _NonLinearCageVertex(1, [-1, 0, 1]),
         _NonLinearCageVertex(2, [1, 0, -1]),
@@ -24,14 +24,14 @@ class FourPlusSix2(Cage):
     )
 
     _vertex_prototypes = (
-        *__vertex_prototypes,
+        *_vertex_prototypes,
         _LinearCageVertex.init_at_center(
             id=8,
-            vertices=(__vertex_prototypes[0], __vertex_prototypes[2]),
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
         ),
         _LinearCageVertex.init_at_center(
             id=9,
-            vertices=(__vertex_prototypes[1], __vertex_prototypes[3]),
+            vertices=(_vertex_prototypes[1], _vertex_prototypes[3]),
         )
     )
 
