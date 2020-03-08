@@ -100,7 +100,7 @@ class TopologyGraph:
 
     def __init__(
         self,
-        vertices,
+        building_block_vertices,
         edges,
         reaction_factory,
         construction_stages,
@@ -112,8 +112,10 @@ class TopologyGraph:
 
         Parameters
         ----------
-        vertices : :class:`tuple` of :class:`.VertexData`
-            The vertices which make up the graph.
+        building_block_vertices : :class:`dict`
+            Maps each :class:`.BuildingBlock` to be placed, to a
+            :class:`tuple` of :class:`.Vertex` instances, on which
+            it should be placed.
 
         edges : :class:`tuple` of :class:`.EdgeData`
             The edges which make up the graph.
@@ -152,7 +154,9 @@ class TopologyGraph:
 
         """
 
-        self._vertices = vertices
+        self._building_block_vertices = self._with_scale(
+            building_block_vertices=building_block_vertices,
+        )
         self._edges = edges
         self._reaction_factory = reaction_factory
         if num_processes == 1:
@@ -171,33 +175,21 @@ class TopologyGraph:
             )
         self._edge_groups = edge_groups
 
+    def get_building_blocks(self):
+        yield from self._building_block_vertices
+
+    def get_num_building_block(self, building_block):
+        return len(
+            self._building_block_vertices.get(building_block, [])
+        )
+
     def _get_lattice_constants(self):
         return
         yield
 
-    def get_building_block_vertices(self, building_blocks):
-        """
-
-        Raises
-        ------
-        :class:`ValueError`
-            If `building_blocks` cannot be assigned to the vertices.
-
-        """
-
-        raise NotImplementedError()
-
-    def construct(self, building_block_vertices):
+    def construct(self):
         """
         Construct a :class:`.ConstructedMolecule`.
-
-        Parameters
-        ----------
-        building_block_vertices : :class:`dict`
-            Maps :class:`.BuildingBlock` instances to a
-            :class:`tuple` holding :class:`.Vertex` instances.
-            The mapping specifies which building block gets placed
-            on which vertices of the graph.
 
         Returns
         -------
@@ -206,19 +198,15 @@ class TopologyGraph:
 
         """
 
-        state = self._get_construction_state(building_block_vertices)
-        state = self._before_placement(state)
+        state = self._get_construction_state()
         state = self._place_building_blocks(state)
-        state = self._before_reactions(state)
         state = self._run_reactions(state)
-        state = self._clean_up(state)
         return ConstructionResult.init_from_construction_state(state)
 
-    def _get_construction_state(self, building_block_vertices):
+    def _get_construction_state(self):
         return ConstructionState(
-            building_block_vertices=building_block_vertices,
+            building_block_vertices=self._building_block_vertices,
             edges=self._edges,
-            scale=self._get_scale(building_block_vertices),
             lattice_constants=self._get_lattice_constants(),
         )
 
@@ -247,14 +235,8 @@ class TopologyGraph:
         for id_ in vertex_ids:
             yield self._vertices[id_]
 
-    def _get_scale(self, building_block_vertices):
+    def _with_scale(self, building_block_vertices):
         raise NotImplementedError()
-
-    def _before_reactions(self, state):
-        return state
-
-    def _before_placement(self, state):
-        return state
 
     def _place_building_blocks(self, state):
         """
@@ -301,9 +283,6 @@ class TopologyGraph:
             if not placed:
                 stages[-1].append(vertex.get_id())
         yield from (stage for stage in stages if stage)
-
-    def _clean_up(self, state):
-        return state
 
     def __str__(self):
         return repr(self)

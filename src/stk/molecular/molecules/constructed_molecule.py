@@ -88,101 +88,27 @@ class ConstructedMolecule(Molecule):
 
     """
 
-    def __init__(
-        self,
-        building_blocks,
-        topology_graph,
-        building_block_vertices=None,
-    ):
+    def __init__(self, topology_graph):
         """
         Initialize a :class:`.ConstructedMolecule`.
 
         Parameters
         ----------
-        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
-            The :class:`.BuildingBlock` instances which
-            represent the building block molecules used for
-            construction. Only one instance is present per building
-            block molecule, even if multiples of that building block
-            join up to form the :class:`.ConstructedMolecule`.
-
         topology_graph : :class:`.TopologyGraph`
             Defines the topology graph of the
             :class:`.ConstructedMolecule` and constructs it.
 
-        building_block_vertices : :class:`dict`, optional
-            Maps the :class:`.BuildingBlock` in  `building_blocks` to
-            the :class:`~.topologies.base.Vertex` instances in
-            `topology_graph` it is placed on. Each
-            :class:`.BuildingBlock` can be mapped to multiple
-            :class:`~.topologies.base.Vertex`
-            objects. See the examples section in the
-            :class:`.ConstructedMolecule` class docstring to help
-            understand how this parameter is used. If ``None``,
-            a building block will be placed on an vertex with a
-            degree equal to its number of functional groups.
-            If multiple building blocks with the same number of
-            functional groups are present in `building_blocks`, this
-            parameter is required, as otherwise placement would be
-            ambiguous.
-
-        Raises
-        ------
-        :class:`.ConstructionError`
-            If multiple building blocks with the same number of
-            functional groups are present, and
-            `building_block_vertices` is not provided.
-
         """
 
-        if building_block_vertices is None:
-            building_block_vertices = (
-                topology_graph.get_building_block_vertices(
-                    building_blocks=building_blocks,
-                )
-            )
-        else:
-            building_block_vertices = dict(building_block_vertices)
-
-        try:
-            construction_result = topology_graph.construct(
-                building_block_vertices=building_block_vertices,
-            )
-
-        except Exception as ex:
-            errormsg = (
-                'Construction failure.\n'
-                '\n'
-                'topology_graph\n'
-                '--------------\n'
-                f'{topology_graph}\n'
-                '\n'
-                'building blocks\n'
-                '---------------\n'
-            )
-
-            bb_blocks = []
-            for i, bb in enumerate(building_blocks):
-                bb_blocks.append(
-                    f'{bb}\n\n'
-                    f'{bb.get_position_matrix()}'
-                )
-
-            errormsg += '\n\n'.join(bb_blocks)
-            raise ConstructionError(errormsg) from ex
-
+        construction_result = topology_graph.construct()
         super().__init__(
             atoms=construction_result.atoms,
             bonds=construction_result.bonds,
             position_matrix=construction_result.position_matrix,
         )
         self._topology_graph = topology_graph
-        self._building_block_vertices = building_block_vertices
         self._atom_infos = construction_result.atom_infos
         self._bond_infos = construction_result.bond_infos
-        self._building_block_counts = (
-            construction_result.building_block_counts
-        )
 
     def clone(self):
         """
@@ -196,44 +122,10 @@ class ConstructedMolecule(Molecule):
         """
 
         clone = super().clone()
-        clone._building_block_vertices = dict(
-            self._building_block_vertices
-        )
-        clone._building_block_counts = dict(
-            self._building_block_counts
-        )
         clone._topology_graph = self._topology_graph
         clone._atom_infos = self._atom_infos
         clone._bond_infos = self._bond_infos
         return clone
-
-    def get_building_blocks(self):
-        """
-        Yield the building blocks.
-
-        Yields
-        ------
-        :class:`.BuildingBlock`
-            A building block of the :class:`ConstructedMolecule`.
-
-        """
-
-        yield from self._building_block_vertices.keys()
-
-    def get_building_block_counts(self):
-        """
-        Get the count of each building block.
-
-        Returns
-        -------
-        :class:`dict`
-            Maps each :class:`.BuildingBlock` used during construction,
-            to the number of times it is present in the
-            :class:`.ConstructedMolecule`.
-
-        """
-
-        return dict(self._building_block_counts)
 
     def get_topology_graph(self):
         """
@@ -287,27 +179,8 @@ class ConstructedMolecule(Molecule):
 
         yield from self._bond_infos
 
-    def get_building_block_vertices(self):
-        """
-        Get vertices on which each building block was placed.
-
-        Returns
-        -------
-        :class:`dict`
-            Maps each :class:`.BuildingBlock` used during construction,
-            to a :class:`tuple` of the :class:`.Vertex` instances on
-            which it was placed.
-
-        """
-
-        return dict(self._building_block_vertices)
-
     def __str__(self):
-        return (
-            f'{self.__class__.__name__}'
-            f'(building_blocks={tuple(self.get_building_blocks())}, '
-            f'topology_graph={self._topology_graph!r})'
-        )
+        return f'{self.__class__.__name__}({self._topology_graph!r})'
 
     def __repr__(self):
         return str(self)

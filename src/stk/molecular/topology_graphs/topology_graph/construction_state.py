@@ -46,7 +46,6 @@ class ConstructionState:
         self._atom_infos = []
         self._bonds = []
         self._bond_infos = []
-        self._building_block_counts = defaultdict(int)
         self._edge_functional_groups = defaultdict(list)
 
     def _get_vertex_edges(self):
@@ -107,9 +106,6 @@ class ConstructionState:
         clone._atom_infos = list(self._atom_infos)
         clone._bonds = list(self._bonds)
         clone._bond_infos = list(self._bond_infos)
-        clone._building_block_counts = defaultdict.copy(
-            self._building_block_counts
-        )
         clone._edge_functional_groups = defaultdict.copy(
             self._edge_functional_groups
         )
@@ -133,7 +129,6 @@ class ConstructionState:
         results_ = zip(building_blocks, results)
         for index, (building_block, result) in enumerate(results_):
             position_matrices.append(result.position_matrix)
-            self._building_block_counts[building_block] += 1
 
             # atom_map maps atoms in the original building block to
             # the new atoms the constructed molecule should hold.
@@ -363,6 +358,3 @@ class ConstructionState:
 
     def get_bond_infos(self):
         yield from self._bond_infos
-
-    def get_building_block_counts(self):
-        return dict(self._building_block_counts)
