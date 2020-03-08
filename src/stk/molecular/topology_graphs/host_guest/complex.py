@@ -61,6 +61,8 @@ class Complex(TopologyGraph):
 
     def __init__(
         self,
+        host,
+        guest,
         guest_start=None,
         guest_target=None,
         displacement=(0, 0, 0),
@@ -117,12 +119,13 @@ class Complex(TopologyGraph):
         self._guest_target = guest_target
         self._displacement = displacement
 
-        vertices = (
-            _HostVertex(0, [0, 0, 0]),
-            _GuestVertex(1, displacement, start, target)
-        )
         super().__init__(
-            vertices=vertices,
+            building_block_vertices={
+                host: (_HostVertex(0, [0, 0, 0]), ),
+                guest: (
+                    _GuestVertex(1, displacement, start, target),
+                ),
+            },
             edges=(),
             reaction_factory=None,
             construction_stages=(),

@@ -62,6 +62,7 @@ into its :class:`.Vertex` counterpart.
 from functools import partial
 import numpy as np
 
+from stk.utilities import flatten
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
 from ..edge_group import EdgeGroup
@@ -256,31 +257,6 @@ class TopologyGraph:
             )
         )
 
-    def get_vertices(self, vertex_ids=None):
-        """
-        Yield the vertices of the graph.
-
-        Parameters
-        ----------
-        vertex_ids : :class:`iterable` of :class:`int`, optional
-            The ids of vertices to yield. If ``None``, then all
-            vertices are yielded.
-
-        Yields
-        ------
-        :class:`.Vertex`
-            A vertex of the graph.
-
-        """
-
-        if vertex_ids is None:
-            vertex_ids = range(len(self._vertices))
-        elif isinstance(vertex_ids, int):
-            vertex_ids = (vertex_ids, )
-
-        for id_ in vertex_ids:
-            yield self._vertices[id_]
-
     def _get_scale(self, building_block_vertices):
         raise NotImplementedError()
 
@@ -319,7 +295,8 @@ class TopologyGraph:
         stages = tuple(
             [] for i in range(len(construction_stages)+1)
         )
-        for vertex in self._vertices:
+        vertices = flatten(self._building_block_vertices.values())
+        for vertex in vertices:
             placed = False
             for i, stage in enumerate(construction_stages):
                 if stage(vertex):

@@ -1,6 +1,8 @@
 import itertools as it
 from collections import Counter
 import numpy as np
+from functools import partial
+from operator import getitem
 
 from ..topology_graph import TopologyGraph, EdgeGroup
 from .edge import _CofEdge
@@ -17,6 +19,7 @@ class Cof(TopologyGraph):
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
     ):
+
         self._vertex_alignments = (
             dict(vertex_alignments)
             if vertex_alignments is not None
@@ -24,15 +27,28 @@ class Cof(TopologyGraph):
         )
         self._lattice_size = lattice_size
         self._periodic = periodic
+
         lattice = self._get_lattice(self._vertex_alignments)
         edges = self._get_edges(lattice)
         vertices = self._get_vertices(lattice)
 
+        if isinstance(building_blocks, dict):
+            get_vertex = partial(getitem, vertices)
+            building_block_vertices = {
+                building_block: map(get_vertex, ids)
+                for building_block, ids in building_blocks.items()
+            }
+        else:
+            building_block_vertices = (
+                self._get_building_block_vertices(
+                    building_blocks=building_blocks,
+                    vertices=vertices,
+                    edges=edges,
+                )
+            )
+
         super().__init__(
-            building_block_vertices=self._get_building_block_vertices(
-                building_blocks=building_blocks,
-                vertices=vertices,
-            ),
+            building_block_vertices=building_block_vertices,
             edges=edges,
             reaction_factory=reaction_factory,
             construction_stages=(),
@@ -178,7 +194,8 @@ class Cof(TopologyGraph):
 
         return tuple(edge_clones)
 
-    def _get_building_block_vertices(self, building_blocks, vertices):
+    @staticmethod
+    def _get_building_block_vertices(building_blocks, vertices, edges):
         bb_by_degree = {}
         for bb in building_blocks:
             if bb.get_num_functional_groups() in bb_by_degree:
@@ -191,7 +208,7 @@ class Cof(TopologyGraph):
 
         vertex_degrees = Counter(
             vertex_id
-            for edge in self._edges
+            for edge in edges
             for vertex_id in (
                 edge.get_vertex1_id(),
                 edge.get_vertex2_id(),

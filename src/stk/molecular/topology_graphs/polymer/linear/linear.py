@@ -252,7 +252,7 @@ class Linear(TopologyGraph):
         edges.append(Edge(len(edges), vertices[-2], vertices[-1]))
 
         super().__init__(
-            building_block_vertices=self.get_buliding_block_vertices(
+            building_block_vertices=self._get_building_block_vertices(
                 building_blocks=building_blocks,
                 vertices=vertices,
             ),

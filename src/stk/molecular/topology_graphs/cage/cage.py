@@ -269,12 +269,18 @@ class Cage(TopologyGraph):
 
         """
 
-        if not isinstance(building_blocks, dict):
+        if isinstance(building_blocks, dict):
+            building_blocks = {
+                building_block: map(self._get_vertex, ids)
+                for building_block, ids in building_blocks.items()
+            }
+
+        else:
             building_blocks = self._get_building_block_vertices(
                 building_blocks=building_blocks,
             )
 
-        vertex_alignments = self._vertex_alignments = (
+        self._vertex_alignments = vertex_alignments = (
             dict(vertex_alignments)
             if vertex_alignments is not None
             else {}
@@ -296,6 +302,9 @@ class Cage(TopologyGraph):
             num_processes=num_processes,
             edge_groups=None,
         )
+
+    def _get_vertex(self, vertex_id):
+        return self._vertex_prototypes[vertex_id]
 
     @staticmethod
     def _with_aligner(vertex_alignments, vertex):
@@ -337,11 +346,10 @@ class Cage(TopologyGraph):
             for bb in building_block_vertices
         )
 
-    def _get_construction_state(self, building_block_vertices):
+    def _get_construction_state(self):
         return _CageConstructionState(
-            building_block_vertices=building_block_vertices,
+            building_block_vertices=self._building_block_vertices,
             edges=self._edges,
-            scale=self._get_scale(building_block_vertices),
             num_placement_stages=len(self._implementation._stages),
             vertex_degrees=self._vertex_degrees,
             lattice_constants=tuple(
