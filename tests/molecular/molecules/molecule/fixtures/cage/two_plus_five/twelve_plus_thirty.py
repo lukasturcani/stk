@@ -17,7 +17,7 @@ from ....case_data import CaseData
                         stk.BuildingBlock(
                             smiles=(
                                 'Br[C+]1C2(Br)[C+]=N[C+]2[C+](Br)[C+]('
-                                'Br[C+]1Br'
+                                'Br)[C+]1Br'
                             ),
                             functional_groups=[stk.BromoFactory()],
                         ),

@@ -8,14 +8,17 @@ from .case_data import CaseData
 @pytest.fixture(
     params=(
         CaseData(
-            building_blocks=(
-                stk.BuildingBlock('BrC#CBr', [stk.BromoFactory()]),
-                stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrC#CBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
                 ),
+                repeating_unit='AB',
+                num_repeating_units=2,
             ),
-            topology_graph=stk.polymer.Linear('AB', 2),
             num_new_atoms=0,
             num_new_bonds=3,
         ),

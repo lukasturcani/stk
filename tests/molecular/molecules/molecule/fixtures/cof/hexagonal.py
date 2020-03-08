@@ -6,67 +6,63 @@ from ...case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData.init_constructed_molecule(
-            topology_graph=stk.cof.Hexagonal(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC1=C(Br)[C+]=N1',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles='BrN1N(Br)[C+]=N1',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1[C+]2[N+][C+2]C2(Br)[C+](I)[C+](I)'
-                            '[C+](Br)[C+]1Br'
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cof.Hexagonal(
+                    building_blocks={
+                        stk.BuildingBlock(
+                            smiles='BrC1=C(Br)[C+]=N1',
+                            functional_groups=[stk.BromoFactory()],
+                        ): (
+                            4, 5, 6, 7, 8, 9, 20, 21, 23, 24, 30, 36,
+                            38, 40, 41, 42, 43, 46, 47, 52, 53, 60, 61,
                         ),
-                        functional_groups=[
-                            stk.BromoFactory(),
-                            stk.IodoFactory(),
-                            stk.FluoroFactory(),
-                        ],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1[C+]2[S][C+2]C2(Br)[C+](I)[C+](I)'
-                            '[C+](Br)[C+]1Br'
+                        stk.BuildingBlock(
+                            smiles='BrN1N(Br)[C+]=N1',
+                            functional_groups=[stk.BromoFactory()],
+                        ): (
+                            10, 11, 12, 13, 14, 15, 22, 25, 26, 27, 28,
+                            29, 37, 39, 44, 45, 54, 55, 56, 57, 58, 59,
+                            31, 62, 63,
                         ),
-                        functional_groups=[
-                            stk.BromoFactory(),
-                            stk.IodoFactory(),
-                            stk.FluoroFactory(),
-                        ],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1[C+]2[S][O]C2(Br)[C+](I)[C+](I)[C'
-                            '+](Br)[C+]1Br'
-                        ),
-                        functional_groups=[
-                            stk.BromoFactory(),
-                            stk.IodoFactory(),
-                            stk.FluoroFactory(),
-                        ],
-                    ),
+                        stk.BuildingBlock(
+                            smiles=(
+                                'Br[C+]1[C+]2[N+][C+2]C2(Br)[C+](I)[C+'
+                                '](I)[C+](Br)[C+]1Br'
+                            ),
+                            functional_groups=[
+                                stk.BromoFactory(),
+                                stk.IodoFactory(),
+                                stk.FluoroFactory(),
+                            ],
+                        ): (0, 1, 18, 50, 51),
+                        stk.BuildingBlock(
+                            smiles=(
+                                'Br[C+]1[C+]2[S][C+2]C2(Br)[C+](I)[C+]'
+                                '(I)[C+](Br)[C+]1Br'
+                            ),
+                            functional_groups=[
+                                stk.BromoFactory(),
+                                stk.IodoFactory(),
+                                stk.FluoroFactory(),
+                            ],
+                        ): (2, 16, 34, 49),
+                        stk.BuildingBlock(
+                            smiles=(
+                                'Br[C+]1[C+]2[S][O]C2(Br)[C+](I)[C+](I'
+                                ')[C+](Br)[C+]1Br'
+                            ),
+                            functional_groups=[
+                                stk.BromoFactory(),
+                                stk.IodoFactory(),
+                                stk.FluoroFactory(),
+                            ],
+                        ): (3, 17, 19, 32, 33, 35, 48),
+                    },
+                    lattice_size=(2, 2, 1),
+                    vertex_alignments={0: 5},
                 ),
-                lattice_size=(2, 2, 1),
-                vertex_alignments={0: 5},
             ),
-            building_block_vertices={
-                0: (
-                    4, 5, 6, 7, 8, 9, 20, 21, 23, 24, 30, 36, 38,
-                    40, 41, 42, 43, 46, 47, 52, 53, 60, 61
-                ),
-                1: (
-                    10, 11, 12, 13, 14, 15, 22, 25, 26, 27, 28, 29,
-                    37, 39, 44, 45, 54, 55, 56, 57, 58, 59, 31, 62, 63,
-                ),
-                2: (0, 1, 18, 50, 51),
-                3: (2, 16, 34, 49),
-                4: (3, 17, 19, 32, 33, 35, 48),
-            },
             smiles=(
                 'BrC1=C([C+]2[C+](Br)[C+](I)[C+]3C4=C([C+]=N4)[C+]4[C+'
                 '](Br)[C+](Br)[C+]5[C+]6N7N=[C+]N7C78OS[C+]7[C+]7C9=C('

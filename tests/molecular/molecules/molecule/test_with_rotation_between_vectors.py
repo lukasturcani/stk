@@ -10,11 +10,14 @@ from ..utilities import has_same_structure, get_displacement_vector
         stk.BuildingBlock('NCCN'),
         stk.BuildingBlock('Brc1ccc(Br)cc1Br', [stk.BromoFactory()]),
         stk.ConstructedMolecule(
-            building_blocks=(
-                stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-                stk.BuildingBlock('BrCNCCBr', [stk.BromoFactory()]),
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock('BrCNCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=2,
             ),
-            topology_graph=stk.polymer.Linear('AB', 2),
         ),
     )
 )

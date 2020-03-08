@@ -5,6 +5,7 @@ import stk
 from .utilities import is_clone
 
 
+@pytest.mark.skip
 def test_with_vertices(construction_state, vertices):
     clone = construction_state.clone()
     _test_with_vertices(construction_state, vertices)

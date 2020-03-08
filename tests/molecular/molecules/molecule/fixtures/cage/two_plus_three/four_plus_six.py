@@ -21,14 +21,14 @@ from ....case_data import CaseData
                         stk.BuildingBlock(
                             smiles=(
                                 'Br[C+]1[C+2][C+](Br)[C+]2[C+][C+2]C2('
-                                'Br[C+2]1'
+                                'Br)[C+2]1'
                             ),
                             functional_groups=[stk.BromoFactory()],
                         ): (0, 1, 2),
                         stk.BuildingBlock(
                             smiles=(
                                 'Br[C+]1[C+2][C+](Br)[C+]2[C+](F)[C+2]'
-                                'C2(Br[C+2]1'
+                                'C2(Br)[C+2]1'
                             ),
                             functional_groups=[stk.BromoFactory()],
                         ): (3, ),
