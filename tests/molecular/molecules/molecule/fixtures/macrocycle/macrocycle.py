@@ -29,6 +29,24 @@ from ...case_data import CaseData
                 '2N=[C+]1'
             ),
         ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.macrocycle.Macrocycle(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrN1N(Br)N=N1',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=8,
+                ),
+            ),
+            smiles=(
+                'N1=NN2N1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N'
+                '=NN21'
+            ),
+        ),
     ),
 )
 def macrocycle(request):

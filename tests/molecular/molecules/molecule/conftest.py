@@ -214,6 +214,7 @@ def building_block(request):
         lazy_fixture('polymer'),
         lazy_fixture('host_guest'),
         lazy_fixture('macrocycle'),
+        lazy_fixture('rotaxane'),
     ),
 )
 def case_data(request):
