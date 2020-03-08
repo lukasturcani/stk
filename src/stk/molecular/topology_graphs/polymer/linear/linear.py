@@ -136,6 +136,7 @@ class Linear(TopologyGraph):
 
     def __init__(
         self,
+        building_blocks,
         repeating_unit,
         num_repeating_units,
         orientations=None,
@@ -251,7 +252,10 @@ class Linear(TopologyGraph):
         edges.append(Edge(len(edges), vertices[-2], vertices[-1]))
 
         super().__init__(
-            vertices=tuple(vertices),
+            building_block_vertices=self.get_buliding_block_vertices(
+                building_blocks=building_blocks,
+                vertices=vertices,
+            ),
             edges=tuple(edges),
             reaction_factory=reaction_factory,
             construction_stages=(),
@@ -266,10 +270,10 @@ class Linear(TopologyGraph):
         base = ord('A')
         return tuple(ord(letter)-base for letter in repeating_unit)
 
-    def get_building_block_vertices(self, building_blocks):
+    def _get_building_block_vertices(self, building_blocks, vertices):
         polymer = self._repeating_unit*self._num_repeating_units
         building_block_vertices = {}
-        for bb_index, vertex in zip(polymer, self._vertices):
+        for bb_index, vertex in zip(polymer, vertices):
             bb = building_blocks[bb_index]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])

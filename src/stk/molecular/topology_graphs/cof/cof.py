@@ -10,6 +10,7 @@ from ...reactions import GenericReactionFactory
 class Cof(TopologyGraph):
     def __init__(
         self,
+        building_blocks,
         lattice_size,
         periodic=False,
         vertex_alignments=None,
@@ -25,8 +26,13 @@ class Cof(TopologyGraph):
         self._periodic = periodic
         lattice = self._get_lattice(self._vertex_alignments)
         edges = self._get_edges(lattice)
+        vertices = self._get_vertices(lattice)
+
         super().__init__(
-            vertices=self._get_vertices(lattice),
+            building_block_vertices=self._get_building_block_vertices(
+                building_blocks=building_blocks,
+                vertices=vertices,
+            ),
             edges=edges,
             reaction_factory=reaction_factory,
             construction_stages=(),
@@ -172,7 +178,7 @@ class Cof(TopologyGraph):
 
         return tuple(edge_clones)
 
-    def get_building_block_vertices(self, building_blocks):
+    def _get_building_block_vertices(self, building_blocks, vertices):
         bb_by_degree = {}
         for bb in building_blocks:
             if bb.get_num_functional_groups() in bb_by_degree:
@@ -193,7 +199,7 @@ class Cof(TopologyGraph):
         )
 
         building_block_vertices = {}
-        for vertex in self._vertices:
+        for vertex in vertices:
             bb = bb_by_degree[vertex_degrees[vertex.get_id()]]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
