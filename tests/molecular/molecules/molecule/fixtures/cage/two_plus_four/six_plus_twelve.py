@@ -9,20 +9,21 @@ from ....case_data import CaseData
     params=(
         CaseData(
             molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC1=C(Br)[C+]=N1',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1C2(Br)[C+]=N[C+]2[C+](Br)[C+](Br)'
-                            '[C+2]1'
+                topology_graph=stk.cage.SixPlusTwelve(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrC1=C(Br)[C+]=N1',
+                            functional_groups=[stk.BromoFactory()],
                         ),
-                        functional_groups=[stk.BromoFactory()],
+                        stk.BuildingBlock(
+                            smiles=(
+                                'Br[C+]1C2(Br)[C+]=N[C+]2[C+](Br)[C+]('
+                                'Br[C+2]1'
+                            ),
+                            functional_groups=[stk.BromoFactory()],
+                        ),
                     ),
                 ),
-                topology_graph=stk.cage.SixPlusTwelve(),
             ),
             smiles=(
                 '[C+]1=NC2=C1[C+]1[C+2][C+]3C4=C(N=[C+]4)[C+]4[C+]5[C+'

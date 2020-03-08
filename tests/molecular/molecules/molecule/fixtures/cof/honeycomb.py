@@ -8,20 +8,21 @@ from ...case_data import CaseData
     params=(
         CaseData(
             molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC1=C(Br)[C+]=N1',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)'
-                            '[C+2]1'
+                topology_graph=stk.cof.Honeycomb(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrC1=C(Br)[C+]=N1',
+                            functional_groups=[stk.BromoFactory()],
                         ),
-                        functional_groups=[stk.BromoFactory()],
+                        stk.BuildingBlock(
+                            smiles=(
+                                'Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)'
+                                '[C+2]1'
+                            ),
+                            functional_groups=[stk.BromoFactory()],
+                        ),
                     ),
-                ),
-                topology_graph=stk.cof.Honeycomb((2, 2, 1)),
+                    lattice_size=(2, 2, 1)),
             ),
             smiles=(
                 '[H]C12[C+]=NC1(Br)[C+](F)[C+](Br)[C+2][C+]2C1=C([C+]2'
@@ -38,20 +39,20 @@ from ...case_data import CaseData
         ),
         CaseData(
             molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC1=C(Br)[C+]=N1',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)'
-                            '[C+2]1'
-                        ),
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                ),
                 topology_graph=stk.cof.Honeycomb(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrC1=C(Br)[C+]=N1',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles=(
+                                'Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)'
+                                '[C+2]1'
+                            ),
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
                     lattice_size=(2, 2, 1),
                     vertex_alignments={0: 1, 1: 1, 2: 1, 3: 1, 4: 1},
                 ),
@@ -71,20 +72,20 @@ from ...case_data import CaseData
         ),
         CaseData(
             molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC1=C(Br)[C+]=N1',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)'
-                            '[C+2]1'
-                        ),
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                ),
                 topology_graph=stk.cof.Honeycomb(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrC1=C(Br)[C+]=N1',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles=(
+                                'Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)'
+                                '[C+2]1'
+                            ),
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
                     lattice_size=(2, 2, 1),
                     vertex_alignments={0: 2, 1: 2},
                 ),

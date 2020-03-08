@@ -28,32 +28,38 @@ def linear(request):
 @pytest.fixture(
     params=(
         CaseData(
-            building_blocks=(
-                stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
+            topology_graph=stk.cof.Honeycomb(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
+                        functional_groups=[stk.BromoFactory()],
+                    ),
                 ),
-                stk.BuildingBlock(
-                    smiles='Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1',
-                    functional_groups=[stk.BromoFactory()],
-                ),
+                lattice_size=(2, 2, 1),
             ),
-            topology_graph=stk.cof.Honeycomb((2, 2, 1)),
             num_new_atoms=0,
             num_new_bonds=20,
         ),
         CaseData(
-            building_blocks=(
-                stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-                stk.BuildingBlock(
-                    smiles='Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-            ),
             topology_graph=stk.cof.Honeycomb(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
                 lattice_size=(2, 2, 1),
                 vertex_alignments={0: 1, 1: 1, 2: 1, 3: 1, 4: 1},
             ),
@@ -61,17 +67,19 @@ def linear(request):
             num_new_bonds=20,
         ),
         CaseData(
-            building_blocks=(
-                stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-                stk.BuildingBlock(
-                    smiles='Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-            ),
             topology_graph=stk.cof.Honeycomb(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
                 lattice_size=(2, 2, 1),
                 vertex_alignments={0: 2, 1: 2},
             ),
@@ -79,32 +87,38 @@ def linear(request):
             num_new_bonds=20,
         ),
         CaseData(
-            building_blocks=(
-                stk.BuildingBlock(
-                    smiles='Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1',
-                    functional_groups=[stk.BromoFactory()],
+            topology_graph=stk.cof.LinkerlessHoneycomb(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles=(
+                            'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        ),
+                        functional_groups=[stk.BromoFactory()],
+                    ),
                 ),
+                lattice_size=(2, 2, 1),
             ),
-            topology_graph=stk.cof.LinkerlessHoneycomb((2, 2, 1)),
             num_new_atoms=0,
             num_new_bonds=8,
         ),
         CaseData(
-            building_blocks=(
-                stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-                stk.BuildingBlock(
-                    smiles='Br[C+]1[C+](F)[C+](I)[C+](I)[C+](Br)C1Br',
-                    functional_groups=[
-                        stk.BromoFactory(),
-                        stk.IodoFactory(),
-                        stk.FluoroFactory(),
-                    ],
-                ),
-            ),
             topology_graph=stk.cof.Hexagonal(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles=(
+                            'Br[C+]1[C+](F)[C+](I)[C+](I)[C+](Br)C1Br'
+                        ),
+                        functional_groups=[
+                            stk.BromoFactory(),
+                            stk.IodoFactory(),
+                            stk.FluoroFactory(),
+                        ],
+                    ),
+                ),
                 lattice_size=(2, 2, 1),
                 vertex_alignments={0: 5},
             ),
@@ -112,35 +126,39 @@ def linear(request):
             num_new_bonds=81,
         ),
         CaseData(
-            building_blocks=(
-                stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-                stk.BuildingBlock(
-                    smiles=(
-                        'Br[C+]1[C+](Br)[C+](F)[C+](Br)[C+](Br)'
-                        '[C+2]1'
+            topology_graph=stk.cof.Kagome(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
                     ),
-                    functional_groups=[stk.BromoFactory()],
+                    stk.BuildingBlock(
+                        smiles=(
+                            'Br[C+]1[C+](Br)[C+](F)[C+](Br)[C+](Br)'
+                            '[C+2]1'
+                        ),
+                        functional_groups=[stk.BromoFactory()],
+                    ),
                 ),
+                lattice_size=(2, 2, 1),
             ),
-            topology_graph=stk.cof.Kagome((2, 2, 1)),
             num_new_atoms=0,
             num_new_bonds=41,
         ),
         CaseData(
-            building_blocks=(
-                stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
+            topology_graph=stk.cof.Square(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='Br[C+]=NC#CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='BrC1=C(Br)C(F)(Br)[C+]1Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
                 ),
-                stk.BuildingBlock(
-                    smiles='BrC1=C(Br)C(F)(Br)[C+]1Br',
-                    functional_groups=[stk.BromoFactory()],
-                ),
+                lattice_size=(2, 2, 1),
             ),
-            topology_graph=stk.cof.Square((2, 2, 1)),
             num_new_atoms=0,
             num_new_bonds=12,
         ),

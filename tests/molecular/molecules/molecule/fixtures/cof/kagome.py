@@ -8,20 +8,22 @@ from ...case_data import CaseData
     params=(
         CaseData(
             molecule=stk.ConstructedMolecule(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC1=C(Br)[C+]=N1',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles=(
-                            'Br[C+]1C2(Br)[C+]=N[C+]2[C+](Br)[C+](Br)'
-                            '[C+2]1'
+                topology_graph=stk.cof.Kagome(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrC1=C(Br)[C+]=N1',
+                            functional_groups=[stk.BromoFactory()],
                         ),
-                        functional_groups=[stk.BromoFactory()],
+                        stk.BuildingBlock(
+                            smiles=(
+                                'Br[C+]1C2(Br)[C+]=N[C+]2[C+](Br)[C+]('
+                                'Br)[C+2]1'
+                            ),
+                            functional_groups=[stk.BromoFactory()],
+                        ),
                     ),
+                    lattice_size=(2, 2, 1),
                 ),
-                topology_graph=stk.cof.Kagome((2, 2, 1)),
             ),
             smiles=(
                 'BrC1=C([C+]2[C+2][C+]3C4=C([C+]=N4)[C+]4[C+2][C+](C5='

@@ -42,11 +42,17 @@ from .fixtures import *  # noqa
         stk.BuildingBlock('N[C+][C+2]N'),
         stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
         stk.ConstructedMolecule(
-            building_blocks=(
-                stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-                stk.BuildingBlock('BrCNCCBr', [stk.BromoFactory()]),
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock(
+                        smiles='BrCNCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=2,
             ),
-            topology_graph=stk.polymer.Linear('AB', 2),
         ),
     ],
     scope='function',
