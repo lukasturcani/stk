@@ -37,11 +37,10 @@ class _GuestVertex(Vertex):
         return clone
 
     def place_building_block(self, building_block, edges):
-        building_block = building_block.with_centroid(
-            posiion=self._position,
+        return building_block.with_centroid(
+            position=self._position,
             atom_ids=building_block.get_placer_ids(),
-        )
-        return building_block.with_rotation_between_vectors(
+        ).with_rotation_between_vectors(
             start=self._start,
             target=self._target,
             origin=self._position,

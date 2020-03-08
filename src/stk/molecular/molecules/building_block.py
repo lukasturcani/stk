@@ -423,8 +423,11 @@ class BuildingBlock(Molecule):
 
         """
 
-        for functional_group in self._functional_groups:
-            yield from functional_group.get_placer_ids()
+        if self._functional_groups:
+            for functional_group in self._functional_groups:
+                yield from functional_group.get_placer_ids()
+        else:
+            yield from range(len(self._atoms))
 
     def get_core_atom_ids(self):
         """

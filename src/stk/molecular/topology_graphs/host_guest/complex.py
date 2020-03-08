@@ -6,8 +6,6 @@ Host Guest Complex
 
 """
 
-import numpy as np
-
 from .vertices import _HostVertex, _GuestVertex
 from ..topology_graph import TopologyGraph
 
@@ -123,13 +121,23 @@ class Complex(TopologyGraph):
             _HostVertex(0, [0, 0, 0]),
             _GuestVertex(1, displacement, start, target)
         )
-        super().__init__(vertices, (), (), num_processes)
+        super().__init__(
+            vertices=vertices,
+            edges=(),
+            reaction_factory=None,
+            construction_stages=(),
+            num_processes=num_processes,
+            edge_groups=(),
+        )
 
     def get_building_block_vertices(self, building_blocks):
         return {
             bb: [vertex]
             for bb, vertex in zip(building_blocks, self._vertices)
         }
+
+    def _run_reactions(self, state):
+        return state
 
     def _get_scale(self, building_block_vertices):
         return 1
