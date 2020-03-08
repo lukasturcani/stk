@@ -55,7 +55,7 @@ class BuildingBlock(Molecule):
         ),
     }
 
-    def __init__(self, smiles, functional_groups=None, random_seed=4):
+    def __init__(self, smiles, functional_groups=(), random_seed=4):
         """
         Initialize a :class:`.BuildingBlock`.
 
@@ -90,9 +90,6 @@ class BuildingBlock(Molecule):
 
         """
 
-        if functional_groups is None:
-            functional_groups = ()
-
         molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
         params = rdkit.ETKDGv2()
         params.randomSeed = random_seed
@@ -104,7 +101,7 @@ class BuildingBlock(Molecule):
         self._init_from_rdkit_mol(molecule, functional_groups)
 
     @classmethod
-    def init_from_molecule(cls, molecule, functional_groups=None):
+    def init_from_molecule(cls, molecule, functional_groups=()):
         """
         Initialize from a :class:`.Molecule`.
 
@@ -158,7 +155,7 @@ class BuildingBlock(Molecule):
         return building_block
 
     @classmethod
-    def init_from_file(cls, path, functional_groups=None):
+    def init_from_file(cls, path, functional_groups=()):
         """
         Initialize from a file.
 
@@ -213,7 +210,7 @@ class BuildingBlock(Molecule):
         )
 
     @classmethod
-    def init_from_rdkit_mol(cls, molecule, functional_groups=None):
+    def init_from_rdkit_mol(cls, molecule, functional_groups=()):
         """
         Initialize from an :mod:`rdkit` molecule.
 
@@ -277,9 +274,6 @@ class BuildingBlock(Molecule):
         None : :class:`NoneType`
 
         """
-
-        if functional_groups is None:
-            functional_groups = ()
 
         atoms = tuple(
             Atom(a.GetIdx(), a.GetAtomicNum(), a.GetFormalCharge())
