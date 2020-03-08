@@ -14,18 +14,11 @@ class ConstructionState:
         self,
         building_block_vertices,
         edges,
-        scale,
-        lattice_constants=None,
+        lattice_constants,
     ):
         """
 
         """
-
-        if lattice_constants is not None:
-            lattice_constants = tuple(
-                np.array(constant, dtype=np.float64)*scale
-                for constant in lattice_constants
-            )
 
         self._vertex_building_blocks = {
             vertex.get_id(): building_block
@@ -34,11 +27,11 @@ class ConstructionState:
             for vertex in vertices
         }
         self._vertices = {
-                vertex.get_id(): vertex.with_scale(scale)
+                vertex.get_id(): vertex
                 for vertices in building_block_vertices.values()
                 for vertex in vertices
         }
-        self._edges = tuple(edge.with_scale(scale) for edge in edges)
+        self._edges = edges
         self._lattice_constants = lattice_constants
         self._vertex_edges = self._get_vertex_edges()
         self._position_matrix = np.empty((0, 3), dtype=np.float64)

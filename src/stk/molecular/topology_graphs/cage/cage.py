@@ -10,15 +10,13 @@ class _CageConstructionState(ConstructionState):
         self,
         building_block_vertices,
         edges,
-        scale,
         num_placement_stages,
         vertex_degrees,
-        lattice_constants=None,
+        lattice_constants,
     ):
         super().__init__(
             building_block_vertices=building_block_vertices,
             edges=edges,
-            scale=scale,
             lattice_constants=lattice_constants,
         )
         self._num_placement_stages = num_placement_stages

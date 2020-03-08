@@ -60,6 +60,7 @@ into its :class:`.Vertex` counterpart.
 """
 
 from functools import partial
+import numpy as np
 
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
@@ -154,10 +155,19 @@ class TopologyGraph:
 
         """
 
-        self._building_block_vertices = self._with_scale(
-            building_block_vertices=building_block_vertices,
+        scale = self._get_scale(building_block_vertices)
+        self._building_block_vertices = {
+                building_block: tuple(
+                    vertex.with_scale(scale) for vertex in vertices
+                )
+                for building_block, vertices
+                in building_block_vertices.items()
+        }
+        self._lattice_constants = tuple(
+            np.array(constant, dtype=np.float64)*scale
+            for constant in self._get_lattice_constants()
         )
-        self._edges = edges
+        self._edges = tuple(edge.with_scale(scale) for edge in edges)
         self._reaction_factory = reaction_factory
         if num_processes == 1:
             self._implementation = _Serial(
@@ -175,7 +185,44 @@ class TopologyGraph:
             )
         self._edge_groups = edge_groups
 
+    def with_building_blocks(self, building_block_map):
+        """
+        Return a clone holding different building blocks.
+
+        Parameters
+        ----------
+        building_block_map : :class:`dict`
+            Maps a :class:`.BuildingBlock` in the current topology
+            graph to the :class:`.BuildingBlock` which should replace
+            it in the clone. If a building block should be not replaced
+            in the clone, it can be omitted from the map.
+
+        Returns
+        -------
+        :class:`.TopologyGraph`
+            The clone.
+
+        """
+
+        ...
+
     def get_building_blocks(self):
+        """
+        Yield the building blocks.
+
+        Building blocks are yielded in an order based on their
+        position in the constructed molecule. For two equivalent
+        topology graphs, but with different building blocks,
+        equivalently positioned building blocks will be yielded at the
+        same time.
+
+        Yields
+        ------
+        :class:`.BuildingBlock`
+            A building block of the topology graph.
+
+        """
+
         yield from self._building_block_vertices
 
     def get_num_building_block(self, building_block):
@@ -207,7 +254,7 @@ class TopologyGraph:
         return ConstructionState(
             building_block_vertices=self._building_block_vertices,
             edges=self._edges,
-            lattice_constants=self._get_lattice_constants(),
+            lattice_constants=self._lattice_constants,
         )
 
     def get_vertices(self, vertex_ids=None):
@@ -235,7 +282,7 @@ class TopologyGraph:
         for id_ in vertex_ids:
             yield self._vertices[id_]
 
-    def _with_scale(self, building_block_vertices):
+    def _get_scale(self, building_block_vertices):
         raise NotImplementedError()
 
     def _place_building_blocks(self, state):
