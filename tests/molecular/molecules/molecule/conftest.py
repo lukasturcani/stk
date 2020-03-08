@@ -212,6 +212,7 @@ def building_block(request):
         lazy_fixture('cage'),
         lazy_fixture('cof'),
         lazy_fixture('polymer'),
+        lazy_fixture('host_guest'),
     ),
 )
 def case_data(request):
