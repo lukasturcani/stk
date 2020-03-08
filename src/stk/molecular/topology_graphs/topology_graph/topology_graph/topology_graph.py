@@ -155,7 +155,7 @@ class TopologyGraph:
 
         """
 
-        scale = self._get_scale(building_block_vertices)
+        scale = self._scale = self._get_scale(building_block_vertices)
         self._building_block_vertices = {
                 building_block: tuple(
                     vertex.with_scale(scale) for vertex in vertices
@@ -163,10 +163,6 @@ class TopologyGraph:
                 for building_block, vertices
                 in building_block_vertices.items()
         }
-        self._lattice_constants = tuple(
-            np.array(constant, dtype=np.float64)*scale
-            for constant in self._get_lattice_constants()
-        )
         self._edges = tuple(edge.with_scale(scale) for edge in edges)
         self._reaction_factory = reaction_factory
         if num_processes == 1:
@@ -254,7 +250,10 @@ class TopologyGraph:
         return ConstructionState(
             building_block_vertices=self._building_block_vertices,
             edges=self._edges,
-            lattice_constants=self._lattice_constants,
+            lattice_constants=tuple(
+                np.array(constant, dtype=np.float64)*self._scale
+                for constant in self._get_lattice_constants()
+            )
         )
 
     def get_vertices(self, vertex_ids=None):

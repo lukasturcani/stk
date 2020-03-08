@@ -1,5 +1,6 @@
 from collections import Counter, defaultdict
 from functools import partial
+import numpy as np
 
 from ..topology_graph import TopologyGraph, ConstructionState
 from ...reactions import GenericReactionFactory
@@ -225,6 +226,7 @@ class Cage(TopologyGraph):
 
     def __init__(
         self,
+        building_blocks,
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
@@ -256,24 +258,34 @@ class Cage(TopologyGraph):
             The number of parallel processes to create during
             :meth:`construct`.
 
+        Raises
+        ------
+        :class:`ValueError`
+            If the there are multiple building blocks with the
+            same number of functional_groups in `building_blocks`,
+            and they are not explicitly assigned to vertices. The
+            desired placement of building blocks is ambiguous in
+            this case.
+
         """
 
-        self._vertex_alignments = (
+        if not isinstance(building_blocks, dict):
+            building_blocks = self._get_building_block_vertices(
+                building_blocks=building_blocks,
+            )
+
+        vertex_alignments = self._vertex_alignments = (
             dict(vertex_alignments)
             if vertex_alignments is not None
             else {}
         )
-
+        with_aligner = partial(self._with_aligner, vertex_alignments)
+        building_block_vertices = {
+            building_block: tuple(map(with_aligner, vertices))
+            for building_block, vertices in building_blocks.items()
+        }
         super().__init__(
-            vertices=tuple(
-                vertex.with_aligner_edge(
-                    aligner_edge=self._vertex_alignments.get(
-                        vertex.get_id(),
-                        0,
-                    ),
-                )
-                for vertex in self._vertex_prototypes
-            ),
+            building_block_vertices=building_block_vertices,
             edges=self._edge_prototypes,
             reaction_factory=reaction_factory,
             construction_stages=tuple(
@@ -285,10 +297,21 @@ class Cage(TopologyGraph):
             edge_groups=None,
         )
 
+    @staticmethod
+    def _with_aligner(vertex_alignments, vertex):
+        """
+        Return a clone of `vertex` with the aligner edge set.
+
+        """
+
+        return vertex.with_aligner_edge(
+            aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
+        )
+
     def _has_degree(self, degree, vertex):
         return vertex.get_id() in self._vertices_of_degree[degree]
 
-    def get_building_block_vertices(self, building_blocks):
+    def _get_building_block_vertices(self, building_blocks):
         bb_by_degree = {}
         for bb in building_blocks:
             if bb.get_num_functional_groups() in bb_by_degree:
@@ -300,7 +323,7 @@ class Cage(TopologyGraph):
             bb_by_degree[bb.get_num_functional_groups()] = bb
 
         building_block_vertices = {}
-        for vertex in self._vertices:
+        for vertex in self._vertex_prototypes:
             bb = bb_by_degree[self._vertex_degrees[vertex.get_id()]]
             building_block_vertices[bb] = (
                 building_block_vertices.get(bb, [])
@@ -321,7 +344,10 @@ class Cage(TopologyGraph):
             scale=self._get_scale(building_block_vertices),
             num_placement_stages=len(self._implementation._stages),
             vertex_degrees=self._vertex_degrees,
-            lattice_constants=self._get_lattice_constants(),
+            lattice_constants=tuple(
+                np.array(constant, dtype=np.float64)*self._scale
+                for constant in self._get_lattice_constants()
+            )
         )
 
     def __repr__(self):
