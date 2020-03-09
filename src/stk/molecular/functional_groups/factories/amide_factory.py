@@ -27,7 +27,7 @@ class AmideFactory(FunctionalGroupFactory):
 
         import stk
 
-        building_block = stk.BuidingBlock(
+        building_block = stk.BuildingBlock(
             smiles='NC(=O)CC(=O)N',
             functional_groups=(stk.AmideFactory(), ),
         )

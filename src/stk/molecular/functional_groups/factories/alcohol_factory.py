@@ -27,7 +27,7 @@ class AlcoholFactory(FunctionalGroupFactory):
 
         import stk
 
-        building_block = stk.BuidingBlock(
+        building_block = stk.BuildingBlock(
             smiles='OCCCO',
             functional_groups=(stk.AlcoholFactory(), ),
         )

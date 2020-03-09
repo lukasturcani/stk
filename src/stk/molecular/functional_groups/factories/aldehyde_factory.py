@@ -27,7 +27,7 @@ class AldehydeFactory(FunctionalGroupFactory):
 
         import stk
 
-        building_block = stk.BuidingBlock(
+        building_block = stk.BuildingBlock(
             smiles='O=CCC=O',
             functional_groups=(stk.AldehydeFactory(), ),
         )

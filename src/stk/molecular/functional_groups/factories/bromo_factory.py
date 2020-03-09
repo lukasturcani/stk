@@ -16,6 +16,26 @@ class BromoFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][Br]`` functional group string.
 
+    Examples
+    --------
+    You want to create a building block which has :class:`.Bromo`
+    functional groups. You want the atom bonded to the bromine to be
+    the *bonder* atom, and the bromine atom to be the *deleter* atom.
+
+    .. code-block:: python
+
+        import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCCBr',
+            functional_groups=(stk.BromoFactory(), ),
+        )
+
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
+
     """
 
     def __init__(self, bonders=(0, ), deleters=(1, )):
@@ -26,11 +46,11 @@ class BromoFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 

@@ -20,20 +20,21 @@ class BoronicAcidFactory(FunctionalGroupFactory):
     --------
     You want to create a building block which has :class:`.BoronicAcid`
     functional groups. You want the boron atom in those functional
-    groups to be the bonder atom and the OH groups to be deleter atoms.
+    groups to be the *bonder* atom and the OH groups to be *deleter*
+    atoms.
 
     .. code-block:: python
 
         import stk
 
-        building_block = stk.BuidingBlock(
+        building_block = stk.BuildingBlock(
             smiles='OB(O)CCCB(O)O',
             functional_groups=(stk.BoronicAcidFactory(), ),
         )
 
     You want to create a building block which has :class:`.BoronicAcid`
     functional groups. You want the oxygen atoms to be treated as
-    bonder atoms, and the hydrogen atoms to be treated as deleter
+    *bonder* atoms, and the hydrogen atoms to be treated as *deleter*
     atoms.
 
     .. code-block:: python
