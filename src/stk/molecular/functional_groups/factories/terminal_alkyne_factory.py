@@ -18,8 +18,8 @@ class TerminalAlkyneFactory(FunctionalGroupFactory):
     Examples
     --------
     You want to create a building block which has
-    :class:`.TerminalAlkyne` functional groups. You want the
-    non-terminal carbon atom in those functional
+    :class:`.Alkyne` functional groups, but only if they are terminal.
+    You want the non-terminal carbon atom in those functional
     groups to be the *bonder* atom, and the terminal CH
     group to be the *deleter* atoms.
 
@@ -33,7 +33,7 @@ class TerminalAlkyneFactory(FunctionalGroupFactory):
         )
 
     You want to create a building block which has
-    :class:`.TerminalAlkyne` functional groups. You want the carbon
+    :class:`.Alkyne` functional groups. You want the carbon
     atoms to be the *bonder* atoms and you don't want any *deleter*
     atoms.
 

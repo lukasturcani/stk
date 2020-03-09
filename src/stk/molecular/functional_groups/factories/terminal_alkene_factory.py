@@ -11,7 +11,7 @@ from ..functional_groups import Alkene
 
 class TerminalAlkeneFactory(FunctionalGroupFactory):
     r"""
-    Creates :class:`.TerminalAlkene` instances.
+    Creates :class:`.Alkene` instances.
 
     Creates functional groups from substructures, which match the
     ``[*][C]([*])=[C]([H])[H]`` functional group string.
@@ -19,8 +19,8 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
     Examples
     --------
     You want to create a building block which has
-    :class:`.TerminalAlkene` functional groups. You want the
-    non-terminal carbon atom in those functional
+    :class:`.Alkene` functional groups, but only if they are terminal.
+    You want the non-terminal carbon atom in those functional
     groups to be the *bonder* atom, and the terminal CH\ :sub:`2`
     group to be the *deleter* atoms.
 
@@ -34,9 +34,9 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
         )
 
     You want to create a building block which has
-    :class:`.TerminalAlkene` functional groups. You want the carbon
-    atoms to be the *bonder* atoms and you don't want any *deleter*
-    atoms.
+    :class:`.Alkene` functional groups, but only if they are terminal.
+    You want the carbon atoms to be the *bonder* atoms and you don't
+    want any *deleter* atoms.
 
     .. code-block:: python
 
