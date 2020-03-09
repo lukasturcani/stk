@@ -10,6 +10,8 @@ from ..functional_groups import Alkene
 
 
 class TerminalAlkeneFactory(FunctionalGroupFactory):
+    # This docstring is a literal string, to silence a flake8 warning
+    # about CH\ :sub:`2`. It's taking the backslash out of context.
     r"""
     Creates :class:`.Alkene` instances.
 
