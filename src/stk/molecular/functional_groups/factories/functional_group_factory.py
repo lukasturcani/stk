@@ -81,7 +81,7 @@ class FunctionalGroupFactory:
     *Subclass Implementation*
 
     The source of the subclasses, listed in
-    :mod:`functional_group_factory`, can serve as good examples.
+    :mod:`.functional_group_factory`, can serve as good examples.
 
     """
 

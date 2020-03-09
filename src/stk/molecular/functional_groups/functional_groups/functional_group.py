@@ -59,12 +59,6 @@ class FunctionalGroup:
     :class:`~.polymer.Linear`, and your custom modification will take
     place.
 
-    If you want to modify a specific set of atoms, but are
-    happy using one of the generic reactions provided in
-    :mod:`.reaction`, you probably do not need to make a new
-    subclass of :class:`.FunctionalGroup` at all. You should just
-    use the :class:`.GenericFunctionalGroup`.
-
     See Also
     --------
     :mod:`.functional_group_factory`
@@ -85,7 +79,7 @@ class FunctionalGroup:
     *Subclass Implementation*
 
     The source code of the subclasses, listed in
-    :mod:`functional_group`, can serve as good examples.
+    :mod:`.functional_group`, can serve as good examples.
 
     """
 
