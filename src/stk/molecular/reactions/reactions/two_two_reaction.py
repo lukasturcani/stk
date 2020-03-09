@@ -1,3 +1,9 @@
+"""
+Two-Two Reaction
+================
+
+"""
+
 import itertools as it
 from scipy.spatial.distance import euclidean
 
@@ -9,6 +15,10 @@ class TwoTwoReaction(Reaction):
     """
     A reaction between two functional groups, each with 2 bonder atoms.
 
+    The reaction creates the two shortest possible bonds between
+    *bonder* atoms of the two functional groups, and deleters and
+    *deleter* atoms.
+
     """
 
     def __init__(
@@ -19,6 +29,28 @@ class TwoTwoReaction(Reaction):
         bond_order,
         periodicity,
     ):
+        """
+        Initialize a :class:`.TwoTwoReaction` instance.
+
+        Parameters
+        ----------
+        construction_state : :class:`.ConstructionState`
+            The construction state of the molecule being constructed.
+
+        functional_group1 : :class:`.GenericFunctionalGroup`
+            The first functional group in the reaction.
+
+        functional_group2 : :class:`.GenericFunctionalGroup`
+            The second functional group in the reaction.
+
+        bond_order : :class:`int`
+            The bond order of the bonds created by the reaction.
+
+        periodicity : :class:`tuple` of :class:`int`
+            The periodicity of the bonds created by the reaction.
+
+        """
+
         self._position_matrix = (
             construction_state.get_position_matrix()
         )

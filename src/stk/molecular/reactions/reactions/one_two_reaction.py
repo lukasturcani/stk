@@ -1,3 +1,9 @@
+"""
+One-Two Reaction
+================
+
+"""
+
 import itertools as it
 
 from .reaction import Reaction
@@ -8,7 +14,9 @@ class OneTwoReaction(Reaction):
     """
     A reaction between two functional groups.
 
-    One functional group has 1 bonder atom and the other has 2.
+    One functional group has 1 *bonder* atom, A, and the other has 2, B
+    and C. Two bonds are created, one between A and B and one between
+    A and C. Any deleter atoms are removed.
 
     """
 
@@ -19,6 +27,25 @@ class OneTwoReaction(Reaction):
         bond_order,
         periodicity,
     ):
+        """
+        Initialize a :class:`.OneTwoReaction` instance.
+
+        Parameters
+        ----------
+        functional_group1 : :class:`.GenericFunctionalGroup`
+            The first functional group in the reaction.
+
+        functional_group2 : :class:`.GenericFunctionalGroup`
+            The second functional group in the reaction.
+
+        bond_order : :class:`int`
+            The bond order of the bond created by the reaction.
+
+        periodicity : :class:`tuple` of :class:`int`
+            The periodicity of the bond created by the reaction.
+
+        """
+
         self._functional_group1 = functional_group1
         self._functional_group2 = functional_group2
         self._bond_order = bond_order
