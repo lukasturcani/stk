@@ -3,8 +3,6 @@
 
 .. figure:: docs/source/figures/stk.png
 
-Requires Python 3.6+.
-
 Overview
 ========
 
