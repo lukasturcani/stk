@@ -75,10 +75,13 @@ class FunctionalGroupFactory:
             ),
         )
 
-        *Subclass Implementation*
+    More usage examples, can be found in the docstrings of the
+    various subclasses.
 
-        The source of the subclasses, listed in
-        :mod:`functional_group_factory`, can serve as good examples.
+    *Subclass Implementation*
+
+    The source of the subclasses, listed in
+    :mod:`functional_group_factory`, can serve as good examples.
 
     """
 
