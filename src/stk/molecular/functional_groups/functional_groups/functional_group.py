@@ -50,7 +50,8 @@ class FunctionalGroup:
     to modify them in a specific way. You will usually accompany the
     creation of the new :class:`.FunctionalGroup` subclass with the
     creation of a new :class:`.Reaction` subclass, which will perform
-    the custom modification on your new :class:`.FunctionalGroup`
+    the custom modification on the atoms held by your new
+    :class:`.FunctionalGroup`
     subclass. Finally, a new :class:`.ReactionFactory` will also be
     created, so that your :class:`.Reaction` subclass instances
     actually get made during construction. Finally, you will pass an
