@@ -82,6 +82,7 @@ class FunctionalGroupFactory:
         Parameters
         ----------
         molecule : :class:`.Molecule`
+            The molecule, whose functional groups are to be found.
 
         Yields
         ------
