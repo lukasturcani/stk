@@ -76,7 +76,7 @@ class BondInfo:
         A unique id for each :class:`.BuildingBlock` placed during
         the construction of the :class:`.ConstructedMolecule`. As a
         single :class:`.BuildingBlock` can be placed multiple times
-        during construction, the :attr:`building_block_id` allows
+        during construction, the building block id  allows
         the user to distinguish between each placement.
 
         Returns
