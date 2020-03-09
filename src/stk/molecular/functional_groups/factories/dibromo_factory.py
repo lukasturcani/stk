@@ -43,7 +43,7 @@ class DibromoFactory(FunctionalGroupFactory):
 
         dibromo_factory = stk.DibromoFactory(
             # The index of one of the non-bromine atoms in the
-            # functional group string is 1.
+            # functional group string (see docstring) is 1.
             bonders=(1, ),
             # The neighboring bromine atom has an index of 0.
             deleters=(0, ),

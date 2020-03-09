@@ -16,6 +16,49 @@ class DiolFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[H][O][#6]~[#6][O][H]`` functional group string.
 
+    Examples
+    --------
+    You want to create a building block which has :class:`.Diol`
+    functional groups. You want the carbon atoms in those functional
+    groups to be the *bonder* atoms, and the OH groups to be a leaving
+    groups.
+
+    .. code-block:: python
+
+        import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='CCCC(O)C(O)CCCC',
+            functional_groups=(stk.DiolFactory(), ),
+        )
+
+    You want to create a building block which has :class:`.Diol`
+    functional groups. You want the oxygen atoms to be the *bonder*
+    atoms and the hydrogen atoms to be the *deleter* atoms.
+
+    .. code-block:: python
+
+        import stk
+
+        diol_factory = stk.DiolFactory(
+            # The indices of the oxygen atoms in the functional
+            # group string (see docstring) are 1 and 4.
+            bonders=(1, 4),
+            # The indices of the hydrogen atoms in the functional
+            # group string (see docstring) are 0 and 5.
+            deleters=(0, 5),
+        )
+        building_block = stk.BuildingBlock(
+            smiles='CCCC(O)C(O)CCCC',
+            functional_groups=(diol_factory, ),
+        )
+
+
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
+
     """
 
     def __init__(self, bonders=(2, 3), deleters=(0, 1, 4, 5)):
@@ -26,11 +69,11 @@ class DiolFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 

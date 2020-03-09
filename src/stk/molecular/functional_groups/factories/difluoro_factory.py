@@ -34,7 +34,7 @@ class DifluoroFactory(FunctionalGroupFactory):
 
     You want to create a building block which has :class:`.Difluoro`
     functional groups, You want only one of non-fluorine atoms to be
-    a *bonder* atoms and its neighboring fluorine atom to be a
+    a *bonder* atom and its neighboring fluorine atom to be a
     *deleter* atom.
 
     .. code-block:: python
@@ -43,7 +43,7 @@ class DifluoroFactory(FunctionalGroupFactory):
 
         difluoro_factory = stk.DifluoroFactory(
             # The index of one of the non-fluorine atoms in the
-            # functional group string is 1.
+            # functional group string (see docstring) is 1.
             bonders=(1, ),
             # The neighboring fluorine atom has an index of 0.
             deleters=(0, ),
