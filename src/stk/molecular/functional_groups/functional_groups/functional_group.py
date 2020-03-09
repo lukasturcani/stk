@@ -53,7 +53,7 @@ class FunctionalGroup:
     the custom modification on your new :class:`.FunctionalGroup`
     subclass. Finally, a new :class:`.ReactionFactory` will also be
     created, so that your :class:`.Reaction` subclass instances
-    actually get made during construction. Finally you will pass an
+    actually get made during construction. Finally, you will pass an
     instance of your :class:`.ReactionFactory` subclass to the
     chosen :class:`.TopologyGraph` you want to make, for example
     :class:`~.polymer.Linear`, and your custom modification will take
