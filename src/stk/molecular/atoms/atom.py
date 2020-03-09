@@ -53,8 +53,10 @@ class Atom:
     _elements = {}
 
     def __init_subclass__(cls, **kwargs):
-        # The init method for subclasses takes a slightly different
-        # form.
+        # Replace the default __init__() method of the subclass with
+        # _subclass_init(). This is because the default __init__()
+        # method takes an atomic_number parameter, but
+        # _subclass_init() does not.
         cls.__init__ = cls._subclass_init
         cls._elements[cls._atomic_number] = cls
 
@@ -194,5 +196,3 @@ class Atom:
         clone._id = self._id
         clone._charge = self._charge
         return clone
-
-
