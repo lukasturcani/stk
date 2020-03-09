@@ -32,6 +32,27 @@ class DibromoFactory(FunctionalGroupFactory):
             functional_groups=(stk.DibromoFactory(), ),
         )
 
+    You want to create a building block which has :class:`.Dibromo`
+    functional groups, You want only one of non-bromine atoms to be
+    a *bonder* atom and its neighboring bromine atom to be a
+    *deleter* atom.
+
+    .. code-block:: python
+
+        import stk
+
+        dibromo_factory = stk.DibromoFactory(
+            # The index of one of the non-bromine atoms in the
+            # functional group string is 1.
+            bonders=(1, ),
+            # The neighboring bromine atom has an index of 0.
+            deleters=(0, ),
+        )
+        building_block = stk.BuildingBlock(
+            smiles='BrCC(Br)CCC',
+            functional_groups=(dibromo_factory, ),
+        )
+
     See Also
     --------
     :class:`.GenericFunctionalGroup`
