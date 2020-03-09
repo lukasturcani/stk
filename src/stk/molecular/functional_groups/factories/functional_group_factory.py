@@ -37,6 +37,8 @@ class FunctionalGroupFactory:
 
     Examples
     --------
+    *Usage*
+
     You have a building block with two functional groups, but you want
     to use just one.
 
@@ -72,6 +74,11 @@ class FunctionalGroupFactory:
                 bromo_groups[4],
             ),
         )
+
+        *Subclass Implementation*
+
+        The source of the subclasses, listed in
+        :mod:`functional_group_factory`, can serve as good examples.
 
     """
 

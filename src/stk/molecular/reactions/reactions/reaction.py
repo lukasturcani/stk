@@ -1,3 +1,14 @@
+"""
+Reaction
+========
+
+#. :class:`.OneOneReaction`
+#. :class:`.OneTwoReaction`
+#. :class:`.RingAmineReaction`
+#. :class:`.TwoTwoReaction`
+
+"""
+
 from typing import NamedTuple
 
 
@@ -23,14 +34,80 @@ class ReactionResult(NamedTuple):
 
     """
 
-    new_atoms: object
-    new_bonds: object
-    deleted_atoms: object
+    __slots__ = ['_new_atoms', '_new_bonds', '_deleted_atoms']
+
+    def __init__(self, new_atoms, new_bonds, deleted_atoms):
+        """
+
+        """
+
+        self._new_atoms = new_atoms
+        self._new_bonds = new_bonds
+        self._deleted_atoms = deleted_atoms
+
+    def get_new_atoms(self):
+        """
+
+        """
+
+        return self._new_atoms
+
+    def get_new_bonds(self):
+        """
+
+        """
+        return self._new_bonds
+
+    def get_deleted_atoms(self):
+        """
+
+        """
+
+        return self._deleted_atoms
 
 
 class Reaction:
     """
     An abstract base class for reactions.
+
+    Reactions are used to add and remove atoms and bonds during
+    :class:`.ConstructedMolecule` construction. Each subclass
+    will implement a specific algorithm for doing this. Each
+    :class:`.Reaction` instance should operate on a small set of
+    directly interacting :class:`.FunctionalGroup` instances, and only
+    modify the atoms and bonds of those instances. Normally, like 99%
+    of the time, this should just be two functional groups, and you
+    should ensure you topology graph only needs to react two functional
+    groups at a time, if you can. However, :mod:`stk` does not actually
+    care, and you can modify as many atoms and bonds as you want in
+    any reaction.
+
+    See Also
+    --------
+    :mod:`.reaction_factory`
+        Used for automated creation of :class:`.Reaction` instances.
+        Typically :class:`.Reaction` instances are not created
+        directly, but only through some kind of
+        :class:`.ReactionFactory` instance.
+
+    Notes
+    -----
+    You might notice that the public method of this abstract
+    base class, :meth:`.get_result`, is implemented. This is purely for
+    convenience when implementing subclasses. The implemented public
+    method is simply a default implementation, which can be safely
+    ignored or overridden, when implementing subclasses. The private
+    methods are an implementation detail of this default
+    implementation. However, they are not implemented. To use the
+    default implementation of :meth:`.get_result`, the private methods
+    it relies on need to be implemented.
+
+    Examples
+    --------
+    *Subclass Implementation*
+
+    The source code of the subclasses, listed in :mod:`.reaction`, can
+    serve as a good examples.
 
     """
 
@@ -40,7 +117,7 @@ class Reaction:
 
         Returns
         -------
-        :class:`._ReactionResult`
+        :class:`.ReactionResult`
             Holds the results of the reaction.
 
         """

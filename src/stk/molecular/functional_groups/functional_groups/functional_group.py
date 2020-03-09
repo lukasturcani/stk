@@ -42,6 +42,12 @@ class FunctionalGroup:
     :class:`.ConstructedMolecule` construction, as well as specify
     which atoms of the building block should be used for positioning.
 
+    See Also
+    --------
+    :mod:`.functional_group_factory`
+        Used for automated creation of :class:`.FunctionalGroup`
+        instances.
+
     Notes
     -----
     You might notice that some of the methods of this abstract base
@@ -50,6 +56,13 @@ class FunctionalGroup:
     default implementations, which can be safely ignored
     or overridden, when implementing subclasses. Any private methods
     are implementation details of these default implementations.
+
+    Examples
+    --------
+    *Subclass Implementation*
+
+    The source code of the subclasses, listed in
+    :mod:`functional_group`, can serve as good examples.
 
     """
 
