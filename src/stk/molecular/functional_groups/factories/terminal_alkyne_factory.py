@@ -15,6 +15,49 @@ class TerminalAlkyneFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][C]#[C][H]`` functional group string.
 
+    Examples
+    --------
+    You want to create a building block which has
+    :class:`.TerminalAlkyne` functional groups. You want the
+    non-terminal carbon atom in those functional
+    groups to be the *bonder* atom, and the terminal CH
+    group to be the *deleter* atoms.
+
+    .. code-block:: python
+
+        import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='C#CCCCCC#C',
+            functional_groups=(stk.TerminalAlkyneFactory(), ),
+        )
+
+    You want to create a building block which has
+    :class:`.TerminalAlkyne` functional groups. You want the carbon
+    atoms to be the *bonder* atoms and you don't want any *deleter*
+    atoms.
+
+    .. code-block:: python
+
+        import stk
+
+        terminal_alkyne_factory = stk.TerminalAlkyneFactory(
+            # The index of the carbon atoms in the functional
+            # group string (see docstring) are 1 and 2.
+            bonders=(1, 2),
+            deleters=(),
+        )
+        building_block = stk.BuildingBlock(
+            smiles='C#CCCCCC#C',
+            functional_groups=(terminal_alkyne_factory, ),
+        )
+
+
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
+
     """
 
     def __init__(self, bonders=(1, ), deleters=(2, 3)):
@@ -25,11 +68,11 @@ class TerminalAlkyneFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 
