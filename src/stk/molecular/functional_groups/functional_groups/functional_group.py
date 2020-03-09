@@ -112,7 +112,7 @@ class FunctionalGroup:
 
     def get_core_atom_ids(self):
         """
-        Yield the ids of core atoms.
+        Yield the ids of core atoms held by the functional group.
 
         Yields
         ------
