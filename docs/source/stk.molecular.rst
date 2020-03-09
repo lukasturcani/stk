@@ -6,18 +6,12 @@ Subpackages
 
 .. toctree::
 
+   stk.molecular.atoms
+   stk.molecular.bonds
    stk.molecular.functional_groups
    stk.molecular.molecules
    stk.molecular.reactions
    stk.molecular.topology_graphs
-
-Submodules
-----------
-
-.. toctree::
-
-   stk.molecular.atoms
-   stk.molecular.bond
 
 Module contents
 ---------------
