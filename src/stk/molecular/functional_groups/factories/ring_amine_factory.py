@@ -14,7 +14,7 @@ class RingAmineFactory(FunctionalGroupFactory):
     Creates :class:`.RingAmine` functional groups.
 
     Creates functional groups from substructures, which match the
-    ``'[N]([H])([H])[#6]~[#6]([H])~[#6R1]'`` functional group string.
+    ``[N]([H])([H])[#6]~[#6]([H])~[#6R1]`` functional group string.
 
     """
 
