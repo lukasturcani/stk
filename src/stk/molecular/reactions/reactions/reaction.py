@@ -14,28 +14,29 @@ class ReactionResult:
     """
     The result of a reaction.
 
-    Attributes
-    ----------
-    new_atoms : :class:`tuple`
-        A :class:`tuple` of the form ``(atom, position)``, holding
-        an :class:`.Atom` added
-        by the reaction and its position as a
-        :class:`numpy.ndarray`. New atoms have a negative id, and
-        will need to be assigned a new one when added to the
-        :class:`.ConstructedMolecule`.
-
-    new_bonds : :class:`tuple` of :class:`.Bond`
-        The bonds added by the reaction.
-
-    deleted_atoms : :class:`tuple` of :class:`.Atom`
-        The atoms deleted by the reaction.
-
     """
 
     __slots__ = ['_new_atoms', '_new_bonds', '_deleted_atoms']
 
     def __init__(self, new_atoms, new_bonds, deleted_atoms):
         """
+        Initialize a :class:`.ReactionResult` instance.
+
+        Parameters
+        ----------
+        new_atoms : :class:`tuple`
+            A :class:`tuple` of the form ``(atom, position)``, holding
+            an :class:`.Atom` added
+            by the reaction and its position as a
+            :class:`numpy.ndarray`. New atoms have a negative id, and
+            will need to be assigned a new one when added to the
+            :class:`.ConstructedMolecule`.
+
+        new_bonds : :class:`tuple` of :class:`.Bond`
+            The bonds added by the reaction.
+
+        deleted_atoms : :class:`tuple` of :class:`.Atom`
+            The atoms deleted by the reaction.
 
         """
 
@@ -45,6 +46,17 @@ class ReactionResult:
 
     def get_new_atoms(self):
         """
+        Get the new atoms added by the reaction.
+
+        Returns
+        -------
+        :class:`tuple`
+            A :class:`tuple` of the form ``(atom, position)``, holding
+            an :class:`.Atom` added
+            by the reaction and its position as a
+            :class:`numpy.ndarray`. New atoms have a negative id, and
+            will need to be assigned a new one when added to the
+            :class:`.ConstructedMolecule`.
 
         """
 
@@ -52,12 +64,24 @@ class ReactionResult:
 
     def get_new_bonds(self):
         """
+        Get the new bonds added by the reaction.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.Bond`
+            The new bonds added by the reaction.
 
         """
         return self._new_bonds
 
     def get_deleted_atoms(self):
         """
+        Get the atoms deleted by the reaction.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.Atom`
+            The atoms deleted by the reaction.
 
         """
 
