@@ -3,7 +3,7 @@ import rdkit.Chem.AllChem as rdkit
 
 def _get_atom_ids(query, molecule):
     """
-    Yield the ids of atoms in `molecule` which `match` query.
+    Yield the ids of atoms in `molecule` which match `query`.
 
     Multiple substructures in `molecule` can match `query` and
     therefore each set is yielded as a group.

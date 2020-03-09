@@ -56,7 +56,6 @@ class AlcoholFactory(FunctionalGroupFactory):
             functional_groups=(alcohol_factory, ),
         )
 
-
     See Also
     --------
     :class:`.GenericFunctionalGroup`
