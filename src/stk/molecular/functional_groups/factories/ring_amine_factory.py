@@ -18,6 +18,16 @@ class RingAmineFactory(FunctionalGroupFactory):
 
     """
 
+    # Keep this __init__() method, which does nothing, here for the
+    # docstring.
+    def __init__(self):
+        """
+        Initialize a :class:`RingAmineFactory` instance.
+
+        """
+
+        return super().__init__()
+
     def get_functional_groups(self, molecule):
         ids = _get_atom_ids(
             query='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
