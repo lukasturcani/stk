@@ -156,7 +156,8 @@ class FunctionalGroup:
         Returns
         -------
         :class:`.FunctionalGroup`
-            The clone.
+            The clone. Has the same type as the original functional
+            group.
 
         Examples
         --------
@@ -196,7 +197,8 @@ class FunctionalGroup:
         Returns
         -------
         :class:`.FunctionalGroup`
-            A clone.
+            A clone. Has the same type as the original functional
+            group.
 
         """
 

@@ -1,16 +1,23 @@
+"""
+Generic Functional Group
+========================
+
+"""
+
 from .functional_group import FunctionalGroup
 
 
 class GenericFunctionalGroup(FunctionalGroup):
     """
-    A functional group which defines general atom classes.
+    A functional group which defines general atomic classes.
 
-    Bonders are atoms which should have bonds added by a
-    :class:`.Reaction`. Deleters are atoms which should be removed
+    *Bonders* are atoms which should have bonds added by a
+    :class:`.Reaction`. *Deleters* are atoms which should be removed
     by a :class:`.Reaction`.
 
     This interface allows the same reactions to be carried out across
-    different functional groups.
+    different functional groups, without knowing which specific
+    elements it holds.
 
     """
 

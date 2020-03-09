@@ -127,7 +127,8 @@ class Atom:
         Returns
         -------
         :class:`.Atom`
-            A clone with a new id.
+            A clone with a new id. Has the same type as the original
+            atom.
 
         """
 
@@ -188,7 +189,7 @@ class Atom:
         Returns
         -------
         :class:`.Atom`
-            The clone.
+            The clone. It has the same type as the original atom.
 
         """
 
