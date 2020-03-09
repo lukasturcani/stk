@@ -1,5 +1,6 @@
 """
-Defines :class:`Bond`.
+Bond
+====
 
 """
 
