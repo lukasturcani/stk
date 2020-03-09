@@ -16,6 +16,49 @@ class BoronicAcidFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][B]([O][H])[O][H]`` functional group string.
 
+    Examples
+    --------
+    You want to create a building block which has :class:`.BoronicAcid`
+    functional groups. You want the boron atom in those functional
+    groups to be the bonder atom and the OH groups to be deleter atoms.
+
+    .. code-block:: python
+
+        import stk
+
+        building_block = stk.BuidingBlock(
+            smiles='OB(O)CCCB(O)O',
+            functional_groups=(stk.BoronicAcidFactory(), ),
+        )
+
+    You want to create a building block which has :class:`.BoronicAcid`
+    functional groups. You want the oxygen atoms to be treated as
+    bonder atoms, and the hydrogen atoms to be treated as deleter
+    atoms.
+
+    .. code-block:: python
+
+        import stk
+
+        boronic_acid_factory = stk.BoronicAcidFactory(
+            # The indices of the oxygen atoms in the functional
+            # group string (see docstring) are 2 and 4.
+            bonders=(2, 4),
+            # The indices of the hydrogen atoms in the
+            # functional group string (see docstring) are 3 and 5.
+            deleters=(3, 5),
+        )
+        building_block = stk.BuildingBlock(
+            smiles='OB(O)CCCB(O)O',
+            functional_groups=(boronic_acid_factory, ),
+        )
+
+
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
+
     """
 
     def __init__(self, bonders=(1, ), deleters=(2, 3, 4, 5)):
@@ -26,11 +69,11 @@ class BoronicAcidFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 

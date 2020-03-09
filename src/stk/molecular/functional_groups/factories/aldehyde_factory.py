@@ -34,7 +34,7 @@ class AldehydeFactory(FunctionalGroupFactory):
 
     You want to create a building block which has :class:`.Aldehyde`
     functional groups. You want the carbon atom to be the bonder atom
-    and the oxygen atom to be the deleter atom.
+    and the hydrogen atom to be the deleter atom.
 
     .. code-block:: python
 
@@ -44,9 +44,9 @@ class AldehydeFactory(FunctionalGroupFactory):
             # The index of the carbon atom in the functional
             # group string (see docstring) is 1.
             bonders=(1, ),
-            # The index of the oxygen atom in the functional
-            # group string (see docstring) is 2.
-            deleters=(2, ),
+            # The index of the hydrogen atom in the functional
+            # group string (see docstring) is 3.
+            deleters=(3, ),
         )
         building_block = stk.BuildingBlock(
             smiles='O=CCC=O',
@@ -68,11 +68,11 @@ class AldehydeFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 
