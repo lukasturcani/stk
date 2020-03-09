@@ -45,7 +45,7 @@ class ThiolFactory(FunctionalGroupFactory):
             # The index of the atom bonded to sulfur is 0 in the
             # functional group string (see docstring).
             bonders=(0, ),
-            # The index of the sulfur and hydrogen atoms in the
+            # The indices of the sulfur and hydrogen atoms in the
             # functional group string (see docstring) is 1 and 2,
             # respectively.
             deleters=(1, 2),
