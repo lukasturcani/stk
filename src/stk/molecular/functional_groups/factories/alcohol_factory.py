@@ -43,7 +43,12 @@ class AlcoholFactory(FunctionalGroupFactory):
         import stk
 
         alcohol_factory = stk.AlcoholFactory(
+            # The index of the connected atom in the functional
+            # group string found in the docstring is 0.
             bonders=(0, ),
+            # The indices of the oxygen and hydrogen atoms in the
+            # functional group string found in the docstring are
+            # 1 and 2, respectively.
             deleters(1, 2),
         )
         building_block = stk.BuildingBlock(
