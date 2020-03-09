@@ -16,6 +16,27 @@ class DibromoFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[Br][#6]~[#6][Br]`` functional group string.
 
+    Examples
+    --------
+    You want to create a building block which has :class:`.Dibromo`
+    functional groups. You want the non-bromine atoms of the functional
+    group to be the *bonder* atoms and the bromine atoms to be the
+    *deleter* atoms.
+
+    .. code-block:: python
+
+        import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCC(Br)CCCC',
+            functional_groups=(stk.DibromoFactory(), ),
+        )
+
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
+
     """
 
     def __init__(self, bonders=(1, 2), deleters=(0, 3)):
@@ -26,11 +47,11 @@ class DibromoFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 
