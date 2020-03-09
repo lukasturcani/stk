@@ -83,7 +83,7 @@ class Reaction:
     See Also
     --------
     :mod:`.reaction_factory`
-        Used for automated creation of :class:`.Reaction` instances.\
+        Used for automated creation of :class:`.Reaction` instances.
         Typically, :class:`.Reaction` instances are not created
         directly, but only through some kind of
         :class:`.ReactionFactory` instance.
