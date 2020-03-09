@@ -16,6 +16,27 @@ class IodoFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][I]`` functional group string.
 
+    Examples
+    --------
+    You want to create a building block which has :class:`.Iodo`
+    functional groups. You want the non-iodine atom in those
+    functional groups to be the *bonder* atom, and the iodine atom
+    to be the *deleter* atom.
+
+    .. code-block:: python
+
+        import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='ICCCI',
+            functional_groups=(stk.IodoFactory(), ),
+        )
+
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
+
     """
 
     def __init__(self, bonders=(0, ), deleters=(1, )):
@@ -26,11 +47,11 @@ class IodoFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 

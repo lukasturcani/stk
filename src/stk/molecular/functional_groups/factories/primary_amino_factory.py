@@ -16,6 +16,49 @@ class PrimaryAminoFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][N]([H])[H]`` functional group string.
 
+    Examples
+    --------
+    You want to create a building block which has :class:`.Amide`
+    functional groups. You want the carbon atom in those functional
+    groups to be the bonder atom, and the amino group to be a leaving
+    group.
+
+    .. code-block:: python
+
+        import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='NC(=O)CC(=O)N',
+            functional_groups=(stk.AmideFactory(), ),
+        )
+
+    You want to create a building block which has :class:`.Amide`
+    functional groups. You want the carbon atom to be the bonder
+    atom and the oxygen atom to be the deleter atom.
+
+    .. code-block:: python
+
+        import stk
+
+        amide_factory = stk.AmideFactory(
+            # The index of the carbon atom in the functional
+            # group string (see docstring) is 1.
+            bonders=(1, ),
+            # The index of the oxygen atom in the functional
+            # group string (see docstring) is 2.
+            deleters=(2, ),
+        )
+        building_block = stk.BuildingBlock(
+            smiles='NC(=O)CC(=O)N',
+            functional_groups=(amide_factory, ),
+        )
+
+
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
+
     """
 
     def __init__(self, bonders=(1, ), deleters=(2, 3)):
