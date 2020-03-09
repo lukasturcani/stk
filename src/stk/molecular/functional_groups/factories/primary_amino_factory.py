@@ -18,39 +18,40 @@ class PrimaryAminoFactory(FunctionalGroupFactory):
 
     Examples
     --------
-    You want to create a building block which has :class:`.Amide`
-    functional groups. You want the carbon atom in those functional
-    groups to be the bonder atom, and the amino group to be a leaving
-    group.
+    You want to create a building block which has
+    :class:`.PrimaryAmino` functional groups. You want the nitrogen
+    atom to be the *bonder* atom, and the hydrogen atoms to be the
+    *deleter* atoms.
 
     .. code-block:: python
 
         import stk
 
         building_block = stk.BuildingBlock(
-            smiles='NC(=O)CC(=O)N',
-            functional_groups=(stk.AmideFactory(), ),
+            smiles='NCCCCN',
+            functional_groups=(stk.PrimaryAminoFactory(), ),
         )
 
-    You want to create a building block which has :class:`.Amide`
-    functional groups. You want the carbon atom to be the bonder
-    atom and the oxygen atom to be the deleter atom.
+    You want to create a building block which has
+    :class:`.PrimaryAmino` functional groups. You want the non-hydrogen
+    atom bonded to nitrogen to be the *bonder* atom and the
+    nitrogen and hydrogen atoms to be *deleter* atoms.
 
     .. code-block:: python
 
         import stk
 
-        amide_factory = stk.AmideFactory(
-            # The index of the carbon atom in the functional
-            # group string (see docstring) is 1.
-            bonders=(1, ),
-            # The index of the oxygen atom in the functional
-            # group string (see docstring) is 2.
-            deleters=(2, ),
+        primary_amino_factory = stk.PrimaryAminoFactory(
+            # The index of the atom attached to the nitrogen is 0 in
+            # the functional group string (see docstring).
+            bonders=(0, ),
+            # The indices of the nitrogen and hydrogen atoms in the
+            # functional group string (see docstring) are 1, 2 and 3.
+            deleters=(1, 2, 3),
         )
         building_block = stk.BuildingBlock(
-            smiles='NC(=O)CC(=O)N',
-            functional_groups=(amide_factory, ),
+            smiles='NCCCCN',
+            functional_groups=(primary_amino_factory, ),
         )
 
 
@@ -69,11 +70,11 @@ class PrimaryAminoFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 
