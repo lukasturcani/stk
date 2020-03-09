@@ -1,3 +1,9 @@
+"""
+Amide
+=====
+
+"""
+
 from .generic_functional_group import GenericFunctionalGroup
 
 

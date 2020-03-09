@@ -1,3 +1,9 @@
+"""
+Ring Amine
+==========
+
+"""
+
 from . import FunctionalGroup
 
 
