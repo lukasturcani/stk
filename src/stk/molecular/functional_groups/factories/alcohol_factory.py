@@ -33,18 +33,18 @@ class AlcoholFactory(FunctionalGroupFactory):
         )
 
     You want to create a building block which has :class:`.Alcohol`
-    functional groups. You want the :class:`.Alcohol` group to be
-    treated as a leaving group. This means the connected atom is the
-    bonder atom and both the oxygen and hydrogen atoms are deleter
-    atoms,
+    functional groups. You want the OH group to be
+    treated as a leaving group. This means the non-hydrogen bonded
+    to oxygen is the *bonder* atom and both the oxygen and hydrogen
+    atoms are *deleter* atoms.
 
     .. code-block:: python
 
         import stk
 
         alcohol_factory = stk.AlcoholFactory(
-            # The index of the connected atom in the functional
-            # group string (see docstring) is 0.
+            # The index of the non-hydrogen atom connected to oxygen
+            # is 0 in the functional group string (see docstring).
             bonders=(0, ),
             # The indices of the oxygen and hydrogen atoms in the
             # functional group string (see docstring) are
