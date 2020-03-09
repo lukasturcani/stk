@@ -43,7 +43,7 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
         import stk
 
         terminal_alkene_factory = stk.TerminalAlkeneFactory(
-            # The index of the carbon atoms in the functional
+            # The indices of the carbon atoms in the functional
             # group string (see docstring) are 1 and 3.
             bonders=(1, 3),
             deleters=(),
