@@ -217,11 +217,11 @@ class ConstructionState:
         deleted_atoms = set()
         for reaction, result in zip(reactions, results):
             deleted_atoms.update(
-                atom.get_id() for atom in result.deleted_atoms
+                atom.get_id() for atom in result.get_deleted_atoms()
             )
 
             atom_map = {}
-            for atom, position in result.new_atoms:
+            for atom, position in result.get_new_atoms():
                 new_atom = atom.with_id(len(self._atoms))
                 atom_map[atom.get_id()] = new_atom
                 self._atoms.append(new_atom)
@@ -234,7 +234,7 @@ class ConstructionState:
                 )
                 new_atom_positions.append(position)
 
-            for bond in result.new_bonds:
+            for bond in result.get_new_bonds():
                 new_bond = bond.with_atoms(atom_map)
                 self._bonds.append(new_bond)
                 self._bond_infos.append(

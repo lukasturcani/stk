@@ -24,9 +24,12 @@ def _test_get_reaction(
 
 
 def is_same_result(result1, result2):
-    are_same_atoms(result1.new_atoms, result2.new_atoms)
-    are_same_bonds(result1.new_bonds, result2.new_bonds)
-    are_same_atoms(result1.deleted_atoms, result2.deleted_atoms)
+    are_same_atoms(result1.get_new_atoms(), result2.get_new_atoms())
+    are_same_bonds(result1.get_new_bonds(), result2.get_new_bonds())
+    are_same_atoms(
+        atoms1=result1.get_deleted_atoms(),
+        atoms2=result2.get_deleted_atoms(),
+    )
 
 
 def are_same_atoms(atoms1, atoms2):
