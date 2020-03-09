@@ -75,7 +75,7 @@ class FunctionalGroupFactory:
             ),
         )
 
-    More usage examples, can be found in the docstrings of the
+    More usage examples can be found in the docstrings of the
     various subclasses.
 
     *Subclass Implementation*

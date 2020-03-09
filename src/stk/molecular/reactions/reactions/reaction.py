@@ -72,19 +72,19 @@ class Reaction:
     :class:`.ConstructedMolecule` construction. Each subclass
     will implement a specific algorithm for doing this. Each
     :class:`.Reaction` instance should operate on a small set of
-    directly interacting :class:`.FunctionalGroup` instances, and only
+    directly relevant :class:`.FunctionalGroup` instances, and only
     modify the atoms and bonds of those instances. Normally, like 99%
     of the time, this should just be two functional groups, and you
-    should ensure you topology graph only needs to react two functional
-    groups at a time, if you can. However, :mod:`stk` does not actually
-    care, and you can modify as many atoms and bonds as you want in
-    any reaction.
+    should ensure your topology graph only needs to react two
+    functional groups at a time, if you can. However, :mod:`stk` does
+    not actually care, and you can modify as many atoms and bonds as
+    you want in any reaction.
 
     See Also
     --------
     :mod:`.reaction_factory`
-        Used for automated creation of :class:`.Reaction` instances.
-        Typically :class:`.Reaction` instances are not created
+        Used for automated creation of :class:`.Reaction` instances.\
+        Typically, :class:`.Reaction` instances are not created
         directly, but only through some kind of
         :class:`.ReactionFactory` instance.
 
