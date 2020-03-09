@@ -42,6 +42,15 @@ class FunctionalGroup:
     :class:`.ConstructedMolecule` construction, as well as specify
     which atoms of the building block should be used for positioning.
 
+    Notes
+    -----
+    You might notice that some of the methods of this abstract base
+    class are implemented. This is purely for convenience when
+    implementing subclasses. The implemented public methods are simply
+    default implementations, which can be safely ignored
+    or overridden, when implementing subclasses. Any private methods
+    are implementation details of these default implementations.
+
     """
 
     def __init__(self, atoms, placers, core_atoms):
