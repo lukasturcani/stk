@@ -1,8 +1,8 @@
 """
-Defines a class for each type of element.
+Elements
+========
 
-An abstract base class for all atoms is provided, :class:`.Atom`,
-read it's docstring for more information.
+Defines an :class:`.Atom` class for each element.
 
 """
 

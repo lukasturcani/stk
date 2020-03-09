@@ -2,7 +2,7 @@ import numpy as np
 
 from .reaction import Reaction
 from ... import atoms
-from ...bond import Bond
+from ...bonds import Bond
 
 
 class RingAmineReaction(Reaction):

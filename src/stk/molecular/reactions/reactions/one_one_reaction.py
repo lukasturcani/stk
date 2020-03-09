@@ -1,5 +1,5 @@
 from .reaction import Reaction
-from ...bond import Bond
+from ...bonds import Bond
 
 
 class OneOneReaction(Reaction):

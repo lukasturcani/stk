@@ -12,7 +12,7 @@ from functools import partial
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
-from ..bond import Bond
+from ..bonds import Bond
 from .molecule import Molecule
 from ...utilities import remake
 

@@ -1,8 +1,8 @@
 import numpy as np
 from collections import defaultdict
 
-from ...atom_info import AtomInfo
-from ...bond_info import BondInfo
+from ...atoms import AtomInfo
+from ...bonds import BondInfo
 
 
 class ConstructionState:
