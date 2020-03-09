@@ -138,7 +138,7 @@ class ConstructionState:
                     AtomInfo(
                         atom=new_atom,
                         building_block=building_block,
-                        building_block_index=index,
+                        building_block_id=index,
                     )
                 )
 
@@ -150,7 +150,7 @@ class ConstructionState:
                     BondInfo(
                         bond=new_bond,
                         building_block=building_block,
-                        building_block_index=index,
+                        building_block_id=index,
                     )
                 )
 
@@ -229,7 +229,7 @@ class ConstructionState:
                     AtomInfo(
                         atom=new_atom,
                         building_block=None,
-                        building_block_index=None,
+                        building_block_id=None,
                     )
                 )
                 new_atom_positions.append(position)
@@ -241,7 +241,7 @@ class ConstructionState:
                     BondInfo(
                         bond=new_bond,
                         building_block=None,
-                        building_block_index=None,
+                        building_block_id=None,
                     )
                 )
         if new_atom_positions:
@@ -276,7 +276,7 @@ class ConstructionState:
             AtomInfo(
                 atom=atom_map[atom_info.atom.get_id()],
                 building_block=atom_info.building_block,
-                building_block_index=atom_info.building_block_index,
+                building_block_id=atom_info.building_block_id,
             )
             for atom_info in valid_atom_infos
         ]
@@ -307,7 +307,7 @@ class ConstructionState:
             BondInfo(
                 bond=self._bonds[index],
                 building_block=bond_info.building_block,
-                building_block_index=bond_info.building_block_index,
+                building_block_id=bond_info.building_block_id,
             )
             for index, bond_info in enumerate(valid_bond_infos)
         ]

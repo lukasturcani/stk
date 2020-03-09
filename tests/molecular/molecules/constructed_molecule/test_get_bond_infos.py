@@ -7,7 +7,7 @@ def test_get_bond_infos(case_data):
 
 def _test_get_bond_infos(constructed_molecule, num_new_bonds):
     new_bonds = filter(
-        lambda bond_info: bond_info.building_block is None,
+        lambda bond_info: bond_info.get_building_block() is None,
         constructed_molecule.get_bond_infos(),
     )
     assert sum(1 for _ in new_bonds) == num_new_bonds
