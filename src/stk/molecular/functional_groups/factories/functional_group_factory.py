@@ -50,7 +50,7 @@ class FunctionalGroupFactory:
             amino_factory.get_functional_groups(building_block)
         )
         building_block = building_block.with_functional_groups(
-            functional_groups=((amino_group, ),
+            functional_groups=(amino_group, ),
         )
 
     You have multiple functional groups, but you want the building
