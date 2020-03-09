@@ -16,6 +16,51 @@ class ThiolFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][S][H]`` functional group string.
 
+    Examples
+    --------
+    You want to create a building block which has :class:`.Thiol`
+    functional groups. You want the sulfur atom in those functional
+    groups to be the *bonder* atom, and the hydrogen atom to be the
+    *deleter* atom.
+
+    .. code-block:: python
+
+        import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='SCCCCS',
+            functional_groups=(stk.ThiolFactory(), ),
+        )
+
+    You want to create a building block which has :class:`.Thiol`
+    functional groups. You want the non-hydrogen atom bonded to the
+    sulfur to be the *bonder* atom and the SH group to be *deleter*
+    atoms.
+
+    .. code-block:: python
+
+        import stk
+
+        thiol_factory = stk.ThiolFactory(
+            # The index of the atom bonded to sulfur is 0 in the
+            # functional group string (see docstring).
+            bonders=(0, ),
+            # The index of the sulfur and hydrogen atoms in the
+            # functional group string (see docstring) is 1 and 2,
+            # respectively.
+            deleters=(1, 2),
+        )
+        building_block = stk.BuildingBlock(
+            smiles='SCCCCS',
+            functional_groups=(thiol_factory, ),
+        )
+
+
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
+
     """
 
     def __init__(self, bonders=(1, ), deleters=(2, )):
@@ -26,11 +71,11 @@ class ThiolFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 
