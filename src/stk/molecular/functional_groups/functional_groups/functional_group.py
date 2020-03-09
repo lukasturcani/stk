@@ -42,6 +42,23 @@ class FunctionalGroup:
     :class:`.ConstructedMolecule` construction, as well as specify
     which atoms of the building block should be used for positioning.
 
+    The most common reason you would want to implement a new
+    :class:`.FunctionalGroup` subclass, is because you want to
+    customize the construction of a :class:`.ConstructedMolecule`.
+    Specifically, you want to modify a specific set of atoms in a
+    :class:`.BuildingBlock` when doing construction, and you want
+    to modify them in a specific way. You will usually accompany the
+    creation of the new :class:`.FunctionalGroup` subclass with the
+    creation of a new :class:`.Reaction` subclass, which will perform
+    the custom modification on your new :class:`.FunctionalGroup`
+    subclass. Finally, a new :class:`.ReactionFactory` will also be
+    created, so that your :class:`.Reaction` subclass instances
+    actually get made during construction. Finally you will pass an
+    instance of your :class:`.ReactionFactory` subclass to the
+    chosen :class:`.TopologyGraph` you want to make, for example
+    :class:`~.polymer.Linear`, and your custom modification will take
+    place.
+
     See Also
     --------
     :mod:`.functional_group_factory`

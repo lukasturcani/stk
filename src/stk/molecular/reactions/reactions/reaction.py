@@ -9,10 +9,8 @@ Reaction
 
 """
 
-from typing import NamedTuple
 
-
-class ReactionResult(NamedTuple):
+class ReactionResult:
     """
     The result of a reaction.
 
