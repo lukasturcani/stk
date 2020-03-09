@@ -39,7 +39,8 @@ class FunctionalGroup:
 
     It is used to give access to atoms of :class:`.BuildingBlock`
     molecules which are modified during
-    :class:`.ConstructedMolecule` construction.
+    :class:`.ConstructedMolecule` construction, as well as specify
+    which atoms of the building block should be used for positioning.
 
     """
 
@@ -117,6 +118,10 @@ class FunctionalGroup:
         ------
         :class:`int`
             The id of an :class:`.Atom`.
+
+        See Also
+        --------
+        :meth:`.BuildingBlock.get_core_atom_ids`
 
         """
 
