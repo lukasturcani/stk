@@ -16,6 +16,41 @@ class AlcoholFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][O][H]`` functional group string.
 
+    Examples
+    --------
+    You want to create a building block which has :class:`.Alcohol`
+    functional groups. You want the oxygen atom in those functional
+    groups to be the bonder atom, and the hydrogen atom to be the
+    deleter atom.
+
+    .. code-block:: python
+
+        import stk
+
+        building_block('OCCCO', (stk.AlcoholFactory(), ))
+
+    You want to create a building block which has :class:`.Alcohol`
+    functional groups. You want the :class:`.Alcohol` group to be
+    treated as a leaving group. This means the connected atom is the
+    bonder atom and both the oxygen and hydrogen atoms are deleter
+    atoms,
+
+    .. code-block:: python
+
+        import stk
+
+        alcohol_factory = stk.AlcoholFactory(
+            bonders=(0, ),
+            deleters(1, 2),
+        )
+        building_block('OCCCO', (alcohol_factory, ))
+
+
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
+
     """
 
     def __init__(self, bonders=(1, ), deleters=(2, )):
@@ -26,11 +61,11 @@ class AlcoholFactory(FunctionalGroupFactory):
         ----------
         bonders : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are bonder atoms.
+            are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
             The indices of atoms in the functional group string, which
-            are deleter atoms.
+            are *deleter* atoms.
 
         """
 
