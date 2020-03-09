@@ -27,7 +27,10 @@ class AlcoholFactory(FunctionalGroupFactory):
 
         import stk
 
-        building_block('OCCCO', (stk.AlcoholFactory(), ))
+        building_block = stk.BuidingBlock(
+            smiles='OCCCO',
+            functional_groups=(stk.AlcoholFactory(), ),
+        )
 
     You want to create a building block which has :class:`.Alcohol`
     functional groups. You want the :class:`.Alcohol` group to be
@@ -43,7 +46,10 @@ class AlcoholFactory(FunctionalGroupFactory):
             bonders=(0, ),
             deleters(1, 2),
         )
-        building_block('OCCCO', (alcohol_factory, ))
+        building_block = stk.BuildingBlock(
+            smiles='OCCCO',
+            functional_groups=(alcohol_factory, ),
+        )
 
 
     See Also
