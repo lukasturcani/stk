@@ -57,7 +57,8 @@ class FunctionalGroup:
 
         core_atoms : :class:`tuple` of :class:`.Atom`
             The atoms of the functional group which also form the core
-            of the :class:`.BuildingBlock`.
+            of the :class:`.BuildingBlock`. See
+            :meth:`.BuildingBlock.get_core_atom_ids`.
 
         """
 
