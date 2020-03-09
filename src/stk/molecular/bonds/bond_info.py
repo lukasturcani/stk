@@ -40,10 +40,55 @@ class BondInfo:
         self._building_block_id = building_block_id
 
     def get_bond(self):
+        """
+        Get the bond about which information is held.
+
+        Returns
+        -------
+        :class:`.Bond`
+            The bond.
+
+        """
+
         return self._bond
 
     def get_building_block(self):
+        """
+        Get the building block from which the bond originates.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The building block.
+
+        None : :class:`NoneType`
+            If the bond was not originally found in a building block,
+            but was added by the construction process instead.
+
+        """
+
         return self._building_block
 
     def get_building_block_id(self):
+        """
+        Get the id of the bond's building block.
+
+        A unique id for each :class:`.BuildingBlock` placed during
+        the construction of the :class:`.ConstructedMolecule`. As a
+        single :class:`.BuildingBlock` can be placed multiple times
+        during construction, the :attr:`building_block_id` allows
+        the user to distinguish between each placement.
+
+        Returns
+        -------
+        :class:`int`
+            The id.
+
+        None : :class:`NoneType`
+            If the bond was not originally found in a building block,
+            but was added by the construction process instead.
+
+        """
+
+        return self._building_block_id
         return self._building_block_id

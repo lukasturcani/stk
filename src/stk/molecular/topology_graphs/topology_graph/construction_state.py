@@ -269,14 +269,15 @@ class ConstructionState:
         self._position_matrix = np.array(position_matrix)
 
         valid_atom_infos = filter(
-            lambda atom_info: atom_info.atom.get_id() in atom_map,
+            lambda atom_info:
+                atom_info.get_atom().get_id() in atom_map,
             self._atom_infos
         )
         self._atom_infos = [
             AtomInfo(
-                atom=atom_map[atom_info.atom.get_id()],
-                building_block=atom_info.building_block,
-                building_block_id=atom_info.building_block_id,
+                atom=atom_map[atom_info.get_atom().get_id()],
+                building_block=atom_info.get_building_block(),
+                building_block_id=atom_info.get_building_block_id(),
             )
             for atom_info in valid_atom_infos
         ]
@@ -296,9 +297,9 @@ class ConstructionState:
 
         valid_bond_infos = filter(
             lambda bond_info: (
-                bond_info.bond.get_atom1().get_id()
+                bond_info.get_bond().get_atom1().get_id()
                 not in deleted_atoms
-                and bond_info.bond.get_atom2().get_id()
+                and bond_info.get_bond().get_atom2().get_id()
                 not in deleted_atoms
             ),
             self._bond_infos,
@@ -306,8 +307,8 @@ class ConstructionState:
         self._bond_infos = [
             BondInfo(
                 bond=self._bonds[index],
-                building_block=bond_info.building_block,
-                building_block_id=bond_info.building_block_id,
+                building_block=bond_info.get_building_block(),
+                building_block_id=bond_info.get_building_block_id(),
             )
             for index, bond_info in enumerate(valid_bond_infos)
         ]
