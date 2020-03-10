@@ -1,3 +1,9 @@
+"""
+Molecule
+========
+
+"""
+
 import os
 import numpy as np
 from scipy.spatial.distance import euclidean
@@ -15,7 +21,16 @@ from stk.utilities import (
 
 class Molecule:
     """
-    An abstract base class for all molecules.
+    An abstract base class for molecules.
+
+    Notes
+    -----
+    You might notice that some of the methods of this abstract base
+    class are implemented. This is purely for convenience when
+    implementing subclasses. The implemented public methods are simply
+    default implementations, which can be safely ignored
+    or overridden, when implementing subclasses. Any private methods
+    are implementation details of these default implementations.
 
     """
 
@@ -333,9 +348,9 @@ class Molecule:
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
-        coords = self._position_matrix[:, atom_ids].T
-        for atom_coords in coords:
-            yield atom_coords
+        positions = self._position_matrix[:, atom_ids].T
+        for atomic_position in positions:
+            yield atomic_position
 
     def get_atoms(self, atom_ids=None):
         """
