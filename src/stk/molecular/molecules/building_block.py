@@ -549,7 +549,7 @@ class BuildingBlock(Molecule):
         Returns
         -------
         :class:`.BuildingBlock`
-            The clone.
+            The clone. Has the same type as the original molecule.
 
         """
 
@@ -603,12 +603,16 @@ class BuildingBlock(Molecule):
 
     def get_placer_ids(self):
         """
-        Yield ids of atoms used for placing the building block.
+        Yield ids of atoms, which should be used for placement.
 
         Yields
         ------
         :class:`int`
-            The id of a placer atom.
+            The id of a *placer* atom.
+
+        See Also
+        --------
+        :meth:`.FunctionalGroup.get_placer_ids`
 
         """
 
