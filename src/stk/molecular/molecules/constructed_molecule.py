@@ -19,20 +19,13 @@ class ConstructedMolecule(Molecule):
     """
     Represents constructed molecules.
 
-    A :class:`ConstructedMolecule` requires at least 2 basic pieces of
-    information: which building block molecules are used to construct
-    the molecule and what the :class:`.TopologyGraph` of the
-    constructed molecule is. The construction of the molecular
-    structure is performed by :meth:`.TopologyGraph.construct`. This
-    method does not have to be called explicitly by the user, it will
-    be called automatically during initialization.
-
     Examples
     --------
     *Initialization*
 
-    A :class:`ConstructedMolecule` can be created from a set of
-    building blocks and a :class:`.TopologyGraph`
+    A :class:`.ConstructedMolecule` is initialized from a
+    :class:`.TopologyGraph`, which is initialized from some
+    :class:`.BuildingBlock` instances.
 
     .. code-block:: python
 
@@ -43,48 +36,26 @@ class ConstructedMolecule(Molecule):
             smiles='O=CC(C=O)CC=O',
             functional_groups=[stk.AldehydeFactory()],
         )
-        tetrahedron = stk.cage.FourPlusSix()
-        cage1 = stk.ConstructedMolecule(
-            building_blocks=(bb1, bb2),
-            topology_graph=tetrahedron,
-        )
+        tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
+        cage1 = stk.ConstructedMolecule(tetrahedron)
 
-    A :class:`ConstructedMolecule` can be used to construct other
-    :class:`ConstructedMolecule` instances, but you have to convert
-    them into a :class:`.BuildingBlock` first
+    Depending on the :class:`.TopologyGraph`, a
+    :class:`ConstructedMolecule` may be used to construct other
+    :class:`ConstructedMolecule` instances.
 
     .. code-block:: python
 
         benzene = stk.BuildingBlock('c1ccccc1')
-        cage_complex = stk.ConstructedMolecule(
-            building_blocks=(
-                stk.BuildingBlock.init_from_molecule(cage1),
-                benzene,
-            ),
-            topology_graph=stk.host_guest.Complex(),
+        cage_complex = stk.host_guest.Complex(
+            host=cage1,
+            guest=benzene,
         )
+        cage_complex = stk.ConstructedMolecule(host_guest_complex)
 
-    During initialization, it is possible to force building blocks to
-    be placed on a specific :class:`.Vertex` of the
-    :class:`.TopologyGraph` by specifying the vertex
-
-    .. code-block:: python
-
-        bb3 = stk.BuildingBlock('NCOCN', [stk.PrimaryAminoFactory()])
-        bb4 = stk.BuildingBlock(
-            smiles='NCOCCCOCN',
-            functional_groups=[stk.PrimaryAminoFactory()],
-        )
-        cage2 = stk.ConstructedMolecule(
-            building_blocks=(bb1, bb2, bb3, bb4),
-            topology_graph=tetrahedron,
-            building_block_vertices={
-                bb1: tetrahedron.get_vertices(vertex_ids=(4, 5)),
-                bb2: tetrahedron.get_vertices(vertex_ids=range(4)),
-                bb3: tetrahedron.get_vertices(vertex_ids=6),
-                bb4: tetrahedron.get_vertices(vertex_ids=range(7, 10)),
-            },
-        )
+    Obviously, the initialization of the :class:`.ConstructedMolecule`
+    depends mostly on the specifics of the :class:`.TopologyGraph`
+    used, and the documentation of those classes should be examined
+    for more examples.
 
     """
 
@@ -95,8 +66,7 @@ class ConstructedMolecule(Molecule):
         Parameters
         ----------
         topology_graph : :class:`.TopologyGraph`
-            Defines the topology graph of the
-            :class:`.ConstructedMolecule` and constructs it.
+            The topology graph of the constructed molecule.
 
         """
 
@@ -111,16 +81,6 @@ class ConstructedMolecule(Molecule):
         self._bond_infos = construction_result.bond_infos
 
     def clone(self):
-        """
-        Return a clone.
-
-        Returns
-        -------
-        :class:`.ConstructedMolecule`
-            The clone.
-
-        """
-
         clone = super().clone()
         clone._topology_graph = self._topology_graph
         clone._atom_infos = self._atom_infos
@@ -139,6 +99,47 @@ class ConstructedMolecule(Molecule):
         """
 
         return self._topology_graph
+
+    def get_building_blocks(self):
+        """
+        Yield the building blocks of the constructed molecule.
+
+        Building blocks are yielded in an order based on their
+        position in the constructed molecule. For two equivalent
+        topology graphs, but with different building blocks,
+        equivalently positioned building blocks will be yielded at the
+        same time.
+
+        Yields
+        ------
+        :class:`.Molecule`
+            A building block of the constructed molecule.
+
+        """
+
+        yield from self._topology_graph.get_building_blocks()
+
+    def get_num_building_block(self, building_block):
+        """
+        Get the number of times `building_block` is present.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block whose frequency in the constructed
+            molecule is desired.
+
+        Returns
+        -------
+        :class:`int`
+            The number of times `building_block` was used in the
+            construction of the constructed molecule.
+
+        """
+
+        return (
+            self._topology_graph.get_num_building_block(building_block)
+        )
 
     def get_atom_infos(self, atom_ids=None):
         """
