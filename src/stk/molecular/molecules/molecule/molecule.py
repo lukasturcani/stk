@@ -284,7 +284,7 @@ class Molecule:
 
         tend = target - np.dot(target, axis)*axis
         # If `tend` is 0, it is parallel to the rotation axis, stop.
-        if np.allclose(tstart, [0, 0, 0], 1e-8):
+        if np.allclose(tend, [0, 0, 0], 1e-8):
             self._with_displacement(origin)
             return self
 
