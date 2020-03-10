@@ -247,6 +247,9 @@ class BuildingBlock(Molecule):
             bonds=bonds,
             position_matrix=position_matrix,
         )
+        functional_groups = building_block._extract_functional_groups(
+            functional_groups=functional_groups,
+        )
         building_block._with_functional_groups(functional_groups)
 
         if placer_ids is not None:
