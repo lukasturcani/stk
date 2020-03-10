@@ -175,7 +175,7 @@ class Molecule:
         vector, then the clone can be rotated so that this vector is
         aligned with `target`. The defined vector can be virtually
         anything. This means that any geometric feature of the molecule
-        can be easily aligned with any arbitrary axis.
+        can be easily aligned with any arbitrary direction.
 
         Parameters
         ----------
