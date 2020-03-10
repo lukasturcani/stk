@@ -22,7 +22,7 @@ def _write_mdl_mol_file(self, path, atom_ids):
     """
 
     with open(path, 'w') as f:
-        f.write(self._to_mdl_mol_block(atom_ids))
+        f.write(_to_mdl_mol_block(self, atom_ids))
 
 
 def _to_mdl_mol_block(self, atom_ids=None):

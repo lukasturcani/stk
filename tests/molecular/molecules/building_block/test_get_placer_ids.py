@@ -1,29 +1,66 @@
+import pytest
+import stk
 import itertools as it
 
 
-def test_get_placer_ids(
-    building_block,
-    get_functional_groups,
-):
-    building_block = building_block.with_functional_groups(
-        functional_groups=get_functional_groups(building_block),
-    )
-    placer_ids = it.zip_longest(
-        building_block.get_placer_ids(),
-        get_placer_ids(
-            building_block=building_block,
-            functional_groups=get_functional_groups(building_block),
+class CaseData:
+    def __init__(self, building_block, placer_ids):
+        self.building_block = building_block
+        self.placer_ids = placer_ids
+
+
+@pytest.fixture(
+    params=(
+        CaseData(
+            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            placer_ids=(0, 1, 2, 3),
         ),
+        CaseData(
+            building_block=stk.BuildingBlock(
+                smiles='BrCCCBr',
+                functional_groups=[stk.BromoFactory()],
+                placer_ids=(),
+            ),
+            placer_ids=(),
+        ),
+        CaseData(
+            building_block=stk.BuildingBlock(
+                smiles='BrCCCBr',
+                functional_groups=[stk.BromoFactory()],
+                placer_ids=(2, ),
+            ),
+            placer_ids=(2, ),
+        ),
+        CaseData(
+            building_block=stk.BuildingBlock(
+                smiles='Br[C+2][C+2]Br',
+                functional_groups=[stk.IodoFactory()],
+            ),
+            placer_ids=(0, 1, 2, 3),
+        ),
+        CaseData(
+            building_block=stk.BuildingBlock(
+                smiles='Br[C+2][C+2]Br',
+                functional_groups=[stk.BromoFactory()],
+            ),
+            placer_ids=(1, 2),
+        ),
+    ),
+)
+def case_data(request):
+    return request.param
+
+
+def test_get_placer_ids(case_data):
+    _test_get_placer_ids(
+        building_block=case_data.building_block,
+        placer_ids=case_data.placer_ids,
     )
-    for placer1, placer2 in placer_ids:
+
+
+def _test_get_placer_ids(building_block, placer_ids):
+    for placer1, placer2 in it.zip_longest(
+        building_block.get_placer_ids(),
+        placer_ids,
+    ):
         assert placer1 == placer2
-
-
-def get_placer_ids(building_block, functional_groups):
-    functional_groups = tuple(functional_groups)
-
-    if functional_groups:
-        for fg in functional_groups:
-            yield from fg.get_placer_ids()
-    else:
-        yield from range(building_block.get_num_atoms())

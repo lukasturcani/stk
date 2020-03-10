@@ -595,6 +595,7 @@ class BuildingBlock(Molecule):
     def clone(self):
         clone = super().clone()
         clone._functional_groups = self._functional_groups
+        clone._placer_ids = self._placer_ids
         return clone
 
     def get_placer_ids(self):
@@ -608,11 +609,7 @@ class BuildingBlock(Molecule):
 
         """
 
-        if self._functional_groups:
-            for functional_group in self._functional_groups:
-                yield from functional_group.get_placer_ids()
-        else:
-            yield from range(len(self._atoms))
+        yield from self._placer_ids
 
     def get_core_atom_ids(self):
         """
