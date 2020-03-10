@@ -627,6 +627,10 @@ class BuildingBlock(Molecule):
         :class:`int`
             The id of a core atom.
 
+        See Also
+        --------
+        :meth:`.FunctionalGroup.get_core_atom_ids`
+
         """
 
         functional_group_atom_ids = {
