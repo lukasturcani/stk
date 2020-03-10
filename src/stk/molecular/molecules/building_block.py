@@ -55,7 +55,13 @@ class BuildingBlock(Molecule):
         ),
     }
 
-    def __init__(self, smiles, functional_groups=(), random_seed=4):
+    def __init__(
+        self,
+        smiles,
+        functional_groups=(),
+        placer_ids=None,
+        random_seed=4,
+    ):
         """
         Initialize a :class:`.BuildingBlock`.
 
@@ -79,6 +85,24 @@ class BuildingBlock(Molecule):
             :class:`.FunctionalGroup` instances are used to identify
             which atoms are modified during
             :class:`.ConstructedMolecule` construction.
+
+        placer_ids : :class:`tuple` of :class:`int`, optional
+            The ids of *placer* atoms. These are atoms used for
+            calculating the position of the building block.
+            Depending on the values passed to `placer_ids`
+            and `functional_groups`, different *placer* ids will be
+            used by the building block.
+
+            #. `placer_ids` is passed to the initializer: the passed
+               *placer* ids will be used by the building block.
+
+            #. `placer_ids` is ``None`` and `functional_groups` is not
+               empty: The *placer* ids of the functional groups will
+               be used as the *placer* ids of the building block.
+
+            #. `placer_ids` is ``None`` and `functional_groups` is
+               empty. All atoms of the molecule will be used for
+               *placer* ids.
 
         random_seed : :class:`int`, optional
             Random seed passed to :func:`rdkit.ETKDGv2`
@@ -144,6 +168,28 @@ class BuildingBlock(Molecule):
         position_matrix,
         functional_groups,
     ):
+        """
+        Initialize a :class:`.BuildingBlock` from its components.
+
+        Parameters
+        ----------
+        atoms : :class:`tuple` of :class:`.Atom`
+            The atoms of the building block.
+
+        bonds : :class:`tuple` of :class:`.Bond`
+            The bonds of the building block.
+
+        position_matrix : :class:`numpy.ndarray`
+            An ``(n, 3)`` position matrix of the building block.
+
+        functional_groups : :class:`iterable`
+            An :class:`iterable` holding the :class:`.FunctionalGroup`
+            instances the building block should have, and / or
+            :class:`.FunctionalGroupFactory` instances used for
+            creating them.
+
+        """
+
         building_block = cls.__new__(cls)
         Molecule.__init__(
             self=building_block,
