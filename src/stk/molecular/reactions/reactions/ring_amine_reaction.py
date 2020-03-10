@@ -15,7 +15,7 @@ class RingAmineReaction(Reaction):
     """
     Performs a reaction between two :class:`.RingAmine` groups.
 
-    The reaction creates a new ring merging the two functional groups.
+    The reaction creates a new ring, merging the two functional groups.
 
     """
 
