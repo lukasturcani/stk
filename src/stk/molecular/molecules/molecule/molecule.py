@@ -79,7 +79,8 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A displaced clone.
+            A displaced clone. Has the same type as the original
+            molecule.
 
         """
 
@@ -125,7 +126,8 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A rotated clone.
+            A rotated clone. Has the same type as the original
+            molecule.
 
         """
 
@@ -190,7 +192,8 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A rotated clone.
+            A rotated clone. Has the same type as the original
+            molecule.
 
         """
 
@@ -282,7 +285,8 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A rotated clone.
+            A rotated clone. Has the same type as the original
+            molecule.
 
         Raises
         ------
@@ -607,7 +611,8 @@ class Molecule:
         Returns
         -------
         :class:`Molecule`
-            A clone with its centroid at `position`.
+            A clone with its centroid at `position`. Has the same type
+            as the original molecule.
 
         """
 
@@ -635,7 +640,7 @@ class Molecule:
         Returns
         -------
         :class:`Molecule`
-            The clone.
+            The clone. Has the same type as the original molecule.
 
         """
         return self.clone()._with_position_matrix(position_matrix)
@@ -696,7 +701,8 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            A clone with atomic positions found in `path`.
+            A clone with atomic positions found in `path`. Has the same
+            type as the original molecule.
 
         """
 
