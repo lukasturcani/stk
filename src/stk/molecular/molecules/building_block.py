@@ -124,9 +124,9 @@ class BuildingBlock(Molecule):
             )
         rdkit.Kekulize(molecule)
         self._init_from_rdkit_mol(
-                molecule=molecule,
-                functional_groups=functional_groups,
-                placer_ids=placer_ids,
+            molecule=molecule,
+            functional_groups=functional_groups,
+            placer_ids=placer_ids,
         )
 
     @classmethod
@@ -238,6 +238,11 @@ class BuildingBlock(Molecule):
                empty. All atoms of the molecule will be used for
                *placer* ids.
 
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The building block.
+
         """
 
         building_block = cls.__new__(cls)
@@ -251,22 +256,12 @@ class BuildingBlock(Molecule):
             functional_groups=functional_groups,
         )
         building_block._with_functional_groups(functional_groups)
-
-        if placer_ids is not None:
-            building_block._placer_ids = placer_ids
-
-        elif building_block._functional_groups:
-            building_block._placer_ids = tuple(flatten(
-                functional_group.get_placer_ids()
-                for functional_group
-                in building_block._functional_groups
-            ))
-
-        else:
-            building_block._placer_ids = tuple(
-                atom.get_id() for atom in building_block._atoms
+        building_block._placer_ids = (
+            building_block._normalize_placer_ids(
+                placer_ids=placer_ids,
+                functional_groups=building_block._functional_groups,
             )
-
+        )
         return building_block
 
     @classmethod
@@ -331,17 +326,17 @@ class BuildingBlock(Molecule):
         """
 
         if os.path.exists(path):
-            _, ext = os.path.splitext(path)
+            _, extension = os.path.splitext(path)
 
-            if ext not in cls._init_funcs:
+            if extension not in cls._init_funcs:
                 raise ValueError(
-                    f'Unable to initialize from "{ext}" files.'
+                    f'Unable to initialize from "{extension}" files.'
                 )
             # This remake needs to be here because molecules loaded
             # with rdkit often have issues, because rdkit tries to do
             # bits of structural analysis like stereocenters. remake
             # gets rid of all this problematic metadata.
-            molecule = remake(cls._init_funcs[ext](path))
+            molecule = remake(cls._init_funcs[extension](path))
 
         return cls.init_from_rdkit_mol(
             molecule=molecule,
@@ -401,13 +396,13 @@ class BuildingBlock(Molecule):
 
         """
 
-        bb = cls.__new__(cls)
-        bb._init_from_rdkit_mol(
+        building_block = cls.__new__(cls)
+        building_block._init_from_rdkit_mol(
             molecule=molecule,
             functional_groups=functional_groups,
             placer_ids=placer_ids,
         )
-        return bb
+        return building_block
 
     def _init_from_rdkit_mol(
         self,
@@ -477,20 +472,53 @@ class BuildingBlock(Molecule):
         self._with_functional_groups(self._extract_functional_groups(
             functional_groups=functional_groups,
         ))
+        self._placer_ids = self._normalize_placer_ids(
+            placer_ids=placer_ids,
+            functional_groups=self._functional_groups,
+        )
+
+    def _normalize_placer_ids(self, placer_ids, functional_groups):
+        """
+        Get the final *placer* ids.
+
+        Parameters
+        ----------
+        placer_ids : :class:`tuple` of :class:`int`
+            The ids of *placer* atoms or ``None``.
+
+        functional_groups : :class:`iterable`
+            The :class:`.FunctionalGroup` instances of the building
+            block.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`int`
+            Depending on the input  values, this function will return
+            different things.
+
+            #. `placer_ids` is a :class:`tuple` of :class`int`: the
+                `placer_ids` will be returned.
+
+            #. `placer_ids` is ``None`` and `functional_groups` is not
+                empty: The *placer* ids of the functional groups will
+                be returned.
+
+            #. `placer_ids` is ``None`` and `functional_groups` is
+               empty. The ids of all atoms in the building block will
+               be returned.
+
+        """
 
         if placer_ids is not None:
-            self._placer_ids = placer_ids
+            return placer_ids
 
-        elif self._functional_groups:
-            self._placer_ids = tuple(flatten(
+        if functional_groups:
+            return tuple(flatten(
                 functional_group.get_placer_ids()
-                for functional_group in self._functional_groups
+                for functional_group in functional_groups
             ))
 
-        else:
-            self._placer_ids = tuple(
-                atom.get_id() for atom in self._atoms
-            )
+        return tuple(atom.get_id() for atom in self._atoms)
 
     def _extract_functional_groups(self, functional_groups):
         """
