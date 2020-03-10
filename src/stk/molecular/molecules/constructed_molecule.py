@@ -11,10 +11,6 @@ from .molecule import Molecule
 logger = logging.getLogger(__name__)
 
 
-class ConstructionError(Exception):
-    ...
-
-
 class ConstructedMolecule(Molecule):
     """
     Represents constructed molecules.
