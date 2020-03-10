@@ -311,7 +311,7 @@ class Molecule:
         Returns
         -------
         :class:`.Molecule`
-            The clone.
+            The clone. Has the same type as the original molecule.
 
         """
 
