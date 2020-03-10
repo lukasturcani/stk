@@ -231,6 +231,19 @@ class Molecule:
                 origin=molecule2.get_centroid(),
             )
 
+        You want to place the benzene flat along the xy plane.
+
+        .. code-block:: python
+
+            import stk
+
+            benzene = stk.BuildingBlock('c1ccccc1')
+            benzene = benzene.with_rotation_between_vectors(
+                start=benzene.get_plane_normal(),
+                target=np.array([0., 0., 1.]),
+                origin=benzene.get_centroid(),
+            )
+
         """
 
         return self.clone()._with_rotation_between_vectors(
