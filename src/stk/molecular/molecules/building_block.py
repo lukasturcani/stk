@@ -261,7 +261,7 @@ class BuildingBlock(Molecule):
 
         else:
             building_block._placer_ids = tuple(
-                atom.get_id() for atom in building_block.get_atoms()
+                atom.get_id() for atom in building_block._atoms
             )
 
         return building_block
