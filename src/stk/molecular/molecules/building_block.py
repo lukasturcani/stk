@@ -603,7 +603,10 @@ class BuildingBlock(Molecule):
 
     def get_placer_ids(self):
         """
-        Yield ids of atoms, which should be used for placement.
+        Yield the ids of *placer* atoms.
+
+        *Placer* atoms are those, which should be used to calculate
+        the position of the building block.
 
         Yields
         ------

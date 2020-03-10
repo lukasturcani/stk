@@ -136,10 +136,10 @@ class FunctionalGroup:
 
     def get_placer_ids(self):
         """
-        Yield the ids of atoms used for position calculation.
+        Yield the ids of *placer* atoms.
 
-        The ids of atoms yielded by this method should be used to
-        calculate the position of the functional group.
+        *Placer* atoms are those, which should be used to calculate
+        the position of the functional group.
 
         Yields
         ------
