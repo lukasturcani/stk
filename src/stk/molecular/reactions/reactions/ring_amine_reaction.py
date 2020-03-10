@@ -1,3 +1,9 @@
+"""
+Ring Amine Reaction
+===================
+
+"""
+
 import numpy as np
 
 from .reaction import Reaction, NewAtom
@@ -6,7 +12,30 @@ from ...bonds import Bond
 
 
 class RingAmineReaction(Reaction):
+    """
+    Performs a reaction between two :class:`.RingAmine` groups.
+
+    The reaction creates a new ring merging the two functional groups.
+
+    """
+
     def __init__(self, position_matrix, ring_amine1, ring_amine2):
+        """
+        Initialize a :class:`.RingAmineReaction` instance.
+
+        Parameters
+        ----------
+        position_matrix : :class:`numpy.ndarray`
+            The position matrix of the molecule being constructed.
+
+        ring_amine1 : :class:`.RingAmine`
+            The first functional group in the reaction.
+
+        ring_amine2 : :class:`.RingAmine`
+            The second functional group in the reaction.
+
+        """
+
         self._position_matrix = np.array(position_matrix)
         self._ring_amine1 = ring_amine1.clone()
         self._ring_amine2 = ring_amine2.clone()

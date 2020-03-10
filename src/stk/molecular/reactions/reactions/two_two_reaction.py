@@ -15,8 +15,8 @@ class TwoTwoReaction(Reaction):
     """
     A reaction between two functional groups, each with 2 bonder atoms.
 
-    The reaction creates the two shortest possible bonds between
-    *bonder* atoms of the two functional groups, and deleters and
+    The reaction creates the two shortest possible bonds between the
+    *bonder* atoms of the two functional groups, and deletes any
     *deleter* atoms.
 
     """
