@@ -14,7 +14,7 @@ from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bonds import Bond
 from .molecule import Molecule
-from ...utilities import remake
+from ...utilities import remake, flatten
 
 
 logger = logging.getLogger(__name__)
@@ -248,6 +248,22 @@ class BuildingBlock(Molecule):
             position_matrix=position_matrix,
         )
         building_block._with_functional_groups(functional_groups)
+
+        if placer_ids is not None:
+            building_block._placer_ids = placer_ids
+
+        elif building_block._functional_groups:
+            building_block._placer_ids = tuple(flatten(
+                functional_group.get_placer_ids()
+                for functional_group
+                in building_block._functional_groups
+            ))
+
+        else:
+            building_block._placer_ids = tuple(
+                atom.get_id() for atom in building_block.get_atoms()
+            )
+
         return building_block
 
     @classmethod
@@ -327,6 +343,7 @@ class BuildingBlock(Molecule):
         return cls.init_from_rdkit_mol(
             molecule=molecule,
             functional_groups=functional_groups,
+            placer_ids=placer_ids,
         )
 
     @classmethod
@@ -385,8 +402,8 @@ class BuildingBlock(Molecule):
         bb._init_from_rdkit_mol(
             molecule=molecule,
             functional_groups=functional_groups,
+            placer_ids=placer_ids,
         )
-
         return bb
 
     def _init_from_rdkit_mol(
@@ -457,6 +474,20 @@ class BuildingBlock(Molecule):
         self._with_functional_groups(self._extract_functional_groups(
             functional_groups=functional_groups,
         ))
+
+        if placer_ids is not None:
+            self._placer_ids = placer_ids
+
+        elif self._functional_groups:
+            self._placer_ids = tuple(flatten(
+                functional_group.get_placer_ids()
+                for functional_group in self._functional_groups
+            ))
+
+        else:
+            self._placer_ids = tuple(
+                atom.get_id() for atom in self._atoms
+            )
 
     def _extract_functional_groups(self, functional_groups):
         """
