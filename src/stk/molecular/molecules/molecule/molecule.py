@@ -74,7 +74,7 @@ class Molecule:
         Parameters
         ----------
         displacement : :class:`numpy.ndarray`
-            The displacement vector applied.
+            The displacement vector to be applied.
 
         Returns
         -------
@@ -194,6 +194,42 @@ class Molecule:
         :class:`.Molecule`
             A rotated clone. Has the same type as the original
             molecule.
+
+        Examples
+        --------
+        You want to rotate a molecule, such that it is aligned along
+        with a specific direction.
+
+        .. code-block:: python
+
+            import stk
+
+            molecule1 = stk.BuildingBlock('CCCCC')
+            # Align molecule1 along x-axis.
+            molecule1 = molecule1.with_rotation_between_vectors(
+                start=molecule1.get_direction(),
+                target=np.array([1., 0., 0.]),
+                origin=molecule1.get_centroid(),
+            )
+
+            molecule2 = stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCCBr',
+                            functional_groups=(stk.BromoFactory(), ),
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=15,
+                ),
+            )
+            # Align molecule2 along the [1, 4, -3] vector.
+            molecule2 = molecule2.with_rotation_between_vectors(
+                start=molecule2.get_direction(),
+                target=np.array([1., 4., -3.]),
+                origin=molecule2.get_centroid(),
+            )
 
         """
 
@@ -694,7 +730,7 @@ class Molecule:
             The path to a molecular structure file holding updated
             coordinates for the :class:`.Molecule`.
 
-        extension : :class:`str, optional
+        extension : :class:`str`, optional
             If you want to treat the file as though it has a
             particular extension, put it here. Include the dot.
 
