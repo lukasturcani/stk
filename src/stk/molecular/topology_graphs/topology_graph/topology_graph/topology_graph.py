@@ -55,7 +55,7 @@ class TopologyGraph:
     addition, you get benefits like parallel construction for free, as
     it is included in the default implementation.
 
-    Typically adding a new topology graph will involve implementing
+    Typically, adding a new topology graph will involve implementing
     any pure virtual methods of :class:`.TopologyGraph`, in a new
     subclass, as well as implementing any pure virtual methods of
     :class:`.Vertex`, again in a new subclass. Combined, this is just a
@@ -146,11 +146,11 @@ class TopologyGraph:
             A collection of callables, each of which takes a
             :class:`.Vertex` and returns ``True`` or ``False``.
             If the first :class:`callable` is applied to a  vertex in
-            the topology graph, that vertex is is part of the first
-            construction stage. The second :class:`callable` is then
-            applied to all vertices not in the first stage and those
-            which return ``True`` belong to the second stage and
-            so on.
+            the topology graph, and the result is ``True``, that vertex
+            is a part of the first construction stage. The second
+            :class:`callable` is then applied to all vertices not in
+            the first stage and those which return ``True`` belong to
+            the second stage and so on.
 
             Vertices which belong to the same construction stage
             all place building blocks together in parallel, before
@@ -167,7 +167,7 @@ class TopologyGraph:
             :meth:`construct`.
 
         edge_groups : :class:`tuple` of :class:`.EdgeGroup`, optional
-            The edge groups of the topology graph, if ``None`` every
+            The edge groups of the topology graph, if ``None``, every
             :class:`.Edge` is in its own edge group.
 
         """
