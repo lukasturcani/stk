@@ -659,7 +659,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`Molecule`
+        :class:`.Molecule`
             A clone with its centroid at `position`. Has the same type
             as the original molecule.
 
@@ -688,7 +688,7 @@ class Molecule:
 
         Returns
         -------
-        :class:`Molecule`
+        :class:`.Molecule`
             The clone. Has the same type as the original molecule.
 
         """

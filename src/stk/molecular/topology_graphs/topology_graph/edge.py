@@ -22,7 +22,7 @@ class Edge:
         position=None,
     ):
         """
-        Initialize a :class:`.Edge` instance.
+        Initialize an :class:`.Edge` instance.
 
         Parameters
         ----------
@@ -45,7 +45,7 @@ class Edge:
 
         position : :class:`numpy.ndarray`, optional
             The position of the edge, if ``None``, the midpoint of the
-            the vertices is used.
+            vertices is used.
 
         """
 
@@ -119,7 +119,7 @@ class Edge:
 
         Parameters
         ----------
-        scale : :class:`float` or :class:`tuple`of :class:`float`
+        scale : :class:`float` or :class:`tuple` of :class:`float`
             The value by which the position of
             the :class:`.Edge` is scaled. Can be a single number if all
             axes are scaled by the same amount or a :class:`tuple` of
@@ -127,7 +127,7 @@ class Edge:
 
         Returns
         -------
-        :class:`Edge`
+        :class:`.Edge`
             The clone. Has the same type as the original edge.
 
 
@@ -141,8 +141,8 @@ class Edge:
 
         Returns
         -------
-        :class:`Edge`
-            The clone.
+        :class:`.Edge`
+            The clone. Has the same type as the original edge.
 
         """
 
