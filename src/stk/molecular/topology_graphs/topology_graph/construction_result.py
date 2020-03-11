@@ -7,7 +7,7 @@ Construction Result
 
 class ConstructionResult:
     """
-    The result of a :class:`.ConstructedMolecule` construction.
+    The result of :meth:`.TopologyGraph.construct`.
 
     """
 
