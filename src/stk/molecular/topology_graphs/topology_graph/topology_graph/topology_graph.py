@@ -52,7 +52,7 @@ class TopologyGraph:
     default implementation of :class:`.TopologyGraph`, you mostly just
     need to implement a :class:`.Vertex` subclass, which is much easier
     than figuring out the whole construction process from scratch. In
-    addition you get benefits like parallel construction for free, as
+    addition, you get benefits like parallel construction for free, as
     it is included in the default implementation.
 
     Typically adding a new topology graph will involve implementing
