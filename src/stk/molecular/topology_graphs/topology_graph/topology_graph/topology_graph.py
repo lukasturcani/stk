@@ -253,8 +253,8 @@ class TopologyGraph:
         Parameters
         ----------
         building_block_map : :class:`dict`
-            Maps a :class:`.BuildingBlock` in the current topology
-            graph to the :class:`.BuildingBlock` which should replace
+            Maps a building block in the current topology
+            graph to the building block which should replace
             it in the clone. If a building block should be not replaced
             in the clone, it can be omitted from the map.
 
