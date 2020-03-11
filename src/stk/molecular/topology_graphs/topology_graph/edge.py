@@ -1,3 +1,9 @@
+"""
+Edge
+====
+
+"""
+
 import numpy as np
 
 
@@ -31,7 +37,11 @@ class Edge:
 
         periodicity : :class:`tuple` of :class:`int`, optional
             The periodicity of the edge, when going from `vertex1` to
-            `vertex2`.
+            `vertex2`. For example, if ``(0, 0, 0)`` the edge is not
+            periodic, if ``(1, 0, -1)`` the edge is periodic going in
+            the positive direction along the x axis, is not periodic
+            across the y axis and is periodic in the negative direction
+            along the z axis.
 
         position : :class:`numpy.ndarray`, optional
             The position of the edge, if ``None``, the midpoint of the
@@ -71,11 +81,11 @@ class Edge:
         Returns
         -------
         :class:`tuple` of :class:`int`
-            The periodicity of the edge. If ``(0, 0, 0)`` the edge is
-            not periodic, if ``(1, 0, -1)`` the edge is periodic going
-            in the positive direction along the x axis, is not periodic
-            across the y axis and is periodic in the negative direction
-            along the z axis.
+            The periodicity of the edge. For example, if ``(0, 0, 0)``
+            the edge is not periodic, if ``(1, 0, -1)`` the edge is
+            periodic going in the positive direction along the x axis,
+            is not periodic across the y axis and is periodic in the
+            negative direction along the z axis.
 
         """
 
@@ -95,6 +105,11 @@ class Edge:
         return any(i != 0 for i in self._periodicity)
 
     def _with_scale(self, scale):
+        """
+        Modify the edge.
+
+        """
+
         self._position *= scale
         return self
 
@@ -104,16 +119,16 @@ class Edge:
 
         Parameters
         ----------
-        scale : :class:`float` or :class:`list`of :class:`float`
+        scale : :class:`float` or :class:`tuple`of :class:`float`
             The value by which the position of
-            the :class:`Edge` is scaled. Can be a single number if all
-            axes are scaled by the same amount or a :class:`list` of
+            the :class:`.Edge` is scaled. Can be a single number if all
+            axes are scaled by the same amount or a :class:`tuple` of
             three numbers if each axis is scaled by a different value.
 
         Returns
         -------
         :class:`Edge`
-            The clone.
+            The clone. Has the same type as the original edge.
 
 
         """
@@ -138,6 +153,23 @@ class Edge:
         clone._position = np.array(self._position)
         clone._periodicity = self._periodicity
         return clone
+
+    def get_vertex_ids(self):
+        """
+        Yield the ids of the vertices connected by the edge.
+
+        The id of the first vertex is yielded first, followed by the id
+        of the second vertex.
+
+        Yields
+        ------
+        :class:`int`
+            The id of a :class:`.Vertex`.
+
+        """
+
+        yield self._vertex1_id
+        yield self._vertex2_id
 
     def get_vertex1_id(self):
         """
@@ -167,7 +199,7 @@ class Edge:
 
     def get_position(self):
         """
-        Return the position.
+        Get the position.
 
         Returns
         -------
@@ -179,6 +211,11 @@ class Edge:
         return np.array(self._position)
 
     def _with_position(self, position):
+        """
+        Modify the edge.
+
+        """
+
         self._position = np.array(position, dtype=np.float64)
         return self
 
@@ -194,7 +231,7 @@ class Edge:
         Returns
         -------
         :class:`.Edge`
-            The clone.
+            The clone. Has the same type as the original edge.
 
         """
 
