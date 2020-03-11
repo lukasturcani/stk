@@ -24,39 +24,6 @@ into separate stages. However,
 if this is not the case, then an empty :class:`tuple` can simply be
 passed.
 
-Why is both :class:`.VertexData` and :class:`.Vertex` needed?
--------------------------------------------------------------
-
-At first, it may appear that having both :class:`.VertexData` and
-:class:`.Vertex` is an unnecessary inconvenience, as when you create
-a new :class:`.TopologyGraph` subclass you have to subclass both of
-these classes rather than just :class:`.Vertex`. The answer is
-related to how these two classes reference other objects in the
-:class:`.TopologyGraph`.
-
-:class:`.VertexData` and :class:`.EdgeData` objects keep pointers
-to each other in the :attr:`~.VertexData.edges` and
-:attr:`~.EdgeData.vertices`. This is extremely convenient for
-defining a :class:`.TopologyGraph` because its components can directly
-reference each other. However, it poses a significant issue for
-serialization. Topology graphs may be highly-cyclic structures
-and are therefore they may not possible to serialize with off-the-shelf
-serialization tools like :mod:`pickle` or :mod:`dill`. However,
-serialization is necessary and fundamental for allowing
-parallelization of :class:`.TopologyGraph` construction. The
-vertices and edges of the graph have to be serialized and sent to
-other cores so that they can place and connect building blocks in
-parallel. As a  result, :class:`.VertexData` exists to allow a
-convenient definition of a :class:`TopologyGraph`, while
-:class:`.Vertex` exists to provide a serializable representation of it.
-:class:`.Verex` and :class:`Edge` do not reference other objects
-directly, instead they refer to them by their :attr:`.Vertex.id`,
-which is used to get an index into :attr:`.TopologyGraph.vertices`
-and :attr:`.TopologyGraph.edges`.
-
-:meth:`.VertexData.get_vertex` is used to convert :class:`.VertexData`
-into its :class:`.Vertex` counterpart.
-
 """
 
 from functools import partial
@@ -182,6 +149,35 @@ class TopologyGraph:
             )
         self._edge_groups = edge_groups
 
+    def _with_building_blocks(self, building_block_map):
+        """
+        Modify the topology graph.
+
+        """
+
+        building_block_vertices = {
+            building_block_map.get(building_block, building_block):
+                tuple(
+                    # The original scaling first needs to be removed,
+                    # so that when the scale is recalculated with the
+                    # new building blocks, it has the same starting
+                    # geometry.
+                    vertex.with_scale(1/self._scale)
+                    for vertex in vertices
+                )
+            for building_block, vertices
+            in self._building_block_vertices.items()
+        }
+        self._scale = scale = self._get_scale(building_block_vertices)
+        self._building_block_vertices = {
+                building_block: tuple(
+                    vertex.with_scale(scale) for vertex in vertices
+                )
+                for building_block, vertices
+                in building_block_vertices.items()
+        }
+        return self
+
     def with_building_blocks(self, building_block_map):
         """
         Return a clone holding different building blocks.
@@ -197,32 +193,62 @@ class TopologyGraph:
         Returns
         -------
         :class:`.TopologyGraph`
-            The clone.
+            The clone. Has the same type as the original topology
+            graph.
 
         """
 
-        ...
+        return self.clone._with_building_blocks(building_block_map)
 
     def get_building_blocks(self):
         """
         Yield the building blocks.
 
         Building blocks are yielded in an order based on their
-        position in the constructed molecule. For two equivalent
+        position in the topology graph. For two equivalent
         topology graphs, but with different building blocks,
         equivalently positioned building blocks will be yielded at the
         same time.
 
         Yields
         ------
-        :class:`.BuildingBlock`
+        :class:`.Molecule`
             A building block of the topology graph.
 
         """
 
-        yield from self._building_block_vertices
+        vertex_building_blocks = {}
+        num_vertices = 0
+        for building_block, vertices in (
+            self._building_block_vertices.items()
+        ):
+            for vertex in vertices:
+                num_vertices += 1
+                vertex_building_blocks[vertex.get_id()] = (
+                    building_block
+                )
+
+        for vertex_id in range(num_vertices):
+            yield vertex_building_blocks[vertex_id]
 
     def get_num_building_block(self, building_block):
+        """
+        Get the number of times `building_block` is present.
+
+        Parameters
+        ----------
+        building_block : :class:`.Molecule`
+            The building block whose frequency in the topology graph
+            is desired.
+
+        Returns
+        -------
+        :class:`int`
+            The number of times `building_block` was used in the
+            topology graph.
+
+        """
+
         return len(
             self._building_block_vertices.get(building_block, [])
         )
