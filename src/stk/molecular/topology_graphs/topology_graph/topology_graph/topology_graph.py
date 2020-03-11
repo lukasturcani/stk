@@ -44,7 +44,7 @@ class TopologyGraph:
     :class:`.EdgeGroup`, :class:`.ConstructionState`,
     and even :class:`.BuildingBlock`, exist as implementation details
     of this default :class:`.TopologyGraph` implementation. You could
-    ignore all of them, define a new :meth:`.construct` method from
+    ignore all of them, and define a new :meth:`.construct` method from
     scratch. In fact, your topology graph does not have to be
     represented as a graph at all. However, using the default
     implementation of :class:`.TopologyGraph` makes it significantly
