@@ -22,12 +22,47 @@ class _PlacementResult(NamedTuple):
 
 
 class _Placement:
+    """
+    Represents placement of a building block on a vertex.
+
+    It represents a computation which carries out the placement
+    of the building block on the vertex and the mapping of its
+    functional group to edges.
+
+    """
+
     def __init__(self, vertex, edges, building_block):
+        """
+        Initialize a :class:`._Placement`.
+
+        Parameters
+        ----------
+        vertex : :class:`.Vertex`
+            The vertex which does the placement.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            The edges connected to `vertex`.
+
+        building_block : :class:`.BuildingBlock`
+            The building block to be placed on `vertex`.
+
+        """
+
         self._vertex = vertex
         self._edges = edges
         self._building_block = building_block
 
     def get_result(self):
+        """
+        Get the result of the placement.
+
+        Returns
+        -------
+        :class:`_PlacementResult`
+            The result of the placement.
+
+        """
+
         position_matrix = self._vertex.place_building_block(
             building_block=self._building_block,
             edges=self._edges,

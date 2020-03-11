@@ -32,6 +32,8 @@ class _CageConstructionState(ConstructionState):
         building_blocks,
         results,
     ):
+        # Need to iterate multiple times through results.
+        results = tuple(results)
         super()._with_placement_results(
             vertices=vertices,
             edges=edges,

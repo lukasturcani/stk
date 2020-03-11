@@ -9,13 +9,13 @@ class _Serial:
 
     def __init__(self, stages):
         """
-        Initialize a :class:`._Parallel`.
+        Initialize a :class:`._Serial` instance.
 
         Parameters
         ----------
         stages : :class:`tuple`
-            A :class:`tuple` of the form ``([v1, v2, v3], [v4, v5])``,
-            where each nested :class:`list` holds the
+            A :class:`tuple` of the form ``((v1, v2, v3), (v4, v5))``,
+            where each nested :class:`tuple` holds the
             :class:`.Vertex` objects used for placement in a particular
             stage.
 
@@ -36,10 +36,10 @@ class _Serial:
                 edges,
                 building_blocks,
             )
-            placement_results = tuple(map(
+            placement_results = map(
                 lambda placement: placement.get_result(),
                 placements,
-            ))
+            )
             state = state.with_placement_results(
                 vertices=vertices,
                 edges=edges,
