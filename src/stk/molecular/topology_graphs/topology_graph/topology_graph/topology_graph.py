@@ -97,9 +97,11 @@ class TopologyGraph:
     hold just one :class:`.Edge`, and the two functional groups on
     that edge will be reacted together through a single
     :class:`.Reaction`. This reaction will normally add the bonds which
-    are required to form the joined-up constructed molecule.
-    Which reaction is selected to join the two functional groups
-    depends on the :class;`.ReactionFactory` given to the
+    are required to form the joined-up constructed molecule, but note
+    that it does not have to add any bonds at all. In addition, a
+    :class:`.Reaction` can add and remove atoms from the constructed
+    molecule. Which reaction is selected to join the functional groups
+    depends on the :class:`.ReactionFactory` given to the
     :class:`.TopologyGraph` during initialization.
 
     Once this is done, you have a :class:`.ConstructedMolecule`.
