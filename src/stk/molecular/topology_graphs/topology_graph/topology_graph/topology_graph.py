@@ -61,8 +61,8 @@ class TopologyGraph:
     :class:`.Vertex`, again in a new subclass. Combined, this is just a
     handful of simple methods to implement. Sometimes, rarely, you
     might also want to subclass :class:`.ConstructionState`, when you
-    want to add additional hooks during construction, which will allow
-    you to extend the methods of this class. If you do this, make sure
+    want to add additional hooks during construction, by extending
+    the methods of this class. If you do this, make sure
     to override :meth:`._get_construction_state` to return your
     subclass of :class:`.ConstructionState`, rather than the base
     class, as is done by default. You can subclass and extend the
