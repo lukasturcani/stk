@@ -61,10 +61,10 @@ class Vertex:
 
         Parameters
         ----------
-        scale : :class:`float` or :class:`list`of :class:`float`
+        scale : :class:`float` or :class:`tuple` of :class:`float`
             The value by which the position of the :class:`Vertex` is
             scaled. Can be a single number if all axes are scaled by
-            the same amount or a :class:`list` of three numbers if
+            the same amount or a :class:`tuple` of three numbers if
             each axis is scaled by a different value.
 
         Returns

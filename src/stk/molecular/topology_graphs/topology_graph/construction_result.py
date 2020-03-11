@@ -20,6 +20,16 @@ class ConstructionResult:
     ]
 
     def __init__(self, construction_state):
+        """
+        Initialize a :class:`.ConstructionResult`.
+
+        Parameters
+        ----------
+        construction_state : :class:`.ConstructionState`
+            The state from which the result is initialized.
+
+        """
+
         self._position_matrix = (
             construction_state.get_position_matrix()
         )
