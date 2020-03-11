@@ -111,7 +111,7 @@ class TopologyGraph:
     *Subclass Implementation*
 
     The source code of subclasses, listed in
-    :mod:`.topology_graph.topology_graph.topology_graph`, can serve
+    :mod:`~.topology_graph.topology_graph.topology_graph`, can serve
     as good examples.
 
     """
