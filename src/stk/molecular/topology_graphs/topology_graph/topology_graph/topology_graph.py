@@ -123,16 +123,19 @@ class TopologyGraph:
 
         """
 
-        scale = self._scale = self._get_scale(building_block_vertices)
+        self._scale = scale = self._get_scale(building_block_vertices)
+
+        def apply_scale(item):
+            return item.with_scale(scale)
+
         self._building_block_vertices = {
-                building_block: tuple(
-                    vertex.with_scale(scale) for vertex in vertices
-                )
-                for building_block, vertices
-                in building_block_vertices.items()
+            building_block: tuple(map(apply_scale, vertices))
+            for building_block, vertices
+            in building_block_vertices.items()
         }
-        self._edges = tuple(edge.with_scale(scale) for edge in edges)
+        self._edges = tuple(map(apply_scale, edges))
         self._reaction_factory = reaction_factory
+
         if num_processes == 1:
             self._implementation = _Serial(
                 stages=tuple(self._get_stages(construction_stages)),
@@ -212,6 +215,28 @@ class TopologyGraph:
             The clone. Has the same type as the original topology
             graph.
 
+        Examples
+        --------
+        .. code-block:: python
+
+            import stk
+
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+
+            linear = stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='A',
+                num_repeating_units=15,
+            )
+
+            bb3 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
+            # All bb1 instances are replaced by bb3, but bb2 remains
+            # in place.
+            clone = linear.with_building_blocks({
+                bb1: bb3,
+            })
+
         """
 
         return self.clone._with_building_blocks(building_block_map)
@@ -270,6 +295,20 @@ class TopologyGraph:
         )
 
     def _get_lattice_constants(self):
+        """
+        Yield the lattice constants of the topology graph.
+
+        The a, b and c lattice constants are yielded, in that order.
+
+        By default, this is an empty generator.
+
+        Yields
+        ------
+        :class:`numpy.ndarray`
+            A lattice constant.
+
+        """
+
         return
         yield
 
@@ -300,6 +339,27 @@ class TopologyGraph:
         )
 
     def _get_scale(self, building_block_vertices):
+        """
+        Get the scale which should be applied to topology graph.
+
+        The scale should be applied to the position of every vertex
+        and edge of topology graph. This allows to graph to adjust
+        based on the size of the building blocks.
+
+        Parameters
+        ----------
+        building_block_vertices : :class:`dict`
+            Maps every :class:`.BuildingBlock` of the topology graph,
+            to a :class:`tuple` of the :class:`.Vertex` instances it
+            is meant to be placed on.
+
+        Returns
+        -------
+        :class:`float`
+            The scale.
+
+        """
+
         raise NotImplementedError()
 
     def _place_building_blocks(self, state):
@@ -308,20 +368,36 @@ class TopologyGraph:
 
         Parameters
         ----------
-        state : :class:`._ConstructionState`
+        state : :class:`.ConstructionState`
             Holds data necessary to construct the molecule.
 
         Returns
         -------
-        :class:`._ConstructionState`
-            The :class:`._ConstructionState` updated to account for
-            the placed building blocks.
+        :class:`.ConstructionState`
+            The new construction state, updated to account for the
+            placed building blocks.
 
         """
 
         return self._implementation._place_building_blocks(state)
 
     def _run_reactions(self, state):
+        """
+        Perform the reactions on the building blocks.
+
+        Parameters
+        ----------
+        state : :class:`.ConstructionState`
+            The current state of the construction process.
+
+        Returns
+        -------
+        :class:`.ConstructionState`
+            The new construction state, updated to account for the
+            reactions between building blocks.
+
+        """
+
         get_reaction = partial(
             self._reaction_factory.get_reaction,
             state,
@@ -334,6 +410,10 @@ class TopologyGraph:
         return state.with_reaction_results(reactions, results)
 
     def _get_stages(self, construction_stages):
+        """
+
+        """
+
         stages = tuple(
             [] for i in range(len(construction_stages)+1)
         )
