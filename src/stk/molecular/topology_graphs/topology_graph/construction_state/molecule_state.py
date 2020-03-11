@@ -16,12 +16,6 @@ class _MoleculeState:
 
     def clone(self):
         clone = self.__class__.__new__(self.__class__)
-        clone._vertex_building_blocks = dict(
-            self._vertex_building_blocks
-        )
-        clone._vertices = dict(self._vertices)
-        clone._vertex_edges = dict(self._vertex_edges)
-        clone._edges = self._edges
         clone._position_matrix = np.array(self._position_matrix)
         clone._atoms = list(self._atoms)
         clone._atom_infos = list(self._atom_infos)
@@ -50,51 +44,59 @@ class _MoleculeState:
         results_ = zip(building_blocks, results)
         for index, (building_block, result) in enumerate(results_):
             position_matrices.append(result.position_matrix)
-
-            # atom_map maps atoms in the original building block to
-            # the new atoms the constructed molecule should hold.
-            # This means their atom_ids are updated.
-            atom_map = {}
-
-            # Create atom_map, add the new atoms and create AtomInfos.
-            for atom in building_block.get_atoms():
-                new_atom = atom.with_id(len(self._atoms))
-                atom_map[atom.get_id()] = new_atom
-
-                self._atoms.append(new_atom)
-                self._atom_infos.append(
-                    AtomInfo(
-                        atom=new_atom,
-                        building_block=building_block,
-                        building_block_id=index,
-                    )
-                )
-
-            # Add bonds holding the new atoms.
-            for bond in building_block.get_bonds():
-                new_bond = bond.with_atoms(atom_map)
-                self._bonds.append(new_bond)
-                self._bond_infos.append(
-                    BondInfo(
-                        bond=new_bond,
-                        building_block=building_block,
-                        building_block_id=index,
-                    )
-                )
-
-            # Add edge to functional group mappings.
-            functional_groups = building_block.get_functional_groups(
-                fg_ids=result.functional_group_edges,
+            atom_map = self._add_atoms(index, building_block)
+            self._add_bonds(index, building_block, atom_map)
+            self._add_edge_functional_groups(
+                building_block=building_block,
+                result=result,
+                atom_map=atom_map,
             )
-            edge_ids = result.functional_group_edges.values()
-            functional_group_edges = zip(functional_groups, edge_ids)
-            for functional_group, edge_id in functional_group_edges:
-                self._edge_functional_groups[edge_id].append(
-                    functional_group.with_atoms(atom_map)
-                )
-
         self._position_matrix = np.vstack(position_matrices)
         return self
+
+    def _add_atoms(self, index, building_block):
+        atom_map = {}
+        for atom in building_block.get_atoms():
+            new_atom = atom.with_id(len(self._atoms))
+            atom_map[atom.get_id()] = new_atom
+            self._atoms.append(new_atom)
+            self._atom_infos.append(
+                AtomInfo(
+                    atom=new_atom,
+                    building_block=building_block,
+                    building_block_id=index,
+                )
+            )
+        return atom_map
+
+    def _add_bonds(self, index, building_block, atom_map):
+        for bond in building_block.get_bonds():
+            new_bond = bond.with_atoms(atom_map)
+            self._bonds.append(new_bond)
+            self._bond_infos.append(
+                BondInfo(
+                    bond=new_bond,
+                    building_block=building_block,
+                    building_block_id=index,
+                )
+            )
+
+    def _add_edge_functional_groups(
+        self,
+        building_block,
+        result,
+        atom_map,
+    ):
+        # Add edge to functional group mappings.
+        functional_groups = building_block.get_functional_groups(
+            fg_ids=result.functional_group_edges,
+        )
+        edge_ids = result.functional_group_edges.values()
+        functional_group_edges = zip(functional_groups, edge_ids)
+        for functional_group, edge_id in functional_group_edges:
+            self._edge_functional_groups[edge_id].append(
+                functional_group.with_atoms(atom_map)
+            )
 
     def with_placement_results(
         self,
@@ -153,36 +155,43 @@ class _MoleculeState:
                 atom.get_id() for atom in result.get_deleted_atoms()
             )
 
-            atom_map = {}
-            for atom, position in result.get_new_atoms():
-                new_atom = atom.with_id(len(self._atoms))
-                atom_map[atom.get_id()] = new_atom
-                self._atoms.append(new_atom)
-                self._atom_infos.append(
-                    AtomInfo(
-                        atom=new_atom,
-                        building_block=None,
-                        building_block_id=None,
-                    )
-                )
-                new_atom_positions.append(position)
+            atom_map = self._add_new_atoms(result, new_atom_positions)
+            self._add_new_bonds(result, atom_map)
 
-            for bond in result.get_new_bonds():
-                new_bond = bond.with_atoms(atom_map)
-                self._bonds.append(new_bond)
-                self._bond_infos.append(
-                    BondInfo(
-                        bond=new_bond,
-                        building_block=None,
-                        building_block_id=None,
-                    )
-                )
         if new_atom_positions:
             self._position_matrix = np.vstack([
                 self._position_matrix,
                 new_atom_positions,
             ])
         return deleted_atoms
+
+    def _add_new_atoms(self, result, positions):
+        atom_map = {}
+        for atom, position in result.get_new_atoms():
+            new_atom = atom.with_id(len(self._atoms))
+            atom_map[atom.get_id()] = new_atom
+            self._atoms.append(new_atom)
+            self._atom_infos.append(
+                AtomInfo(
+                    atom=new_atom,
+                    building_block=None,
+                    building_block_id=None,
+                )
+            )
+            positions.append(position)
+        return atom_map
+
+    def _add_new_bonds(self, result, atom_map):
+        for bond in result.get_new_bonds():
+            new_bond = bond.with_atoms(atom_map)
+            self._bonds.append(new_bond)
+            self._bond_infos.append(
+                BondInfo(
+                    bond=new_bond,
+                    building_block=None,
+                    building_block_id=None,
+                )
+            )
 
     def _remove_deleted_atoms(self, deleted_atoms):
         atom_map = {}
