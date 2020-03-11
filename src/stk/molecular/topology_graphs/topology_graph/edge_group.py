@@ -9,8 +9,8 @@ class EdgeGroup:
     """
     Represents a group of edges.
 
-    All edges, and functional groups held by them, should be used
-    together in a single :class:`.Reaction`.
+    All edges in a group, and functional groups held by them, should be
+    used together in a single :class:`.Reaction`.
 
     """
 

@@ -1,90 +1,18 @@
 import numpy as np
 from collections import defaultdict
 
-from ...atoms import AtomInfo
-from ...bonds import BondInfo
+from ....atoms import AtomInfo
+from ....bonds import BondInfo
 
 
-class ConstructionState:
-    """
-
-    """
-
-    def __init__(
-        self,
-        building_block_vertices,
-        edges,
-        lattice_constants,
-    ):
-        """
-
-        """
-
-        self._vertex_building_blocks = {
-            vertex.get_id(): building_block
-            for building_block, vertices
-            in building_block_vertices.items()
-            for vertex in vertices
-        }
-        self._vertices = {
-                vertex.get_id(): vertex
-                for vertices in building_block_vertices.values()
-                for vertex in vertices
-        }
-        self._edges = edges
-        self._lattice_constants = lattice_constants
-        self._vertex_edges = self._get_vertex_edges()
+class _MoleculeState:
+    def __init__(self):
         self._position_matrix = np.empty((0, 3), dtype=np.float64)
         self._atoms = []
         self._atom_infos = []
         self._bonds = []
         self._bond_infos = []
         self._edge_functional_groups = defaultdict(list)
-
-    def _get_vertex_edges(self):
-        vertex_edges = defaultdict(list)
-        for edge in self._edges:
-            vertex_ids = (edge.get_vertex1_id(), edge.get_vertex2_id())
-
-            if edge.is_periodic():
-                for vertex_id in vertex_ids:
-                    periodic_edge = self._get_periodic_edge(
-                        edge=edge,
-                        reference=vertex_id,
-                    )
-                    vertex_edges[vertex_id].append(periodic_edge)
-            else:
-                for vertex_id in vertex_ids:
-                    vertex_edges[vertex_id].append(edge)
-        return vertex_edges
-
-    def _get_periodic_edge(self, edge, reference):
-        vertex1 = self._vertices[reference]
-        vertex2 = self._vertices[
-            edge.get_vertex1_id()
-            if reference == edge.get_vertex2_id()
-            else edge.get_vertex2_id()
-        ]
-
-        direction = 1 if reference == edge.get_vertex1_id() else -1
-        periodicity = np.array(edge.get_periodicity())
-        end_cell = (
-            vertex1.get_cell() + direction*periodicity
-        )
-
-        cell_shift = end_cell - vertex2.get_cell()
-
-        shift = sum(
-            axis_shift*constant
-            for axis_shift, constant in zip(
-                cell_shift,
-                self._lattice_constants,
-            )
-        )
-        position = (
-            (vertex2.get_position()+shift+vertex1.get_position()) / 2
-        )
-        return edge.with_position(position)
 
     def clone(self):
         clone = self.__class__.__new__(self.__class__)
@@ -182,35 +110,40 @@ class ConstructionState:
             results=results,
         )
 
-    def get_building_block(self, vertex_id):
+    def get_position_matrix(self):
         """
 
         """
 
-        return self._vertex_building_blocks[vertex_id]
+        return np.array(self._position_matrix)
 
-    def get_vertex(self, vertex_id):
-        """
+    def get_atoms(self):
+        yield from self._atoms
 
-        """
+    def get_bonds(self):
+        yield from self._bonds
 
-        return self._vertices[vertex_id]
+    def get_atom_infos(self):
+        yield from self._atom_infos
 
-    def get_num_vertices(self):
-        return len(self._vertices)
-
-    def get_edge(self, edge_id):
-        return self._edges[edge_id]
-
-    def get_num_edges(self):
-        return len(self._edges)
-
-    def get_edges(self, vertex_id):
-        return self._vertex_edges[vertex_id]
+    def get_bond_infos(self):
+        yield from self._bond_infos
 
     def get_edge_group_functional_groups(self, edge_group):
         for edge_id in edge_group.get_edge_ids():
             yield from self._edge_functional_groups[edge_id]
+
+    def with_reaction_results(self, reactions, results):
+        return self.clone()._with_reaction_results(reactions, results)
+
+    def _with_reaction_results(self, reactions, results):
+        deleted_atoms = self._add_new_atoms_and_bonds(
+            reactions=reactions,
+            results=results,
+        )
+        atom_map = self._remove_deleted_atoms(deleted_atoms)
+        self._update_bonds(deleted_atoms, atom_map)
+        return self
 
     def _add_new_atoms_and_bonds(self, reactions, results):
         new_atom_positions = []
@@ -312,43 +245,3 @@ class ConstructionState:
             )
             for index, bond_info in enumerate(valid_bond_infos)
         ]
-
-    def _with_reaction_results(self, reactions, results):
-        deleted_atoms = self._add_new_atoms_and_bonds(
-            reactions=reactions,
-            results=results,
-        )
-        atom_map = self._remove_deleted_atoms(deleted_atoms)
-        self._update_bonds(deleted_atoms, atom_map)
-        return self
-
-    def with_reaction_results(self, reactions, results):
-        return self.clone()._with_reaction_results(reactions, results)
-
-    def _with_vertices(self, vertices):
-        self._vertices = {
-            vertex.get_id(): vertex for vertex in vertices
-        }
-        return self
-
-    def with_vertices(self, vertices):
-        return self.clone()._with_vertices(vertices)
-
-    def get_position_matrix(self):
-        """
-
-        """
-
-        return np.array(self._position_matrix)
-
-    def get_atoms(self):
-        yield from self._atoms
-
-    def get_bonds(self):
-        yield from self._bonds
-
-    def get_atom_infos(self):
-        yield from self._atom_infos
-
-    def get_bond_infos(self):
-        yield from self._bond_infos
