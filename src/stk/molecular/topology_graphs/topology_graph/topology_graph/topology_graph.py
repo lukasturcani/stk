@@ -155,27 +155,43 @@ class TopologyGraph:
 
         """
 
+        # The original scaling first needs to be removed, so that when
+        # the scale is recalculated with the new building blocks, it
+        # has the same starting geometry.
+        def undo_scale(vertex):
+            return vertex.with_scale(1/self._scale)
+
         building_block_vertices = {
             building_block_map.get(building_block, building_block):
-                tuple(
-                    # The original scaling first needs to be removed,
-                    # so that when the scale is recalculated with the
-                    # new building blocks, it has the same starting
-                    # geometry.
-                    vertex.with_scale(1/self._scale)
-                    for vertex in vertices
-                )
+                tuple(map(undo_scale, vertices))
             for building_block, vertices
             in self._building_block_vertices.items()
         }
-        self._scale = scale = self._get_scale(building_block_vertices)
+        scale = self._get_scale(building_block_vertices)
+
+        def scale_vertex(vertex):
+            return vertex.with_scale(scale)
+
         self._building_block_vertices = {
-                building_block: tuple(
-                    vertex.with_scale(scale) for vertex in vertices
-                )
-                for building_block, vertices
-                in building_block_vertices.items()
+            building_block: tuple(map(scale_vertex, vertices))
+            for building_block, vertices
+            in building_block_vertices.items()
         }
+
+        def scale_edge(edge):
+            # Remove the old scale and apply the new one.
+            return edge.with_scale(scale/self._scale)
+
+        self._edges = edges = tuple(map(scale_edge, self._edges))
+
+        def get_new_edge(edge_id):
+            return edges[edge_id]
+
+        self._edge_groups = tuple(
+            EdgeGroup(map(get_new_edge, edge_group.get_edge_ids()))
+            for edge_group in self._edge_groups
+        )
+        self._scale = scale
         return self
 
     def with_building_blocks(self, building_block_map):
