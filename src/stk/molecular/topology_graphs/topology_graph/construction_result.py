@@ -1,58 +1,95 @@
-from typing import NamedTuple
+"""
+Construction Result
+===================
+
+"""
 
 
-class ConstructionResult(NamedTuple):
+class ConstructionResult:
     """
     The result of a :class:`.ConstructedMolecule` construction.
 
-    Attributes
-    ----------
-    atoms : :class:`tuple` of :class:`.Atom`
-        The atoms of the constructed molecule.
-
-    bonds : :class:`tuple` of :class:`.Bond`
-        The bonds of the constructed molecule.
-
-    position_matrix : :class:`numpy.ndarray`
-        The position matrix of the constructed molecule.
-
-    atom_infos : :class:`tuple` of :class:`.AtomInfo`
-        Holds additional data for each atom in the constructed
-        molecule, for example, which building block it originated
-        from.
-
-    bond_infos : :class:`tuple` of :class:`.BondInfo`
-        Holds additional data for each bond in the constructed
-        molecule, for example, which building block it originated from.
-
     """
 
-    atoms: object
-    bonds: object
-    position_matrix: object
-    atom_infos: object
-    bond_infos: object
+    __slots__ = [
+        '_atoms',
+        '_bonds',
+        '_atom_infos',
+        '_bond_infos',
+        '_position_matrix',
+    ]
 
-    @classmethod
-    def init_from_construction_state(cls, construction_state):
-        """
-        Initialize a :class:`.ConstructionResult` instance.
-
-        Parameters
-        ----------
-        construction_state : :class:`.ConstructionState`
-            The construction state from which to create the result.
-
-        """
-
-        position_matrix = construction_state.get_position_matrix()
-        position_matrix.setflags(write=False)
-        return cls(
-            atoms=tuple(construction_state.get_atoms()),
-            bonds=tuple(construction_state.get_bonds()),
-            position_matrix=position_matrix,
-            atom_infos=tuple(construction_state.get_atom_infos()),
-            bond_infos=tuple(
-                construction_state.get_bond_infos()
-            ),
+    def __init__(self, construction_state):
+        self._position_matrix = (
+            construction_state.get_position_matrix()
         )
+        self._position_matrix.setflags(write=False)
+        self._atoms = tuple(construction_state.get_atoms())
+        self._bonds = tuple(construction_state.get_bonds())
+        self._atom_infos = tuple(construction_state.get_atom_infos())
+        self._bond_infos = tuple(construction_state.get_bond_infos())
+
+    def get_position_matrix(self):
+        """
+        Get the position matrix of the constructed molecule.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The position matrix of the constructed molecule.
+
+        """
+
+        return self._position_matrix
+
+    def get_atoms(self):
+        """
+        Get the atoms of the constructed molecule.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.Atom`
+            The atoms of the constructed molecule.
+
+        """
+
+        return self._atoms
+
+    def get_bonds(self):
+        """
+        Get the bonds of the constructed molecule.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.Bond`
+            The bonds of the constructed molecule.
+
+        """
+
+        return self._bonds
+
+    def get_atom_infos(self):
+        """
+        Get the atom infos of the constructed molecule.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.AtomInfo`
+            The atom infos of the constructed molecule.
+
+        """
+
+        return self._atom_infos
+
+    def get_bond_infos(self):
+        """
+        Get the bond infos of the constructed molecule.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.BondInfo`
+            The bond infos of the constructed molecule.
+
+        """
+
+        return self._bond_infos

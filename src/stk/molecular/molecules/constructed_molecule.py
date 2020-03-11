@@ -68,13 +68,13 @@ class ConstructedMolecule(Molecule):
 
         construction_result = topology_graph.construct()
         super().__init__(
-            atoms=construction_result.atoms,
-            bonds=construction_result.bonds,
-            position_matrix=construction_result.position_matrix,
+            atoms=construction_result.get_atoms(),
+            bonds=construction_result.get_bonds(),
+            position_matrix=construction_result.get_position_matrix(),
         )
         self._topology_graph = topology_graph
-        self._atom_infos = construction_result.atom_infos
-        self._bond_infos = construction_result.bond_infos
+        self._atom_infos = construction_result.get_atom_infos()
+        self._bond_infos = construction_result.get_bond_infos()
 
     def clone(self):
         clone = super().clone()

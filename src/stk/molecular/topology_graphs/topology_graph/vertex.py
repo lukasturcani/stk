@@ -3,7 +3,16 @@ import numpy as np
 
 class Vertex:
     """
-    Represents a vertex in a :class:`.TopologyGraph`.
+    An abstract base class for :class:`.TopologyGraph` vertices.
+
+    Notes
+    -----
+    You might notice that some of the public methods of this abstract
+    base class are implemented. This is purely for convenience when
+    implementing subclasses. The implemented public methods are
+    simply default implementations, which can be safely ignored or
+    overridden, when implementing subclasses. Any private methods are
+    implementation details of these default implementations.
 
     """
 
@@ -16,10 +25,10 @@ class Vertex:
         id : :class:`int`
             The id of the vertex.
 
-        position : :class:`numpy.ndarray`
+        position : :class:`tuple` of :class:`float`
             The position of the vertex.
 
-            """
+        """
 
         self._id = id
         self._position = np.array(position, dtype=np.float64)
@@ -38,12 +47,17 @@ class Vertex:
         return self._id
 
     def _with_scale(self, scale):
+        """
+        Modify the vertex.
+
+        """
+
         self._position *= scale
         return self
 
     def with_scale(self, scale):
         """
-        Scale the position by `scale`.
+        Get a clone with a scaled position.
 
         Parameters
         ----------
@@ -55,8 +69,8 @@ class Vertex:
 
         Returns
         -------
-        :class:`Vertex`
-            The vertex is returned.
+        :class:`.Vertex`
+            The clone. Has the same type as the original vertex.
 
         """
 
@@ -68,19 +82,18 @@ class Vertex:
 
         Returns
         -------
-        :class:`Vertex`
+        :class:`.Vertex`
             The clone.
 
         """
 
         clone = self.__class__.__new__(self.__class__)
-        clone._id = self._id
-        clone._position = np.array(self._position)
+        Vertex.__init__(clone, self._id, self._position)
         return clone
 
     def get_position(self):
         """
-        Return the position.
+        Get the position.
 
         Returns
         -------
@@ -92,12 +105,17 @@ class Vertex:
         return np.array(self._position)
 
     def _with_position(self, position):
+        """
+        Modify the vertex.
+
+        """
+
         self._position = np.array(position, dtype=np.float64)
         return self
 
     def with_position(self, position):
         """
-        Return a clone at a certain position.
+        Get a clone at a certain position.
 
         Parameters
         ----------
@@ -107,7 +125,7 @@ class Vertex:
         Returns
         -------
         :class:`.Vertex`
-            The clone.
+            The clone. Has the same type as the original vertex.
 
         """
 
@@ -132,7 +150,7 @@ class Vertex:
 
         Parameters
         ----------
-        building_block : :class:`.Molecule`
+        building_block : :class:`.BuildingBlock`
             The building block molecule which is to be placed on the
             vertex.
 
@@ -158,9 +176,9 @@ class Vertex:
 
         Parameters
         ----------
-        building_block : :class:`.Molecule`
-            The building block molecule which is needs to have
-            functional groups assigned to edges.
+        building_block : :class:`.BuildingBlock`
+            The building block which is needs to have functional
+            groups assigned to edges.
 
         edges : :class:`tuple` of :class:`.Edge`
             The edges to which the vertex is attached.

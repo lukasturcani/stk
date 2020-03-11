@@ -375,7 +375,7 @@ class TopologyGraph:
         state = self._get_construction_state()
         state = self._place_building_blocks(state)
         state = self._run_reactions(state)
-        return ConstructionResult.init_from_construction_state(state)
+        return ConstructionResult(state)
 
     def _get_construction_state(self):
         return ConstructionState(
