@@ -285,7 +285,7 @@ class TopologyGraph:
         Returns
         -------
         :class:`int`
-            The number of times `building_block` was used in the
+            The number of times `building_block` is present in the
             topology graph.
 
         """
@@ -340,7 +340,7 @@ class TopologyGraph:
 
     def _get_scale(self, building_block_vertices):
         """
-        Get the scale which should be applied to topology graph.
+        Get the scale, which should be applied to topology graph.
 
         The scale should be applied to the position of every vertex
         and edge of topology graph. This allows to graph to adjust
@@ -411,6 +411,12 @@ class TopologyGraph:
 
     def _get_stages(self, construction_stages):
         """
+        Yield the parallelizable stages of construction.
+
+        Yields
+        ------
+        :class:`tuple` of :class:`.Vertex`
+            Vertices, which can be placed in parallel.
 
         """
 
@@ -427,7 +433,7 @@ class TopologyGraph:
                     break
             if not placed:
                 stages[-1].append(vertex.get_id())
-        yield from (stage for stage in stages if stage)
+        yield from (tuple(stage) for stage in stages if stage)
 
     def __str__(self):
         return repr(self)
