@@ -1,8 +1,10 @@
 import numpy as np
 from collections import defaultdict
 
-from ....atoms import AtomInfo
-from ....bonds import BondInfo
+from .reactions_summary import _ReactionsSummary
+from .deletions_summary import _DeletionsSummary
+from .....atoms import AtomInfo
+from .....bonds import BondInfo
 
 
 class _MoleculeState:
@@ -139,99 +141,36 @@ class _MoleculeState:
         return self.clone()._with_reaction_results(reactions, results)
 
     def _with_reaction_results(self, reactions, results):
-        atoms = self._atoms
-        atom_infos = self._atom_infos
-        bonds = self._bonds
-        bond_infos = self._bond_infos
-        positions = []
-        deleted_ids = set()
-
-        def get_id(item):
-            return item.get_id()
-
-        def with_result(result):
-            atom_map = {}
-
-            def with_new_atom(atom):
-                atoms.append(atom.with_id(len(atoms)))
-                atom_infos.append(AtomInfo(atoms[-1], None, None))
-                atom_map[atom.get_id()] = atoms[-1]
-
-            def with_new_bond(bond):
-                bonds.append(bond.with_atoms(atom_map))
-                bond_infos.append(BondInfo(bonds[-1], None, None))
-
-            for atom, position in result.get_new_atoms():
-                with_new_atom(atom)
-                positions.append(position)
-
-            for bond in result.get_new_bonds():
-                with_new_bond(bond)
-
-            deleted_ids.update(map(get_id, result.get_deleted_atoms()))
-
-        for reaction in reactions:
-            with_result(reaction)
-
-        positions = (
-            np.vstack([self._position_matrix, positions])
-            if positions
-            else self._position_matrix
+        reactions_summary = _ReactionsSummary(
+            next_id=len(self._atoms),
+            reaction_results=results,
         )
+        self._with_reactions_summary(reactions_summary)
+        self._with_deletions_summary(_DeletionsSummary(
+            atoms=self._atoms,
+            atom_infos=self._atom_infos,
+            bonds=self._bonds,
+            bond_infos=self._bond_infos,
+            position_matrix=self._position_matrix,
+            deleted_ids=reactions_summary.get_deleted_ids(),
+        ))
 
-        def valid_atom(atom):
-            return atom.get_id() not in deleted_ids
+    def _with_reactions_summary(self, summary):
+        self._atoms.extend(summary.get_atoms())
+        self._atom_infos.extend(summary.get_atom_infos())
+        self._bonds.extend(summary.get_bonds())
+        self._bond_infos.extend(summary.get_bond_infos())
 
-        valid_atoms = []
-        valid_atom_infos = []
-        valid_positions = []
-        atom_map = {}
+        positions = summary.get_positions()
+        if positions:
+            self._position_matrix = np.vstack([
+                self._position_matrix,
+                positions,
+            ])
 
-        def with_valid_atom(atom):
-            atom_id = atom.get_id()
-            valid_atoms.append(atom.with_id(len(valid_atoms)))
-            valid_positions.append(positions[atom_id])
-            atom_map[atom_id] = valid_atoms[-1]
-
-            info = atom_infos[atom_id]
-            valid_atom_infos.append(
-                AtomInfo(
-                    atom=valid_atoms[-1],
-                    building_block=info.get_building_block(),
-                    building_block_id=info.get_building_block_id(),
-                )
-            )
-
-        for atom in filter(valid_atom, atoms):
-            with_valid_atom(atom)
-
-        self._atoms = valid_atoms
-        self._atom_infos = valid_atom_infos
-        self._position_matrix = np.vstack(valid_positions)
-
-        def valid_bond(bond_data):
-            index, bond = bond_data
-            return (
-                bond.get_atom1().get_id() not in deleted_ids
-                and bond.get_atom2.get_id() not in deleted_ids
-            )
-
-        valid_bonds = []
-        valid_bond_infos = []
-
-        def with_valid_bond(index, bond):
-            valid_bonds.append(bond.with_atoms(atom_map))
-            info = bond_infos[index]
-            valid_bond_infos.append(
-                BondInfo(
-                    bond=valid_bonds[-1],
-                    building_block=info.get_building_block(),
-                    building_block_id=info.get_building_block_id(),
-                )
-            )
-
-        for index, bond in filter(valid_bond, enumerate(bonds)):
-            with_valid_bond(index, bond)
-
-        self._bonds = valid_bonds
-        self._bond_infos = valid_bond_infos
+    def _with_deletions_summary(self, summary):
+        self._atoms = summary.get_atoms()
+        self._atom_infos = summary.get_atom_infos()
+        self._bonds = summary.get_bonds()
+        self._bond_infos = summary.get_bond_infos()
+        self._position_matrix = summary.get_position_matrix()
