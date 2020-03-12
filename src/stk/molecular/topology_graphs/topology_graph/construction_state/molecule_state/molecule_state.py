@@ -169,8 +169,8 @@ class _MoleculeState:
             ])
 
     def _with_deletions_summary(self, summary):
-        self._atoms = summary.get_atoms()
-        self._atom_infos = summary.get_atom_infos()
-        self._bonds = summary.get_bonds()
-        self._bond_infos = summary.get_bond_infos()
-        self._position_matrix = summary.get_position_matrix()
+        self._atoms = list(summary.get_atoms())
+        self._atom_infos = list(summary.get_atom_infos())
+        self._bonds = list(summary.get_bonds())
+        self._bond_infos = list(summary.get_bond_infos())
+        self._position_matrix = np.array(summary.get_positions())

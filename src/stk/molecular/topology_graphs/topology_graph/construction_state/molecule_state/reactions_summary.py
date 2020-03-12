@@ -21,14 +21,14 @@ class _ReactionsSummary:
         positions = self._positions
         atom_map = {}
 
-        def with_atom(atom, id_):
-            atoms.append(atom.with_id(id_))
+        def with_atom(atom, id):
+            atoms.append(atom.with_id(id))
             atom_infos.append(AtomInfo(atoms[-1], None, None))
             atom_map[atom.get_id()] = atoms[-1]
             positions.append(position)
 
         new_atoms = result.get_new_atoms()
-        next_id = self._new_id
+        next_id = self._next_id
         for id_, (atom, position) in enumerate(new_atoms, next_id):
             with_atom(atom, id_)
         self._next_id += len(new_atoms)
