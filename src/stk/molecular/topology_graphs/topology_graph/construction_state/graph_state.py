@@ -71,14 +71,6 @@ class _GraphState:
         clone._vertices = dict(self._vertices)
         clone._vertex_edges = dict(self._vertex_edges)
         clone._edges = self._edges
-        clone._position_matrix = np.array(self._position_matrix)
-        clone._atoms = list(self._atoms)
-        clone._atom_infos = list(self._atom_infos)
-        clone._bonds = list(self._bonds)
-        clone._bond_infos = list(self._bond_infos)
-        clone._edge_functional_groups = defaultdict.copy(
-            self._edge_functional_groups
-        )
         return clone
 
     def get_building_block(self, vertex_id):
