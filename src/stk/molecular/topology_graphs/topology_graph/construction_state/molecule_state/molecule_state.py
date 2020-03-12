@@ -188,6 +188,17 @@ class _MoleculeState:
 
     def get_edge_group_functional_groups(self, edge_group):
         """
+        Yield the functional groups associated with `edge_group`.
+
+        Parameters
+        ----------
+        edge_group : :class:`.EdgeGroup`
+            The edge group, whose functional groups are desired.
+
+        Yields
+        ------
+        :class:`.FunctionalGroup`
+            A functional group which belongs to `edge_group`.
 
         """
 
@@ -196,6 +207,21 @@ class _MoleculeState:
 
     def with_reaction_results(self, reactions, results):
         """
+        Return a clone holding the reaction results.
+
+        Parameters
+        ----------
+        reactions : :class:`tuple` of :class:`.Reaction`
+            The reactions.
+
+        results : :class:`.ReactionResult`
+            For each reaction in `reactions`, its result.
+
+        Returns
+        -------
+        :class:`._MoleculeState`
+            The clone holding the reaction results. Has the same type
+            as the original instance.
 
         """
         return self.clone()._with_reaction_results(reactions, results)
@@ -222,6 +248,7 @@ class _MoleculeState:
 
     def _with_reactions_summary(self, summary):
         """
+        Add the results held in `summary`.
 
         Parameters
         ----------
@@ -248,6 +275,7 @@ class _MoleculeState:
 
     def _with_deletions_summary(self, summary):
         """
+        Add the results held in `summary`.
 
         Parameters
         ----------
