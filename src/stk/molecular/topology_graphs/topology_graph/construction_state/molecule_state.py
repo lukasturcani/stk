@@ -232,3 +232,6 @@ class _MoleculeState:
 
         for index, bond in filter(valid_bond, enumerate(bonds)):
             with_valid_bond(index, bond)
+
+        self._bonds = valid_bonds
+        self._bond_infos = valid_bond_infos
