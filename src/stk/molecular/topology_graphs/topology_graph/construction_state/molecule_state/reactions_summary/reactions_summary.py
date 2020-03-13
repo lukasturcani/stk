@@ -3,8 +3,10 @@ from .....bonds import BondInfo
 
 
 class _ReactionsSummary:
-    def __init__(self, next_id, reaction_results):
-        self._next_id = next_id
+    def __init__(self, num_atoms, reaction_results):
+        # This will get updated as reaction results are added to the
+        # summary.
+        self._num_atoms = num_atoms
         self._atoms = []
         self._atom_infos = []
         self._positions = []
@@ -14,12 +16,12 @@ class _ReactionsSummary:
 
         for result in reaction_results:
             self._with_reaction_result(result)
+            self._num_atoms += len(result.get_new_atoms())
 
     def _with_reaction_result(self, result):
         atoms = self._atoms
         atom_infos = self._atom_infos
         positions = self._positions
-        atom_map = {}
 
         def with_atom(atom, id):
             atoms.append(atom.with_id(id))
