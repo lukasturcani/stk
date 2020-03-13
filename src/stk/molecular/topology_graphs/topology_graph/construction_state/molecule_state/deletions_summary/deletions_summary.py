@@ -41,16 +41,22 @@ class _DeletionsSummary:
         Parameters
         ----------
         atoms : :class:`iterable` of :class:`.Atom`
+            Atoms, some of which are to be deleted.
 
         atom_infos : :class:`iterable` of :class:`.AtomInfo`
+            Info on every atom in `atoms`.
 
         bonds : :class:`iterable` of :class:`.Bond`
+            The bonds of the molecule being constructed.
 
         bond_infos : :class:`iterable` of :class:`.BondInfo`
+            Info on every bond in `bonds`.
 
         position_matrix : :class:`numpy.ndarray`
+            The position matrix for all the `atoms`.
 
         deleted_ids : :class:`iterable` of :class:`int`
+            The ids of `atoms`, which should be deleted.
 
         """
 
