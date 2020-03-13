@@ -18,9 +18,16 @@ class _PlacementsSummary:
         '_bond_infos',
         '_edge_functional_groups',
         '_position_matrices',
+        '_num_atoms',
     ]
 
-    def __init__(self, building_blocks, placement_results, next_id):
+    def __init__(
+        self,
+        building_blocks,
+        placement_results,
+        num_atoms,
+        num_previous_placements,
+    ):
         """
         Initialize a :class:`._PlacementsSummary` instance.
 
@@ -33,10 +40,13 @@ class _PlacementsSummary:
             Holds a :class:`_PlacementResults` instances for each
             building block in `building_blocks`.
 
-        next_id : :class:`int`
-            Each building block placement must be given a unique id,
-            this is the first id to be used on the placements in this
-            summary.
+        num_atoms : :class:`int`
+            The number of atoms in molecule being constructed,
+            before this summary is taken into account.
+
+        num_previous_placements : :class:`int`
+            The total number of building block placements done
+            previously.
 
         """
 
@@ -46,12 +56,16 @@ class _PlacementsSummary:
         self._bond_infos = []
         self._edge_functional_groups = defaultdict(list)
         self._position_matrices = []
+        # This will get updated as placement results are added to the
+        # summary.
+        self._num_atoms = num_atoms
 
         for id_, (building_block, result) in enumerate(
             zip(building_blocks, placement_results),
-            next_id,
+            num_previous_placements,
         ):
             self._with_placement_result(building_block, id_, result)
+            self._num_atoms += building_block.get_num_atoms()
 
     def _with_placement_result(
         self,
@@ -83,18 +97,25 @@ class _PlacementsSummary:
 
         atom_batch_data = _AtomBatchData(
             atoms=building_block.get_atoms(),
-            next_id=len(self._atoms),
+            num_atoms=self._num_atoms,
             building_block=building_block,
             building_block_id=building_block_id,
         )
-        self._with_atom_batch(atom_batch_data)
+        self._with_atom_batch_data(atom_batch_data)
+        atom_map = atom_batch_data.get_atom_map()
 
         bond_batch_data = _BondBatchData(
-            atom_map=atom_batch_data.get_atom_map(),
+            atom_map=atom_map,
             building_block=building_block,
             building_block_id=building_block_id,
         )
         self._with_bond_batch_data(bond_batch_data)
+
+        self._with_functional_group_edges(
+            building_block=building_block,
+            functional_group_edges=result.functional_group_edges,
+            atom_map=atom_map,
+        )
 
     def _with_atom_batch_data(self, batch_data):
         """
@@ -131,6 +152,22 @@ class _PlacementsSummary:
 
         self._bonds.extend(batch_data.get_bonds())
         self._bond_infos.extend(batch_data.get_bond_infos())
+
+    def _with_functional_group_edges(
+        self,
+        building_block,
+        functional_group_edges,
+        atom_map,
+    ):
+        functional_groups = building_block.get_functional_groups(
+            fg_ids=functional_group_edges,
+        )
+        edge_ids = functional_group_edges.values()
+        functional_group_edges = zip(functional_groups, edge_ids)
+        for functional_group, edge_id in functional_group_edges:
+            self._edge_functional_groups[edge_id].append(
+                functional_group.with_atoms(atom_map)
+            )
 
     def get_atoms(self):
         """
