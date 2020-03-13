@@ -1,8 +1,7 @@
 import numpy as np
 
-
-from .atom_batch_data import _AtomBatchData
-from .bond_batch_data import _BondBatchData
+from .....atoms import AtomInfo
+from .....bonds import BondInfo
 
 
 class _DeletionsSummary:
@@ -75,6 +74,15 @@ class _DeletionsSummary:
         self._with_valid_data()
 
     def _with_valid_data(self):
+        """
+        Add the data of atoms which aren't deleted.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         atoms = self._atoms
         atom_infos = self._atom_infos
         position_matrix = self._position_matrix
