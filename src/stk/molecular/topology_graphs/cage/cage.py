@@ -94,7 +94,9 @@ class _CageConstructionState(ConstructionState):
                     )
                 )
 
-        self._update_vertices()
+        self._graph_state = self._graph_state.with_vertices(
+            vertices=self._get_new_vertices(),
+        )
 
     def _get_neighbors(self, vertex, vertex_edges):
         for edge in vertex_edges:
@@ -107,27 +109,22 @@ class _CageConstructionState(ConstructionState):
             if neighbor.use_neighbor_placement():
                 yield neighbor_id, edge.get_id()
 
-    def _update_vertices(self):
-        updateable = (
-            (vertex_id, vertex)
-            for vertex_id, vertex
-            in enumerate(self._graph_state.get_vertices())
+    def _get_new_vertices(self):
+        for vertex_id, vertex in enumerate(
+            self._graph_state.get_vertices()
+        ):
             if (
                 len(self._neighbor_positions.get(vertex_id, []))
                 == self._vertex_degrees[vertex_id]
-            )
-        )
-        self._graph_state = self._graph_state.with_vertices(
-            vertices=(
-                vertex.with_position(
+            ):
+                yield vertex.with_position(
                     position=(
                         sum(self._neighbor_positions[vertex_id])
                         / len(self._neighbor_positions[vertex_id])
                     ),
                 )
-                for vertex_id, vertex in updateable
-            )
-        )
+            else:
+                yield vertex
 
     def clone(self):
         clone = super().clone()
