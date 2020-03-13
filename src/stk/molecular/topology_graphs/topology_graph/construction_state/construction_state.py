@@ -120,10 +120,12 @@ class ConstructionState:
     def with_reaction_results(self, reactions, results):
         return self.clone()._with_reaction_results(reactions, results)
 
+    def _with_vertices(self, vertices):
+        self._graph_state = self._graph_state.with_vertices(vertices)
+        return self
+
     def with_vertices(self, vertices):
-        clone = self.clone()
-        clone._graph_state = self._graph_state.with_vertices(vertices)
-        return clone
+        return self.clone()._with_vertices(vertices)
 
     def get_position_matrix(self):
         """
