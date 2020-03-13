@@ -9,6 +9,7 @@ class _ReactionsSummary:
     """
 
     __slots__ = [
+        '_num_atoms',
         '_atoms',
         '_atom_infos',
         '_positions',

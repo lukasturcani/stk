@@ -72,13 +72,16 @@ class _MoleculeState:
         self._atom_infos.extend(summary.get_atom_infos())
         self._bonds.extend(summary.get_bonds())
         self._bond_infos.extend(summary.get_bond_infos())
-        self._edge_functional_groups.update(
-            summary.get_edge_functional_groups()
-        )
         self._position_matrix = np.concatenate([
             self._position_matrix,
             summary.get_position_matrix(),
         ])
+        for edge_id, functional_groups in (
+            summary.get_edge_functional_groups()
+        ):
+            self._edge_functional_groups[edge_id].extend(
+                functional_groups
+            )
         return self
 
     def with_placement_results(
