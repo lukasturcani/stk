@@ -24,7 +24,7 @@ class _MoleculeState:
         self._bonds = []
         self._bond_infos = []
         self._edge_functional_groups = defaultdict(list)
-        self._num_building_blocks = 0
+        self._num_placements = 0
 
     def clone(self):
         """
@@ -43,7 +43,7 @@ class _MoleculeState:
         clone._atom_infos = list(self._atom_infos)
         clone._bonds = list(self._bonds)
         clone._bond_infos = list(self._bond_infos)
-        clone._num_building_blocks = self._num_building_blocks
+        clone._num_placements = self._num_placements
         clone._edge_functional_groups = defaultdict.copy(
             self._edge_functional_groups
         )
@@ -64,9 +64,10 @@ class _MoleculeState:
         summary = _PlacementsSummary(
             building_blocks=building_blocks,
             placement_results=results,
-            next_id=len(self._num_building_blocks),
+            num_atoms=len(self._atoms),
+            num_previous_placements=self._num_placements,
         )
-        self._num_building_blocks += len(building_blocks)
+        self._num_placements += len(vertices)
         self._atoms.extend(summary.get_atoms())
         self._atom_infos.extend(summary.get_atom_infos())
         self._bonds.extend(summary.get_bonds())
