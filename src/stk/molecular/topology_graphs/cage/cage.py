@@ -105,7 +105,7 @@ class _CageConstructionState(ConstructionState):
                 if vertex.get_id() != edge.get_vertex1_id()
                 else edge.get_vertex2_id()
             )
-            neighbor = self._graph_state.get_vertex(neighbor_id)
+            neighbor, = self._graph_state.get_vertices(neighbor_id)
             if neighbor.use_neighbor_placement():
                 yield neighbor_id, edge.get_id()
 
