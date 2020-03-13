@@ -298,5 +298,5 @@ class _MoleculeState:
         self._atom_infos = list(summary.get_atom_infos())
         self._bonds = list(summary.get_bonds())
         self._bond_infos = list(summary.get_bond_infos())
-        self._position_matrix = np.array(summary.get_positions())
+        self._position_matrix = np.array(list(summary.get_positions()))
         return self
