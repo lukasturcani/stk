@@ -163,7 +163,7 @@ class _DeletionsSummary:
 
         """
 
-        yield from self._valid_atom_ids
+        yield from self._valid_atom_infos
 
     def get_bonds(self):
         """

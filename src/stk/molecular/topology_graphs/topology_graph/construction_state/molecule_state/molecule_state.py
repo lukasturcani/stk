@@ -272,7 +272,7 @@ class _MoleculeState:
         self._bonds.extend(summary.get_bonds())
         self._bond_infos.extend(summary.get_bond_infos())
 
-        positions = summary.get_positions()
+        positions = tuple(summary.get_positions())
         if positions:
             self._position_matrix = np.vstack([
                 self._position_matrix,
