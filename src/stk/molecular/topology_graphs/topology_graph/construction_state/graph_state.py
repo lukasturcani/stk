@@ -80,13 +80,6 @@ class _GraphState:
 
         return self._vertex_building_blocks[vertex_id]
 
-    def get_vertex(self, vertex_id):
-        """
-
-        """
-
-        return self._vertices[vertex_id]
-
     def get_vertices(self, vertex_ids=None):
         if vertex_ids is None:
             vertex_ids = range(len(self._vertices))

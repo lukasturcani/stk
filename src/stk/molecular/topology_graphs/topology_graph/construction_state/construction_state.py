@@ -82,12 +82,12 @@ class ConstructionState:
 
         return self._graph_state.get_building_block(vertex_id)
 
-    def get_vertex(self, vertex_id):
+    def get_vertices(self, vertex_ids):
         """
 
         """
 
-        return self._graph_state.get_vertex(vertex_id)
+        yield from self._graph_state.get_vertices(vertex_ids)
 
     def get_num_vertices(self):
         return self._graph_state.get_num_vertices()

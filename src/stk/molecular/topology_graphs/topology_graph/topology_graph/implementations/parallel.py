@@ -32,7 +32,7 @@ class _Parallel:
     def _place_building_blocks(self, state):
         with pathos.pools.ProcessPool(self._num_processes) as pool:
             for stage in self._stages:
-                vertices = tuple(map(state.get_vertex, stage))
+                vertices = tuple(state.get_vertices(stage))
                 building_blocks = tuple(
                     map(state.get_building_block, stage)
                 )
