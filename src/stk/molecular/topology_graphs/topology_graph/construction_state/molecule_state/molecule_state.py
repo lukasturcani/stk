@@ -234,7 +234,7 @@ class _MoleculeState:
         """
 
         reactions_summary = _ReactionsSummary(
-            next_id=len(self._atoms),
+            num_atoms=len(self._atoms),
             reaction_results=results,
         )
         self._with_reactions_summary(reactions_summary)

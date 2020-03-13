@@ -37,7 +37,7 @@ class _PlacementsSummary:
             The building blocks which were placed.
 
         placement_results : :class:`iterable`
-            Holds a :class:`_PlacementResults` instances for each
+            Holds a :class:`_PlacementResults` instance for each
             building block in `building_blocks`.
 
         num_atoms : :class:`int`
@@ -210,7 +210,7 @@ class _PlacementsSummary:
 
     def get_bond_infos(self):
         """
-        Yield info about the bonds in the summary.
+        Yield infos about the bonds in the summary.
 
         Yields
         ------
