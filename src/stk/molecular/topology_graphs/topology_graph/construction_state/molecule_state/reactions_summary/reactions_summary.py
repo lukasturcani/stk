@@ -75,7 +75,9 @@ class _ReactionsSummary:
         )
         self._with_bond_batch_data(bond_batch_data)
 
-        self._deleted_ids.update(result.get_deleted_ids())
+        self._deleted_ids.update(
+            atom.get_id() for atom in result.get_deleted_atoms()
+        )
 
     def _with_atom_batch_data(self, batch_data):
         """
