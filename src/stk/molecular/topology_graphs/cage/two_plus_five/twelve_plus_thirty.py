@@ -82,71 +82,71 @@ class TwelvePlusThirty(Cage):
             id=24,
             vertices=(_vertex_prototypes[9], _vertex_prototypes[11]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=25,
             vertices=(_vertex_prototypes[9], _vertex_prototypes[7]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=26,
             vertices=(_vertex_prototypes[1], _vertex_prototypes[7]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=27,
             vertices=(_vertex_prototypes[1], _vertex_prototypes[6]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=28,
             vertices=(_vertex_prototypes[8], _vertex_prototypes[6]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=29,
             vertices=(_vertex_prototypes[8], _vertex_prototypes[10]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=30,
             vertices=(_vertex_prototypes[4], _vertex_prototypes[10]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=31,
             vertices=(_vertex_prototypes[4], _vertex_prototypes[2]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=32,
             vertices=(_vertex_prototypes[2], _vertex_prototypes[11]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=33,
             vertices=(_vertex_prototypes[11], _vertex_prototypes[7]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=34,
             vertices=(_vertex_prototypes[7], _vertex_prototypes[6]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=35,
             vertices=(_vertex_prototypes[6], _vertex_prototypes[10]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=36,
             vertices=(_vertex_prototypes[10], _vertex_prototypes[2]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=37,
             vertices=(_vertex_prototypes[2], _vertex_prototypes[3]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=38,
             vertices=(_vertex_prototypes[11], _vertex_prototypes[3]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=39,
             vertices=(_vertex_prototypes[7], _vertex_prototypes[3]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=40,
             vertices=(_vertex_prototypes[6], _vertex_prototypes[3]),
         ),
-        _NonLinearCageVertex.init_at_center(
+        _LinearCageVertex.init_at_center(
             id=41,
             vertices=(_vertex_prototypes[10], _vertex_prototypes[3]),
         )
