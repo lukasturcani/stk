@@ -87,6 +87,15 @@ class _GraphState:
 
         return self._vertices[vertex_id]
 
+    def get_vertices(self, vertex_ids=None):
+        if vertex_ids is None:
+            vertex_ids = range(len(self._vertices))
+        elif isinstance(vertex_ids, int):
+            vertex_ids = (vertex_ids, )
+
+        for vertex_id in vertex_ids:
+            yield self._vertices[vertex_id]
+
     def get_num_vertices(self):
         return len(self._vertices)
 
@@ -106,6 +115,4 @@ class _GraphState:
         return self
 
     def with_vertices(self, vertices):
-        clone = self.clone()
-        clone._graph_state = self._graph_state.with_vertices(vertices)
         return self.clone()._with_vertices(vertices)

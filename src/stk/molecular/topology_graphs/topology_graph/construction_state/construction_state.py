@@ -40,9 +40,26 @@ class ConstructionState:
 
     def clone(self):
         clone = self.__class__.__new__(self.__class__)
-        clone._graph_state = self._graph_state.clone()
-        clone._molecule_state = self._molecule_state.clone()
+        clone._graph_state = self._graph_state
+        clone._molecule_state = self._molecule_state
         return clone
+
+    def _with_placement_results(
+        self,
+        vertices,
+        edges,
+        building_blocks,
+        results,
+    ):
+        self._molecule_state = (
+            self._molecule_state.with_placement_results(
+                vertices=vertices,
+                edges=edges,
+                building_blocks=building_blocks,
+                results=results,
+            )
+        )
+        return self
 
     def with_placement_results(
         self,
@@ -51,16 +68,7 @@ class ConstructionState:
         building_blocks,
         results,
     ):
-        clone = self.clone()
-        clone._molecule_state = (
-            self._molecule_state.with_placement_results(
-                vertices=vertices,
-                edges=edges,
-                building_blocks=building_blocks,
-                results=results,
-            )
-        )
-        return clone
+        return self.clone._with_placement_results()
 
     def get_building_block(self, vertex_id):
         """
