@@ -105,6 +105,7 @@ class _PlacementsSummary:
         atom_map = atom_batch_data.get_atom_map()
 
         bond_batch_data = _BondBatchData(
+            bonds=building_block.get_bonds(),
             atom_map=atom_map,
             building_block=building_block,
             building_block_id=building_block_id,

@@ -1,4 +1,4 @@
-from .....bonds import BondInfo
+from ......bonds import BondInfo
 
 
 class _BondBatchData:

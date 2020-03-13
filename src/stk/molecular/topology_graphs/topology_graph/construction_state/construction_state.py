@@ -4,6 +4,7 @@ from .molecule_state import _MoleculeState
 
 class ConstructionState:
     """
+    The state of the molecule and topology graph under construction.
 
     """
 
@@ -24,6 +25,9 @@ class ConstructionState:
             The edges of the topology graph.
 
         lattice_constants : :class:`tuple`, optional
+            A :class:`numpy.ndarray` for each lattice constants.
+            Can be an empty :class:`tuple` if the topology graph is
+            not periodic.
 
         """
 
@@ -85,8 +89,10 @@ class ConstructionState:
         return self._graph_state.get_edges(vertex_id)
 
     def get_edge_group_functional_groups(self, edge_group):
-        yield from self._molecule_state.get_edge_functional_groups(
-            edge_group=edge_group,
+        yield from (
+            self._molecule_state.get_edge_group_functional_groups(
+                edge_group=edge_group,
+            )
         )
 
     def with_reaction_results(self, reactions, results):

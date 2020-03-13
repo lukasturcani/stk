@@ -79,6 +79,7 @@ class _MoleculeState:
             self._position_matrix,
             summary.get_position_matrix(),
         ])
+        return self
 
     def with_placement_results(
         self,
@@ -246,6 +247,7 @@ class _MoleculeState:
             position_matrix=self._position_matrix,
             deleted_ids=reactions_summary.get_deleted_ids(),
         ))
+        return self
 
     def _with_reactions_summary(self, summary):
         """
@@ -294,3 +296,4 @@ class _MoleculeState:
         self._bonds = list(summary.get_bonds())
         self._bond_infos = list(summary.get_bond_infos())
         self._position_matrix = np.array(summary.get_positions())
+        return self

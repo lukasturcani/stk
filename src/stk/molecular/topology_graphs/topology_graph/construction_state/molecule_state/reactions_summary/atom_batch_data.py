@@ -1,4 +1,4 @@
-from .....atoms import AtomInfo
+from ......atoms import AtomInfo
 
 
 class _AtomBatchData:
