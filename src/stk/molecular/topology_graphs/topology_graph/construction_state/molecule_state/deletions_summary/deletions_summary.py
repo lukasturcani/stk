@@ -1,10 +1,31 @@
 import numpy as np
 
-from .....atoms import AtomInfo
-from .....bonds import BondInfo
+
+from .atom_batch_data import _AtomBatchData
+from .bond_batch_data import _BondBatchData
 
 
 class _DeletionsSummary:
+    """
+    A summary of deletion results.
+
+    """
+
+    __slots__ = [
+        '_atoms',
+        '_atom_infos',
+        '_bonds',
+        '_bond_infos',
+        '_position_matrix',
+        '_deleted_ids',
+
+        '_valid_atoms',
+        '_valid_atom_infos',
+        '_valid_bonds',
+        '_valid_bond_infos',
+        '_valid_positions',
+    ]
+
     def __init__(
         self,
         atoms,
@@ -14,6 +35,25 @@ class _DeletionsSummary:
         position_matrix,
         deleted_ids,
     ):
+        """
+        Initialize a :class:`._DeletionsSummary` instance.
+
+        Parameters
+        ----------
+        atoms : :class:`iterable` of :class:`.Atom`
+
+        atom_infos : :class:`iterable` of :class:`.AtomInfo`
+
+        bonds : :class:`iterable` of :class:`.Bond`
+
+        bond_infos : :class:`iterable` of :class:`.BondInfo`
+
+        position_matrix : :class:`numpy.ndarray`
+
+        deleted_ids : :class:`iterable` of :class:`int`
+
+        """
+
         self._atoms = tuple(atoms)
         self._atom_infos = tuple(atom_infos)
         self._bonds = tuple(bonds)
@@ -86,16 +126,66 @@ class _DeletionsSummary:
             with_bond(index, bond)
 
     def get_atoms(self):
+        """
+        Yield the atoms in the summary.
+
+        Yields
+        ------
+        :class:`.Atom`
+            An atom.
+
+        """
+
         yield from self._valid_atoms
 
     def get_atom_infos(self):
+        """
+        Yield infos about atoms in the summary.
+
+        Yields
+        ------
+        :class:`.AtomInfo`
+            Info about an atom.
+
+        """
+
         yield from self._valid_atom_ids
 
     def get_bonds(self):
+        """
+        Yield the bonds in the summary.
+
+        Yields
+        ------
+        :class:`.Bond`
+            A bond.
+
+        """
+
         yield from self._valid_bonds
 
     def get_bond_infos(self):
+        """
+        Yield infos about the bonds in the summary.
+
+        Yields
+        ------
+        :class:`.BondInfo`
+            Info about a bond.
+
+        """
+
         yield from self._valid_bond_infos
 
     def get_positions(self):
+        """
+        Yield the positions of atoms held by the summary.
+
+        Yields
+        ------
+        :class:`numpy.ndarray`
+            The position of an atom held by the summary.
+
+        """
+
         yield from self._valid_positions
