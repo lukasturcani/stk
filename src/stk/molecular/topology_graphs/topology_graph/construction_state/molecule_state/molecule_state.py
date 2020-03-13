@@ -1,5 +1,4 @@
 import numpy as np
-from collections import defaultdict
 
 from .reactions_summary import _ReactionsSummary
 from .deletions_summary import _DeletionsSummary
@@ -23,7 +22,7 @@ class _MoleculeState:
         self._atom_infos = []
         self._bonds = []
         self._bond_infos = []
-        self._edge_functional_groups = defaultdict(list)
+        self._edge_functional_groups = {}
         self._num_placements = 0
 
     def clone(self):
@@ -44,9 +43,11 @@ class _MoleculeState:
         clone._bonds = list(self._bonds)
         clone._bond_infos = list(self._bond_infos)
         clone._num_placements = self._num_placements
-        clone._edge_functional_groups = defaultdict.copy(
-            self._edge_functional_groups
-        )
+        clone._edge_functional_groups = {
+            edge_id: list(functional_groups)
+            for edge_id, functional_groups
+            in self._edge_functional_groups.items()
+        }
         return clone
 
     def _with_placement_results(
@@ -79,6 +80,9 @@ class _MoleculeState:
         for edge_id, functional_groups in (
             summary.get_edge_functional_groups()
         ):
+            self._edge_functional_groups[edge_id] = (
+                self._edge_functional_groups.get(edge_id, [])
+            )
             self._edge_functional_groups[edge_id].extend(
                 functional_groups
             )
