@@ -25,7 +25,7 @@ class _CageConstructionState(ConstructionState):
         self._vertex_degrees = dict(vertex_degrees)
         self._neighbor_positions = {}
 
-    def with_placement_results(
+    def _with_placement_results(
         self,
         vertices,
         edges,
@@ -34,7 +34,7 @@ class _CageConstructionState(ConstructionState):
     ):
         # Need to iterate multiple times through results.
         results = tuple(results)
-        super().with_placement_results(
+        super()._with_placement_results(
             vertices=vertices,
             edges=edges,
             building_blocks=building_blocks,
