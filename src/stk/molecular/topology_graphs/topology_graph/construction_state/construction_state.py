@@ -68,7 +68,12 @@ class ConstructionState:
         building_blocks,
         results,
     ):
-        return self.clone._with_placement_results()
+        return self.clone()._with_placement_results(
+            vertices=vertices,
+            edges=edges,
+            building_blocks=building_blocks,
+            results=results,
+        )
 
     def get_building_block(self, vertex_id):
         """
@@ -103,15 +108,17 @@ class ConstructionState:
             )
         )
 
-    def with_reaction_results(self, reactions, results):
-        clone = self.clone()
-        clone._molecule_state = (
+    def _with_reaction_results(self, reactions, results):
+        self._molecule_state = (
             self._molecule_state.with_reaction_results(
                 reactions=reactions,
                 results=results,
             )
         )
-        return clone
+        return self
+
+    def with_reaction_results(self, reactions, results):
+        return self.clone()._with_reaction_results(reactions, results)
 
     def with_vertices(self, vertices):
         clone = self.clone()
