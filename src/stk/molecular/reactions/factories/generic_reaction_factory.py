@@ -119,7 +119,7 @@ class GenericReactionFactory(ReactionFactory):
         bond_orders : :class:`dict`, optional
             Maps a :class:`frozenset` of
             :class:`.GenericFunctionalGroup` subclasses to the
-            bond orders for their respective reactions, if missing
+            bond orders for their respective reactions, if missing,
             defaults to 1. If ``None`` the following will be used
 
             .. code-block:: python
