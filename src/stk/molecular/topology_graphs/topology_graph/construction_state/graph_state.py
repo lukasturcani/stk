@@ -49,32 +49,70 @@ class _GraphState:
             for vertex in vertices
         }
         self._vertices = {
-                vertex.get_id(): vertex
-                for vertices in building_block_vertices.values()
-                for vertex in vertices
+            vertex.get_id(): vertex
+            for vertices in building_block_vertices.values()
+            for vertex in vertices
         }
         self._edges = edges
         self._lattice_constants = lattice_constants
         self._vertex_edges = self._get_vertex_edges()
 
     def _get_vertex_edges(self):
+        """
+        Get the edges connected to each vertex.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps the id of every vertex to a :class:`tuple` of
+            :class:`.Edge` instances connected to it.
+
+        """
+
         vertex_edges = defaultdict(list)
         for edge in self._edges:
-            vertex_ids = (edge.get_vertex1_id(), edge.get_vertex2_id())
-
             if edge.is_periodic():
-                for vertex_id in vertex_ids:
+                for vertex_id in edge.get_vertex_ids():
                     periodic_edge = self._get_periodic_edge(
                         edge=edge,
                         reference=vertex_id,
                     )
                     vertex_edges[vertex_id].append(periodic_edge)
             else:
-                for vertex_id in vertex_ids:
+                for vertex_id in edge.get_vertex_ids():
                     vertex_edges[vertex_id].append(edge)
         return vertex_edges
 
     def _get_periodic_edge(self, edge, reference):
+        """
+        Get an :class:`.Edge`, with its position correctly set.
+
+        For a periodic edge, its correct position is not at the
+        midpoint of the two vertices it connects. Instead, its
+        correction position is different for each vertex. The get the
+        correct position from the perspective of *vertex1*, *vertex2*
+        must first be shifted to its periodic position, and only then
+        can the midpoint of the vertices be used to get the edge
+        position. An analogous calculation must be done to get the
+        position of the edge from the perspective of *vertex2*.
+
+        Parameters
+        ----------
+        edge : :class:`.Edge`
+            The edge whose periodic position must be set.
+
+        reference : :class:`int`
+            The id of the vertex, relative to which the edge position
+            is being calculated.
+
+        Returns
+        -------
+        :class:`.Edge`
+            A clone of `edge`, shifted to have the correct periodic
+            position relative to `reference`.
+
+        """
+
         vertex1 = self._vertices[reference]
         id1, id2 = edge.get_vertex_ids()
         vertex2 = self._vertices[id1 if reference == id2 else id2]
@@ -97,6 +135,16 @@ class _GraphState:
         return edge.with_position(position)
 
     def clone(self):
+        """
+        Get a clone.
+
+        Returns
+        -------
+        :class:`._GraphState`
+            The clone. Has the same type as the original instance.
+
+        """
+
         clone = self.__class__.__new__(self.__class__)
         clone._vertex_building_blocks = dict(
             self._vertex_building_blocks
@@ -108,12 +156,41 @@ class _GraphState:
 
     def get_building_block(self, vertex_id):
         """
+        Get the building block to be placed on a given vertex.
+
+        Parameters
+        ----------
+        vertex_id : :class:`int`
+            The id of the vertex, on which the building block is to
+            be placed.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The building block.
 
         """
 
         return self._vertex_building_blocks[vertex_id]
 
     def get_vertices(self, vertex_ids=None):
+        """
+        Yield the topology graph vertices.
+
+        Parameters
+        ----------
+        vertex_ids : :class:`iterable` of :class:`int`, optional
+            The ids of vertices to yield. If ``None``, all vertices
+            will be yielded. Can be a single :class:`int` if a
+            single vertex is to be yielded.
+
+        Yields
+        ------
+        :class:`.Vertex`
+            A vertex.
+
+        """
+
         if vertex_ids is None:
             vertex_ids = range(len(self._vertices))
         elif isinstance(vertex_ids, int):
@@ -123,22 +200,92 @@ class _GraphState:
             yield self._vertices[vertex_id]
 
     def get_num_vertices(self):
+        """
+        Get the number of vertices in the topology graph.
+
+        Returns
+        -------
+        :class:`int`
+            The number of vertices in the topology graph.
+
+        """
+
         return len(self._vertices)
 
     def get_edge(self, edge_id):
+        """
+        Get an edge.
+
+        Parameters
+        ----------
+        edge_id : :class:`int`
+            The id of an edge.
+
+        Returns
+        -------
+        :class:`.Edge`
+            An edge.
+
+        """
+
         return self._edges[edge_id]
 
     def get_num_edges(self):
+        """
+        Get the number of edges in the topology graph.
+
+        Returns
+        -------
+        :class:`int`
+            The number of edges.
+
+        """
+
         return len(self._edges)
 
     def get_edges(self, vertex_id):
+        """
+        Get the edges connect to a vertex.
+
+        Parameters
+        ----------
+        vertex_id : class:`int`
+            The id of a vertex.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.Edge`
+            The connected edges.
+
+        """
+
         return self._vertex_edges[vertex_id]
 
     def _with_vertices(self, vertices):
+        """
+        Modify the instance.
+
+        """
+
         self._vertices = {
             vertex.get_id(): vertex for vertex in vertices
         }
         return self
 
     def with_vertices(self, vertices):
+        """
+        Returns a clone holding `vertices`.
+
+        Parameters
+        ----------
+        vertices : :class:`iterable` of :class:`.Vertex`
+            The vertices the clone should hold.
+
+        Returns
+        -------
+        :class:`._GraphState`
+            The clone. Has the same type as the original instance.
+
+        """
+
         return self.clone()._with_vertices(vertices)
