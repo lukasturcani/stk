@@ -79,7 +79,7 @@ class Cof(TopologyGraph):
 
     *Multi-Building Block COF Construction*
 
-    You can also build COFs with multiple buildingh blocks, but,
+    You can also build COFs with multiple building blocks, but,
     if you have multiple building blocks with the same number of
     functional groups, you have to assign each building block to the
     vertex you want to place it on
