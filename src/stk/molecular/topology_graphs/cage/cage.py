@@ -172,9 +172,20 @@ class Cage(TopologyGraph):
 
         Parameters
         ----------
+        building_blocks : :class:`tuple` or :class:`dict`
+            Can be a :class:`tuple` of :class:`.BuildingBlock`
+            instances, which should be placed on the topology graph.
+
+            Can also be a :class:`dict` which maps the
+            :class:`.BuildingBlock` instances to the ids of the
+            vertices it should be placed on. A :class:`dict` is
+            required when there are multiple building blocks with the
+            same number of functional groups, because in this case
+            the desired placement is ambiguous.
+
         vertex_alignments : :class:`dict`, optional
-            A mapping from the :attr:`.Vertex.id` of a :class:`.Vertex`
-            :attr:`vertices` to an :class:`.Edge` connected to it.
+            A mapping from the id of a :class:`.Vertex`
+            to an :class:`.Edge` connected to it.
             The :class:`.Edge` is used to align the first
             :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
             placed on that vertex. Only vertices which need to have
@@ -221,13 +232,17 @@ class Cage(TopologyGraph):
             if vertex_alignments is not None
             else {}
         )
-        with_aligner = partial(self._with_aligner, vertex_alignments)
-        building_block_vertices = {
-            building_block: tuple(map(with_aligner, vertices))
-            for building_block, vertices in building_blocks.items()
-        }
+
+        def with_aligner(vertex):
+            return vertex.with_aligner_edge(
+                aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
+            )
+
         super().__init__(
-            building_block_vertices=building_block_vertices,
+            building_block_vertices={
+                building_block: tuple(map(with_aligner, vertices))
+                for building_block, vertices in building_blocks.items()
+            },
             edges=self._edge_prototypes,
             reaction_factory=reaction_factory,
             construction_stages=tuple(
@@ -240,27 +255,66 @@ class Cage(TopologyGraph):
         )
 
     def _get_vertices(self, vertex_ids):
+        """
+        Yield vertex prototypes.
+
+        Parameters
+        ----------
+        vertex_ids : :class:`iterable` of :class:`int`
+            The ids of the vertices to yield.
+
+        Yields
+        ------
+        :class:`.Vertex`
+            A vertex prototype of the topology graph.
+
+        """
+
         if isinstance(vertex_ids, int):
             vertex_ids = (vertex_ids, )
 
         for vertex_id in vertex_ids:
             yield self._vertex_prototypes[vertex_id]
 
-    @staticmethod
-    def _with_aligner(vertex_alignments, vertex):
-        """
-        Return a clone of `vertex` with the aligner edge set.
-
-        """
-
-        return vertex.with_aligner_edge(
-            aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
-        )
-
     def _has_degree(self, degree, vertex):
+        """
+        Check if `vertex` has a degree of `degree`.
+
+        Parameters
+        ----------
+        degree : :class:`int`
+            The degree in question.
+
+        vertex : :class:`.Vertex`
+            The vertex in question.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if `vertex` has a degree of `degree`.
+
+        """
+
         return vertex.get_id() in self._vertices_of_degree[degree]
 
     def _get_building_block_vertices(self, building_blocks):
+        """
+        Map building blocks to the vertices of the graph.
+
+        Parameters
+        ----------
+        building_blocks : :class:`iterable` of :class:`.BuildingBlock`
+            The building blocks which need to be mapped to vertices.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps each building block in `building_blocks` to a
+            :class:`tuple` of :class:`.Vertex` instances it should be
+            placed on.
+
+        """
+
         bb_by_degree = {}
         for bb in building_blocks:
             if bb.get_num_functional_groups() in bb_by_degree:
