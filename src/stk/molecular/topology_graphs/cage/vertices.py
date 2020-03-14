@@ -7,7 +7,7 @@ from stk.utilities import (
     normalize_vector,
 )
 from ..utilities import _FunctionalGroupSorter, _EdgeSorter
-from ...topology_graph import Vertex
+from ..topology_graph import Vertex
 
 
 class _CageVertex(Vertex):
