@@ -237,7 +237,11 @@ class _NonLinearCageVertex(_CageVertex):
         # Once the fgs and edges are ordered, zip and assign them.
 
         fg_sorter = _FunctionalGroupSorter(building_block)
-        edge_sorter = _EdgeSorter(edges, fg_sorter.get_axis())
+        edge_sorter = _EdgeSorter(
+            edges=edges,
+            aligner_edge=edges[self._aligner_edge],
+            axis=fg_sorter.get_axis(),
+        )
         return {
             fg_id: edge.get_id()
             for fg_id, edge in zip(
@@ -358,6 +362,7 @@ class _FunctionalGroupSorter(_Sorter):
         '_reference',
         '_axis',
         '_placer_centroid',
+        '_building_block',
     ]
 
     def __init__(self, building_block):
@@ -367,9 +372,12 @@ class _FunctionalGroupSorter(_Sorter):
         Parameters
         ----------
         building_block : :class:`.BuildingBlock`
+            The building block, whose functional groups are to be
+            sorted.
 
         """
 
+        self._building_block = building_block
         fg0_position = building_block.get_centroid(
             atom_ids=next(
                 building_block.get_functional_groups()
