@@ -242,6 +242,7 @@ class _MoleculeState:
             as the original instance.
 
         """
+
         return self.clone()._with_reaction_results(reactions, results)
 
     def _with_reaction_results(self, reactions, results):
