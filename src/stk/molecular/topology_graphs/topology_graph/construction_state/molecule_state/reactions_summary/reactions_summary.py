@@ -1,5 +1,5 @@
-from .atom_batch_data import _AtomBatchData
-from .bond_batch_data import _BondBatchData
+from .atom_batch import _AtomBatch
+from .bond_batch import _BondBatch
 
 
 class _ReactionsSummary:
@@ -63,30 +63,30 @@ class _ReactionsSummary:
 
         """
 
-        atom_batch_data = _AtomBatchData(
+        atom_batch = _AtomBatch(
             atoms=result.get_new_atoms(),
             num_atoms=self._num_atoms,
         )
-        self._with_atom_batch_data(atom_batch_data)
+        self._with_atom_batch(atom_batch)
 
-        bond_batch_data = _BondBatchData(
+        bond_batch = _BondBatch(
             bonds=result.get_new_bonds(),
-            atom_map=atom_batch_data.get_atom_map(),
+            atom_map=atom_batch.get_atom_map(),
         )
-        self._with_bond_batch_data(bond_batch_data)
+        self._with_bond_batch(bond_batch)
 
         self._deleted_ids.update(
             atom.get_id() for atom in result.get_deleted_atoms()
         )
 
-    def _with_atom_batch_data(self, batch_data):
+    def _with_atom_batch(self, batch):
         """
-        Add data about a batch of atoms to the summary.
+        Add a batch of atoms to the summary.
 
         Parameters
         ----------
-        batch_data : :class:`._AtomBatchData`
-            Data about a batch of atoms.
+        batch : :class:`._AtomBatch`
+            A batch of atoms.
 
         Returns
         -------
@@ -94,18 +94,18 @@ class _ReactionsSummary:
 
         """
 
-        self._atoms.extend(batch_data.get_atoms())
-        self._atom_infos.extend(batch_data.get_atom_infos())
-        self._positions.extend(batch_data.get_positions())
+        self._atoms.extend(batch.get_atoms())
+        self._atom_infos.extend(batch.get_atom_infos())
+        self._positions.extend(batch.get_positions())
 
-    def _with_bond_batch_data(self, batch_data):
+    def _with_bond_batch(self, batch):
         """
-        Add data about a batch of bonds to the summary.
+        Add a batch of bonds to the summary.
 
         Parameters
         ----------
-        batch_data : :class:`.BondBatchData`
-            Data about a batch of bonds.
+        batch : :class:`.BondBatch`
+            A batch of bonds.
 
         Returns
         -------
@@ -113,8 +113,8 @@ class _ReactionsSummary:
 
         """
 
-        self._bonds.extend(batch_data.get_bonds())
-        self._bond_infos.extend(batch_data.get_bond_infos())
+        self._bonds.extend(batch.get_bonds())
+        self._bond_infos.extend(batch.get_bond_infos())
 
     def get_atoms(self):
         """
