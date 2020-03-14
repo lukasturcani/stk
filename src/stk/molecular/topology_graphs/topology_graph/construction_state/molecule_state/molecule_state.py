@@ -12,6 +12,7 @@ class _MoleculeState:
     """
 
     __slots__ = [
+        '_position_matrix',
         '_atoms',
         '_atom_infos',
         '_bonds',
