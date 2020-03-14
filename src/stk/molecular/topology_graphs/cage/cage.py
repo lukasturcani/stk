@@ -1,3 +1,28 @@
+"""
+Cage
+====
+
+#. :class:`.EightPlusSixteen`
+#. :class:`.EightPlusTwelve`
+#. :class:`.FivePlusTen`
+#. :class:`.FourPlusEight`
+#. :class:`.FourPlusFour`
+#. :class:`.FourPlusSix`
+#. :class:`.FourPlusSix2`
+#. :class:`.OnePlusOne`
+#. :class:`.SixPlusEight`
+#. :class:`.SixPlusNine`
+#. :class:`.SixPlusTwelve`
+#. :class:`.TenPlusTwenty`
+#. :class:`.ThreePlusSix`
+#. :class:`.TwelvePlusThirty`
+#. :class:`.TwentyPlusThirty`
+#. :class:`.TwoPlusFour`
+#. :class:`.TwoPlusThree`
+#. :class:`.TwoPlusTwo`
+
+"""
+
 from collections import Counter, defaultdict
 from functools import partial
 import numpy as np
@@ -11,14 +36,23 @@ class Cage(TopologyGraph):
     """
     Represents a cage topology graph.
 
-    Cage topologies are added by creating a subclass which defines the
+    Notes
+    -----
+    Cage topologies are added by creating a subclass, which defines the
     :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
     attributes.
 
     Examples
     --------
-    :class:`Cage` instances can be made without supplying
-    additional arguments (using :class:`.FourPlusSix` as an example)
+    *Subclass Implementation*
+
+    The source code of the subclasses, listed in :mod:`~.cage.cage`,
+    can serve as good examples.
+
+    *Basic Construction*
+
+    :class:`.Cage` instances can be made by providing the building
+    block molecules only (using :class:`.FourPlusSix` as an example)
 
     .. code-block:: python
 
@@ -30,21 +64,21 @@ class Cage(TopologyGraph):
             functional_groups=[stk.AldehydeFactory()],
         )
         cage1 = stk.ConstructedMolecule(
-            building_blocks=(bb1, bb2),
-            topology_graph=stk.cage.FourPlusSix()
+            topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
         )
+
+    *Structural Isomer Construction*
 
     Different structural isomers of cages can be made by using the
     `vertex_alignments` optional parameter
 
     .. code-block:: python
 
-        tetrahedron = stk.cage.FourPlusSix(
-            vertex_alignments={0: 1, 1: 1, 2: 2}
-        )
         cage2 = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
-            topology_graph=tetrahedron
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(bb1, bb2),
+                vertex_alignments={0: 1, 1: 1, 2: 2},
+            ),
         )
 
     The parameter maps the id of a vertex to a number
@@ -55,31 +89,61 @@ class Cage(TopologyGraph):
     By changing which edge each vertex is aligned with, a different
     structural isomer of the cage can be formed.
 
-    You can also build cages with multiple building blocks, but you
-    have to assign each building block to a vertex with
-    `building_block_vertices`.
+    *Multi-Building Block Cage Construction*
 
-    bb1 = stk.BuildingBlock('O=CC(C=O)C=O', [stk.AldehydeFactory()])
-    bb2 = stk.BuildingBlock(
-        smiles='O=CC(Cl)(C=O)C=O',
-        functional_groups=[stk.AldehydeFactory()],
-    )
-    bb3 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-    bb4 = stk.BuildingBlock('NCC(Cl)N', [stk.PrimaryAminoFactory()])
-    bb5 = stk.BuildingBlock('NCCCCN', [stk.PrimaryAminoFactory()])
+    You can also build cages with multiple building blocks, but,
+    if you have multiple building blocks with the same number
+    of functional groups, you have to assign each building block to the
+    vertex you want to place it on
 
-    tetrahedron = stk.cage.FourPlusSix()
-    cage = stk.ConstructedMolecule(
-        building_blocks=[bb1, bb2, bb3, bb4, bb5],
-        topology_graph=tetrahedron,
-        building_block_vertices={
-            bb1: tetrahedron.get_vertices(range(2)),
-            bb2: tetrahedron.get_vertices((2, 3)),
-            bb3: tetrahedron.get_vertices(4),
-            bb4: tetrahedron.get_vertices(5),
-            bb5: tuple(tetrahedron.get_vertices())[6:],
-        }
-    )
+    .. code-block:: python
+
+        bb1 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(Cl)(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        bb3 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb4 = stk.BuildingBlock(
+            smiles='NCC(Cl)N',
+            functional_groups=[stk.PrimaryAminoFactory()],
+        )
+        bb5 = stk.BuildingBlock('NCCCCN', [stk.PrimaryAminoFactory()])
+
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                # building_blocks is now a dict, which maps building
+                # blocks to the id of the vertices it should be placed
+                # on. You can use ranges to specify the ids.
+                building_blocks={
+                    bb1: range(2),
+                    bb2: (2, 3),
+                    bb3: 4,
+                    bb4: 5,
+                    bb5: range(6, 10),
+                },
+            ),
+        )
+
+    You can combine this with the `vertex_alignments` parameter
+
+    .. code-block:: python
+
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks={
+                    bb1: range(2),
+                    bb2: (2, 3),
+                    bb3: 4,
+                    bb4: 5,
+                    bb5: range(6, 10),
+                },
+            ),
+            vertex_alignments={0: 1, 1: 1, 2: 2},
+        )
 
     """
 
@@ -143,7 +207,7 @@ class Cage(TopologyGraph):
 
         if isinstance(building_blocks, dict):
             building_blocks = {
-                building_block: map(self._get_vertex, ids)
+                building_block: self._get_vertices(ids)
                 for building_block, ids in building_blocks.items()
             }
 
@@ -175,8 +239,12 @@ class Cage(TopologyGraph):
             edge_groups=None,
         )
 
-    def _get_vertex(self, vertex_id):
-        return self._vertex_prototypes[vertex_id]
+    def _get_vertices(self, vertex_ids):
+        if isinstance(vertex_ids, int):
+            vertex_ids = (vertex_ids, )
+
+        for vertex_id in vertex_ids:
+            yield self._vertex_prototypes[vertex_id]
 
     @staticmethod
     def _with_aligner(vertex_alignments, vertex):
