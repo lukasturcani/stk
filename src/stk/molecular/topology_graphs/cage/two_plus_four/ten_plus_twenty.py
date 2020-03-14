@@ -11,20 +11,21 @@ class TenPlusTwenty(Cage):
 
     """
 
-    _x = 2
+    _x = 1.5
+    _z = _x / 2
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [-_x, _x, -_x]),
-        _NonLinearCageVertex(1, [-_x, -_x, -_x]),
-        _NonLinearCageVertex(2, [_x, _x, -_x]),
-        _NonLinearCageVertex(3, [_x, -_x, -_x]),
+        _NonLinearCageVertex(0, [-_x, _x, -_z]),
+        _NonLinearCageVertex(1, [-_x, -_x, -_z]),
+        _NonLinearCageVertex(2, [_x, _x, -_z]),
+        _NonLinearCageVertex(3, [_x, -_x, -_z]),
 
-        _NonLinearCageVertex(4, [-_x, _x, _x]),
-        _NonLinearCageVertex(5, [-_x, -_x, _x]),
-        _NonLinearCageVertex(6, [_x, _x, _x]),
-        _NonLinearCageVertex(7, [_x, -_x, _x]),
+        _NonLinearCageVertex(4, [-_x, _x, _z]),
+        _NonLinearCageVertex(5, [-_x, -_x, _z]),
+        _NonLinearCageVertex(6, [_x, _x, _z]),
+        _NonLinearCageVertex(7, [_x, -_x, _z]),
 
-        _NonLinearCageVertex(8, [0, 0, _x*1.5]),
-        _NonLinearCageVertex(9, [0, 0, -_x*1.5]),
+        _NonLinearCageVertex(8, [0, 0, _x]),
+        _NonLinearCageVertex(9, [0, 0, -_x]),
     )
 
     _vertex_prototypes = (
