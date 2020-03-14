@@ -306,7 +306,7 @@ class Cage(TopologyGraph):
         -------
         :class:`dict`
             Maps each building block in `building_blocks` to a
-            :class:`tuple` of :class:`.Vertex` instances it should be
+            :class:`list` of :class:`.Vertex` instances it should be
             placed on.
 
         """

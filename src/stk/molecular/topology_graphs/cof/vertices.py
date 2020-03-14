@@ -10,7 +10,35 @@ from ..topology_graph import Vertex
 
 
 class _CofVertex(Vertex):
+    """
+    A :class:`.Cof` vertex.
+
+    """
+
     def __init__(self, id, position, aligner_edge=0, cell=(0, 0, 0)):
+        """
+        Initialize a :class:`._Cof` vertex.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the vertex.
+
+        position : :class:`tuple` of :class:`float`
+            The position of the vertex.
+
+        aligner_edge : :class:`int`, optional
+            The edge which is used to align the :class:`.BuildingBlock`
+            placed on the vertex. The first :class:`.FunctionalGroup`
+            is rotated such that it lies exactly on this
+            :class:`.Edge`. Must be between ``0`` and the number of
+            edges the vertex is connected to.
+
+        cell : :class:`tuple` of :class:`int`, optional
+            The cell of the lattice in which the vertex is found.
+
+        """
+
         super().__init__(id, position)
         self._aligner_edge = aligner_edge
         self._cell = np.array(cell)
@@ -26,15 +54,43 @@ class _CofVertex(Vertex):
         aligner_edge=0,
         cell=(0, 0, 0),
     ):
-        obj = cls.__new__(cls)
-        obj._id = id
-        obj._position = np.array([0, 0, 0], dtype=np.float64)
-        for count, vertex in enumerate(vertices, 1):
-            obj._position += vertex.get_position()
-        obj._position /= count
-        obj._aligner_edge = aligner_edge
-        obj._cell = cell
-        return obj
+        """
+        Initialize a :class:`._CageVertex` in the middle of `vertices`.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the initialized vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            The vertices at whose center this one needs to be.
+
+        aligner_edge : :class:`int`, optional
+            The edge which is used to align the :class:`.BuildingBlock`
+            placed on the vertex. The first :class:`.FunctionalGroup`
+            is rotated such that it lies exactly on this
+            :class:`.Edge`. Must be between ``0`` and the number of
+            edges the vertex is connected to.
+
+        cell : :class:`tuple` of :class:`int`, optional
+            The cell of the lattice in which the vertex is found.
+
+        Returns
+        -------
+        :class:`._CofVertex`
+            The new vertex.
+
+        """
+
+        return cls(
+            id=id,
+            position=(
+                sum(vertex.get_position() for vertex in vertices)
+                / len(vertices)
+            ),
+            aligner_edge=aligner_edge,
+            cell=cell,
+        )
 
     @classmethod
     def init_at_shifted_center(
@@ -46,6 +102,10 @@ class _CofVertex(Vertex):
         aligner_edge=0,
         cell=(0, 0, 0),
     ):
+        """
+
+        """
+
         positions = []
         for vertex, cell_shift in zip(vertices, cell_shifts):
             shift = sum(
