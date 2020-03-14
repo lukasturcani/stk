@@ -146,42 +146,37 @@ class _LinearCageVertex(_CageVertex):
                 building_block.get_functional_groups()
             ).get_placer_ids(),
         )
-        start = fg_centroid - self._position
-        edge_coord = edges[self._aligner_edge].get_position()
+        edge_position = edges[self._aligner_edge].get_position()
         edge_centroid = (
             sum(edge.get_position() for edge in edges) / len(edges)
         )
         building_block = building_block.with_rotation_between_vectors(
-            start=start,
-            target=edge_coord - edge_centroid,
+            start=fg_centroid - self._position,
+            target=edge_position - edge_centroid,
             origin=self._position,
         )
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
-        building_block = (
-            building_block.with_rotation_to_minimize_angle(
-                start=core_centroid - self._position,
-                target=self._position,
-                axis=normalize_vector(
-                    edges[0].get_position() - edges[1].get_position()
-                ),
-                origin=self._position,
-            )
-        )
-        return building_block.get_position_matrix()
+        return building_block.with_rotation_to_minimize_angle(
+            start=core_centroid - self._position,
+            target=self._position,
+            axis=normalize_vector(
+                edges[0].get_position() - edges[1].get_position()
+            ),
+            origin=self._position,
+        ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-        fg = next(building_block.get_functional_groups(0))
-        fg0_position = building_block.get_centroid(fg.get_placer_ids())
+        fg, = building_block.get_functional_groups(0)
+        fg_position = building_block.get_centroid(fg.get_placer_ids())
+
+        def fg_distance(edge):
+            return euclidean(edge.get_position(), fg_position)
+
+        edges = sorted(edges, key=fg_distance)
         return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(sorted(
-                edges,
-                key=lambda edge: euclidean(
-                    edge.get_position(),
-                    fg0_position,
-                ),
-            ))
+            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
         }
 
 
@@ -223,17 +218,13 @@ class _NonLinearCageVertex(_CageVertex):
                 building_block.get_functional_groups()
             ).get_placer_ids(),
         )
-        start = fg_bonder_centroid - self._position
-        edge_coord = edges[self._aligner_edge].get_position()
-        building_block = (
-            building_block.with_rotation_to_minimize_angle(
-                start=start,
-                target=edge_coord - edge_centroid,
-                axis=edge_normal,
-                origin=self._position,
-            )
-        )
-        return building_block.get_position_matrix()
+        edge_position = edges[self._aligner_edge].get_position()
+        return building_block.with_rotation_to_minimize_angle(
+            start=fg_bonder_centroid - self._position,
+            target=edge_position - edge_centroid,
+            axis=edge_normal,
+            origin=self._position,
+        ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
         # The idea is to order the functional groups in building_block
@@ -264,45 +255,40 @@ class _NonLinearCageVertex(_CageVertex):
                 vector=building_block.get_plane_normal(),
             ),
         )
-        functional_groups = sorted(
-            range(building_block.get_num_functional_groups()),
-            key=self._get_functional_group_angle(
-                building_block=building_block,
-                fg0_direction=fg0_direction,
-                centroid=placer_centroid,
-                axis=axis,
-            ),
-        )
-        edges = sorted(edges, key=self._get_edge_angle(axis, edges))
-        return {
-            fg_id: edge.get_id()
-            for fg_id, edge in zip(functional_groups, edges)
-        }
 
-    def _get_functional_group_angle(
-        self,
-        building_block,
-        fg0_direction,
-        centroid,
-        axis,
-    ):
+        def get_angle(reference, vector):
+            """
+            Get the angle of `vector` relative to `reference`.
 
-        def angle(fg_id):
-            fg = next(building_block.get_functional_groups(fg_id))
-            position = building_block.get_centroid(
-                atom_ids=fg.get_placer_ids(),
-            )
-            fg_direction = position - centroid
-            theta = vector_angle(fg0_direction, fg_direction)
+            """
 
-            projection = fg_direction @ axis
+            theta = vector_angle(reference, vector)
+
+            projection = vector @ axis
             if theta > 0 and projection < 0:
                 return 2*np.pi - theta
             return theta
 
-        return angle
+        def get_functional_group_angle(fg_id):
+            """
+            Get the angle of a functional group.
 
-    def _get_edge_angle(self, axis, edges):
+            It is calculated relative to `fg0_direction`.
+
+            """
+
+            fg, = building_block.get_functional_groups(fg_id)
+            fg_position = building_block.get_centroid(
+                atom_ids=fg.get_placer_ids(),
+            )
+            fg_direction = fg_position - placer_centroid
+            return get_angle(fg0_direction, fg_direction)
+
+        functional_groups = sorted(
+            range(building_block.get_num_functional_groups()),
+            key=get_functional_group_angle,
+        )
+
         aligner_edge = edges[self._aligner_edge]
         edge_centroid = (
             sum(edge.get_position() for edge in edges) / len(edges)
@@ -311,16 +297,19 @@ class _NonLinearCageVertex(_CageVertex):
             aligner_edge.get_position() - edge_centroid
         )
 
-        def angle(edge):
+        def get_edge_angle(edge):
+            """
+            Get the angle of `edge`.
+
+            It is calculated relative to `aligner_edge_direction`.
+
+            """
+
             edge_direction = edge.get_position() - edge_centroid
-            theta = vector_angle(
-                vector1=edge_direction,
-                vector2=aligner_edge_direction,
-            )
+            return get_angle(aligner_edge_direction, edge_direction)
 
-            projection = edge_direction @ axis
-            if theta > 0 and projection < 0:
-                return 2*np.pi - theta
-            return theta
-
-        return angle
+        edges = sorted(edges, key=get_edge_angle)
+        return {
+            fg_id: edge.get_id()
+            for fg_id, edge in zip(functional_groups, edges)
+        }
