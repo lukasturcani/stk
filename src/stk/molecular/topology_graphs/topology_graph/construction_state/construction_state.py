@@ -332,7 +332,7 @@ class ConstructionState:
         Yields
         ------
         :class:`.Atom`
-            An atom of the molecule.
+            An atom of the molecule being constructed.
 
         """
 
@@ -345,7 +345,7 @@ class ConstructionState:
         Yields
         ------
         :class:`.Bond`
-            A bond of the molecule.
+            A bond of the molecule being constructed.
 
         """
 
@@ -358,7 +358,7 @@ class ConstructionState:
         Yields
         ------
         :class:`.AtomInfo`
-            An atom info of the molecule.
+            An atom info of the molecule being constructed.
 
         """
 
@@ -371,7 +371,7 @@ class ConstructionState:
         Yields
         ------
         :class:`.BondInfo`
-            The bond info of the molecule.
+            The bond info of the molecule being constructed.
 
         """
 
