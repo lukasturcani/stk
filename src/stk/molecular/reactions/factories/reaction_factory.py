@@ -35,7 +35,7 @@ class ReactionFactory:
 
     def get_reaction(self, construction_state, edge_group):
         """
-        Get a reaction to use on the `functional_groups`.
+        Get a reaction to use on the `edge_group`.
 
         Parameters
         ----------
