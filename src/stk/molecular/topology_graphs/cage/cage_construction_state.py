@@ -2,18 +2,44 @@ from ..topology_graph import ConstructionState
 
 
 class _CageConstructionState(ConstructionState):
+    """
+    The construction state of a :class:`.Cage`.
+
+    """
+
     def __init__(
         self,
         building_block_vertices,
         edges,
         num_placement_stages,
         vertex_degrees,
-        lattice_constants,
     ):
+        """
+        Initialize a :class:`._CageConstructionState` instance.
+
+        Parameters
+        ----------
+        building_block_vertices : :class:`dict`
+            Maps each :class:`.BuildingBlock` to be placed, to a
+            :class:`tuple` of :class:`.Vertex` instances, on which
+            it should be placed.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            The edges of the topology graph.
+
+        num_placement_stages : :class:`int`
+            The number of placement stages.
+
+        vertex_degrees : :class:`dict`
+            Maps the id of a vertex to the number of edges it is
+            connected to.
+
+        """
+
         super().__init__(
             building_block_vertices=building_block_vertices,
             edges=edges,
-            lattice_constants=lattice_constants,
+            lattice_constants=(),
         )
         self._num_placement_stages = num_placement_stages
         self._num_placement_stages_done = 0
@@ -59,6 +85,74 @@ class _CageConstructionState(ConstructionState):
         building_blocks,
         results,
     ):
+        # Use literal docstring here to prevent linter errors stemming
+        # from the use of "\" in the docstring.
+        r"""
+        Put vertices in the middle of placer centroids.
+
+        Normally, linear vertices are in the middle of the
+        non-linear vertices they are neighbors to. However,
+        they should really be placed in the middle of the functional
+        groups sitting on the vertices. This ensures that the bonds
+        made are straight.
+
+        For example, take ``N`` to be a non-linear vertex, ``L``
+        to be a linear vertex and ``X`` to be a functional group
+        placed on a vertex. If, vertex positions are not updated,
+        a linear vertex will be in the middle of the two non-linear
+        vertices:
+
+            X               X
+            |               |
+            N    X--L--X    N
+
+        Therefore, the bonds made will be bent:
+
+            X           X
+            | \       / |
+            N  X--L--X  N
+
+        However, this method updates the position of ``L`` to
+        be in the middle of the functional groups:
+
+            X    X--L--X    X
+            |               |
+            N               N
+
+        Now when bonds are made, they will be straight:
+
+            X----X--L--X----X
+            |               |
+            N               N
+
+        Note that all vertices, which can have their positions updated,
+        will have them updated, even the non-linear ones. A vertex
+        can have its position updated, if the positions of all of the
+        neighboring functional groups (the ``X`` in the diagrams
+        above), are known.
+
+        Parameters
+        ----------
+        vertices : :class:`iterable` of :class:`vertex`
+            The vertices which were just used to place a set of
+            `building_blocks`.
+
+        edges : :class:`iterable`
+            For each vertex in `vertices`, a :class:`tuple` of of the
+            :class:`.Edge` instances it is connected to.
+
+        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
+            The building blocks which are just placed.
+
+        results : :class:`iterable` of :class:`._PlacementResult`
+            For each vertex in `vertices`, the result of the placement.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         for vertex, vertex_edges, building_block, result in zip(
             vertices,
             edges,
@@ -77,7 +171,7 @@ class _CageConstructionState(ConstructionState):
                 vertex_edges=vertex_edges,
             ):
                 fg_id = edge_functional_groups[edge_id]
-                functional_group = next(
+                functional_group, = (
                     building_block.get_functional_groups(fg_id)
                 )
                 self._neighbor_positions[neighbor_id] = (
@@ -94,6 +188,26 @@ class _CageConstructionState(ConstructionState):
         )
 
     def _get_neighbors(self, vertex, vertex_edges):
+        """
+        Yield the neighbor vertices of `vertex`.
+
+        Parameters
+        ----------
+        vertex : :class:`.Vertex`
+            The vertex whose neighbors are desired.
+
+        vertex_edges : :class:`tuple` of :class:`.Edge`
+            The edges connected to `vertex`.
+
+        Yields
+        ------
+        :class:`tuple`
+            The first element is the id of a neighbor vertex and
+            the second element is the id of the edge through which
+            it is connected.
+
+        """
+
         for edge in vertex_edges:
             neighbor_id = (
                 edge.get_vertex1_id()
@@ -105,6 +219,16 @@ class _CageConstructionState(ConstructionState):
                 yield neighbor_id, edge.get_id()
 
     def _get_new_vertices(self):
+        """
+        Yield the vertices once new positions have been added.
+
+        Yields
+        ------
+        :class:`.Vertex`
+            A vertex of the topology graph.
+
+        """
+
         for vertex_id, vertex in enumerate(
             self._graph_state.get_vertices()
         ):

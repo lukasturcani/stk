@@ -25,7 +25,6 @@ Cage
 
 from collections import Counter, defaultdict
 from functools import partial
-import numpy as np
 
 from .cage_construction_state import _CageConstructionState
 from ..topology_graph import TopologyGraph
@@ -348,10 +347,6 @@ class Cage(TopologyGraph):
             edges=self._edges,
             num_placement_stages=self._implementation.get_num_stages(),
             vertex_degrees=self._vertex_degrees,
-            lattice_constants=tuple(
-                np.array(constant, dtype=np.float64)*self._scale
-                for constant in self._get_lattice_constants()
-            )
         )
 
     def __repr__(self):
