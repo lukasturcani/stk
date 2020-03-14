@@ -127,6 +127,9 @@ class GenericReactionFactory(ReactionFactory):
 
         """
 
+        # Used for __repr__.
+        self._default_bond_orders = bond_orders is None
+
         if bond_orders is None:
             bond_orders = {
                 frozenset({PrimaryAmino, Aldehyde}): 2,
@@ -179,3 +182,12 @@ class GenericReactionFactory(ReactionFactory):
         """
 
         return frozenset(map(type, functional_groups))
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        bond_orders = (
+            '' if self._default_bond_orders else f'{self._bond_orders}'
+        )
+        return f'{self.__class__.__name__}({bond_orders})'
