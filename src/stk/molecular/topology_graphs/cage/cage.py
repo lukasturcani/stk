@@ -233,13 +233,6 @@ class Cage(TopologyGraph):
             else {}
         )
 
-        stages = tuple(
-            partial(self._has_degree, degree)
-            for degree
-            in sorted(self._vertices_of_degree, reverse=True)
-        )
-        self._num_stages = len(stages)
-
         def with_aligner(vertex):
             return vertex.with_aligner_edge(
                 aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
@@ -250,9 +243,13 @@ class Cage(TopologyGraph):
                 building_block: tuple(map(with_aligner, vertices))
                 for building_block, vertices in building_blocks.items()
             },
-            construction_stages=stages,
             edges=self._edge_prototypes,
             reaction_factory=reaction_factory,
+            construction_stages=tuple(
+                partial(self._has_degree, degree)
+                for degree
+                in sorted(self._vertices_of_degree, reverse=True)
+            ),
             num_processes=num_processes,
             edge_groups=None,
         )
@@ -349,7 +346,7 @@ class Cage(TopologyGraph):
         return _CageConstructionState(
             building_block_vertices=self._building_block_vertices,
             edges=self._edges,
-            num_placement_stages=self._num_stages,
+            num_placement_stages=self._implementation.get_num_stages(),
             vertex_degrees=self._vertex_degrees,
             lattice_constants=tuple(
                 np.array(constant, dtype=np.float64)*self._scale

@@ -54,3 +54,16 @@ class _Parallel:
                     results=placement_results,
                 )
         return state
+
+    def get_num_stages(self):
+        """
+        Get the number of placement stages.
+
+        Returns
+        -------
+        :class:`int`
+            The number of placement stages.
+
+        """
+
+        return len(self._stages)
