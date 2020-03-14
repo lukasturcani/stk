@@ -1,3 +1,15 @@
+"""
+COF
+===
+
+#. :class:`.Hexagonal`
+#. :class:`.Honeycomb`
+#. :class:`.Kagome`
+#. :class:`.LinkerlessHoneycomb`
+#. :class:`.Square`
+
+"""
+
 import itertools as it
 from collections import Counter
 import numpy as np
@@ -10,6 +22,109 @@ from ...reactions import GenericReactionFactory
 
 
 class Cof(TopologyGraph):
+    """
+    Represents a COF topology graph.
+
+    Notes
+    -----
+    COF topologies are added by creating a subclass, which defines
+    the :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
+    attributes.
+
+    Examples
+    --------
+    *Subclass Implementation*
+
+    The source code of the subclasses, listed in :mod:`.cof.cof`,
+    can serve as good examples.
+
+    *Basic Construction*
+
+    :class:`.Cof` instances can be made by providing the building
+    block molecules and lattice size only (using :class:`.Honeycomb`
+    as an example)
+
+    .. code-block:: python
+
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+        cof = stk.ConstructedMolecule(
+            topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
+        )
+
+    *Structural Isomer Construction*
+
+    Different structural isomers of COFs can be made by using the
+    `vertex_alignments` optional parameter
+
+    .. code-block:: python
+
+        cof2 = stk.ConstructedMolecule(
+            topology_graph=stk.cof.Honeycomb(
+                building_blocks=(bb1, bb2),
+                lattice_size=(3, 3, 1),
+                vertex_alignments={0: 2, 1: 1, 2: 1},
+            ),
+        )
+
+    The parameter maps the id of a vertex to a number
+    between 0 (inclusive) and the number of edges the vertex is
+    connected to (exclusive). So a vertex connected to three edges
+    can be mapped to ``0``, ``1`` or ``2``.
+
+    By changing which edge each vertex is aligned with, a different
+    structural isomer of the COF can be formed.
+
+    *Multi-Building Block COF Construction*
+
+    You can also build COFs with multiple buildingh blocks, but,
+    if you have multiple building blocks with the same number of
+    functional groups, you have to assign each building block to the
+    vertex you want to place it on
+
+    .. code-block:: python
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
+        bb3 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+        bb4 = stk.BuildingBlock('BrCC(NCBr)CBr', [stk.BromoFactory()])
+
+        cof = stk.ConstructedMolecule(
+            topology_graph=stk.cof.Honeycomb(
+                # building_blocks is now a dict, which maps building
+                # blocks to the id of the vertices it should be placed
+                # on. You can use ranges to specify the ids.
+                building_blocks={
+                    bb1: (2, 4, 7, 8, 9, 12, 13, 14, 17, 18, 19),
+                    bb2: 3,
+                    bb3: (0, 10, 11, 15, 16),
+                    bb4: (1, 5, 6),
+                },
+                lattice_size=(2, 2, 1),
+            ),
+        )
+
+    You can combine this with the `vertex_alignments` parameter
+
+    .. code-block:: python
+
+        cof2 = stk.ConstructedMolecule(
+            topology_graph=stk.cof.Honeycomb(
+                building_blocks={
+                    bb1: (2, 4, 7, 8, 9, 12, 13, 14, 17, 18, 19),
+                    bb2: 3,
+                    bb3: (0, 10, 11, 15, 16),
+                    bb4: (1, 5, 6),
+                },
+                lattice_size=(2, 2, 1),
+                vertex_alignments={0: 2, 1: 1, 2: 1},
+            ),
+        )
+
+    """
+
     def __init__(
         self,
         building_blocks,
@@ -19,6 +134,62 @@ class Cof(TopologyGraph):
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
     ):
+        """
+        Initialize a :class:`.Cof` instance.
+
+        Parameters
+        ----------
+        building_blocks : :class:`tuple` or :class:`dict`
+            Can be a :class:`tuple` of :class:`.BuildingBlock`
+            instances, which should be placed on the topology graph.
+
+            Can also be a :class:`dict` which maps the
+            :class:`.BuildingBlock` instances to the ids of the
+            vertices it should be placed on. A :class:`dict` is
+            required when there are multiple building blocks with the
+            same number of functional groups, because in this case
+            the desired placement is ambiguous.
+
+        lattice_size : :class:`tuple` of :class:`int`
+            The size of the lattice in the x, y and z directions.
+
+        periodic : :class:`bool`, optional
+            If the constructed molecule is periodic, if ``True``
+            periodic bonds will be made across the edges of the
+            lattice.
+
+        vertex_alignments : :class:`dict`, optional
+            A mapping from the id of a :class:`.Vertex`
+            to an :class:`.Edge` connected to it.
+            The :class:`.Edge` is used to align the first
+            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+            placed on that vertex. Only vertices which need to have
+            their default edge changed need to be present in the
+            :class:`dict`. If ``None`` then the default edge is used
+            for each vertex. Changing which :class:`.Edge` is used will
+            mean that the topology graph represents different
+            structural isomers. The edge is referred to by a number
+            between ``0`` (inclusive) and the number of edges the
+            vertex is connected to (exclusive).
+
+        reaction_factory : :class:`.ReactionFactory`, optional
+            The reaction factory to use for creating bonds between
+            building blocks.
+
+        num_processes : :class:`int`, optional
+            The number of parallel processes to create during
+            :meth:`construct`.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If the there are multiple building blocks with the
+            same number of functional_groups in `building_blocks`,
+            and they are not explicitly assigned to vertices. The
+            desired placement of building blocks is ambiguous in
+            this case.
+
+        """
 
         self._vertex_alignments = (
             dict(vertex_alignments)
@@ -35,7 +206,12 @@ class Cof(TopologyGraph):
         if isinstance(building_blocks, dict):
             get_vertex = partial(getitem, vertices)
             building_block_vertices = {
-                building_block: map(get_vertex, ids)
+                building_block: map(
+                    get_vertex,
+                    # Account for the fact that a building block can
+                    # be mapped to a single int.
+                    (ids, ) if isinstance(ids, int) else ids
+                )
                 for building_block, ids in building_blocks.items()
             }
         else:
@@ -57,6 +233,27 @@ class Cof(TopologyGraph):
         )
 
     def _get_edge_groups(self, edges):
+        """
+        Get the edge groups for the COF.
+
+        Parameters
+        ----------
+        edges : :class:`iterable` of :class:`.Edge`
+            The edges which are to be placed into edge groups.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.EdgeGroup`
+            The edge groups. These are returned when the lattice is
+            not periodic, which means that some edges should not be
+            part of an edge group, in order to prevent bond formation
+            across the edges of the lattice.
+
+        None : :class:`NoneType`
+            If an edge group is to be created for every single edge.
+
+        """
+
         if self._periodic:
             return None
 
@@ -66,6 +263,23 @@ class Cof(TopologyGraph):
         )
 
     def _get_vertices(self, lattice):
+        """
+        Get the vertices in the `lattice`.
+
+        Parameters
+        ----------
+        lattice : :class:`list`
+            A nested list which can be in the form
+            ``lattice[x][y][z][vertex_id]`` which returns a vertex
+            in the (x, y, z) cell of the lattice.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`.Vertex`
+            All the vertices extracted from `lattice`.
+
+        """
+
         xdim, ydim, zdim = self._lattice_size
         num_vertices = xdim*ydim*zdim*len(self._vertex_prototypes)
         vertices = [None for i in range(num_vertices)]
