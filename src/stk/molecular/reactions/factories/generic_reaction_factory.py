@@ -119,8 +119,10 @@ class GenericReactionFactory(ReactionFactory):
         bond_orders : :class:`dict`, optional
             Maps a :class:`frozenset` of
             :class:`.GenericFunctionalGroup` subclasses to the
-            bond orders for their respective reactions, if missing,
-            defaults to 1. If ``None`` the following will be used
+            bond orders for their respective reactions, if a pair
+            of functional groups is missing, a default bond order of
+            1 will be used for their reactions. If `bond_orders` is
+            ``None``, the following :class:`dict` will be used
 
             .. code-block:: python
 
