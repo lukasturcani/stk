@@ -133,5 +133,3 @@ class _CageConstructionState(ConstructionState):
         clone._num_placement_stages = self._num_placement_stages
         clone._vertex_degrees = dict(self._vertex_degrees)
         return clone
-
-
