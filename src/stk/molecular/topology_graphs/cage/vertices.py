@@ -236,13 +236,149 @@ class _NonLinearCageVertex(_CageVertex):
         #
         # Once the fgs and edges are ordered, zip and assign them.
 
+        fg_sorter = _FunctionalGroupSorter(building_block)
+        edge_sorter = _EdgeSorter(edges, fg_sorter.get_axis())
+        return {
+            fg_id: edge.get_id()
+            for fg_id, edge in zip(
+                fg_sorter.get_items(),
+                edge_sorter.get_items(),
+            )
+        }
+
+
+class _Sorter:
+    """
+    Sorts items according to their angle from a reference vector.
+
+    """
+
+    __slots__ = ['_items', '_reference', '_axis']
+
+    def __init__(self, items, reference, axis):
+        """
+        Initialize a :class:`._Sorter`.
+
+        Parameters
+        ----------
+        items : :class:`iterable` of :class:`object`
+            The items to be sorted.
+
+        reference : :class:`numpy.ndarray`
+            The reference from which the angle is calculated.
+
+        axis : :class:`numpy.ndarray`
+            A vector orthogonal to `reference`, used to determine
+            which direction is clockwise. Must be an immutable
+            array.
+
+        """
+
+        self._items = items
+        self._reference = reference
+        self._axis = axis
+
+    def _get_vector(self, item):
+        """
+        Get the vector according to which `item` should be sorted.
+
+        Parameters
+        ----------
+        item : :class:`object`
+            The item being sorted.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The vector of the `item`, which should be used to measure
+            its angle with respect to the *reference*.
+
+        """
+
+        raise NotImplementedError()
+
+    def _get_angle(self, item):
+        """
+        Get the angle of `vector` relative to `reference`.
+
+        Parameters
+        ----------
+        item : :class:`object`
+            The item being sorted.
+
+        Returns
+        -------
+        :class:`float`
+            The angle between `item` and the reference vector.
+
+        """
+
+        vector = self._get_vector(item)
+        theta = vector_angle(self._reference, vector)
+        projection = vector @ self._axis
+        if theta > 0 and projection < 0:
+            return 2*np.pi - theta
+        return theta
+
+    def get_items(self):
+        """
+        Yield the sorted items.
+
+        Yields
+        ------
+        :class:`object`
+            An item.
+
+        """
+
+        yield from sorted(self._items, key=self._get_angle)
+
+    def get_axis(self):
+        """
+        Get the axis used to determine which direction is clockwise.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The axis. The array is immutable.
+
+        """
+
+        return self._axis
+
+
+class _FunctionalGroupSorter(_Sorter):
+    """
+    Sorts functional groups according to their angle.
+
+    """
+
+    __slots__ = [
+        '_items',
+        '_reference',
+        '_axis',
+        '_placer_centroid',
+    ]
+
+    def __init__(self, building_block):
+        """
+        Initialize a :class:`._FunctionalGroupSorter` instance.
+
+        Parameters
+        ----------
+        building_block : :class:`.BuildingBlock`
+
+        """
+
         fg0_position = building_block.get_centroid(
             atom_ids=next(
                 building_block.get_functional_groups()
             ).get_placer_ids(),
         )
-        placer_centroid = building_block.get_centroid(
-            atom_ids=building_block.get_placer_ids(),
+        self._placer_centroid = placer_centroid = (
+            building_block.get_centroid(
+                atom_ids=building_block.get_placer_ids(),
+            )
         )
         fg0_direction = fg0_position - placer_centroid
         core_centroid = building_block.get_centroid(
@@ -255,61 +391,59 @@ class _NonLinearCageVertex(_CageVertex):
                 vector=building_block.get_plane_normal(),
             ),
         )
-
-        def get_angle(reference, vector):
-            """
-            Get the angle of `vector` relative to `reference`.
-
-            """
-
-            theta = vector_angle(reference, vector)
-
-            projection = vector @ axis
-            if theta > 0 and projection < 0:
-                return 2*np.pi - theta
-            return theta
-
-        def get_functional_group_angle(fg_id):
-            """
-            Get the angle of a functional group.
-
-            It is calculated relative to `fg0_direction`.
-
-            """
-
-            fg, = building_block.get_functional_groups(fg_id)
-            fg_position = building_block.get_centroid(
-                atom_ids=fg.get_placer_ids(),
-            )
-            fg_direction = fg_position - placer_centroid
-            return get_angle(fg0_direction, fg_direction)
-
-        functional_groups = sorted(
-            range(building_block.get_num_functional_groups()),
-            key=get_functional_group_angle,
+        axis.setflags(write=False)
+        super().__init__(
+            items=range(building_block.get_num_functional_groups()),
+            reference=fg0_direction,
+            axis=axis,
         )
 
-        aligner_edge = edges[self._aligner_edge]
-        edge_centroid = (
+    def _get_vector(self, item):
+        building_block = self._building_block
+        fg, = building_block.get_functional_groups(item)
+        fg_position = building_block.get_centroid(fg.get_placer_ids())
+        return fg_position - self._placer_centroid
+
+
+class _EdgeSorter(_Sorter):
+    """
+    Sorted edges according to their angle.
+
+    """
+
+    __slots__ = [
+        '_items',
+        '_reference',
+        '_axis',
+        '_edge_centroid',
+    ]
+
+    def __init__(self, edges, aligner_edge, axis):
+        """
+        Initialize an :class:`._EdgeSorter` instance.
+
+        Parameters
+        ----------
+        edges : :class:`iterable` of :class:`.Edge`
+            The edges to sort.
+
+        aligner_edge : :class:`.Edge`
+            The edge in edges, used to calculate the reference vector.
+
+        axis : :class:`numpy.ndarray`
+            Must be immutable. The axis used to determine the clockwise
+            direction.
+
+        """
+
+        self._edge_centroid = edge_centroid = (
             sum(edge.get_position() for edge in edges) / len(edges)
         )
-        aligner_edge_direction = (
-            aligner_edge.get_position() - edge_centroid
+        super().__init__(
+            items=edges,
+            axis=axis,
+            reference=aligner_edge.get_position() - edge_centroid,
         )
 
-        def get_edge_angle(edge):
-            """
-            Get the angle of `edge`.
-
-            It is calculated relative to `aligner_edge_direction`.
-
-            """
-
-            edge_direction = edge.get_position() - edge_centroid
-            return get_angle(aligner_edge_direction, edge_direction)
-
-        edges = sorted(edges, key=get_edge_angle)
-        return {
-            fg_id: edge.get_id()
-            for fg_id, edge in zip(functional_groups, edges)
-        }
+    def _get_vector(self, item):
+        return item.get_position() - self._edge_centroid
