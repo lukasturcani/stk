@@ -55,7 +55,7 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
-        Initialize a :class:`._CageVertex` in the middle of `vertices`.
+        Initialize a :class:`._CofVertex` in the middle of `vertices`.
 
         Parameters
         ----------
@@ -103,6 +103,39 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
+        Initialize a :class:`.CofVertex` at the center of `vertices`.
+
+        The `vertices` are shifted according to the lattice constants
+        and cell shifts.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the initialized vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            The vertices at whose center this one needs to be.
+
+        cell_shifts : :class:`tuple` of :class:`int`
+            The number of cells shifted in the x, y and z directions.
+
+        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+            The a, b and c lattice constants.
+
+        aligner_edge : :class:`int`, optional
+            The edge which is used to align the :class:`.BuildingBlock`
+            placed on the vertex. The first :class:`.FunctionalGroup`
+            is rotated such that it lies exactly on this
+            :class:`.Edge`. Must be between ``0`` and the number of
+            edges the vertex is connected to.
+
+        cell : :class:`tuple` of :class:`int`, optional
+            The cell of the lattice in which the vertex is found.
+
+        Returns
+        -------
+        :class:`.CofVertex`
+            The new vertex.
 
         """
 
