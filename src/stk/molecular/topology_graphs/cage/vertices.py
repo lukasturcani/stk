@@ -23,12 +23,31 @@ class _CageVertex(Vertex):
         use_neighbor_placement=True,
         aligner_edge=0,
     ):
+        """
+        Initialize a :class:`._CageVertex`.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the vertex.
+
+        position : :class:`tuple` of :class:`float`
+            The position of the vertex.
+
+        use_neighbor_placement : :class:`bool`, optional
+            If ``True``, the position of the vertex will be updated
+            based on the neighboring functional groups.
+
+        aligner_edge : :class:`int`, optional
+            The edge which is used to align the :class:`.BuildingBlock`
+            placed on the vertex. The first :class:`.FunctionalGroup`
+            is rotated such that it lies exactly on this
+            :class:`.Edge`. Must be between ``0`` and the number of
+            edges the vertex is connected to.
+
+        """
+
         self._use_neighbor_placement = use_neighbor_placement
-        # The edge which is used to align the :class:`.BuildingBlock`
-        # placed on the vertex. The first :class:`.FunctionalGroup`
-        # is rotated such that it lies exactly on this :class:`.Edge`.
-        # Must be between ``0`` and the number of edges the vertex is
-        # connected to.
         self._aligner_edge = aligner_edge
         super().__init__(id, position)
 
@@ -39,17 +58,67 @@ class _CageVertex(Vertex):
         return clone
 
     def _with_aligner_edge(self, aligner_edge):
+        """
+        Modify the instance.
+
+        """
+
         self._aligner_edge = aligner_edge
         return self
 
     def with_aligner_edge(self, aligner_edge):
+        """
+        Return a clone with a different `aligner_edge`.
+
+        Parameters
+        ----------
+        aligner_edge : :class:`int`
+            The aligner edge of the clone.
+
+        Returns
+        -------
+        :class:`._CageVertex`
+            The clone. Has the same type as the original instance.
+
+        """
+
         return self.clone()._with_aligner_edge(aligner_edge)
 
     def use_neighbor_placement(self):
+        """
+        ``True`` if the position should be updated based on neighbors.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if the position of the vertex should be updated
+            based on the positions of functional groups on neighboring
+            vertices.
+
+        """
+
         return self._use_neighbor_placement
 
     @classmethod
     def init_at_center(cls, id, vertices):
+        """
+        Initialize a :class:`._CageVertex` in the middle of `vertices`.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the initialized vertex.
+
+        vertices : :class:`tuple` of :class:`.Vertex`
+            The vertices at whose center this one needs to be.
+
+        Returns
+        -------
+        :class:`._CageVertex`
+            The new vertex.
+
+        """
+
         return cls(
             id=id,
             position=(
