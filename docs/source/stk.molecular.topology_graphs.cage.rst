@@ -18,6 +18,7 @@ Submodules
 .. toctree::
 
    stk.molecular.topology_graphs.cage.cage
+   stk.molecular.topology_graphs.cage.cage_construction_state
    stk.molecular.topology_graphs.cage.vertices
 
 Module contents
