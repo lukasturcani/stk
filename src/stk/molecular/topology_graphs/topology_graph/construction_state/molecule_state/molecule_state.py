@@ -11,6 +11,15 @@ class _MoleculeState:
 
     """
 
+    __slots__ = [
+        '_atoms',
+        '_atom_infos',
+        '_bonds',
+        '_bond_infos',
+        '_edge_functional_groups',
+        '_num_placements',
+    ]
+
     def __init__(self):
         """
         Initialize a :class:`._MoleculeState` instance.

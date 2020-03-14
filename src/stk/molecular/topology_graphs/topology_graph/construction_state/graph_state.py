@@ -3,12 +3,45 @@ from collections import defaultdict
 
 
 class _GraphState:
+    """
+    The topology graph of a molecule under construction.
+
+    """
+
+    __slots__ = [
+        '_vertex_building_blocks',
+        '_vertices',
+        '_edges',
+        '_lattice_constants',
+        '_vertex_edges',
+    ]
+
     def __init__(
         self,
         building_block_vertices,
         edges,
         lattice_constants,
     ):
+        """
+        Initialize a :class:`._GraphState` instance.
+
+        Parameters
+        ----------
+        building_block_vertices : :class:`dict`
+            Maps each :class:`.BuildingBlock` to be placed, to a
+            :class:`tuple` of :class:`.Vertex` instances, on which
+            it should be placed.
+
+        edges : :class:`tuple` of :class:`.Edge`
+            The edges which make up the topology graph.
+
+        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+            A :class:`numpy.ndarray` for each lattice constant.
+            Can be an empty :class:`tuple` if the topology graph is
+            not periodic.
+
+        """
+
         self._vertex_building_blocks = {
             vertex.get_id(): building_block
             for building_block, vertices

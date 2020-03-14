@@ -20,12 +20,15 @@ class ConstructionState:
         Parameters
         ----------
         building_block_vertices : :class:`dict`
+            Maps each :class:`.BuildingBlock` to be placed, to a
+            :class:`tuple` of :class:`.Vertex` instances, on which
+            it should be placed.
 
         edges : :class:`tuple` of :class:`.Edge`
             The edges of the topology graph.
 
         lattice_constants : :class:`tuple`, optional
-            A :class:`numpy.ndarray` for each lattice constants.
+            A :class:`numpy.ndarray` for each lattice constant.
             Can be an empty :class:`tuple` if the topology graph is
             not periodic.
 
