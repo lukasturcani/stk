@@ -1,3 +1,9 @@
+"""
+Generic Reaction Factory
+========================
+
+"""
+
 from .reaction_factory import ReactionFactory
 from ..reactions import (
     OneOneReaction,
@@ -96,6 +102,11 @@ _reactions = {
 class GenericReactionFactory(ReactionFactory):
     """
     Create reactions for :class:`.GenericFunctionalGroup` instances.
+
+    This reaction factory assumes that the functional groups, which
+    belong to the :class:`.EdgeGroup` passed to it, are
+    :class:`.GenericFunctionalGroup` instances. It returns a
+    :class:`.Reaction` suitable for two such instances.
 
     """
 
