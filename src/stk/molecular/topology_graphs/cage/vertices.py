@@ -6,7 +6,7 @@ from stk.utilities import (
     get_plane_normal,
     normalize_vector,
 )
-from .utilities import _FunctionalGroupSorter, _EdgeSorter
+from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ...topology_graph import Vertex
 
 
