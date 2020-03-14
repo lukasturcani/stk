@@ -1,3 +1,9 @@
+"""
+Vertex
+======
+
+"""
+
 import numpy as np
 
 
