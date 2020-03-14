@@ -1,1 +1,1 @@
-from .vertices import _LinearCageVertex, NonLinearCageVertex
+from .vertices import _LinearCageVertex, _NonLinearCageVertex
