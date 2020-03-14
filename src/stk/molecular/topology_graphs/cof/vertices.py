@@ -218,11 +218,11 @@ class _NonLinearCofVertex(_CofVertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        normal = building_block.get_plane_normal(
-            atom_ids=building_block.get_placer_ids(),
-        )
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
+        )
+        normal = building_block.get_plane_normal(
+            atom_ids=building_block.get_placer_ids(),
         )
         normal = get_acute_vector(
             reference=core_centroid - self._position,
@@ -233,18 +233,15 @@ class _NonLinearCofVertex(_CofVertex):
             target=[0, 0, 1],
             origin=self._position,
         )
-        fg = next(building_block.get_functional_groups(0))
+        fg, = building_block.get_functional_groups(0)
         fg_centroid = building_block.get_centroid(fg.get_placer_ids())
-        edge_coord = edges[self._aligner_edge].get_position()
-        building_block = (
-            building_block.with_rotation_to_minimize_angle(
-                start=fg_centroid - self._position,
-                target=edge_coord - self._position,
-                axis=np.array([0, 0, 1], dtype=np.float64),
-                origin=self._position,
-            )
-        )
-        return building_block.get_position_matrix()
+        edge_position = edges[self._aligner_edge].get_position()
+        return building_block.with_rotation_to_minimize_angle(
+            start=fg_centroid - self._position,
+            target=edge_position - self._position,
+            axis=np.array([0, 0, 1], dtype=np.float64),
+            origin=self._position,
+        ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
         # Sort to ensure that for two vertices, which are periodically
