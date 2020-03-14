@@ -410,32 +410,55 @@ class Cof(TopologyGraph):
 
     @staticmethod
     def _get_building_block_vertices(building_blocks, vertices, edges):
-        bb_by_degree = {}
-        for bb in building_blocks:
-            if bb.get_num_functional_groups() in bb_by_degree:
+        """
+        Map building blocks to the vertices of the graph.
+
+        Parameters
+        ----------
+        building_blocks : :class:`iterable` of :class:`.BuildingBlock`
+            The building blocks which need to be mapped to `vertices`.
+
+        vertices : :class:`iterable` of :class:`.Vertex`
+            The vertices which need to have a building block map to
+            them.
+
+        edges : :class:`iterable`of :class:`.Edge`
+            The edges of the graph.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps each building block in `building_blocks` to a
+            :class:`list` of the :class:`.Vertex` instances it should
+            be placed on
+
+        """
+
+        building_blocks_by_degree = {}
+        for building_block in building_blocks:
+            num_fgs = building_block.get_num_functional_groups()
+            if num_fgs in building_blocks_by_degree:
                 raise ValueError(
                     'If there are multiple building blocks with the '
                     'same number of functional groups, '
                     'building_block_vertices must be set explicitly.'
                 )
-            bb_by_degree[bb.get_num_functional_groups()] = bb
+            building_blocks_by_degree[num_fgs] = building_block
 
         vertex_degrees = Counter(
             vertex_id
             for edge in edges
-            for vertex_id in (
-                edge.get_vertex1_id(),
-                edge.get_vertex2_id(),
-            )
+            for vertex_id in edge.get_vertex_ids()
         )
 
         building_block_vertices = {}
         for vertex in vertices:
-            bb = bb_by_degree[vertex_degrees[vertex.get_id()]]
-            building_block_vertices[bb] = (
-                building_block_vertices.get(bb, [])
+            vertex_degree = vertex_degrees[vertex.get_id()]
+            building_block = building_blocks_by_degree[vertex_degree]
+            building_block_vertices[building_block] = (
+                building_block_vertices.get(building_block, [])
             )
-            building_block_vertices[bb].append(vertex)
+            building_block_vertices[building_block].append(vertex)
         return building_block_vertices
 
     def _get_lattice_constants(self):

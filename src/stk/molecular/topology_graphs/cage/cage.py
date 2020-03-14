@@ -150,10 +150,7 @@ class Cage(TopologyGraph):
         cls._vertex_degrees = Counter(
             vertex_id
             for edge in cls._edge_prototypes
-            for vertex_id in (
-                edge.get_vertex1_id(),
-                edge.get_vertex2_id(),
-            )
+            for vertex_id in edge.get_vertex_ids()
         )
         cls._vertices_of_degree = defaultdict(set)
         for vertex_id, degree in cls._vertex_degrees.items():
