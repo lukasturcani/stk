@@ -233,6 +233,13 @@ class Cage(TopologyGraph):
             else {}
         )
 
+        stages = tuple(
+            partial(self._has_degree, degree)
+            for degree
+            in sorted(self._vertices_of_degree, reverse=True)
+        )
+        self._num_stages = len(stages)
+
         def with_aligner(vertex):
             return vertex.with_aligner_edge(
                 aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
@@ -243,13 +250,9 @@ class Cage(TopologyGraph):
                 building_block: tuple(map(with_aligner, vertices))
                 for building_block, vertices in building_blocks.items()
             },
+            construction_stages=stages,
             edges=self._edge_prototypes,
             reaction_factory=reaction_factory,
-            construction_stages=tuple(
-                partial(self._has_degree, degree)
-                for degree
-                in sorted(self._vertices_of_degree, reverse=True)
-            ),
             num_processes=num_processes,
             edge_groups=None,
         )
@@ -315,23 +318,25 @@ class Cage(TopologyGraph):
 
         """
 
-        bb_by_degree = {}
-        for bb in building_blocks:
-            if bb.get_num_functional_groups() in bb_by_degree:
+        building_blocks_by_degree = {}
+        for building_block in building_blocks:
+            num_fgs = building_block.get_num_functional_groups()
+            if num_fgs in building_blocks_by_degree:
                 raise ValueError(
                     'If there are multiple building blocks with the '
                     'same number of functional groups, '
                     'building_block_vertices must be set explicitly.'
                 )
-            bb_by_degree[bb.get_num_functional_groups()] = bb
+            building_blocks_by_degree[num_fgs] = building_block
 
         building_block_vertices = {}
         for vertex in self._vertex_prototypes:
-            bb = bb_by_degree[self._vertex_degrees[vertex.get_id()]]
-            building_block_vertices[bb] = (
-                building_block_vertices.get(bb, [])
+            vertex_degree = self._vertex_degrees[vertex.get_id()]
+            building_block = building_blocks_by_degree[vertex_degree]
+            building_block_vertices[building_block] = (
+                building_block_vertices.get(building_block, [])
             )
-            building_block_vertices[bb].append(vertex)
+            building_block_vertices[building_block].append(vertex)
         return building_block_vertices
 
     def _get_scale(self, building_block_vertices):
@@ -344,7 +349,7 @@ class Cage(TopologyGraph):
         return _CageConstructionState(
             building_block_vertices=self._building_block_vertices,
             edges=self._edges,
-            num_placement_stages=len(self._implementation._stages),
+            num_placement_stages=self._num_stages,
             vertex_degrees=self._vertex_degrees,
             lattice_constants=tuple(
                 np.array(constant, dtype=np.float64)*self._scale
