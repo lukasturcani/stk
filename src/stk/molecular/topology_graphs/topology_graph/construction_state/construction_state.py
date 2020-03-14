@@ -215,7 +215,7 @@ class ConstructionState:
 
         Parameters
         ----------
-        vertex_id : class:`int`
+        vertex_id : :class:`int`
             The id of a vertex.
 
         Returns

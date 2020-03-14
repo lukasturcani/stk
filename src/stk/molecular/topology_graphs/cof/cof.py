@@ -35,7 +35,7 @@ class Cof(TopologyGraph):
     --------
     *Subclass Implementation*
 
-    The source code of the subclasses, listed in :mod:`.cof.cof`,
+    The source code of the subclasses, listed in :mod:`~.cof.cof`,
     can serve as good examples.
 
     *Basic Construction*
@@ -154,9 +154,9 @@ class Cof(TopologyGraph):
             The size of the lattice in the x, y and z directions.
 
         periodic : :class:`bool`, optional
-            If the constructed molecule is periodic, if ``True``
-            periodic bonds will be made across the edges of the
-            lattice.
+            Toggle the construction of a periodic molecule. If
+            ``True``, periodic bonds will be made across the edges of
+            the lattice.
 
         vertex_alignments : :class:`dict`, optional
             A mapping from the id of a :class:`.Vertex`
