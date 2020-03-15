@@ -1,3 +1,11 @@
+"""
+Macrocycle
+==========
+
+#. :class:`.Macrocycle`
+
+"""
+
 import numpy as np
 
 from .vertices import _CycleVertex

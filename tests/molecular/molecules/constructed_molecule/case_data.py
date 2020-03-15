@@ -13,4 +13,3 @@ class CaseData:
         )
         self.num_new_atoms = num_new_atoms
         self.num_new_bonds = num_new_bonds
-        self.topology_graph = topology_graph

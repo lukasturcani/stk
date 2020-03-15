@@ -11,10 +11,6 @@ def _test_clone(constructed_molecule):
 
 
 def is_clone(molecule1, molecule2):
-    assert (
-        molecule1.get_topology_graph()
-        is molecule2.get_topology_graph()
-    )
     for atom_info1, atom_info2 in it.zip_longest(
         molecule1.get_atom_infos(),
         molecule2.get_atom_infos(),
