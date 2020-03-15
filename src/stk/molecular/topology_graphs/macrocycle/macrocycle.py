@@ -19,16 +19,21 @@ class Macrocycle(TopologyGraph):
 
     Examples
     --------
+    *Construction*
+
     .. code-block:: python
 
         import stk
 
         macrocycle = stk.ConstructedMolecule(
-            building_blocks=[
-                stk.BuildingBlock('NCCN', ['amine']),
-                stk.BuildingBlock('O=CCC=O', ['aldehyde'])
-            ],
-            topology_graph=stk.macrocycle.Macrocycle('AB', 5)
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+            ),
         )
 
     The repeating unit can also be specified through the indices of
