@@ -5,6 +5,7 @@ Constructed Molecule
 """
 
 import logging
+import numpy as np
 
 from .molecule import Molecule
 
@@ -108,7 +109,7 @@ class ConstructedMolecule(Molecule):
 
         Yields
         ------
-        :class:`.Molecule`
+        :class:`.BuildingBlock`
             A building block of the constructed molecule.
 
         """
@@ -121,7 +122,7 @@ class ConstructedMolecule(Molecule):
 
         Parameters
         ----------
-        building_block : :class:`.Molecule`
+        building_block : :class:`.BuildingBlock`
             The building block whose frequency in the constructed
             molecule is desired.
 
@@ -136,6 +137,68 @@ class ConstructedMolecule(Molecule):
         return (
             self._topology_graph.get_num_building_block(building_block)
         )
+
+    def with_building_blocks(self, building_block_map):
+        """
+        Return a clone a clone made of different building blocks.
+
+        Parameters
+        ----------
+        building_block_map : :class:`dict`
+            Maps a building block in the current constructed molecule
+            to the building block which should replace it in the clone.
+            If a building block should be not replaced in the clone, it
+            can be omitted from the map.
+
+        Returns
+        -------
+        :class:`.ConstructedMolecule`
+            The clone. Has the same type as the original constructed
+            molecule.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            import stk
+
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+
+            linear = stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(bb1, bb2),
+                    repeating_unit='A',
+                    num_repeating_units=15,
+                ),
+            )
+
+            bb3 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
+            # All bb1 instances are replaced by bb3, but bb2 remains
+            # in place.
+            clone = linear.with_building_blocks({
+                bb1: bb3,
+            })
+
+        """
+
+        return self.clone()._with_building_blocks()
+
+    def _with_building_blocks(self, building_block_map):
+        topology_graph = self._topology_graph.with_building_blocks(
+            building_block_map=building_block_map,
+        )
+        self._topology_graph = topology_graph
+
+        construction_result = topology_graph.construct()
+        self._atoms = construction_result.get_atoms()
+        self._bonds = construction_result.get_bonds()
+        self._position_matrix = np.array(
+            construction_result.get_position_matrix()
+        )
+        self._atom_infos = construction_result.get_atom_infos()
+        self._bond_infos = construction_result.get_bond_infos()
+        return self
 
     def get_atom_infos(self, atom_ids=None):
         """

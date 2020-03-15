@@ -302,7 +302,7 @@ class TopologyGraph:
 
         Yields
         ------
-        :class:`.Molecule`
+        :class:`.BuildingBlock`
             A building block of the topology graph.
 
         """
@@ -327,7 +327,7 @@ class TopologyGraph:
 
         Parameters
         ----------
-        building_block : :class:`.Molecule`
+        building_block : :class:`.BuildingBlock`
             The building block whose frequency in the topology graph
             is desired.
 
