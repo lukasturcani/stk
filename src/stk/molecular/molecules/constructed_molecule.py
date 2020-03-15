@@ -140,7 +140,7 @@ class ConstructedMolecule(Molecule):
 
     def with_building_blocks(self, building_block_map):
         """
-        Return a clone a clone made of different building blocks.
+        Return a made of different building blocks.
 
         Parameters
         ----------
@@ -182,7 +182,7 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        return self.clone()._with_building_blocks()
+        return self.clone()._with_building_blocks(building_block_map)
 
     def _with_building_blocks(self, building_block_map):
         """
