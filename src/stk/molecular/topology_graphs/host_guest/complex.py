@@ -20,6 +20,11 @@ class Complex(TopologyGraph):
 
     Examples
     --------
+    *Construction*
+
+    You can use :class:`.ConstructedMolecule` instances as the host,
+    but you should turn them into a :class:`.BuildingBlock` first
+
     .. code-block:: python
 
         import stk
@@ -34,25 +39,27 @@ class Complex(TopologyGraph):
             ),
             topology_graph=stk.cage.FourPlusSix()
         )
-        host = stk.BuildingBlock.init_from_molecule(host),
-        guest = stk.BuildingBlock('[Br][Br]')
         complex1 = stk.ConstructedMolecule(
-            building_blocks=(host, guest),
+            host=stk.BuildingBlock.init_from_molecule(host),
+            guest=stk.BuildingBlock('[Br][Br]'),
             topology_graph=stk.host_guest.Complex(),
         )
 
-    Change the position and orientation of the guest
+    You can change the position and orientation of the guest, as well
+    as its displacement
 
     .. code-block:: python
 
         complex2 = stk.ConstructedMolecule(
-            building_blocks=(host, guest),
+            host=stk.BuildingBlock.init_from_molecule(host),
+            guest=stk.BuildingBlock('[Br][Br]'),
             topology_graph=stk.host_guest.Complex(
                 # Apply a rotation onto the guest molecule such that
                 # the vector returned by get_direction() has the same
                 # direction as [1, 1, 1].
                 guest_start=guest.get_direction(),
                 guest_target=[1, 1, 1],
+                # Change the displacement of the guest.
                 displacement=[5.3, 2.1, 7.1],
             ),
         )
@@ -73,18 +80,22 @@ class Complex(TopologyGraph):
 
         Parameters
         ----------
+        host : :class:`.BuildingBlock`
+            The host molecule.
+
+        guest : :class:`.BuildingBlock`
+            The guest molecule.
+
         guest_start : :class:`tuple` of :class:`float`, optional
             A direction vector which gets aligned with `guest_target`.
 
         guest_target : :class:`tuple` of :class:`float`, optional
             A direction vector which determines the rotation applied to
-            the guest building block. A rotation such that
-            `guest_start` is transformed into `guest_target` is applied
-            to the guest building block.
+            the `guest`. A rotation such that `guest_start` is
+            transformed into `guest_target` is applied.
 
         displacement : :class:`tuple` of :class:`float`, optional
-            The translational offset of the guest from the center of
-            the host cavity.
+            The translational offset of the guest.
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
@@ -132,12 +143,6 @@ class Complex(TopologyGraph):
             num_processes=num_processes,
             edge_groups=(),
         )
-
-    def get_building_block_vertices(self, building_blocks):
-        return {
-            bb: [vertex]
-            for bb, vertex in zip(building_blocks, self._vertices)
-        }
 
     def _run_reactions(self, state):
         return state
