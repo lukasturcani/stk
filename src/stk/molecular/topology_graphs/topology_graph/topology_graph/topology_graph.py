@@ -41,19 +41,19 @@ class TopologyGraph:
     implementation details of these default implementations.
 
     Many classes, such as :class:`.Vertex`, :class:`.Edge`,
-    :class:`.EdgeGroup`, :class:`.ConstructionState`,
-    and even :class:`.BuildingBlock`, exist as implementation details
-    of this default :class:`.TopologyGraph` implementation. You could
-    ignore all of them, and define a new :meth:`.construct` method from
-    scratch. In fact, your topology graph does not have to be
-    represented as a graph at all. However, using the default
-    implementation of :class:`.TopologyGraph` makes it significantly
-    easier to implement a construction process. When using the
-    default implementation of :class:`.TopologyGraph`, you mostly just
-    need to implement a :class:`.Vertex` subclass, which is much easier
-    than figuring out the whole construction process from scratch. In
-    addition, you get benefits like parallel construction for free, as
-    it is included in the default implementation.
+    :class:`.EdgeGroup` and :class:`.ConstructionState`, exist as
+    implementation details of this default :class:`.TopologyGraph`
+    implementation. You could ignore all of them, and define a new
+    :meth:`.construct` method from scratch. In fact, your topology
+    graph does not have to be represented as a graph at all. However,
+    using the default implementation of :class:`.TopologyGraph` makes
+    it significantly easier to implement a construction process. When
+    using the default implementation of :class:`.TopologyGraph`, you
+    mostly just need to implement a :class:`.Vertex` subclass, which
+    is much easier than figuring out the whole construction process
+    from scratch. In addition, you get benefits like parallel
+    construction for free, as it is included in the default
+    implementation.
 
     Typically, adding a new topology graph will involve implementing
     any pure virtual methods of :class:`.TopologyGraph`, in a new
