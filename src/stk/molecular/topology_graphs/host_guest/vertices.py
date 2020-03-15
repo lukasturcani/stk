@@ -26,6 +26,27 @@ class _GuestVertex(Vertex):
     """
 
     def __init__(self, id, position, start, target):
+        """
+        Initialize a :class:`._GuestVertex` instance.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the vertex.
+
+        position : :class:`tuple` of :class:`float`
+            The position of the vertex.
+
+        start : :class:`tuple` of :class:`float`
+            A vector which defines the start of the rotation applied
+            to the molecules placed by the vertex.
+
+        target : :class:`tuple` of :class:`float`
+            A vector which defines the end of the rotation applied
+            to the molecules placed by the vertex.
+
+        """
+
         self._start = np.array(start, dtype=np.float64)
         self._target = np.array(target, dtype=np.float64)
         super().__init__(id, position)
