@@ -73,39 +73,24 @@ class ConstructedMolecule(Molecule):
             bonds=construction_result.get_bonds(),
             position_matrix=construction_result.get_position_matrix(),
         )
-        self._topology_graph = topology_graph
         self._atom_infos = construction_result.get_atom_infos()
         self._bond_infos = construction_result.get_bond_infos()
 
     def clone(self):
         clone = super().clone()
-        clone._topology_graph = self._topology_graph
         clone._atom_infos = self._atom_infos
         clone._bond_infos = self._bond_infos
         return clone
-
-    def get_topology_graph(self):
-        """
-        Get the :class:`.TopologyGraph` used for construction.
-
-        Returns
-        -------
-        :class:`.TopologyGraph`
-            The topology graph used for construction.
-
-        """
-
-        return self._topology_graph
 
     def get_building_blocks(self):
         """
         Yield the building blocks of the constructed molecule.
 
         Building blocks are yielded in an order based on their
-        position in the constructed molecule. For two equivalent
-        topology graphs, but with different building blocks,
-        equivalently positioned building blocks will be yielded at the
-        same time.
+        position in the constructed molecule. For two topologically
+        equivalent constructed molecules, but with different building
+        blocks, equivalently positioned building blocks will be
+        yielded at the same time.
 
         Yields
         ------
