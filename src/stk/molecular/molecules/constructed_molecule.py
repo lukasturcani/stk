@@ -185,6 +185,11 @@ class ConstructedMolecule(Molecule):
         return self.clone()._with_building_blocks()
 
     def _with_building_blocks(self, building_block_map):
+        """
+        Modify the instance.
+
+        """
+
         topology_graph = self._topology_graph.with_building_blocks(
             building_block_map=building_block_map,
         )
