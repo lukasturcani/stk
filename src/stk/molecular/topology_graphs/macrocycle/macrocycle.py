@@ -45,9 +45,9 @@ class Macrocycle(TopologyGraph):
 
     .. code-block:: python
 
-        bb1 = stk.BuildingBlock('BrCCBr', ['bromine'])
-        bb2 = stk.BuildingBlock('BrCNCBr', ['bromine'])
-        bb3 = stk.BuildingBlock('BrCNNCBr', ['bromine'])
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
+        bb3 = stk.BuildingBlock('BrCNNCBr', [stk.BromoFactory()])
 
         # c1 and c2 are different ways to write the same thing.
         c1 = stk.ConstructedMolecule(

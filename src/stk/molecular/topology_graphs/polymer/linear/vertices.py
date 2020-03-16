@@ -123,21 +123,19 @@ class _TerminalVertex(_LinearVertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        fg = next(building_block.get_functional_groups())
+        fg, = building_block.get_functional_groups()
         fg_centroid = building_block.get_centroid(
             atom_ids=fg.get_placer_ids(),
         )
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
-        centroid_displacement = fg_centroid - core_centroid
-        building_block = building_block.with_rotation_between_vectors(
-            start=centroid_displacement,
+        return building_block.with_rotation_between_vectors(
+            start=fg_centroid - core_centroid,
             # _cap_direction is defined by a subclass.
             target=[self._cap_direction, 0, 0],
             origin=self._position,
-        )
-        return building_block.get_position_matrix()
+        ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
         if building_block.get_num_functional_groups() == 2:
