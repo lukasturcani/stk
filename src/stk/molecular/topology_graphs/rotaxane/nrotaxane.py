@@ -38,7 +38,7 @@ class NRotaxane(TopologyGraph):
                 ),
                 repeating_units='A',
                 num_repeating_units=5,
-            )
+            ),
         )
         axle = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
@@ -77,7 +77,7 @@ class NRotaxane(TopologyGraph):
                 ),
                 repeating_unit='ACB',
                 num_repeating_units=3,
-            )
+            ),
         )
         r2 = stk.ConstructedMolecule(
             topology_graph=stk.rotaxane.NRotaxane(
@@ -87,7 +87,7 @@ class NRotaxane(TopologyGraph):
                     stk.BuildingBlock.init_from_molecule(cycle2),
                     stk.BuildingBlock.init_from_molecule(cycle3),
                 ),
-                repeating_unit=(1, 3, 2),
+                repeating_unit=(0, 2, 1),
                 num_repeating_units=3,
             ),
         )
@@ -97,77 +97,95 @@ class NRotaxane(TopologyGraph):
 
     .. code-block:: python
 
-        bb4 = stk.BuildingBlock('BrCNCCBr', [stk.BromoFactory()])
-
-        p3 = stk.ConstructedMolecule(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(bb2, bb4),
+        r3 = stk.ConstructedMolecule(
+            topology_graph=stk.rotaxane.NRotaxane(
+                axle=stk.BuildingBlock.init_from_molecule(axle),
+                cycles=(
+                    stk.BuildingBlock.init_from_molecule(cycle),
+                    stk.BuildingBlock.init_from_molecule(cycle2),
+                ),
                 repeating_unit='AB',
-                num_repeating_units=5,
-                orientations=(1, 0.5),
+                num_repeating_units=3,
+                orientations=(1., 0.5),
             ),
         )
 
-    In the above example, ``bb2`` is guaranteed to be flipped,
-    ``bb4`` has a 50% chance of being flipped, each time it is placed
-    on a node.
+    In the above example, ``cycle`` is guaranteed to be flipped,
+    ``cycle2`` has a 50% chance of being flipped, each time it is
+    placed on a node.
 
     Note that whether a building block will be flipped or not
-    is decided during the initialization of :class:`.Linear`
+    is decided during the initialization of :class:`.NRotaxane`
 
     .. code-block:: python
 
-        # chain will always construct the same polymer.
-        chain = stk.polymer.Linear(
-            building_blocks=(bb2, bb4),
+        # rotaxane1 will always construct the same [n]rotaxane.
+        rotaxane1 = stk.rotaxane.NRotaxane(
+            axle=stk.BuildingBlock.init_from_molecule(axle),
+            cycles=(
+                stk.BuildingBlock.init_from_molecule(cycle),
+                stk.BuildingBlock.init_from_molecule(cycle2),
+            ),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
         )
-        # p4 and p5 are guaranteed to be the same as they used the same
+        # r4 and r5 are guaranteed to be the same as they used the same
         # topology graph.
-        p4 = stk.ConstructedMolecule(chain)
-        p5 = stk.ConstructedMolecule(chain)
+        r4 = stk.ConstructedMolecule(rotaxane1)
+        r5 = stk.ConstructedMolecule(rotaxane1)
 
-        # chain2 may lead to a different polymer than chain, despite
+        # rotaxane2 may lead to a different [n]rotaxane, despite
         # being initialized with the same parameters.
-        chain2 = stk.polymer.Linear(
-            building_blocks=(bb2, bb4),
+        rotaxane2 = stk.rotaxane.NRotaxane(
+            axle=stk.BuildingBlock.init_from_molecule(axle),
+            cycles=(
+                stk.BuildingBlock.init_from_molecule(cycle),
+                stk.BuildingBlock.init_from_molecule(cycle2),
+            ),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45)
         )
 
-        # p6 and p7 are guaranteed to be the same because they used the
-        # the same topology graph. However, they may be different to
-        # p4 and p5.
-        p6 = stk.ConstructedMolecule(chain2)
-        p7 = stk.ConstructedMolecule(chain2)
+        # r6 and r7 are guaranteed to be the same because they used the
+        # same topology graph. However, they may be different to r4 and
+        # r5.
+        r6 = stk.ConstructedMolecule(rotaxane2)
+        r7 = stk.ConstructedMolecule(rotaxane2)
 
     The `random_seed` parameter can be used to get reproducible results
 
     .. code-block:: python
 
-        # p8 and p9 are guaranteed to be the same, because chain3 and
+        # r8 and r9 are guaranteed to be the same, because chain3 and
         # chain4 used the same random seed.
 
-        chain3 = stk.polymer.Linear(
-            building_blocks=(bb2, bb4),
+        rotaxane3 = stk.rotaxane.NRotaxane(
+            axle=stk.BuildingBlock.init_from_molecule(axle),
+            cycles=(
+                stk.BuildingBlock.init_from_molecule(cycle),
+                stk.BuildingBlock.init_from_molecule(cycle2),
+            ),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        p8 = stk.ConstructedMolecule(chain3)
+        p8 = stk.ConstructedMolecule(rotaxane3)
 
-        chain4 = stk.polymer.Linear(
-            building_blocks=(bb2, bb4),
+        rotaxane4 = stk.rotaxane.NRotaxane(
+            axle=stk.BuildingBlock.init_from_molecule(axle),
+            cycles=(
+                stk.BuildingBlock.init_from_molecule(cycle),
+                stk.BuildingBlock.init_from_molecule(cycle2),
+            ),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        p9 = stk.ConstructedMolecule(chain4)
+        p9 = stk.ConstructedMolecule(rotaxane4)
 
     """
 

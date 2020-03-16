@@ -111,7 +111,7 @@ class Macrocycle(TopologyGraph):
             orientations=(0.65, 0.45)
         )
 
-        # c6 and c7 are guaranteed to be the same because they used the
+        # c6 and c7 are guaranteed to be the same because they used
         # the same topology graph. However, they may be different to
         # c4 and c5.
         c6 = stk.ConstructedMolecule(cycle2)

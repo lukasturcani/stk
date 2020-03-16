@@ -116,7 +116,7 @@ class Linear(TopologyGraph):
             orientations=(0.65, 0.45)
         )
 
-        # p6 and p7 are guaranteed to be the same because they used the
+        # p6 and p7 are guaranteed to be the same because they used
         # the same topology graph. However, they may be different to
         # p4 and p5.
         p6 = stk.ConstructedMolecule(chain2)
