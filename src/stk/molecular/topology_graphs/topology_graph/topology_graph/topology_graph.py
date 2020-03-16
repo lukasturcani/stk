@@ -4,7 +4,7 @@ Topology Graph
 
 #. :mod:`.polymer`
 #. :mod:`~.macrocycle.macrocycle`
-#. :mod:`.host_guest`
+#. :mod:`.host_guest.complex`
 #. :mod:`~.cof.cof`
 #. :mod:`~.cage.cage`
 #. :mod:`.rotaxane`
