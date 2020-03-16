@@ -38,7 +38,7 @@ class Linear(TopologyGraph):
     However, building blocks with a single functional group can
     also be provided as capping units
 
-    .. code-block: python
+    .. code-block:: python
 
         bb3 = stk.BuildingBlock('CCN', [stk.PrimaryAminoFactory()])
         polymer = stk.ConstructedMolecule(
@@ -64,7 +64,7 @@ class Linear(TopologyGraph):
         )
         p2 = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
-                building_blocks=[bb1, bb2, bb3],
+                building_blocks=(bb1, bb2, bb3),
                 repeating_unit=(0, 2, 1),
                 num_repeating_units=1,
             ),
