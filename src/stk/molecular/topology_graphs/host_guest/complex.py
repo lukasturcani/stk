@@ -26,19 +26,21 @@ class Complex(TopologyGraph):
         import stk
 
         host = stk.ConstructedMolecule(
-            building_blocks=(
-                stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
-                stk.BuildingBlock(
-                    smiles='O=CC(C=O)C=O',
-                    functional_groups=[stk.AldehydeFactory()],
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock(
+                        smiles='BrCC(Br)CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
                 ),
             ),
-            topology_graph=stk.cage.FourPlusSix()
         )
         complex1 = stk.ConstructedMolecule(
-            host=stk.BuildingBlock.init_from_molecule(host),
-            guest=stk.BuildingBlock('[Br][Br]'),
-            topology_graph=stk.host_guest.Complex(),
+            topology_graph=stk.host_guest.Complex(
+                host=stk.BuildingBlock.init_from_molecule(host),
+                guest=stk.BuildingBlock('[Br][Br]'),
+            ),
         )
 
     You can change the position and orientation of the guest, as well
@@ -47,9 +49,9 @@ class Complex(TopologyGraph):
     .. code-block:: python
 
         complex2 = stk.ConstructedMolecule(
-            host=stk.BuildingBlock.init_from_molecule(host),
-            guest=stk.BuildingBlock('[Br][Br]'),
             topology_graph=stk.host_guest.Complex(
+                host=stk.BuildingBlock.init_from_molecule(host),
+                guest=stk.BuildingBlock('[Br][Br]'),
                 # Apply a rotation onto the guest molecule such that
                 # the vector returned by get_direction() has the same
                 # direction as [1, 1, 1].
