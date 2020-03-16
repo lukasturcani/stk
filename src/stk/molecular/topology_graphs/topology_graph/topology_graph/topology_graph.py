@@ -2,11 +2,11 @@
 Topology Graph
 ==============
 
-#. :mod:`.polymer`
-#. :mod:`~.macrocycle.macrocycle`
-#. :mod:`.host_guest.complex`
-#. :mod:`~.cof.cof`
 #. :mod:`~.cage.cage`
+#. :mod:`~.cof.cof`
+#. :mod:`.host_guest.complex`
+#. :mod:`~.macrocycle.macrocycle`
+#. :mod:`.polymer`
 #. :mod:`.rotaxane`
 
 """
