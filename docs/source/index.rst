@@ -67,8 +67,6 @@ Introduction
 
 GitHub: https://www.github.com/lukasturcani/stk
 
-Slack: https://t.co/LCPzWhvsVO
-
 
 Installation
 ------------
