@@ -21,10 +21,37 @@ class _CycleVertex(Vertex):
     """
 
     def __init__(self, id, position, flip):
+        """
+        Initialize a :class:`._CycleVertex` instance.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the vertex.
+
+        position : :class:`tuple` of :class:`float`
+            The position of the vertex.
+
+        flip : :class:`bool`
+            If ``True``, the orientation of building blocks placed by
+            the vertex will be flipped.
+
+        """
+
         self._flip = flip
         super().__init__(id, position)
 
     def get_flip(self):
+        """
+        Return ``True`` if the vertex flips building blocks it places.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if the vertex flips building blocks it places.
+
+        """
+
         return self._flip
 
     def clone(self):

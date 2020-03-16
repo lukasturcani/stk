@@ -202,7 +202,8 @@ class Macrocycle(TopologyGraph):
         Raises
         ------
         :class:`ValueError`
-            If the number of `orientations` provided is incorrect.
+            If the length of `orientations` is not equal in length to
+            `repeating_unit` or to the total number of vertices.
 
         """
 

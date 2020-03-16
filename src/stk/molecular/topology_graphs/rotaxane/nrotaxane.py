@@ -211,13 +211,13 @@ class NRotaxane(TopologyGraph):
             The cycles threaded onto the `axle`.
 
         repeating_unit : :class:`str` or :class:`tuple` of :class:`int`
-            A string specifying the repeating unit of the macrocycles.
-            For example, ``'AB'`` or ``'ABB'``. The first macrocycle
-            passed to `building_blocks` is ``'A'`` and so on.
+            A string specifying the repeating unit of the `cycles`.
+            For example, ``'AB'`` or ``'ABB'``. The first cycle in
+            `cycles` is ``'A'`` and so on.
 
             The repeating unit can also be specified by the indices of
-            `building_blocks`, for example ``'ABB'`` can be
-            written as ``(1, 2, 2)``.
+            `cycles`, for example ``'ABB'`` can be
+            written as ``(0, 1, 1)``.
 
         num_repeating_units : :class:`int`
             The number of repeating units threaded along the axle.
@@ -226,13 +226,13 @@ class NRotaxane(TopologyGraph):
             For each character in the repeating unit, a value
             between ``0`` and ``1`` (both inclusive) must be given in
             a :class:`tuple`. It indicates the probability that each
-            macrocycle will have its orientation along the axle
-            flipped. If ``0`` then the macrocycle is guaranteed not to
+            cycle will have its orientation along the axle
+            flipped. If ``0`` then the cycle is guaranteed not to
             flip. If ``1`` it is guaranteed to flip. This allows the
             user to create head-to-head or head-to-tail chains, as well
             as chain with a preference for head-to-head or head-to-tail
             if a number between ``0`` and ``1`` is chosen. If
-            ``None`` then defaults to ``0`` in every case.
+            ``None``, then defaults to ``0`` in every case.
 
             It is also possible to supply an orientation for every
             cycle vertex in the final topology graph. In this case, the
@@ -245,6 +245,12 @@ class NRotaxane(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If the length of `orientations` is not equal in length to
+            `repeating_unit` or to the total number of vertices.
 
         """
 
