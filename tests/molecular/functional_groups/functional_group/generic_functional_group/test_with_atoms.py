@@ -11,7 +11,9 @@ def get_atom_map_0(functional_group):
 
     """
 
-    # Make sure new_id is always valid.
+    # Make sure new_id is always valid, by making 1 larger than the
+    # biggest on in the functional group. This prevents two atoms in
+    # the functional group from having the same id.
     new_id = max(functional_group.get_atom_ids()) + 1
     atoms = (stk.Li(new_id), )
     return dict(zip(functional_group.get_atom_ids(), atoms))
@@ -91,6 +93,11 @@ def _test_with_atoms(functional_group, get_atom_map):
     is_modified_id_sequence(
         ids1=functional_group.get_placer_ids(),
         ids2=clone.get_placer_ids(),
+        atom_map=atom_map,
+    )
+    is_modified_id_sequence(
+        ids1=functional_group.get_core_atom_ids(),
+        ids2=clone.get_core_atom_ids(),
         atom_map=atom_map,
     )
 
