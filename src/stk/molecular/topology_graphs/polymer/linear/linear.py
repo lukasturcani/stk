@@ -1,8 +1,6 @@
 """
-Polymer
-=======
-
-#. :class:`.Linear`
+Linear
+======
 
 """
 
@@ -86,8 +84,8 @@ class Linear(TopologyGraph):
             ),
         )
 
-    In the above example, ``bb1`` is guaranteed to be flipped,
-    ``bb2`` has a 50% chance of being flipped, each time it is placed
+    In the above example, ``bb2`` is guaranteed to be flipped,
+    ``bb4`` has a 50% chance of being flipped, each time it is placed
     on a node.
 
     Note that whether a building block will be flipped or not
@@ -136,7 +134,7 @@ class Linear(TopologyGraph):
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        p8 = stk.ConstructedMolecule([bb2, bb4], chain3)
+        p8 = stk.ConstructedMolecule(chain3)
 
         chain4 = stk.polymer.Linear(
             building_blocks=(bb2, bb4),
@@ -145,8 +143,7 @@ class Linear(TopologyGraph):
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        p9 = stk.ConstructedMolecule([bb2, bb4], chain4)
-
+        p9 = stk.ConstructedMolecule(chain4)
 
     """
 

@@ -65,6 +65,83 @@ class Macrocycle(TopologyGraph):
             )
         )
 
+    The `orientations` parameter allows the direction of each building
+    block along to the chain to be flipped
+
+    .. code-block:: python
+
+        bb4 = stk.BuildingBlock('BrCOCCBr', [stk.BromoFactory()])
+
+        c3 = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(bb2, bb4),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                orientations=(1, 0.5),
+            ),
+        )
+
+    In the above example, ``bb2`` is guaranteed to be flipped,
+    ``bb4`` has a 50% chance of being flipped, each time it is placed
+    on a node.
+
+    Note that whether a building block will be flipped or not
+    is decided during the initialization of :class:`.Macrocycle`
+
+    .. code-block:: python
+
+        # cycle will always construct the same macrocycle.
+        cycle = stk.macrocycle.Macrocycle(
+            building_blocks=(bb2, bb4),
+            repeating_unit='AB',
+            num_repeating_units=5,
+            orientations=(0.65, 0.45),
+        )
+        # c4 and c5 are guaranteed to be the same as they used the same
+        # topology graph.
+        c4 = stk.ConstructedMolecule(cycle)
+        c5 = stk.ConstructedMolecule(cycle)
+
+        # cycle2 may lead to a different polymer than chain, despite
+        # being initialized with the same parameters.
+        cycle2 = stk.macrocycle.Macrocycle(
+            building_blocks=(bb2, bb4),
+            repeating_unit='AB',
+            num_repeating_units=5,
+            orientations=(0.65, 0.45)
+        )
+
+        # c6 and c7 are guaranteed to be the same because they used the
+        # the same topology graph. However, they may be different to
+        # c4 and c5.
+        c6 = stk.ConstructedMolecule(cycle2)
+        c7 = stk.ConstructedMolecule(cycle2)
+
+    The `random_seed` parameter can be used to get reproducible results
+
+    .. code-block:: python
+
+        # c8 and c9 are guaranteed to be the same, because cycle3 and
+        # cycle4 used the same random seed.
+
+        cycle3 = stk.macrocycle.Macrocycle(
+            building_blocks=(bb2, bb4),
+            repeating_unit='AB',
+            num_repeating_units=5,
+            orientations=(0.65, 0.45),
+            random_seed=4,
+        )
+        c8 = stk.ConstructedMolecule(cycle3)
+
+        cycle4 = stk.macrocycle.Macrocycle(
+            building_blocks=(bb2, bb4),
+            repeating_unit='AB',
+            num_repeating_units=5,
+            orientations=(0.65, 0.45),
+            random_seed=4,
+        )
+        c9 = stk.ConstructedMolecule(cycle4)
+
     """
 
     def __init__(
