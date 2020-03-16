@@ -17,6 +17,8 @@ class Linear(TopologyGraph):
 
     Examples
     --------
+    *Construction*
+
     Linear polymers require building blocks with two functional groups
 
     .. code-block:: python

@@ -1,3 +1,9 @@
+"""
+[N]Rotaxane
+===========
+
+"""
+
 import numpy as np
 
 from .vertices import _AxleVertex, _CycleVertex
@@ -14,31 +20,45 @@ class NRotaxane(TopologyGraph):
     to monomers in linear polymers, in terms of a repeating unit,
     except that no bonds are formed between them.
 
-    The axle must be provided first to the `building_blocks` in
-    :class:`.ConstructedMolecule.__init__`.
-
     Examples
     --------
+    *Construction*
+
     .. code-block:: python
 
         import stk
 
         cycle = stk.ConstructedMolecule(
-            building_blocks=[
-                stk.BuildingBlock('[Br]CC[Br]', ['bromine'])
-            ],
-            topology_graph=stk.macrocycle.Macrocycle('A', 5)
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='[Br]CC[Br]',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                repeating_units='A',
+                num_repeating_units=5,
+            )
         )
         axle = stk.ConstructedMolecule(
-            building_blocks=[
-                stk.BuildingBlock('NCCN', ['amine']),
-                stk.BuildingBlock('O=CCC=O', ['aldehyde'])
-            ],
-            topology_graph=stk.polymer.Linear('AB', 7)
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=7,
+            )
         )
         rotaxane = stk.ConstructedMolecule(
-            building_blocks=[axle, cycle],
-            topology_graph=stk.rotaxane.NRotaxane('A', 3)
+            topology_graph=stk.rotaxane.NRotaxane(
+                axle=stk.BuildingBlock.init_from_molecule(axle),
+                cycles=(
+                    stk.BuildingBlock.init_from_molecule(cycle),
+                ),
+                repeating_unit='A',
+                num_repeating_units=3,
+            ),
         )
 
     The repeating unit can also be specified through the indices of
@@ -48,17 +68,106 @@ class NRotaxane(TopologyGraph):
 
         # r1 and r2 are different ways to write the same thing.
         r1 = stk.ConstructedMolecule(
-            building_blocks=[axle, cycle, cycle2, cycle3],
-            topology_graph=stk.rotaxane.NRotaxane('ACB', 3)
+            topology_graph=stk.rotaxane.NRotaxane(
+                axle=stk.BuildingBlock.init_from_molecule(axle),
+                cycles=(
+                    stk.BuildingBlock.init_from_molecule(cycle),
+                    stk.BuildingBlock.init_from_molecule(cycle2),
+                    stk.BuildingBlock.init_from_molecule(cycle3),
+                ),
+                repeating_unit='ACB',
+                num_repeating_units=3,
+            )
         )
         r2 = stk.ConstructedMolecule(
-            building_blocks=[axle, cycle, cycle2, cycle3],
-            topology_graph=stk.rotaxane.NRotaxane((1, 3, 2), 3)
+            topology_graph=stk.rotaxane.NRotaxane(
+                axle=stk.BuildingBlock.init_from_molecule(axle),
+                cycles=(
+                    stk.BuildingBlock.init_from_molecule(cycle),
+                    stk.BuildingBlock.init_from_molecule(cycle2),
+                    stk.BuildingBlock.init_from_molecule(cycle3),
+                ),
+                repeating_unit=(1, 3, 2),
+                num_repeating_units=3,
+            ),
         )
 
-    :class:`.NRotaxane` shares many parameters with :class:`.Linear`,
-    and the examples described there are also valid for this class.
-    Be sure to read them.
+    The `orientations` parameter allows the direction of each cycle
+    along the axle to be flipped
+
+    .. code-block:: python
+
+        bb4 = stk.BuildingBlock('BrCNCCBr', [stk.BromoFactory()])
+
+        p3 = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb2, bb4),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                orientations=(1, 0.5),
+            ),
+        )
+
+    In the above example, ``bb2`` is guaranteed to be flipped,
+    ``bb4`` has a 50% chance of being flipped, each time it is placed
+    on a node.
+
+    Note that whether a building block will be flipped or not
+    is decided during the initialization of :class:`.Linear`
+
+    .. code-block:: python
+
+        # chain will always construct the same polymer.
+        chain = stk.polymer.Linear(
+            building_blocks=(bb2, bb4),
+            repeating_unit='AB',
+            num_repeating_units=5,
+            orientations=(0.65, 0.45),
+        )
+        # p4 and p5 are guaranteed to be the same as they used the same
+        # topology graph.
+        p4 = stk.ConstructedMolecule(chain)
+        p5 = stk.ConstructedMolecule(chain)
+
+        # chain2 may lead to a different polymer than chain, despite
+        # being initialized with the same parameters.
+        chain2 = stk.polymer.Linear(
+            building_blocks=(bb2, bb4),
+            repeating_unit='AB',
+            num_repeating_units=5,
+            orientations=(0.65, 0.45)
+        )
+
+        # p6 and p7 are guaranteed to be the same because they used the
+        # the same topology graph. However, they may be different to
+        # p4 and p5.
+        p6 = stk.ConstructedMolecule(chain2)
+        p7 = stk.ConstructedMolecule(chain2)
+
+    The `random_seed` parameter can be used to get reproducible results
+
+    .. code-block:: python
+
+        # p8 and p9 are guaranteed to be the same, because chain3 and
+        # chain4 used the same random seed.
+
+        chain3 = stk.polymer.Linear(
+            building_blocks=(bb2, bb4),
+            repeating_unit='AB',
+            num_repeating_units=5,
+            orientations=(0.65, 0.45),
+            random_seed=4,
+        )
+        p8 = stk.ConstructedMolecule(chain3)
+
+        chain4 = stk.polymer.Linear(
+            building_blocks=(bb2, bb4),
+            repeating_unit='AB',
+            num_repeating_units=5,
+            orientations=(0.65, 0.45),
+            random_seed=4,
+        )
+        p9 = stk.ConstructedMolecule(chain4)
 
     """
 
@@ -77,6 +186,12 @@ class NRotaxane(TopologyGraph):
 
         Parameters
         ----------
+        axle : :class:`.BuildingBlock`
+            The axle of the rotaxane.
+
+        cycles : :class:`tuple` of :class:`.BuildingBlock`
+            The cycles threaded onto the `axle`.
+
         repeating_unit : :class:`str` or :class:`tuple` of :class:`int`
             A string specifying the repeating unit of the macrocycles.
             For example, ``'AB'`` or ``'ABB'``. The first macrocycle
