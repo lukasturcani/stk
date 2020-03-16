@@ -1,5 +1,4 @@
 import numpy as np
-from functools import partial
 from scipy.spatial.distance import euclidean
 
 from ..topology_graph import Vertex
@@ -12,6 +11,27 @@ class _CycleVertex(Vertex):
     """
 
     def __init__(self, id, position, flip, angle):
+        """
+        Initialize a :class:`._CycleVertex` instance.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the vertex.
+
+        position : :class:`tuple` of :class:`float`
+            The position of the vertex.
+
+        flip : :class:`bool`
+            If ``True``, the orientation of building blocks placed by
+            the vertex will be flipped.
+
+        angle : :class:`float`
+            The position of the vertex along the cycle, specified by
+            the `angle`.
+
+        """
+
         super().__init__(id, position)
         self._flip = flip
         self._angle = angle
@@ -23,6 +43,16 @@ class _CycleVertex(Vertex):
         return clone
 
     def get_flip(self):
+        """
+        Return ``True`` if the vertex flips building blocks it places.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if the vertex flips building blocks it places.
+
+        """
+
         return self._flip
 
     def place_building_block(self, building_block, edges):
@@ -53,11 +83,11 @@ class _CycleVertex(Vertex):
                 building_block.get_functional_groups()
             ).get_placer_ids(),
         )
-        fg0_distance = partial(euclidean, fg0_position)
-        edge0 = min(
-            edges,
-            key=lambda edge: fg0_distance(edge.get_position()),
-        )
+
+        def fg0_distance(edge):
+            return euclidean(edge.get_position(), fg0_position)
+
+        edge0 = min(edges, key=fg0_distance)
         return {
             0: edge0.get_id(),
             1: (
