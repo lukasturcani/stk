@@ -19,7 +19,7 @@ class Linear(TopologyGraph):
 
     Examples
     --------
-    Linear polymers require building blocks with functional groups
+    Linear polymers require building blocks with two functional groups
 
     .. code-block:: python
 
@@ -28,19 +28,25 @@ class Linear(TopologyGraph):
         bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
         bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
         polymer = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
-            topology_graph=stk.polymer.Linear('AB', 12),
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                num_repeating_units=12,
+            ),
         )
 
-    However building blocks with a single functional group can
+    However, building blocks with a single functional group can
     also be provided as capping units
 
     .. code-block: python
 
         bb3 = stk.BuildingBlock('CCN', [stk.PrimaryAminoFactory()])
         polymer = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear('ABABC', 1),
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2, bb3),
+                repeating_unit='ABABC',
+                num_repeating_unit=1,
+            ),
         )
 
     The repeating unit can also be specified through the indices of
@@ -50,12 +56,18 @@ class Linear(TopologyGraph):
 
         # p1 and p2 are different ways to write the same thing.
         p1 = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear('ACB', 1),
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2, bb3),
+                repeating_unit='ACB',
+                num_repeating_units=1,
+            ),
         )
         p2 = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.polymer.Linear((0, 2, 1), 1),
+            topology_graph=stk.polymer.Linear(
+                building_blocks=[bb1, bb2, bb3],
+                repeating_unit=(0, 2, 1),
+                num_repeating_units=1,
+            ),
         )
 
     The `orientations` parameter allows the direction of each building
@@ -63,11 +75,11 @@ class Linear(TopologyGraph):
 
     .. code-block:: python
 
-        bb4 = stk.BuildingBlock('NCNCCN', ['amine'])
+        bb4 = stk.BuildingBlock('NCNCCN', [stk.PrimaryAminoFactory()])
 
         p3 = stk.ConstructedMolecule(
-            building_blocks=[bb2, bb4],
             topology_graph=stk.polymer.Linear(
+                building_blocks=(bb2, bb4),
                 repeating_unit='AB',
                 num_repeating_units=5,
                 orientations=(1, 0.5),
@@ -85,28 +97,30 @@ class Linear(TopologyGraph):
 
         # chain will always construct the same polymer.
         chain = stk.polymer.Linear(
+            building_blocks=(bb2, bb4),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
         )
         # p4 and p5 are guaranteed to be the same as they used the same
         # topology graph.
-        p4 = stk.ConstructedMolecule([bb2, bb4], chain)
-        p5 = stk.ConstructedMolecule([bb2, bb4], chain)
+        p4 = stk.ConstructedMolecule(chain)
+        p5 = stk.ConstructedMolecule(chain)
 
         # chain2 may lead to a different polymer than chain, despite
         # being initialized with the same parameters.
         chain2 = stk.polymer.Linear(
+            building_blocks=(bb2, bb4),
             repeating_unit='AB',
-            num_repeating_untis=5,
+            num_repeating_units=5,
             orientations=(0.65, 0.45)
         )
 
         # p6 and p7 are guaranteed to be the same because they used the
         # the same topology graph. However, they may be different to
         # p4 and p5.
-        p6 = stk.ConstructedMolecule([bb2, bb4], chain2)
-        p7 = stk.ConstructedMolecule([bb2, bb4], chain2)
+        p6 = stk.ConstructedMolecule(chain2)
+        p7 = stk.ConstructedMolecule(chain2)
 
     The `random_seed` parameter can be used to get reproducible results
 
@@ -116,16 +130,18 @@ class Linear(TopologyGraph):
         # chain4 used the same random seed.
 
         chain3 = stk.polymer.Linear(
+            building_blocks=(bb2, bb4),
             repeating_unit='AB',
-            num_repeating_untis=5,
+            num_repeating_units=5,
             orientations=(0.65, 0.45),
             random_seed=4,
         )
         p8 = stk.ConstructedMolecule([bb2, bb4], chain3)
 
         chain4 = stk.polymer.Linear(
+            building_blocks=(bb2, bb4),
             repeating_unit='AB',
-            num_repeating_untis=5,
+            num_repeating_units=5,
             orientations=(0.65, 0.45),
             random_seed=4,
         )
@@ -149,6 +165,9 @@ class Linear(TopologyGraph):
 
         Parameters
         ----------
+        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
+            The building blocks of the polymer.
+
         repeating_unit : :class:`str` or :class:`tuple` of :class:`int`
             A string specifying the repeating unit of the polymer.
             For example, ``'AB'`` or ``'ABB'``. The first building
