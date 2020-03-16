@@ -95,3 +95,34 @@ def is_equivalent_functional_group(
         ids1=functional_group1.get_core_atom_ids(),
         ids2=functional_group2.get_core_atom_ids(),
     )
+
+
+def is_equivalent_generic_functional_group(
+    functional_group1,
+    functional_group2,
+):
+    is_equivalent_functional_group(
+        functional_group1=functional_group1,
+        functional_group2=functional_group2,
+    )
+    is_equivalent_sequence(
+        functional_group1.get_bonders(),
+        functional_group2.get_bonders(),
+    )
+    same_ids(
+        ids1=functional_group1.get_bonder_ids(),
+        ids2=functional_group2.get_bonder_ids(),
+    )
+    assert (
+        functional_group1.get_num_bonders()
+        == functional_group2.get_num_bonders()
+    )
+
+    is_equivalent_sequence(
+        functional_group1.get_deleters(),
+        functional_group2.get_deleters(),
+    )
+    same_ids(
+        ids1=functional_group1.get_deleter_ids(),
+        ids2=functional_group2.get_deleter_ids(),
+    )
