@@ -15,7 +15,7 @@ class NRotaxane(TopologyGraph):
     Represents [n]rotaxane topology graphs.
 
     This class assumes one axle with (n-1) macrocycles threaded on it.
-    The macrocycles are spaced evenly along the thread in repeating
+    The macrocycles are spaced evenly along the axle in repeating
     patterns. The threaded macrocycles can be described analogously
     to monomers in linear polymers, in terms of a repeating unit,
     except that no bonds are formed between them.
