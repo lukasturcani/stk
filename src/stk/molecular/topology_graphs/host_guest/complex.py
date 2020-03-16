@@ -14,10 +14,6 @@ class Complex(TopologyGraph):
     """
     Represents a host-guest complex topology graph.
 
-    When using this topology graph, the host must be first in the
-    `building_blocks` of the :class:`.ConstructedMolecule`
-    and the guest must be second.
-
     Examples
     --------
     *Construction*
