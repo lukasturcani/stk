@@ -34,6 +34,16 @@ class _LinearVertex(Vertex):
         self._flip = flip
 
     def get_flip(self):
+        """
+        Return ``True`` if the vertex flips building blocks it places.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if the vertex flips building blocks it places.
+
+        """
+
         return self._flip
 
     def clone(self):
@@ -53,13 +63,11 @@ class _LinearVertex(Vertex):
         fg2_position = building_block.get_centroid(
             atom_ids=fg2.get_placer_ids(),
         )
-        fg_displacement = fg2_position - fg1_position
-        building_block = building_block.with_rotation_between_vectors(
-            start=fg_displacement,
+        return building_block.with_rotation_between_vectors(
+            start=fg2_position - fg1_position,
             target=[-1 if self._flip else 1, 0, 0],
             origin=self._position,
-        )
-        return building_block.get_position_matrix()
+        ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
         fg1_id, fg2_id = self._sort_functional_groups(building_block)
