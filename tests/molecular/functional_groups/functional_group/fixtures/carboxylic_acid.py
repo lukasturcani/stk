@@ -1,7 +1,7 @@
 import stk
 import pytest
 
-from .case_data import GenericCaseData
+from ..case_data import GenericCaseData
 
 
 @pytest.fixture
