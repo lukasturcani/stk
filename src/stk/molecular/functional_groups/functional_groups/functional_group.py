@@ -179,6 +179,9 @@ class FunctionalGroup:
         self._placers = tuple(
             atom_map.get(a.get_id(), a) for a in self._placers
         )
+        self._core_atoms = tuple(
+            atom_map.get(a.get_id(), a) for a in self._core_atoms
+        )
         return self
 
     def with_atoms(self, atom_map):
