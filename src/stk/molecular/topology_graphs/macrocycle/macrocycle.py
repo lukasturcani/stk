@@ -21,6 +21,10 @@ class Macrocycle(TopologyGraph):
     --------
     *Construction*
 
+    This topology graph essentially makes a polymer chain and joins
+    the ends, hence the constructor parameters allows you to specify
+    the chain
+
     .. code-block:: python
 
         import stk
@@ -47,17 +51,19 @@ class Macrocycle(TopologyGraph):
 
         # c1 and c2 are different ways to write the same thing.
         c1 = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.macrocycle.Macrocycle('ACB', 3)
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(bb1, bb2, bb3),
+                repeating_unit='ACB',
+                num_repeating_units=3
+            )
         )
         c2 = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2, bb3],
-            topology_graph=stk.macrocycle.Macrocycle((0, 2, 1), 3)
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(bb1, bb2, bb3),
+                repeating_unit=(0, 2, 1),
+                num_repeating_units=3,
+            )
         )
-
-    :class:`.Macrocycle` shares many parameters with :class:`.Linear`,
-    and the examples described there are also valid for this class.
-    Be sure to read them.
 
     """
 
@@ -76,6 +82,9 @@ class Macrocycle(TopologyGraph):
 
         Parameters
         ----------
+        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
+            The building blocks of the macrocycle.
+
         repeating_unit : :class:`str` or :class:`tuple` of :class:`int`
             A string specifying the repeating unit of the macrocycle.
             For example, ``'AB'`` or ``'ABB'``. The first building
@@ -98,7 +107,7 @@ class Macrocycle(TopologyGraph):
             ``1`` it is guaranteed to flip. This allows the user to
             create head-to-head or head-to-tail chains, as well as
             chain with a preference for head-to-head or head-to-tail if
-            a number between ``0`` and ``1`` is chosen. If ``None``
+            a number between ``0`` and ``1`` is chosen. If ``None``,
             then ``0`` is picked in every case.
 
             It is also possible to supply an orientation for every
@@ -112,6 +121,11 @@ class Macrocycle(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If the number of `orientations` provided is incorrect.
 
         """
 
