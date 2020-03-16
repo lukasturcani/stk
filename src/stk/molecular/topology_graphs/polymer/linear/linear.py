@@ -87,7 +87,7 @@ class Linear(TopologyGraph):
         )
 
     In the above example, ``bb1`` is guaranteed to be flipped,
-    ``bb2`` has a 50 % chance of being flipped, each time it is placed
+    ``bb2`` has a 50% chance of being flipped, each time it is placed
     on a node.
 
     Note that whether a building block will be flipped or not
