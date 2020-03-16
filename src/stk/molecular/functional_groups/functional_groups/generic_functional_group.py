@@ -38,12 +38,13 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         """
 
-        deleter_set = set(deleters)
+        deleter_set = set(atom.get_id() for atom in deleters)
         super().__init__(
             atoms=atoms,
             placers=bonders,
             core_atoms=tuple(
-                atom for atom in atoms if atom not in deleter_set
+                atom for atom in atoms
+                if atom.get_id() not in deleter_set
             ),
         )
         self._bonders = bonders

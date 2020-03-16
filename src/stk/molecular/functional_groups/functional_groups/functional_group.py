@@ -261,6 +261,7 @@ class FunctionalGroup:
         return (
             f'{self.__class__.__name__}('
             f'atoms={self._atoms}, '
-            f'placers={self._placers}'
+            f'placers={self._placers}, '
+            f'core_atoms={self._core_atoms}'
             ')'
         )
