@@ -1,8 +1,7 @@
 import numpy as np
-import stk
 import pytest
 
-from ..utilities import get_num_atom_ids
+from ..utilities import get_num_atom_ids, normalize_ids
 
 
 @pytest.fixture(
@@ -46,74 +45,79 @@ def get_atom_ids(request):
     return request.param
 
 
-@pytest.fixture(
-    params=(
-        [1., 0., 0.],
-        [0., 1., 0.],
-        [0., 1., 0.],
-        stk.normalize_vector([1., 1., 1.]),
-        stk.normalize_vector([2.231, 0.75, -1.32]),
+def test_get_direction(case_data, get_atom_ids):
+    _test_get_direction(
+        molecule=case_data.molecule,
+        position_matrix=case_data.position_matrix,
+        get_atom_ids=get_atom_ids,
     )
-)
-def direction(request):
-    """
-    A direction vector.
-
-    """
-
-    return np.array(request.param)
 
 
-def test_get_direction(molecule, get_atom_ids, direction):
+def _test_get_direction(molecule, position_matrix, get_atom_ids):
     if get_num_atom_ids(molecule, get_atom_ids) == 1:
         # Any non-0 vector is valid in this case.
         assert not np.allclose(
             a=[0, 0, 0],
-            b=molecule.get_plane_normal(get_atom_ids(molecule)),
+            b=molecule.get_direction(get_atom_ids(molecule)),
             atol=1e-13,
         )
         return
 
-    position_matrix = get_position_matrix(
-        molecule=molecule,
-        atom_ids=get_atom_ids(molecule),
-        direction=direction,
+    direction = get_direction(
+        position_matrix=position_matrix,
+        atom_ids=normalize_ids(molecule, get_atom_ids(molecule)),
     )
-    molecule = molecule.with_position_matrix(position_matrix)
     result = molecule.get_direction(get_atom_ids(molecule))
     # The direction may be parallel or anti-parallel.
     return abs(abs(result @ direction) - 1) < 1e-13
 
 
-def get_position_matrix(molecule, atom_ids, direction):
+def get_direction(position_matrix, atom_ids):
+    atom_positions = position_matrix[atom_ids, :]
+    centered_positions = atom_positions - atom_positions.mean(axis=0)
+    return np.linalg.svd(centered_positions)[-1][0]
+
+
+@pytest.mark.parametrize(
+    argnames=('position_matrix', 'atom_ids', 'direction'),
+    arvalues=(
+        (
+            np.array([
+                [1., 0., 0.],
+                [2., 0., 0.],
+                [3., 0., 0.],
+            ]),
+            (0, 1, 2),
+            np.array([1., 0., 0.]),
+        ),
+        (
+            np.array([
+                [0., 1., 0.],
+                [0., 2., 0.],
+                [0., 3., 0.],
+            ]),
+            (0, 1, 2),
+            np.array([0., 1., 0.]),
+        ),
+        (
+            np.array([
+                [1., 0., 0.],
+                [2., 0., 0.],
+                [0., 5., 0.],
+            ]),
+            (0, 1),
+            np.array([1., 0., 0.]),
+        ),
+    ),
+)
+def test_get_direction_helper(position_matrix, atom_ids, direction):
     """
-    Create a position matrix with a specific `direction`.
-
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule for which the position matrix is created.
-
-    atom_ids : :class:`iterable` of :class:`int`
-        The ids of atoms which are to have a specific direction.
-        If ``None``, then all atoms are used.
-
-    direction : :class:`numpy.ndarray`
-        The desired direction.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        A position matrix for `molecule`.
+    Test the :func:`.get_direction` function, defined in this module.
 
     """
 
-    if atom_ids is None:
-        atom_ids = range(molecule.get_num_atoms())
-    elif not isinstance(atom_ids, (tuple, list)):
-        atom_ids = tuple(atom_ids)
-
-    position_matrix = molecule.get_position_matrix()
-    for atom_id in atom_ids:
-        position_matrix[atom_id] = direction*atom_id
-    return position_matrix
+    assert np.allclose(
+        a=get_direction(position_matrix, atom_ids),
+        b=direction,
+        atol=1e-32,
+    )
