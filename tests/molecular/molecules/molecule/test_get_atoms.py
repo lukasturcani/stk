@@ -33,11 +33,10 @@ def test_get_atoms_1(molecule, atoms, get_atom_ids):
     if atom_ids is None:
         atom_ids = range(molecule.get_num_atoms())
 
-    results = it.zip_longest(
+    for atom_id, atom in it.zip_longest(
         normalize_ids(molecule, atom_ids),
         molecule.get_atoms(get_atom_ids(molecule)),
-    )
-    for atom_id, atom in results:
+    ):
         is_equivalent_atom(atoms[atom_id], atom)
 
 
@@ -68,6 +67,6 @@ def get_rdkit_mol(molecule):
         rdkit_mol.AddBond(
             beginAtomIdx=bond.get_atom1().get_id(),
             endAtomIdx=bond.get_atom2().get_id(),
-            order=rdkit.BondType(bond.get_order())
+            order=rdkit.BondType(bond.get_order()),
         )
     return rdkit_mol.GetMol()

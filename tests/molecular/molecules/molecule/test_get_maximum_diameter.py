@@ -45,17 +45,15 @@ def get_atom_ids(request):
     return request.param
 
 
-@pytest.fixture(params=[0, 0.32, 1, 2.3, 100.12])
-def maximum_diameter(request):
-    """
-    A maximum diameter value.
-
-    """
-
-    return request.param
+def test_get_maximum_diameter(case_data, get_atom_ids):
+    _test_get_maximum_diameter(
+        molecule=case_data.molecule,
+        position_matrix=case_data.position_matrix,
+        get_atom_ids=get_atom_ids,
+    )
 
 
-def test_get_maximum_diameter(
+def _test_get_maximum_diameter(
     molecule,
     get_atom_ids,
     maximum_diameter,
