@@ -8,7 +8,7 @@ def test_with_atoms(bond, get_atom_map):
         The bond to test.
 
     get_atom_map : :class:`callable`
-        Take a single parameter, `bond`, and returns a valid
+        Takes a single parameter, `bond`, and returns a valid
         `atom_map` parameter for its :meth:`.Bond.with_atoms` method.
         This allows the testing of different values of this parameter.
 
