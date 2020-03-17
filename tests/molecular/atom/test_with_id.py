@@ -19,8 +19,7 @@ def test_with_id(atom, id):
 
     """
 
-    # Save a clone, to ensure that the original was not changed by the
-    # test.
+    # Save a clone, to ensure that "atom" is not changed by the test.
     before = atom.clone()
     _test_with_id(atom, id)
     is_equivalent_atom(before, atom)
