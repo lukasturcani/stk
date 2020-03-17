@@ -67,3 +67,7 @@ def are_clone_functional_groups(functional_group1, functional_group2):
         ids1=sorted(functional_group1.get_placer_ids()),
         ids2=sorted(functional_group2.get_placer_ids()),
     )
+    are_same_id_sequences(
+        ids1=sorted(functional_group1.get_core_atom_ids()),
+        ids2=sorted(functional_group2.get_core_atom_ids()),
+    )
