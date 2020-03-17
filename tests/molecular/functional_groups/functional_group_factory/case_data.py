@@ -17,6 +17,22 @@ class CaseData:
     """
 
     def __init__(self, factory, molecule, functional_groups):
+        """
+        Initialize a :class:`.CaseData` instance.
+
+        Parameters
+        ----------
+        factory : :class:`.FunctionalGroupFactory`
+            The factory to test.
+
+        molecule : :class:`.Molecule`
+            The molecule, whose functional groups are found.
+
+        functional_groups : :class:`tuple` of :class:`.FunctionalGroup`
+            The expected functional groups.
+
+        """
+
         self.factory = factory
         self.molecule = molecule
         self.functional_groups = functional_groups
