@@ -10,23 +10,22 @@ def get_version():
     return p.search(content).group(1)
 
 
-setup(name='stk',
-      author='Lukas Turcani',
-      author_email='lukasturcani93@gmail.com',
-      url='https://www.github.com/lukasturcani/stk',
-      version=get_version(),
-      package_dir={'': 'src'},
-      packages=find_packages(where='src'),
-      install_requires=[
-          'scipy',
-          'matplotlib',
-          'psutil',
-          'pandas',
-          'pathos',
-          'seaborn',
-          'numpy',
-          'setuptools',
-          'pywindowx',
-          'numpydoc',
-       ],
-      python_requires='>=3.7')
+setup(
+    name='stk',
+    author='Lukas Turcani',
+    author_email='lukasturcani93@gmail.com',
+    url='https://www.github.com/lukasturcani/stk',
+    version=get_version(),
+    package_dir={'': 'src'},
+    packages=find_packages(where='src'),
+    install_requires=(
+        'scipy',
+        'matplotlib',
+        'psutil',
+        'pandas',
+        'pathos',
+        'seaborn',
+        'numpy',
+    ),
+    python_requires='>=3.7',
+)
