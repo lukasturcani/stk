@@ -3,11 +3,11 @@ import pytest
 import stk
 
 from .utilities import (
-    CaseData,
     are_clone_sequences,
     atom_id,
     are_same_id_sequences,
 )
+from .case_data import CaseData
 
 
 @pytest.mark.parametrize(
