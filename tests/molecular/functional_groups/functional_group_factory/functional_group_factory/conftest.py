@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ..utilities import CaseData
+from ..case_data import CaseData
 
 
 @pytest.fixture(
