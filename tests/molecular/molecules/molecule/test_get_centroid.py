@@ -45,14 +45,17 @@ def get_atom_ids(request):
 def test_get_centroid(case_data, get_atom_ids):
     _test_get_centroid(
         molecule=case_data.molecule,
-        position_matrix=case_data.position_matrix,
+        centroid=get_centroid(
+            position_matrix=case_data.position_matrix,
+            atom_ids=get_atom_ids(case_data.molecule),
+        ),
         get_atom_ids=get_atom_ids,
     )
 
 
-def _test_get_centroid(molecule, position_matrix, get_atom_ids):
+def _test_get_centroid(molecule, centroid, get_atom_ids):
     assert np.allclose(
-        a=get_centroid(position_matrix, get_atom_ids(molecule)),
+        a=centroid,
         b=molecule.get_centroid(get_atom_ids(molecule)),
         atol=1e-32,
     )
