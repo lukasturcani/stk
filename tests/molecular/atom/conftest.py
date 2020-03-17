@@ -44,7 +44,11 @@ def case_data_1(atomic_number, id, charge):
     """
 
     return CaseData(
-        atom=stk.Atom(atomic_number, id, charge),
+        atom=stk.Atom(
+            id=id,
+            atomic_number=atomic_number,
+            charge=charge,
+        ),
         id=id,
         charge=charge,
         atomic_number=atomic_number,
