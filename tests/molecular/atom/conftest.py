@@ -91,7 +91,7 @@ def atom(cls):
 
 
 @pytest.fixture(
-    params=[0],
+    params=[0, 3],
 )
 def id(request):
     """
