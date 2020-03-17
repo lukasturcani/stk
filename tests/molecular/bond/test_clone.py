@@ -1,4 +1,18 @@
 def test_clone(bond):
+    """
+    Test :meth:`.Bond.clone`.
+
+    Parameters
+    ----------
+    bond : :class:`.Bond`
+        The bond to test.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     clone = bond.clone()
 
     assert clone.get_atom1() is bond.get_atom1()
