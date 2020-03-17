@@ -41,9 +41,8 @@ def _test_get_bonder_ids(functional_group, bonders):
 
     """
 
-    fg_atoms = it.zip_longest(
+    for id_, atom in it.zip_longest(
         functional_group.get_bonder_ids(),
         bonders,
-    )
-    for id_, atom in fg_atoms:
+    ):
         assert id_ == atom.get_id()
