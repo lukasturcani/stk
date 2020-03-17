@@ -26,7 +26,7 @@ def get_atom_map(request):
     Returns
     -------
     :class:`dict`
-        A valid `atom_map` parameter for :meth:`.Bond.clone`.
+        A valid `atom_map` parameter for :meth:`.Bond.with_atoms`.
 
     """
 
