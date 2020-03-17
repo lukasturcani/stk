@@ -93,7 +93,6 @@ from ...utilities import (
     XTBInvalidSolventError,
     XTBExtractor
 )
-import pywindow
 
 from ..base_calculators import MoleculeCalculator, _MoleculeCalculator
 
@@ -183,6 +182,7 @@ class CageOptimizerSequence(_MoleculeCalculator, Optimizer):
         self,
         num_expected_windows,
         optimizers,
+        window_calculator,
         use_cache=False
     ):
         """
@@ -198,6 +198,10 @@ class CageOptimizerSequence(_MoleculeCalculator, Optimizer):
             The :class:`Optimizers` used in sequence to optimize
             cage molecules.
 
+        window_calculator : :class:`callable`
+            A :class:`callable` whicch takes a :class:`.Molecule`
+            and returns the diameters of its windows.
+
         use_cache : :class:`bool`, optional
             If ``True`` :meth:`optimize` will not run twice on the same
             molecule.
@@ -206,6 +210,7 @@ class CageOptimizerSequence(_MoleculeCalculator, Optimizer):
 
         self._num_expected_windows = num_expected_windows
         self._optimizers = optimizers
+        self._window_calculator = window_calculator
         super().__init__(use_cache=use_cache)
 
     def _optimize(self, mol):
@@ -224,11 +229,7 @@ class CageOptimizerSequence(_MoleculeCalculator, Optimizer):
         """
 
         for optimizer in self._optimizers:
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                loader = pywindow.molecular.Molecule.load_rdkit_mol
-                pw_molecule = loader(mol.to_rdkit_mol())
-                windows = pw_molecule.calculate_windows()
+            windows = self._window_calculator(mol)
             logger.debug(f'Windows found: {windows}.')
 
             if (
