@@ -52,7 +52,13 @@ def case_data_1(atomic_number, id, charge):
     )
 
 
+@pytest.fixture
 def case_data_2(cls, id, charge):
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
     return CaseData(
         atom=cls(id, charge),
         id=id,
@@ -73,13 +79,13 @@ def case_data(request):
 
 
 @pytest.fixture
-def atom(get_atom):
+def atom(cls):
     """
     An :class:`.Atom` instance.
 
     """
 
-    return get_atom(3, -5).clone()
+    return cls(3, -5).clone()
 
 
 @pytest.fixture(
@@ -103,4 +109,9 @@ def charge(request):
 
     """
 
+    return request.param
+
+
+@pytest.fixture(params=tuple(range(1, 118)))
+def atomic_number(request):
     return request.param

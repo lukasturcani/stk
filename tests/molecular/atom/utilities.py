@@ -14,7 +14,8 @@ def is_equivalent_atom(atom1, atom2):
 _periodic_table = rdkit.GetPeriodicTable()
 
 atomic_numbers = {
-    atomic_number: stk.__dict__[_periodic_table.GetElementSymbol]
+    stk.__dict__[_periodic_table.GetElementSymbol(atomic_number)]:
+        atomic_number
     for atomic_number in range(1, 119)
 }
 
