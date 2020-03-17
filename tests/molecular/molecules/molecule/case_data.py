@@ -10,11 +10,15 @@ class CaseData:
     smiles : :class:`str`
         The smiles for the molecule.
 
+    position_matrix : :class:`numpy.ndarray`
+        The position matrix of the molecule.
+
     """
 
-    def __init__(self, molecule, smiles):
+    def __init__(self, molecule, smiles, position_matrix):
         self.molecule = molecule
         self.smiles = smiles
+        self.position_matrix = position_matrix
 
     def __str__(self):
         return repr(self)

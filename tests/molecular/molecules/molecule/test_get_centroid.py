@@ -42,62 +42,28 @@ def get_atom_ids(request):
     return request.param
 
 
-@pytest.fixture
-def centroid(origin):
-    return origin
-
-
-def test_get_centroid(molecule, get_atom_ids, centroid):
-    position_matrix = get_position_matrix(
-        molecule=molecule,
-        atom_ids=get_atom_ids(molecule),
-        centroid=centroid,
+def test_get_centroid(case_data, get_atom_ids):
+    _test_get_centroid(
+        molecule=case_data.molecule,
+        position_matrix=case_data.position_matrix,
+        get_atom_ids=get_atom_ids,
     )
-    molecule = molecule.with_position_matrix(position_matrix)
+
+
+def _test_get_centroid(molecule, position_matrix, get_atom_ids):
     assert np.allclose(
-        a=centroid,
+        a=get_centroid(position_matrix, get_atom_ids(molecule)),
         b=molecule.get_centroid(get_atom_ids(molecule)),
         atol=1e-32,
     )
 
 
-def get_position_matrix(molecule, atom_ids, centroid):
-    """
-    Create a position matrix with a specific `centroid`.
-
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule for which the position matrix is created.
-
-    atom_ids : :class:`iterable` of :class:`int`
-        The ids of atoms which are to have a specific `centroid`.
-        If ``None``, then all atoms are used.
-
-    centroid : :class:`numpy.ndarray`
-        The desired centroid.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        A position matrix for `molecule`.
-
-
-    """
-
+def get_centroid(position_matrix, atom_ids):
     if atom_ids is None:
-        atom_ids = range(molecule.get_num_atoms())
-    elif not isinstance(atom_ids, (list, tuple)):
-        atom_ids = tuple(atom_ids)
+        atom_ids = range(len(position_matrix))
+    elif isinstance(atom_ids, int):
+        atom_ids = (atom_ids, )
+    else:
+        atom_ids = len(atom_ids)
 
-    position_matrix = molecule.get_position_matrix()
-    # First, place all atoms on the centroid.
-    position_matrix[atom_ids, :] = centroid
-    # Displace pairs of atoms such that the center of mass remains
-    # same.
-    generator = np.random.RandomState(4)
-    for atom_id in range(0, molecule.get_num_atoms()-1, 2):
-        displacement = generator.normal(scale=59, size=3)
-        position_matrix[atom_id] += displacement
-        position_matrix[atom_id] -= displacement
-    return position_matrix
+    return np.sum(position_matrix[atom_ids, :], axis=0) / len(atom_ids)
