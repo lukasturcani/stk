@@ -1,5 +1,9 @@
 import pytest
+from pytest_lazyfixture import lazy_fixture
 import stk
+
+from .utilities import atomic_numbers, atomic_masses
+from .case_data import CaseData
 
 
 @pytest.fixture(
@@ -10,7 +14,7 @@ import stk
         and cls is not stk.Atom
     ],
 )
-def get_atom(request):
+def cls(request):
     """
     Return an :class:`.Atom` instance.
 
@@ -29,6 +33,42 @@ def get_atom(request):
 
     """
 
+    return request.param
+
+
+@pytest.fixture
+def case_data_1(atomic_number, id, charge):
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
+    return CaseData(
+        atom=stk.Atom(atomic_number, id, charge),
+        id=id,
+        charge=charge,
+        atomic_number=atomic_number,
+        mass=atomic_masses[atomic_number],
+    )
+
+
+def case_data_2(cls, id, charge):
+    return CaseData(
+        atom=cls(id, charge),
+        id=id,
+        charge=charge,
+        atomic_number=atomic_numbers[cls],
+        mass=atomic_masses[atomic_numbers[cls]],
+    )
+
+
+@pytest.fixture(
+    params=(
+        lazy_fixture('case_data_1'),
+        lazy_fixture('case_data_2'),
+    )
+)
+def case_data(request):
     return request.param
 
 
