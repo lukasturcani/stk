@@ -2,7 +2,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 import stk
 
-from .utilities import atomic_numbers, atomic_masses
+from .utilities import atomic_numbers
 from .case_data import CaseData
 
 
@@ -52,7 +52,6 @@ def case_data_1(atomic_number, id, charge):
         id=id,
         charge=charge,
         atomic_number=atomic_number,
-        mass=atomic_masses[atomic_number],
     )
 
 
@@ -68,7 +67,6 @@ def case_data_2(cls, id, charge):
         id=id,
         charge=charge,
         atomic_number=atomic_numbers[cls],
-        mass=atomic_masses[atomic_numbers[cls]],
     )
 
 
@@ -93,7 +91,7 @@ def atom(cls):
 
 
 @pytest.fixture(
-    params=[0, 10],
+    params=[0],
 )
 def id(request):
     """
@@ -105,7 +103,7 @@ def id(request):
 
 
 @pytest.fixture(
-    params=[0, 10, -1],
+    params=[0],
 )
 def charge(request):
     """

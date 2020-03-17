@@ -160,19 +160,6 @@ class Atom:
 
         return self._charge
 
-    def get_mass(self):
-        """
-        Get the mass of the atom.
-
-        Returns
-        -------
-        :class:`float`
-            The mass.
-
-        """
-
-        return self._mass
-
     def __repr__(self):
         charge = (
             f', charge={self._charge}' if self._charge != 0 else ''

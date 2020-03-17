@@ -18,8 +18,3 @@ atomic_numbers = {
         atomic_number
     for atomic_number in range(1, 119)
 }
-
-atomic_masses = {
-    atomic_number: _periodic_table.GetAtomicWeight(atomic_number)
-    for atomic_number in range(1, 119)
-}
