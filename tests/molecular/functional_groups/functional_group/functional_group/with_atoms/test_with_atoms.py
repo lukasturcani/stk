@@ -1,59 +1,57 @@
-import pytest
 import itertools as it
-import stk
 
 from ..utilities import is_clone_functional_group
 
 
-def get_atom_map_0(functional_group):
+def test_with_atoms(functional_group, get_atom_map):
     """
-    Get an atom_map with a single atom.
-
-    """
-
-    # Make sure new_id is always valid, by making 1 larger than the
-    # biggest on in the functional group. This prevents two atoms in
-    # the functional group from having the same id.
-    new_id = max(functional_group.get_atom_ids()) + 1
-    atoms = (stk.Li(new_id), )
-    return dict(zip(functional_group.get_atom_ids(), atoms))
-
-
-@pytest.fixture(
-    params=[
-        lambda functional_group: {},
-        get_atom_map_0,
-    ],
-)
-def get_atom_map(request):
-    """
-    Return a valid `atom_map` parameter for a functional group.
+    Test :meth:`.FunctionalGroup.with_atoms`.
 
     Parameters
     ----------
     functional_group : :class:`.FunctionalGroup`
-        A functional group being cloned, for which a valid
-        `atom_map` parameter needs to created.
+        The functional group to test.
+
+    get_atom_map : :class:`callable`
+        Takes a single parameter, `functional_group`, and returns a
+        valid `atom_map` parameter for its
+        :meth:`.FunctionalGroup.with_atoms` method. This allows the
+        testing of different values of this parameter.
 
     Returns
     -------
-    :class:`dict`
-        A valid `atom_map` parameter for calling
-        :meth:`~.FunctionalGroup.with_atoms` on `functional_group`.
+    None : :class:`NoneType`
 
     """
 
-    return request.param
-
-
-def test_with_atoms(functional_group, get_atom_map):
+    # Save a clone to ensure that "functional_group" is not changed by
+    # the test.
     before = functional_group.clone()
     _test_with_atoms(functional_group, get_atom_map)
-    # Test immutability.
     is_clone_functional_group(before, functional_group)
 
 
 def _test_with_atoms(functional_group, get_atom_map):
+    """
+    Test :meth:`.FunctionalGroup.with_atoms`.
+
+    Parameters
+    ----------
+    functional_group : :class:`.FunctionalGroup`
+        The functional group to test.
+
+    get_atom_map : :class:`callable`
+        Takes a single parameter, `functional_group`, and returns a
+        valid `atom_map` parameter for its
+        :meth:`.FunctionalGroup.with_atoms` method. This allows the
+        testing of different values of this parameter.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     atom_map = get_atom_map(functional_group)
     clone = functional_group.with_atoms(atom_map)
 
