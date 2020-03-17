@@ -7,6 +7,11 @@ from ..case_data import CaseData
 
 @pytest.fixture
 def functional_group2(functional_group1):
+    """
+    A :class:`.GenericFunctionalGroup` with 1 bonder atom.
+
+    """
+
     return functional_group1
 
 
@@ -17,6 +22,11 @@ def one_one_reaction(
     bond_order,
     periodicity,
 ):
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
     return CaseData(
         reaction=stk.OneOneReaction(
             functional_group1=functional_group1,

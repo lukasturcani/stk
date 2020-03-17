@@ -12,6 +12,11 @@ def one_two_reaction(
     bond_order,
     periodicity,
 ):
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
     return CaseData(
         reaction=stk.OneTwoReaction(
             functional_group1=functional_group1,

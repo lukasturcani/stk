@@ -6,13 +6,13 @@ from .utilities import is_equivalent_atom
 
 def test_get_new_atoms(case_data):
     """
-    Test correct atoms were added by a :class:`.Reaction`.
+    Test that correct atoms are added by a :class:`.Reaction`.
 
     Parameters
     ----------
     case_data : :class:`.CaseData`
-        A test case. Includes the reaction to be tested the atoms,
-        which should have been added.
+        A test case. Includes the reaction to be tested and the atoms,
+        which should be added.
 
     Returns
     -------

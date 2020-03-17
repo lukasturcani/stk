@@ -11,6 +11,11 @@ from ..case_data import CaseData
 
 @pytest.fixture
 def functional_group2_2(functional_group2):
+    """
+    A :class:`.GenericFunctionalGroup` instance with 2 bonder atoms.
+
+    """
+
     return functional_group2
 
 
@@ -21,6 +26,11 @@ def two_two_reaction(
     bond_order,
     periodicity,
 ):
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
     return CaseData(
         reaction=stk.TwoTwoReaction(
             construction_state=get_construction_state(
