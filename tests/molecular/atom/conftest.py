@@ -77,6 +77,11 @@ def case_data_2(cls, id, charge):
     )
 )
 def case_data(request):
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
     return request.param
 
 
@@ -116,4 +121,9 @@ def charge(request):
 
 @pytest.fixture(params=tuple(range(1, 118)))
 def atomic_number(request):
+    """
+    An atomic number.
+
+    """
+
     return request.param

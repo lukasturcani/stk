@@ -2,6 +2,23 @@ from .utilities import is_equivalent_atom
 
 
 def test_with_id(atom, id):
+    """
+    Test :meth:`.Atom.with_id`.
+
+    Parameters
+    ----------
+    atom : :class:`.Atom`
+        The atom to test.
+
+    id : :class:`int`
+        The correct id of the clone.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     # Test immutability.
     before = atom.clone()
     _test_with_id(atom, id)
@@ -9,6 +26,23 @@ def test_with_id(atom, id):
 
 
 def _test_with_id(atom, id):
+    """
+    Test :meth:`.Atom.with_id`.
+
+    Parameters
+    ----------
+    atom : :class:`.Atom`
+        The atom to test.
+
+    id : :class:`int`
+        The correct id of the clone.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     other = atom.with_id(id)
     assert other is not atom
     assert other.__class__ is atom.__class__
