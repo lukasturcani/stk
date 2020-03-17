@@ -2,6 +2,21 @@ import itertools as it
 
 
 def test_get_reaction(case_data):
+    """
+    Test :class:`.ReactionFactory.get_reaction`.
+
+    Parameters
+    ----------
+    case_data : :class:`.CaseData`
+        The test case. Holds the factory, and the expected reaction
+        result.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     _test_get_reaction(
         factory=case_data.factory,
         construction_state=case_data.construction_state,
@@ -16,6 +31,26 @@ def _test_get_reaction(
     edge_group,
     reaction_result,
 ):
+    """
+    Test :class:`.ReactionFactory.get_reaction`.
+
+    Parameters
+    ----------
+    factory : :class:`.ReactionFactory`
+        The factory to test.
+
+    construction_state : :class:`.ConstructionState`
+        The construction state to pass to the factory.
+
+    edge_group : :class:`.EdgeGroup`
+        The edge group to pass to the factory.
+
+    reaction_result : :class:`.ReactionResult`
+        The expected result of the reaction returned by
+        `factory`.
+
+    """
+
     reaction = factory.get_reaction(
         construction_state=construction_state,
         edge_group=edge_group,
