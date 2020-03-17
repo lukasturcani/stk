@@ -15,4 +15,3 @@ def _test_with_id(atom, id):
     assert other.get_id() == id
     assert other.get_charge() == atom.get_charge()
     assert other.get_atomic_number() == atom.get_atomic_number()
-    assert other.get_mass() == atom.get_mass()
