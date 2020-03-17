@@ -42,8 +42,8 @@ def _test_get_functional_groups(factory, molecule, functional_groups):
     molecule : :class:`.Molecule`
         The molecule to test.
 
-    functional_groups : :class:`tuple` of :class:`.FunctionalGroup`
-        The correct functional groups.
+    functional_groups : :class:`tuple`
+        The correct :class:`.GenericFunctionalGroup` instances.
 
     Returns
     -------
