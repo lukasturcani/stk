@@ -1,6 +1,6 @@
 import itertools as it
 
-from ..utilities import is_clone_generic_functional_group
+from ...utilities import is_clone_generic_functional_group
 
 
 def test_with_atoms(generic_functional_group, get_atom_map):

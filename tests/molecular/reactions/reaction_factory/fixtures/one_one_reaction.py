@@ -3,7 +3,7 @@ import itertools as it
 import stk
 from stk.molecular.reactions.reactions.reaction import ReactionResult
 
-from .case_data import CaseData
+from ..case_data import CaseData
 from .utilities import MockConstructionState, MockEdge
 
 
