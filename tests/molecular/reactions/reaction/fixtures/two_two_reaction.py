@@ -6,7 +6,7 @@ from stk.molecular.topology_graphs.topology_graph import (
     ConstructionState,
 )
 
-from .case_data import CaseData
+from ..case_data import CaseData
 
 
 @pytest.fixture

@@ -137,6 +137,11 @@ from .fixtures import *  # noqa
     ),
 )
 def functional_group1(request):
+    """
+    A :class:`.FunctionalGroup` instance.
+
+    """
+
     return request.param
 
 
@@ -186,6 +191,11 @@ def functional_group1(request):
     ),
 )
 def functional_group2(request):
+    """
+    A :class:`.FunctionalGroup` instance.
+
+    """
+
     return request.param
 
 
@@ -197,6 +207,11 @@ def functional_group2(request):
     ),
 )
 def case_data(request):
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
     return request.param
 
 
@@ -204,6 +219,11 @@ def case_data(request):
     params=(1, 3),
 )
 def bond_order(request):
+    """
+    The bond order of a bond made by a reaction.
+
+    """
+
     return request.param
 
 
@@ -214,4 +234,9 @@ def bond_order(request):
     ),
 )
 def periodicity(request):
+    """
+    The periodicity of a bond made by a reaction.
+
+    """
+
     return request.param
