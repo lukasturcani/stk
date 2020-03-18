@@ -223,15 +223,28 @@ def case_data(request):
     """
     A :class:`.CaseData` instance.
 
+    Notes
+    -----
+    This fixture either needs to load a saved position matrix for each
+    test case, or it needs to save the position matrix of the molecule
+    in the test case.
+
+    The purpose of loading a saved position matrix, is to ensure that
+    the geometry of the molecule being tested has not changed
+    unexpectedly.
+
+    If the position matrix held in a file needs to be updated, the file
+    holding the position matrix simply needs to be deleted. When the
+    file is missing, this fixture will save the current geometry of a
+    molecule into the file.
+
     """
 
-    p = re.compile(r'\[(.*)\]')
-    name = p.search(request.node.name).group(1).split('-')[-1]
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'fixtures',
         'position_matrices',
-        f'{name}.npy',
+        f'{_get_filename(request)}.npy',
     )
 
     if not os.path.exists(path):
@@ -242,3 +255,27 @@ def case_data(request):
         )
 
     return request.param.with_position_matrix(path)
+
+
+def _get_filename(request):
+    """
+    Get the filename for a position matrix of a molecule.
+
+    Parameters
+    ----------
+    request : :class:`pytest.Request`
+        The :mod:`pytest` request holding the test information.
+
+    Returns
+    -------
+    :class:`str`
+        The filename for the position matrix.
+
+    """
+
+    # "request.node.name" has a value of the form
+    # test_something[param1-param2-param3].
+    # Therefore, return the last "param" value, because that is the
+    # name of the molecule + a unique id.
+    p = re.compile(r'\[(.*)\]')
+    return p.search(request.node.name).group(1).split('-')[-1]
