@@ -1,4 +1,5 @@
 import pytest
+import os
 from pytest_lazyfixture import lazy_fixture
 import stk
 import numpy as np
@@ -206,6 +207,9 @@ def building_block(request):
     return request.param
 
 
+_name_counts = {}
+
+
 @pytest.fixture(
     params=(
         lazy_fixture('building_block'),
@@ -217,7 +221,17 @@ def building_block(request):
         lazy_fixture('rotaxane'),
     ),
 )
-def case_data(tmp_path, request):
-    return request.param.with_position_matrix(
-        path=tmp_path / 'position_matrix.dump',
+def case_data(request):
+    name = request.param.molecule.__class__.__qualname___
+    count = _name_counts.get(name, 0)
+    _name_counts[name] = count + 1
+    path = os.path.join(
+        'fixtures',
+        'position_matrices',
+        name,
+        f'_{count}.dump',
     )
+    if not os.path.exists(path):
+        request.param.molecule.get_position_matrix().dump(path)
+
+    return request.param.with_position_matrix(path)
