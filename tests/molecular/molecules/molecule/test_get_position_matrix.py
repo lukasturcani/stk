@@ -17,7 +17,8 @@ def test_get_position_matrix(case_data):
 
     """
 
-    assert np.all(np.equal(
-        case_data.position_matrix,
-        case_data.molecule.get_position_matrix(),
+    assert np.allclose(
+        a=case_data.position_matrix,
+        b=case_data.molecule.get_position_matrix(),
+        atol=1e-13,
     ))
