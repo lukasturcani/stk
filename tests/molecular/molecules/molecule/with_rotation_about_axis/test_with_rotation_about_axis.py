@@ -1,30 +1,34 @@
 import numpy as np
 import stk
-import pytest
-
-
-@pytest.fixture(
-    params=[
-        -np.pi/2,
-        np.pi/2,
-    ],
-)
-def angle(request):
-    return request.param
-
-
-@pytest.fixture(
-    params=[
-        np.array([0, 1, 0]),
-        np.array([1, 0, 0]),
-        np.array([1/np.sqrt(3), 1/np.sqrt(3), 1/np.sqrt(3)])
-    ],
-)
-def axis(request):
-    return np.array(request.param)
 
 
 def test_with_rotation_about_axis(molecule, angle, axis, get_origin):
+    """
+    Test :meth:`.Moleucle.with_rotation_about_axis`.
+
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule to test.
+
+    angle : :class:`float`
+        The angle of the rotation.
+
+    axis : :class:`numpy.ndarray`
+        The axis on which the rotation happens.
+
+    get_origin : :class:`callable`
+        Takes a single parameter, `molecule`, and returns a valid
+        `origin` parameter for this test. Using a :class:`callable`
+        allows the origin for the test to be set to molecule-specific
+        values, such as the centroid of the molecule being tested.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     origin = get_origin(molecule)
     original = rotational_space_positions(molecule, axis, origin)
     new = molecule.with_rotation_about_axis(angle, axis, origin)
