@@ -1,10 +1,4 @@
 import numpy as np
-import pytest
-
-
-@pytest.fixture
-def displacement(origin):
-    return origin
 
 
 def test_with_displacement(molecule, displacement):
