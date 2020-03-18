@@ -57,8 +57,6 @@ def test_get_plane_normal(position_matrix, atom_ids, normal):
 
     """
 
-    assert np.allclose(
-        a=get_plane_normal(position_matrix, atom_ids),
-        b=normal,
-        atol=1e-32,
-    )
+    result = get_plane_normal(position_matrix, atom_ids)
+    # The normal may be parallel or anti-parallel.
+    assert abs(abs(result @ normal) - 1) < 1e-32

@@ -1,6 +1,7 @@
 import numpy as np
 
 from ...utilities import get_num_atom_ids, normalize_ids
+from ..utilities import get_direction
 from .utilities import get_plane_normal
 
 
@@ -94,37 +95,9 @@ def _test_get_plane_normal(molecule, get_atom_ids, normal):
     elif num_atom_ids == 2:
         # Any perpendicular vector is valid in this case.
         result = molecule.get_plane_normal(get_atom_ids(molecule))
-        assert result @ get_direction(molecule, 0, 1) < 1e-13
+        assert result @ get_direction(molecule, (0, 1)) < 1e-13
         return
 
-    position_matrix = get_position_matrix(
-        molecule=molecule,
-        atom_ids=get_atom_ids(molecule),
-        normal=normal,
-    )
-    molecule = molecule.with_position_matrix(position_matrix)
     result = molecule.get_plane_normal(get_atom_ids(molecule))
     # The normal may be parallel or anti-parallel.
     assert abs(abs(result @ normal) - 1) < 1e-13
-
-
-def get_position_matrix(molecule, atom_ids, normal):
-    if atom_ids is None:
-        atom_ids = range(molecule.get_num_atoms())
-    elif not isinstance(atom_ids, (list, tuple)):
-        atom_ids = tuple(atom_ids)
-
-    position_matrix = molecule.get_position_matrix()
-    for atom_id in atom_ids:
-        remove_component(position_matrix, atom_id, normal)
-    return position_matrix
-
-
-def remove_component(position_matrix, atom_id, normal):
-    component_magnitude = position_matrix[atom_id] @ normal
-    position_matrix[atom_id, :] -= component_magnitude * normal
-
-
-def get_direction(molecule, atom1, atom2):
-    position_matrix = molecule.get_position_matrix()
-    return position_matrix[atom1] - position_matrix[atom2]

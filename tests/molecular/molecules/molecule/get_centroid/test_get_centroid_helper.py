@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from .utilities import get_centroid
+from ..utilities import get_centroid
 
 
 @pytest.mark.parametrize(

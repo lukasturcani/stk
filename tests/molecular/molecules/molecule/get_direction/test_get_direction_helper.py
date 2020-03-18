@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from .utilities import get_direction
+from ..utilities import get_direction
 
 
 @pytest.mark.parametrize(
@@ -38,7 +38,7 @@ from .utilities import get_direction
 )
 def test_get_direction(position_matrix, atom_ids, direction):
     """
-    Test the :func:`.get_direction` function, defined in this module.
+    Test the :func:`.get_direction`.
 
     """
 

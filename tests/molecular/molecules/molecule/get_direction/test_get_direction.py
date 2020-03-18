@@ -1,7 +1,7 @@
 import numpy as np
 
+from ..utilities import get_direction
 from ...utilities import get_num_atom_ids, normalize_ids
-from .utilities import get_direction
 
 
 def test_get_direction(case_data, get_atom_ids):
