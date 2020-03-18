@@ -217,5 +217,7 @@ def building_block(request):
         lazy_fixture('rotaxane'),
     ),
 )
-def case_data(request):
-    return request.param
+def case_data(tmp_path, request):
+    return request.param.with_position_matrix(
+        path=tmp_path / 'position_matrix.dump',
+    )
