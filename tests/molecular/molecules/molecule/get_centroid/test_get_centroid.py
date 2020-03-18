@@ -46,10 +46,10 @@ def test_get_centroid(case_data, get_atom_ids):
         molecule=case_data.molecule,
         centroid=get_centroid(
             position_matrix=case_data.position_matrix,
-            atom_ids=normalize_ids(
+            atom_ids=tuple(normalize_ids(
                 molecule=case_data.molecule,
                 ids=get_atom_ids(case_data.molecule),
-            ),
+            )),
         ),
         get_atom_ids=get_atom_ids,
     )
