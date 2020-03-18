@@ -6,7 +6,7 @@ from ..utilities import get_direction
 
 @pytest.mark.parametrize(
     argnames=('position_matrix', 'atom_ids', 'direction'),
-    arvalues=(
+    argvalues=(
         (
             np.array([
                 [1., 0., 0.],

@@ -1,6 +1,6 @@
 import itertools as it
 
-from ..utilities import is_equivalent_atom, normalize_ids
+from ....utilities import is_equivalent_atom, normalize_ids
 
 
 def test_get_atoms(case_data, get_atom_ids):

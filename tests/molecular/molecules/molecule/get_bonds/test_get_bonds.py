@@ -1,6 +1,6 @@
 import itertools as it
 
-from ..utilities import is_equivalent_bond
+from ...utilities import is_equivalent_bond
 
 
 def test_get_bonds(case_data):
