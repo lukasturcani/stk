@@ -63,8 +63,4 @@ def _test_get_atomic_positions(
         normalize_ids(molecule, get_atom_ids(molecule)),
         molecule.get_atomic_positions(get_atom_ids(molecule)),
     ):
-        assert np.allclose(
-            a=position,
-            b=position_matrix[atom_id],
-            atol=1e-32,
-        )
+        assert np.all(np.equal(position, position_matrix[atom_id]))
