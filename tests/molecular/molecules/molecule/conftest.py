@@ -227,11 +227,12 @@ _counter = _Counter()
     ),
 )
 def case_data(request):
+    name = request.node.__name__
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'fixtures',
         'position_matrices',
-        f'{_counter.count}.npy',
+        f'{name}.npy',
     )
     _counter.count += 1
 
