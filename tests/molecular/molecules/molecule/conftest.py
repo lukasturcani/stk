@@ -276,6 +276,7 @@ def _get_filename(request):
     # "request.node.name" has a value of the form
     # test_something[param1-param2-param3].
     # Therefore, return the last "param" value, because that is the
-    # name of the molecule + a unique id.
+    # name of the fixture from which the molecule originates + a unique
+    # id.
     p = re.compile(r'\[(.*)\]')
     return p.search(request.node.name).group(1).split('-')[-1]
